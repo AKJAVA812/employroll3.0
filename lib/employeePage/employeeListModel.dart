@@ -1,0 +1,67 @@
+class EmployeeListModel {
+  List<Data>? data;
+
+  EmployeeListModel({this.data});
+
+  EmployeeListModel.fromJson(Map<String, dynamic> json) {
+    if (json['data'] != null) {
+      data = <Data>[];
+      json['data'].forEach((v) {
+        data!.add(new Data.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Data {
+  var empId;
+  String? empContactNo;
+  String? empName;
+  int? empdetailsId;
+  String? empEmail;
+  String? devicestatus;
+  String? empDept;
+  String? empPhoto;
+
+  Data(
+      {this.empId,
+        this.empContactNo,
+        this.empName,
+        this.empdetailsId,
+        this.empEmail,
+        this.devicestatus,
+        this.empDept,
+        this.empPhoto});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    empId = json['empId'];
+    empContactNo = json['empContactNo'];
+    empName = json['empName'];
+    empdetailsId = json['empdetailsId'];
+    empEmail = json['empEmail'];
+    devicestatus = json['devicestatus'];
+    empDept = json['empDept'];
+    empPhoto = json['empPhoto'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['empId'] = this.empId;
+    data['empContactNo'] = this.empContactNo;
+    data['empName'] = this.empName;
+    data['empdetailsId'] = this.empdetailsId;
+    data['empEmail'] = this.empEmail;
+    data['devicestatus'] = this.devicestatus;
+    data['empDept'] = this.empDept;
+    data['empPhoto'] = this.empPhoto;
+    return data;
+  }
+}
