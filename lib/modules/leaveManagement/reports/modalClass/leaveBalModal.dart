@@ -54,11 +54,11 @@ class LeaveData {
 }
 
 class CL607 {
-  double? lwp;
-  double? leavesTaken;
-  double? totalLeavesPending;
-  double? currentYearLeaves;
-  double? lastYearLeaves;
+  dynamic lwp;
+  dynamic leavesTaken;
+  dynamic totalLeavesPending;
+  dynamic currentYearLeaves;
+  dynamic lastYearLeaves;
 
   CL607(
       {this.lwp,

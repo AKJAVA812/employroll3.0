@@ -276,12 +276,20 @@ class _MSSDashboardState extends State<MSSDashboard> {
   int pageIndex = 0;
   int currentIndex = 3;
   var titleName = "Dashboard";
+  void _handleOption1(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Option 1 Selected')));
+  }
+
+  void _handleOption2(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Option 2 Selected')));
+  }
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData queryData;
     //queryData = MediaQuery.of(context).size.width/2;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      /*floatingActionButton: FloatingActionButton(
         onPressed: () async {
           date = (await showDatePicker(
               context: context,
@@ -303,9 +311,75 @@ class _MSSDashboardState extends State<MSSDashboard> {
         },
         backgroundColor: Mythemes.lightBluishColor,
         child: singleDay.toString().text.color(Mythemes.whitish).make(),
+      ),*/
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            isScrollControlled: true,
+            builder: (context) => FilterBottomSheet(),
+          );
+        },
+        child: Icon(Icons.filter_list),
       ),
       appBar: AppBar(
-        title: titleName.text.make(),
+        title: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '$titleName - ',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Mythemes.successColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'HR Manager - 1005',
+                    style: TextStyle(
+                      color: Mythemes.whitish,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert),
+            onSelected: (String value) {
+              if (value == 'HR Manager - 1005') {
+                _handleOption1(context);
+              } else if (value == 'Reporting Manager - 1005') {
+                _handleOption2(context);
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'HR Manager - 1005',
+                child: Text('HR Manager - 1005'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Reporting Manager - 1005',
+                child: Text('Reporting Manager - 1005'),
+              ),
+            ],
+          ),
+        ],
       ),
       body: dashboardModelGlobal == null
           ? loader()
@@ -1831,6 +1905,119 @@ class _MSSDashboardState extends State<MSSDashboard> {
               ),
             ]),
           )
+        ],
+      ),
+    );
+  }
+}
+
+class FilterBottomSheet extends StatefulWidget {
+  @override
+  _FilterBottomSheetState createState() => _FilterBottomSheetState();
+}
+
+class _FilterBottomSheetState extends State<FilterBottomSheet> {
+  String? selectedOrg;
+  DateTime? selectedDate;
+  String? selectedDateFormatted;
+  final List<String> organizations = ['Org A', 'Org B', 'Org C'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.4, // Increased height
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+          Text(
+            'Filter',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16),
+
+          /// Organization Dropdown
+          DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: 'Select Organization',
+              border: OutlineInputBorder(),
+            ),
+            value: selectedOrg,
+            items: organizations.map((org) {
+              return DropdownMenuItem(
+                value: org,
+                child: Text(org),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedOrg = value;
+              });
+            },
+          ),
+          SizedBox(height: 8),
+
+          /// Date Picker Field
+          GestureDetector(
+            onTap: () async {
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: selectedDate ?? DateTime.now(),
+                firstDate: DateTime(1947),
+                lastDate: DateTime.now(),
+              );
+              if (pickedDate != null) {
+                setState(() {
+                  selectedDate = pickedDate;
+                  selectedDateFormatted = DateFormat('dd-MM-yyyy').format(pickedDate);
+                });
+              }
+            },
+            child: AbsorbPointer(
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Select Date',
+                  hintText: 'dd-mm-yyyy',
+                  border: OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                controller: TextEditingController(
+                  text: selectedDateFormatted ?? '',
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 24),
+
+          /// Filter Button
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                print("Selected Org: $selectedOrg");
+                print("Selected Date: $selectedDateFormatted");
+              },
+              icon: Icon(Icons.filter_alt),
+              label: Text("Apply Filter"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Mythemes.successColor,
+              ),
+            ),
+          ),
         ],
       ),
     );
