@@ -76,6 +76,7 @@ class SessionManager {
     final String? userType = prefs.getString('userType');
     return userType;
   }
+
   setEmpCode(empCode) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -466,5 +467,43 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     final String? exitShow = prefs.getString('exitShow');
     return exitShow;
+  }
+
+  setUserPanel(userPanel) async {
+    // Obtain shared preferences.
+    final prefs = await SharedPreferences.getInstance();
+    // Save an String value to 'action' key.
+    await prefs.setString('userPanel', userPanel);
+  }
+
+  getUserPanel() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? userPanel = prefs.getString('userPanel');
+    return userPanel;
+  }
+
+  setDefaultProfileName(profileNameNew) async {
+    // Obtain shared preferences.
+    final prefs = await SharedPreferences.getInstance();
+    // Save an String value to 'action' key.
+    await prefs.setString('profileNameNew', profileNameNew);
+  }
+
+  getDefaultProfileName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? profileNameNew = prefs.getString('profileNameNew');
+    return profileNameNew;
+  }
+  setDefaultProfileId(profileIdNew) async {
+    // Obtain shared preferences.
+    final prefs = await SharedPreferences.getInstance();
+    // Save an String value to 'action' key.
+    await prefs.setString('profileIdNew', profileIdNew);
+  }
+
+  getDefaultProfileId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? profileIdNew = prefs.getString('profileIdNew');
+    return profileIdNew;
   }
 }

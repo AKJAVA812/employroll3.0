@@ -88,6 +88,10 @@ class _LoginPageState extends State<LoginPage> {
   var attAction;
   var mobileActions;
   var mobileTrackTime;
+
+  var profileName;
+  var profileId;
+  var defaultProfile;
   Future<LoginModel> monthAttendance(String emailId, String password) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.login;
@@ -609,7 +613,10 @@ class _LoginPageState extends State<LoginPage> {
       shared.setIfscCode(loginModelglobal!.data!.ifscCode);
       shared.setEmpId(loginModelglobal!.data!.empId);
       shared.setUserType(loginModelglobal!.data!.userLoginned!.userType);
+
+      shared.setUserPanel(loginModelglobal!.data!.userPanel);
     });
+
 
     shared.setEmpRoll(loginModelglobal!.data!.empRole!.length);
     shared.setMobAction(loginModelglobal!.data!.mobAction!.length);
@@ -642,6 +649,23 @@ class _LoginPageState extends State<LoginPage> {
       print('attActionSet $attAction');
       print('MobActionSet $mobileActions');
       print('MobTrackTime $mobileTrackTime');
+    }
+
+    for(int i=0; i<loginModelglobal!.data!.profileList!.length;i++){
+      profileName = loginModelglobal!.data!.profileList![i].profileName;
+      profileId = loginModelglobal!.data!.profileList![i].profileId;
+      defaultProfile = loginModelglobal!.data!.profileList![i].defaultProfile;
+
+      if (defaultProfile == true || loginModelglobal!.data!.profileList![i].isDefaultProfile == true) {
+        String profileNameNew = '${loginModelglobal!.data!.profileList![i].profileName}';
+        String profileIdNew = '${loginModelglobal!.data!.profileList![i].profileId}';
+        shared.setDefaultProfileName(profileNameNew);
+        shared.setDefaultProfileId(profileIdNew);
+      }
+
+      print('Profile Name $profileName');
+      print('Profile Id $profileId');
+      print('Default Profile $defaultProfile');
     }
     empLength;
     roLength;
@@ -730,6 +754,7 @@ class _LoginPageState extends State<LoginPage> {
       /*for(int i=0; i<loginModelglobal!.data!.userRoles!.length;i++){
         print(loginModelglobal!.data!.userRoles![i]);
       }*/
+
     });
 
 

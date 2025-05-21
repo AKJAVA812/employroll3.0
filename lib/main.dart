@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:er_flutter_project/MSS_Bundle/dashboard/mssDashboard.dart';
 import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
 import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
@@ -44,7 +45,41 @@ import 'package:month_year_picker/month_year_picker.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:workmanager/workmanager.dart';
+/*import 'ESS_Bundle/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
+import 'ESS_Bundle/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';*/
 import 'EZNew/landingPage.dart';
+import 'MSS_Bundle/dashboard/adminDashboard.dart';
+import 'MSS_Bundle/leaveManagement/levelOneLeaveReq.dart';
+import 'MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
+import 'MSS_Bundle/leaveManagement/othersEmpRequisition.dart';
+import 'MSS_Bundle/leaveManagement/pendingRequisitionList.dart';
+import 'MSS_Bundle/reports/RoWorkDoneReportFiltering.dart' as mss;
+import 'MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
+import 'MSS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
+import 'MSS_Bundle/timeAndAttendance/pendingReqListRo.dart';
+import 'MSS_Bundle/travelAndExpense/claimMssItems.dart';
+import 'MSS_MO_Bundle/dashboard/adminDashboard.dart';
+import 'MSS_MO_Bundle/dashboard/mssDashboard.dart';
+import 'MSS_MO_Bundle/leaveManagement/levelOneLeaveReq.dart';
+import 'MSS_MO_Bundle/leaveManagement/levelTwoLeaveReq.dart';
+import 'MSS_MO_Bundle/leaveManagement/othersEmpRequisition.dart';
+import 'MSS_MO_Bundle/leaveManagement/pendingRequisitionList.dart';
+import 'MSS_MO_Bundle/reports/RoWorkDoneReportFiltering.dart';
+import 'MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
+import 'MSS_MO_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
+import 'MSS_MO_Bundle/timeAndAttendance/pendingReqListRo.dart';
+import 'MSS_MO_Bundle/travelAndExpense/claimMssItems.dart';
+import 'UIS_Bundle/dashboard/adminDashboard.dart';
+import 'UIS_Bundle/dashboard/mssDashboard.dart';
+import 'UIS_Bundle/leaveManagement/levelOneLeaveReq.dart';
+import 'UIS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
+import 'UIS_Bundle/leaveManagement/othersEmpRequisition.dart';
+import 'UIS_Bundle/leaveManagement/pendingRequisitionList.dart';
+import 'UIS_Bundle/reports/RoWorkDoneReportFiltering.dart';
+import 'UIS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
+import 'UIS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
+import 'UIS_Bundle/timeAndAttendance/pendingReqListRo.dart';
+import 'UIS_Bundle/travelAndExpense/claimMssItems.dart';
 import 'adminPage/adminDashboard/adminDashboard.dart';
 import 'adminPage/adminDashboard/adminPanelDashboard.dart';
 import 'adminPage/mssDashboard.dart';
@@ -167,7 +202,7 @@ import 'modules/timeAndAttendance/reports/otherEmpRequisitionAttendance.dart';
 import 'modules/timeAndAttendance/reports/pendingRequisition/pendingReqAppDiss.dart';
 import 'modules/timeAndAttendance/reports/pendingRequisition/pendingReqListRo.dart';
 import 'modules/timeAndAttendance/reports/pendingRequisition/selfRequisition.dart';
-import 'modules/timeAndAttendance/reports/workDoneReport/RoWorkDoneReportFiltering.dart';
+import 'modules/timeAndAttendance/reports/workDoneReport/RoWorkDoneReportFiltering.dart' as taa;
 import 'modules/timeAndAttendance/reports/workDoneReport/roWorkDoneReport.dart';
 import 'modules/timeAndAttendance/reports/workDoneReport/workDoneReport.dart';
 import 'modules/timeAndAttendance/reports/workDoneReport/workDoneReportDateSelect.dart';
@@ -605,10 +640,10 @@ class _MyHomePageState extends State<MyHomePage> {
         //MyRoutings.rosterCalendarRoute: (context) => RosterCalendar(),
         MyRoutings.inductionOnboardRoute: (context) => OnboardListView(),
         MyRoutings.addInductionProcessRoute: (context) => AddInductionProcess(),
-        MyRoutings.roWorkDoneFilterRoute: (context) => RoWorkDoneReportFiltering(),
+        MyRoutings.roWorkDoneFilterRoute: (context) => taa.RoWorkDoneReportFiltering(),
         MyRoutings.documentsAddedRoute: (context) => DocumentsAdded(),
         MyRoutings.documentDownloadRoute: (context) => DownloadLetters("0", ""),
-        MyRoutings.roWorkDoneReportRoute: (context) => RoWorkDoneReport(fromDatePickedStringRo, toDatePickedStringRo, filterType, empNewIdRo),
+        MyRoutings.roWorkDoneReportRoute: (context) => RoWorkDoneReport(taa.fromDatePickedStringRo, taa.toDatePickedStringRo, taa.filterType, taa.empNewIdRo),
         MyRoutings.hrDetailsRoute: (context) => HRISDetails(),
         MyRoutings.ocrPageRoute: (context) => OCRPage(),
         MyRoutings.faceRecognitionHome: (context) => FaceRecognitinHome(),
@@ -650,6 +685,70 @@ class _MyHomePageState extends State<MyHomePage> {
         MyRoutings.resetPasswordRoute: (context) => ForgotPasswordResetPage(),
         MyRoutings.preOnboardItemRoute: (context) => PreOnboardingItems(),
         MyRoutings.exitEmpListRoute: (context) => ExitEmployeeListView(),
+
+        //MSS Bundle
+        MyRoutings.mssAttPendingRequestRoRoute: (context) => MSS_Att_PendingRequisitionRo(PendingRequisitionModel()),
+        MyRoutings.mssPendingOdRequisitionRoute: (context) => MSS_PendingOdRequisition(PendingOdReqList()),
+        MyRoutings.mssOthersAttRequestPageRoute: (context) => MSS_OthersAttendanceRequisitionPage(),
+
+        //Leave
+        MyRoutings.mssPendingLeaveRequestRoute: (context) => MSS_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
+        MyRoutings.mssLevelOnePendingReqRoute: (context) => MSS_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
+        MyRoutings.mssLevelTwoPendingReqRoute: (context) => MSS_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+        MyRoutings.mssOtherLeaveReqRoute: (context) => MSS_OthersLeaveReqPage(),
+
+        //Dashboards
+        MyRoutings.mssNewDashboardRoute: (context) => MSSNewDashboard(DashboardModel()),
+        MyRoutings.adminNewDashboardRoute: (context) => AdminNewDashboard(DashboardModel()),
+
+        //Reports
+        MyRoutings.mssWorkDoneReportRoute: (context) => mss.MSS_RoWorkDoneReportFiltering(),
+
+        //Claim
+        MyRoutings.mssClaimItemRoute: (context) => MSS_ClaimMSSItemsList(),
+
+
+        //MSS MO Bundle
+        MyRoutings.mssMoAttPendingRequestRoRoute: (context) => MSS_MO_PendingRequisitionRo(PendingRequisitionModel()),
+        MyRoutings.mssMoPendingOdRequisitionRoute: (context) => MSS_MO_PendingOdRequisition(PendingOdReqList()),
+        MyRoutings.mssMoOthersAttRequestPageRoute: (context) => MSS_MO_OthersAttendanceRequisitionPage(),
+
+        //Leave
+        MyRoutings.mssMoPendingLeaveRequestRoute: (context) => MSS_MO_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
+        MyRoutings.mssMoLevelOnePendingReqRoute: (context) => MSS_MO_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
+        MyRoutings.mssMoLevelTwoPendingReqRoute: (context) => MSS_MO_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+        MyRoutings.mssMoOtherLeaveReqRoute: (context) => MSS_MO_OthersLeaveReqPage(),
+
+        //Dashboards
+        MyRoutings.mssMoNewDashboardRoute: (context) => MSS_MO_Dashboard(DashboardModel()),
+        MyRoutings.adminNewMoDashboardRoute: (context) => Admin_MSS_MO_Dashboard(DashboardModel()),
+
+        //Reports
+        MyRoutings.mssMoWorkDoneReportRoute: (context) => MSS_MO_RoWorkDoneReportFiltering(),
+
+        //Claim
+        MyRoutings.mssMoClaimItemRoute: (context) => MSS_MO_ClaimMSSItemsList(),
+
+        //UIS Bundle
+        MyRoutings.uisAttPendingRequestRoRoute: (context) => UIS_PendingRequisitionRo(PendingRequisitionModel()),
+        MyRoutings.uisPendingOdRequisitionRoute: (context) => UIS_PendingOdRequisition(PendingOdReqList()),
+        MyRoutings.uisOthersAttRequestPageRoute: (context) => UIS_OthersAttendanceRequisitionPage(),
+
+        //Leave
+        MyRoutings.uisPendingLeaveRequestRoute: (context) => UIS_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
+        MyRoutings.uisLevelOnePendingReqRoute: (context) => UIS_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
+        MyRoutings.uisLevelTwoPendingReqRoute: (context) => UIS_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+        MyRoutings.uisOtherLeaveReqRoute: (context) => UIS_OthersLeaveReqPage(),
+
+        //Dashboards
+        MyRoutings.uisNewDashboardRoute: (context) => UIS_Dashboard(DashboardModel()),
+        MyRoutings.adminNewUisDashboardRoute: (context) => Admin_UIS_Dashboard(DashboardModel()),
+
+        //Reports
+        MyRoutings.uisWorkDoneReportRoute: (context) => UIS_RoWorkDoneReportFiltering(),
+
+        //Claim
+        MyRoutings.uisClaimItemRoute: (context) => UIS_ClaimMSSItemsList(),
       },
 
     );

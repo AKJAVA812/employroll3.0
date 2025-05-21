@@ -31,6 +31,7 @@ class Data {
   String? latestVersionCode;
   String? contact;
   List<String>? roRole;
+  String? userPanel;
   String? department;
   var ifscCode;
   List<String>? adminrole;
@@ -39,6 +40,7 @@ class Data {
   var pfNo;
   UserLoginned? userLoginned;
   List<MobAction>? mobAction;
+  List<ProfileList>? profileList;
   String? sessionId;
   var aadharNo;
   String? helpdesk;
@@ -67,6 +69,7 @@ class Data {
         this.contact,
         this.roRole,
         this.department,
+        this.userPanel,
         this.ifscCode,
         this.adminrole,
         this.branchId,
@@ -102,6 +105,7 @@ class Data {
     contact = json['contact'];
     roRole = json['roRole'].cast<String>();
     department = json['department'];
+    userPanel = json['userPanel'];
     ifscCode = json['ifscCode'];
     adminrole = json['adminrole'].cast<String>();
     branchId = json['branchId'];
@@ -114,6 +118,12 @@ class Data {
       mobAction = <MobAction>[];
       json['mobAction'].forEach((v) {
         mobAction!.add(new MobAction.fromJson(v));
+      });
+    }
+    if (json['profileList'] != null) {
+      profileList = <ProfileList>[];
+      json['profileList'].forEach((v) {
+        profileList!.add(new ProfileList.fromJson(v));
       });
     }
     sessionId = json['sessionId'];
@@ -146,6 +156,7 @@ class Data {
     data['contact'] = this.contact;
     data['roRole'] = this.roRole;
     data['department'] = this.department;
+    data['userPanel'] = this.userPanel;
     data['ifscCode'] = this.ifscCode;
     data['adminrole'] = this.adminrole;
     data['branchId'] = this.branchId;
@@ -262,6 +273,42 @@ class MobAction {
     data['mobAction'] = this.mobAction;
     data['attAction'] = this.attAction;
     data['time'] = this.time;
+    return data;
+  }
+}
+
+class ProfileList {
+  dynamic profileName;
+  dynamic roMapId;
+  dynamic defaultProfile;
+  dynamic profileId;
+  dynamic profileCode;
+  dynamic mappedID;
+  dynamic isDefaultProfile;
+  dynamic userId;
+
+  ProfileList({this.profileName, this.roMapId, this.defaultProfile, this.profileId, this.profileCode, this.mappedID, this.isDefaultProfile, this.userId});
+
+ProfileList.fromJson(Map<String, dynamic> json) {
+    profileName = json['profileName'];
+    roMapId = json['roMapId'];
+    defaultProfile = json['defaultProfile'];
+    profileId = json['profileId'];
+    profileCode = json['profileCode'];
+    mappedID = json['mappedID'];
+    isDefaultProfile = json['isDefaultProfile'];
+    userId = json['userId'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['profileName'] = this.profileName;
+    data['defaultProfile'] = this.defaultProfile;
+    data['profileId'] = this.profileId;
+    data['profileCode'] = this.profileCode;
+    data['mappedID'] = this.mappedID;
+    data['isDefaultProfile'] = this.isDefaultProfile;
+    data['userId'] = this.userId;
     return data;
   }
 }

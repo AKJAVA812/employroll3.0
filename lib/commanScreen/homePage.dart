@@ -86,6 +86,8 @@ int? orgnizationID=0;
 late String UserName="Employee Name";
 late String employeeCode="101";
 String? imageStringNew;
+String? defaultProfileName;
+String? defaultProfileId;
 
 SessionManager shared = SessionManager();
 String? clockingType = " ";
@@ -275,6 +277,10 @@ class _HomePageState extends State<HomePage> {
 
     sessionId = await shared!.getSessionId();
     userType = await shared!.getUserType();
+    defaultProfileName = await shared!.getDefaultProfileName();
+    defaultProfileId = await shared!.getDefaultProfileId();
+    print("Default Profile Name - $defaultProfileName");
+    print("Default Profile Id - $defaultProfileId");
     setState(() {
 
     });
@@ -359,8 +365,38 @@ class _HomePageState extends State<HomePage> {
           elevation: 3,
 
           //backgroundColor: Colors.white,
-          title: Text(
-            title,
+          title:
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '$title - ',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Mythemes.successColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$defaultProfileName',
+                      style: TextStyle(
+                        color: Mythemes.whitish,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: <Widget>[
             IconButton(

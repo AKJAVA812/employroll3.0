@@ -233,5 +233,68 @@ class MyRoutings {
   static String resetPasswordRoute= "/resetPasswordRoute";
 
 
+  //MSS Bundle Pages
+  static String mssAttPendingRequestRoRoute= "/mssAttPendingRequestRoRoute";
+  static String mssPendingOdRequisitionRoute= "/mssPendingOdRequisitionRoute";
+  static String mssOthersAttRequestPageRoute= "/mssOthersAttRequestPageRoute";
+
+  //Leave
+  static String mssPendingLeaveRequestRoute= "/mssPendingLeaveRequestRoute";
+  static String mssLevelOnePendingReqRoute= "/mssLevelOnePendingReqRoute";
+  static String mssLevelTwoPendingReqRoute= "/mssLevelTwoPendingReqRoute";
+  static String mssOtherLeaveReqRoute= "/mssOtherLeaveReqRoute";
+
+  //Dashboard
+  static String mssNewDashboardRoute= "/mssNewDashboardRoute";
+  static String adminNewDashboardRoute= "/adminNewDashboardRoute";
+
+  //Reports
+  static String mssWorkDoneReportRoute= "/mssWorkDoneReportRoute";
+
+  //Claims
+  static String mssClaimItemRoute= "/mssClaimItemRoute";
+
+  //MSS MO Bundle Pages
+  static String mssMoAttPendingRequestRoRoute= "/mssMoAttPendingRequestRoRoute";
+  static String mssMoPendingOdRequisitionRoute= "/mssMoPendingOdRequisitionRoute";
+  static String mssMoOthersAttRequestPageRoute= "/mssMoOthersAttRequestPageRoute";
+
+  //Leave
+  static String mssMoPendingLeaveRequestRoute= "/mssMoPendingLeaveRequestRoute";
+  static String mssMoLevelOnePendingReqRoute= "/mssMoLevelOnePendingReqRoute";
+  static String mssMoLevelTwoPendingReqRoute= "/mssMoLevelTwoPendingReqRoute";
+  static String mssMoOtherLeaveReqRoute= "/mssMoOtherLeaveReqRoute";
+
+  //Dashboard
+  static String mssMoNewDashboardRoute= "/mssMoNewDashboardRoute";
+  static String adminNewMoDashboardRoute= "/adminNewMoDashboardRoute";
+
+  //Reports
+  static String mssMoWorkDoneReportRoute= "/mssMoWorkDoneReportRoute";
+
+  //Claims
+  static String mssMoClaimItemRoute= "/mssMoClaimItemRoute";
+
+  //MSS MO Bundle Pages
+  static String uisAttPendingRequestRoRoute= "/uisAttPendingRequestRoRoute";
+  static String uisPendingOdRequisitionRoute= "/uisPendingOdRequisitionRoute";
+  static String uisOthersAttRequestPageRoute= "/uisOthersAttRequestPageRoute";
+
+  //Leave
+  static String uisPendingLeaveRequestRoute= "/uisPendingLeaveRequestRoute";
+  static String uisLevelOnePendingReqRoute= "/uisLevelOnePendingReqRoute";
+  static String uisLevelTwoPendingReqRoute= "/uisLevelTwoPendingReqRoute";
+  static String uisOtherLeaveReqRoute= "/uisOtherLeaveReqRoute";
+
+  //Dashboard
+  static String uisNewDashboardRoute= "/uisNewDashboardRoute";
+  static String adminNewUisDashboardRoute= "/adminNewUisDashboardRoute";
+
+  //Reports
+  static String uisWorkDoneReportRoute= "/uisWorkDoneReportRoute";
+
+  //Claims
+  static String uisClaimItemRoute= "/uisClaimItemRoute";
+
 
 }
