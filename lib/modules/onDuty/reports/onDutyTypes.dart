@@ -40,6 +40,7 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
+  String userPanelPermission = "COMPANY_EMPLOYEE";
 
   @override
   void initState() {
@@ -51,6 +52,8 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
+    userPanelPermission= await shared.getUserPanel();
+    print("User Panel - $userPanelPermission");
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
@@ -102,8 +105,8 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
     List<Widget> generateGridViewItems() {
 
       List<Widget> items = [];
-
-
+      //OD Punch ESS
+      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'odPunch',
@@ -162,8 +165,10 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
             ),
           ),
         );
+      }
 
-      if(showHide) {
+      //My OD Requests ESS
+      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'myRequest',
@@ -228,10 +233,11 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
         );
       }
 
-      if(showRo || showAdmin) {
+      //MSS OD Pending
+      if(userPanelPermission == "MSS") {
         items.add(
           Hero(
-            tag: 'leaveBalance',
+            tag: 'pendingOdReq',
             child: Card(
               color: Mythemes.whitish,
               child: InkWell(
@@ -252,7 +258,125 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
                     });
                   } else {
                     Navigator.pushNamed(
-                        context, MyRoutings.pendingRequisitionListRoute);
+                        context, MyRoutings.mssPendingOdRequisitionRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        CupertinoIcons.doc_plaintext,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending Requisition',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //MSS MO OD Pending
+      if(userPanelPermission == "MSS_MO_ADMIN") {
+        items.add(
+          Hero(
+            tag: 'pendingOdReq',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck =
+                  await InternetConnectionChecker().hasConnection;
+                  if (internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection"
+                            .text
+                            .make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            "Please check your Internet connection."),
+                      ));
+                    });
+                  } else {
+                    Navigator.pushNamed(
+                        context, MyRoutings.mssMoPendingOdRequisitionRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        CupertinoIcons.doc_plaintext,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending Requisition',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //UIS OD Pending
+      if(userPanelPermission == "USER") {
+        items.add(
+          Hero(
+            tag: 'pendingOdReq',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck =
+                  await InternetConnectionChecker().hasConnection;
+                  if (internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection"
+                            .text
+                            .make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            "Please check your Internet connection."),
+                      ));
+                    });
+                  } else {
+                    Navigator.pushNamed(
+                        context, MyRoutings.uisPendingOdRequisitionRoute);
                   }
                 },
                 child: Stack(

@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math';
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +40,9 @@ int? adminRoles;
 bool showHide = false;
 bool showAdmin = false;
 bool showRo = false;
+String? userPanel;
+String? profileName;
+dynamic profileId;
 
 class _ReportPageState extends State<ReportPage> {
   int currentIndex = 0;
@@ -62,6 +67,9 @@ class _ReportPageState extends State<ReportPage> {
     print('Show Payroll: ${setShowPayroll}');
     print('OrgId -  ${orgId}');
     print('OrgName - : ${orgName}');
+    userPanel= await shared.getUserPanel();
+    profileName= await shared.getDefaultProfileName();
+    profileId= await shared.getDefaultProfileId();
     setState(() {
 
     });
@@ -108,6 +116,7 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   var hideWidget = false;
+  int value = 0;
   @override
   Widget build(BuildContext context) {
 
@@ -123,7 +132,7 @@ class _ReportPageState extends State<ReportPage> {
       print("CheckOrg - $orgId");
       List<Widget> items = [];
 
-      if(showHide || showAdmin){
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN"){
         items.add(
           Hero(
             tag: 'myAttendance',
@@ -166,7 +175,7 @@ class _ReportPageState extends State<ReportPage> {
         );
       }
 
-      if(showHide) {
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'leaveBalance',
@@ -272,17 +281,17 @@ class _ReportPageState extends State<ReportPage> {
         );
       }
 
-
-      items.add(
-        Hero(
-          tag: 'workDoneReport',
-          child: Card(
-            color: Mythemes.whitish,
-            child: InkWell(
-              onTap: (){
-                Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
-                //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
-                /*Fluttertoast.showToast(
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+        items.add(
+          Hero(
+            tag: 'workDoneReport',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
+                  //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
+                  /*Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
@@ -291,69 +300,25 @@ class _ReportPageState extends State<ReportPage> {
                     textColor: Colors.white,
                     fontSize: 16.0
                 );*/
-              },
-              child: Stack(
-                children: <Widget>[
-                  Center(
-                    child: Icon(
-                      Icons.work_history,
-                      size: 50,
-                      color: Mythemes.successColor,
-                    ),
-                    /*Image(
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.work_history,
+                        size: 50,
+                        color: Mythemes.successColor,
+                      ),
+                      /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                  ),
-                  Center(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 75, left: 10),
-                      padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                      child: Text(
-                          'Work Done',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                          TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-
-      /*if(showRo  || showAdmin) {
-        items.add(
-          Hero(
-            tag: 'tracking',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: (){
-
-                  Navigator.pushNamed(context, MyRoutings.empListRoute);
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.location_on,
-                        size: 50,
-                        color: Mythemes.lightBluishColor,
-                      ),
-                      *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
                     ),
                     Center(
                       child: Container(
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'Tracking',
+                            'Work Done',
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style:
@@ -367,60 +332,138 @@ class _ReportPageState extends State<ReportPage> {
             ),
           ),
         );
-      }*/
+      }
 
-      /*if(showRo  || showAdmin) {
-        items.add(
-          Hero(
-            tag: 'timelines',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: (){
-
-                  Navigator.pushNamed(context, MyRoutings.empListRoute);
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.view_timeline,
-                        size: 50,
-                        color: Mythemes.alertColor,
-                      ),
-                      *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Timeline',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }*/
 
       return items;
     }
     timeDilation = 0.5;
     return Material(
       child: Scaffold(
-        body: GridView.count(
-          crossAxisCount: 3,
-          children: generateGridViewItems(),
+        body: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Visibility(
+                  visible: userPanel == "MSS",
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedToggleSwitch<int>.size(
+                        height: 30,
+                        current: min(value, 2),
+                        style: ToggleStyle(
+                          backgroundColor: Mythemes.greyishade,
+                          indicatorColor: Mythemes.lightBluishColor,
+                          borderColor: Colors.transparent,
+                          borderRadius: BorderRadius.circular(20.0),
+                          indicatorBorderRadius: BorderRadius.zero,
+                        ),
+                        values: const [0, 1],
+                        iconOpacity: 1.0,
+                        selectedIconScale: 1.0,
+                        indicatorSize: const Size.fromWidth(150),
+                        iconAnimationType: AnimationType.onHover,
+                        styleAnimationType: AnimationType.onHover,
+                        spacing: 2.0,
+                        customSeparatorBuilder: (context, local, global) {
+                          final opacity =
+                          ((global.position - local.position).abs() - 0.5)
+                              .clamp(0.0, 1.0);
+                          return VerticalDivider(
+                              indent: 10.0,
+                              endIndent: 10.0,
+                              color: Colors.white38.withOpacity(opacity));
+                        },
+                        customIconBuilder: (context, local, global) {
+                          final text = const ['ESS', 'MSS'][local.index];
+                          return Center(
+                              child: Text(text,
+                                  style: TextStyle(
+                                      color: Color.lerp(Colors.black, Colors.white,
+                                          local.animationValue))));
+                        },
+                        borderWidth: 0.0,
+                        onChanged: (i) {
+                          setState(() {
+                            value = i;
+                            print(i);
+                          });
+                          if(value == 1) {
+                            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: userPanel == "MSS_MO_ADMIN",
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedToggleSwitch<int>.size(
+                        height: 30,
+                        current: min(value, 2),
+                        style: ToggleStyle(
+                          backgroundColor: Mythemes.greyishade,
+                          indicatorColor: Mythemes.lightBluishColor,
+                          borderColor: Colors.transparent,
+                          borderRadius: BorderRadius.circular(20.0),
+                          indicatorBorderRadius: BorderRadius.zero,
+                        ),
+                        values: const [0, 1],
+                        iconOpacity: 1.0,
+                        selectedIconScale: 1.0,
+                        indicatorSize: const Size.fromWidth(150),
+                        iconAnimationType: AnimationType.onHover,
+                        styleAnimationType: AnimationType.onHover,
+                        spacing: 2.0,
+                        customSeparatorBuilder: (context, local, global) {
+                          final opacity =
+                          ((global.position - local.position).abs() - 0.5)
+                              .clamp(0.0, 1.0);
+                          return VerticalDivider(
+                              indent: 10.0,
+                              endIndent: 10.0,
+                              color: Colors.white38.withOpacity(opacity));
+                        },
+                        customIconBuilder: (context, local, global) {
+                          final text = const ['ESS', 'MSS MO'][local.index];
+                          return Center(
+                              child: Text(text,
+                                  style: TextStyle(
+                                      color: Color.lerp(Colors.black, Colors.white,
+                                          local.animationValue))));
+                        },
+                        borderWidth: 0.0,
+                        onChanged: (i) {
+                          setState(() {
+                            value = i;
+                            print(i);
+
+                          });
+                          if(value == 1) {
+                            //Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ).pLTRB(0, 8, 0, 8),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 3,
+                children: generateGridViewItems(),
+              ),
+            ),
+          ],
         ),
 
 

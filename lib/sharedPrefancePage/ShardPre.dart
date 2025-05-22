@@ -498,12 +498,12 @@ class SessionManager {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
     // Save an String value to 'action' key.
-    await prefs.setString('profileIdNew', profileIdNew);
+    await prefs.setInt('profileIdNew', profileIdNew);
   }
 
   getDefaultProfileId() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? profileIdNew = prefs.getString('profileIdNew');
+    final int? profileIdNew = prefs.getInt('profileIdNew');
     return profileIdNew;
   }
 }

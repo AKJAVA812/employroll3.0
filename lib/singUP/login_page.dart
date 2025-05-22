@@ -90,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
   var mobileTrackTime;
 
   var profileName;
+  var userPanel;
   var profileId;
   var defaultProfile;
   Future<LoginModel> monthAttendance(String emailId, String password) async {
@@ -275,6 +276,8 @@ class _LoginPageState extends State<LoginPage> {
           context, "Your mobile timing is not updated, please change time settings", "Info ");
     }*/
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    print("User Panel - $userPanel");
     levelOne =await shared!.getLevelOne();
     levelTwo =await shared!.getLevelTwo();
     empLength=await shared!.getEmpRoll();
@@ -615,7 +618,10 @@ class _LoginPageState extends State<LoginPage> {
       shared.setUserType(loginModelglobal!.data!.userLoginned!.userType);
 
       shared.setUserPanel(loginModelglobal!.data!.userPanel);
+      userPanel = loginModelglobal!.data!.userPanel;
     });
+
+    print("Check User Panel - $userPanel");
 
 
     shared.setEmpRoll(loginModelglobal!.data!.empRole!.length);
@@ -651,22 +657,47 @@ class _LoginPageState extends State<LoginPage> {
       print('MobTrackTime $mobileTrackTime');
     }
 
-    for(int i=0; i<loginModelglobal!.data!.profileList!.length;i++){
+    /*for(int i=0; i<loginModelglobal!.data!.profileList!.length;i++){
       profileName = loginModelglobal!.data!.profileList![i].profileName;
       profileId = loginModelglobal!.data!.profileList![i].profileId;
       defaultProfile = loginModelglobal!.data!.profileList![i].defaultProfile;
 
       if (defaultProfile == true || loginModelglobal!.data!.profileList![i].isDefaultProfile == true) {
         String profileNameNew = '${loginModelglobal!.data!.profileList![i].profileName}';
-        String profileIdNew = '${loginModelglobal!.data!.profileList![i].profileId}';
-        shared.setDefaultProfileName(profileNameNew);
-        shared.setDefaultProfileId(profileIdNew);
+        dynamic profileIdNew = loginModelglobal!.data!.profileList![i].profileId;
+          shared.setDefaultProfileName(profileNameNew);
+          shared.setDefaultProfileId(profileIdNew);
       }
 
       print('Profile Name $profileName');
       print('Profile Id $profileId');
       print('Default Profile $defaultProfile');
-    }
+    }*/
+    if (userPanel == "COMPANY_EMPLOYEE") {
+      // Clear profile ID and name in SharedPreferences
+       shared.setDefaultProfileName('');
+       shared.setDefaultProfileId(0); // or '' if you're treating it as a String
+    } else {
+      // Loop through profiles and save default one
+      for (int i = 0; i < loginModelglobal!.data!.profileList!.length; i++) {
+        profileName = loginModelglobal!.data!.profileList![i].profileName;
+        profileId = loginModelglobal!.data!.profileList![i].profileId;
+        defaultProfile = loginModelglobal!.data!.profileList![i].defaultProfile;
+
+        if (defaultProfile == true || loginModelglobal!.data!.profileList![i].isDefaultProfile == true) {
+          String profileNameNew = loginModelglobal!.data!.profileList![i].profileName ?? '';
+          dynamic profileIdNew = loginModelglobal!.data!.profileList![i].profileId;
+           shared.setDefaultProfileName(profileNameNew);
+           shared.setDefaultProfileId(profileIdNew);
+        }
+
+        print('Profile Name $profileName');
+        print('Profile Id $profileId');
+        print('Default Profile $defaultProfile');
+      }
+    } setState(() {
+
+    });
     empLength;
     roLength;
     adminlength;

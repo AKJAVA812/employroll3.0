@@ -29,6 +29,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //import 'package:safe_device/safe_device.dart';
 //import 'package:trust_location/trust_location.dart';
@@ -44,6 +45,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import '../adminPage/modelClass/dashboardModel.dart';
+import '../mss_profiles/global_profile.dart';
+import '../mss_profiles/profileListModal.dart';
 import '../reports/reportPage.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -87,7 +90,10 @@ late String UserName="Employee Name";
 late String employeeCode="101";
 String? imageStringNew;
 String? defaultProfileName;
-String? defaultProfileId;
+dynamic defaultProfileId;
+dynamic profileIdGetter;
+dynamic profileNameGetter;
+String? userPanelPermission;
 
 SessionManager shared = SessionManager();
 String? clockingType = " ";
@@ -281,6 +287,7 @@ class _HomePageState extends State<HomePage> {
     defaultProfileId = await shared!.getDefaultProfileId();
     print("Default Profile Name - $defaultProfileName");
     print("Default Profile Id - $defaultProfileId");
+    userPanelPermission = await shared!.getUserPanel();
     setState(() {
 
     });
@@ -363,10 +370,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 3,
-
-          //backgroundColor: Colors.white,
-          title:
-          RichText(
+          title: RichText(
             text: TextSpan(
               children: [
                 TextSpan(
@@ -385,13 +389,22 @@ class _HomePageState extends State<HomePage> {
                       color: Mythemes.successColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      '$defaultProfileName',
-                      style: TextStyle(
-                        color: Mythemes.whitish,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: ValueListenableBuilder<String>(
+                      valueListenable: selectedProfileNameNotifier,
+                      builder: (context, value, _) {
+                        final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
+                            ? "COMPANY_EMPLOYEE"
+                            : value;
+
+                        return Text(
+                          displayText,
+                          style: TextStyle(
+                            color: Mythemes.whitish,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -400,10 +413,11 @@ class _HomePageState extends State<HomePage> {
           ),
           actions: <Widget>[
             IconButton(
-                icon: Icon(Icons.power_settings_new_outlined),
-                onPressed: () {
-                  logoutApp(context);
-                })
+              icon: Icon(Icons.power_settings_new_outlined),
+              onPressed: () {
+                logoutApp(context);
+              },
+            ),
           ],
         ),
         body: screens[currentIndex],
@@ -1744,13 +1758,67 @@ class _DrawerFileState extends State<DrawerFile> {
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
-
+  dynamic selectedProfileId;
+  dynamic selectedProfileName;
   @override
   void initState() {
     getUserRoles();
+    getSharedPreferences();
+    loadSelectedProfile();
     //getUserNameImage();
     super.initState();
   }
+
+
+  Future<void> getSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    selectedProfileId = prefs.getInt('defaultProfileId');
+    selectedProfileName = prefs.getString('defaultProfileName');
+    userPanelPermission = await shared!.getUserPanel();
+    print("Loaded ID: $selectedProfileId, Name: $selectedProfileName");
+
+    getProfileList(sessionId!).then((value) {
+      setState(() {
+        profileListModal = value;
+      });
+    });
+  }
+
+  ProfileListModal? profileListModal;
+  List<ProfileData> profileListGetter = [];
+
+  void loadSelectedProfile() async {
+    selectedProfileId = await shared.getDefaultProfileId();
+    selectedProfileName = await shared.getDefaultProfileName();
+
+    // Optional: update the ValueNotifiers if needed globally
+    selectedProfileIdNotifier.value = selectedProfileId!;
+    selectedProfileNameNotifier.value = selectedProfileName!;
+
+    setState(() {});
+  }
+
+  Future<ProfileListModal> getProfileList(String sessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.profileListApi;
+
+    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission");
+    final response = await http.post(urlapi);
+
+    var mapResponse = json.decode(response.body);
+    profileListModal = ProfileListModal.fromJson(mapResponse);
+
+    // Clear old data
+    profileListGetter.clear();
+    profileListGetter.addAll(profileListModal?.data ?? []);
+
+    // Set default selected profile
+    var defaultProfile = profileListGetter.firstWhere((p) => p.isDefaultProfile == true, orElse: () => profileListGetter.first);
+    selectedProfileId = defaultProfile.profileId;
+
+    return profileListModal!;
+  }
+
 
   getUserRoles() async {
     empRole = await shared.getEmpRoll();
@@ -1791,300 +1859,88 @@ class _DrawerFileState extends State<DrawerFile> {
   Widget build(BuildContext context) {
     //timeDilation = 1.8;
     return Drawer(
-      child: Container(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
+            padding: EdgeInsets.zero,
+            child: UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
-              padding: EdgeInsets.zero,
-              child: UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
-                accountName: Text(name,
-                    style: TextStyle(
-                        color: Mythemes.black, fontWeight: FontWeight.bold)),
-                accountEmail:
-                Text(emailid, style: TextStyle(color: Mythemes.black)),
-                margin: EdgeInsets.zero,
-                /*   decoration: BoxDecoration(
-                  color:Colors.red,
-                ),*/
-                currentAccountPicture: CircleAvatar(
-                  backgroundImage: NetworkImage(profileImage),
-                  backgroundColor: Mythemes.greyish,
-                ),
+              accountName: Text(name, style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.bold)),
+              accountEmail: Text(emailid, style: TextStyle(color: Mythemes.black)),
+              margin: EdgeInsets.zero,
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: NetworkImage(profileImage),
+                backgroundColor: Mythemes.greyish,
               ),
             ),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              "Profiles".text.bold.size(17).make()
+            ],
+          ).p8(),
+          ValueListenableBuilder<int>(
+            valueListenable: selectedProfileIdNotifier,
+            builder: (context, currentSelectedId, _) {
+              return Column(
+                children: profileListGetter.map((profile) {
+                  bool isSelected = currentSelectedId == profile.profileId;
 
-            /*ListTile(
-              leading: Icon(CupertinoIcons.profile_circled),
-              title: Text(
-                "Profile",
-                textScaler: TextScaler.linear(1.2),
-              ),
-              onTap: (){
-                print("profile click");
-                */ /*Fluttertoast.showToast(
-                    msg: "Profile Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );*/ /*
-                Navigator.pushNamed(context, MyRoutings.profileRoute);
-                // Navigator.of(context, rootNavigator: true).pop();
-              },
-            ),*/
-            /*ListTile(
-              leading: Icon(CupertinoIcons.chart_bar_square),
-              title: Text(
-                "Dashboard ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
-                screens[currentIndex];
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => screens[3]),
-                );
-                //Navigator.of(context, rootNavigator: true).pop();
-                //screens[3];
-                //Dashboard();
-                //Navigator.pushNamed(context, MyRoutings.alarmSetRoute);
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => screens[3]));
-                */ /*setState(() {
-                  //Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
-                  //Navigator.of(context, rootNavigator: true).pop();
-                  print( "hollaa $screens[3]");
-                  screens[3];
-                });*/ /*
-                //Navigator.of(context, rootNavigator: true).pop();
-                //currentIndex = 3;
-                */ /*Fluttertoast.showToast(
-                    msg: "Dashboard Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );*/ /*
-              },
-            ),
+                  return ListTile(
+                    title: Text(
+                      profile.profileName ?? '',
+                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                    ),
+                    trailing: isSelected ? Icon(Icons.check, color: Colors.green) : null,
+                    tileColor: isSelected ? Colors.grey.shade200 : null,
+                    onTap: () async {
+                      selectedProfileId = profile.profileId!;
+                      selectedProfileName = profile.profileName!;
 
-            ListTile(
-              leading: Icon(CupertinoIcons.antenna_radiowaves_left_right),
-              title: Text(
-                "Workflow ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: () async {
-                bool internetCheck = await InternetConnectionChecker().hasConnection;
-                if(internetCheck == false) {
-                  setState(() {
-                    AlertDialog(
-                      content: "Please check your internet connection".text.make(),
-                    );
-                    Fluttertoast.showToast(
-                        msg: "Please check your Internet connection",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM_RIGHT,
-                        timeInSecForIosWeb: 4,
-                        backgroundColor: Mythemes.black,
-                        textColor: Colors.white,
-                        fontSize: 17.0
-                    );
-                  });
+                      await shared.setDefaultProfileId(selectedProfileId);
+                      await shared.setDefaultProfileName(selectedProfileName);
 
-                } else {
-                  Navigator.of(context, rootNavigator: true).pop();
-                  Fluttertoast.showToast(
-                      msg: "Workflow Click",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM_RIGHT,
-                      timeInSecForIosWeb: 4,
-                      backgroundColor: Mythemes.black,
-                      textColor: Colors.white,
-                      fontSize: 17.0
+                      selectedProfileIdNotifier.value = selectedProfileId!;
+                      selectedProfileNameNotifier.value = selectedProfileName!;
+
+                      Navigator.pop(context);
+                    },
                   );
-                  //Navigator.pushNamed(context, MyRoutings.cameraPageRoute);
-                }
-              },
-            ),*/
+                }).toList(),
+              );
+            },
+          ),
 
-            Visibility(
-              visible: showHide || showAdmin,
-              child: Hero(
-                tag: 'animatedDrawer',
-                child: ListTile(
-                  leading: Icon(CupertinoIcons.list_bullet_below_rectangle),
-                  title: Text(
-                    "Employee List",
-                    textScaler: TextScaler.linear(1.2),
-                  ),
-                  onTap: () async {
-                    bool internetCheck =
-                    await InternetConnectionChecker().hasConnection;
-                    if (internetCheck == false) {
-                      setState(() {
-                        AlertDialog(
-                          content: "Please check your internet connection"
-                              .text
-                              .make(),
-                        );
-                        Fluttertoast.showToast(
-                            msg: "Please check your Internet connection",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM_RIGHT,
-                            timeInSecForIosWeb: 4,
-                            backgroundColor: Mythemes.black,
-                            textColor: Colors.white,
-                            fontSize: 17.0);
-                      });
-                    } else {
-                      Navigator.pushNamed(context, MyRoutings.empListRoute);
-                    }
-                  },
-                ),
-              ),
-            ),
-            Visibility(
-              visible: false,
-              child: ListTile(
-                leading: Icon(CupertinoIcons.settings_solid),
-                title: Text(
-                  "Settings",
-                  textScaleFactor: 1.2,
-                ),
-                onTap: () async {
-                  bool internetCheck =
-                  await InternetConnectionChecker().hasConnection;
-                  if (internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content:
-                        "Please check your internet connection".text.make(),
-                      );
-                      Fluttertoast.showToast(
-                          msg: "Please check your Internet connection",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM_RIGHT,
-                          timeInSecForIosWeb: 4,
-                          backgroundColor: Mythemes.black,
-                          textColor: Colors.white,
-                          fontSize: 17.0);
-                    });
-                  } else {
-                    Navigator.of(context, rootNavigator: true).pop();
-                    Fluttertoast.showToast(
-                        msg: "Settings Click",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM_RIGHT,
-                        timeInSecForIosWeb: 4,
-                        backgroundColor: Mythemes.black,
-                        textColor: Colors.white,
-                        fontSize: 17.0);
-                  }
-                },
-              ),
-            ),
-            /*ListTile(
-              leading: Icon(CupertinoIcons.folder),
+          /*...profileListGetter.map((profile) {
+            bool isSelected = selectedProfileId == profile.profileId;
+            return ListTile(
               title: Text(
-                "Reports",
-                textScaleFactor: 1.2,
+                profile.profileName ?? '',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
               ),
+              trailing: isSelected ? Icon(Icons.check, color: Colors.green) : null,
+              tileColor: isSelected ? Colors.grey.shade200 : null,
               onTap: () async {
-                bool internetCheck = await InternetConnectionChecker().hasConnection;
-                if(internetCheck == false) {
-                  setState(() {
-                    AlertDialog(
-                      content: "Please check your internet connection".text.make(),
-                    );
-                    Fluttertoast.showToast(
-                        msg: "Please check your Internet connection",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM_RIGHT,
-                        timeInSecForIosWeb: 4,
-                        backgroundColor: Mythemes.black,
-                        textColor: Colors.white,
-                        fontSize: 17.0
-                    );
-                  });
+                setState(() {
+                  selectedProfileId = profile.profileId!;
+                  selectedProfileName = profile.profileName!;
+                });
 
-                } else {
-                  //Navigator.pushNamed(context, MyRoutings.testPdfDownload);
-                  //Navigator.pushNamed(context, MyRoutings.ocrPageRoute);
-                  Navigator.of(context, rootNavigator: true).pop();
-                  Fluttertoast.showToast(
-                      msg: "Reports Click",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM_RIGHT,
-                      timeInSecForIosWeb: 4,
-                      backgroundColor: Mythemes.black,
-                      textColor: Colors.white,
-                      fontSize: 17.0
-                  );
-                }
-              },
-            ),
-            Hero(
-              tag: 'helpdeskItem',
-              child: ListTile(
-                leading: Icon(Icons.support_agent_rounded),
-                title: Text(
-                  "Helpdesk",
-                  textScaleFactor: 1.2,
-                ),
-                onTap: () async {
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
-                  if(internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection".text.make(),
-                      );
-                      Fluttertoast.showToast(
-                          msg: "Please check your Internet connection",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM_RIGHT,
-                          timeInSecForIosWeb: 4,
-                          backgroundColor: Mythemes.black,
-                          textColor: Colors.white,
-                          fontSize: 17.0
-                      );
-                    });
+                await shared.setDefaultProfileId(selectedProfileId);
+                await shared.setDefaultProfileName(selectedProfileName);
 
-                  } else {
-                    Navigator.pushNamed(context, MyRoutings.helpDeskItemsRoute);
-                  }
-                },
-              ),
-            ),*/
-            /*ListTile(
-              leading: Icon(Icons.support_agent_rounded),
-              title: Text(
-                "Helpdesk ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
-                print("I am helpdeksk");
-                Navigator.pushNamed(context, MyRoutings.empListRoute);
-               */ /* Fluttertoast.showToast(
-                    msg: "Helpdesk Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );*/ /*
-                Navigator.of(context, rootNavigator: true).pop();
+                selectedProfileIdNotifier.value = selectedProfileId!;
+                selectedProfileNameNotifier.value = selectedProfileName!;
+
+                Navigator.pop(context); // Close Drawer
               },
-            ),*/
-          ],
-        ),
+            );
+          }).toList(),*/
+        ],
       ),
     );
   }

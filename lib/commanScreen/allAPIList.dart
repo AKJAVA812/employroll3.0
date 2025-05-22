@@ -180,4 +180,7 @@ class ApiDetails{
    static var preOnboardApproveApi = "restful/service/pre/onboard/mobile/details/approve";
    static var preOnboardAadharVerifyApi = "restful/service/pre/onboard/mobile/aadhar/verification";
 
+   //profile list
+   static var profileListApi = "restful/service/get/user/all/mapped/profile/list";
+
 }

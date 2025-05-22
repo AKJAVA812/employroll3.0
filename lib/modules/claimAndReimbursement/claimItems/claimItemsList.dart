@@ -29,7 +29,7 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
-
+  String userPanelPermission = "COMPANY_EMPLOYEE";
   String? claimLevelOne;
   String? claimLevelTwo;
   String? claimLevelThree;
@@ -66,6 +66,9 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
     claimLevelOne = await shared!.getClaimLevelOne();
     claimLevelTwo = await shared!.getClaimLevelTwo();
     claimLevelThree = await shared!.getClaimLevelThree();
+
+    userPanelPermission= await shared.getUserPanel();
+    print("User Panel - $userPanelPermission");
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
@@ -120,7 +123,7 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
       //My Requests
-      if(showHide) {
+      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'raiseClaim',
@@ -175,8 +178,8 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
           ),
         );
       }
-      //Pending Requisition List Ro
-      if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW" || claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW" || claimLevelThree == "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
+      //Pending Requisition List MSS
+      if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW" || claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW" || claimLevelThree == "CLAIM_APPROVAL_LEVEL_THREE_VIEW" || userPanelPermission == "MSS") {
         items.add(
           Hero(
             tag: 'myTeamPendingReq',
@@ -196,7 +199,7 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
                     });
 
                   } else {
-                    Navigator.pushNamed(context, MyRoutings.claimMssItemsRoute);
+                    Navigator.pushNamed(context, MyRoutings.mssClaimItemRoute);
                   }
                 },
                 child: Stack(
@@ -231,7 +234,6 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
           ),
         );
       }
-
 
       return items;
     }
