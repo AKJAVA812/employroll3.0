@@ -39,6 +39,7 @@ class UIS_Dashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanelPermission;
 DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
@@ -87,6 +88,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
       isLoading = true; // Start loading
     });
     sessionId = await shared!.getSessionId();
+    userPanelPermission = await shared!.getUserPanel();
     Future<DashboardModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
@@ -512,58 +514,122 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedToggleSwitch<int>.size(
-                    height: 30,
-                    current: min(value, 2),
-                    style: ToggleStyle(
-                      backgroundColor: Mythemes.greyishade,
-                      indicatorColor: Mythemes.lightBluishColor,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20.0),
-                      indicatorBorderRadius: BorderRadius.zero,
-                    ),
-                    values: const [0, 1],
-                    iconOpacity: 1.0,
-                    selectedIconScale: 1.0,
-                    indicatorSize: const Size.fromWidth(150),
-                    iconAnimationType: AnimationType.onHover,
-                    styleAnimationType: AnimationType.onHover,
-                    spacing: 2.0,
-                    customSeparatorBuilder: (context, local, global) {
-                      final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
-                      return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
-                    },
-                    customIconBuilder: (context, local, global) {
-                      final text = const ['ESS', 'MSS'][local.index];
-                      return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
-                    },
-                    borderWidth: 0.0,
-                    onChanged: (i) {
-                      setState(() {
-                        value = i;
-                        print(i);
+              Visibility(
+                visible: userPanelPermission == "MSS",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 2),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(150),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 2.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['ESS', 'MSS'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
 
-                      });
-                      if(value == 0) {
-                        Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-                      }
-                    },
-                  )
-                ],
-              ).py(4),
+                        });
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                        }
+                        if(value == 0) {
+                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
+              Visibility(
+                visible: userPanelPermission == "MSS_MO_ADMIN",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 2),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(150),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 2.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['ESS', 'MSS MO'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
+
+                        });
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                        }
+                        if(value == 0) {
+                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
               /*Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,

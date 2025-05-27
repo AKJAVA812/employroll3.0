@@ -40,10 +40,11 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 //import '../adminPage/adminDashboard/adminDashboard.dart';
+import '../UIS_Bundle/dashboard/adminDashboard.dart' as mss;
 import '../adminPage/modelClass/dashboardModel.dart';
 import '../ess/EssDashboarrddModel.dart';
 //import '../ess/essDashboard.dart';
-import '../ess/essDashboard.dart';
+import '../ess/essDashboard.dart' as ess;
 import '../main.dart';
 import '../mss_profiles/global_profile.dart';
 import '../mss_profiles/organisationListModal.dart';
@@ -81,7 +82,7 @@ class PunchInOUtActivity extends StatefulWidget {
 Position? position = Position(
     longitude: 0.0,
     latitude: 0.0,
-    timestamp: date,
+    timestamp: ess.date,
     accuracy: 0.0,
     altitude: 0.0,
     altitudeAccuracy: 0.0,
@@ -2210,7 +2211,9 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return EssAdminDashboard(EssDashboarrdModel());
+    return userPanelPermission == "USER" ?
+    mss.Admin_UIS_Dashboard(DashboardModel()) :
+    ess.EssAdminDashboard(EssDashboarrdModel());
   }
 }
 
