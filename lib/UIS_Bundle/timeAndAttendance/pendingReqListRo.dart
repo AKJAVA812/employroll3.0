@@ -38,6 +38,10 @@ List<Data>? foundDataNew=[];
 PendingRequisitionModel? pendingRequisitionLabel;
 PendingRequisitionModel? pendingRequisitionLabeled;
 
+String? userPanel;
+String? getProfileId;
+String? orgId;
+
 class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> with RouteAware{
   final PendingRequisitionModel pendingRequisitionModel;
   _UIS_PendingRequisitionRoState(this.pendingRequisitionModel);
@@ -77,6 +81,8 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingRequisitionModel> getEmployeeList11 = getPendingReqList(sessionId!);
     final loading = Row(
@@ -102,7 +108,11 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
     String apiUrl = ApiDetails.pendingReqListRo;
     print('employeeList11: ${SessionId}');
     PendingRequisitionModel pendingRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "userPermission=$userPanel&"
+        "profileId=$getProfileId&"
+        "orgId=0");
 
     final response = await http.post(urlapi);
 

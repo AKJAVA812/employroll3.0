@@ -29,6 +29,9 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
   bool showAdmin = false;
   bool showRo = false;
   String userPanelPermission = "COMPANY_EMPLOYEE";
+  String pendingAttRequestMOPermission = "0";
+  String pendingAttRequestMSSPermission = "0";
+  String pendingAttRequestUISPermission = "0";
   @override
   void initState() {
     getSharedPrfanceList();
@@ -39,6 +42,10 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
       empRole= await shared.getEmpRoll();
       roRole= await shared.getRoRole();
       userPanelPermission= await shared.getUserPanel();
+      pendingAttRequestMOPermission= (await shared.getPendingAttendanceReqMSSMOPermission())!;
+      pendingAttRequestMSSPermission= (await shared.getPendingAttendanceReqMSSPermission())!;
+      pendingAttRequestUISPermission= (await shared.getPendingAttendanceReqUISPermission())!;
+      print("Pending Attendance Request - $pendingAttRequestMOPermission");
       print("User Panel - $userPanelPermission");
       adminRole= await shared.getAdminRole();
     print('empRole $empRole');
@@ -94,49 +101,6 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
-      //My Requests
-      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
-        items.add(
-          Hero(
-            tag: 'myRequests',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.pendingReqRoute);
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.list_alt,
-                        size: 50,
-                        color: Mythemes.lightBluishColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'My Requests',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
       // Attendance Report
       /*if(showHide || showAdmin) {
         items.add(
@@ -220,7 +184,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
         );
       }*/
       //Pending Requisition List Ro
-      if(userPanelPermission == "MSS") {
+      if(userPanelPermission == "MSS" && pendingAttRequestMSSPermission == "1") {
         items.add(
           Hero(
             tag: 'myTeamPendingReq',
@@ -263,7 +227,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
         );
       }
       //Other Employee Requisition
-      if(userPanelPermission == "MSS") {
+      if(userPanelPermission == "MSS" && pendingAttRequestMSSPermission == "1") {
         items.add(
           Hero(
             tag: 'otherAttendanceReq',
@@ -308,7 +272,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
 
 
       //Pending Requisition List MSS MO
-      if(userPanelPermission == "MSS_MO_ADMIN") {
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingAttRequestMOPermission == "1") {
         items.add(
           Hero(
             tag: 'myTeamPendingReq',
@@ -352,7 +316,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
       }
 
       //Other Employee Requisition MSS MO
-      if(userPanelPermission == "MSS_MO_ADMIN") {
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingAttRequestMOPermission == "1") {
         items.add(
           Hero(
             tag: 'otherAttendanceReq',
@@ -396,7 +360,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
       }
 
       //Pending Requisition List UIS
-      if(userPanelPermission == "USER") {
+      if(userPanelPermission == "USER" && pendingAttRequestUISPermission == "1") {
         items.add(
           Hero(
             tag: 'myTeamPendingReq',
@@ -440,7 +404,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
       }
 
       //Other Employee Requisition UIS
-      if(userPanelPermission == "USER") {
+      if(userPanelPermission == "USER" && pendingAttRequestUISPermission == "1") {
         items.add(
           Hero(
             tag: 'otherAttendanceReq',

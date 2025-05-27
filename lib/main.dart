@@ -95,6 +95,8 @@ import 'commanScreen/ujalaWorkDone2.dart';
 import 'ess/EssDashboarrddModel.dart';
 import 'ess/essDashboard.dart';
 import 'ess/essDashboardNavigate.dart';
+import 'ess/myAllReports.dart';
+import 'ess/myAllRequestsPage.dart';
 import 'faceRecognizationAttendance/FaceRecognitionHome.dart';
 import 'faceRecognizationAttendance/attendancMarkAi.dart';
 import 'faceRecognizationAttendance/empListFaceRegistered.dart';
@@ -749,6 +751,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
         //Claim
         MyRoutings.uisClaimItemRoute: (context) => UIS_ClaimMSSItemsList(),
+
+        //ESS
+        MyRoutings.myAllRequestRoute: (context) => MyAllRequestPage(),
+        MyRoutings.myAllReportsRoute: (context) => MyAllReportsPage(),
       },
 
     );

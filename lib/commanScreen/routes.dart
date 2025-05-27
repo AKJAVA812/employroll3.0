@@ -296,5 +296,9 @@ class MyRoutings {
   //Claims
   static String uisClaimItemRoute= "/uisClaimItemRoute";
 
+  //ESS
+  //My Requests
+  static String myAllRequestRoute= "/myAllRequestRoute";
+  static String myAllReportsRoute= "/myAllReportsRoute";
 
 }

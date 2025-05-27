@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/modules/leaveManagement/reports/modalClass/pendingLeaveRequisitionModal.dart';
 import 'package:er_flutter_project/modules/leaveManagement/reports/pendingRequisition/pendingLeaveApprovalDis.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
@@ -36,20 +37,41 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? foundDataNewMO=[];
 String? levelOne;
 String? levelTwo;
 PendingLeaveRequisitionModal? pendingLeaveReqLabel;
 PendingLeaveRequisitionModal? pendingLeaveReqLabeled;
-
+String? userPanel;
+dynamic getProfileId;
+dynamic matchedOrg;
 class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeaveRequisitionList> with RouteAware{
   final PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
   _MSS_MO_PendingLeaveRequisitionListState(this.pendingLeaveRequisitionModal);
 
+  bool _isFirstBuild = true;
+  bool _isBottomSheetOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // DO NOT use `context` here
+    // Move `getSharedPrfanceList()` to `didChangeDependencies`
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+    if (_isFirstBuild) {
+      _isFirstBuild = false;
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+      // Defer execution until after current build frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        getSharedPrfanceList(); // Safe to call here
+      });
+    }
   }
 
   @override
@@ -60,20 +82,42 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
-    getSharedPrfanceList();
+    // Called when returning to this page
+    getSharedPrfanceList(); // Reload and open filter bottom sheet again
     super.didPopNext();
   }
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    setState(() {
-      getSharedPrfanceList();
-      var listLength;
-      listLength = foundDataNew!.length;
-      print('listLength $listLength');
-    });
+
+  List<Map<String, dynamic>> storedOrgList = [];
+  List<String> organizations = []; // for Dropdown values
+  String? selectedOrg;
+  dynamic getOrgId;
+
+  Future<void> loadOrgListFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? orgListString = prefs.getString("orgList");
+
+    if (orgListString != null) {
+      List<dynamic> decoded = json.decode(orgListString);
+      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+
+      // Populate dropdown list
+      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+
+      // Start with "Select" as default (null value)
+      selectedOrg = null;
+      getOrgId = '';
+
+      setState(() {});
+    }
+  }
+  bool isLoading = false;
+
+  Future getSharedPrfanceList() async {
+    if (!_isBottomSheetOpen) {
+      await Future.delayed(Duration(milliseconds: 100));
+      _showFilterBottomSheet();
+    }
+    loadOrgListFromPrefs();
   }
 
   showNodata(BuildContext buildContext, result,reason) {
@@ -113,7 +157,7 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
         });
   }
 
-  Future getSharedPrfanceList() async {
+  Future getSharedPrfanceLists() async {
     sessionId = await shared!.getSessionId();
     levelOne = await shared!.getLevelOne();
     levelTwo = await shared!.getLevelTwo();
@@ -131,17 +175,17 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
 
     getAppReq11.then((value) {
       setState(() {
-        foundDataNew = allUsernew;
+        foundDataNewMO = allUsernew;
         pendingLeaveReqLabel=value;
         pendingLeaveReqLabeled=pendingLeaveReqLabel;
-        if(foundDataNew != null) {
-          foundDataNew!.length;
-          print("Fetch data $foundDataNew");
+        if(foundDataNewMO != null) {
+          foundDataNewMO!.length;
+          print("Fetch data $foundDataNewMO");
         } else {
           Center(
             child: "There is no data available right now".text.make(),
           );
-          foundDataNew = [];
+          foundDataNewMO = [];
         }
       });
       //print('employeeList00${pendingLeaveReqLabel!.result!.data!.length}');
@@ -204,7 +248,156 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewMO = results;
+    });
+  }
+
+  void _showFilterBottomSheet() {
+    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    _isBottomSheetOpen = true;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true, // <--- Make sure this is true
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            padding: EdgeInsets.all(16),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Filter',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+
+                    /// Organization Dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Organization',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedOrg,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Select'),
+                        ),
+                        ...organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org,
+                            child: Text(org),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedOrg = value;
+
+                          // Match selected org name to get ID
+                          matchedOrg = storedOrgList.firstWhere(
+                                (org) => org['orgName'] == value,
+                            orElse: () => {},
+                          );
+
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print('Org Name: $selectedOrg');
+                          print('Org ID: $getOrgId');
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+                    SizedBox(height: 50),
+
+                    /// Filter Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.of(bottomSheetContext).pop();
+                          await Future.delayed(Duration(milliseconds: 100));
+
+                          // Now perform async logic
+                          setState(() {
+                            pendingLeaveReqLabeled = null;
+                            isLoading = true;
+                          });
+
+                          sessionId = await shared!.getSessionId();
+                          levelOne = await shared!.getLevelOne();
+                          levelTwo = await shared!.getLevelTwo();
+                          print("Level 1 - $levelOne");
+                          print("Level 2 - $levelTwo");
+                          userPanel = await shared!.getUserPanel();
+                          getProfileId = await shared!.getDefaultProfileId();
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print("ORG ID - $getOrgId");
+                          try {
+                            final value = await getPendingLeaveReq(sessionId!);
+
+                            setState(() {
+                              foundDataNewMO = allUsernew;
+                              pendingLeaveReqLabel=value;
+                              pendingLeaveReqLabeled=pendingLeaveReqLabel;
+                              if(foundDataNewMO != null) {
+                                foundDataNewMO!.length;
+                                print("Fetch data $foundDataNewMO");
+                              } else {
+                                Center(
+                                  child: "There is no data available right now".text.make(),
+                                );
+                                foundDataNewMO = [];
+                              }
+                              isLoading = false;
+                            });
+                          } catch (e) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                            print('Error while fetching requisitions: $e');
+                          }
+                        },
+                        icon: Icon(Icons.filter_alt),
+                        label: Text("Apply Filter"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Mythemes.successColor,
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
     });
   }
 
@@ -252,10 +445,17 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
         ),
       ),
 
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showFilterBottomSheet,
+        child: Icon(Icons.filter_list),
+      ),
+
       body: Container(
         color: context.canvasColor,
         child:
-            Column(
+        isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Column(
               children: [
                 Visibility(
                   visible: levelOne == "true",
@@ -323,9 +523,7 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                 ),
 
                 Expanded(child:
-                pendingLeaveReqLabeled == null ?
-                Center(
-                    child: CircularProgressIndicator()):
+                pendingLeaveReqLabeled == null ? Center(child: "Please select Organisation first!".text.bold.center.make()) :
                 getPendingLeaveReqList(pendingLeaveReqLabeled!),
                 )
               ],
@@ -419,11 +617,11 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: foundDataNew!.length,
+        itemCount: foundDataNewMO!.length,
         itemBuilder: (context, itemCount) {
           return InkWell(
               onTap: (){
-                print(foundDataNew!.length);
+                print("List Length - ${foundDataNewMO!.length}");
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => PendingLeaveApproveDisapprove(
                     pendingLeaveRequisitionModal, itemCount)));
                 //Navigator.pushNamed(context, MyRoutings.pendingLeaveAppDisRoute);
@@ -436,13 +634,13 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                       children: [
                         Row(
                           children: [
-                            foundDataNew![itemCount].employeeName.toString().text.make().px8().py4(),
+                            foundDataNewMO![itemCount].employeeName.toString().text.make().px8().py4(),
                             Expanded(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    foundDataNew![itemCount].status.toString().text.make().px8(),
+                                    foundDataNewMO![itemCount].status.toString().text.make().px8(),
                                   ],
                                 )
                             )
@@ -451,12 +649,12 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                         ),
                         Row(
                           children: [
-                            foundDataNew![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
+                            foundDataNewMO![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
                           ],
                         ),
                         Row(
                           children: [
-                            foundDataNew![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
+                            foundDataNewMO![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
                           ],
                         ),
                         Row(
@@ -465,7 +663,7 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                             Column(
                               children: [
                                 "Start Date".text.sm.make(),
-                                foundDataNew![itemCount].startDate.toString().text.sm.make()
+                                foundDataNewMO![itemCount].startDate.toString().text.sm.make()
                               ],
                             ),
                             Padding(
@@ -473,14 +671,14 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                               child: Column(
                                 children: [
                                   "End Date".text.sm.make(),
-                                  foundDataNew![itemCount].endDate.toString().text.sm.make()
+                                  foundDataNewMO![itemCount].endDate.toString().text.sm.make()
                                 ],
                               ),
                             ),
                             Column(
                               children: [
                                 "In Time".text.sm.make(),
-                                foundDataNew![itemCount].startTime.toString().text.sm.make()
+                                foundDataNewMO![itemCount].startTime.toString().text.sm.make()
                               ],
                             ),
                             Padding(
@@ -488,7 +686,7 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                               child: Column(
                                 children: [
                                   "Out Time".text.sm.make(),
-                                  foundDataNew![itemCount].endTime.toString().text.sm.make()
+                                  foundDataNewMO![itemCount].endTime.toString().text.sm.make()
                                 ],
                               ),
                             ),

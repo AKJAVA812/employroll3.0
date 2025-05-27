@@ -31,6 +31,18 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
   bool showAdmin = false;
   bool showRo = false;
   String userPanelPermission = "COMPANY_EMPLOYEE";
+  String pendingLeaveRequestMOPermission = "0";
+  String pendingLeaveL1RequestMOPermission = "0";
+  String pendingLeaveL2RequestMOPermission = "0";
+  String pendingLeaveRequestMSSPermission = "0";
+  String pendingLeaveL1RequestMSSPermission = "0";
+  String pendingLeaveL2RequestMSSPermission = "0";
+  String pendingLeaveRequestUISPermission = "0";
+  String pendingLeaveL1RequestUISPermission = "0";
+  String pendingLeaveL2RequestUISPermission = "0";
+  String othersLeaveRequestUISPermission = "0";
+  String othersLeaveRequestMOPermission = "0";
+  String othersLeaveRequestMSSPermission = "0";
 
   @override
   void initState() {
@@ -46,6 +58,18 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
     levelTwo = await shared!.getLevelTwo();
     pendingLeaveRequisitions = await shared!.getPendingLeaveReq();
     userPanelPermission= await shared.getUserPanel();
+    pendingLeaveRequestMOPermission= (await shared.getPendingLeaveReqMSSMOPermission())!;
+    pendingLeaveL1RequestMOPermission= (await shared.getPendingLeaveReqL1MSSMOPermission())!;
+    pendingLeaveL2RequestMOPermission= (await shared.getPendingLeaveReqL2MSSMOPermission())!;
+    pendingLeaveRequestMSSPermission= (await shared.getPendingLeaveReqMSSPermission())!;
+    pendingLeaveL1RequestMSSPermission= (await shared.getPendingLeaveReqL1MSSPermission())!;
+    pendingLeaveL2RequestMSSPermission= (await shared.getPendingLeaveReqL2MSSPermission())!;
+    pendingLeaveRequestUISPermission= (await shared.getPendingLeaveReqUISPermission())!;
+    pendingLeaveL1RequestUISPermission= (await shared.getPendingLeaveReqL1UISPermission())!;
+    pendingLeaveL2RequestUISPermission= (await shared.getPendingLeaveReqL2UISPermission())!;
+    othersLeaveRequestMSSPermission= (await shared.getOthersLeaveReqMSSPermission())!;
+    othersLeaveRequestMOPermission= (await shared.getOthersLeaveReqMSSMOPermission())!;
+    othersLeaveRequestUISPermission= (await shared.getOthersLeaveReqUISPermission())!;
     print("User Panel - $userPanelPermission");
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
@@ -99,61 +123,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
-      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
-        items.add(
-          Hero(
-            tag: 'myRequests',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () async {
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
-                  if(internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection".text.make(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Please check your Internet connection."),
-                      ));
-                    });
 
-                  } else {
-                    Navigator.pushNamed(context, MyRoutings.requestedRequisitionRoute);
-                  }
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.pending_actions_rounded,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'My Requests',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
 
       /*if(showHide) {
         items.add(
@@ -264,7 +234,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
       }*/
 
       //MSS Pending Leaves
-      if(userPanelPermission == "MSS") {
+      if(userPanelPermission == "MSS" && pendingLeaveRequestMSSPermission == "1") {
         items.add(
           Hero(
             tag: 'pendingLeave',
@@ -320,7 +290,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
         );
       }
       //MSS Others Leave
-      if(userPanelPermission == "MSS") {
+      if(userPanelPermission == "MSS" && pendingLeaveRequestMSSPermission == "1") {
         items.add(
           Hero(
             tag: 'others',
@@ -377,7 +347,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
       }
 
       //MSS MO Pending Leaves
-      if(userPanelPermission == "MSS_MO_ADMIN") {
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingLeaveRequestMOPermission == "1") {
         items.add(
           Hero(
             tag: 'pendingLeave',
@@ -433,7 +403,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
         );
       }
       //MSS MO Others Leave
-      if(userPanelPermission == "MSS_MO_ADMIN") {
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingLeaveRequestMOPermission == "1") {
         items.add(
           Hero(
             tag: 'others',
@@ -490,7 +460,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
       }
 
       //UIS Pending Leaves
-      if(userPanelPermission == "USER") {
+      if(userPanelPermission == "USER" && pendingLeaveRequestUISPermission == "1") {
         items.add(
           Hero(
             tag: 'pendingLeave',
@@ -546,7 +516,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
         );
       }
       //UIS Others Leave
-      if(userPanelPermission == "USER") {
+      if(userPanelPermission == "USER" && pendingLeaveRequestUISPermission == "1") {
         items.add(
           Hero(
             tag: 'others',

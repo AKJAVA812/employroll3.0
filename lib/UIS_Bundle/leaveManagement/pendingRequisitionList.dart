@@ -36,7 +36,7 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? foundDataNewUIS=[];
 String? levelOne;
 String? levelTwo;
 PendingLeaveRequisitionModal? pendingLeaveReqLabel;
@@ -71,7 +71,7 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
     setState(() {
       getSharedPrfanceList();
       var listLength;
-      listLength = foundDataNew!.length;
+      listLength = foundDataNewUIS!.length;
       print('listLength $listLength');
     });
   }
@@ -131,17 +131,17 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
 
     getAppReq11.then((value) {
       setState(() {
-        foundDataNew = allUsernew;
+        foundDataNewUIS = allUsernew;
         pendingLeaveReqLabel=value;
         pendingLeaveReqLabeled=pendingLeaveReqLabel;
-        if(foundDataNew != null) {
-          foundDataNew!.length;
-          print("Fetch data $foundDataNew");
+        if(foundDataNewUIS != null) {
+          foundDataNewUIS!.length;
+          print("Fetch data $foundDataNewUIS");
         } else {
           Center(
             child: "There is no data available right now".text.make(),
           );
-          foundDataNew = [];
+          foundDataNewUIS = [];
         }
       });
       //print('employeeList00${pendingLeaveReqLabel!.result!.data!.length}');
@@ -204,7 +204,7 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewUIS = results;
     });
   }
 
@@ -419,11 +419,11 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: foundDataNew!.length,
+        itemCount: foundDataNewUIS!.length,
         itemBuilder: (context, itemCount) {
           return InkWell(
               onTap: (){
-                print(foundDataNew!.length);
+                print(foundDataNewUIS!.length);
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => PendingLeaveApproveDisapprove(
                     pendingLeaveRequisitionModal, itemCount)));
                 //Navigator.pushNamed(context, MyRoutings.pendingLeaveAppDisRoute);
@@ -436,13 +436,13 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
                       children: [
                         Row(
                           children: [
-                            foundDataNew![itemCount].employeeName.toString().text.make().px8().py4(),
+                            foundDataNewUIS![itemCount].employeeName.toString().text.make().px8().py4(),
                             Expanded(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    foundDataNew![itemCount].status.toString().text.make().px8(),
+                                    foundDataNewUIS![itemCount].status.toString().text.make().px8(),
                                   ],
                                 )
                             )
@@ -451,12 +451,12 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
                         ),
                         Row(
                           children: [
-                            foundDataNew![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
+                            foundDataNewUIS![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
                           ],
                         ),
                         Row(
                           children: [
-                            foundDataNew![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
+                            foundDataNewUIS![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
                           ],
                         ),
                         Row(
@@ -465,7 +465,7 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
                             Column(
                               children: [
                                 "Start Date".text.sm.make(),
-                                foundDataNew![itemCount].startDate.toString().text.sm.make()
+                                foundDataNewUIS![itemCount].startDate.toString().text.sm.make()
                               ],
                             ),
                             Padding(
@@ -473,14 +473,14 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
                               child: Column(
                                 children: [
                                   "End Date".text.sm.make(),
-                                  foundDataNew![itemCount].endDate.toString().text.sm.make()
+                                  foundDataNewUIS![itemCount].endDate.toString().text.sm.make()
                                 ],
                               ),
                             ),
                             Column(
                               children: [
                                 "In Time".text.sm.make(),
-                                foundDataNew![itemCount].startTime.toString().text.sm.make()
+                                foundDataNewUIS![itemCount].startTime.toString().text.sm.make()
                               ],
                             ),
                             Padding(
@@ -488,7 +488,7 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
                               child: Column(
                                 children: [
                                   "Out Time".text.sm.make(),
-                                  foundDataNew![itemCount].endTime.toString().text.sm.make()
+                                  foundDataNewUIS![itemCount].endTime.toString().text.sm.make()
                                 ],
                               ),
                             ),

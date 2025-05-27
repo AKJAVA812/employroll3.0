@@ -8,6 +8,7 @@ import 'package:er_flutter_project/adminPage/adminDashboard/presentEmpList.dart'
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 import '../../adminPage/adminDashboard/absentEmpList.dart';
@@ -24,6 +25,7 @@ import '../../adminPage/modelClass/shiftListModal.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/routes.dart';
+import '../../main.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
@@ -39,6 +41,7 @@ class MSS_MO_Dashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanelPermission;
 DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
@@ -54,10 +57,12 @@ var singleDay = single.format(day);
 late List<String?> list = [];
 late List<String?> branchList = [];
 late List<String?>? shiftList = [];
-bool isLoading = true;
+bool isLoading = false;
 String valuenew = "listText";
 String shiftValue = "listText";
-class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> {
+dynamic matchedOrg;
+class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
+
   final DashboardModel dashboardModel1;
 
   _MSS_MO_DashboardState(this.dashboardModel1);
@@ -79,10 +84,277 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> {
   int? overTime;
   var dropdownNewvalue;
   var dropdownNewvalueShift;
+  bool _isFirstBuild = true;
+  bool _isBottomSheetOpen = false;
 
+  @override
+  void initState() {
+    super.initState();
+    var now = new DateTime.now();
+    var formatter = new DateFormat('dd/MM/yyyy');
+    todayDate = formatter.format(now);
+    //getSharedPrfanceList();
+    setState(() {});
 
+    getTodayDate();
+
+    // TODO: implement initState
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isFirstBuild) {
+      _isFirstBuild = false;
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+      // Defer execution until after current build frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        getSharedPrfanceList(); // Safe to call here
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when returning to this page
+    getSharedPrfanceList(); // Reload and open filter bottom sheet again
+    super.didPopNext();
+  }
+
+  List<Map<String, dynamic>> storedOrgList = [];
+  List<String> organizations = []; // for Dropdown values
+  String? selectedOrg;
+  dynamic getOrgId;
+
+  Future<void> loadOrgListFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? orgListString = prefs.getString("orgList");
+
+    if (orgListString != null) {
+      List<dynamic> decoded = json.decode(orgListString);
+      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+
+      // Populate dropdown list
+      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+
+      // Start with "Select" as default (null value)
+      selectedOrg = null;
+      getOrgId = '';
+
+      setState(() {});
+    }
+  }
 
   Future getSharedPrfanceList() async {
+
+    if (!_isBottomSheetOpen) {
+      await Future.delayed(Duration(milliseconds: 100));
+      _showFilterBottomSheet();
+    }
+    loadOrgListFromPrefs();
+    userPanelPermission = await shared.getUserPanel();
+  }
+
+  DateTime? selectedDate;
+  String? selectedDateFormatted;
+
+  void _showFilterBottomSheet() {
+    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    _isBottomSheetOpen = true;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true, // <--- Make sure this is true
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            padding: EdgeInsets.all(16),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Filter',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+
+                    /// Organization Dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Organization',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedOrg,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Select'),
+                        ),
+                        ...organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org,
+                            child: Text(org),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedOrg = value;
+
+                          // Match selected org name to get ID
+                          matchedOrg = storedOrgList.firstWhere(
+                                (org) => org['orgName'] == value,
+                            orElse: () => {},
+                          );
+
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print('Org Name: $selectedOrg');
+                          print('Org ID: $getOrgId');
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+                    SizedBox(height: 8),
+                    /// Date Picker Field
+                    GestureDetector(
+                      onTap: () async {
+                        final pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate ?? DateTime.now(),
+                          firstDate: DateTime(1947),
+                          lastDate: DateTime.now(),
+                        );
+                        if (pickedDate != null) {
+                          setState(() {
+                            selectedDate = pickedDate;
+                            selectedDateFormatted = DateFormat('dd-MM-yyyy').format(pickedDate);
+                          });
+                        }
+                      },
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Select Date',
+                            hintText: 'dd-mm-yyyy',
+                            border: OutlineInputBorder(),
+                            suffixIcon: Icon(Icons.calendar_today),
+                          ),
+                          controller: TextEditingController(
+                            text: selectedDateFormatted ?? '',
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 50),
+
+                    /// Filter Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.of(bottomSheetContext).pop();
+                          await Future.delayed(Duration(milliseconds: 100));
+
+                          setState(() {
+                            isLoading = true; // Start loader
+                          });
+
+                          try {
+                            sessionId = await shared!.getSessionId();
+
+                            // Fetch all data in parallel
+                            final results = await Future.wait([
+                              getDashboardData(sessionId!),
+                              getBranchList(sessionId!),
+                              getShiftList(sessionId!),
+                              getEventData(sessionId!)
+                            ]);
+
+                            final dashboard = results[0] as DashboardModel;
+                            final branchList = results[1] as BranchListModal;
+                            final shiftList = results[2] as ShiftListModal;
+                            final eventsList = results[3] as EventsListModal;
+
+                            final empRoleLocal = await shared!.getEmpRoll();
+                            final roRoleLocal = await shared!.getRoRole();
+
+                            // Update all state together
+                            setState(() {
+                              dashboardModelGlobal = dashboard;
+                              branchListModalGloabal = branchList;
+                              shiftListModalGlobal = shiftList;
+                              eventsListModalGlobal = eventsList;
+                              empRole = empRoleLocal;
+                              roRole = roRoleLocal;
+                              isLoading = false; // Stop loader
+                            });
+
+                          } catch (e) {
+                            print("Error while fetching dashboard data: $e");
+                            setState(() {
+                              isLoading = false; // Stop loader even on error
+                            });
+
+                            // Optional: Show error message
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Something went wrong while fetching data."),
+                            ));
+                          }
+                        },
+                        icon: Icon(Icons.filter_alt),
+                        label: Text("Apply Filter"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Mythemes.successColor,
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+    });
+  }
+
+
+  Future getSharedPrfanceLists() async {
     setState(() {
       isLoading = true; // Start loading
     });
@@ -259,19 +531,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> {
       ),
     );
   }
-  @override
-  void initState() {
-    super.initState();
-    var now = new DateTime.now();
-    var formatter = new DateFormat('dd/MM/yyyy');
-    todayDate = formatter.format(now);
-    getSharedPrfanceList();
-    setState(() {});
 
-    getTodayDate();
-
-    // TODO: implement initState
-  }
   int pageIndex = 0;
   int currentIndex = 3;
   var titleName = "Dashboard";
@@ -312,17 +572,8 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> {
         child: singleDay.toString().text.color(Mythemes.whitish).make(),
       ),*/
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            isScrollControlled: true,
-            builder: (context) => FilterBottomSheet(),
-          );
-        },
-        child: Icon(Icons.filter_list),
+        onPressed: _showFilterBottomSheet,
+        child: Icon(Icons.filter_list, color: Mythemes.whitish,),
       ),
       appBar: AppBar(
         title: RichText(
@@ -380,13 +631,20 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> {
           ),
         ],
       ),
-      body: dashboardModelGlobal == null
-          ? loader()
-          : RefreshIndicator(
-          onRefresh: () {
-            return getSharedPrfanceList();
-          },
-          child: DashboardWidgets(dashboardModelGlobal!)),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+        children: [
+          Expanded(child: dashboardModelGlobal == null
+              ? Center(child: "Please select Organisation first!".text.bold.center.make())
+              : RefreshIndicator(
+              onRefresh: () {
+                return getSharedPrfanceList();
+              },
+              child: DashboardWidgets(dashboardModelGlobal!)),)
+        ],
+      ),
+
 
       bottomNavigationBar:
       BottomNavigationBar (
@@ -512,58 +770,122 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedToggleSwitch<int>.size(
-                    height: 30,
-                    current: min(value, 2),
-                    style: ToggleStyle(
-                      backgroundColor: Mythemes.greyishade,
-                      indicatorColor: Mythemes.lightBluishColor,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20.0),
-                      indicatorBorderRadius: BorderRadius.zero,
-                    ),
-                    values: const [0, 1],
-                    iconOpacity: 1.0,
-                    selectedIconScale: 1.0,
-                    indicatorSize: const Size.fromWidth(150),
-                    iconAnimationType: AnimationType.onHover,
-                    styleAnimationType: AnimationType.onHover,
-                    spacing: 2.0,
-                    customSeparatorBuilder: (context, local, global) {
-                      final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
-                      return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
-                    },
-                    customIconBuilder: (context, local, global) {
-                      final text = const ['ESS', 'MSS'][local.index];
-                      return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
-                    },
-                    borderWidth: 0.0,
-                    onChanged: (i) {
-                      setState(() {
-                        value = i;
-                        print(i);
+              Visibility(
+                visible: userPanelPermission == "MSS",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 2),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(150),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 2.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['ESS', 'MSS'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
 
-                      });
-                      if(value == 0) {
-                        Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-                      }
-                    },
-                  )
-                ],
-              ).py(4),
+                        });
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                        }
+                        if(value == 0) {
+                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
+              Visibility(
+                visible: userPanelPermission == "MSS_MO_ADMIN",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 2),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(150),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 2.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['ESS', 'MSS MO'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
+
+                        });
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                        }
+                        if(value == 0) {
+                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
               /*Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,

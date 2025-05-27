@@ -9,6 +9,9 @@ import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import '../../../MSS_Bundle/travelAndExpense/claimMssItems.dart';
+import '../../../MSS_MO_Bundle/travelAndExpense/claimMssItems.dart';
+import '../../../UIS_Bundle/travelAndExpense/claimMssItems.dart';
 import '../../../commanScreen/allAPIList.dart';
 import '../../../commanScreen/commanNotificationPage.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
@@ -32,6 +35,7 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 dynamic empId;
+var userPanel;
 
 dynamic claimRaiseId;
 dynamic levelStatusChecked;
@@ -96,8 +100,20 @@ class _ClaimMssApprovalState extends State<ClaimMssApproval> {
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     empId = await shared!.getEmpId();
+    userPanel = await shared!.getUserPanel();
     levelStatusChecked = levelStatusCheck;
-    empIdReceived = empIdSend;
+    if(userPanel == "MSS") {
+      empIdReceived = empIdSendMSS;
+      levelStatusChecked = levelStatusCheckMSS;
+    }
+    if(userPanel == "MSS_MO_ADMIN") {
+      empIdReceived = empIdSendMO;
+      levelStatusChecked = levelStatusCheckMO;
+    }
+    if(userPanel == "USER") {
+      empIdReceived = empIdSendUIS;
+      levelStatusChecked = levelStatusCheckUIS;
+    }
     print("EMP ID REC - $empIdReceive");
 
     if(levelStatusChecked == "LEVEL_ONE_PENDING") {
@@ -285,11 +301,11 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                   print("Remarks for $action: $remarks");
                   if(action == "Approve") {
                     approveClaim(
-                      remarks, claimRaiseId, approverAmt,
+                      context,remarks, claimRaiseId, approverAmt,
                     );
                   } else {
                     disApproveClaim(
-                      remarks, claimRaiseId, approverAmt,
+                     context, remarks, claimRaiseId, approverAmt,
                     );
                   }
 
@@ -372,7 +388,11 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     }
   }
 
-  Future<void> approveClaim(String remarks, dynamic claimRaiseId, dynamic approveAmt) async {
+  Future<void> approveClaim(BuildContext buildContext,String remarks, dynamic claimRaiseId, dynamic approveAmt) async {
+    if (buildContext == null) {
+      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      return;
+    }
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimApproveApi;
 
@@ -435,6 +455,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
 
       // Show Success/Error/Warning Dialog
       showDialog(
+
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -449,13 +470,14 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             actions: [
               TextButton(
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                    Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
-                    Navigator.of(context).maybePop();
-                  } else {
-                    print("⚠️ Warning: No route to close.");
-                  }
-               } ,
+                  Navigator.of(context, rootNavigator: true).pop();
+
+                  Future.delayed(Duration(milliseconds: 300), () {
+                    if (buildContext.mounted && Navigator.of(buildContext).canPop()) {
+                      Navigator.of(buildContext).pop();
+                    }
+                  });
+                },
                 child: Text("OK"),
               ),
             ],
@@ -465,7 +487,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     }
   }
 
-  Future<void> disApproveClaim(String remarks, dynamic claimRaiseId, dynamic approveAmt) async {
+  Future<void> disApproveClaim(BuildContext buildContext, String remarks, dynamic claimRaiseId, dynamic approveAmt) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimDisApproveApi;
 
@@ -542,12 +564,13 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             actions: [
               TextButton(
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                    Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
-                    Navigator.of(context).maybePop();
-                  } else {
-                    print("⚠️ Warning: No route to close.");
-                  }
+                  Navigator.of(context, rootNavigator: true).pop();
+
+                  Future.delayed(Duration(milliseconds: 300), () {
+                    if (buildContext.mounted && Navigator.of(buildContext).canPop()) {
+                      Navigator.of(buildContext).pop();
+                    }
+                  });
                } ,
                 child: Text("OK"),
               ),

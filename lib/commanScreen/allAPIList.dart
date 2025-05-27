@@ -4,7 +4,7 @@ class ApiDetails{
    static var server="http://www.employroll.com/";
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://ea4268569ea2.ngrok.app/";
+   //static var server="https://a0b1401d2fea.ngrok.app/";
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
    static String punchIn="/restful/service/attendance/via/mobile";
@@ -182,5 +182,8 @@ class ApiDetails{
 
    //profile list
    static var profileListApi = "restful/service/get/user/all/mapped/profile/list";
+
+   //Organisation List
+   static var orgListApi = "restful/service/org/details/master/list";
 
 }

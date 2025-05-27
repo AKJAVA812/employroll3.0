@@ -53,8 +53,12 @@ ClaimApproverListModalClass? claimApproverListModalGlobal;
 ClaimApproverListModalClass? claimApproverListModalGlobaled;
 var empName;
 var empId;
-var empIdSend;
-dynamic levelStatusCheck;
+var empIdSendMO;
+var userPanel;
+var getProfileId;
+var getProfileName;
+var orgId;
+dynamic levelStatusCheckMO;
 var statusUpdate = "LEVEL_ONE_PENDING";
 dynamic MyColor;
 class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> with RouteAware{
@@ -95,6 +99,9 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
+    getProfileName = await shared!.getDefaultProfileName();
     claimLevelOne = await shared!.getClaimLevelOne();
     claimLevelTwo = await shared!.getClaimLevelTwo();
     claimLevelThree = await shared!.getClaimLevelThree();
@@ -185,7 +192,10 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$SessionId&"
         "permissionId=$permissionId&"
-        "status=$statusUpdate");
+        "status=$statusUpdate&"
+        "orgId=$orgId&"
+        "userPermission=$userPanel&"
+        "profileId=$getProfileId");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -760,12 +770,12 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                 print(foundDataNew![i].status);
                 return InkWell(
                   onTap: () {
-                    levelStatusCheck = foundDataNew![i].status;
-                    empIdSend = foundDataNew![i].empId.toString();
-                    print("EMP ID --> $empIdSend");
+                    levelStatusCheckMO = foundDataNew![i].status;
+                    empIdSendMO = foundDataNew![i].empId.toString();
+                    print("EMP ID --> $empIdSendMO");
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => ClaimMssApproval(
-                          levelStatus: levelStatusCheck!, empId: empIdSend
+                          levelStatus: levelStatusCheckMO!, empId: empIdSendMO
                         )));
                     /*Navigator.push(context,
                         MaterialPageRoute(builder: (context) => ClaimMssApproval()));*/

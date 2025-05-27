@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
 import '../../../profiles/profilePageWithHead.dart';
+import '../../main.dart';
 import '../../modules/leaveManagement/reports/modalClass/leaveBalanceModel.dart';
 import '../../modules/leaveManagement/reports/modalClass/otherReqEmpList.dart';
 import '../../modules/leaveManagement/reports/othersAttendanceList.dart';
@@ -27,7 +29,7 @@ class MSS_MO_OthersAttendanceRequisitionPage extends StatefulWidget {
   State<MSS_MO_OthersAttendanceRequisitionPage> createState() => _MSS_MO_OthersAttendanceRequisitionPageState();
 }
 List<String> leavereqIdGlobel=[];
-var empNewId;
+var empNewIdMO;
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
@@ -40,7 +42,11 @@ String? branchName;
 String? deptName;
 String? empName;
 String singleDateString="";
-class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAttendanceRequisitionPage> {
+String? userPanel;
+dynamic getProfileId;
+String? orgId;
+dynamic matchedOrg;
+class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAttendanceRequisitionPage> with RouteAware{
   var titleName = "Other Employee's Requisition";
   //static const List<String> list = <String>['Casual Leave', 'Leave Monthly'];
   //String dropdownValue = list.first;
@@ -65,38 +71,57 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
   var nominee;
 
 
+  bool _isFirstBuild = true;
+  bool _isBottomSheetOpen = false;
+
   @override
   void initState() {
+    super.initState();
     int i = 0;
     //empId = employeeListModelglobel?.data![i].empId;
     leaveTypeId = leaveBalanceLabel?.leaveTypeListDetails?[i].leaveId;
-    // TODO: implement initState
-    super.initState();
-    getSharedPrfanceList();
+    // DO NOT use `context` here
+    // Move `getSharedPrfanceList()` to `didChangeDependencies`
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isFirstBuild) {
+      _isFirstBuild = false;
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+      // Defer execution until after current build frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        getSharedPrfanceList(); // Safe to call here
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when returning to this page
+    getSharedPrfanceList(); // Reload and open filter bottom sheet again
+    super.didPopNext();
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    if (!_isBottomSheetOpen) {
+      await Future.delayed(Duration(milliseconds: 100));
+      _showFilterBottomSheet();
+    }
+    loadOrgListFromPrefs();
     branchName = await shared!.getBranch()??"N/A";
     deptName = await shared!.getDept()??"N/A";
     empName = await shared!.getempName()??"N/A";
-    // await Future.delayed(Duration(seconds: 5));
-    Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(sessionId!);
-    //Future<LeaveBalanceModel?> getLeaveType12 = getLeaveTypeList(sessionId!);
-    final loading = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        CircularProgressIndicator(),
-        Text(" Login ... Please wait")
-      ],
-    );
 
-    getEmployeeList11.then((value) {
-      setState(() {
-        employeeListModelglobel=value;
-      });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
-    });
 
    /* getLeaveType12.then((value) {
       setState(() {
@@ -114,7 +139,11 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
     String apiUrl = ApiDetails.othersReqEmpList;
     print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "userPermission=$userPanel&"
+        "profileId=$getProfileId&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -155,6 +184,31 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
     return leaveBalanceLabel;
   }
 
+  List<Map<String, dynamic>> storedOrgList = [];
+  List<String> organizations = []; // for Dropdown values
+  String? selectedOrg;
+  dynamic getOrgId;
+
+  Future<void> loadOrgListFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? orgListString = prefs.getString("orgList");
+
+    if (orgListString != null) {
+      List<dynamic> decoded = json.decode(orgListString);
+      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+
+      // Populate dropdown list
+      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+
+      // Start with "Select" as default (null value)
+      selectedOrg = null;
+      getOrgId = '';
+
+      setState(() {});
+    }
+  }
+  bool isLoading = false;
+
   DateTime _date = (DateTime.now());
   String formattedDate = DateFormat.ABBR_MONTH;
   String dateFormate = DateFormat("dd-MM-yyyy").format(DateTime.parse("2019-09-30"));
@@ -176,6 +230,144 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
   int pageIndex = 0;
   int currentIndex = 1;
 
+
+  void _showFilterBottomSheet() {
+    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    _isBottomSheetOpen = true;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true, // <--- Make sure this is true
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            padding: EdgeInsets.all(16),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Filter',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+
+                    /// Organization Dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Organization',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedOrg,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Select'),
+                        ),
+                        ...organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org,
+                            child: Text(org),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedOrg = value;
+
+                          // Match selected org name to get ID
+                          matchedOrg = storedOrgList.firstWhere(
+                                (org) => org['orgName'] == value,
+                            orElse: () => {},
+                          );
+
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print('Org Name: $selectedOrg');
+                          print('Org ID: $getOrgId');
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+                    SizedBox(height: 50),
+
+                    /// Filter Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.of(bottomSheetContext).pop();
+                          await Future.delayed(Duration(milliseconds: 100));
+
+                          // Now perform async logic
+
+                          sessionId = await shared!.getSessionId();
+                          userPanel = await shared!.getUserPanel();
+                          getProfileId = await shared!.getDefaultProfileId();
+                          branchName = await shared!.getBranch()??"N/A";
+                          deptName = await shared!.getDept()??"N/A";
+                          empName = await shared!.getempName()??"N/A";
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print("ORG ID - $getOrgId");
+                          // await Future.delayed(Duration(seconds: 5));
+                          Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(sessionId!);
+                          //Future<LeaveBalanceModel?> getLeaveType12 = getLeaveTypeList(sessionId!);
+                          final loading = Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              CircularProgressIndicator(),
+                              Text(" Login ... Please wait")
+                            ],
+                          );
+
+                          getEmployeeList11.then((value) {
+                            setState(() {
+                              employeeListModelglobel=value;
+                            });
+                            print('employeeList00${employeeListModelglobel!.data!.length}');
+                          });
+                        },
+                        icon: Icon(Icons.filter_alt),
+                        label: Text("Apply Filter"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Mythemes.successColor,
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return DismissKeyboard(
@@ -185,17 +377,76 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
           title: titleName.text.make(),
         ),
 
-        floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            //Navigator.pushNamed(context, MyRoutings.otherAttendanceListRoute);
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => OthersAttendanceList(AttendanceReportModel(),0)));
-          },
-          backgroundColor: Mythemes.lightBluishColor,
-          child: Icon(
-            Icons.list, color: Mythemes.whitish, size: 28,
-          ),
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Left FAB
+            Padding(
+              padding: const EdgeInsets.only(left: 32.0),
+              child: FloatingActionButton(
+                heroTag: 'leftFAB',
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => OthersAttendanceList(AttendanceReportModel(),0)));
+                  print('Right FAB pressed');
+                },
+                child: Icon(Icons.list, color: Mythemes.whitish,),
+              ),
+            ),
+
+            Container(
+              height: 90,
+              color: context.cardColor,
+              child: ButtonBar(
+                  alignment: MainAxisAlignment.center,
+                  buttonPadding: Vx.mOnly(right: 16),
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
+                        if(singleDateString.compareToIgnoringCase("")==0){
+                          print('responseemployeeList');
+                          setState(() {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Please Select Date First "),
+                            ));
+                          });
+                        }else{
+                          print("EmpIdOther - $empNewIdMO");
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => OthersSingleDateAttendance(
+                                singleDateString: singleDateString!, empId: empNewIdMO,
+                              )));
+                          /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+                          OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*/
+
+                        }
+                      },
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.all(Mythemes.lightBluishColor),
+                      ),
+                      child: "Get Details".text.make(),
+                    ).wh(150, 40).py12()
+                  ]),
+            ),
+            // Right FAB
+            Padding(
+              padding: const EdgeInsets.only(right: 32.0),
+              child: FloatingActionButton(
+                heroTag: 'rightFAB', // Needed to avoid Hero tag conflict
+                onPressed: () {
+                  _showFilterBottomSheet();
+                  print('Right FAB pressed');
+                },
+                child: Icon(Icons.filter_list, color: Mythemes.whitish,),
+              ),
+            ),
+
+
+          ],
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
 
         /*bottomNavigationBar: Container(
           height: 90,
@@ -271,8 +522,8 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                       onChanged: (newVal) {
                         valuenew = newVal.toString();
                         int i =list.indexOf(valuenew);
-                        empNewId = employeeListModelglobel?.data?[i].empId;
-                        print("EmpId  $empNewId");
+                        empNewIdMO = employeeListModelglobel?.data?[i].empId;
+                        print("EmpId  $empNewIdMO");
                         setState(() {
 
                           dropdownvalue = newVal;
@@ -362,42 +613,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                     ),
                   ),
 
-                  Container(
-                    height: 90,
-                    color: context.cardColor,
-                    child: ButtonBar(
-                        alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
-                              if(singleDateString.compareToIgnoringCase("")==0){
-                                print('responseemployeeList');
-                                setState(() {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text("Please Select Date First "),
-                                  ));
-                                });
-                              }else{
-                                print("EmpIdOther - $empNewId");
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => OthersSingleDateAttendance(
-                                      singleDateString: singleDateString!, empId: empNewId,
-                                    )));
-                                /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                          OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*/
 
-                              }
-                            },
-                            style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.all(Mythemes.lightBluishColor),
-                            ),
-                            child: "Get Details".text.make(),
-                          ).wh(150, 40).py12()
-                        ]),
-                  ).py(80),
                 ],
               )
           ),

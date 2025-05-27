@@ -41,6 +41,9 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
   bool showAdmin = false;
   bool showRo = false;
   String userPanelPermission = "COMPANY_EMPLOYEE";
+  String odPendingPermissionMO = "0";
+  String odPendingPermissionMSS = "0";
+  String odPendingPermissionUIS = "0";
 
   @override
   void initState() {
@@ -53,6 +56,9 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
     userPanelPermission= await shared.getUserPanel();
+    odPendingPermissionMO= (await shared.getODPendingListMO())!;
+    odPendingPermissionMSS= (await shared.getODPendingList())!;
+    odPendingPermissionUIS= (await shared.getODPendingListUIS())!;
     print("User Panel - $userPanelPermission");
     print('empRole $empRole');
     print('roRole $roRole');
@@ -105,136 +111,10 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
     List<Widget> generateGridViewItems() {
 
       List<Widget> items = [];
-      //OD Punch ESS
-      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
-        items.add(
-          Hero(
-            tag: 'odPunch',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () async{
-                  bool internetCheck =
-                  await InternetConnectionChecker().hasConnection;
-                  if (internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection"
-                            .text
-                            .make(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            "Please check your Internet connection."),
-                      ));
-                    });
-                  } else {
-                    Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                    /*  Navigator.pushNamed(
-                        context, MyRoutings.odSelfReqDateSelectRoute);*/
-                  }
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.location_on,
-                        size: 50,
-                        color: Mythemes.lightBluishColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'OD Punch',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
 
-      //My OD Requests ESS
-      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
-        items.add(
-          Hero(
-            tag: 'myRequest',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () async{
-                  bool internetCheck =
-                  await InternetConnectionChecker().hasConnection;
-                  if (internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection"
-                            .text
-                            .make(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            "Please check your Internet connection."),
-                      ));
-                    });
-                  } else {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SelfODRequisitionList(
-                          startDate: "",
-                          endDate: "",
-                        )));
-                    /*  Navigator.pushNamed(
-                        context, MyRoutings.odSelfReqDateSelectRoute);*/
-                  }
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.work_history,
-                        size: 50,
-                        color: Mythemes.successColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'My Requests',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
 
       //MSS OD Pending
-      if(userPanelPermission == "MSS") {
+      if(userPanelPermission == "MSS" && odPendingPermissionMSS == "1") {
         items.add(
           Hero(
             tag: 'pendingOdReq',
@@ -293,7 +173,7 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
       }
 
       //MSS MO OD Pending
-      if(userPanelPermission == "MSS_MO_ADMIN") {
+      if(userPanelPermission == "MSS_MO_ADMIN" && odPendingPermissionMO == "1") {
         items.add(
           Hero(
             tag: 'pendingOdReq',
@@ -352,7 +232,7 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
       }
 
       //UIS OD Pending
-      if(userPanelPermission == "USER") {
+      if(userPanelPermission == "USER" && odPendingPermissionUIS == "1") {
         items.add(
           Hero(
             tag: 'pendingOdReq',

@@ -21,7 +21,7 @@ class Data {
   String? odReq;
   String? compOff;
   var bankName;
-  List<String>? userPermissions;
+  /*List<String>? userPermissions;*/
   var bankAccNo;
   String? branch;
   int? orgId;
@@ -44,7 +44,7 @@ class Data {
   String? sessionId;
   var aadharNo;
   String? helpdesk;
-  List<String>? userRoles;
+  /*List<String>? userRoles;*/
   String? empCode;
   String? dob;
   var esicNo;
@@ -58,7 +58,7 @@ class Data {
         this.odReq,
         this.compOff,
         this.bankName,
-        this.userPermissions,
+       /* this.userPermissions,*/
         this.bankAccNo,
         this.branch,
         this.orgId,
@@ -80,7 +80,7 @@ class Data {
         this.sessionId,
         this.aadharNo,
         this.helpdesk,
-        this.userRoles,
+        /*this.userRoles,*/
         this.empCode,
         this.dob,
         this.esicNo,
@@ -94,7 +94,7 @@ class Data {
     odReq = json['odReq'];
     compOff = json['compOff'];
     bankName = json['bankName'];
-    userPermissions = json['userPermissions'].cast<String>();
+   /* userPermissions = json['userPermissions'].cast<String>();*/
     bankAccNo = json['bankAccNo'];
     branch = json['branch'];
     orgId = json['orgId'];
@@ -129,7 +129,7 @@ class Data {
     sessionId = json['sessionId'];
     aadharNo = json['aadharNo'];
     helpdesk = json['helpdesk'];
-    userRoles = json['userRoles'].cast<String>();
+   /* userRoles = json['userRoles'].cast<String>();*/
     empCode = json['empCode'];
     dob = json['dob'];
     esicNo = json['esicNo'];
@@ -145,7 +145,7 @@ class Data {
     data['odReq'] = this.odReq;
     data['compOff'] = this.compOff;
     data['bankName'] = this.bankName;
-    data['userPermissions'] = this.userPermissions;
+   /* data['userPermissions'] = this.userPermissions;*/
     data['bankAccNo'] = this.bankAccNo;
     data['branch'] = this.branch;
     data['orgId'] = this.orgId;
@@ -171,7 +171,7 @@ class Data {
     data['sessionId'] = this.sessionId;
     data['aadharNo'] = this.aadharNo;
     data['helpdesk'] = this.helpdesk;
-    data['userRoles'] = this.userRoles;
+   /* data['userRoles'] = this.userRoles;*/
     data['empCode'] = this.empCode;
     data['dob'] = this.dob;
     data['esicNo'] = this.esicNo;
@@ -281,18 +281,22 @@ class ProfileList {
   dynamic profileName;
   dynamic roMapId;
   dynamic defaultProfile;
+  List<String>? profilePermission;
   dynamic profileId;
   dynamic profileCode;
   dynamic mappedID;
   dynamic isDefaultProfile;
   dynamic userId;
 
-  ProfileList({this.profileName, this.roMapId, this.defaultProfile, this.profileId, this.profileCode, this.mappedID, this.isDefaultProfile, this.userId});
+  ProfileList({this.profileName, this.roMapId, this.defaultProfile, this.profilePermission, this.profileId, this.profileCode, this.mappedID, this.isDefaultProfile, this.userId});
 
-ProfileList.fromJson(Map<String, dynamic> json) {
+  ProfileList.fromJson(Map<String, dynamic> json) {
     profileName = json['profileName'];
     roMapId = json['roMapId'];
     defaultProfile = json['defaultProfile'];
+    profilePermission = json['profilePermission'] != null
+        ? List<String>.from(json['profilePermission'])
+        : [];
     profileId = json['profileId'];
     profileCode = json['profileCode'];
     mappedID = json['mappedID'];
@@ -304,6 +308,7 @@ ProfileList.fromJson(Map<String, dynamic> json) {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['profileName'] = this.profileName;
     data['defaultProfile'] = this.defaultProfile;
+    data['profilePermission'] = this.profilePermission;
     data['profileId'] = this.profileId;
     data['profileCode'] = this.profileCode;
     data['mappedID'] = this.mappedID;

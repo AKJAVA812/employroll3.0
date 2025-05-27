@@ -1,8 +1,7 @@
 class ProfileListModal {
   List<ProfileData>? data;
-  bool? defaultEss;
 
-  ProfileListModal({this.data, this.defaultEss});
+  ProfileListModal({this.data});
 
   ProfileListModal.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
@@ -11,7 +10,6 @@ class ProfileListModal {
         data!.add(new ProfileData.fromJson(v));
       });
     }
-    defaultEss = json['defaultEss'];
   }
 
   Map<String, dynamic> toJson() {
@@ -19,13 +17,13 @@ class ProfileListModal {
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['defaultEss'] = this.defaultEss;
     return data;
   }
 }
 
 class ProfileData {
   String? profileName;
+  List<String>? profilePermission;
   int? roMapId;
   int? profileId;
   String? profileCode;
@@ -36,6 +34,7 @@ class ProfileData {
 
   ProfileData(
       {this.profileName,
+        this.profilePermission,
         this.roMapId,
         this.profileId,
         this.profileCode,
@@ -46,6 +45,7 @@ class ProfileData {
 
   ProfileData.fromJson(Map<String, dynamic> json) {
     profileName = json['profileName'];
+    profilePermission = json['profilePermission'].cast<String>();
     roMapId = json['roMapId'];
     profileId = json['profileId'];
     profileCode = json['profileCode'];
@@ -58,6 +58,7 @@ class ProfileData {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['profileName'] = this.profileName;
+    data['profilePermission'] = this.profilePermission;
     data['roMapId'] = this.roMapId;
     data['profileId'] = this.profileId;
     data['profileCode'] = this.profileCode;

@@ -329,7 +329,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
             builder: (context) => FilterBottomSheet(),
           );
         },
-        child: Icon(Icons.filter_list),
+        child: Icon(Icons.filter_list, color: Mythemes.whitish,),
       ),
       appBar: AppBar(
         title: RichText(

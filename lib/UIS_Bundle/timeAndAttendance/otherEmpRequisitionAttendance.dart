@@ -27,7 +27,7 @@ class UIS_OthersAttendanceRequisitionPage extends StatefulWidget {
   State<UIS_OthersAttendanceRequisitionPage> createState() => _UIS_OthersAttendanceRequisitionPageState();
 }
 List<String> leavereqIdGlobel=[];
-var empNewId;
+var empNewIdUSER;
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
@@ -40,6 +40,9 @@ String? branchName;
 String? deptName;
 String? empName;
 String singleDateString="";
+String? userPanel;
+String? getProfileId;
+String? orgId;
 class _UIS_OthersAttendanceRequisitionPageState extends State<UIS_OthersAttendanceRequisitionPage> {
   var titleName = "Other Employee's Requisition";
   //static const List<String> list = <String>['Casual Leave', 'Leave Monthly'];
@@ -77,6 +80,8 @@ class _UIS_OthersAttendanceRequisitionPageState extends State<UIS_OthersAttendan
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     branchName = await shared!.getBranch()??"N/A";
     deptName = await shared!.getDept()??"N/A";
     empName = await shared!.getempName()??"N/A";
@@ -114,7 +119,11 @@ class _UIS_OthersAttendanceRequisitionPageState extends State<UIS_OthersAttendan
     String apiUrl = ApiDetails.othersReqEmpList;
     print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "userPermission=$userPanel&"
+        "profileId=$getProfileId&"
+        "orgId=$orgId");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -271,8 +280,8 @@ class _UIS_OthersAttendanceRequisitionPageState extends State<UIS_OthersAttendan
                       onChanged: (newVal) {
                         valuenew = newVal.toString();
                         int i =list.indexOf(valuenew);
-                        empNewId = employeeListModelglobel?.data?[i].empId;
-                        print("EmpId  $empNewId");
+                        empNewIdUSER = employeeListModelglobel?.data?[i].empId;
+                        print("EmpId  $empNewIdUSER");
                         setState(() {
 
                           dropdownvalue = newVal;
@@ -380,10 +389,10 @@ class _UIS_OthersAttendanceRequisitionPageState extends State<UIS_OthersAttendan
                                   ));
                                 });
                               }else{
-                                print("EmpIdOther - $empNewId");
+                                print("EmpIdOther - $empNewIdUSER");
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => OthersSingleDateAttendance(
-                                      singleDateString: singleDateString!, empId: empNewId,
+                                      singleDateString: singleDateString!, empId: empNewIdUSER,
                                     )));
                                 /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
                           OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*/
