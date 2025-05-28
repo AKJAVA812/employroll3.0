@@ -5,6 +5,7 @@ import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/modules/leaveManagement/reports/pendingRequisition/pendingLeaveApprovalDis.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
@@ -37,7 +38,10 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? foundDataNewMOL2=[];
+String? userPanel;
+dynamic getProfileId;
+dynamic matchedOrg;
 
 LevelTwoPendingLeaveModal? pendingLeaveReqLabel;
 LevelTwoPendingLeaveModal? pendingLeaveReqLabeled;
@@ -46,10 +50,29 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
   final LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
   _MSS_MO_LevelTwoPendingLeaveState(this.pendingLeaveRequisitionModal);
 
+  bool _isFirstBuild = true;
+  bool _isBottomSheetOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // DO NOT use `context` here
+    // Move `getSharedPrfanceList()` to `didChangeDependencies`
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+    if (_isFirstBuild) {
+      _isFirstBuild = false;
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+      // Defer execution until after current build frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        getSharedPrfanceList(); // Safe to call here
+      });
+    }
   }
 
   @override
@@ -60,20 +83,190 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
-    getSharedPrfanceList();
+    // Called when returning to this page
+    getSharedPrfanceList(); // Reload and open filter bottom sheet again
     super.didPopNext();
   }
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    setState(() {
-      getSharedPrfanceList();
-      var listLength;
-      listLength = foundDataNew!.length;
 
-      print('listLength $listLength');
+  List<Map<String, dynamic>> storedOrgList = [];
+  List<String> organizations = []; // for Dropdown values
+  String? selectedOrg;
+  dynamic getOrgId;
+
+  Future<void> loadOrgListFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? orgListString = prefs.getString("orgList");
+
+    if (orgListString != null) {
+      List<dynamic> decoded = json.decode(orgListString);
+      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+
+      // Populate dropdown list
+      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+
+      // Start with "Select" as default (null value)
+      selectedOrg = null;
+      getOrgId = '';
+
+      setState(() {});
+    }
+  }
+  bool isLoading = false;
+
+  Future getSharedPrfanceList() async {
+    if (!_isBottomSheetOpen) {
+      await Future.delayed(Duration(milliseconds: 100));
+      _showFilterBottomSheet();
+    }
+    loadOrgListFromPrefs();
+  }
+
+  void _showFilterBottomSheet() {
+    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    _isBottomSheetOpen = true;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true, // <--- Make sure this is true
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            padding: EdgeInsets.all(16),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Filter',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+
+                    /// Organization Dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Organization',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedOrg,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Select'),
+                        ),
+                        ...organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org,
+                            child: Text(org),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedOrg = value;
+
+                          // Match selected org name to get ID
+                          matchedOrg = storedOrgList.firstWhere(
+                                (org) => org['orgName'] == value,
+                            orElse: () => {},
+                          );
+
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print('Org Name: $selectedOrg');
+                          print('Org ID: $getOrgId');
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+                    SizedBox(height: 50),
+
+                    /// Filter Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.of(bottomSheetContext).pop();
+                          await Future.delayed(Duration(milliseconds: 100));
+
+                          // Now perform async logic
+                          setState(() {
+                            pendingLeaveReqLabeled = null;
+                            isLoading = true;
+                          });
+
+                          sessionId = await shared!.getSessionId();
+                          levelOne = await shared!.getLevelOne();
+                          levelTwo = await shared!.getLevelTwo();
+                          print("Level 1 - $levelOne");
+                          print("Level 2 - $levelTwo");
+                          userPanel = await shared!.getUserPanel();
+                          getProfileId = await shared!.getDefaultProfileId();
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print("ORG ID - $getOrgId");
+                          try {
+                            final value = await getPendingLeaveReq(sessionId!);
+
+                            setState(() {
+                              foundDataNewMOL2 = allUsernew;
+                              pendingLeaveReqLabel=value;
+                              pendingLeaveReqLabeled=pendingLeaveReqLabel;
+                              if(foundDataNewMOL2 != null) {
+                                foundDataNewMOL2!.length;
+                                print("Fetch data $foundDataNewMOL2");
+                              } else {
+                                Center(
+                                  child: "There is no data available right now".text.make(),
+                                );
+                                foundDataNewMOL2 = [];
+                              }
+                              isLoading = false;
+                            });
+                          } catch (e) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                            print('Error while fetching requisitions: $e');
+                          }
+                        },
+                        icon: Icon(Icons.filter_alt),
+                        label: Text("Apply Filter"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Mythemes.successColor,
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
     });
   }
 
@@ -114,43 +307,16 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
         });
   }
 
-  Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    await Future.delayed(Duration(seconds: 2));
-    Future<LevelTwoPendingLeaveModal> getAppReq11 = getPendingLeaveReq(sessionId!);
-    final loading = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        CircularProgressIndicator(),
-        Text(" Login ... Please wait")
-      ],
-    );
-
-    getAppReq11.then((value) {
-      setState(() {
-        foundDataNew = allUsernew;
-        pendingLeaveReqLabel=value;
-        pendingLeaveReqLabeled=pendingLeaveReqLabel;
-        if(foundDataNew != null) {
-          foundDataNew!.length;
-          print("Fetch data $foundDataNew");
-        } else {
-          Center(
-            child: "There is no data available right now".text.make(),
-          );
-          foundDataNew = [];
-        }
-      });
-      //print('employeeList00${pendingLeaveReqLabel!.result!.data!.length}');
-    });
-  }
-
   Future<LevelTwoPendingLeaveModal> getPendingLeaveReq(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.levelTwoLeaveList;
     print('employeeList11: ${SessionId}');
     LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -200,7 +366,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewMOL2 = results;
     });
   }
 
@@ -414,11 +580,11 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: foundDataNew!.length,
+        itemCount: foundDataNewMOL2!.length,
         itemBuilder: (context, itemCount) {
           return InkWell(
               onTap: (){
-                print(foundDataNew!.length);
+                print(foundDataNewMOL2!.length);
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => LevelTwoPendingApproval(
                     pendingLeaveRequisitionModal, itemCount)));
                 //Navigator.pushNamed(context, MyRoutings.pendingLeaveAppDisRoute);
@@ -431,13 +597,13 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                       children: [
                         Row(
                           children: [
-                            foundDataNew![itemCount].employeeName.toString().text.make().px8().py4(),
+                            foundDataNewMOL2![itemCount].employeeName.toString().text.make().px8().py4(),
                             Expanded(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    foundDataNew![itemCount].status.toString().text.make().px8(),
+                                    foundDataNewMOL2![itemCount].status.toString().text.make().px8(),
                                   ],
                                 )
                             )
@@ -446,12 +612,12 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                         ),
                         Row(
                           children: [
-                            foundDataNew![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
+                            foundDataNewMOL2![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
                           ],
                         ),
                         Row(
                           children: [
-                            foundDataNew![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
+                            foundDataNewMOL2![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
                           ],
                         ),
                         Row(
@@ -460,7 +626,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                             Column(
                               children: [
                                 "Start Date".text.sm.make(),
-                                foundDataNew![itemCount].startDate.toString().text.sm.make()
+                                foundDataNewMOL2![itemCount].startDate.toString().text.sm.make()
                               ],
                             ),
                             Padding(
@@ -468,7 +634,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                               child: Column(
                                 children: [
                                   "End Date".text.sm.make(),
-                                  foundDataNew![itemCount].endDate.toString().text.sm.make()
+                                  foundDataNewMOL2![itemCount].endDate.toString().text.sm.make()
                                 ],
                               ),
                             ),

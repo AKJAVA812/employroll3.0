@@ -10,6 +10,8 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../MSS_Bundle/leaveManagement/levelOneLeaveReq.dart';
+import '../../../MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
@@ -30,6 +32,8 @@ class LevelOnePendingApproval extends StatefulWidget {
   @override
   State<LevelOnePendingApproval> createState() => _LevelOnePendingApprovalState(pendingLeaveRequisitionModal, itemCount);
 }
+
+var userPanelPermissions;
 
 class _LevelOnePendingApprovalState extends State<LevelOnePendingApproval> {
   LevelOnePendingLeaveModal? pendingLeaveRequisitionModal;
@@ -169,22 +173,25 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
   var getComment;
   @override
   void initState() {
-    leaveType = foundDataNew![itemCount].leaveType;
-    branchName = foundDataNew![itemCount].branchName;
-    department = foundDataNew![itemCount].department;
-    empName = foundDataNew![itemCount].employeeName;
-    applicationDate = foundDataNew![itemCount].applicationDate;
-    fromDate = foundDataNew![itemCount].startDate;
-    toDate = foundDataNew![itemCount].endDate;
-    reqRemarks = foundDataNew![itemCount].summary;
-    leaveReqId = foundDataNew![itemCount].reqId;
-    status = foundDataNew![itemCount].status;
+
+    leaveType = foundDataNewMSSL1![itemCount].leaveType;
+    branchName = foundDataNewMSSL1![itemCount].branchName;
+    department = foundDataNewMSSL1![itemCount].department;
+    empName = foundDataNewMSSL1![itemCount].employeeName;
+    applicationDate = foundDataNewMSSL1![itemCount].applicationDate;
+    fromDate = foundDataNewMSSL1![itemCount].startDate;
+    toDate = foundDataNewMSSL1![itemCount].endDate;
+    reqRemarks = foundDataNewMSSL1![itemCount].summary;
+    leaveReqId = foundDataNewMSSL1![itemCount].reqId;
+    status = foundDataNewMSSL1![itemCount].status;
+    getSharedPrfanceList();
     //getComment = _commentController;
     super.initState();
-    getSharedPrfanceList();
+
   }
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPermissions = await shared!.getUserPanel();
   }
   @override
   Widget build(BuildContext context) {
@@ -442,7 +449,7 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
 
   Future<void> approveLeaveRequisition(String getComment, int? leaveReqId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.leaveApprovalApi;
+    String apiUrl = ApiDetails.leaveApprovalLevel1Api;
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
@@ -460,12 +467,12 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       dynamic reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("Leave Requisition Approval")==0){
-        showDialgSucess1(context,reason.upperCamelCase+" ","Leave Requisition Approval");
-      }else if(result.compareToIgnoringCase("error")==0){
-        showDialgSucess1(context,reason.upperCamelCase, " Error ");
-      }else if(result.compareToIgnoringCase('null')==0){
-        showDialgSucess1(context,"Some Error Occurred !", " Error ");
+      if (result.toString().toLowerCase() == "success") {
+        showDialgSucess1(context, reason.upperCamelCase + " ", "Leave Requisition Approval");
+      } else if (result.toString().toLowerCase() == "error") {
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
+      } else if (result.toString().toLowerCase() == "null") {
+        showDialgSucess1(context, "Some Error Occurred !", " Error ");
       }
 
     }
@@ -473,7 +480,7 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
 
   Future<void> disApproveLeaveRequisition(String getComment, int? leaveReqId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.leaveApprovalApi;
+    String apiUrl = ApiDetails.leaveApprovalLevel1Api;
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"

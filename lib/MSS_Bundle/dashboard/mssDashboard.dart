@@ -24,6 +24,7 @@ import '../../adminPage/modelClass/shiftListModal.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/routes.dart';
+import '../../mss_profiles/global_profile.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
@@ -39,6 +40,9 @@ class MSSNewDashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? defaultProfileName;
+dynamic defaultProfileId;
+String? userPanel;
 DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
@@ -83,10 +87,14 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
 
 
   Future getSharedPrfanceList() async {
+    defaultProfileId = await shared!.getDefaultProfileId();
+    defaultProfileName = await shared!.getDefaultProfileName();
     setState(() {
       isLoading = true; // Start loading
     });
     sessionId = await shared!.getSessionId();
+
+    userPanel = await shared!.getUserPanel();
     Future<DashboardModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
@@ -145,7 +153,7 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
 
   Future<DashboardModel> getDashboardData(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.adminDashboardAPi;
+    String apiUrl = ApiDetails.adminDashboardNewAPi;
 
     //print('employeeList11: ${SessionId}');
     DashboardModel dashboardModel;
@@ -153,7 +161,10 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');
@@ -220,7 +231,7 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
 
   Future<EventsListModal> getEventData(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.eventListModalApi;
+    String apiUrl = ApiDetails.eventListModalNewApi;
 
     print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
@@ -228,7 +239,10 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');
@@ -288,7 +302,7 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
     MediaQueryData queryData;
     //queryData = MediaQuery.of(context).size.width/2;
     return Scaffold(
-      /*floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         onPressed: () async {
           date = (await showDatePicker(
               context: context,
@@ -310,8 +324,8 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
         },
         backgroundColor: Mythemes.lightBluishColor,
         child: singleDay.toString().text.color(Mythemes.whitish).make(),
-      ),*/
-      floatingActionButton: FloatingActionButton(
+      ),
+      /*floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
             context: context,
@@ -323,38 +337,50 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
           );
         },
         child: Icon(Icons.filter_list),
-      ),
+      ),*/
       appBar: AppBar(
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: '$titleName - ',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Mythemes.successColor,
-                    borderRadius: BorderRadius.circular(12),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '$titleName - ',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  child: Text(
-                    'HR Manager - 1005',
-                    style: TextStyle(
-                      color: Mythemes.whitish,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                ),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Mythemes.successColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ValueListenableBuilder<String>(
+                      valueListenable: selectedProfileNameNotifier,
+                      builder: (context, value, _) {
+                        final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
+                            ? "COMPANY_EMPLOYEE"
+                            : value;
+
+                        return Text(
+                          displayText,
+                          style: TextStyle(
+                            color: Mythemes.whitish,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         actions: [
@@ -512,58 +538,122 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedToggleSwitch<int>.size(
-                    height: 30,
-                    current: min(value, 2),
-                    style: ToggleStyle(
-                      backgroundColor: Mythemes.greyishade,
-                      indicatorColor: Mythemes.lightBluishColor,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20.0),
-                      indicatorBorderRadius: BorderRadius.zero,
-                    ),
-                    values: const [0, 1],
-                    iconOpacity: 1.0,
-                    selectedIconScale: 1.0,
-                    indicatorSize: const Size.fromWidth(150),
-                    iconAnimationType: AnimationType.onHover,
-                    styleAnimationType: AnimationType.onHover,
-                    spacing: 2.0,
-                    customSeparatorBuilder: (context, local, global) {
-                      final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
-                      return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
-                    },
-                    customIconBuilder: (context, local, global) {
-                      final text = const ['ESS', 'MSS'][local.index];
-                      return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
-                    },
-                    borderWidth: 0.0,
-                    onChanged: (i) {
-                      setState(() {
-                        value = i;
-                        print(i);
+              Visibility(
+                visible: userPanel == "MSS",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 2),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(150),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 2.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['ESS', 'MSS'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
 
-                      });
-                      if(value == 0) {
-                        Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-                      }
-                    },
-                  )
-                ],
-              ).py(4),
+                        });
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
+                        }
+                        if(value == 0) {
+                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
+              Visibility(
+                visible: userPanel == "MSS_MO_ADMIN",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 2),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(150),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 2.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['ESS', 'MSS MO'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
+
+                        });
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                        }
+                        if(value == 0) {
+                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
               /*Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,

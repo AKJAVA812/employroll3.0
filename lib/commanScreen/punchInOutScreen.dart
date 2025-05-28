@@ -778,45 +778,48 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 3,
-          title: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '$title - ',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Mythemes.successColor,
-                      borderRadius: BorderRadius.circular(12),
+          title: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$title - ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
-                    child: ValueListenableBuilder<String>(
-                      valueListenable: selectedProfileNameNotifier,
-                      builder: (context, value, _) {
-                        final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
-                            ? "COMPANY_EMPLOYEE"
-                            : value;
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Mythemes.successColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ValueListenableBuilder<String>(
+                        valueListenable: selectedProfileNameNotifier,
+                        builder: (context, value, _) {
+                          final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
+                              ? "COMPANY_EMPLOYEE"
+                              : value;
 
-                        return Text(
-                          displayText,
-                          style: TextStyle(
-                            color: Mythemes.whitish,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        );
-                      },
+                          return Text(
+                            displayText,
+                            style: TextStyle(
+                              color: Mythemes.whitish,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           actions: <Widget>[
@@ -2207,7 +2210,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  var title = "Dashboard";
+  var title = "My Dashboard";
 
   @override
   Widget build(BuildContext context) {

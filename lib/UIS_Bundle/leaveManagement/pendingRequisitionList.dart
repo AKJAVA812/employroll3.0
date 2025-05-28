@@ -37,6 +37,8 @@ SessionManager shared = SessionManager();
 String? sessionId;
 List<Data>? allUsernew=[];
 List<Data>? foundDataNewUIS=[];
+String? userPanel;
+dynamic getProfileId;
 String? levelOne;
 String? levelTwo;
 PendingLeaveRequisitionModal? pendingLeaveReqLabel;
@@ -115,6 +117,8 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     levelOne = await shared!.getLevelOne();
     levelTwo = await shared!.getLevelTwo();
     print("Level 1 - $levelOne");
@@ -153,7 +157,11 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
     String apiUrl = ApiDetails.pendingLeaveReqList;
     print('employeeList11: ${SessionId}');
     PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');

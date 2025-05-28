@@ -33,7 +33,7 @@ class PendingLeaveApproveDisapprove extends StatefulWidget {
   @override
   State<PendingLeaveApproveDisapprove> createState() => _PendingLeaveApproveDisapproveState(pendingLeaveRequisitionModal, itemCount);
 }
-
+var userPanelPermissions;
 class _PendingLeaveApproveDisapproveState extends State<PendingLeaveApproveDisapprove> {
   PendingLeaveRequisitionModal? pendingLeaveRequisitionModal;
   int itemCount;
@@ -41,7 +41,7 @@ class _PendingLeaveApproveDisapproveState extends State<PendingLeaveApproveDisap
   var titleName = "Leave Approval";
   int pageIndex = 0;
   int currentIndex = 2;
-  var userPanel;
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -174,20 +174,11 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
   var getComment;
   @override
   void initState() {
-    if(userPanel == "MSS") {
-      leaveType = foundDataNewMSS![itemCount].leaveType;
-      lBalance = foundDataNewMSS![itemCount].totalLeave;
-      branchName = foundDataNewMSS![itemCount].branchName;
-      department = foundDataNewMSS![itemCount].department;
-      empName = foundDataNewMSS![itemCount].employeeName;
-      applicationDate = foundDataNewMSS![itemCount].applicationDate;
-      fromDate = foundDataNewMSS![itemCount].startDate;
-      toDate = foundDataNewMSS![itemCount].endDate;
-      reqRemarks = foundDataNewMSS![itemCount].summary;
-      leaveReqId = foundDataNewMSS![itemCount].reqId;
-      status = foundDataNewMSS![itemCount].status;
+    getSharedPrfanceList();
+    /*if(userPanelPermissions == "MSS") {
+
     }
-    if(userPanel == "MSS_MO_ADMIN") {
+    if(userPanelPermissions == "MSS_MO_ADMIN") {
       leaveType = foundDataNewMO![itemCount].leaveType;
       lBalance = foundDataNewMO![itemCount].totalLeave;
       branchName = foundDataNewMO![itemCount].branchName;
@@ -200,7 +191,56 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       leaveReqId = foundDataNewMO![itemCount].reqId;
       status = foundDataNewMO![itemCount].status;
     }
-    if(userPanel == "USER") {
+    if(userPanelPermissions == "USER") {
+      leaveType = foundDataNewUIS![itemCount].leaveType;
+      lBalance = foundDataNewUIS![itemCount].totalLeave;
+      branchName = foundDataNewUIS![itemCount].branchName;
+      department = foundDataNewUIS![itemCount].department;
+      empName = foundDataNewUIS![itemCount].employeeName;
+      applicationDate = foundDataNewUIS![itemCount].applicationDate;
+      fromDate = foundDataNewUIS![itemCount].startDate;
+      toDate = foundDataNewUIS![itemCount].endDate;
+      reqRemarks = foundDataNewUIS![itemCount].summary;
+      leaveReqId = foundDataNewUIS![itemCount].reqId;
+      status = foundDataNewUIS![itemCount].status;
+    }*/
+
+
+
+    //getComment = _commentController;
+    super.initState();
+
+  }
+  Future getSharedPrfanceList() async {
+    sessionId = await shared!.getSessionId();
+    userPanelPermissions = await shared!.getUserPanel();
+    if(userPanelPermissions == "MSS") {
+      leaveType = foundDataNewMSS![itemCount].leaveType;
+      lBalance = foundDataNewMSS![itemCount].totalLeave;
+      branchName = foundDataNewMSS![itemCount].branchName;
+      department = foundDataNewMSS![itemCount].department;
+      empName = foundDataNewMSS![itemCount].employeeName;
+      applicationDate = foundDataNewMSS![itemCount].applicationDate;
+      fromDate = foundDataNewMSS![itemCount].startDate;
+      toDate = foundDataNewMSS![itemCount].endDate;
+      reqRemarks = foundDataNewMSS![itemCount].summary;
+      leaveReqId = foundDataNewMSS![itemCount].reqId;
+      status = foundDataNewMSS![itemCount].status;
+    }
+    if(userPanelPermissions == "MSS_MO_ADMIN") {
+      leaveType = foundDataNewMO![itemCount].leaveType;
+      lBalance = foundDataNewMO![itemCount].totalLeave;
+      branchName = foundDataNewMO![itemCount].branchName;
+      department = foundDataNewMO![itemCount].department;
+      empName = foundDataNewMO![itemCount].employeeName;
+      applicationDate = foundDataNewMO![itemCount].applicationDate;
+      fromDate = foundDataNewMO![itemCount].startDate;
+      toDate = foundDataNewMO![itemCount].endDate;
+      reqRemarks = foundDataNewMO![itemCount].summary;
+      leaveReqId = foundDataNewMO![itemCount].reqId;
+      status = foundDataNewMO![itemCount].status;
+    }
+    if(userPanelPermissions == "USER") {
       leaveType = foundDataNewUIS![itemCount].leaveType;
       lBalance = foundDataNewUIS![itemCount].totalLeave;
       branchName = foundDataNewUIS![itemCount].branchName;
@@ -214,14 +254,10 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       status = foundDataNewUIS![itemCount].status;
     }
 
+    setState(() {
 
-    //getComment = _commentController;
-    super.initState();
-    getSharedPrfanceList();
-  }
-  Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
+    });
+    print("Panel - $userPanelPermissions");
   }
   @override
   Widget build(BuildContext context) {

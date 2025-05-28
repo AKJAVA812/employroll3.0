@@ -36,7 +36,7 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? foundDataNewMO=[];
 PendingRequisitionModel? pendingRequisitionLabel;
 PendingRequisitionModel? pendingRequisitionLabeled;
 String? userPanel;
@@ -173,7 +173,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewMO = results;
     });
   }
 
@@ -287,7 +287,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
                                 final value = await getPendingReqList(sessionId!);
 
                                 setState(() {
-                                foundDataNew = allUsernew;
+                                foundDataNewMO = allUsernew;
                                 pendingRequisitionLabel = value;
                                 pendingRequisitionLabeled = value;
                                 isLoading = false;
@@ -467,7 +467,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
         return Future.value(false);
       },
       child: ListView.builder(
-          itemCount: foundDataNew!.length,
+          itemCount: foundDataNewMO!.length,
           itemBuilder: (context, itemCount) {
             return  Column(
               children: [
@@ -477,13 +477,13 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
                   child:
                   ListTile(
                     onTap: () {
-                      print(foundDataNew!.length);
+                      print(foundDataNewMO!.length);
                       //Navigator.pushNamed(context, MyRoutings.approveDisapproveReqRoute);
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
                           ApproveDisapproveReq(pendingRequisitionModel,itemCount)));
                     },
-                    title: foundDataNew![itemCount].empName.toString().text.make(),
-                    subtitle: foundDataNew![itemCount].onDate.toString().text.make(),
+                    title: foundDataNewMO![itemCount].empName.toString().text.make(),
+                    subtitle: foundDataNewMO![itemCount].onDate.toString().text.make(),
                     trailing:  Icon(
                         CupertinoIcons.chevron_forward
                     ),

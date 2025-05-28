@@ -5,6 +5,9 @@ import 'package:er_flutter_project/modules/timeAndAttendance/reports/pendingRequ
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../../../MSS_Bundle/timeAndAttendance/pendingReqListRo.dart';
+import '../../../../MSS_MO_Bundle/timeAndAttendance/pendingReqListRo.dart';
+import '../../../../UIS_Bundle/timeAndAttendance/pendingReqListRo.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -149,6 +152,7 @@ class _RadioGroupsState extends State<RadioGroups> {
   Map<String, dynamic> mapResponse = {};
   var empName = "Employee Name";
   String? sessionId;
+  String? userPanel;
   var _outTimePicker;
   var _inTimePicker;
   String? dateSet;
@@ -163,22 +167,64 @@ class _RadioGroupsState extends State<RadioGroups> {
 
 @override
   void initState() {
-   _inTimePicker = foundDataNew![itemCount].inTime.toString();
-   _outTimePicker = foundDataNew![itemCount].outTime.toString();
-   name=foundDataNew![itemCount].empName.toString();
-
-    dateSet= foundDataNew![itemCount].onDate;
-    actualInTimeset= foundDataNew![itemCount].actualInTime;
-    inTimeReqset= foundDataNew![itemCount].inTime;
-    inRemarkset= foundDataNew![itemCount].inRemarks;
-    actualOutTimeset= foundDataNew![itemCount].actualOutTime;
-    outTimeReqset= foundDataNew![itemCount].outTime;
-    outRemarkset= foundDataNew![itemCount].outRemarks;
-    attReqId = foundDataNew![itemCount].requestId;
    getSharedPrfanceList();
 
     // TODO: implement initState
     super.initState();
+  }
+
+  Future getSharedPrfanceList() async {
+    sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    print("User Panel - $userPanel");
+
+    if(userPanel == "MSS") {
+      _inTimePicker = foundDataNewMSS![itemCount].inTime.toString();
+      _outTimePicker = foundDataNewMSS![itemCount].outTime.toString();
+      name=foundDataNewMSS![itemCount].empName.toString();
+
+      dateSet= foundDataNewMSS![itemCount].onDate;
+      actualInTimeset= foundDataNewMSS![itemCount].actualInTime;
+      inTimeReqset= foundDataNewMSS![itemCount].inTime;
+      inRemarkset= foundDataNewMSS![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewMSS![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewMSS![itemCount].outTime;
+      outRemarkset= foundDataNewMSS![itemCount].outRemarks;
+      attReqId = foundDataNewMSS![itemCount].requestId;
+    }
+
+    if(userPanel == "MSS_MO_ADMIN") {
+      _inTimePicker = foundDataNewMO![itemCount].inTime.toString();
+      _outTimePicker = foundDataNewMO![itemCount].outTime.toString();
+      name=foundDataNewMO![itemCount].empName.toString();
+
+      dateSet= foundDataNewMO![itemCount].onDate;
+      actualInTimeset= foundDataNewMO![itemCount].actualInTime;
+      inTimeReqset= foundDataNewMO![itemCount].inTime;
+      inRemarkset= foundDataNewMO![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewMO![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewMO![itemCount].outTime;
+      outRemarkset= foundDataNewMO![itemCount].outRemarks;
+      attReqId = foundDataNewMO![itemCount].requestId;
+    }
+
+    if(userPanel == "USER") {
+      _inTimePicker = foundDataNewUIS![itemCount].inTime.toString();
+      _outTimePicker = foundDataNewUIS![itemCount].outTime.toString();
+      name=foundDataNewUIS![itemCount].empName.toString();
+
+      dateSet= foundDataNewUIS![itemCount].onDate;
+      actualInTimeset= foundDataNewUIS![itemCount].actualInTime;
+      inTimeReqset= foundDataNewUIS![itemCount].inTime;
+      inRemarkset= foundDataNewUIS![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewUIS![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewUIS![itemCount].outTime;
+      outRemarkset= foundDataNewUIS![itemCount].outRemarks;
+      attReqId = foundDataNewUIS![itemCount].requestId;
+    }
+    setState(() {
+
+    });
   }
 
   @override
@@ -615,9 +661,7 @@ class _RadioGroupsState extends State<RadioGroups> {
       }
     }
   }
-  Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-  }
+
 
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(

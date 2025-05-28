@@ -173,7 +173,11 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage> w
     String apiUrl = ApiDetails.othersReqEmpList;
     print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');

@@ -436,7 +436,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
   int pageIndex = 0;
   int currentIndex = 3;
-  var titleName = "Dashboard";
+  var titleName = "My Dashboard";
 
   @override
   Widget build(BuildContext context) {
@@ -655,7 +655,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
                       });
                       if(value == 1) {
-                        Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                        Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
                       }
                       if(value == 0) {
                         Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);

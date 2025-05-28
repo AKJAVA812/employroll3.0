@@ -85,31 +85,30 @@ class _OthersSingleDateAttendanceState extends State<OthersSingleDateAttendance>
     try {
       sessionId = await shared!.getSessionId();
       userPanel = await shared!.getUserPanel();
-      if(userPanel == "MSS") {
+
+      if (userPanel == "MSS") {
         empId = empNewIdMSS;
-      }
-      if(userPanel == "MSS_MO_ADMIN") {
+      } else if (userPanel == "MSS_MO_ADMIN") {
         empId = empNewIdMO;
-      }
-      if(userPanel == "USER") {
+      } else if (userPanel == "USER") {
         empId = empNewIdUSER;
       }
 
       final fetchedData = await getSingleAttList(sessionId!, singleDateString);
+
+      if (!mounted) return; // 👈 check before calling setState
       setState(() {
         onDateAttModelGlobel = fetchedData;
       });
 
-      if (getData == 0 )  {
+      if (getData == 0) {
         print("No data found in the model");
-        Center(
-          child:
-          "There is no data".text.make()
-        );
-        //showNodata(context, "Oops", "No data available.");
+        if (!mounted) return; // 👈 check again before using context
+        showNodata(context, "Oops", "No data available.");
       }
     } catch (e) {
       print("Error: $e");
+      if (!mounted) return; // 👈 prevent error here too
       showNodata(context, "Error", "Failed to fetch data.");
     }
   }
@@ -408,7 +407,7 @@ class _AttListState extends State<AttList> {
                           child: Column(
                             children: [
 
-                              "Working Hours".text.sm.make(),
+                              "Work Hours".text.sm.make(),
                               onDateAttModelGlobel!.workingHrs!.text.sm.make()
                             ],
                           ),

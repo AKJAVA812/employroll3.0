@@ -101,6 +101,7 @@ class _ProjectListState extends State<ProjectList> {
 
     sessionId = await shared!.getSessionId();
     userType = await shared!.getUserType();
+
     setState(() {
 
     });
@@ -116,6 +117,12 @@ class _ProjectListState extends State<ProjectList> {
     setPreOnboardShow= await shared.getPreOnboardShow();
     setExitShow= await shared.getExitShow();
     userPanel= await shared.getUserPanel();
+
+    if(userPanel == "COMPANY_EMPLOYEE") {
+      value = 0;
+    } else {
+      value = 1;
+    }
     profileName= await shared.getDefaultProfileName();
     profileId= await shared.getDefaultProfileId();
     print("Default Profile Name - $profileName");

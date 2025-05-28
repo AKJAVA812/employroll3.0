@@ -37,7 +37,9 @@ class Admin_UIS_Dashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
-String? userPanelPermission;
+String? defaultProfileName;
+dynamic defaultProfileId;
+String? userPanel;
 DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
@@ -82,7 +84,8 @@ class _Admin_UIS_DashboardState extends State<Admin_UIS_Dashboard> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
-    userPanelPermission = await shared!.getUserPanel();
+    userPanel = await shared!.getUserPanel();
+    defaultProfileId = await shared!.getDefaultProfileId();
     setState(() {
       isLoading = true; // Start loading
     });
@@ -143,7 +146,7 @@ class _Admin_UIS_DashboardState extends State<Admin_UIS_Dashboard> {
 
   Future<DashboardModel> getDashboardData(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.adminDashboardAPi;
+    String apiUrl = ApiDetails.adminDashboardNewAPi;
 
     //print('employeeList11: ${SessionId}');
     DashboardModel dashboardModel;
@@ -151,7 +154,10 @@ class _Admin_UIS_DashboardState extends State<Admin_UIS_Dashboard> {
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');
@@ -245,7 +251,7 @@ class _Admin_UIS_DashboardState extends State<Admin_UIS_Dashboard> {
 
   Future<EventsListModal> getEventData(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.eventListModalApi;
+    String apiUrl = ApiDetails.eventListModalNewApi;
 
     print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
@@ -253,7 +259,10 @@ class _Admin_UIS_DashboardState extends State<Admin_UIS_Dashboard> {
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');
@@ -396,7 +405,7 @@ class _Admin_UIS_DashboardState extends State<Admin_UIS_Dashboard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Visibility(
-                visible: userPanelPermission == "MSS",
+                visible: userPanel == "MSS",
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -443,7 +452,7 @@ class _Admin_UIS_DashboardState extends State<Admin_UIS_Dashboard> {
 
                         });
                         if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                          Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
                         }
                         if(value == 0) {
                           Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -454,7 +463,7 @@ class _Admin_UIS_DashboardState extends State<Admin_UIS_Dashboard> {
                 ),
               ),
               Visibility(
-                visible: userPanelPermission == "MSS_MO_ADMIN",
+                visible: userPanel == "MSS_MO_ADMIN",
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -29,6 +29,8 @@ var empNewId;
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanel;
+dynamic getProfileId;
 RequistionEmpListModel? employeeListModelglobel;
 LeaveBalanceModel? leaveBalanceLabel;
 String valuenew="listText";
@@ -70,6 +72,8 @@ class _MSS_OthersLeaveReqPageState extends State<MSS_OthersLeaveReqPage> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(sessionId!);
     Future<LeaveBalanceModel?> getLeaveType12 = getLeaveTypeList(sessionId!);
@@ -104,7 +108,11 @@ class _MSS_OthersLeaveReqPageState extends State<MSS_OthersLeaveReqPage> {
     String apiUrl = ApiDetails.othersReqEmpList;
     print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');

@@ -24,6 +24,7 @@ import '../../adminPage/modelClass/shiftListModal.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/routes.dart';
+import '../../mss_profiles/global_profile.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
@@ -44,6 +45,9 @@ DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
 EventsListModal? eventsListModalGlobal;
+String? defaultProfileName;
+dynamic defaultProfileId;
+String? userPanel;
 DateTime date = DateTime.now();
 var branchId = 0;
 var shift = 0;
@@ -88,6 +92,9 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
       isLoading = true; // Start loading
     });
     sessionId = await shared!.getSessionId();
+    defaultProfileId = await shared!.getDefaultProfileId();
+    defaultProfileName = await shared!.getDefaultProfileName();
+    userPanel = await shared!.getUserPanel();
     userPanelPermission = await shared!.getUserPanel();
     Future<DashboardModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
@@ -147,7 +154,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 
   Future<DashboardModel> getDashboardData(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.adminDashboardAPi;
+    String apiUrl = ApiDetails.adminDashboardNewAPi;
 
     //print('employeeList11: ${SessionId}');
     DashboardModel dashboardModel;
@@ -155,7 +162,10 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');
@@ -222,7 +232,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 
   Future<EventsListModal> getEventData(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.eventListModalApi;
+    String apiUrl = ApiDetails.eventListModalNewApi;
 
     print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
@@ -230,7 +240,10 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');
@@ -290,7 +303,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     MediaQueryData queryData;
     //queryData = MediaQuery.of(context).size.width/2;
     return Scaffold(
-      /*floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         onPressed: () async {
           date = (await showDatePicker(
               context: context,
@@ -312,8 +325,8 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
         },
         backgroundColor: Mythemes.lightBluishColor,
         child: singleDay.toString().text.color(Mythemes.whitish).make(),
-      ),*/
-      floatingActionButton: FloatingActionButton(
+      ),
+      /*floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
             context: context,
@@ -325,38 +338,50 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
           );
         },
         child: Icon(Icons.filter_list),
-      ),
+      ),*/
       appBar: AppBar(
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: '$titleName - ',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Mythemes.successColor,
-                    borderRadius: BorderRadius.circular(12),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '$titleName - ',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  child: Text(
-                    'HR Manager - 1005',
-                    style: TextStyle(
-                      color: Mythemes.whitish,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                ),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Mythemes.successColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ValueListenableBuilder<String>(
+                      valueListenable: selectedProfileNameNotifier,
+                      builder: (context, value, _) {
+                        final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
+                            ? "COMPANY_EMPLOYEE"
+                            : value;
+
+                        return Text(
+                          displayText,
+                          style: TextStyle(
+                            color: Mythemes.whitish,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         actions: [
@@ -562,7 +587,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 
                         });
                         if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                          Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
                         }
                         if(value == 0) {
                           Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);

@@ -41,7 +41,7 @@ String? deptName;
 String? empName;
 String singleDateString="";
 String? userPanel;
-String? getProfileId;
+dynamic getProfileId;
 String? orgId;
 class _UIS_OthersAttendanceRequisitionPageState extends State<UIS_OthersAttendanceRequisitionPage> {
   var titleName = "Other Employee's Requisition";

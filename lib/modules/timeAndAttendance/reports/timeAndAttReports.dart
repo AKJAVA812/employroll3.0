@@ -45,7 +45,9 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
       pendingAttRequestMOPermission= (await shared.getPendingAttendanceReqMSSMOPermission())!;
       pendingAttRequestMSSPermission= (await shared.getPendingAttendanceReqMSSPermission())!;
       pendingAttRequestUISPermission= (await shared.getPendingAttendanceReqUISPermission())!;
-      print("Pending Attendance Request - $pendingAttRequestMOPermission");
+      print("Pending Attendance Request MSS MO- $pendingAttRequestMOPermission");
+      print("Pending Attendance Request MSS- $pendingAttRequestMSSPermission");
+      print("Pending Attendance Request UIS- $pendingAttRequestUISPermission");
       print("User Panel - $userPanelPermission");
       adminRole= await shared.getAdminRole();
     print('empRole $empRole');

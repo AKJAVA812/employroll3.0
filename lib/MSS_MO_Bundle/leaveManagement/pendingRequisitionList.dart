@@ -197,7 +197,11 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
     String apiUrl = ApiDetails.pendingLeaveReqList;
     print('employeeList11: ${SessionId}');
     PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -447,7 +451,7 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
 
       floatingActionButton: FloatingActionButton(
         onPressed: _showFilterBottomSheet,
-        child: Icon(Icons.filter_list),
+        child: Icon(Icons.filter_list, color: Mythemes.whitish,),
       ),
 
       body: Container(
@@ -507,14 +511,14 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                           });
 
                           if(value == 0) {
-                            Navigator.pushNamed(context, MyRoutings.pendingLeaveReqListRoute);
+                            Navigator.pushNamed(context, MyRoutings.mssMoPendingLeaveRequestRoute);
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
                           if(value == 1) {
-                            Navigator.pushNamed(context, MyRoutings.levelOnePendingRoute);
+                            Navigator.pushNamed(context, MyRoutings.mssMoLevelOnePendingReqRoute);
                           }
                            if(value == 2) {
-                             Navigator.pushNamed(context, MyRoutings.levelTwoPendingRoute);
+                             Navigator.pushNamed(context, MyRoutings.mssMoLevelTwoPendingReqRoute);
                           }
                         },
                       )

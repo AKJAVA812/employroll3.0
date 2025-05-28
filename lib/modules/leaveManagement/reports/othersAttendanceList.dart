@@ -14,6 +14,9 @@ import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import '../../../MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
+import '../../../MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
+import '../../../UIS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
@@ -36,6 +39,7 @@ class OthersAttendanceList extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanel;
 AttendanceReportModel? attendanceModelGlobel;
 OnDateAttModel? onDateAttModel;
 int? empId;
@@ -75,7 +79,16 @@ class _OthersAttendanceListState extends State<OthersAttendanceList> with RouteA
   }
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
-    empId= empNewId;
+    userPanel = await shared!.getUserPanel();
+    if(userPanel == "MSS") {
+      empId = empNewIdMSS;
+    }
+    if(userPanel == "MSS_MO_ADMIN") {
+      empId = empNewIdMO;
+    }
+    if(userPanel == "USER") {
+      empId = empNewIdUSER;
+    }
     print("EMPID - $empId");
     // await Future.delayed(Duration(seconds: 5));
     Future<AttendanceReportModel> getEmployeeList11 = getEmployeeList(sessionId!);
@@ -268,8 +281,12 @@ class _OthersAttendanceListState extends State<OthersAttendanceList> with RouteA
                           Column(
                             children: [
                               "In Time".text.sm.make(),
-                              attendanceModelGlobel!.data![itemCount].inTime! == "National Holiday" ? "NH".text.sm.make() :
-                              attendanceModelGlobel!.data![itemCount].inTime!.text.sm.make()
+                              (attendanceModelGlobel!.data![itemCount].inTime! == "National Holiday" ||
+                                  attendanceModelGlobel!.data![itemCount].inTime! == "Restricted Holiday")
+                                  ? (attendanceModelGlobel!.data![itemCount].inTime! == "National Holiday"
+                                  ? "NH".text.sm.make()
+                                  : "RH".text.sm.make())
+                                  : attendanceModelGlobel!.data![itemCount].inTime!.text.sm.make()
                             ],
                           ),
                           Padding(
@@ -282,15 +299,16 @@ class _OthersAttendanceListState extends State<OthersAttendanceList> with RouteA
                               ],
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Out Time".text.sm.make(),
-                                attendanceModelGlobel!.data![itemCount].outTime! == "National Holiday" ? "NH".text.sm.make() :
-                                attendanceModelGlobel!.data![itemCount].outTime!.text.sm.make()
-                              ],
-                            ),
+                          Column(
+                            children: [
+                              "Out Time".text.sm.make(),
+                              (attendanceModelGlobel!.data![itemCount].outTime! == "National Holiday" ||
+                                  attendanceModelGlobel!.data![itemCount].outTime! == "Restricted Holiday")
+                                  ? (attendanceModelGlobel!.data![itemCount].outTime! == "National Holiday"
+                                  ? "NH".text.sm.make()
+                                  : "RH".text.sm.make())
+                                  : attendanceModelGlobel!.data![itemCount].outTime!.text.sm.make()
+                            ],
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top:15, left: 5, right: 3, bottom: 18),

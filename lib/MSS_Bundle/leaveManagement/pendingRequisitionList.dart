@@ -39,6 +39,9 @@ List<Data>? allUsernew=[];
 List<Data>? foundDataNewMSS=[];
 String? levelOne;
 String? levelTwo;
+String? userPanel;
+dynamic getProfileId;
+String? orgId;
 PendingLeaveRequisitionModal? pendingLeaveReqLabel;
 PendingLeaveRequisitionModal? pendingLeaveReqLabeled;
 
@@ -115,6 +118,8 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    getProfileId = await shared!.getDefaultProfileId();
+    userPanel = await shared!.getUserPanel();
     levelOne = await shared!.getLevelOne();
     levelTwo = await shared!.getLevelTwo();
     print("Level 1 - $levelOne");
@@ -153,7 +158,11 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
     String apiUrl = ApiDetails.pendingLeaveReqList;
     print('employeeList11: ${SessionId}');
     PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -307,14 +316,14 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                           });
 
                           if(value == 0) {
-                            Navigator.pushNamed(context, MyRoutings.pendingLeaveReqListRoute);
+                            Navigator.pushNamed(context, MyRoutings.mssPendingLeaveRequestRoute);
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
                           if(value == 1) {
-                            Navigator.pushNamed(context, MyRoutings.levelOnePendingRoute);
+                            Navigator.pushNamed(context, MyRoutings.mssLevelOnePendingReqRoute);
                           }
                            if(value == 2) {
-                             Navigator.pushNamed(context, MyRoutings.levelTwoPendingRoute);
+                             Navigator.pushNamed(context, MyRoutings.mssLevelTwoPendingReqRoute);
                           }
                         },
                       )

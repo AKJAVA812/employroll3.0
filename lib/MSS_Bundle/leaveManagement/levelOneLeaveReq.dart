@@ -36,8 +36,10 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+String? userPanel;
+dynamic getProfileId;
 List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? foundDataNewMSSL1=[];
 
 LevelOnePendingLeaveModal? pendingLeaveReqLabel;
 LevelOnePendingLeaveModal? pendingLeaveReqLabeled;
@@ -71,13 +73,15 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
     setState(() {
       getSharedPrfanceList();
       var listLength;
-      listLength = foundDataNew!.length;
+      listLength = foundDataNewMSSL1!.length;
       print('listLength $listLength');
     });
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     await Future.delayed(Duration(seconds: 2));
     Future<LevelOnePendingLeaveModal> getAppReq11 = getPendingLeaveReq(sessionId!);
     final loading = Row(
@@ -90,17 +94,17 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
 
     getAppReq11.then((value) {
       setState(() {
-        foundDataNew = allUsernew;
+        foundDataNewMSSL1 = allUsernew;
         pendingLeaveReqLabel=value;
         pendingLeaveReqLabeled=pendingLeaveReqLabel;
-        if(foundDataNew != null) {
-          foundDataNew!.length;
-          print("Fetch data $foundDataNew");
+        if(foundDataNewMSSL1 != null) {
+          foundDataNewMSSL1!.length;
+          print("Fetch data $foundDataNewMSSL1");
         } else {
           Center(
             child: "There is no data available right now".text.make(),
           );
-          foundDataNew = [];
+          foundDataNewMSSL1 = [];
         }
       });
       print('employeeList00${pendingLeaveReqLabel!.result!.data!.length}');
@@ -150,7 +154,11 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
     String apiUrl = ApiDetails.levelOneLeaveList;
     print('employeeList11: ${SessionId}');
     LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -200,7 +208,7 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewMSSL1 = results;
     });
   }
 
@@ -301,14 +309,14 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
                         });
 
                         if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.pendingLeaveReqListRoute);
+                          Navigator.pushNamed(context, MyRoutings.mssPendingLeaveRequestRoute);
                           //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                         }
                         if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.levelOnePendingRoute);
+                          Navigator.pushNamed(context, MyRoutings.mssLevelOnePendingReqRoute);
                         }
                         if(value == 2) {
-                          Navigator.pushNamed(context, MyRoutings.levelTwoPendingRoute);
+                          Navigator.pushNamed(context, MyRoutings.mssLevelTwoPendingReqRoute);
                         }
                       },
                     )
@@ -410,11 +418,11 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: foundDataNew!.length,
+        itemCount: foundDataNewMSSL1!.length,
         itemBuilder: (context, itemCount) {
           return InkWell(
               onTap: (){
-                print(foundDataNew!.length);
+                print(foundDataNewMSSL1!.length);
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => LevelOnePendingApproval(
                     pendingLeaveRequisitionModal, itemCount)));
                 //Navigator.pushNamed(context, MyRoutings.pendingLeaveAppDisRoute);
@@ -427,13 +435,13 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
                       children: [
                         Row(
                           children: [
-                            foundDataNew![itemCount].employeeName.toString().text.make().px8().py4(),
+                            foundDataNewMSSL1![itemCount].employeeName.toString().text.make().px8().py4(),
                             Expanded(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    foundDataNew![itemCount].status.toString().text.make().px8(),
+                                    foundDataNewMSSL1![itemCount].status.toString().text.make().px8(),
                                   ],
                                 )
                             )
@@ -442,12 +450,12 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
                         ),
                         Row(
                           children: [
-                            foundDataNew![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
+                            foundDataNewMSSL1![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
                           ],
                         ),
                         Row(
                           children: [
-                            foundDataNew![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
+                            foundDataNewMSSL1![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
                           ],
                         ),
                         Row(
@@ -456,7 +464,7 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
                             Column(
                               children: [
                                 "Start Date".text.sm.make(),
-                                foundDataNew![itemCount].startDate.toString().text.sm.make()
+                                foundDataNewMSSL1![itemCount].startDate.toString().text.sm.make()
                               ],
                             ),
                             Padding(
@@ -464,7 +472,7 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
                               child: Column(
                                 children: [
                                   "End Date".text.sm.make(),
-                                  foundDataNew![itemCount].endDate.toString().text.sm.make()
+                                  foundDataNewMSSL1![itemCount].endDate.toString().text.sm.make()
                                 ],
                               ),
                             ),

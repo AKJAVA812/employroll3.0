@@ -30,7 +30,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../UIS_Bundle/dashboard/adminDashboard.dart' as mss;
+import '../ess/essDashboard.dart' as ess;
 //import 'package:safe_device/safe_device.dart';
 //import 'package:trust_location/trust_location.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -440,45 +441,48 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 3,
-          title: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: '$title - ',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Mythemes.successColor,
-                      borderRadius: BorderRadius.circular(12),
+          title: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$title - ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
-                    child: ValueListenableBuilder<String>(
-                      valueListenable: selectedProfileNameNotifier,
-                      builder: (context, value, _) {
-                        final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
-                            ? "COMPANY_EMPLOYEE"
-                            : value;
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Mythemes.successColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ValueListenableBuilder<String>(
+                        valueListenable: selectedProfileNameNotifier,
+                        builder: (context, value, _) {
+                          final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
+                              ? "COMPANY_EMPLOYEE"
+                              : value;
 
-                        return Text(
-                          displayText,
-                          style: TextStyle(
-                            color: Mythemes.whitish,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        );
-                      },
+                          return Text(
+                            displayText,
+                            style: TextStyle(
+                              color: Mythemes.whitish,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           actions: <Widget>[
@@ -1814,7 +1818,9 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return EssAdminDashboard(EssDashboarrdModel());
+    return userPanelPermission == "USER" ?
+    mss.Admin_UIS_Dashboard(DashboardModel()) :
+    ess.EssAdminDashboard(EssDashboarrdModel());
   }
 }
 

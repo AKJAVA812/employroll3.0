@@ -26,6 +26,7 @@ import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/routes.dart';
 import '../../main.dart';
+import '../../mss_profiles/global_profile.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
@@ -42,6 +43,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 String? userPanelPermission;
+dynamic defaultProfileId;
+String? defaultProfileName;
 DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
@@ -161,6 +164,8 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     }
     loadOrgListFromPrefs();
     userPanelPermission = await shared.getUserPanel();
+    defaultProfileName = await shared.getDefaultProfileName();
+    defaultProfileId = await shared.getDefaultProfileId();
   }
 
   DateTime? selectedDate;
@@ -250,18 +255,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                     /// Date Picker Field
                     GestureDetector(
                       onTap: () async {
-                        final pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: selectedDate ?? DateTime.now(),
-                          firstDate: DateTime(1947),
-                          lastDate: DateTime.now(),
-                        );
-                        if (pickedDate != null) {
-                          setState(() {
-                            selectedDate = pickedDate;
-                            selectedDateFormatted = DateFormat('dd-MM-yyyy').format(pickedDate);
-                          });
-                        }
+                        date = (await showDatePicker(
+                            context: context,
+                            initialDate: date,
+                            firstDate: DateTime(1947),
+                            lastDate: DateTime.now().add(Duration(days: 0))))!;
+
+                        setState(() {
+                          loader();
+                          //getSharedPrfanceList();
+                          singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                          singleDay = DateFormat('dd').format(date!);
+                          print("SingleDateNew $singleDateString");
+                          print("singleDay $singleDay");
+                          //dateController.text = DateFormat("dd").format(date!);
+
+                          //  DateFormat.yMd().format(date!).toString();
+                        });
                       },
                       child: AbsorbPointer(
                         child: TextFormField(
@@ -272,7 +282,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                             suffixIcon: Icon(Icons.calendar_today),
                           ),
                           controller: TextEditingController(
-                            text: selectedDateFormatted ?? '',
+                            text: singleDateString ?? '',
                           ),
                         ),
                       ),
@@ -294,7 +304,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
                           try {
                             sessionId = await shared!.getSessionId();
-
+                            getOrgId = matchedOrg['id']?.toString() ?? '';
                             // Fetch all data in parallel
                             final results = await Future.wait([
                               getDashboardData(sessionId!),
@@ -417,7 +427,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
   Future<DashboardModel> getDashboardData(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.adminDashboardAPi;
+    String apiUrl = ApiDetails.adminDashboardNewAPi;
 
     //print('employeeList11: ${SessionId}');
     DashboardModel dashboardModel;
@@ -425,7 +435,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanelPermission&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');
@@ -492,7 +505,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
   Future<EventsListModal> getEventData(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.eventListModalApi;
+    String apiUrl = ApiDetails.eventListModalNewApi;
 
     print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
@@ -500,7 +513,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanelPermission&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');
@@ -576,36 +592,48 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
         child: Icon(Icons.filter_list, color: Mythemes.whitish,),
       ),
       appBar: AppBar(
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: '$titleName - ',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Mythemes.successColor,
-                    borderRadius: BorderRadius.circular(12),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: '$titleName - ',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  child: Text(
-                    'HR Manager - 1005',
-                    style: TextStyle(
-                      color: Mythemes.whitish,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                ),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Mythemes.successColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ValueListenableBuilder<String>(
+                      valueListenable: selectedProfileNameNotifier,
+                      builder: (context, value, _) {
+                        final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
+                            ? "COMPANY_EMPLOYEE"
+                            : value;
+
+                        return Text(
+                          displayText,
+                          style: TextStyle(
+                            color: Mythemes.whitish,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         actions: [
@@ -818,7 +846,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
                         });
                         if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                          Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
                         }
                         if(value == 0) {
                           Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
