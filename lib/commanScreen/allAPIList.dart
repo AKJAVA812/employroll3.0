@@ -123,7 +123,6 @@ class ApiDetails{
    //ESS Calendar API
    static var calendarApi = "/restful/service/get/emp/calendar/ess";
 
-
    //Travel & Expense
    static var selfClaimRequestListApi = "restful/service/get/employee/self/claim/policy/list";
    static var reimbursementTypeListApi = "restful/service/employee/get/claim/policy/map/list";
