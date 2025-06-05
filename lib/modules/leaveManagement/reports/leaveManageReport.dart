@@ -30,7 +30,19 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
-
+  String userPanelPermission = "COMPANY_EMPLOYEE";
+  String pendingLeaveRequestMOPermission = "0";
+  String pendingLeaveL1RequestMOPermission = "0";
+  String pendingLeaveL2RequestMOPermission = "0";
+  String pendingLeaveRequestMSSPermission = "0";
+  String pendingLeaveL1RequestMSSPermission = "0";
+  String pendingLeaveL2RequestMSSPermission = "0";
+  String pendingLeaveRequestUISPermission = "0";
+  String pendingLeaveL1RequestUISPermission = "0";
+  String pendingLeaveL2RequestUISPermission = "0";
+  String othersLeaveRequestUISPermission = "0";
+  String othersLeaveRequestMOPermission = "0";
+  String othersLeaveRequestMSSPermission = "0";
 
   @override
   void initState() {
@@ -45,6 +57,20 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
     levelOne = await shared!.getLevelOne();
     levelTwo = await shared!.getLevelTwo();
     pendingLeaveRequisitions = await shared!.getPendingLeaveReq();
+    userPanelPermission= await shared.getUserPanel();
+    pendingLeaveRequestMOPermission= (await shared.getPendingLeaveReqMSSMOPermission())!;
+    pendingLeaveL1RequestMOPermission= (await shared.getPendingLeaveReqL1MSSMOPermission())!;
+    pendingLeaveL2RequestMOPermission= (await shared.getPendingLeaveReqL2MSSMOPermission())!;
+    pendingLeaveRequestMSSPermission= (await shared.getPendingLeaveReqMSSPermission())!;
+    pendingLeaveL1RequestMSSPermission= (await shared.getPendingLeaveReqL1MSSPermission())!;
+    pendingLeaveL2RequestMSSPermission= (await shared.getPendingLeaveReqL2MSSPermission())!;
+    pendingLeaveRequestUISPermission= (await shared.getPendingLeaveReqUISPermission())!;
+    pendingLeaveL1RequestUISPermission= (await shared.getPendingLeaveReqL1UISPermission())!;
+    pendingLeaveL2RequestUISPermission= (await shared.getPendingLeaveReqL2UISPermission())!;
+    othersLeaveRequestMSSPermission= (await shared.getOthersLeaveReqMSSPermission())!;
+    othersLeaveRequestMOPermission= (await shared.getOthersLeaveReqMSSMOPermission())!;
+    othersLeaveRequestUISPermission= (await shared.getOthersLeaveReqUISPermission())!;
+    print("User Panel - $userPanelPermission");
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
     print("Pending Leave Requisitions - $pendingLeaveRequisitions");
@@ -97,61 +123,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
-      if(showHide) {
-        items.add(
-          Hero(
-            tag: 'myRequests',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () async {
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
-                  if(internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection".text.make(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Please check your Internet connection."),
-                      ));
-                    });
 
-                  } else {
-                    Navigator.pushNamed(context, MyRoutings.requestedRequisitionRoute);
-                  }
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.pending_actions_rounded,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'My Requests',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
 
       /*if(showHide) {
         items.add(
@@ -261,7 +233,8 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
         );
       }*/
 
-      if(showHide) {
+      //MSS Pending Leaves
+      if(userPanelPermission == "MSS" && pendingLeaveRequestMSSPermission == "1") {
         items.add(
           Hero(
             tag: 'pendingLeave',
@@ -281,7 +254,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
                     });
 
                   } else {
-                    Navigator.pushNamed(context, MyRoutings.pendingLeaveReqListRoute);
+                    Navigator.pushNamed(context, MyRoutings.mssPendingLeaveRequestRoute);
                   }
                 },
                 child: Stack(
@@ -302,6 +275,288 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
                             'Pending Leaves',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      //MSS Others Leave
+      if(userPanelPermission == "MSS" && pendingLeaveRequestMSSPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'others',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
+
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.mssOtherLeaveReqRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.account_circle_rounded,
+                        size: 50,
+                        color: Mythemes.warningColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Others Requisition',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //MSS MO Pending Leaves
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingLeaveRequestMOPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'pendingLeave',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
+
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.mssMoPendingLeaveRequestRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.pending_actions_rounded,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending Leaves',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      //MSS MO Others Leave
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingLeaveRequestMOPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'others',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
+
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.mssMoOtherLeaveReqRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.account_circle_rounded,
+                        size: 50,
+                        color: Mythemes.warningColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Others Requisition',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //UIS Pending Leaves
+      if(userPanelPermission == "USER" && pendingLeaveRequestUISPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'pendingLeave',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
+
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.uisPendingLeaveRequestRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.pending_actions_rounded,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending Leaves',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      //UIS Others Leave
+      if(userPanelPermission == "USER" && pendingLeaveRequestUISPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'others',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
+
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.uisOtherLeaveReqRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.account_circle_rounded,
+                        size: 50,
+                        color: Mythemes.warningColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Others Requisition',
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style:
@@ -479,61 +734,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
         );
       }*/
 
-      if(showRo || showAdmin) {
-        items.add(
-          Hero(
-            tag: 'others',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () async {
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
-                  if(internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection".text.make(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Please check your Internet connection."),
-                      ));
-                    });
 
-                  } else {
-                    Navigator.pushNamed(context, MyRoutings.othersEmpReqRoute);
-                  }
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.account_circle_rounded,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Others Requisition',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
 
       return items;
     }

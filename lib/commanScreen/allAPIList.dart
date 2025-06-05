@@ -4,7 +4,7 @@ class ApiDetails{
    static var server="http://www.employroll.com/";
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://c05b671c9d94.ngrok.app/";
+   //static var server="https://accbf7b67c83.ngrok.app/";
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
    static String punchIn="/restful/service/attendance/via/mobile";
@@ -39,6 +39,8 @@ class ApiDetails{
    static var qrBasedAttendance = "/restful/service/attendance/via/mobile/qr/code/scanner";
    //Leave management
    static var leaveApprovalApi = "/restful/service/requested/leave/approval";
+   static var leaveApprovalLevel1Api = "/restful/service/requested/leave/approval/level/one";
+   static var leaveApprovalLevel2Api = "/restful/service/requested/leave/approval/level/two";
    static var leaveBalanceApi = "/restful/service/leave/type/list";
    static var leaveBal = "/restful/service/get/leave/ledger/yearly";
    static var roApprovedReqList = "/restful/service/approved/leave/requisition/list";
@@ -69,7 +71,9 @@ class ApiDetails{
 
    //Admin dashboard API
    static var adminDashboardAPi = "restful/service/dashboard/present/absent/count";
+   static var adminDashboardNewAPi = "restful/service/dashboard/present/absent/count/new";
    static var eventListModalApi = "restful/service/get/emp/event";
+   static var eventListModalNewApi = "restful/service/get/emp/event/new";
    static var branchListApi = "restful/service/dashboard/branchlist";
    static var shiftListApi = "restful/service/dashboard/shiftlist";
 
@@ -178,5 +182,11 @@ class ApiDetails{
    static var preOnboardSaveApi = "restful/service/pre/onboard/mobile/details/save";
    static var preOnboardApproveApi = "restful/service/pre/onboard/mobile/details/approve";
    static var preOnboardAadharVerifyApi = "restful/service/pre/onboard/mobile/aadhar/verification";
+
+   //profile list
+   static var profileListApi = "restful/service/get/user/all/mapped/profile/list";
+
+   //Organisation List
+   static var orgListApi = "restful/service/org/details/master/list";
 
 }

@@ -34,7 +34,7 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
-
+  String userPanelPermission = "COMPANY_EMPLOYEE";
 
   @override
   void initState() {
@@ -49,6 +49,8 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
     empId= await shared.getEmpId();
     orgId= await shared.getOrgId();
     setPreOnboardShow= await shared.getPreOnboardShow();
+    userPanelPermission= await shared.getUserPanel();
+    print("User Panel - $userPanelPermission");
     emailId= await shared.getEmailId();
     levelOne = await shared!.getLevelOne();
     levelTwo = await shared!.getLevelTwo();
@@ -62,6 +64,8 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
     print('EMP ID - $empId');
     print('ORG ID - $orgId');
     print('PreOnboardShow- $setPreOnboardShow');
+
+
 
     if(empRole==1){
       showHide=true;
@@ -108,7 +112,8 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
-      if(setPreOnboardShow == "true" || empId == 75324 || emailId == "sid@voyageofwellness.co.in"  || orgId == 145 || orgId == 3) {
+      if(setPreOnboardShow == "true" || empId == 75324 || emailId == "sid@voyageofwellness.co.in"  || orgId == 145 || orgId == 3
+      || userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'preOnboardList',
@@ -163,11 +168,72 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
           ),
         );
       }
-      //Permission activated on Shivank, SID, Privado, Thumbmatic
+      //Permission activated on Shivank, SID, Privado, Thumbmatic - MSS
       if (empId == 75324 ||
           emailId == "sid@voyageofwellness.co.in" ||
           orgId == 145 ||
-          orgId == 3) {
+          orgId == 3 || userPanelPermission == "MSS") {
+        items.add(
+          Hero(
+            tag: 'pendingPreOnboardList',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
+
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.pendingPreOnboardListRoute);
+
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.pending_actions_rounded,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Approval',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //Permission activated on Shivank, SID, Privado, Thumbmatic MSS MO
+      if (empId == 75324 ||
+          emailId == "sid@voyageofwellness.co.in" ||
+          orgId == 145 ||
+          orgId == 3 || userPanelPermission == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'pendingPreOnboardList',

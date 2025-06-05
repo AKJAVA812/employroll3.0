@@ -29,10 +29,16 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
-
-  String? claimLevelOne;
-  String? claimLevelTwo;
-  String? claimLevelThree;
+  String userPanelPermission = "COMPANY_EMPLOYEE";
+  String? claimLevelOneMO;
+  String? claimLevelTwoMO;
+  String? claimLevelThreeMO;
+  String? claimLevelOneMSS;
+  String? claimLevelTwoMSS;
+  String? claimLevelThreeMSS;
+  String? claimLevelOneUIS;
+  String? claimLevelTwoUIS;
+  String? claimLevelThreeUIS;
 
   @override
   void didChangeDependencies() {
@@ -63,16 +69,25 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
-    claimLevelOne = await shared!.getClaimLevelOne();
-    claimLevelTwo = await shared!.getClaimLevelTwo();
-    claimLevelThree = await shared!.getClaimLevelThree();
+    claimLevelOneMSS = await shared!.getClaimLevelOne();
+    claimLevelTwoMSS = await shared!.getClaimLevelTwo();
+    claimLevelThreeMSS = await shared!.getClaimLevelThree();
+    claimLevelOneMO = await shared!.getClaimLevelOneMO();
+    claimLevelTwoMO = await shared!.getClaimLevelTwoMO();
+    claimLevelThreeMO = await shared!.getClaimLevelThreeMO();
+    claimLevelOneUIS = await shared!.getClaimLevelOneUIS();
+    claimLevelTwoUIS = await shared!.getClaimLevelTwoUIS();
+    claimLevelThreeUIS = await shared!.getClaimLevelThreeUIS();
+
+    userPanelPermission= await shared.getUserPanel();
+    print("User Panel - $userPanelPermission");
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
 
-    print('Claim L1 $claimLevelOne');
-    print('Claim L2 $claimLevelTwo');
-    print('Claim L3 $claimLevelThree');
+    print('Claim L1 $claimLevelOneMO');
+    print('Claim L2 $claimLevelTwoMO');
+    print('Claim L3 $claimLevelThreeMO');
 
     if(empRole==1){
       showHide=true;
@@ -120,7 +135,7 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
       //My Requests
-      if(showHide) {
+      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'raiseClaim',
@@ -175,64 +190,124 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
           ),
         );
       }
-      //Pending Requisition List Ro
-      if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW" || claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW" || claimLevelThree == "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
-        items.add(
-          Hero(
-            tag: 'myTeamPendingReq',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () async{
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
-                  if(internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection".text.make(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Please check your Internet connection."),
-                      ));
-                    });
 
-                  } else {
-                    Navigator.pushNamed(context, MyRoutings.claimMssItemsRoute);
-                  }
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.pending,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
+      if(userPanelPermission == "MSS") {
+        //Pending Requisition List MSS
+        if(claimLevelOneMSS == "1" || claimLevelTwoMSS == "1" || claimLevelThreeMSS == "1") {
+          items.add(
+            Hero(
+              tag: 'myTeamPendingReq',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () async{
+                    bool internetCheck = await InternetConnectionChecker().hasConnection;
+                    if(internetCheck == false) {
+                      setState(() {
+                        AlertDialog(
+                          content: "Please check your internet connection".text.make(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Please check your Internet connection."),
+                        ));
+                      });
+
+                    } else {
+                      Navigator.pushNamed(context, MyRoutings.mssClaimItemRoute);
+                    }
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.pending,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
                               'Pending Claims',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
+          );
+        }
       }
+      if(userPanelPermission == "MSS_MO_ADMIN") {
+        //Pending Requisition List MSS MO
+        if(claimLevelOneMO == "1" || claimLevelTwoMO == "1" || claimLevelThreeMO == "1") {
+          items.add(
+            Hero(
+              tag: 'myTeamPendingReq',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () async{
+                    bool internetCheck = await InternetConnectionChecker().hasConnection;
+                    if(internetCheck == false) {
+                      setState(() {
+                        AlertDialog(
+                          content: "Please check your internet connection".text.make(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Please check your Internet connection."),
+                        ));
+                      });
 
+                    } else {
+                      Navigator.pushNamed(context, MyRoutings.mssMoClaimItemRoute);
+                    }
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.pending,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Pending Claims',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
 
+      }
       return items;
     }
 

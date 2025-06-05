@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/leaveManagement/reports/pendingRequisition/pendingRequisitionList.dart';
+import 'package:er_flutter_project/MSS_MO_Bundle/leaveManagement/pendingRequisitionList.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../../../MSS_Bundle/leaveManagement/pendingRequisitionList.dart';
+import '../../../../UIS_Bundle/leaveManagement/pendingRequisitionList.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -30,7 +33,7 @@ class PendingLeaveApproveDisapprove extends StatefulWidget {
   @override
   State<PendingLeaveApproveDisapprove> createState() => _PendingLeaveApproveDisapproveState(pendingLeaveRequisitionModal, itemCount);
 }
-
+var userPanelPermissions;
 class _PendingLeaveApproveDisapproveState extends State<PendingLeaveApproveDisapprove> {
   PendingLeaveRequisitionModal? pendingLeaveRequisitionModal;
   int itemCount;
@@ -38,6 +41,7 @@ class _PendingLeaveApproveDisapproveState extends State<PendingLeaveApproveDisap
   var titleName = "Leave Approval";
   int pageIndex = 0;
   int currentIndex = 2;
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -170,23 +174,90 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
   var getComment;
   @override
   void initState() {
-    leaveType = foundDataNew![itemCount].leaveType;
-    lBalance = foundDataNew![itemCount].totalLeave;
-    branchName = foundDataNew![itemCount].branchName;
-    department = foundDataNew![itemCount].department;
-    empName = foundDataNew![itemCount].employeeName;
-    applicationDate = foundDataNew![itemCount].applicationDate;
-    fromDate = foundDataNew![itemCount].startDate;
-    toDate = foundDataNew![itemCount].endDate;
-    reqRemarks = foundDataNew![itemCount].summary;
-    leaveReqId = foundDataNew![itemCount].reqId;
-    status = foundDataNew![itemCount].status;
+    getSharedPrfanceList();
+    /*if(userPanelPermissions == "MSS") {
+
+    }
+    if(userPanelPermissions == "MSS_MO_ADMIN") {
+      leaveType = foundDataNewMO![itemCount].leaveType;
+      lBalance = foundDataNewMO![itemCount].totalLeave;
+      branchName = foundDataNewMO![itemCount].branchName;
+      department = foundDataNewMO![itemCount].department;
+      empName = foundDataNewMO![itemCount].employeeName;
+      applicationDate = foundDataNewMO![itemCount].applicationDate;
+      fromDate = foundDataNewMO![itemCount].startDate;
+      toDate = foundDataNewMO![itemCount].endDate;
+      reqRemarks = foundDataNewMO![itemCount].summary;
+      leaveReqId = foundDataNewMO![itemCount].reqId;
+      status = foundDataNewMO![itemCount].status;
+    }
+    if(userPanelPermissions == "USER") {
+      leaveType = foundDataNewUIS![itemCount].leaveType;
+      lBalance = foundDataNewUIS![itemCount].totalLeave;
+      branchName = foundDataNewUIS![itemCount].branchName;
+      department = foundDataNewUIS![itemCount].department;
+      empName = foundDataNewUIS![itemCount].employeeName;
+      applicationDate = foundDataNewUIS![itemCount].applicationDate;
+      fromDate = foundDataNewUIS![itemCount].startDate;
+      toDate = foundDataNewUIS![itemCount].endDate;
+      reqRemarks = foundDataNewUIS![itemCount].summary;
+      leaveReqId = foundDataNewUIS![itemCount].reqId;
+      status = foundDataNewUIS![itemCount].status;
+    }*/
+
+
+
     //getComment = _commentController;
     super.initState();
-    getSharedPrfanceList();
+
   }
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPermissions = await shared!.getUserPanel();
+    if(userPanelPermissions == "MSS") {
+      leaveType = foundDataNewMSS![itemCount].leaveType;
+      lBalance = foundDataNewMSS![itemCount].totalLeave;
+      branchName = foundDataNewMSS![itemCount].branchName;
+      department = foundDataNewMSS![itemCount].department;
+      empName = foundDataNewMSS![itemCount].employeeName;
+      applicationDate = foundDataNewMSS![itemCount].applicationDate;
+      fromDate = foundDataNewMSS![itemCount].startDate;
+      toDate = foundDataNewMSS![itemCount].endDate;
+      reqRemarks = foundDataNewMSS![itemCount].summary;
+      leaveReqId = foundDataNewMSS![itemCount].reqId;
+      status = foundDataNewMSS![itemCount].status;
+    }
+    if(userPanelPermissions == "MSS_MO_ADMIN") {
+      leaveType = foundDataNewMO![itemCount].leaveType;
+      lBalance = foundDataNewMO![itemCount].totalLeave;
+      branchName = foundDataNewMO![itemCount].branchName;
+      department = foundDataNewMO![itemCount].department;
+      empName = foundDataNewMO![itemCount].employeeName;
+      applicationDate = foundDataNewMO![itemCount].applicationDate;
+      fromDate = foundDataNewMO![itemCount].startDate;
+      toDate = foundDataNewMO![itemCount].endDate;
+      reqRemarks = foundDataNewMO![itemCount].summary;
+      leaveReqId = foundDataNewMO![itemCount].reqId;
+      status = foundDataNewMO![itemCount].status;
+    }
+    if(userPanelPermissions == "USER") {
+      leaveType = foundDataNewUIS![itemCount].leaveType;
+      lBalance = foundDataNewUIS![itemCount].totalLeave;
+      branchName = foundDataNewUIS![itemCount].branchName;
+      department = foundDataNewUIS![itemCount].department;
+      empName = foundDataNewUIS![itemCount].employeeName;
+      applicationDate = foundDataNewUIS![itemCount].applicationDate;
+      fromDate = foundDataNewUIS![itemCount].startDate;
+      toDate = foundDataNewUIS![itemCount].endDate;
+      reqRemarks = foundDataNewUIS![itemCount].summary;
+      leaveReqId = foundDataNewUIS![itemCount].reqId;
+      status = foundDataNewUIS![itemCount].status;
+    }
+
+    setState(() {
+
+    });
+    print("Panel - $userPanelPermissions");
   }
   @override
   Widget build(BuildContext context) {

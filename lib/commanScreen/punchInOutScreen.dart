@@ -25,6 +25,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:safe_device/safe_device.dart';
 //import 'package:trust_location/trust_location.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -39,11 +40,15 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 //import '../adminPage/adminDashboard/adminDashboard.dart';
+import '../UIS_Bundle/dashboard/adminDashboard.dart' as mss;
 import '../adminPage/modelClass/dashboardModel.dart';
 import '../ess/EssDashboarrddModel.dart';
 //import '../ess/essDashboard.dart';
-import '../ess/essDashboard.dart';
+import '../ess/essDashboard.dart' as ess;
 import '../main.dart';
+import '../mss_profiles/global_profile.dart';
+import '../mss_profiles/organisationListModal.dart';
+import '../mss_profiles/profileListModal.dart';
 import '../reports/reportPage.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -77,7 +82,7 @@ class PunchInOUtActivity extends StatefulWidget {
 Position? position = Position(
     longitude: 0.0,
     latitude: 0.0,
-    timestamp: date,
+    timestamp: ess.date,
     accuracy: 0.0,
     altitude: 0.0,
     altitudeAccuracy: 0.0,
@@ -101,6 +106,46 @@ int? orgnizationID = 0;
 late String UserName = "Employee Name";
 late String employeeCode = "101";
 String? imageString;
+String? defaultProfileName;
+dynamic defaultProfileId;
+dynamic profileIdGetter;
+dynamic profileNameGetter;
+String? userPanelPermission;
+//MSS MO Permission Variable
+dynamic pendingAttendanceReqMOPermission = "0";
+dynamic othersAttendanceReqMOPermission = "0";
+dynamic pendingLeaveReqMOPermission = "0";
+dynamic pendingLeaveReqL1MOPermission = "0";
+dynamic pendingLeaveReqL2MOPermission = "0";
+dynamic othersLeaveReqMOPermission = "0";
+dynamic odPendingReqMOPermission = "0";
+dynamic claimPendingReqMOPermission = "0";
+dynamic preOnboardPendingReqMOPermission = "0";
+dynamic exitFormalityMOPermission = "0";
+
+//MSS Permission Variable
+dynamic pendingAttendanceReqPermission = "0";
+dynamic othersAttendanceReqPermission = "0";
+dynamic pendingLeaveReqPermission = "0";
+dynamic pendingLeaveReqL1Permission = "0";
+dynamic pendingLeaveReqL2Permission = "0";
+dynamic othersLeaveReqPermission = "0";
+dynamic odPendingReqPermission = "0";
+dynamic claimPendingReqPermission = "0";
+dynamic preOnboardPendingReqPermission = "0";
+dynamic exitFormalityPermission = "0";
+
+//UIS Permission Variable
+dynamic pendingAttendanceReqUISPermission = "0";
+dynamic othersAttendanceReqUISPermission = "0";
+dynamic pendingLeaveReqUISPermission = "0";
+dynamic pendingLeaveReqL1UISPermission = "0";
+dynamic pendingLeaveReqL2UISPermission = "0";
+dynamic othersLeaveReqUISPermission = "0";
+dynamic odPendingReqUISPermission = "0";
+dynamic claimPendingReqUISPermission = "0";
+dynamic preOnboardPendingReqUISPermission = "0";
+dynamic exitFormalityUISPermission = "0";
 
 SessionManager shared = SessionManager();
 String? clockingType = " ";
@@ -117,7 +162,10 @@ final screens = [
   ProfileCheck(),
 ];
 
+late List<String?> organisationList = [];
+
 class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
+  OrganisationListModal? organisationListModal;
   //Tracking start variables
   final _locationClient = LocationClient();
   final _points = <LatLng>[];
@@ -142,12 +190,14 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     });
   }
 
+
+
   @override
   void initState() {
     // TODO: implement initState
     _loginModel = new LoginModel();
     getSharedPrfanceList();
-
+    loadProfileFromPrefs();
     var now = new DateTime.now();
     //var now =  ntpTime.toUtc();
 
@@ -158,6 +208,16 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     getUserNameImage();
     super.initState();
   }
+
+  void loadProfileFromPrefs() async {
+    String? name = await shared.getDefaultProfileName();
+    int? id = await shared.getDefaultProfileId();
+
+    selectedProfileNameNotifier.value = name ?? '';
+    selectedProfileIdNotifier.value = id ?? 0;
+  }
+
+
 
   var type = "0";
 
@@ -302,10 +362,26 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     emailid = await shared.getEmailId();
   }
 
+
+
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     userType = await shared!.getUserType();
+    defaultProfileName = await shared!.getDefaultProfileName();
+    defaultProfileId = await shared!.getDefaultProfileId();
+    print("Default Profile Name - $defaultProfileName");
+    print("Default Profile Id - $defaultProfileId");
+    userPanelPermission = await shared!.getUserPanel();
     print("User Type - $userType");
+
+    Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
+    getOrgList.then((value) {
+      setState(() {
+        organisationListModal=value;
+      });
+
+    });
+
     setState(() {
 
     });
@@ -322,6 +398,32 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     //currentPostion = LatLng(lat, lng);
     //print('Response snapshot: ${sessionId}');
   }
+
+  Future<OrganisationListModal> getOrganisationList(String sessionId) async {
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.orgListApi;
+
+      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission");
+      final response = await http.post(urlapi);
+
+      var mapResponse = json.decode(response.body);
+      organisationListModal = OrganisationListModal.fromJson(mapResponse);
+
+      print("Organisation List -  ${mapResponse}");
+
+      /// Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      String orgListString = json.encode(organisationListModal?.list ?? []);
+      await prefs.setString("orgList", orgListString);
+
+      return organisationListModal!;
+    } catch (e) {
+      print("Error loading profiles: $e");
+      rethrow;
+    }
+  }
+
   //Tracking Code Start
   startTracking() {
     if(getMobActions == "BOTH" || getMobActions == "ATT") {
@@ -676,17 +778,57 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 3,
+          title: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$title - ',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Mythemes.successColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ValueListenableBuilder<String>(
+                        valueListenable: selectedProfileNameNotifier,
+                        builder: (context, value, _) {
+                          final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
+                              ? "COMPANY_EMPLOYEE"
+                              : value;
 
-          //backgroundColor: Colors.white,
-          title: Text(
-            title,
+                          return Text(
+                            displayText,
+                            style: TextStyle(
+                              color: Mythemes.whitish,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           actions: <Widget>[
             IconButton(
-                icon: Icon(Icons.power_settings_new_outlined),
-                onPressed: () {
-                  logoutApp(context);
-                })
+              icon: Icon(Icons.power_settings_new_outlined),
+              onPressed: () {
+                logoutApp(context);
+              },
+            ),
           ],
         ),
         body: screens[currentIndex],
@@ -894,6 +1036,7 @@ class DefaultPage extends StatefulWidget {
   State<DefaultPage> createState() => _DefaultPageState();
 }
 
+
 Map<String, dynamic> mapResponse = {};
 
 class _DefaultPageState extends State<DefaultPage> {
@@ -912,6 +1055,7 @@ class _DefaultPageState extends State<DefaultPage> {
   String? mockLat;
   String? mockLong;
   bool? isMock = false;
+
 
   @override
   void initState() {
@@ -932,6 +1076,9 @@ class _DefaultPageState extends State<DefaultPage> {
     //TrustLocation.stop();
     super.dispose();
   }
+
+
+
 
 
   Future<Position> _determinePosition() async {
@@ -1034,6 +1181,8 @@ class _DefaultPageState extends State<DefaultPage> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPermission = await shared!.getUserPanel();
+    print("$userPanelPermission");
     lat = await shared!.getLatitude();
     //position= Position(longitude: shared.getLongitude(), latitude: shared.getLatitude(), timestamp: date, accuracy: 1, altitude: 1, altitudeAccuracy: 1, heading: 1, headingAccuracy: 1, speed: 1, speedAccuracy: 1);
     empRole = await shared.getEmpRoll();
@@ -1048,6 +1197,7 @@ class _DefaultPageState extends State<DefaultPage> {
     print("LatLong - ${LatLng(position!.latitude, position!.longitude)}");
     //print("Long - $lng");
     currentPostion = LatLng(position!.latitude, position!.longitude);
+
 
     mobAction = await shared.getMobAction();
     print('mobActions $mobAction');
@@ -2060,11 +2210,13 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  var title = "Dashboard";
+  var title = "My Dashboard";
 
   @override
   Widget build(BuildContext context) {
-    return EssAdminDashboard(EssDashboarrdModel());
+    return userPanelPermission == "USER" ?
+    mss.Admin_UIS_Dashboard(DashboardModel()) :
+    ess.EssAdminDashboard(EssDashboarrdModel());
   }
 }
 
@@ -2078,13 +2230,148 @@ class _DrawerFileState extends State<DrawerFile> {
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
-
+  dynamic selectedProfileId;
+  dynamic selectedProfileName;
   @override
   void initState() {
     getUserRoles();
+    getSharedPreferences();
+    loadSelectedProfile();
     //getUserNameImage();
     super.initState();
   }
+
+
+  Future<void> getSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    selectedProfileId = prefs.getInt('defaultProfileId');
+    selectedProfileName = prefs.getString('defaultProfileName');
+    userPanelPermission = await shared!.getUserPanel();
+    print("Loaded ID: $selectedProfileId, Name: $selectedProfileName");
+
+    getProfileList(sessionId!).then((value) {
+      setState(() {
+        profileListModal = value;
+      });
+    });
+  }
+
+  ProfileListModal? profileListModal;
+  List<ProfileData> profileListGetter = [];
+
+  void loadSelectedProfile() async {
+    selectedProfileId = await shared.getDefaultProfileId();
+    selectedProfileName = await shared.getDefaultProfileName();
+
+    // Optional: update the ValueNotifiers if needed globally
+    selectedProfileIdNotifier.value = selectedProfileId!;
+    selectedProfileNameNotifier.value = selectedProfileName!;
+
+    setState(() {});
+  }
+
+  Future<ProfileListModal> getProfileList(String sessionId) async {
+    setState(() {
+      isLoadingProfiles = true;
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.profileListApi;
+
+      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission");
+      final response = await http.post(urlapi);
+
+      var mapResponse = json.decode(response.body);
+      profileListModal = ProfileListModal.fromJson(mapResponse);
+
+      profileListGetter.clear();
+      profileListGetter.addAll(profileListModal?.data ?? []);
+
+      for (int i = 0; i < profileListGetter.length; i++) {
+        List<String>? userPermission = profileListGetter[i].profilePermission;
+
+        print("User Permission for profile ${i + 1} - $userPermission");
+        /*//MSS MO
+        //Attendance Pending Request & Other Attendance Request
+        if (userPermission != null &&
+            userPermission.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD")) {
+          pendingAttendanceReqMOPermission = "1";
+        }
+        //Leave Pending Request
+        if (userPermission != null &&
+            userPermission.contains("LEAVE_REQ_APPROVAL_MO_ADD")) {
+          pendingLeaveReqMOPermission = "1";
+        }
+        //Leave Pending Request L1
+        if (userPermission != null &&
+            userPermission.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD")) {
+          pendingLeaveReqL1MOPermission = "1";
+        }
+        //Leave Pending Request L2
+        if (userPermission != null &&
+            userPermission.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD")) {
+          pendingLeaveReqL2MOPermission = "1";
+        }
+        //Other Leave Request
+        if (userPermission != null &&
+            userPermission.contains("OTHERS_LEAVE_REQUEST_MO_ADD")) {
+          othersLeaveReqMOPermission = "1";
+        }
+
+        //MSS
+        //Attendance Pending Request & Other Attendance Request
+        if (userPermission != null &&
+            userPermission.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD")) {
+          pendingAttendanceReqMOPermission = "1";
+        }
+        //Leave Pending Request
+        if (userPermission != null &&
+            userPermission.contains("LEAVE_REQ_APPROVAL_ADD")) {
+          pendingLeaveReqMOPermission = "1";
+        }
+        //Leave Pending Request L1
+        if (userPermission != null &&
+            userPermission.contains("LEVEL_ONE_LEAVE_APPROVE_ADD")) {
+          pendingLeaveReqL1MOPermission = "1";
+        }
+        //Leave Pending Request L2
+        if (userPermission != null &&
+            userPermission.contains("LEVEL_TWO_LEAVE_APPROVE_ADD")) {
+          pendingLeaveReqL2MOPermission = "1";
+        }
+        //Other Leave Request
+        if (userPermission != null &&
+            userPermission.contains("OTHERS_LEAVE_REQUEST_ADD")) {
+          othersLeaveReqMOPermission = "1";
+        }*/
+
+
+        print("Attendance Permission - $pendingAttendanceReqMOPermission");
+      }
+
+      if (profileListGetter.isNotEmpty) {
+        var defaultProfile = profileListGetter.firstWhere(
+              (p) => p.isDefaultProfile == true,
+          orElse: () => profileListGetter.first,
+        );
+        selectedProfileId = defaultProfile.profileId;
+      } else {
+        selectedProfileId = 0;
+        print("⚠️ profileListGetter is empty.");
+      }
+
+      return profileListModal!;
+    } catch (e) {
+      print("Error loading profiles: $e");
+      rethrow;
+    } finally {
+      setState(() {
+        isLoadingProfiles = false;
+      });
+    }
+  }
+  bool isLoadingProfiles = false;
 
   getUserRoles() async {
     empRole = await shared.getEmpRoll();
@@ -2125,300 +2412,331 @@ class _DrawerFileState extends State<DrawerFile> {
   Widget build(BuildContext context) {
     //timeDilation = 1.8;
     return Drawer(
-      child: Container(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
+            padding: EdgeInsets.zero,
+            child: UserAccountsDrawerHeader(
               decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
-              padding: EdgeInsets.zero,
-              child: UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
-                accountName: Text(name,
-                    style: TextStyle(
-                        color: Mythemes.black, fontWeight: FontWeight.bold)),
-                accountEmail:
-                    Text(emailid, style: TextStyle(color: Mythemes.black)),
-                margin: EdgeInsets.zero,
-                /*   decoration: BoxDecoration(
-                  color:Colors.red,
-                ),*/
-                currentAccountPicture: CircleAvatar(
-                  backgroundImage: NetworkImage(profileImage),
-                  backgroundColor: Mythemes.greyish,
-                ),
+              accountName: Text(name, style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.bold)),
+              accountEmail: Text(emailid, style: TextStyle(color: Mythemes.black)),
+              margin: EdgeInsets.zero,
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: NetworkImage(profileImage),
+                backgroundColor: Mythemes.greyish,
               ),
             ),
+          ),
+          Visibility(
+            visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN" || userPanelPermission == "USER",
+            child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              "Profiles".text.bold.size(17).make()
+            ],
+          ).p8(),),
 
-            /*ListTile(
-              leading: Icon(CupertinoIcons.profile_circled),
-              title: Text(
-                "Profile",
-                textScaler: TextScaler.linear(1.2),
-              ),
-              onTap: (){
-                print("profile click");
-                */ /*Fluttertoast.showToast(
-                    msg: "Profile Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );*/ /*
-                Navigator.pushNamed(context, MyRoutings.profileRoute);
-                //  Navigator.of(context, rootNavigator: true).pop();
-              },
-            ),*/
-            /*ListTile(
-              leading: Icon(CupertinoIcons.chart_bar_square),
-              title: Text(
-                "Dashboard ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
-                screens[currentIndex];
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => screens[3]),
+          /*Visibility(
+            visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN",
+            child: ValueListenableBuilder<int>(
+              valueListenable: selectedProfileIdNotifier,
+              builder: (context, currentSelectedId, _) {
+                return Column(
+                  children: profileListGetter.map((profile) {
+                    bool isSelected = currentSelectedId == profile.profileId;
+
+                    return ListTile(
+                      title: Text(
+                        profile.profileName ?? '',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                      ),
+                      trailing: isSelected ? Icon(Icons.check, color: Colors.green) : null,
+                      tileColor: isSelected ? Colors.grey.shade200 : null,
+                      onTap: () async {
+                        selectedProfileId = profile.profileId!;
+                        selectedProfileName = profile.profileName!;
+
+                        await shared.setDefaultProfileId(selectedProfileId);
+                        await shared.setDefaultProfileName(selectedProfileName);
+
+                        selectedProfileIdNotifier.value = selectedProfileId!;
+                        selectedProfileNameNotifier.value = selectedProfileName!;
+
+                        Navigator.pop(context);
+                      },
+                    );
+                  }).toList(),
                 );
-                // Navigator.of(context, rootNavigator: true).pop();
-                //screens[3];
-                //Dashboard();
-                //Navigator.pushNamed(context, MyRoutings.alarmSetRoute);
-                //Navigator.push(context, MaterialPageRoute(builder: (context) => screens[3]));
-                */ /*setState(() {
-                  //Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
-                  // Navigator.of(context, rootNavigator: true).pop();
-                  print( "hollaa $screens[3]");
-                  screens[3];
-                });*/ /*
-                // Navigator.of(context, rootNavigator: true).pop();
-                //currentIndex = 3;
-                */ /*Fluttertoast.showToast(
-                    msg: "Dashboard Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );*/ /*
               },
             ),
+          ),*/
+          Visibility(
+            visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN" || userPanelPermission == "USER",
+            child: isLoadingProfiles
+                ? Center(child: CircularProgressIndicator()).p12()
+                : ValueListenableBuilder<int>(
+              valueListenable: selectedProfileIdNotifier,
+              builder: (context, currentSelectedId, _) {
+                return Column(
+                  children: profileListGetter.map((profile) {
+                    bool isSelected = currentSelectedId == profile.profileId;
 
-            ListTile(
-              leading: Icon(CupertinoIcons.antenna_radiowaves_left_right),
+                    return ListTile(
+                      title: Text(
+                        profile.profileName ?? '',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                      ),
+                      trailing: isSelected ? Icon(Icons.check, color: Colors.green) : null,
+                      tileColor: isSelected ? Colors.grey.shade200 : null,
+                        onTap: () async {
+                          selectedProfileId = profile.profileId!;
+                          selectedProfileName = profile.profileName!;
+
+                          // 🟢 Find the selected profile from the list using profileId
+                          final selected = profileListGetter.firstWhere(
+                                (p) => p.profileId == selectedProfileId,
+                            orElse: () => profile,
+                          );
+
+                          //MSS MO
+                          // 🟢 Check if the selected profile has the Pending Attendance Request permission
+                          String pendingAttReqMOPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request permission
+                          String leaveReqMOPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L1 permission
+                          String leaveReqL1MOPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L2 permission
+                          String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L2 permission
+                          String othersLeaveReqMOPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L1 permission
+                          String pendingClaimL1MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L2 permission
+                          String pendingClaimL2MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L3 permission
+                          String pendingClaimL3MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the OD Pending List permission
+                          String pendingODListMOPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the OD Activate permission
+                          String odActivateMOPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                              ? "1"
+                              : "0";
+
+                          //MSS
+                          // 🟢 Check if the selected profile has the Pending Attendance Request permission
+                          String pendingAttReqMSSPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request permission
+                          String leaveReqMSSPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L1 permission
+                          String leaveReqL1MSSPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L2 permission
+                          String leaveReqL2MSSPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L2 permission
+                          String othersLeaveReqMSSPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L1 permission
+                          String pendingClaimL1Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L2 permission
+                          String pendingClaimL2Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L3 permission
+                          String pendingClaimL3Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the OD Pending List permission
+                          String pendingODListPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the OD Activate permission
+                          String odActivatePermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                              ? "1"
+                              : "0";
+
+                          //USER
+                          // 🟢 Check if the selected profile has the Pending Attendance Request permission
+                          String pendingAttReqUISPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request permission
+                          String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L1 permission
+                          String leaveReqL1UISPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L2 permission
+                          String leaveReqL2UISPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Leave Request L2 permission
+                          String othersLeaveReqUISPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L1 permission
+                          String pendingClaimL1UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L2 permission
+                          String pendingClaimL2UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Claim L3 permission
+                          String pendingClaimL3UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the OD Pending List permission
+                          String pendingODListUISPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the OD Activate permission
+                          String odActivateUISPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                              ? "1"
+                              : "0";
+
+                          // 🟢 Save the MSS MO permission to SharedPreferences
+                          await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
+                          await shared.setPendingLeaveReqMSSMOPermission(leaveReqMOPermValue);
+                          await shared.setPendingLeaveReqL1MSSMOPermission(leaveReqL1MOPermValue);
+                          await shared.setPendingLeaveReqL2MSSMOPermission(leaveReqL2MOPermValue);
+                          await shared.setOthersLeaveReqMSSMOPermission(othersLeaveReqMOPermValue);
+                          await shared.setClaimLevelOneMO(pendingClaimL1MOPermission);
+                          await shared.setClaimLevelTwoMO(pendingClaimL2MOPermission);
+                          await shared.setClaimLevelThreeMO(pendingClaimL3MOPermission);
+                          await shared.setODActivateMO(odActivateMOPermission);
+                          await shared.setODPendingListMO(pendingODListMOPermission);
+                          print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
+                          print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
+                          print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
+                          print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MOPermValue");
+                          print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMOPermValue");
+                          print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1MOPermission");
+                          print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2MOPermission");
+                          print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3MOPermission");
+                          print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateMOPermission");
+                          print("✅ Pending OD Permission for profileId $selectedProfileId: $pendingODListMOPermission");
+
+                          // 🟢 Save the MSS permission to SharedPreferences
+                          await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
+                          await shared.setPendingLeaveReqMSSPermission(leaveReqMSSPermValue);
+                          await shared.setPendingLeaveReqL1MSSPermission(leaveReqL1MSSPermValue);
+                          await shared.setPendingLeaveReqL2MSSPermission(leaveReqL2MSSPermValue);
+                          await shared.setOthersLeaveReqMSSPermission(othersLeaveReqMSSPermValue);
+                          await shared.setClaimLevelOne(pendingClaimL1Permission);
+                          await shared.setClaimLevelTwo(pendingClaimL2Permission);
+                          await shared.setClaimLevelThree(pendingClaimL3Permission);
+                          await shared.setODActivate(odActivatePermission);
+                          await shared.setODPendingList(pendingODListPermission);
+                          print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMSSPermValue");
+                          print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMSSPermValue");
+                          print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MSSPermValue");
+                          print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MSSPermValue");
+                          print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMSSPermValue");
+                          print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1Permission");
+                          print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2Permission");
+                          print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3Permission");
+                          print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivatePermission");
+                          print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListPermission");
+
+                          // 🟢 Save the UIS permission to SharedPreferences
+                          await shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
+                          await shared.setPendingLeaveReqUISPermission(leaveReqUISPermValue);
+                          await shared.setPendingLeaveReqL1UISPermission(leaveReqL1UISPermValue);
+                          await shared.setPendingLeaveReqL2UISPermission(leaveReqL2UISPermValue);
+                          await shared.setOthersLeaveReqUISPermission(othersLeaveReqUISPermValue);
+                          await shared.setClaimLevelOneUIS(pendingClaimL1UISPermission);
+                          await shared.setClaimLevelTwoUIS(pendingClaimL2UISPermission);
+                          await shared.setClaimLevelThreeUIS(pendingClaimL3UISPermission);
+                          await shared.setODActivateUIS(odActivateUISPermission);
+                          await shared.setODPendingListUIS(pendingODListUISPermission);
+                          print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqUISPermValue");
+                          print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqUISPermValue");
+                          print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1UISPermValue");
+                          print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2UISPermValue");
+                          print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqUISPermValue");
+                          print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1UISPermission");
+                          print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2UISPermission");
+                          print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3UISPermission");
+                          print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateUISPermission");
+                          print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListUISPermission");
+                          // 🟢 Save selected profile details
+                          await shared.setDefaultProfileId(selectedProfileId);
+                          await shared.setDefaultProfileName(selectedProfileName);
+
+                          selectedProfileIdNotifier.value = selectedProfileId!;
+                          selectedProfileNameNotifier.value = selectedProfileName!;
+                          setState(() {
+
+                          });
+
+                          Navigator.pop(context);
+                        }
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ),
+
+          /*...profileListGetter.map((profile) {
+            bool isSelected = selectedProfileId == profile.profileId;
+            return ListTile(
               title: Text(
-                "Workflow ",
-                textScaleFactor: 1.2,
+                profile.profileName ?? '',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
               ),
+              trailing: isSelected ? Icon(Icons.check, color: Colors.green) : null,
+              tileColor: isSelected ? Colors.grey.shade200 : null,
               onTap: () async {
-                bool internetCheck = await InternetConnectionChecker().hasConnection;
-                if(internetCheck == false) {
-                  setState(() {
-                    AlertDialog(
-                      content: "Please check your internet connection".text.make(),
-                    );
-                    Fluttertoast.showToast(
-                        msg: "Please check your Internet connection",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM_RIGHT,
-                        timeInSecForIosWeb: 4,
-                        backgroundColor: Mythemes.black,
-                        textColor: Colors.white,
-                        fontSize: 17.0
-                    );
-                  });
+                setState(() {
+                  selectedProfileId = profile.profileId!;
+                  selectedProfileName = profile.profileName!;
+                });
 
-                } else {
-                   Navigator.of(context, rootNavigator: true).pop();
-                  Fluttertoast.showToast(
-                      msg: "Workflow Click",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM_RIGHT,
-                      timeInSecForIosWeb: 4,
-                      backgroundColor: Mythemes.black,
-                      textColor: Colors.white,
-                      fontSize: 17.0
-                  );
-                  //Navigator.pushNamed(context, MyRoutings.cameraPageRoute);
-                }
+                await shared.setDefaultProfileId(selectedProfileId);
+                await shared.setDefaultProfileName(selectedProfileName);
+
+                selectedProfileIdNotifier.value = selectedProfileId!;
+                selectedProfileNameNotifier.value = selectedProfileName!;
+
+                Navigator.pop(context); // Close Drawer
               },
-            ),*/
-
-            Visibility(
-              visible: showHide || showAdmin,
-              child: Hero(
-                tag: 'animatedDrawer',
-                child: ListTile(
-                  leading: Icon(CupertinoIcons.list_bullet_below_rectangle),
-                  title: Text(
-                    "Employee List",
-                    textScaler: TextScaler.linear(1.2),
-                  ),
-                  onTap: () async {
-                    bool internetCheck =
-                        await InternetConnectionChecker().hasConnection;
-                    if (internetCheck == false) {
-                      setState(() {
-                        AlertDialog(
-                          content: "Please check your internet connection"
-                              .text
-                              .make(),
-                        );
-                        Fluttertoast.showToast(
-                            msg: "Please check your Internet connection",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM_RIGHT,
-                            timeInSecForIosWeb: 4,
-                            backgroundColor: Mythemes.black,
-                            textColor: Colors.white,
-                            fontSize: 17.0);
-                      });
-                    } else {
-                      Navigator.pushNamed(context, MyRoutings.empListRoute);
-                    }
-                  },
-                ),
-              ),
-            ),
-            Visibility(
-              visible: false,
-              child: ListTile(
-                leading: Icon(CupertinoIcons.settings_solid),
-                title: Text(
-                  "Settings",
-                  textScaleFactor: 1.2,
-                ),
-                onTap: () async {
-                  bool internetCheck =
-                      await InternetConnectionChecker().hasConnection;
-                  if (internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content:
-                            "Please check your internet connection".text.make(),
-                      );
-                      Fluttertoast.showToast(
-                          msg: "Please check your Internet connection",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM_RIGHT,
-                          timeInSecForIosWeb: 4,
-                          backgroundColor: Mythemes.black,
-                          textColor: Colors.white,
-                          fontSize: 17.0);
-                    });
-                  } else {
-                     Navigator.of(context, rootNavigator: true).pop();
-                    Fluttertoast.showToast(
-                        msg: "Settings Click",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM_RIGHT,
-                        timeInSecForIosWeb: 4,
-                        backgroundColor: Mythemes.black,
-                        textColor: Colors.white,
-                        fontSize: 17.0);
-                  }
-                },
-              ),
-            ),
-            /*ListTile(
-              leading: Icon(CupertinoIcons.folder),
-              title: Text(
-                "Reports",
-                textScaleFactor: 1.2,
-              ),
-              onTap: () async {
-                bool internetCheck = await InternetConnectionChecker().hasConnection;
-                if(internetCheck == false) {
-                  setState(() {
-                    AlertDialog(
-                      content: "Please check your internet connection".text.make(),
-                    );
-                    Fluttertoast.showToast(
-                        msg: "Please check your Internet connection",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM_RIGHT,
-                        timeInSecForIosWeb: 4,
-                        backgroundColor: Mythemes.black,
-                        textColor: Colors.white,
-                        fontSize: 17.0
-                    );
-                  });
-
-                } else {
-                  //Navigator.pushNamed(context, MyRoutings.testPdfDownload);
-                  //Navigator.pushNamed(context, MyRoutings.ocrPageRoute);
-                   Navigator.of(context, rootNavigator: true).pop();
-                  Fluttertoast.showToast(
-                      msg: "Reports Click",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM_RIGHT,
-                      timeInSecForIosWeb: 4,
-                      backgroundColor: Mythemes.black,
-                      textColor: Colors.white,
-                      fontSize: 17.0
-                  );
-                }
-              },
-            ),
-            Hero(
-              tag: 'helpdeskItem',
-              child: ListTile(
-                leading: Icon(Icons.support_agent_rounded),
-                title: Text(
-                  "Helpdesk",
-                  textScaleFactor: 1.2,
-                ),
-                onTap: () async {
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
-                  if(internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection".text.make(),
-                      );
-                      Fluttertoast.showToast(
-                          msg: "Please check your Internet connection",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM_RIGHT,
-                          timeInSecForIosWeb: 4,
-                          backgroundColor: Mythemes.black,
-                          textColor: Colors.white,
-                          fontSize: 17.0
-                      );
-                    });
-
-                  } else {
-                    Navigator.pushNamed(context, MyRoutings.helpDeskItemsRoute);
-                  }
-                },
-              ),
-            ),*/
-            /*ListTile(
-              leading: Icon(Icons.support_agent_rounded),
-              title: Text(
-                "Helpdesk ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
-                print("I am helpdeksk");
-                Navigator.pushNamed(context, MyRoutings.empListRoute);
-               */ /* Fluttertoast.showToast(
-                    msg: "Helpdesk Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );*/ /*
-                 Navigator.of(context, rootNavigator: true).pop();
-              },
-            ),*/
-          ],
-        ),
+            );
+          }).toList(),*/
+        ],
       ),
     );
   }

@@ -8,6 +8,7 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import '../../../MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
@@ -28,6 +29,8 @@ class LevelTwoPendingApproval extends StatefulWidget {
   @override
   State<LevelTwoPendingApproval> createState() => _LevelTwoPendingApprovalState(pendingLeaveRequisitionModal, itemCount);
 }
+var userPanelPermissions;
+
 
 class _LevelTwoPendingApprovalState extends State<LevelTwoPendingApproval> {
   LevelTwoPendingLeaveModal? pendingLeaveRequisitionModal;
@@ -167,22 +170,24 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
   var getComment;
   @override
   void initState() {
-    leaveType = foundDataNew![itemCount].leaveType;
-    branchName = foundDataNew![itemCount].branchName;
-    department = foundDataNew![itemCount].department;
-    empName = foundDataNew![itemCount].employeeName;
-    applicationDate = foundDataNew![itemCount].applicationDate;
-    fromDate = foundDataNew![itemCount].startDate;
-    toDate = foundDataNew![itemCount].endDate;
-    reqRemarks = foundDataNew![itemCount].summary;
-    leaveReqId = foundDataNew![itemCount].reqId;
-    status = foundDataNew![itemCount].status;
+      leaveType = foundDataNewMSSL2![itemCount].leaveType;
+      branchName = foundDataNewMSSL2![itemCount].branchName;
+      department = foundDataNewMSSL2![itemCount].department;
+      empName = foundDataNewMSSL2![itemCount].employeeName;
+      applicationDate = foundDataNewMSSL2![itemCount].applicationDate;
+      fromDate = foundDataNewMSSL2![itemCount].startDate;
+      toDate = foundDataNewMSSL2![itemCount].endDate;
+      reqRemarks = foundDataNewMSSL2![itemCount].summary;
+      leaveReqId = foundDataNewMSSL2![itemCount].reqId;
+      status = foundDataNewMSSL2![itemCount].status;
+      getSharedPrfanceList();
     //getComment = _commentController;
     super.initState();
-    getSharedPrfanceList();
+
   }
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPermissions = await shared!.getUserPanel();
   }
   @override
   Widget build(BuildContext context) {
@@ -458,10 +463,12 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        showDialgSucess1(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        showDialgSucess1(context,reason.upperCamelCase, " Error ");
+      if (result.toString().toLowerCase() == "success") {
+        showDialgSucess1(context, reason.upperCamelCase + " ", "Leave Requisition Approval");
+      } else if (result.toString().toLowerCase() == "error") {
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
+      } else if (result.toString().toLowerCase() == "null") {
+        showDialgSucess1(context, "Some Error Occurred !", " Error ");
       }
 
     }
@@ -469,7 +476,7 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
 
   Future<void> disApproveLeaveRequisition(String getComment, int? leaveReqId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.leaveApprovalApi;
+    String apiUrl = ApiDetails.leaveApprovalLevel2Api;
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
@@ -487,10 +494,12 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        showDialgSucess1(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        showDialgSucess1(context,reason.upperCamelCase, " Error ");
+      if (result.toString().toLowerCase() == "success") {
+        showDialgSucess1(context, reason.upperCamelCase + " ", "Leave Requisition DisApproved");
+      } else if (result.toString().toLowerCase() == "error") {
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
+      } else if (result.toString().toLowerCase() == "null") {
+        showDialgSucess1(context, "Some Error Occurred !", " Error ");
       }
 
     }

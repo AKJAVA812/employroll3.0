@@ -76,6 +76,7 @@ class SessionManager {
     final String? userType = prefs.getString('userType');
     return userType;
   }
+
   setEmpCode(empCode) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -436,6 +437,74 @@ class SessionManager {
     final String? claimLevelThree = prefs.getString('claimLevelThree');
     return claimLevelThree;
   }
+
+  //MSS MO Claim
+  setClaimLevelOneMO(claimLevelOne) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('claimLevelOne', claimLevelOne);
+  }
+
+  getClaimLevelOneMO() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? claimLevelOne = prefs.getString('claimLevelOne');
+    return claimLevelOne;
+  }
+
+  setClaimLevelTwoMO(claimLevelTwo) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('claimLevelTwo', claimLevelTwo);
+  }
+
+  getClaimLevelTwoMO() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? claimLevelTwo = prefs.getString('claimLevelTwo');
+    return claimLevelTwo;
+  }
+
+  setClaimLevelThreeMO(claimLevelThree) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('claimLevelThree', claimLevelThree);
+  }
+
+  getClaimLevelThreeMO() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? claimLevelThree = prefs.getString('claimLevelThree');
+    return claimLevelThree;
+  }
+
+  //UIS Claim
+  setClaimLevelOneUIS(claimLevelOne) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('claimLevelOne', claimLevelOne);
+  }
+
+  getClaimLevelOneUIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? claimLevelOne = prefs.getString('claimLevelOne');
+    return claimLevelOne;
+  }
+
+  setClaimLevelTwoUIS(claimLevelTwo) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('claimLevelTwo', claimLevelTwo);
+  }
+
+  getClaimLevelTwoUIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? claimLevelTwo = prefs.getString('claimLevelTwo');
+    return claimLevelTwo;
+  }
+
+  setClaimLevelThreeUIS(claimLevelThree) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('claimLevelThree', claimLevelThree);
+  }
+
+  getClaimLevelThreeUIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? claimLevelThree = prefs.getString('claimLevelThree');
+    return claimLevelThree;
+  }
   setPendingLeaveReq(pendingLeaveRequisitions) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('pendingLeaveRequisitions', pendingLeaveRequisitions);
@@ -466,5 +535,265 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     final String? exitShow = prefs.getString('exitShow');
     return exitShow;
+  }
+
+  setUserPanel(userPanel) async {
+    // Obtain shared preferences.
+    final prefs = await SharedPreferences.getInstance();
+    // Save an String value to 'action' key.
+    await prefs.setString('userPanel', userPanel);
+  }
+
+  getUserPanel() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? userPanel = prefs.getString('userPanel');
+    return userPanel;
+  }
+
+  setDefaultProfileName(profileNameNew) async {
+    // Obtain shared preferences.
+    final prefs = await SharedPreferences.getInstance();
+    // Save an String value to 'action' key.
+    await prefs.setString('profileNameNew', profileNameNew);
+  }
+
+  getDefaultProfileName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? profileNameNew = prefs.getString('profileNameNew');
+    return profileNameNew;
+  }
+  setDefaultProfileId(profileIdNew) async {
+    // Obtain shared preferences.
+    final prefs = await SharedPreferences.getInstance();
+    // Save an String value to 'action' key.
+    await prefs.setInt('profileIdNew', profileIdNew);
+  }
+
+  getDefaultProfileId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? profileIdNew = prefs.getInt('profileIdNew');
+    return profileIdNew;
+  }
+
+  //MSS MO Permissions
+  //Pending Attendance Request Permission & Others Attendance Request Permission
+  Future<void> setPendingAttendanceReqMSSMOPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_attendance_req_mss_mo_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqMSSMOPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_attendance_req_mss_mo_permission');
+  }
+  //Pending Leave Request Permission
+  Future<void> setPendingLeaveReqMSSMOPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_mss_mo_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqMSSMOPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_mss_mo_permission');
+  }
+  //Pending Leave Request L1 Permission
+  Future<void> setPendingLeaveReqL1MSSMOPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_l1_mss_mo_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqL1MSSMOPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_l1_mss_mo_permission');
+  }
+
+  //Pending Leave Request L2 Permission
+  Future<void> setPendingLeaveReqL2MSSMOPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_l2_mss_mo_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqL2MSSMOPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_l2_mss_mo_permission');
+  }
+  //Others Leave Request Permission
+  Future<void> setOthersLeaveReqMSSMOPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('others_leave_req_mss_mo_permission', value);
+  }
+
+  Future<String?> getOthersLeaveReqMSSMOPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('others_leave_req_mss_mo_permission');
+  }
+
+  //OD Activate Permission
+  Future<void> setODActivateMO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('od_activate_mo_permission', value);
+  }
+
+  Future<String?> getODActivateMO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('od_activate_mo_permission');
+  }
+  //OD Pending List Permission
+  Future<void> setODPendingListMO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('od_pending_mo_permission', value);
+  }
+
+  Future<String?> getODPendingListMO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('od_pending_mo_permission');
+  }
+
+  //MSS Permissions
+  //Pending Attendance Request Permission & Others Attendance Request Permission
+  Future<void> setPendingAttendanceReqMSSPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_attendance_req_mss_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqMSSPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_attendance_req_mss_permission');
+  }
+  //Pending Leave Request Permission
+  Future<void> setPendingLeaveReqMSSPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_mss_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqMSSPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_mss_permission');
+  }
+  //Pending Leave Request L1 Permission
+  Future<void> setPendingLeaveReqL1MSSPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_l1_mss_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqL1MSSPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_l1_mss_permission');
+  }
+
+  //Pending Leave Request L2 Permission
+  Future<void> setPendingLeaveReqL2MSSPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_l2_mss_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqL2MSSPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_l2_mss_permission');
+  }
+  //Others Leave Request Permission
+  Future<void> setOthersLeaveReqMSSPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('others_leave_req_mss_permission', value);
+  }
+
+  Future<String?> getOthersLeaveReqMSSPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('others_leave_req_mss_permission');
+  }
+
+  //OD Activate Permission
+  Future<void> setODActivate(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('od_activate_permission', value);
+  }
+
+  Future<String?> getODActivate() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('od_activate_permission');
+  }
+  //OD Pending List Permission
+  Future<void> setODPendingList(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('od_pending_permission', value);
+  }
+
+  Future<String?> getODPendingList() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('od_pending_permission');
+  }
+
+  //UIS Permissions
+  //Pending Attendance Request Permission & Others Attendance Request Permission
+  Future<void> setPendingAttendanceReqUISPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_attendance_req_uis_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqUISPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_attendance_req_uis_permission');
+  }
+  //Pending Leave Request Permission
+  Future<void> setPendingLeaveReqUISPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_uis_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqUISPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_uis_permission');
+  }
+  //Pending Leave Request L1 Permission
+  Future<void> setPendingLeaveReqL1UISPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_l1_uis_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqL1UISPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_l1_uis_permission');
+  }
+
+  //Pending Leave Request L2 Permission
+  Future<void> setPendingLeaveReqL2UISPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_leave_req_l2_uis_permission', value);
+  }
+
+  Future<String?> getPendingLeaveReqL2UISPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_leave_req_l2_uis_permission');
+  }
+  //Others Leave Request Permission
+  Future<void> setOthersLeaveReqUISPermission(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('others_leave_req_uis_permission', value);
+  }
+
+  Future<String?> getOthersLeaveReqUISPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('others_leave_req_uis_permission');
+  }
+
+  //OD Activate Permission
+  Future<void> setODActivateUIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('od_activate_uis_permission', value);
+  }
+
+  Future<String?> getODActivateUIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('od_activate_uis_permission');
+  }
+  //OD Pending List Permission
+  Future<void> setODPendingListUIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('od_pending_uis_permission', value);
+  }
+
+  Future<String?> getODPendingListUIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('od_pending_uis_permission');
   }
 }

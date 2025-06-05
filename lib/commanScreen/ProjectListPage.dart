@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math';
+import 'package:velocity_x/velocity_x.dart';
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -28,6 +31,9 @@ SessionManager shared = SessionManager();
 String? sessionId;
 String? userType;
 String? emailId;
+String? userPanel;
+String? profileName;
+dynamic profileId;
 dynamic empIdNew;
 bool? setShowPayroll;
 String? setPreOnboardShow;
@@ -63,7 +69,6 @@ class _ProjectListState extends State<ProjectList> {
     print('Response status: ${response.statusCode}');
     //print('Response body: ${response.body}');
     mapResponse = json.decode(response.body);
-    log('Response body: ${mapResponse}');
     loginModel = LoginModel.fromJson(mapResponse);
     return loginModel;
     if (response.statusCode == 200) {
@@ -96,6 +101,7 @@ class _ProjectListState extends State<ProjectList> {
 
     sessionId = await shared!.getSessionId();
     userType = await shared!.getUserType();
+
     setState(() {
 
     });
@@ -110,6 +116,18 @@ class _ProjectListState extends State<ProjectList> {
     adminRoles= await shared.getAdminRole();
     setPreOnboardShow= await shared.getPreOnboardShow();
     setExitShow= await shared.getExitShow();
+    userPanel= await shared.getUserPanel();
+
+    if(userPanel == "COMPANY_EMPLOYEE") {
+      value = 0;
+    } else {
+      value = 1;
+    }
+    profileName= await shared.getDefaultProfileName();
+    profileId= await shared.getDefaultProfileId();
+    print("Default Profile Name - $profileName");
+    print("Default Profile Id - $profileId");
+    print("User Panel - $userPanel");
     print('Pre-Onboard $setPreOnboardShow');
     print('Exit Show $setExitShow');
     print('empRole $empRoles');
@@ -314,7 +332,7 @@ class _ProjectListState extends State<ProjectList> {
   var hideWidget = false;
 
 
-
+  int value = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -331,21 +349,67 @@ class _ProjectListState extends State<ProjectList> {
       print("CheckOrg - $orgId");
       List<Widget> items = [];
 
-      if(orgId != 144 && orgId != 138) {
+      //ESS Cards
+      //My Requests
+      if(value == 0) {
         items.add(
           Hero(
-            tag: 'reportAnimate',
+            tag: 'myAllRequests',
             child: Card(
               color: Mythemes.whitish,
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+                  Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
                 },
                 child: Stack(
                   children: <Widget>[
                     Center(
                       child: Icon(
-                        Icons.access_time_filled,
+                        Icons.playlist_add_rounded,
+                        size: 50,
+                        color: Mythemes.successColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'My Requests',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //My Reports
+      if(value == 0) {
+        items.add(
+          Hero(
+            tag: 'myAllReports',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.data_exploration_outlined,
                         size: 50,
                         color: Mythemes.lightBluishColor,
                       ),
@@ -358,11 +422,11 @@ class _ProjectListState extends State<ProjectList> {
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'Attendance',
+                            'My Reports',
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
                         ),
                       ),
                     ),
@@ -374,89 +438,8 @@ class _ProjectListState extends State<ProjectList> {
         );
       }
 
-
-      items.add(
-        Hero(
-          tag: 'leaveReport',
-          child: Card(
-            color: Mythemes.whitish,
-            child: InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-              },
-              child: Stack(
-                children: <Widget>[
-                  Center(
-                    child: Icon(
-                      Icons.calendar_month_rounded,
-                      size: 50,
-                      color: Mythemes.successColor,
-                    ),
-                    /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                  ),
-                  Center(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 75, left: 10),
-                      padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                      child: Text(
-                        'Leave',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style:
-                        TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      /*if(setShowPayroll == true) {
-        items.add(
-          InkWell(
-            onTap: () {
-              Navigator.pushNamed(context, MyRoutings.documentsAddedRoute);
-
-            },
-            child: Hero(
-              tag: 'e-doc',
-              child: Card(
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.document_scanner_sharp,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                          'E-Doc',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                          TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }*/
-
-      if(userType != 'COMPANY_ADMIN') {
+      //HRIS Requisition
+      if(userType != 'COMPANY_ADMIN' && value == 0 && value != 1) {
         items.add(
           Hero(
             tag: 'hrisReport',
@@ -481,7 +464,7 @@ class _ProjectListState extends State<ProjectList> {
                       child: Icon(
                         Icons.supervised_user_circle,
                         size: 50,
-                        color: Mythemes.alertColor,
+                        color: Colors.orange,
                       ),
                       /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
@@ -492,9 +475,9 @@ class _ProjectListState extends State<ProjectList> {
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'HRIS',
+                            'My Profile',
                             style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
                         ),
                       ),
                     ),
@@ -507,15 +490,104 @@ class _ProjectListState extends State<ProjectList> {
       }
 
 
-      items.add(
-        Hero(
-          tag: 'odReport',
-          child: Card(
-            color: Mythemes.whitish,
-            child: InkWell(
-              onTap: (){
-                Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                /*Fluttertoast.showToast(
+      if(value == 1) {
+          //Time & Attendance
+          if(orgId != 144 && orgId != 138 || value == 1) {
+            items.add(
+              Hero(
+                tag: 'reportAnimate',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.access_time_filled,
+                            size: 50,
+                            color: Mythemes.lightBluishColor,
+                          ),
+                          /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'Attendance',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+        //Leave Management
+
+          items.add(
+            Hero(
+              tag: 'leaveReport',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.calendar_month_rounded,
+                          size: 50,
+                          color: Mythemes.successColor,
+                        ),
+                        /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Leave',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+
+          //OUT DUTY
+            items.add(
+              Hero(
+                tag: 'odReport',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: (){
+                      Navigator.pushNamed(context, MyRoutings.onDutyTypes);
+                      /*Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
@@ -524,89 +596,52 @@ class _ProjectListState extends State<ProjectList> {
                     textColor: Colors.white,
                     fontSize: 16.0
                 );*/
-              },
-              child: Stack(
-                children: <Widget>[
-                  Center(
-                    child: Icon(
-                      Icons.business_center,
-                      size: 50,
-                      color: Mythemes.dangerColorOne,
-                    ),
-                    /*Image(
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.business_center,
+                            size: 50,
+                            color: Mythemes.dangerColorOne,
+                          ),
+                          /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                  ),
-                  Center(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 75, left: 10),
-                      padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                      child: Text(
-                          'OD',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                          TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                      ),
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'OD',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ),
-      );
+            );
 
-      /*items.add(
-        Hero(
-          tag: 'workDoneReport',
-          child: Card(
-            color: Mythemes.whitish,
-            child: InkWell(
-              onTap: (){
-                Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
 
-              },
-              child: Stack(
-                children: <Widget>[
-                  Center(
-                    child: Icon(
-                      Icons.work_history,
-                      size: 50,
-                      color: Mythemes.successColor,
-                    ),
 
-                  ),
-                  Center(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 75, left: 10),
-                      padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                      child: Text(
-                          'Work Done',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                          TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );*/
-
-      if(orgId == 3 || orgId == 145 || orgId == 171 || orgId == 179 || orgId == 186) {
-        items.add(
-          Hero(
-            tag: 'claim',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.claimItemsListRoute);
-                  /*Fluttertoast.showToast(
+        //TRAVEL & EXPENSE
+        if(orgId == 3 || orgId == 145 || orgId == 171 || orgId == 179 || orgId == 186) {
+          items.add(
+            Hero(
+              tag: 'claim',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.claimItemsListRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -615,50 +650,51 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.currency_exchange,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.currency_exchange,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Claim',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Claim',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      if(orgId == 3 || orgId == 145 || orgId == 39) {
-        items.add(
-          Hero(
-            tag: 'claimAdvance',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.claimAdvanceRoute);
-                  /*Fluttertoast.showToast(
+        //Advance
+        if(orgId == 3 || orgId == 145 || orgId == 39) {
+          items.add(
+            Hero(
+              tag: 'claimAdvance',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.claimAdvanceRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -667,50 +703,51 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.payment,
-                        size: 50,
-                        color: Mythemes.successColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.payment,
+                          size: 50,
+                          color: Mythemes.successColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Advance',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Advance',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'loanAdvanceReport',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
-                  /*Fluttertoast.showToast(
+        //Loan
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'loanAdvanceReport',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -719,50 +756,51 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.money,
-                        size: 50,
-                        color: Mythemes.lightBluishColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.money,
+                          size: 50,
+                          color: Mythemes.lightBluishColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                          'Loan',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                          TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Loan',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'helpdeskItems',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.helpDeskItemsRoute);
-                  /*Fluttertoast.showToast(
+        //Helpdesk
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'helpdeskItems',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.helpDeskItemsRoute);
+                    /*Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
@@ -771,42 +809,42 @@ class _ProjectListState extends State<ProjectList> {
                     textColor: Colors.white,
                     fontSize: 16.0
                 );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.support_agent_rounded,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.support_agent_rounded,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Helpdesk',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Helpdesk',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
 
-      /*if(showRo  || showAdmin) {
+        /*if(showRo  || showAdmin) {
         items.add(
           Hero(
             tag: 'tracking',
@@ -836,7 +874,7 @@ class _ProjectListState extends State<ProjectList> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
                         ),
                       ),
                     ),
@@ -848,16 +886,17 @@ class _ProjectListState extends State<ProjectList> {
         );
       }*/
 
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'ocr',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: (){
-                  Navigator.pushNamed(context, MyRoutings.ocrPageRoute);
-                  /*Fluttertoast.showToast(
+        //OCR
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'ocr',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pushNamed(context, MyRoutings.ocrPageRoute);
+                    /*Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
@@ -866,50 +905,51 @@ class _ProjectListState extends State<ProjectList> {
                     textColor: Colors.white,
                     fontSize: 16.0
                 );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.document_scanner_outlined,
-                        size: 50,
-                        color: Mythemes.activeStepColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.document_scanner_outlined,
+                          size: 50,
+                          color: Mythemes.activeStepColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'OCR',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'OCR',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'face_recognition',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: (){
-                  Navigator.pushNamed(context, MyRoutings.faceRecognitionHome);
-                  /*Fluttertoast.showToast(
+        //Face Recognition
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'face_recognition',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pushNamed(context, MyRoutings.faceRecognitionHome);
+                    /*Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
@@ -918,51 +958,52 @@ class _ProjectListState extends State<ProjectList> {
                     textColor: Colors.white,
                     fontSize: 16.0
                 );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.face_retouching_natural,
-                        size: 50,
-                        color: Mythemes.successColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.face_retouching_natural,
+                          size: 50,
+                          color: Mythemes.successColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Face Recognition',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Face Recognition',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
 
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'visitorManage',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                  /*Fluttertoast.showToast(
+        //Visitor Management
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'visitorManage',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -971,51 +1012,52 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.approval,
-                        size: 50,
-                        color: Mythemes.alertColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.approval,
+                          size: 50,
+                          color: Mythemes.alertColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Visitor ',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Visitor ',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'frontPage',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                  Navigator.pushNamed(context, MyRoutings.landingPageRoute);
-                  /*Fluttertoast.showToast(
+        //New Landing
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'frontPage',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                    Navigator.pushNamed(context, MyRoutings.landingPageRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1024,52 +1066,52 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.new_releases_sharp,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.new_releases_sharp,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'New',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'New',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'induction',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                  Navigator.pushNamed(context, MyRoutings.inductionOnboardRoute);
-                  /*Fluttertoast.showToast(
+        //Induction Onboarding
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'induction',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                    Navigator.pushNamed(context, MyRoutings.inductionOnboardRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1078,52 +1120,52 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.add_moderator_outlined,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.add_moderator_outlined,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Induction',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Induction',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      //Pre-Onboard
-      if(setPreOnboardShow == "true" || empIdNew == 75324 || emailId == "sid@voyageofwellness.co.in" || orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'preInduction',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                  Navigator.pushNamed(context, MyRoutings.preOnboardItemRoute);
-                  /*Fluttertoast.showToast(
+        //Pre-Onboard
+        if(setPreOnboardShow == "true" || empIdNew == 75324 || emailId == "sid@voyageofwellness.co.in" || orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'preInduction',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                    Navigator.pushNamed(context, MyRoutings.preOnboardItemRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1132,52 +1174,52 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.manage_accounts_sharp,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.manage_accounts_sharp,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Pre-Induction',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Pre-Induction',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      //Exit
-      if(setExitShow == "true" || orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'exit',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                  Navigator.pushNamed(context, MyRoutings.exitListRoute);
-                  /*Fluttertoast.showToast(
+        //Exit
+        if(setExitShow == "true" || orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'exit',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                    Navigator.pushNamed(context, MyRoutings.exitListRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1186,54 +1228,96 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.auto_delete,
-                        size: 50,
-                        color: Mythemes.dangerColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.auto_delete,
+                          size: 50,
+                          color: Mythemes.dangerColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Exit',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Exit',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'realLocation',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                 // Navigator.pushNamed(context, MyRoutings.realTimeLocationRoute);
-                  //Navigator.pushNamed(context, MyRoutings.customCalender);
-                  //Navigator.pushNamed(context, MyRoutings.locationTracking);
-                  Navigator.pushNamed(context, MyRoutings.geoLocationTracking);
-                  /*Fluttertoast.showToast(
+        if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+            items.add(
+              Hero(
+                tag: 'myTeams',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: (){
+                      Navigator.pushNamed(context, MyRoutings.empListRoute);
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.supervised_user_circle_sharp,
+                            size: 50,
+                            color: Colors.deepOrange,
+                          ),
+
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'My Team',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+        //Location
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'realLocation',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                    // Navigator.pushNamed(context, MyRoutings.realTimeLocationRoute);
+                    //Navigator.pushNamed(context, MyRoutings.customCalender);
+                    //Navigator.pushNamed(context, MyRoutings.locationTracking);
+                    Navigator.pushNamed(context, MyRoutings.geoLocationTracking);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1242,51 +1326,52 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.pin_drop,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.pin_drop,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Location',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Location',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
+          );
+        }
 
-      if(orgId == 3 || orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'essDashboard',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                  Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-                  /*Fluttertoast.showToast(
+        //ESS Dashboard
+        if(orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'essDashboard',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                    Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1295,39 +1380,41 @@ class _ProjectListState extends State<ProjectList> {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.dashboard,
-                        size: 50,
-                        color: Mythemes.warningColor,
-                      ),
-                      /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.dashboard,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'ESS Dash',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'ESS Dash',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
+          );
+        }
       }
+
 
       /*if(orgId == 3 || orgId == 145) {
         items.add(
@@ -1358,7 +1445,7 @@ class _ProjectListState extends State<ProjectList> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
                         ),
                       ),
                     ),
@@ -1409,7 +1496,7 @@ class _ProjectListState extends State<ProjectList> {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style:
-                        TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
                       ),
                     ),
                   ),
@@ -1424,938 +1511,131 @@ class _ProjectListState extends State<ProjectList> {
     timeDilation = 0.5;
     return Material(
       child: Scaffold(
-        body: GridView.count(
-          crossAxisCount: 3,
-          children: generateGridViewItems(),
-          /*<Widget>[
-            Hero(
-              tag: 'reportAnimate',
-              child: Card(
-                color: Mythemes.whitish,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.access_time_filled,
-                          size: 50,
-                          color: Mythemes.greyish,
+        body: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Visibility(
+                  visible: userPanel == "MSS",
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedToggleSwitch<int>.size(
+                        height: 30,
+                        current: min(value, 2),
+                        style: ToggleStyle(
+                          backgroundColor: Mythemes.greyishade,
+                          indicatorColor: Mythemes.lightBluishColor,
+                          borderColor: Colors.transparent,
+                          borderRadius: BorderRadius.circular(20.0),
+                          indicatorBorderRadius: BorderRadius.zero,
                         ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Attendance',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
+                        values: const [0, 1],
+                        iconOpacity: 1.0,
+                        selectedIconScale: 1.0,
+                        indicatorSize: const Size.fromWidth(150),
+                        iconAnimationType: AnimationType.onHover,
+                        styleAnimationType: AnimationType.onHover,
+                        spacing: 2.0,
+                        customSeparatorBuilder: (context, local, global) {
+                          final opacity =
+                          ((global.position - local.position).abs() - 0.5)
+                              .clamp(0.0, 1.0);
+                          return VerticalDivider(
+                              indent: 10.0,
+                              endIndent: 10.0,
+                              color: Colors.white38.withOpacity(opacity));
+                        },
+                        customIconBuilder: (context, local, global) {
+                          final text = const ['ESS', 'MSS'][local.index];
+                          return Center(
+                              child: Text(text,
+                                  style: TextStyle(
+                                      color: Color.lerp(Colors.black, Colors.white,
+                                          local.animationValue))));
+                        },
+                        borderWidth: 0.0,
+                        onChanged: (i) {
+                          setState(() {
+                            value = i;
+                            print(i);
+                          });
+                          if(value == 1) {
+                            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                          }
+                        },
+                      )
                     ],
                   ),
                 ),
-              ),
-            ),
-            Hero(
-              tag: 'leaveReport',
-              child: Card(
-                color: Mythemes.whitish,
-                child: InkWell(
-                  onTap: () {
-                   Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.calendar_month_rounded,
-                          size: 50,
-                          color: Mythemes.greyish,
+                Visibility(
+                  visible: userPanel == "MSS_MO_ADMIN",
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedToggleSwitch<int>.size(
+                        height: 30,
+                        current: min(value, 2),
+                        style: ToggleStyle(
+                          backgroundColor: Mythemes.greyishade,
+                          indicatorColor: Mythemes.lightBluishColor,
+                          borderColor: Colors.transparent,
+                          borderRadius: BorderRadius.circular(20.0),
+                          indicatorBorderRadius: BorderRadius.zero,
                         ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Leave',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                                TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, MyRoutings.documentsAddedRoute);
-                *//*Fluttertoast.showToast(
-                    msg: "Not Activated",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );*//*
-              },
-              child: Hero(
-                tag: 'e-doc',
-                child: Card(
-                  //color: Mythemes.whiteShadeSeventy,
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.document_scanner_sharp,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'E-Doc',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.greyish, fontSize: boxText),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Hero(
-              tag: 'hrisReport',
-              child: InkWell(
-                onTap: () {
-                  *//*Fluttertoast.showToast(
-                      msg: "Not Activated",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.black,
-                      textColor: Colors.white,
-                      fontSize: 16.0
-                  );*//*
-                  Navigator.pushNamed(context, MyRoutings.hrDetailsRoute);
-                },
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.supervised_user_circle,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'HRIS',
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Hero(
-              tag: 'loanAdvanceReport',
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: () {
-                    //Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
-                    Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.currency_exchange,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Loan',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+                        values: const [0, 1],
+                        iconOpacity: 1.0,
+                        selectedIconScale: 1.0,
+                        indicatorSize: const Size.fromWidth(150),
+                        iconAnimationType: AnimationType.onHover,
+                        styleAnimationType: AnimationType.onHover,
+                        spacing: 2.0,
+                        customSeparatorBuilder: (context, local, global) {
+                          final opacity =
+                          ((global.position - local.position).abs() - 0.5)
+                              .clamp(0.0, 1.0);
+                          return VerticalDivider(
+                              indent: 10.0,
+                              endIndent: 10.0,
+                              color: Colors.white38.withOpacity(opacity));
+                        },
+                        customIconBuilder: (context, local, global) {
+                          final text = const ['ESS', 'MSS MO'][local.index];
+                          return Center(
+                              child: Text(text,
+                                  style: TextStyle(
+                                      color: Color.lerp(Colors.black, Colors.white,
+                                          local.animationValue))));
+                        },
+                        borderWidth: 0.0,
+                        onChanged: (i) {
+                          setState(() {
+                            value = i;
+                            print(i);
 
-            Hero(
-              tag: 'claim',
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: () {
-                    //Navigator.pushNamed(context, MyRoutings.claimItemsListRoute);
-                    Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.handshake_outlined,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Claim',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
+                          });
+                          if(value == 1) {
+                            //Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                          }
+                        },
+                      )
                     ],
                   ),
                 ),
+              ],
+            ).pLTRB(0, 8, 0, 8),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 3,
+                children: generateGridViewItems(),
               ),
             ),
-            Hero(
-              tag: 'odReport',
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: (){
-                    //Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                    Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.business_center,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'OD',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            Hero(
-              tag: 'helpdeskItems',
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: () {
-                    //Navigator.pushNamed(context, MyRoutings.helpDeskItemsRoute);
-                    Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.support_agent_rounded,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Helpdesk',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Hero(
-              tag: 'tracking',
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: (){
-                    Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                    //Navigator.pushNamed(context, MyRoutings.empListRoute);
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.location_on,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Tracking',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            *//*Hero(
-              tag: 'qrItems',
-              child: Card(
-                //color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: () {
-                    Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                    //Navigator.pushNamed(context, MyRoutings.qrItemsRoute);
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.qr_code_scanner,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//**//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//**//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'QR',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),*//*
-            *//*Hero(
-              tag: 'roster',
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: () {
-                    Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                    //Navigator.pushNamed(context, MyRoutings.rosterCalendarRoute);
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.calendar_month,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//**//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//**//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Roster',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Hero(
-              tag: 'induction',
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: () {
-                    Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );
-                    //Navigator.pushNamed(context, MyRoutings.inductionOnboardRoute);
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.supervised_user_circle*//**//**//**//*,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//**//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//**//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Onboard',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                //Navigator.pushNamed(context, MyRoutings.ocrPageRoute);
-                Fluttertoast.showToast(
-                    msg: "Not Activated",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-              },
-              child: Hero(
-                tag: 'ocr',
-                child: Card(
-                  color: Mythemes.whiteShadeSeventy,
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.document_scanner,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//**//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//**//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'OCR',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.greyish, fontSize: boxText),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            Hero(
-              tag: 'taskManage',
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: InkWell(
-                  onTap: (){
-                   *//**//* Fluttertoast.showToast(
-                        msg: "Not Activated",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.black,
-                        textColor: Colors.white,
-                        fontSize: 16.0
-                    );*//**//*
-                    Navigator.pushNamed(context, MyRoutings.projectManageItemsRoute);
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.task_alt,
-                          size: 50,
-                          color: Mythemes.greyish,
-                        ),
-                        *//**//*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//**//*
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 80, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                            'Project',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            InkWell(
-              onTap: () {
-                Fluttertoast.showToast(
-                    msg: "Not Activated",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-              },
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.bar_chart,
-                        size: 50,
-                        color: Mythemes.greyish,
-                      ),
-                      *//**//*Image(
-                        image: AssetImage('images/applications.png'),width: 100,height: 100,
-                      ),*//**//*
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 80, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                          'PMS',
-                          style:
-                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-
-            InkWell(
-              onTap: () {
-                Fluttertoast.showToast(
-                    msg: "Not Activated",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-              },
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.coronavirus,
-                        size: 50,
-                        color: Mythemes.greyish,
-                      ),
-                      *//**//*Image(
-                        image: AssetImage('images/applications.png'),width: 100,height: 100,
-                      ),*//**//*
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 80, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                          'Covid-19',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                          TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-
-            InkWell(
-              onTap: () {
-                Fluttertoast.showToast(
-                    msg: "Not Activated",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-              },
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.inventory_2,
-                        size: 50,
-                        color: Mythemes.greyish,
-                      ),
-                      *//**//*Image(
-                        image: AssetImage('images/applications.png'),width: 100,height: 100,
-                      ),*//**//*
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 80, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                          'Assets',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                Fluttertoast.showToast(
-                    msg: "Not Activated",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-              },
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.groups,
-                        size: 50,
-                        color: Mythemes.greyish,
-                      ),
-                      *//**//*Image(
-                        image: AssetImage('images/applications.png'),width: 100,height: 100,
-                      ),*//**//*
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 80, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                          'Company',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                Fluttertoast.showToast(
-                    msg: "Not Activated",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
-                );
-              },
-              child: Card(
-                color: Mythemes.whiteShadeSeventy,
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.settings,
-                        size: 50,
-                        color: Mythemes.greyish,
-                      ),
-                      *//**//*Image(
-                        image: AssetImage('images/applications.png'),width: 100,height: 100,
-                      ),*//**//*
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 80, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                          'Settings',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),*//*
-          ],*/
+          ]
         ),
-
-        /*GridView.builder(
-          itemCount: 10,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3),
-            itemBuilder: (ctx, index) {
-              return Container (
-                color: Colors.blue,
-                margin: EdgeInsets.all(5),
-                child: Center(
-                  child: Text(index.toString(),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),),
-                ),
-              );
-            }),*/
-        /*   GridView(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-          children: <Widget>[
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.all(5),
-
-            ),
-
-            Container(
-              color: Colors.blue,
-              margin: EdgeInsets.all(5),
-            ),
-            Container(
-              color: Colors.blue,
-              margin: EdgeInsets.all(5),
-            ),
-            Container(
-              color: Colors.blue,
-              margin: EdgeInsets.all(5),
-            ),
-            Container(
-              color: Colors.blue,
-              margin: EdgeInsets.all(5),
-            ),
-            Container(
-              color: Colors.blue,
-              margin: EdgeInsets.all(5),
-            ),
-            Container(
-              color: Colors.blue,
-              margin: EdgeInsets.all(5),
-            ),
-            Container(
-              color: Colors.blue,
-              margin: EdgeInsets.all(5),
-            ),
-          ],
-        ),*/
-
-
-        //IndexedStack(
-        //index:currentIndex,
-        //children: screens,
-        //),
-
-
       ),
       //debugShowCheckedModeBanner: false,
     );

@@ -28,6 +28,10 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
+  String userPanelPermission = "COMPANY_EMPLOYEE";
+  String pendingAttRequestMOPermission = "0";
+  String pendingAttRequestMSSPermission = "0";
+  String pendingAttRequestUISPermission = "0";
   @override
   void initState() {
     getSharedPrfanceList();
@@ -37,6 +41,14 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
   Future getSharedPrfanceList() async{
       empRole= await shared.getEmpRoll();
       roRole= await shared.getRoRole();
+      userPanelPermission= await shared.getUserPanel();
+      pendingAttRequestMOPermission= (await shared.getPendingAttendanceReqMSSMOPermission())!;
+      pendingAttRequestMSSPermission= (await shared.getPendingAttendanceReqMSSPermission())!;
+      pendingAttRequestUISPermission= (await shared.getPendingAttendanceReqUISPermission())!;
+      print("Pending Attendance Request MSS MO- $pendingAttRequestMOPermission");
+      print("Pending Attendance Request MSS- $pendingAttRequestMSSPermission");
+      print("Pending Attendance Request UIS- $pendingAttRequestUISPermission");
+      print("User Panel - $userPanelPermission");
       adminRole= await shared.getAdminRole();
     print('empRole $empRole');
     print('roRole $roRole');
@@ -91,49 +103,6 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
-      //My Requests
-      if(showHide || showAdmin) {
-        items.add(
-          Hero(
-            tag: 'myRequests',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.pendingReqRoute);
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.list_alt,
-                        size: 50,
-                        color: Mythemes.lightBluishColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'My Requests',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
       // Attendance Report
       /*if(showHide || showAdmin) {
         items.add(
@@ -217,7 +186,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
         );
       }*/
       //Pending Requisition List Ro
-      if(showRo  || showAdmin) {
+      if(userPanelPermission == "MSS" && pendingAttRequestMSSPermission == "1") {
         items.add(
           Hero(
             tag: 'myTeamPendingReq',
@@ -225,7 +194,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
               color: Mythemes.whitish,
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.pendingReqRoRoute);
+                  Navigator.pushNamed(context, MyRoutings.mssAttPendingRequestRoRoute);
                 },
                 child: Stack(
                   children: <Widget>[
@@ -260,7 +229,7 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
         );
       }
       //Other Employee Requisition
-      if(showRo  || showAdmin) {
+      if(userPanelPermission == "MSS" && pendingAttRequestMSSPermission == "1") {
         items.add(
           Hero(
             tag: 'otherAttendanceReq',
@@ -268,7 +237,184 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
               color: Mythemes.whitish,
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.otherEmpReqAttendance);
+                  Navigator.pushNamed(context, MyRoutings.mssOthersAttRequestPageRoute);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.supervised_user_circle,
+                        size: 50,
+                        color: Mythemes.dangerColorOne,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Others Requisition',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+
+      //Pending Requisition List MSS MO
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingAttRequestMOPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'myTeamPendingReq',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.mssMoAttPendingRequestRoRoute);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.pending,
+                        size: 50,
+                        color: Mythemes.VoiletColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending Requests',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //Other Employee Requisition MSS MO
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingAttRequestMOPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'otherAttendanceReq',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.mssMoOthersAttRequestPageRoute);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.supervised_user_circle,
+                        size: 50,
+                        color: Mythemes.dangerColorOne,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Others Requisition',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //Pending Requisition List UIS
+      if(userPanelPermission == "USER" && pendingAttRequestUISPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'myTeamPendingReq',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.uisAttPendingRequestRoRoute);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.pending,
+                        size: 50,
+                        color: Mythemes.VoiletColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending Requests',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //Other Employee Requisition UIS
+      if(userPanelPermission == "USER" && pendingAttRequestUISPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'otherAttendanceReq',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.uisOthersAttRequestPageRoute);
                 },
                 child: Stack(
                   children: <Widget>[

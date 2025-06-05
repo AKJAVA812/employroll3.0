@@ -40,6 +40,8 @@ class MSSDashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? defaultProfileName;
+dynamic defaultProfileId;
 DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
@@ -88,6 +90,10 @@ class _MSSDashboardState extends State<MSSDashboard> {
       isLoading = true; // Start loading
     });
     sessionId = await shared!.getSessionId();
+    defaultProfileName = await shared!.getDefaultProfileName();
+    defaultProfileId = await shared!.getDefaultProfileId();
+    print("Default Profile Name - $defaultProfileName");
+    print("Default Profile Id - $defaultProfileId");
     Future<DashboardModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
@@ -323,7 +329,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
             builder: (context) => FilterBottomSheet(),
           );
         },
-        child: Icon(Icons.filter_list),
+        child: Icon(Icons.filter_list, color: Mythemes.whitish,),
       ),
       appBar: AppBar(
         title: RichText(
@@ -346,7 +352,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'HR Manager - 1005',
+                    '$defaultProfileName',
                     style: TextStyle(
                       color: Mythemes.whitish,
                       fontSize: 12,

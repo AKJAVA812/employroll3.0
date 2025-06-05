@@ -8,6 +8,9 @@ import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../../../MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
+import '../../../../MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
+import '../../../../UIS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -40,6 +43,7 @@ class OthersSingleDateAttendance extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+
 var getData;
 
 OthersOnDateAttendanceModal? onDateAttModelGlobel;
@@ -49,6 +53,8 @@ class _OthersSingleDateAttendanceState extends State<OthersSingleDateAttendance>
   final String singleDateString;
 
   _OthersSingleDateAttendanceState(this.singleDateString);
+
+  var userPanel;
   @override
   void initState() {
 
@@ -78,23 +84,31 @@ class _OthersSingleDateAttendanceState extends State<OthersSingleDateAttendance>
   Future<void> getSharedPrfanceList() async {
     try {
       sessionId = await shared!.getSessionId();
-      empId = empNewId;
+      userPanel = await shared!.getUserPanel();
+
+      if (userPanel == "MSS") {
+        empId = empNewIdMSS;
+      } else if (userPanel == "MSS_MO_ADMIN") {
+        empId = empNewIdMO;
+      } else if (userPanel == "USER") {
+        empId = empNewIdUSER;
+      }
 
       final fetchedData = await getSingleAttList(sessionId!, singleDateString);
+
+      if (!mounted) return; // 👈 check before calling setState
       setState(() {
         onDateAttModelGlobel = fetchedData;
       });
 
-      if (getData == 0 )  {
+      if (getData == 0) {
         print("No data found in the model");
-        Center(
-          child:
-          "There is no data".text.make()
-        );
-        //showNodata(context, "Oops", "No data available.");
+        if (!mounted) return; // 👈 check again before using context
+        showNodata(context, "Oops", "No data available.");
       }
     } catch (e) {
       print("Error: $e");
+      if (!mounted) return; // 👈 prevent error here too
       showNodata(context, "Error", "Failed to fetch data.");
     }
   }
@@ -393,7 +407,7 @@ class _AttListState extends State<AttList> {
                           child: Column(
                             children: [
 
-                              "Working Hours".text.sm.make(),
+                              "Work Hours".text.sm.make(),
                               onDateAttModelGlobel!.workingHrs!.text.sm.make()
                             ],
                           ),
