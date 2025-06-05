@@ -315,14 +315,14 @@ class _UIS_PendingLeaveRequisitionListState extends State<UIS_PendingLeaveRequis
                           });
 
                           if(value == 0) {
-                            Navigator.pushNamed(context, MyRoutings.pendingLeaveReqListRoute);
+                            Navigator.pushNamed(context, MyRoutings.uisPendingLeaveRequestRoute);
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
                           if(value == 1) {
-                            Navigator.pushNamed(context, MyRoutings.levelOnePendingRoute);
+                            Navigator.pushNamed(context, MyRoutings.uisLevelOnePendingReqRoute);
                           }
                            if(value == 2) {
-                             Navigator.pushNamed(context, MyRoutings.levelTwoPendingRoute);
+                             Navigator.pushNamed(context, MyRoutings.uisLevelTwoPendingReqRoute);
                           }
                         },
                       )

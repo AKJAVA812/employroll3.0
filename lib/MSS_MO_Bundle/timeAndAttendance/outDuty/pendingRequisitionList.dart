@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 import '../../../../adminPage/modelClass/dashboardModel.dart';
@@ -42,7 +43,10 @@ List<Listdata>? foundDataNew=[];
 bool isLoading = true;
 PendingOdReqList? pendingOdReqListLabel;
 PendingOdReqList? pendingOdReqListLabeled;
-
+String? userPanel;
+dynamic getProfileId;
+String? orgId;
+dynamic matchedOrg;
 class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisition> with RouteAware{
   final PendingOdReqList pendingOdReqList;
 
@@ -55,10 +59,43 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
   var startDate;
   var endDate;
 
+  bool _isFirstBuild = true;
+  bool _isBottomSheetOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // DO NOT use `context` here
+    // Move `getSharedPrfanceList()` to `didChangeDependencies`
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+    if (_isFirstBuild) {
+      _isFirstBuild = false;
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+      // Defer execution until after current build frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        getSharedPrfanceList(); // Safe to call here
+        DateTime now = DateTime.now();
+        odStatus = "Pending";
+        startDate = "2015-01-01";
+        DateFormat currentDateFormat = DateFormat("yyyy-MM-dd");
+        String currentDateFormatString = currentDateFormat.format(now);
+        print("current date $currentDateFormatString");
+        endDate = currentDateFormatString;
+        // TODO: implement initState
+        super.initState();
+        setState(() {
+          var listLength;
+          listLength = foundDataNew!.length;
+          print('listLength $listLength');
+        });
+      });
+    }
   }
 
   @override
@@ -69,31 +106,195 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
-    getSharedPrfanceList();
+    // Called when returning to this page
+    getSharedPrfanceList(); // Reload and open filter bottom sheet again
     super.didPopNext();
   }
 
-  @override
-  void initState() {
-    DateTime now = DateTime.now();
-    odStatus = "Pending";
-    startDate = "2015-01-01";
-    DateFormat currentDateFormat = DateFormat("yyyy-MM-dd");
-    String currentDateFormatString = currentDateFormat.format(now);
-    print("current date $currentDateFormatString");
-    endDate = currentDateFormatString;
-    // TODO: implement initState
-    super.initState();
-    setState(() {
-      getSharedPrfanceList();
-      var listLength;
-      listLength = foundDataNew!.length;
-      print('listLength $listLength');
+  List<Map<String, dynamic>> storedOrgList = [];
+  List<String> organizations = []; // for Dropdown values
+  String? selectedOrg;
+  dynamic getOrgId;
+
+  Future<void> loadOrgListFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? orgListString = prefs.getString("orgList");
+
+    if (orgListString != null) {
+      List<dynamic> decoded = json.decode(orgListString);
+      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+
+      // Populate dropdown list
+      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+
+      // Start with "Select" as default (null value)
+      selectedOrg = null;
+      getOrgId = '';
+
+      setState(() {});
+    }
+  }
+  bool isLoading = false;
+
+  Future getSharedPrfanceList() async {
+    if (!_isBottomSheetOpen) {
+      await Future.delayed(Duration(milliseconds: 100));
+      _showFilterBottomSheet();
+    }
+    loadOrgListFromPrefs();
+  }
+
+  void _showFilterBottomSheet() {
+    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    _isBottomSheetOpen = true;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true, // <--- Make sure this is true
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            padding: EdgeInsets.all(16),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Filter',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+
+                    /// Organization Dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Organization',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedOrg,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Select'),
+                        ),
+                        ...organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org,
+                            child: Text(org),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedOrg = value;
+
+                          // Match selected org name to get ID
+                          matchedOrg = storedOrgList.firstWhere(
+                                (org) => org['orgName'] == value,
+                            orElse: () => {},
+                          );
+
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print('Org Name: $selectedOrg');
+                          print('Org ID: $getOrgId');
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+                    SizedBox(height: 50),
+
+                    /// Filter Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.of(bottomSheetContext).pop();
+                          await Future.delayed(Duration(milliseconds: 100));
+
+                          // Now perform async logic
+                          setState(() {
+                            pendingOdReqListLabeled = null;
+                            //isLoading = true;
+                          });
+
+                          sessionId = await shared!.getSessionId();
+                          userPanel = await shared!.getUserPanel();
+                          getProfileId = await shared!.getDefaultProfileId();
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          // await Future.delayed(Duration(seconds: 5));
+                          Future<PendingOdReqList> getEmployeeList11 =
+                          getPendingOdReqList(sessionId!);
+                          final loading = Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              CircularProgressIndicator(),
+                              Text(" Login ... Please wait")
+                            ],
+                          );
+
+                          getEmployeeList11.then((value) {
+                            setState(() {
+                              foundDataNew = allUsernew;
+                              pendingOdReqListLabel = value;
+                              pendingOdReqListLabeled = pendingOdReqListLabel;
+                              if(foundDataNew != null) {
+                                foundDataNew!.length;
+                                print("Fetch data $foundDataNew");
+                                isLoading = false;
+                              } else {
+                                Center(
+                                  child: "There is no data available right now".text.make(),
+                                );
+                                foundDataNew = [];
+                              }
+                            });
+
+                            //print('employeeList00${pendingOdReqListLabel!.listdata!.length}');
+                          });
+                        },
+                        icon: Icon(Icons.filter_alt),
+                        label: Text("Apply Filter"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Mythemes.successColor,
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
     });
   }
 
-  Future getSharedPrfanceList() async {
+  Future getSharedPrfanceLists() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingOdReqList> getEmployeeList11 =
@@ -136,7 +337,10 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
         "sessionId=$SessionId&"
         "odStatus=$odStatus&"
         "startDate=$startDate&"
-        "endDate=$endDate");
+        "endDate=$endDate&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=$getOrgId");
 
     final response = await http.post(urlapi);
     print('URL ${response.request}');

@@ -629,6 +629,8 @@ class _ProjectListState extends State<ProjectList> {
               ),
             );
 
+
+
         //TRAVEL & EXPENSE
         if(orgId == 3 || orgId == 145 || orgId == 171 || orgId == 179 || orgId == 186) {
           items.add(
@@ -1259,6 +1261,47 @@ class _ProjectListState extends State<ProjectList> {
             ),
           );
         }
+
+        if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+            items.add(
+              Hero(
+                tag: 'myTeams',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: (){
+                      Navigator.pushNamed(context, MyRoutings.empListRoute);
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.supervised_user_circle_sharp,
+                            size: 50,
+                            color: Colors.deepOrange,
+                          ),
+
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'My Team',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
 
         //Location
         if(orgId == 3 || orgId == 145) {
