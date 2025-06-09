@@ -296,6 +296,12 @@ class MyRoutings {
   //Claims
   static String uisClaimItemRoute= "/uisClaimItemRoute";
 
+  //My Team
+  static String myTeamMORoute= "/myTeamMORoute";
+
+  //Exit List
+  static String exitListMORoute= "/exitListMORoute";
+
   //ESS
   //My Requests
   static String myAllRequestRoute= "/myAllRequestRoute";

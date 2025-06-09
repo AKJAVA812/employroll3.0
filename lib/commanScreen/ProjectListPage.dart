@@ -490,7 +490,7 @@ class _ProjectListState extends State<ProjectList> {
       }
 
 
-      if(value == 1) {
+      if(value == 1 || userPanel == "USER") {
           //Time & Attendance
           if(orgId != 144 && orgId != 138 || value == 1) {
             items.add(
@@ -1217,8 +1217,14 @@ class _ProjectListState extends State<ProjectList> {
                 color: Mythemes.whitish,
                 child: InkWell(
                   onTap: () {
+                    if(userPanel == "MSS" || userPanel == "USER") {
+                      Navigator.pushNamed(context, MyRoutings.exitListRoute);
+                    }
+                    if(userPanel == "MSS_MO_ADMIN") {
+                      Navigator.pushNamed(context, MyRoutings.exitListMORoute);
+                    }
                     //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                    Navigator.pushNamed(context, MyRoutings.exitListRoute);
+
                     /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
@@ -1262,6 +1268,7 @@ class _ProjectListState extends State<ProjectList> {
           );
         }
 
+        //My Teams
         if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
             items.add(
               Hero(
@@ -1270,7 +1277,13 @@ class _ProjectListState extends State<ProjectList> {
                   color: Mythemes.whitish,
                   child: InkWell(
                     onTap: (){
-                      Navigator.pushNamed(context, MyRoutings.empListRoute);
+                      if(userPanel == "MSS" || userPanel == "USER") {
+                        Navigator.pushNamed(context, MyRoutings.empListRoute);
+                      }
+                      if(userPanel == "MSS_MO_ADMIN") {
+                        Navigator.pushNamed(context, MyRoutings.myTeamMORoute);
+                      }
+
                     },
                     child: Stack(
                       children: <Widget>[
