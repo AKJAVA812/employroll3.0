@@ -5,6 +5,7 @@ import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
@@ -21,22 +22,21 @@ import '../../employeePage/mapView.dart';
 import '../../main.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../themes/empThemes.dart';
-import 'exitWorkflow.dart';
 
-class ExitListView extends StatefulWidget {
-  const ExitListView({Key? key}) : super(key: key);
+class EmpListViewMO extends StatefulWidget {
+  const EmpListViewMO({Key? key}) : super(key: key);
 
   static const String _title = 'Employee List';
 
   @override
-  State<ExitListView> createState() => _ExitListViewState();
+  State<EmpListViewMO> createState() => _EmpListViewMOState();
 }
 
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? foundDataNewMO=[];
 EmployeeListModel? employeeListModelglobel;
 EmployeeListModel? employeeListModelglobeled;
 var empName;
@@ -45,8 +45,8 @@ String? userPanel;
 dynamic getProfileId;
 String? orgId;
 dynamic matchedOrg;
-class _ExitListViewState extends State<ExitListView> with RouteAware{
-  @override
+class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware{
+  /*@override
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
@@ -99,7 +99,217 @@ class _ExitListViewState extends State<ExitListView> with RouteAware{
       });
       print('employeeList00${employeeListModelglobel!.data!.length}');
     });
+  }*/
+  bool _isFirstBuild = true;
+  bool _isBottomSheetOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // DO NOT use `context` here
+    // Move `getSharedPrfanceList()` to `didChangeDependencies`
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isFirstBuild) {
+      _isFirstBuild = false;
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+      // Defer execution until after current build frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        getSharedPrfanceList(); // Safe to call here
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when returning to this page
+    getSharedPrfanceList(); // Reload and open filter bottom sheet again
+    super.didPopNext();
+  }
+
+  List<Map<String, dynamic>> storedOrgList = [];
+  List<String> organizations = []; // for Dropdown values
+  String? selectedOrg;
+  dynamic getOrgId;
+
+  Future<void> loadOrgListFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? orgListString = prefs.getString("orgList");
+
+    if (orgListString != null) {
+      List<dynamic> decoded = json.decode(orgListString);
+      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+
+      // Populate dropdown list
+      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+
+      // Start with "Select" as default (null value)
+      selectedOrg = null;
+      getOrgId = '';
+
+      setState(() {});
+    }
+  }
+  bool isLoading = false;
+
+  Future getSharedPrfanceList() async {
+    if (!_isBottomSheetOpen) {
+      await Future.delayed(Duration(milliseconds: 100));
+      _showFilterBottomSheet();
+    }
+    loadOrgListFromPrefs();
+  }
+
+
+  void _showFilterBottomSheet() {
+    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    _isBottomSheetOpen = true;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true, // <--- Make sure this is true
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            padding: EdgeInsets.all(16),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Filter',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+
+                    /// Organization Dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Organization',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedOrg,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Select'),
+                        ),
+                        ...organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org,
+                            child: Text(org),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedOrg = value;
+
+                          // Match selected org name to get ID
+                          matchedOrg = storedOrgList.firstWhere(
+                                (org) => org['orgName'] == value,
+                            orElse: () => {},
+                          );
+
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print('Org Name: $selectedOrg');
+                          print('Org ID: $getOrgId');
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+                    SizedBox(height: 50),
+
+                    /// Filter Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.of(bottomSheetContext).pop();
+                          await Future.delayed(Duration(milliseconds: 100));
+
+                          // Now perform async logic
+                          setState(() {
+                            employeeListModelglobeled = null;
+                            isLoading = true;
+                          });
+
+                          sessionId = await shared!.getSessionId();
+                          userPanel = await shared!.getUserPanel();
+                          getProfileId = await shared!.getDefaultProfileId();
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print("ORG ID - $getOrgId");
+                          try {
+                            final value = await getEmployeeList(sessionId!);
+
+                            setState(() {
+                              foundDataNewMO = allUsernew;
+                              employeeListModelglobel=value;
+                              employeeListModelglobeled=employeeListModelglobel;
+                              isLoading = false;
+                            });
+
+                            print('employeeList00: ${value.data?.length}');
+                          } catch (e) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                            print('Error while fetching requisitions: $e');
+                          }
+                        },
+                        icon: Icon(Icons.filter_alt),
+                        label: Text("Apply Filter"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Mythemes.successColor,
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+    });
+  }
+
 
   Future<EmployeeListModel> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
@@ -109,7 +319,7 @@ class _ExitListViewState extends State<ExitListView> with RouteAware{
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$SessionId&"
         "profileId=$getProfileId&"
-        "orgId=0&"
+        "orgId=$getOrgId&"
         "userPermission=$userPanel");
     final response = await http.post(urlapi);
 
@@ -152,7 +362,7 @@ class _ExitListViewState extends State<ExitListView> with RouteAware{
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewMO = results;
     });
   }
   TextEditingController searchType = TextEditingController();
@@ -191,7 +401,7 @@ class _ExitListViewState extends State<ExitListView> with RouteAware{
                   },
                   horizontalPadding: 8,
                   searchIconColor: Mythemes.black,
-                  centerTitle: "$titleName - ${foundDataNew!.length}",
+                  centerTitle: "$titleName - ${foundDataNewMO!.length}",
                   verticalPadding: 3,
                   centerTitleStyle: TextStyle(
                       fontSize: 19,
@@ -200,6 +410,10 @@ class _ExitListViewState extends State<ExitListView> with RouteAware{
                   searchTextEditingController: searchType),
             ),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _showFilterBottomSheet,
+          child: Icon(Icons.filter_list),
         ),
         bottomNavigationBar:
         BottomNavigationBar (
@@ -267,7 +481,7 @@ class _ExitListViewState extends State<ExitListView> with RouteAware{
             ),
           ],
         ),
-        floatingActionButton: getFAB(),
+        //floatingActionButton: getFAB(),
         /*floatingActionButton: FloatingActionButton(
           onPressed: (){
             Navigator.pushNamed(context, MyRoutings.exitWorkflowRoute);
@@ -282,7 +496,7 @@ class _ExitListViewState extends State<ExitListView> with RouteAware{
           ),
         ),*/
 
-        body: Container(
+        /*body: Container(
           color: Mythemes.whitish,
           child: Column(
             children: [
@@ -290,21 +504,35 @@ class _ExitListViewState extends State<ExitListView> with RouteAware{
               Center(child: CircularProgressIndicator()): MyStatelessWidget(employeeListModelglobeled!)),
             ],
           ),
-        )
+        )*/
+        body: Container(
+    padding: EdgeInsets.all(8.0),
+    child: isLoading
+    ? Center(child: CircularProgressIndicator())
+        : Column(
+    children: [
+    Expanded(
+    child: employeeListModelglobeled == null
+    ? Center(child: "Please select Organisation first!".text.bold.center.make())
+        : MyStatelessWidget(employeeListModelglobeled!),
+    ),
+    ],
+    ),
+    ),
     );
   }
 
   Widget getFAB() {
     return
-    FloatingActionButton.extended(
-      tooltip: "Go to Exit List",
-      onPressed: (){
-        Navigator.pushNamed(context, MyRoutings.exitEmpListRoute);
-      },
-      backgroundColor: Mythemes.lightBluishColor,
-      icon:  Icon(Icons.not_interested, color: Mythemes.whitish,),
-      label: Text('Go to Exit List', style: TextStyle(color: Mythemes.whitish),),
-    ).py0();
+      FloatingActionButton.extended(
+        tooltip: "Go to Exit List",
+        onPressed: (){
+          Navigator.pushNamed(context, MyRoutings.exitEmpListRoute);
+        },
+        backgroundColor: Mythemes.lightBluishColor,
+        icon:  Icon(Icons.not_interested, color: Mythemes.whitish,),
+        label: Text('Go to Exit List', style: TextStyle(color: Mythemes.whitish),),
+      ).py0();
   }
 }
 
@@ -404,7 +632,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     }
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: foundDataNew!.length,
+      itemCount: foundDataNewMO!.length,
       itemBuilder: (context, i) {
 
         return Container(
@@ -421,12 +649,10 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
           ),
           child: InkWell(
             onTap: () {
-              empId = foundDataNew![i].empdetailsId;
-              empName = foundDataNew![i].empName;
+              empId = foundDataNewMO![i].empdetailsId;
+              empName = foundDataNewMO![i].empName;
               print('ID $empId');
               print('NameCheck $empName');
-              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                  ExitWorkflow(empId, empName)));
               //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
             },
             child: Card(
@@ -443,7 +669,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         CircleAvatar(
                           radius: 36,
                           backgroundColor: Mythemes.greyish,
-                          backgroundImage: NetworkImage(foundDataNew![i].empPhoto ?? ""),
+                          backgroundImage: NetworkImage(foundDataNewMO![i].empPhoto ?? ""),
                         ),
                         SizedBox(width: 16),
                         Expanded(
@@ -451,14 +677,39 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                foundDataNew![i].empName ?? '',
+                                foundDataNewMO![i].empName ?? '',
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 4),
-                              Text("📞 ${foundDataNew![i].empContactNo ?? '-'}"),
-                              Text("🆔${foundDataNew![i].empId ?? '-'}"),
-                              Text("✉️ ${foundDataNew![i].empEmail ?? '-'}"),
-                              Text("🏢 ${foundDataNew![i].empDept ?? '-'}"),
+                              Text("📞 ${foundDataNewMO![i].empContactNo ?? '-'}"),
+                              Text("🆔${foundDataNewMO![i].empId ?? '-'}"),
+                              Text("✉️ ${foundDataNewMO![i].empEmail ?? '-'}"),
+                              Text("🏢 ${foundDataNewMO![i].empDept ?? '-'}"),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    empId = foundDataNewMO![i].empdetailsId;
+                                    empName = foundDataNewMO![i].empName;
+                                    print('emID $empId');
+                                    print('name $empName');
+                                    print("Emp list clicked");
+                                  });
+
+                                  showTrackDialog(
+                                      context, "How do you want to see tracking?".toString() + " " , "Tracking Location");
+                                },
+                                icon: Icon(
+                                  Icons.location_on,
+                                  size: 28.0, color: Mythemes.lightBluishColor,
+                                ),
+                              ),
                             ],
                           ),
                         ),

@@ -40,6 +40,10 @@ EmployeeListModel? employeeListModelglobel;
 EmployeeListModel? employeeListModelglobeled;
 var empName;
 var empId;
+String? userPanel;
+dynamic getProfileId;
+String? orgId;
+dynamic matchedOrg;
 class _EmpListViewState extends State<EmpListView> with RouteAware{
   @override
   void didChangeDependencies() {
@@ -74,6 +78,8 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<EmployeeListModel> getEmployeeList11 = getEmployeeList(sessionId!);
     final loading = Row(
@@ -99,7 +105,11 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
     String apiUrl = ApiDetails.getEmpList;
     print('employeeList11: ${SessionId}');
     EmployeeListModel employeeListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "profileId=$getProfileId&"
+        "orgId=0&"
+        "userPermission=$userPanel");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.body}');

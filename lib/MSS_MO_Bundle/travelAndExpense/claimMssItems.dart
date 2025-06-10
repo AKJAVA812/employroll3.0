@@ -5,6 +5,7 @@ import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
@@ -54,15 +55,16 @@ ClaimApproverListModalClass? claimApproverListModalGlobaled;
 var empName;
 var empId;
 var empIdSendMO;
-var userPanel;
-var getProfileId;
-var getProfileName;
-var orgId;
+String? userPanel;
+dynamic getProfileId;
+dynamic getProfileName;
+String? orgId;
+dynamic matchedOrg;
 dynamic levelStatusCheckMO;
 var statusUpdate = "LEVEL_ONE_PENDING";
 dynamic MyColor;
 class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> with RouteAware{
-  @override
+  /*@override
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
@@ -106,7 +108,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
     claimLevelTwo = await shared!.getClaimLevelTwo();
     claimLevelThree = await shared!.getClaimLevelThree();
 
-    /*if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
+    if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
       permissionId = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
       statusUpdate = "LEVEL_ONE_PENDING";
     }
@@ -117,14 +119,14 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
     if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
       permissionId = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
       statusUpdate = "LEVEL_THREE_PENDING";
-    }*/
+    }
     print("Claim L1 $claimLevelOne");
     print("Claim L2 $claimLevelTwo");
     print("Claim L3 $claimLevelThree");
     print("Status $statusUpdate");
 
 
-   /* lOne = claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
+    lOne = claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
     lTwo = claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
     lThree = claimLevelThree == "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
 
@@ -134,9 +136,9 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
       lTwo = true;
     } else if (lTwo) {
       lOne = true;
-    }*/
+    }
 
-    /*if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
+    if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
       lOne = true;
       lTwo = false;
       lThree = false;
@@ -150,7 +152,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
       lOne = true;
       lTwo = true;
       lThree = true;
-    }*/
+    }
     // await Future.delayed(Duration(seconds: 5));
     Future<ClaimApproverListModalClass> getEmployeeList11 = getEmployeeList(sessionId!);
     final loading = Row(
@@ -169,6 +171,261 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
         isLoading = false;
       });
       print('employeeList00${claimApproverListModalGlobal!.data!.length}');
+    });
+  }*/
+
+  bool _isFirstBuild = true;
+  bool _isBottomSheetOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // DO NOT use `context` here
+    // Move `getSharedPrfanceList()` to `didChangeDependencies`
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isFirstBuild) {
+      _isFirstBuild = false;
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+
+      // Defer execution until after current build frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        getSharedPrfanceList(); // Safe to call here
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Called when returning to this page
+    getSharedPrfanceList(); // Reload and open filter bottom sheet again
+    super.didPopNext();
+  }
+
+  List<Map<String, dynamic>> storedOrgList = [];
+  List<String> organizations = []; // for Dropdown values
+  String? selectedOrg;
+  dynamic getOrgId;
+
+  Future<void> loadOrgListFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? orgListString = prefs.getString("orgList");
+
+    if (orgListString != null) {
+      List<dynamic> decoded = json.decode(orgListString);
+      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+
+      // Populate dropdown list
+      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+
+      // Start with "Select" as default (null value)
+      selectedOrg = null;
+      getOrgId = '';
+
+      setState(() {});
+    }
+  }
+  bool isLoading = false;
+
+  Future getSharedPrfanceList() async {
+    if (!_isBottomSheetOpen) {
+      await Future.delayed(Duration(milliseconds: 100));
+      _showFilterBottomSheet();
+    }
+    loadOrgListFromPrefs();
+  }
+
+
+  void _showFilterBottomSheet() {
+    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    _isBottomSheetOpen = true;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true, // <--- Make sure this is true
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            padding: EdgeInsets.all(16),
+            child: StatefulBuilder(
+              builder: (context, setModalState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        margin: EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Filter',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+
+                    /// Organization Dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Select Organization',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedOrg,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Select'),
+                        ),
+                        ...organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org,
+                            child: Text(org),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selectedOrg = value;
+
+                          // Match selected org name to get ID
+                          matchedOrg = storedOrgList.firstWhere(
+                                (org) => org['orgName'] == value,
+                            orElse: () => {},
+                          );
+
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print('Org Name: $selectedOrg');
+                          print('Org ID: $getOrgId');
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+                    SizedBox(height: 50),
+
+                    /// Filter Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Navigator.of(bottomSheetContext).pop();
+                          await Future.delayed(Duration(milliseconds: 100));
+
+                          // Now perform async logic
+                          sessionId = await shared!.getSessionId();
+                          userPanel = await shared!.getUserPanel();
+                          getProfileId = await shared!.getDefaultProfileId();
+                          getProfileName = await shared!.getDefaultProfileName();
+                          claimLevelOne = await shared!.getClaimLevelOne();
+                          claimLevelTwo = await shared!.getClaimLevelTwo();
+                          claimLevelThree = await shared!.getClaimLevelThree();
+
+                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
+                            permissionId = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
+                            statusUpdate = "LEVEL_ONE_PENDING";
+                          }
+                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_TWO_VIEW") {
+                            permissionId = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
+                            statusUpdate = "LEVEL_TWO_PENDING";
+                          }
+                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
+                            permissionId = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
+                            statusUpdate = "LEVEL_THREE_PENDING";
+                          }
+                          print("Claim L1 $claimLevelOne");
+                          print("Claim L2 $claimLevelTwo");
+                          print("Claim L3 $claimLevelThree");
+                          print("Status $statusUpdate");
+
+
+                          lOne = claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
+                          lTwo = claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
+                          lThree = claimLevelThree == "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
+
+// Ensure higher levels include lower levels
+                          if (lThree) {
+                            lOne = true;
+                            lTwo = true;
+                          } else if (lTwo) {
+                            lOne = true;
+                          }
+
+                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
+                            lOne = true;
+                            lTwo = false;
+                            lThree = false;
+                          }
+                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW" || claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW") {
+                            lOne = true;
+                            lTwo = true;
+                            lThree = false;
+                          }
+                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW" || claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW" || claimLevelThree == "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
+                            lOne = true;
+                            lTwo = true;
+                            lThree = true;
+                          }
+                          // await Future.delayed(Duration(seconds: 5));
+                          Future<ClaimApproverListModalClass> getEmployeeList11 = getEmployeeList(sessionId!);
+                          final loading = Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              CircularProgressIndicator(),
+                              Text(" Login ... Please wait")
+                            ],
+                          );
+
+                          getEmployeeList11.then((value) {
+                            setState(() {
+                              foundDataNew = allUsernew;
+                              claimApproverListModalGlobal=value;
+                              claimApproverListModalGlobaled=claimApproverListModalGlobal;
+                              isLoading = false;
+                            });
+                            print('employeeList00${claimApproverListModalGlobal!.data!.length}');
+                          });
+                        },
+                        icon: Icon(Icons.filter_alt),
+                        label: Text("Apply Filter"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Mythemes.successColor,
+                        ),
+                      ),
+                    )
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
     });
   }
 
@@ -377,6 +634,11 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
             Icons.add, color: Mythemes.whitish, size: 28,
           ),
         ),*/
+
+        floatingActionButton: FloatingActionButton(
+          onPressed: _showFilterBottomSheet,
+          child: Icon(Icons.filter_list, color: Mythemes.whitish,),
+        ),
 
         body: Container(
           color: context.canvasColor,

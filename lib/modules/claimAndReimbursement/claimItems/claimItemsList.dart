@@ -135,7 +135,7 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
       //My Requests
-      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN") {
+      if(userPanelPermission == "COMPANY_EMPLOYEE" || userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN" || userPanelPermission == "USER") {
         items.add(
           Hero(
             tag: 'raiseClaim',
@@ -272,6 +272,65 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
 
                     } else {
                       Navigator.pushNamed(context, MyRoutings.mssMoClaimItemRoute);
+                    }
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.pending,
+                          size: 50,
+                          color: Mythemes.warningColor,
+                        ),
+                        /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Pending Claims',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+      }
+      if(userPanelPermission == "USER") {
+        //Pending Requisition List USER
+        if(claimLevelOneMO == "1" || claimLevelTwoMO == "1" || claimLevelThreeMO == "1") {
+          items.add(
+            Hero(
+              tag: 'myTeamPendingReq',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () async{
+                    bool internetCheck = await InternetConnectionChecker().hasConnection;
+                    if(internetCheck == false) {
+                      setState(() {
+                        AlertDialog(
+                          content: "Please check your internet connection".text.make(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Please check your Internet connection."),
+                        ));
+                      });
+
+                    } else {
+                      Navigator.pushNamed(context, MyRoutings.uisClaimItemRoute);
                     }
                   },
                   child: Stack(

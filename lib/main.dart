@@ -60,10 +60,12 @@ import 'MSS_Bundle/timeAndAttendance/pendingReqListRo.dart';
 import 'MSS_Bundle/travelAndExpense/claimMssItems.dart';
 import 'MSS_MO_Bundle/dashboard/adminDashboard.dart';
 import 'MSS_MO_Bundle/dashboard/mssDashboard.dart';
+import 'MSS_MO_Bundle/exitProcess/exitListMO.dart';
 import 'MSS_MO_Bundle/leaveManagement/levelOneLeaveReq.dart';
 import 'MSS_MO_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import 'MSS_MO_Bundle/leaveManagement/othersEmpRequisition.dart';
 import 'MSS_MO_Bundle/leaveManagement/pendingRequisitionList.dart';
+import 'MSS_MO_Bundle/myTeam/myTeams.dart';
 import 'MSS_MO_Bundle/reports/RoWorkDoneReportFiltering.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
@@ -730,6 +732,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
         //Claim
         MyRoutings.mssMoClaimItemRoute: (context) => MSS_MO_ClaimMSSItemsList(),
+
+        //My Teams MO
+        MyRoutings.myTeamMORoute: (context) => EmpListViewMO(),
+
+        //Exit List MO
+        MyRoutings.exitListMORoute: (context) => ExitListViewMO(),
 
         //UIS Bundle
         MyRoutings.uisAttPendingRequestRoRoute: (context) => UIS_PendingRequisitionRo(PendingRequisitionModel()),
