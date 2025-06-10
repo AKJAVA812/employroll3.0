@@ -231,8 +231,19 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                             value: org,
                             child: Text(org),
                           );
-                        }).toList(),
+                        }),
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Select'),
+                        ),
+                        ...organizations.map((org) {
+                          return DropdownMenuItem(
+                            value: org,
+                            child: Text(org),
+                          );
+                        }),
                       ],
+
                       onChanged: (value) {
                         setState(() {
                           selectedOrg = value;
