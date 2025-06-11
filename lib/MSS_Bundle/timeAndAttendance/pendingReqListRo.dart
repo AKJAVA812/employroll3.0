@@ -241,7 +241,8 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            Navigator.pop(context);
             print('Attendance');
           }
           if(index==3){

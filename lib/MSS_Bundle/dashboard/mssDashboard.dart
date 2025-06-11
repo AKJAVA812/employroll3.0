@@ -430,7 +430,9 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
             print('home tab');
           }
           if(index==1){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => HomePage()));
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
           if(index==2){
@@ -459,8 +461,8 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(Icons.manage_accounts_rounded),
+            label: 'Workflow',
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.doc_chart),

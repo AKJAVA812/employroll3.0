@@ -365,7 +365,8 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+            //Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+            Navigator.pop(context);
             print('Leave');
           }
           if(index==3){

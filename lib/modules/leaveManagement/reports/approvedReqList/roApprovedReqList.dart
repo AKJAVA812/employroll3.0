@@ -111,11 +111,11 @@ class _ApprovedLeaveRequisitionListState extends State<ApprovedLeaveRequisitionL
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        /*leading: IconButton(
             onPressed: () {
               Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
             },
-            icon: Icon(Icons.arrow_back_ios)),
+            icon: Icon(Icons.arrow_back_ios)),*/
         title: titleName.text.make(),
         actions: [
           IconButton(
@@ -225,8 +225,8 @@ class _ApprovedLeaveRequisitionListState extends State<ApprovedLeaveRequisitionL
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-            print('Leave');
+            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            print('My Requests');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -255,8 +255,8 @@ class _ApprovedLeaveRequisitionListState extends State<ApprovedLeaveRequisitionL
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.group_off),
-            label: 'Leave',
+            icon: Icon(Icons.account_tree_outlined),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),

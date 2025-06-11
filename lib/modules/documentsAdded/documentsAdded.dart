@@ -57,7 +57,7 @@ class _DocumentsAddedState extends State<DocumentsAdded> {
     });
 
   }
-  var titleName = 'E-Documents';
+  var titleName = 'My Documents';
 
   Future<DocumentListModal> getDocuments(String SessionId) async {
     String conn = ApiDetails.serverTwo;
@@ -267,8 +267,8 @@ class _DocumentsAddedState extends State<DocumentsAdded> {
             print('Dashboard');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            print('Reports');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.documentsAddedRoute);
@@ -289,8 +289,8 @@ class _DocumentsAddedState extends State<DocumentsAdded> {
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.time_solid),
-            label: 'Attendance',
+            icon: Icon(Icons.data_exploration_outlined),
+            label: 'Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(

@@ -1070,7 +1070,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+            //Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
             print('Leave');
           }
           if(index==3){

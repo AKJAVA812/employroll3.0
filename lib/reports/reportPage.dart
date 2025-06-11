@@ -342,7 +342,7 @@ class _ReportPageState extends State<ReportPage> {
       child: Scaffold(
         body: Column(
           children: [
-            Row(
+           /* Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -456,7 +456,7 @@ class _ReportPageState extends State<ReportPage> {
                   ),
                 ),
               ],
-            ).pLTRB(0, 8, 0, 8),
+            ).pLTRB(0, 8, 0, 8),*/
             Expanded(
               child: GridView.count(
                 crossAxisCount: 3,

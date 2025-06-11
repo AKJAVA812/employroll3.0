@@ -2670,7 +2670,13 @@ class _DrawerFileState extends State<DrawerFile> {
                           print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3Permission");
                           print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivatePermission");
                           print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListPermission");
-
+                          // Notify global listener
+                          permissionNotifier.updatePermission(pendingClaimL1Permission);
+                          permissionNotifier.updatePermission(pendingClaimL2Permission);
+                          permissionNotifier.updatePermission(pendingClaimL3Permission);
+                          permissionNotifier.updatePermission(pendingClaimL1MOPermission);
+                          permissionNotifier.updatePermission(pendingClaimL2MOPermission);
+                          permissionNotifier.updatePermission(pendingClaimL3MOPermission);
                           // 🟢 Save the UIS permission to SharedPreferences
                           await shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
                           await shared.setPendingLeaveReqUISPermission(leaveReqUISPermValue);

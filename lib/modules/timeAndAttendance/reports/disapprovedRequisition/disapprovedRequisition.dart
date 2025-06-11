@@ -110,11 +110,11 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
     return Scaffold(
       appBar: AppBar(
         title: "Disapproved Requisition List".text.overflow(TextOverflow.ellipsis).maxLines(1).make(),
-        leading: IconButton(
+        /*leading: IconButton(
             onPressed: () {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             },
-            icon: Icon(Icons.arrow_back_ios)),
+            icon: Icon(Icons.arrow_back_ios)),*/
         actions: [
           IconButton(
               onPressed: () {
@@ -235,8 +235,8 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            print('My Requests');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -265,8 +265,8 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(Icons.account_tree_outlined),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),

@@ -1459,7 +1459,7 @@ class TotalList {
   String? branch;
   String? inTime;
   String? empName;
-  String? workingHours;
+  dynamic workingHours;
   String? outTime;
   String? status;
   String? statusCode;

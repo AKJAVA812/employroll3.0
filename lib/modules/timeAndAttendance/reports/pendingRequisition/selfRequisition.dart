@@ -216,7 +216,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
     });
   }
 
-  var titleName = "My Requests";
+  var titleName = "My Attendance Requests";
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
@@ -244,7 +244,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                 ),
                 backIcon: Icons.arrow_back_ios,
                 backIconColor: Mythemes.black,
-                previousScreen:  TimeAndAttendanceReports(),
+                //previousScreen:  TimeAndAttendanceReports(),
                 textStyle: TextStyle(fontSize: 14),
                 onChanged: (value) {
                   _runFilter(value);
@@ -367,8 +367,8 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            print('My Requests');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -397,8 +397,8 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(Icons.account_tree_outlined),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),

@@ -152,7 +152,7 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
     }
     return leaveBalModal;
   }
-  var titleName = "Leave Balance";
+  var titleName = "My Leave Balance";
   int pageIndex = 0;
   int currentIndex = 2;
   @override
@@ -189,8 +189,8 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-            print('Leave');
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            print('Reports');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -219,8 +219,8 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.group_off),
-            label: 'Leave',
+            icon: Icon(Icons.data_exploration_outlined),
+            label: 'Reports',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),

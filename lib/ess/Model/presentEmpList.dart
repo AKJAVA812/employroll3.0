@@ -125,7 +125,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
     for(int i = 0; i < dashboardModelGlobal!.countData!.data!.length; i++) {
-      itemCount = dashboardModelGlobal!.countData!.presentList!.length;
+      itemCount = dashboardModelGlobal!.countData!.totalList!.length;
     }
     print("ItemCount - $itemCount");
     return ListView.builder(
@@ -148,13 +148,14 @@ class _PresentEmpListState extends State<PresentEmpList> {
                   children: [
                     Row(
                       children: [
-                        dashboardModelGlobal!.countData!.presentList![itemCount].empName!.text.make().px8().py4(),
+                        dashboardModelGlobal!.countData!.totalList![itemCount].empName!.text.make().px8().py4(),
                         Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                dashboardModelGlobal!.countData!.presentList![itemCount].logDate!.text.make().px8(),
+                                dashboardModelGlobal!.countData!.totalList![itemCount].status!.text.bold.size(16).color(Mythemes.successColor).make().px8(),
+                                dashboardModelGlobal!.countData!.totalList![itemCount].logDate!.text.make().px8(),
                               ],
                             )
                         )
@@ -162,13 +163,13 @@ class _PresentEmpListState extends State<PresentEmpList> {
                     ),
                     Row(
                       children: [
-                        dashboardModelGlobal!.countData!.presentList![itemCount].branch!.text.textStyle(context.captionStyle).make().px8(),
+                        dashboardModelGlobal!.countData!.totalList![itemCount].branch!.text.textStyle(context.captionStyle).make().px8(),
 
                       ],
                     ),
                     Row(
                       children: [
-                        dashboardModelGlobal!.countData!.presentList![itemCount].dept!.text.textStyle(context.captionStyle).make().px8(),
+                        dashboardModelGlobal!.countData!.totalList![itemCount].dept!.text.textStyle(context.captionStyle).make().px8(),
 
                       ],
                     ),
@@ -187,7 +188,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
                         Column(
                           children: [
                             "In Time".text.sm.make(),
-                            dashboardModelGlobal!.countData!.presentList![itemCount].inTime!.text.sm.make()
+                            dashboardModelGlobal!.countData!.totalList![itemCount].inTime!.text.sm.make()
                           ],
                         ),
                         Padding(
@@ -205,11 +206,11 @@ class _PresentEmpListState extends State<PresentEmpList> {
                           child: Column(
                             children: [
                               "Out Time".text.sm.make(),
-                              dashboardModelGlobal!.countData!.presentList![itemCount].outTime!.text.sm.make()
+                              dashboardModelGlobal!.countData!.totalList![itemCount].outTime!.text.sm.make()
                             ],
                           ),
                         ),
-                        Padding(
+                      /*  Padding(
                           padding: const EdgeInsets.only(top:15, left: 5, right: 3, bottom: 18),
                           child: Column(
                             children: [
@@ -218,17 +219,17 @@ class _PresentEmpListState extends State<PresentEmpList> {
                               ),
                             ],
                           ),
-                        ),
-                        Padding(
+                        ),*/
+                        /*Padding(
                           padding:  EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                           child: Column(
                             children: [
 
                               "Working Hours".text.sm.make(),
-                              dashboardModelGlobal!.countData!.presentList![itemCount].workingHours!.text.sm.make()
+                              dashboardModelGlobal!.countData!.totalList![itemCount].workingHours!.text.sm.make()
                             ],
                           ),
-                        ),
+                        ),*/
                       ],
                     )
                   ],

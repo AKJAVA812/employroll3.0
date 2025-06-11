@@ -195,7 +195,7 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
                 },
                 horizontalPadding: 8,
                 searchIconColor: Mythemes.black,
-                centerTitle: titleName,
+                centerTitle: "$titleName ${foundDataNewUIS!.length}",
                 verticalPadding: 3,
                 centerTitleStyle: TextStyle(
                     fontSize: 19,

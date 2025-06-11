@@ -156,6 +156,12 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     }
   }
 
+  // Variables you'll need to define
+  int? selectedBranchId;
+  String? selectedBranchName;
+  List<Map<String, dynamic>> storedBranchList = [];
+  bool isBranchLoading = false;
+
   Future getSharedPrfanceList() async {
 
     if (!_isBottomSheetOpen) {
@@ -215,6 +221,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                     SizedBox(height: 16),
 
                     /// Organization Dropdown
+                    /// Organization Dropdown
                     DropdownButtonFormField<String>(
                       decoration: InputDecoration(
                         labelText: 'Select Organization',
@@ -232,31 +239,102 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                             child: Text(org),
                           );
                         }),
+                      ],
+                      onChanged: (value) async {
+                        sessionId = await shared!.getSessionId();
+
+                        // Step 1: Immediately show loader and reset old branch data
+                        setState(() {
+                          selectedOrg = value;
+                          selectedBranchName = null;
+                          isBranchLoading = true;
+                          storedBranchList = [];
+                        });
+
+                        // Step 2: Allow UI to update before fetching
+                        await Future.delayed(Duration(milliseconds: 100));
+
+                        // Step 3: Get Org ID
+                        matchedOrg = storedOrgList.firstWhere(
+                              (org) => org['orgName'] == value,
+                          orElse: () => {},
+                        );
+                        getOrgId = matchedOrg['id']?.toString() ?? '';
+                        print('Org Name: $selectedOrg');
+                        print('Org ID: $getOrgId');
+
+                        // Step 4: Fetch Branch Data
+                        await getBranchList(sessionId!);
+
+                        // Step 5: Populate Branch Dropdown List
+                        storedBranchList = branchListModalGloabal?.data?.map((branch) {
+                          return {
+                            'branchId': branch.branchId,
+                            'branchName': branch.branchName?.trim() ?? '',
+                          };
+                        }).toList() ?? [];
+
+                        // Step 6: Stop loader
+                        setState(() {
+                          isBranchLoading = false;
+                        });
+
+                        setModalState(() {});
+                      },
+                    ),
+
+                    SizedBox(height: 8),
+
+                    /// Branch Dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: isBranchLoading ? 'Loading Branches...' : 'Select Branch',
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedBranchName,
+                      items: isBranchLoading
+                          ? [
+                        DropdownMenuItem<String>(
+                          value: null,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 15,
+                                height: 15,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                              SizedBox(width: 10),
+                              Text("Loading...")
+                            ],
+                          ),
+                        )
+                      ]
+                          : [
                         const DropdownMenuItem<String>(
                           value: null,
                           child: Text('Select'),
                         ),
-                        ...organizations.map((org) {
-                          return DropdownMenuItem(
-                            value: org,
-                            child: Text(org),
+                        ...storedBranchList.map((branch) {
+                          return DropdownMenuItem<String>(
+                            value: branch['branchName'],
+                            child: Text(branch['branchName']),
                           );
                         }),
                       ],
-
-                      onChanged: (value) {
+                      onChanged: isBranchLoading
+                          ? null
+                          : (value) {
                         setState(() {
-                          selectedOrg = value;
+                          selectedBranchName = value;
 
-                          // Match selected org name to get ID
-                          matchedOrg = storedOrgList.firstWhere(
-                                (org) => org['orgName'] == value,
+                          final matchedBranch = storedBranchList.firstWhere(
+                                (branch) => branch['branchName'] == value,
                             orElse: () => {},
                           );
 
-                          getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
+                          selectedBranchId = matchedBranch['branchId'] ?? 0;
+                          print('Branch Name: $selectedBranchName');
+                          print('Branch ID: $selectedBranchId');
                         });
 
                         setModalState(() {});
@@ -319,15 +397,15 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                             // Fetch all data in parallel
                             final results = await Future.wait([
                               getDashboardData(sessionId!),
-                              getBranchList(sessionId!),
+                              //getBranchList(sessionId!),
                               getShiftList(sessionId!),
                               getEventData(sessionId!)
                             ]);
 
                             final dashboard = results[0] as DashboardModel;
-                            final branchList = results[1] as BranchListModal;
-                            final shiftList = results[2] as ShiftListModal;
-                            final eventsList = results[3] as EventsListModal;
+                            //final branchList = results[1] as BranchListModal;
+                            final shiftList = results[1] as ShiftListModal;
+                            final eventsList = results[2] as EventsListModal;
 
                             final empRoleLocal = await shared!.getEmpRoll();
                             final roRoleLocal = await shared!.getRoRole();
@@ -335,7 +413,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                             // Update all state together
                             setState(() {
                               dashboardModelGlobal = dashboard;
-                              branchListModalGloabal = branchList;
+                              //branchListModalGloabal = branchList;
                               shiftListModalGlobal = shiftList;
                               eventsListModalGlobal = eventsList;
                               empRole = empRoleLocal;
@@ -444,7 +522,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     DashboardModel dashboardModel;
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
-        "branch=$branchId&"
+        "branch=$selectedBranchId&"
         "shift=$shift&"
         "date=$singleDateString&"
         "profileId=$defaultProfileId&"
@@ -462,7 +540,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     return dashboardModel;
   }
 
-  Future<BranchListModal> getBranchList(String SessionId) async {
+  /*Future<BranchListModal> getBranchList(String SessionId) async {
     branchList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.branchListApi;
@@ -485,6 +563,31 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
       branchList?.add(branchListModal!.data![i].branchName);
       //print('branchNameNew $branchName');
     }
+    return branchListModal;
+  }*/
+  /// Branch List API Call
+  Future<BranchListModal> getBranchList(String sessionId) async {
+    branchList = [];
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.branchListApi;
+
+    BranchListModal branchListModal;
+    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+    final response = await http.post(urlapi);
+
+    print('BRANCH URL ${response.request}');
+
+    mapResponse = json.decode(response.body);
+    var getData = mapResponse;
+
+    branchListModal = BranchListModal.fromJson(mapResponse);
+
+    for (int i = 0; i < branchListModal.data!.length; i++) {
+      var branchName = branchListModal.data![i].branchName;
+      branchList?.add(branchName);
+    }
+
+    branchListModalGloabal = branchListModal;
     return branchListModal;
   }
 
@@ -522,7 +625,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     EventsListModal eventsListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
-        "branch=$branchId&"
+        "branch=$selectedBranchId&"
         "shift=$shift&"
         "date=$singleDateString&"
         "profileId=$defaultProfileId&"

@@ -125,6 +125,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
       print("CheckOrg - $orgId");
       List<Widget> items = [];
 
+      // My Attendance
       if(showHide || showAdmin){
         items.add(
           Hero(
@@ -168,6 +169,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
         );
       }
 
+      //My Leave Balance
       if(showHide) {
         items.add(
           Hero(
@@ -222,6 +224,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
         );
       }
 
+      // My Documents
       if(setShowPayroll == true) {
         items.add(
           InkWell(
@@ -274,6 +277,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
         );
       }
 
+      //Work Done Report
       items.add(
         Hero(
           tag: 'workDoneReport',
@@ -371,11 +375,11 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
               print('home tab');
             }
             if(index==1){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => HomePage()));
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+              //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
               print('Reports');
             }
             if(index==3){
@@ -400,11 +404,11 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              icon: Icon(Icons.manage_accounts_outlined),
+              label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
+              icon: Icon(Icons.data_exploration_outlined),
               label: 'Reports',
             ),
             BottomNavigationBarItem(

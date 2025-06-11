@@ -51,7 +51,7 @@ bool showAdmin = false;
 bool showRo = false;
 
 class _MyAllRequestPageState extends State<MyAllRequestPage> {
-  int currentIndex = 0;
+  int currentIndex = 1;
   final ImagePicker _picker = ImagePicker();
   File? image;
 
@@ -212,6 +212,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
         );
       }
 
+      //My Leave Requests
       if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
         items.add(
           Hero(
@@ -394,6 +395,66 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
           ),
         );
       }
+
+      //My Claim Requests
+      if(orgId == 3 || orgId == 145 || orgId == 171 || orgId == 179 || orgId == 186) {
+        if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+          items.add(
+            Hero(
+              tag: 'raiseClaim',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () async{
+                    bool internetCheck = await InternetConnectionChecker().hasConnection;
+                    if(internetCheck == false) {
+                      setState(() {
+                        AlertDialog(
+                          content: "Please check your internet connection".text.make(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Please check your Internet connection."),
+                        ));
+                      });
+
+                    } else {
+                      Navigator.pushNamed(context, MyRoutings.claimReqListRoute);
+                    }
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.currency_rupee,
+                          size: 50,
+                          color: Mythemes.lightBluishColor,
+                        ),
+                        /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Add Claim',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+      }
+
 
       return items;
     }
