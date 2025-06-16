@@ -1351,6 +1351,45 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
             );
           }
 
+          items.add(
+            Hero(
+              tag: 'incidentReporting',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pushNamed(context, MyRoutings.incidentReportListRoute);
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.report_outlined,
+                          size: 50,
+                          color: Colors.red,
+                        ),
+
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Incident',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+
         //Location
         if(orgId == 3 || orgId == 145) {
           items.add(

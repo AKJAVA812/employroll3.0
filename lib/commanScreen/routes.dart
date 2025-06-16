@@ -307,4 +307,8 @@ class MyRoutings {
   static String myAllRequestRoute= "/myAllRequestRoute";
   static String myAllReportsRoute= "/myAllReportsRoute";
 
+
+  //Incident Reporting
+  static String incidentReportListRoute= "/incidentReportListRoute";
+  static String incidentReportPageRoute= "/incidentReportPageRoute";
 }

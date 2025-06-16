@@ -2709,6 +2709,9 @@ class _DrawerFileState extends State<DrawerFile> {
                           });
 
                           Navigator.pop(context);
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => PunchInOUtActivity())
+                          );
                         }
                     );
                   }).toList(),

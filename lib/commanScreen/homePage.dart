@@ -2313,8 +2313,11 @@ class _DrawerFileState extends State<DrawerFile> {
                           setState(() {
 
                           });
-
                           Navigator.pop(context);
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => HomePage())
+                          );
+
                         }
                     );
                   }).toList(),
