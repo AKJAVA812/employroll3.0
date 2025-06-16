@@ -60,11 +60,16 @@ import 'commanNotificationPage.dart';
 import 'digiWeighWorkDone.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final int selectedIndex;
+  const HomePage({super.key, this.selectedIndex = 0});
+
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
+int pageIndex = 0;
+int currentIndex = 0;
 
 Position? positionCheck = Position(
     longitude: 0.0,
@@ -135,8 +140,7 @@ dynamic exitFormalityUISPermission = "0";
 
 SessionManager shared = SessionManager();
 String? clockingType = " ";
-int pageIndex = 0;
-int currentIndex = 0;
+
 String profileImage = "";
 String emailid = "abc@gmail.com";
 String name = "Employee Name ";
@@ -163,7 +167,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     _loginModel = new LoginModel();
     getSharedPrfanceList();
-
+    currentIndex = widget.selectedIndex;
     var now = new DateTime.now();
     //var now =  ntpTime.toUtc();
 
@@ -2315,7 +2319,7 @@ class _DrawerFileState extends State<DrawerFile> {
                           });
                           Navigator.pop(context);
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => HomePage())
+                              MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 1,))
                           );
 
                         }

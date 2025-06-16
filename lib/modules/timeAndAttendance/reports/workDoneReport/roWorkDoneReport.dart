@@ -2,11 +2,17 @@ import 'dart:convert';
 
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneReport/roWorkDoneReportModel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:velocity_x/velocity_x.dart';
 
+import '../../../../adminPage/modelClass/dashboardModel.dart';
+import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
+import '../../../../commanScreen/homePage.dart';
+import '../../../../commanScreen/punchInOutScreen.dart';
+import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'RoWorkDoneReportFiltering.dart';
@@ -34,6 +40,9 @@ class RoWorkDoneReport extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanel;
+dynamic getProfileId;
+dynamic orgId;
 List<Data>? allUsernew=[];
 List<Data>? foundDataNew=[];
 late ROWorkdoneReportModel? roWorkDoneReportModelGlobal =
@@ -65,6 +74,8 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     print('ResponseAttendance: ${sessionId}');
     print('ResponseAttendance: ${fromDatePickedString}');
     print('ResponseAttendance: ${toDatePickedStringRo}');
@@ -146,7 +157,10 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
             "todate=$fromdate&"
             "fromdate=$toDate&"
             "filterType=$filterType&"
-            "empId=$empNewId"
+            "empId=$empNewId&"
+            "userPermission=$userPanel&"
+            "profileId=$getProfileId&"
+            "orgId=0"
     );
     final response = await http.post(urlapi);
 
@@ -222,6 +236,9 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
     });
   }
 
+   int pageIndex = 0;
+   int currentIndex = 2;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -245,6 +262,7 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 backIcon: Icons.arrow_back_ios,
+                previousScreen: PunchInOUtActivity(selectedIndex: 2,),
                 backIconColor: Mythemes.black,
                 textStyle: TextStyle(fontSize: 14),
                 onChanged: (value) {
@@ -278,6 +296,75 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
             ),
           ],
         ),
+      ),
+
+      bottomNavigationBar:
+      BottomNavigationBar (
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
+
+          if(index==0){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => HomePage()));
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if(index==1){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          }
+          if(index==2){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
+            /* Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Attendance');*/
+          }
+          if(index==3){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            );
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('Dashboard');
+          }
+          if(index==4){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew())
+            );
+            print('Profile');
+          }
+          /*if(index==3){
+                title="Notifications";
+              }*/
+          setState(() => currentIndex = index);
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'Reports',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_customize),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+            //backgroundColor: Colors.blue,
+          ),
+        ],
       ),
     );
   }

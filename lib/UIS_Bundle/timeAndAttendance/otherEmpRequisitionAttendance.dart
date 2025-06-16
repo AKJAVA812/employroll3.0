@@ -14,6 +14,7 @@ import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
 import '../../../profiles/profilePageWithHead.dart';
+import '../../commanScreen/homePage.dart';
 import '../../modules/leaveManagement/reports/modalClass/leaveBalanceModel.dart';
 import '../../modules/leaveManagement/reports/modalClass/otherReqEmpList.dart';
 import '../../modules/leaveManagement/reports/othersAttendanceList.dart';
@@ -422,23 +423,28 @@ class _UIS_OthersAttendanceRequisitionPageState extends State<UIS_OthersAttendan
           onTap: (index) {
 
             if(index==0){
+
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Workflow');
             }
             if(index==2){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
+              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Attendance');
+            }
+            if(index==3){
+              Navigator.pushNamed(context, MyRoutings.uisNewDashboardRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==3){
+            if(index==4){
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
               );
@@ -454,6 +460,10 @@ class _UIS_OthersAttendanceRequisitionPageState extends State<UIS_OthersAttendan
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.manage_accounts_outlined),
+              label: 'Workflow',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.pending_actions),
