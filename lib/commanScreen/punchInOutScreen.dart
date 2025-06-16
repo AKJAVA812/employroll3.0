@@ -154,7 +154,7 @@ int currentIndex = 0;
 String profileImage = "";
 String emailid = "abc@gmail.com";
 String name = "Employee Name ";
-final screens = [
+var screens = [
   const DefaultPage(),
   const Workflow(),
   const Report(),
