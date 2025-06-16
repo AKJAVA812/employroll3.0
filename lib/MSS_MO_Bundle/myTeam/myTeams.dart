@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
@@ -426,17 +427,19 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware{
 
             if(index==0){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
+              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Reports');
             }
             if(index==3){
               Navigator.push(context,
@@ -466,8 +469,8 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware{
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'Reports',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_customize),
