@@ -811,7 +811,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     onTap: () {
                       if (totalAttendance == 0 || totalAttendance == null) {
                         Fluttertoast.showToast(
-                            msg: "There is no data available for this date.",
+                            msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,
@@ -890,7 +890,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     onTap: () {
                       if (totalAbsentEmp == 0 || totalAbsentEmp == null) {
                         Fluttertoast.showToast(
-                            msg: "There is no data available for this date.",
+                            msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,
@@ -976,7 +976,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     onTap: () {
                       if (misPunchEmp == 0 || misPunchEmp == null) {
                         Fluttertoast.showToast(
-                            msg: "There is no data available for this date.",
+                            msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,
@@ -1056,7 +1056,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     onTap: () {
                       if (totalAttendance == 0 || totalAttendance == null) {
                         Fluttertoast.showToast(
-                            msg: "There is no data available for this date.",
+                            msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,
@@ -1143,7 +1143,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     onTap: () {
                       if (earlyOutEmp == 0 || earlyOutEmp == null) {
                         Fluttertoast.showToast(
-                            msg: "There is no data available for this date.",
+                            msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,
@@ -1224,7 +1224,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     onTap: () {
                       if (lateIn == 0 || lateIn == null) {
                         Fluttertoast.showToast(
-                            msg: "There is no data available for this date.",
+                            msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,
@@ -1310,7 +1310,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     onTap: () {
                       if (overTime == 0 || overTime == null) {
                         Fluttertoast.showToast(
-                            msg: "There is no data available for this date.",
+                            msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,
@@ -1397,7 +1397,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     onTap: () {
                       if (halfEmp == 0 || halfEmp == null) {
                         Fluttertoast.showToast(
-                            msg: "There is no data available for this date.",
+                            msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,

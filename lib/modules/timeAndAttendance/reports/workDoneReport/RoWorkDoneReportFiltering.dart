@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneReport/roWorkDoneReport.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_segment/flutter_advanced_segment.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -34,6 +35,9 @@ late String toDatePickedStringRo, fromDatePickedStringRo;
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanel;
+dynamic getProfileId;
+String? orgId;
 List<Data>? allUsernew=[];
 List<Data>? foundDataNew=[];
 EmployeeListModel? employeeListModelglobel;
@@ -119,6 +123,8 @@ class _WorkDoneReport extends State<RoWorkDoneReportFiltering> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
@@ -183,7 +189,11 @@ class _WorkDoneReport extends State<RoWorkDoneReportFiltering> {
     String apiUrl = ApiDetails.othersReqEmpList;
     print('employeeList11: ${sessionId}');
     EmployeeListModel requistionEmpListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "userPermission=$userPanel&"
+        "profileId=$getProfileId&"
+        "orgId=0");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -217,7 +227,8 @@ class _WorkDoneReport extends State<RoWorkDoneReportFiltering> {
           elevation: 0.5,
           leading: IconButton(
               onPressed: () {
-                Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
               },
               icon: Icon(Icons.arrow_back_ios)),
           title: "Workdone Report".text.make(),
@@ -239,11 +250,13 @@ class _WorkDoneReport extends State<RoWorkDoneReportFiltering> {
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
+             /* Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Attendance');*/
             }
             if(index==3){
               Navigator.push(context,
@@ -273,8 +286,8 @@ class _WorkDoneReport extends State<RoWorkDoneReportFiltering> {
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'Reports',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_customize),

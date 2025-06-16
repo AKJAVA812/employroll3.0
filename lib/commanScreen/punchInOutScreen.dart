@@ -73,12 +73,14 @@ import 'package:intl/intl.dart';
 import 'dart:math' show asin, cos, sqrt;
 
 class PunchInOUtActivity extends StatefulWidget {
-  const PunchInOUtActivity({Key? key}) : super(key: key);
+  final int selectedIndex;
+  const PunchInOUtActivity({super.key, this.selectedIndex = 0});
 
   @override
   State<PunchInOUtActivity> createState() => _PunchInOUtActivityState();
 }
-
+int pageIndex = 0;
+int currentIndex = 0;
 Position? position = Position(
     longitude: 0.0,
     latitude: 0.0,
@@ -110,7 +112,7 @@ String? defaultProfileName;
 dynamic defaultProfileId;
 dynamic profileIdGetter;
 dynamic profileNameGetter;
-String? userPanelPermission;
+String? userPanelPermissions;
 //MSS MO Permission Variable
 dynamic pendingAttendanceReqMOPermission = "0";
 dynamic othersAttendanceReqMOPermission = "0";
@@ -149,12 +151,11 @@ dynamic exitFormalityUISPermission = "0";
 
 SessionManager shared = SessionManager();
 String? clockingType = " ";
-int pageIndex = 0;
-int currentIndex = 0;
+
 String profileImage = "";
 String emailid = "abc@gmail.com";
 String name = "Employee Name ";
-var screens = [
+final screensNew = [
   const DefaultPage(),
   const Workflow(),
   const Report(),
@@ -197,6 +198,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     // TODO: implement initState
     _loginModel = new LoginModel();
     getSharedPrfanceList();
+    currentIndex = widget.selectedIndex;
     loadProfileFromPrefs();
     var now = new DateTime.now();
     //var now =  ntpTime.toUtc();
@@ -371,7 +373,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     defaultProfileId = await shared!.getDefaultProfileId();
     print("Default Profile Name - $defaultProfileName");
     print("Default Profile Id - $defaultProfileId");
-    userPanelPermission = await shared!.getUserPanel();
+    userPanelPermissions = await shared!.getUserPanel();
     print("User Type - $userType");
 
     Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
@@ -404,7 +406,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
       String conn = ApiDetails.server;
       String apiUrl = ApiDetails.orgListApi;
 
-      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission");
+      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermissions");
       final response = await http.post(urlapi);
 
       var mapResponse = json.decode(response.body);
@@ -802,7 +804,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
                       child: ValueListenableBuilder<String>(
                         valueListenable: selectedProfileNameNotifier,
                         builder: (context, value, _) {
-                          final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
+                          final displayText = (userPanelPermissions == "COMPANY_EMPLOYEE")
                               ? "COMPANY_EMPLOYEE"
                               : value;
 
@@ -831,7 +833,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
             ),
           ],
         ),
-        body: screens[currentIndex],
+        body: screensNew[currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
@@ -1181,8 +1183,8 @@ class _DefaultPageState extends State<DefaultPage> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
-    userPanelPermission = await shared!.getUserPanel();
-    print("$userPanelPermission");
+    userPanelPermissions = await shared!.getUserPanel();
+    print("$userPanelPermissions");
     lat = await shared!.getLatitude();
     //position= Position(longitude: shared.getLongitude(), latitude: shared.getLatitude(), timestamp: date, accuracy: 1, altitude: 1, altitudeAccuracy: 1, heading: 1, headingAccuracy: 1, speed: 1, speedAccuracy: 1);
     empRole = await shared.getEmpRoll();
@@ -2214,7 +2216,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return userPanelPermission == "USER" ?
+    return userPanelPermissions == "USER" ?
     mss.Admin_UIS_Dashboard(DashboardModel()) :
     ess.EssAdminDashboard(EssDashboarrdModel());
   }
@@ -2246,7 +2248,7 @@ class _DrawerFileState extends State<DrawerFile> {
     final prefs = await SharedPreferences.getInstance();
     selectedProfileId = prefs.getInt('defaultProfileId');
     selectedProfileName = prefs.getString('defaultProfileName');
-    userPanelPermission = await shared!.getUserPanel();
+    userPanelPermissions = await shared!.getUserPanel();
     print("Loaded ID: $selectedProfileId, Name: $selectedProfileName");
 
     getProfileList(sessionId!).then((value) {
@@ -2279,7 +2281,7 @@ class _DrawerFileState extends State<DrawerFile> {
       String conn = ApiDetails.server;
       String apiUrl = ApiDetails.profileListApi;
 
-      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission");
+      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermissions");
       final response = await http.post(urlapi);
 
       var mapResponse = json.decode(response.body);
@@ -2430,7 +2432,7 @@ class _DrawerFileState extends State<DrawerFile> {
             ),
           ),
           Visibility(
-            visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN" || userPanelPermission == "USER",
+            visible: userPanelPermissions == "MSS" || userPanelPermissions == "MSS_MO_ADMIN" || userPanelPermissions == "USER",
             child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -2474,7 +2476,7 @@ class _DrawerFileState extends State<DrawerFile> {
             ),
           ),*/
           Visibility(
-            visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN" || userPanelPermission == "USER",
+            visible: userPanelPermissions == "MSS" || userPanelPermissions == "MSS_MO_ADMIN" || userPanelPermissions == "USER",
             child: isLoadingProfiles
                 ? Center(child: CircularProgressIndicator()).p12()
                 : ValueListenableBuilder<int>(
@@ -2710,7 +2712,7 @@ class _DrawerFileState extends State<DrawerFile> {
 
                           Navigator.pop(context);
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => PunchInOUtActivity())
+                              MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,))
                           );
                         }
                     );

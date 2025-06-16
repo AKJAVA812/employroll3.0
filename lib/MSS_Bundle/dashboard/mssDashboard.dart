@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:er_flutter_project/commanScreen/punchInOutScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/adminPage/adminDashboard/presentEmpList.dart';
@@ -383,7 +384,7 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
             ),
           ),
         ),
-        actions: [
+       /* actions: [
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             onSelected: (String value) {
@@ -404,7 +405,7 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
               ),
             ],
           ),
-        ],
+        ],*/
       ),
       body: dashboardModelGlobal == null
           ? loader()
@@ -424,19 +425,34 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
         onTap: (index) {
 
           if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomePage(selectedIndex: 1),
+              ),
+            );
+
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            print('workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+            //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PunchInOUtActivity(selectedIndex: 2),
+              ),
+            );
             print('Reports');
           }
           if(index==3){

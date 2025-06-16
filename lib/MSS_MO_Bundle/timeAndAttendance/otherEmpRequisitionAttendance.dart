@@ -630,13 +630,14 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
 
             if(index==0){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+              print('Workflow');
             }
             if(index==2){
               Navigator.push(context,
@@ -664,7 +665,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              label: 'Workflow',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_customize),

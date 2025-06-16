@@ -230,13 +230,13 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }

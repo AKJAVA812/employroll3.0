@@ -224,28 +224,28 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
 
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.pushNamed(context, MyRoutings.uisNewDashboardRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }

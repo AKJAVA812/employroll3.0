@@ -23,6 +23,7 @@ import '../../adminPage/modelClass/eventListModal.dart';
 import '../../adminPage/modelClass/shiftListModal.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
+import '../../commanScreen/punchInOutScreen.dart';
 import '../../commanScreen/routes.dart';
 import '../../mss_profiles/global_profile.dart';
 import '../../profiles/profilePageWithHead.dart';
@@ -421,25 +422,42 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
 
           if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomePage(selectedIndex: 1),
+              ),
+            );
+
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+            //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const PunchInOUtActivity(selectedIndex: 2),
+              ),
+            );
             print('Reports');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.pushNamed(context, MyRoutings.uisNewDashboardRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
@@ -460,8 +478,8 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(Icons.manage_accounts_rounded),
+            label: 'Workflow',
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.doc_chart),
