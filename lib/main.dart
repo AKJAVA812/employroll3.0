@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:er_flutter_project/MSS_Bundle/dashboard/mssDashboard.dart';
+import 'package:er_flutter_project/MSS_Bundle/incidentReporting/incidentReportingPage.dart';
 import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
 import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
@@ -49,6 +50,7 @@ import 'package:workmanager/workmanager.dart';
 import 'ESS_Bundle/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';*/
 import 'EZNew/landingPage.dart';
 import 'MSS_Bundle/dashboard/adminDashboard.dart';
+import 'MSS_Bundle/incidentReporting/incidentReportList.dart';
 import 'MSS_Bundle/leaveManagement/levelOneLeaveReq.dart';
 import 'MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import 'MSS_Bundle/leaveManagement/othersEmpRequisition.dart';
@@ -763,6 +765,11 @@ class _MyHomePageState extends State<MyHomePage> {
         //ESS
         MyRoutings.myAllRequestRoute: (context) => MyAllRequestPage(),
         MyRoutings.myAllReportsRoute: (context) => MyAllReportsPage(),
+
+
+        //Incident Reporting
+        MyRoutings.incidentReportListRoute: (context) => IncidentListPage(),
+        MyRoutings.incidentReportPageRoute: (context) => IncidentFormPage(),
       },
 
     );

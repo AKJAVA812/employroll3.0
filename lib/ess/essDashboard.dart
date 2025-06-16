@@ -97,6 +97,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
   var todayDate = "dd/mm/yyyy";
   int? totalAttendance;
+  int? presentCount;
   int? paidDaysCount;
   int? totalDays;
   int? totalAbsentEmp;
@@ -617,6 +618,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     halfEmp = essDashboardModelGlobal!.countData!.halfday;
     shortLeaveCount = essDashboardModelGlobal!.countData!.shortlev;
 
+    presentCount = (totalDays ?? 0) - (totalAbsentEmp ?? 0);
     print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
@@ -885,7 +887,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        if (totalAttendance == 0 || totalAttendance == null) {
+                        if (presentCount == 0 || presentCount == null) {
                           Fluttertoast.showToast(
                               msg: "There is no data available for this date.",
                               toastLength: Toast.LENGTH_SHORT,
@@ -927,7 +929,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                                           .centered()
                                           .py8()
                                           .px8()
-                                          : "$totalAttendance / $totalDays"
+                                          : "$presentCount / $totalDays"
                                           .text
                                           .xl2
                                           .bold

@@ -250,7 +250,7 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
   dynamic levelFivePendingStatus = false;
 
   int valueChange = 0;
- var titleName="Claim Requisition List";
+ var titleName="My Claim Requisitions";
  TextEditingController searchType = TextEditingController();
   int currentIndex = 2;
   @override
@@ -328,8 +328,8 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.claimItemsListRoute);
-            print('Claim Items');
+            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            print('My Requests');
           }
           if(index==3){
             Navigator.push(context,
@@ -360,8 +360,8 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.monetization_on_outlined),
-            label: 'Claims',
+            icon: Icon(Icons.account_tree_outlined),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),

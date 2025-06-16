@@ -619,15 +619,47 @@ class _MSS_OthersLeaveReqPageState extends State<MSS_OthersLeaveReqPage> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
-                                if (dayRadio == '1') {
-                                  singleDayRequisition(_remarkController.text, leaveTypeId, _fromDateController.text, empNewId);
+                                if (dropdownvalue == null) {
+                                  setState(() {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text("Please Select Employee ! "),
+                                    ));
+                                  });
                                 }
-                                else if(dayRadio == '2') {
-                                  multipleDayRequisition(_remarkController.text, leaveTypeId, _toDateController.text, _fromDateController.text, empNewId);
+                                if(dropdownNewvalue == null) {
+                                  setState(() {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text("Please Select Leave Type ! "),
+                                    ));
+                                  });
                                 }
-                                else if (dayRadio == '3') {
-                                  halfDayRequisition(fromTimePickerController.text, toTimePickerController.text, _remarkController.text, leaveTypeId, _fromDateController.text, empNewId);
+                                if(_fromDateController.text == ""){
+                                  print('responseemployeeList');
+                                  setState(() {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text("Please Select Date ! "),
+                                    ));
+                                  });
                                 }
+                                if(_remarkController.text == ""){
+                                  print('responseemployeeList');
+                                  setState(() {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text("Please Enter Remarks ! "),
+                                    ));
+                                  });
+                                } else {
+                                  if (dayRadio == '1') {
+                                    singleDayRequisition(_remarkController.text, leaveTypeId, _fromDateController.text, empNewId);
+                                  }
+                                  else if(dayRadio == '2') {
+                                    multipleDayRequisition(_remarkController.text, leaveTypeId, _toDateController.text, _fromDateController.text, empNewId);
+                                  }
+                                  else if (dayRadio == '3') {
+                                    halfDayRequisition(fromTimePickerController.text, toTimePickerController.text, _remarkController.text, leaveTypeId, _fromDateController.text, empNewId);
+                                  }
+                                }
+
                                 //key = "APPROVED";
                                 //approveLeaveRequisition(_commentController.text, leaveReqId);
                               },
@@ -668,7 +700,8 @@ class _MSS_OthersLeaveReqPageState extends State<MSS_OthersLeaveReqPage> {
               print('Workflow');
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+              //Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+              Navigator.pop(context);
               print('Leave');
             }
             if(index==3){

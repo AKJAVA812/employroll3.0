@@ -144,11 +144,11 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.5,
-        leading: IconButton(
+       /* leading: IconButton(
             onPressed: () {
               Navigator.pushNamed(context, MyRoutings.reportSectionHead);
             },
-            icon: Icon(Icons.arrow_back_ios)),
+            icon: Icon(Icons.arrow_back_ios)),*/
         title: "Workdone Report".text.make(),
       ),
       bottomNavigationBar:
@@ -171,8 +171,7 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
           }
           if(index==3){
             Navigator.push(context,
@@ -202,8 +201,8 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(Icons.data_exploration_outlined),
+            label: 'Reports',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),

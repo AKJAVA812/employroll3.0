@@ -192,7 +192,7 @@ class _OthersSingleDateAttendanceState extends State<OthersSingleDateAttendance>
     return onDateAttModel;
   }
   int pageIndex = 0;
-  int currentIndex = 1;
+  int currentIndex = 2;
 
   @override
   Widget build(BuildContext context) {

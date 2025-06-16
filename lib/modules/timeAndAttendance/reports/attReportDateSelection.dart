@@ -87,7 +87,7 @@ class _AttReportState extends State<AttReport> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.5,
-        title: "Attendance Report".text.make(),
+        title: "My Attendance".text.make(),
       ),
 
       body: Column(
@@ -347,8 +347,8 @@ class _AttReportState extends State<AttReport> {
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            print('Reports');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -377,8 +377,8 @@ class _AttReportState extends State<AttReport> {
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(Icons.data_exploration_outlined),
+            label: 'Reports',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),

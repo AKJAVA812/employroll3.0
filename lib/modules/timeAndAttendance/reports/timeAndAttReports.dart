@@ -456,12 +456,12 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
       appBar: AppBar(
         elevation: 0.5,
         title: "Time and Attendance".text.make(),
-        leading: IconButton(
+       /* leading: IconButton(
             onPressed: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => HomePage()));
             },
-            icon: Icon(Icons.arrow_back_ios)),
+            icon: Icon(Icons.arrow_back_ios)),*/
       ),
       body:   GridView.count(
           crossAxisCount: 3,
@@ -781,11 +781,14 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            if(userPanelPermission != "USER") {
+              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            }
+
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }

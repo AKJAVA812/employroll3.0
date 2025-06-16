@@ -78,8 +78,8 @@ class _ODLocationViewState extends State<ODLocationView> {
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-            print('OD');
+            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            print('My All Requests');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -108,8 +108,8 @@ class _ODLocationViewState extends State<ODLocationView> {
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.outbond_outlined),
-            label: 'OD',
+            icon: Icon(Icons.account_tree_outlined),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),

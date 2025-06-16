@@ -178,7 +178,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
   }
 
   int pageIndex = 0;
-  int currentIndex = 1;
+  int currentIndex = 2;
 
 
 
@@ -351,7 +351,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
                 },
                 horizontalPadding: 8,
                 searchIconColor: Mythemes.black,
-                centerTitle: titleName,
+                centerTitle: "$titleName - ${foundDataNewMO!.length}",
                 verticalPadding: 3,
                 centerTitleStyle: TextStyle(
                     fontSize: 19,
@@ -363,7 +363,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showFilterBottomSheet,
-        child: Icon(Icons.filter_list),
+        child: Icon(Icons.filter_list, color: Mythemes.whitish,),
       ),
       body: Container(
         padding: EdgeInsets.all(8.0),
@@ -403,7 +403,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
           if(index==3){

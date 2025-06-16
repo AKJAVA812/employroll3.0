@@ -241,7 +241,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
     return DismissKeyboard(
       child: Scaffold(
         appBar: AppBar(
-          title: "My Request".text.make(),
+          title: "My OD Requests".text.make(),
         ),
         body: Container(
           child: Column(
@@ -409,8 +409,8 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
               print('Workflow');
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-              print('OD');
+              Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+              print('My All requests');
             }
             if(index==3){
               Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -439,8 +439,8 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.outbond_outlined),
-              label: 'OD',
+              icon: Icon(Icons.account_tree_outlined),
+              label: 'My Requests',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_customize),

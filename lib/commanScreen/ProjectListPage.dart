@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:dio/dio.dart';
@@ -18,7 +19,7 @@ import '../singUP/model/loginModel.dart';
 import '../widgets/drawer_file.dart';
 import 'dart:io';
 import 'package:path/path.dart';
-
+import 'package:er_flutter_project/main.dart';
 class ProjectList extends StatefulWidget {
   const ProjectList({Key? key}) : super(key: key);
 
@@ -46,8 +47,35 @@ int? adminRoles;
 bool showHide = false;
 bool showAdmin = false;
 bool showRo = false;
+String? claimLevelOneMO;
+String? claimLevelTwoMO;
+String? claimLevelThreeMO;
+String? claimLevelOneMSS;
+String? claimLevelTwoMSS;
+String? claimLevelThreeMSS;
+String? claimLevelOneUIS;
+String? claimLevelTwoUIS;
+String? claimLevelThreeUIS;
+class _ProjectListState extends State<ProjectList> with RouteAware{
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(this.context)!);
+    //routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
 
-class _ProjectListState extends State<ProjectList> {
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // ✅ Called when coming back from Form Page
+    getSharedPrfanceList();
+    super.didPopNext();
+  }
   int currentIndex = 0;
   final ImagePicker _picker = ImagePicker();
   File? image;
@@ -117,7 +145,16 @@ class _ProjectListState extends State<ProjectList> {
     setPreOnboardShow= await shared.getPreOnboardShow();
     setExitShow= await shared.getExitShow();
     userPanel= await shared.getUserPanel();
-
+    claimLevelOneMSS = await shared!.getClaimLevelOne();
+    print("CLAIM APPROVAL L1 - $claimLevelOneMSS");
+    claimLevelTwoMSS = await shared!.getClaimLevelTwo();
+    claimLevelThreeMSS = await shared!.getClaimLevelThree();
+    claimLevelOneMO = await shared!.getClaimLevelOneMO();
+    claimLevelTwoMO = await shared!.getClaimLevelTwoMO();
+    claimLevelThreeMO = await shared!.getClaimLevelThreeMO();
+    claimLevelOneUIS = await shared!.getClaimLevelOneUIS();
+    claimLevelTwoUIS = await shared!.getClaimLevelTwoUIS();
+    claimLevelThreeUIS = await shared!.getClaimLevelThreeUIS();
     if(userPanel == "COMPANY_EMPLOYEE") {
       value = 0;
     } else {
@@ -506,7 +543,7 @@ class _ProjectListState extends State<ProjectList> {
                       children: <Widget>[
                         Center(
                           child: Icon(
-                            Icons.access_time_filled,
+                            Icons.more_time_rounded,
                             size: 50,
                             color: Mythemes.lightBluishColor,
                           ),
@@ -603,7 +640,7 @@ class _ProjectListState extends State<ProjectList> {
                           child: Icon(
                             Icons.business_center,
                             size: 50,
-                            color: Mythemes.dangerColorOne,
+                            color: Colors.orange,
                           ),
                           /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
@@ -629,10 +666,8 @@ class _ProjectListState extends State<ProjectList> {
               ),
             );
 
-
-
         //TRAVEL & EXPENSE
-        if(orgId == 3 || orgId == 145 || orgId == 171 || orgId == 179 || orgId == 186) {
+        if(claimLevelOneMSS == "1" || claimLevelTwoMSS == "1" || claimLevelThreeMSS == "1") {
           items.add(
             Hero(
               tag: 'claim',
@@ -1291,7 +1326,7 @@ class _ProjectListState extends State<ProjectList> {
                           child: Icon(
                             Icons.supervised_user_circle_sharp,
                             size: 50,
-                            color: Colors.deepOrange,
+                            color: Colors.purpleAccent,
                           ),
 
                         ),
@@ -1315,6 +1350,45 @@ class _ProjectListState extends State<ProjectList> {
               ),
             );
           }
+
+          items.add(
+            Hero(
+              tag: 'incidentReporting',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: (){
+                    Navigator.pushNamed(context, MyRoutings.incidentReportListRoute);
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.report_outlined,
+                          size: 50,
+                          color: Colors.red,
+                        ),
+
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'Incident',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
 
         //Location
         if(orgId == 3 || orgId == 145) {

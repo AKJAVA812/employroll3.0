@@ -95,6 +95,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   var todayDate = "dd/mm/yyyy";
   int? totalAttendance;
+  int? presentCount;
   int? paidDaysCount;
   int? totalDays;
   int? totalAbsentEmp;
@@ -555,6 +556,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     halfEmp = essDashboardModelGlobal!.countData!.halfday;
     shortLeaveCount = essDashboardModelGlobal!.countData!.shortlev;
 
+    presentCount = (totalDays ?? 0) - (totalAbsentEmp ?? 0);
+
     print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
@@ -848,7 +851,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                         .centered()
                                         .py8()
                                         .px8()
-                                        : "$totalAttendance / $totalDays"
+                                        : "$presentCount / $totalDays"
                                         .text
                                         .xl2
                                         .bold
