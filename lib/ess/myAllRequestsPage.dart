@@ -14,8 +14,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' show utf8;
+import '../adminPage/modelClass/dashboardModel.dart';
+import '../adminPage/mssDashboard.dart';
+import '../commanScreen/homePage.dart';
+import '../commanScreen/punchInOutScreen.dart';
 import '../main.dart';
 import '../modules/onDuty/reports/selfRequisition/selfOdRequisitionList.dart';
+import '../profiles/profilePageWithHead.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../singUP/model/loginModel.dart';
 import '../widgets/drawer_file.dart';
@@ -496,7 +501,37 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
           unselectedFontSize: 10,
           onTap: (index) {
             String newTitle = "";
-
+            if(index==0){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
+              //Navigator.pop(context);
+              print('home tab');
+            }
+            if(index==1){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            }
+            if(index==2){
+              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Claim');
+            }
+            if(index==3){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+              );
+              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+              print('Dashboard');
+            }
+            if(index==4){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+              );
+              print('Profile');
+            }
+            /*if(index==3){
+                title="Notifications";
+              }*/
+            setState(() => currentIndex = index);
             // Adjust index mapping if Profile is hidden
             int adjustedIndex = index;
             if (userType == 'COMPANY_ADMIN' && index >= 4) {

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:er_flutter_project/ess/essDashboardNavigate.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/travelExpenseRequestRaise.dart';
+import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/updateRaisedClaim.dart';
 import 'package:http/http.dart' as http;
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
@@ -671,6 +672,10 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
                     print(foundDataNewDraft![i].status);
                     return InkWell(
                       onTap: () {
+                        foundDataNewDraft![i].claimRaiseId;
+                        print("Claim id - ${foundDataNewDraft![i].claimRaiseId}");
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
+                            TravelExpenseRequestUpdate()));
                         /*Navigator.push(context,
                             MaterialPageRoute(builder: (context) => TravelExpenseRequestRaise()));*/
                       },

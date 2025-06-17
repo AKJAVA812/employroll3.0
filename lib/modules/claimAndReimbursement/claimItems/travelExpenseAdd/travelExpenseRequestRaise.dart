@@ -432,6 +432,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
   var dropdownSubSubExpCatValue;
 
   String singleDateString="";
+
   @override
   Widget build(BuildContext context) {
     return DismissKeyboard(
@@ -463,6 +464,27 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                 itemCount: cardList.length,
                 itemBuilder: (context, index) {
                   final cardData = cardList[index];
+                  void calculateKilometers() {
+                    final startText = cardData.odometerStartController.text;
+                    final endText = cardData.odometerEndController.text;
+
+                    if (startText.isNotEmpty && endText.isNotEmpty) {
+                      final start = int.tryParse(startText);
+                      final end = int.tryParse(endText);
+                      print("Run 1");
+                      if (start != null && end != null && end >= start) {
+                        final kms = end - start;
+                        cardData.kilometerController.text = kms.toString();
+                        print("Run 2");
+                      } else {
+                        // Invalid range, clear kilometer field
+                        cardData.kilometerController.text = '';
+                      }
+                    } else {
+                      // One of the fields is empty, clear kilometer field
+                      cardData.kilometerController.text = '';
+                    }
+                  }
                       return Card(
                           elevation: 2,
                           child: ExpansionTile(
@@ -812,7 +834,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                         children: [
                                           Expanded(
                                             child: TextFormField(
-                                              controller: cardData.odometerStartController.text.isEmpty ? null : cardData.odometerStartController,
+                                              controller: cardData.odometerStartController,
                                               enabled: true,
                                               // initialValue: "Head Office",
                                               //maxLines: 3,
@@ -820,6 +842,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                               onChanged: (value) {
                                                 //value = cardData.fromPlaceController.text;
                                                 _odometerStartController.text = value;
+                                                calculateKilometers();
                                                 print("$value");
                                               },
                                               decoration: InputDecoration(
@@ -850,7 +873,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                           ),
                                           Expanded(
                                             child: TextFormField(
-                                              controller: cardData.odometerEndController.text.isEmpty ? null : cardData.odometerEndController,
+                                              controller: cardData.odometerEndController,
                                               enabled: true,
                                               // initialValue: "Head Office",
                                               //maxLines: 3,
@@ -858,6 +881,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                               onChanged: (value) {
                                                 //value = cardData.fromPlaceController.text;
                                                 _odometerEndController.text = value;
+                                                calculateKilometers();
                                                 print("$value");
                                               },
                                               decoration: InputDecoration(
@@ -991,7 +1015,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                                   context: context,
                                                   initialDate: date ?? DateTime.now(),
                                                   firstDate: DateTime(1947),
-                                                  lastDate: DateTime.now(),
+                                                  lastDate: DateTime(2070),
                                                   builder: (context, child) {
                                                     return Theme(
                                                       data: ThemeData(
@@ -1070,7 +1094,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                                     context: context,
                                                     initialDate: date,
                                                     firstDate:DateTime(1947),
-                                                    lastDate: DateTime.now().add(Duration(days: 0)));
+                                                    lastDate: DateTime(2070).add(Duration(days: 0)));
                                                 setState(() {
                                                   singleDateString = DateFormat('dd-MM-yyyy').format(date!);
                                                   cardData.dateController.text = DateFormat("dd-MM-yyyy").format(date!);
@@ -1322,6 +1346,30 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                             ElevatedButton(
                                               onPressed: () {
                                                 //draftInductionData(context);
+                                                finalRaiseClaimRequest(
+                                                  sessionId!,
+                                                  empId!,
+                                                  _claimAmtController.text,
+                                                  claimIdCheck = claimIdCheck,
+                                                  claimRaiseId = "0",
+                                                  claimReqId = "0",
+                                                  _odometerEndController.text,
+                                                  expCategoryId,
+                                                  _merchantController.text,
+                                                  selectedDate!,
+                                                  odometer = true,
+                                                  _kmController.text,
+                                                  reimbursementId,
+                                                  _remarksController.text,
+                                                  _dateController.text,
+                                                  _odometerStartController.text,
+                                                  subExpCategoryId,
+                                                  subSubExpCategoryId,
+                                                  _fromPlaceController.text,
+                                                  _toPlaceController.text,
+                                                  status = "DRAFT",
+                                                  uploadedFile == null ? "" : uploadedFile!.path,
+                                                );
                                               },
                                               style: ButtonStyle(
                                                 backgroundColor:
@@ -1539,12 +1587,54 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
       print('reason both $reason $result');
       print('reason${reason}');
       if(result.compareToIgnoringCase("Success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
+        showDialgSucess(context,reason.upperCamelCase+" ","Success");
       }else if(result.compareToIgnoringCase("Error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      showDialgSucess(context,reason.upperCamelCase, " Error ");
       }
 
     }
+  }
+
+  static showDialgSucess(BuildContext buildContext, String result, String alert) {
+    if (buildContext == null) {
+      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      return;
+    }
+
+    showDialog(
+      context: buildContext,
+      barrierDismissible: false, // Prevents accidental dismiss
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+          title: Row(
+            children: [
+              Expanded(child: Text(alert)),
+            ],
+          ),
+          content: Text(result),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // close the result dialog
+
+                // ✅ Pop 2 screens back using `buildContext`
+                Future.delayed(Duration(milliseconds: 100), () {
+                  int count = 0;
+                  Navigator.of(buildContext).popUntil((route) {
+                    return count++ == 1;
+                  });
+                });
+              },
+              child: Text("OK"),
+            ),
+          ],
+          elevation: 24.0,
+        );
+      },
+    );
   }
 }
 
