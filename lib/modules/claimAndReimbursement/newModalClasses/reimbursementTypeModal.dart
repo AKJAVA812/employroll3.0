@@ -27,7 +27,7 @@ class ClaimDataList {
   String? policyName;
   int? claimId;
   String? policyCode;
-  int? reimbId;
+  var reimbId;
 
   ClaimDataList(
       {this.policyId,
