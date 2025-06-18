@@ -29,10 +29,58 @@ import '../../newModalClasses/reimbursementTypeModal.dart';
 
 
 class TravelExpenseRequestUpdate extends StatefulWidget {
-  const TravelExpenseRequestUpdate({super.key});
+  String? reimbursementType;
+  String? expCategory;
+  String? subExpCategory;
+  String? travelFrom;
+  String? travelTo;
+  String? odometerStart;
+  String? odometerEnd;
+  String? merchant;
+  String? kilometers;
+  String? month;
+  String? date;
+  String? claimedAmount;
+  String? remarks;
+  String? documents;
+  String? claimIdCheck;
+
+  TravelExpenseRequestUpdate(
+      this.reimbursementType,
+      this.expCategory,
+      this.subExpCategory,
+      this.travelFrom,
+      this.travelTo,
+      this.odometerStart,
+      this.odometerEnd,
+      this.merchant,
+      this.kilometers,
+      this.month,
+      this.date,
+      this.claimedAmount,
+      this.remarks,
+      this.documents,
+      this.claimIdCheck,
+      );
 
   @override
-  State<TravelExpenseRequestUpdate> createState() => _TravelExpenseRequestUpdateState();
+  State<TravelExpenseRequestUpdate> createState() => _TravelExpenseRequestUpdateState(
+    reimbursementType,
+    expCategory,
+    subExpCategory,
+    travelFrom,
+    travelTo,
+    odometerStart,
+    odometerEnd,
+    merchant,
+    kilometers,
+    month,
+    date,
+    claimedAmount,
+    remarks,
+    documents,
+    claimIdCheck,
+  );
 }
 
 late List<String?> reimbursementTypeList = [];
@@ -71,6 +119,23 @@ dynamic remarksShow = false;
 dynamic addDocShow = false;
 
 class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate> {
+  _TravelExpenseRequestUpdateState(
+      String? reimbursementType,
+      String? expCategory,
+      String? subExpCategory,
+      String? travelFrom,
+      String? travelTo,
+      String? odometerStart,
+      String? odometerEnd,
+      String? merchant,
+      String? kilometers,
+      String? month,
+      String? date,
+      String? claimedAmount,
+      String? remarks,
+      String? documents,
+      String? claimIdCheck
+      );
   CategoriesModalClass? categoriesModalClass;
   var titleName = "Claim Requisition";
   ReimbursementTypeListModal? reimbursementTypeListModal;
@@ -511,7 +576,7 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      "Add Claim".text.bold.size(16).make()
+                                      "Update Claim".text.bold.size(16).make()
                                     ],
                                   ),
                                   Row(
