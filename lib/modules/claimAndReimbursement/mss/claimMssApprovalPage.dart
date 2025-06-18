@@ -28,6 +28,7 @@ class ClaimMssApproval extends StatefulWidget {
   @override
   State<ClaimMssApproval> createState() => _ClaimMssApprovalState(levelStatus, empId);
 }
+List<bool> _expansionStates = [];
 bool isExpanded = false;
 bool isExpandedDefault = true;
 SessionManager sessionManager=SessionManager();
@@ -334,6 +335,14 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     );
   }
 
+  @override
+  void initState() {
+    _expansionStates = List<bool>.filled(foundDataNew!.length, false);
+
+    // TODO: implement initState
+    super.initState();
+  }
+
   Future<ClaimMssApprovalDataModal> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimApproveDataApi;
@@ -399,8 +408,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     // Show Loader (Using Future.delayed to ensure UI update)
     Future.delayed(Duration.zero, () {
       showDialog(
-        context: context,
-        barrierDismissible: false, // Prevent closing while loading
+        context: buildContext,
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
             content: Column(
@@ -457,7 +466,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       showDialog(
 
         context: context,
-        builder: (BuildContext context) {
+        builder: (BuildContext dialogContext) {
           return AlertDialog(
             title: Row(
               children: [
@@ -470,12 +479,14 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop();
+                  Navigator.of(dialogContext).pop(); // close the result dialog
 
-                  Future.delayed(Duration(milliseconds: 300), () {
-                    if (buildContext.mounted && Navigator.of(buildContext).canPop()) {
-                      Navigator.of(buildContext).pop();
-                    }
+                  // ✅ Pop 2 screens back using `buildContext`
+                  Future.delayed(Duration(milliseconds: 100), () {
+                    int count = 0;
+                    Navigator.of(context).popUntil((route) {
+                      return count++ == 1;
+                    });
                   });
                 },
                 child: Text("OK"),
@@ -494,7 +505,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     // Show Loader (Using Future.delayed to ensure UI update)
     Future.delayed(Duration.zero, () {
       showDialog(
-        context: context,
+        context: buildContext,
         barrierDismissible: false, // Prevent closing while loading
         builder: (BuildContext context) {
           return AlertDialog(
@@ -547,11 +558,10 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
         icon = Icons.warning;
         iconColor = Colors.orange;
       }
-
       // Show Success/Error/Warning Dialog
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (BuildContext dialogContext) {
           return AlertDialog(
             title: Row(
               children: [
@@ -564,14 +574,16 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop();
+                  Navigator.of(dialogContext).pop(); // close the result dialog
 
-                  Future.delayed(Duration(milliseconds: 300), () {
-                    if (buildContext.mounted && Navigator.of(buildContext).canPop()) {
-                      Navigator.of(buildContext).pop();
-                    }
+                  // ✅ Pop 2 screens back using `buildContext`
+                  Future.delayed(Duration(milliseconds: 100), () {
+                    int count = 0;
+                    Navigator.of(context).popUntil((route) {
+                      return count++ == 1;
+                    });
                   });
-               } ,
+                },
                 child: Text("OK"),
               ),
             ],
@@ -646,25 +658,27 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
               shrinkWrap: true,
               itemCount: foundDataNew!.length,
               itemBuilder: (context, index) {
-                reimbursementTypeController.text = foundDataNew![index].reimburName;
-                expenseTypeController.text = foundDataNew![index].expName;
-                subExpTypeController.text = foundDataNew![index].subExpname;
-                subSubExpTypeController.text = foundDataNew![index].categoryName;
-                travelFromController.text = foundDataNew![index].reimburName;
-                travelToController.text = foundDataNew![index].reimburName;
-                merchantController.text = foundDataNew![index].reimburName;
+                reimbursementTypeController.text = foundDataNew![index].reimburName.toString();
+                print("Reimbursement Type - ${reimbursementTypeController.text}");
+                expenseTypeController.text = foundDataNew![index].expName.toString();
+                subExpTypeController.text = foundDataNew![index].subExpname.toString();
+                subSubExpTypeController.text = foundDataNew![index].categoryName.toString();
+                travelFromController.text = foundDataNew![index].fromPlace.toString();
+                travelToController.text = foundDataNew![index].toPlace.toString();
+                merchantController.text = foundDataNew![index].merchant.toString();
                 dateController.text = foundDataNew![index].date;
-                monthController.text = foundDataNew![index].reimburName;
+                monthController.text = foundDataNew![index].month;
                 odoStartController.text = foundDataNew![index].startReading;
                 odoEndController.text = foundDataNew![index].endReading;
                 kmController.text = foundDataNew![index].kilometer;
                 claimAmtController.text = foundDataNew![index].claimAMount.toString();
+                print("Claim Amt. - ${claimAmtController.text}");
                 remarksController.text = foundDataNew![index].remarks;
                 //final cardData = cardList[index];
                 return Card(
                     elevation: 2,
                     child: ExpansionTile(
-                      initiallyExpanded: isExpanded,
+                      initiallyExpanded: _expansionStates[index],
                       childrenPadding: EdgeInsets.all(16).copyWith(top: 0),
                       title: "Claim ${index+1}"
                           .text
@@ -735,7 +749,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: reimbursementTypeController,
+                            controller: TextEditingController(text: foundDataNew![index].reimburName.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -774,7 +788,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: expenseTypeController,
+                            controller: TextEditingController(text: foundDataNew![index].expName.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -806,7 +820,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         ),
                         Expanded(
                           child: TextFormField(
-                            controller: subExpTypeController,
+                            controller: TextEditingController(text: foundDataNew![index].subExpname.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -845,7 +859,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: subSubExpTypeController,
+                            controller: TextEditingController(text: foundDataNew![index].categoryName.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -884,7 +898,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: travelFromController,
+                            controller: TextEditingController(text: foundDataNew![index].fromPlace.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -916,7 +930,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         ),
                         Expanded(
                           child: TextFormField(
-                            controller: travelToController,
+                            controller: TextEditingController(text: foundDataNew![index].toPlace.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -955,7 +969,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: odoStartController,
+                            controller: TextEditingController(text: foundDataNew![index].startReading.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -987,7 +1001,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         ),
                         Expanded(
                           child: TextFormField(
-                            controller: odoEndController,
+                            controller: TextEditingController(text: foundDataNew![index].endReading.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -1026,7 +1040,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: merchantController,
+                            controller: TextEditingController(text: foundDataNew![index].merchant.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -1058,7 +1072,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         ),
                         Expanded(
                           child: TextFormField(
-                            controller: kmController,
+                            controller: TextEditingController(text: foundDataNew![index].kilometer.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -1097,7 +1111,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: monthController,
+                            controller: TextEditingController(text: foundDataNew![index].month.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -1129,7 +1143,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         ),
                         Expanded(
                           child: TextFormField(
-                            controller: dateController,
+                            controller: TextEditingController(text: foundDataNew![index].date.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -1167,7 +1181,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: claimAmtController,
+                            controller: TextEditingController(text: foundDataNew![index].claimAMount.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,
@@ -1206,7 +1220,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: remarksController,
+                            controller: TextEditingController(text: foundDataNew![index].remarks.toString()),
                             readOnly: true,
                             // initialValue: "Head Office",
                             //maxLines: 3,

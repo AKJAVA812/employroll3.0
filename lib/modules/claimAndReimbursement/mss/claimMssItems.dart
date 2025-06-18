@@ -299,17 +299,17 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware{
 
             if(index==0){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
+              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Claim');
             }
             if(index==3){
               Navigator.push(context,
@@ -339,8 +339,8 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware{
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              icon: Icon(Icons.currency_rupee),
+              label: 'Claim',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_customize),

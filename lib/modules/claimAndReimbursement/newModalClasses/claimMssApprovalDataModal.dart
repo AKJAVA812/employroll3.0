@@ -27,11 +27,13 @@ class Data {
   dynamic levelThreeappAmt;
   dynamic reimburName;
   dynamic endReading;
+  dynamic fromPlace;
   dynamic subexpenseId;
   dynamic odoMeter;
   dynamic levelFiveAppAmt;
   dynamic categoryName;
   dynamic claimAMount;
+  dynamic toPlace;
   dynamic levelOneappAmt;
   dynamic subExpname;
   dynamic levelTFourAppAmt;
@@ -40,10 +42,12 @@ class Data {
   dynamic levelFourRemarks;
   dynamic levelOneRemarks;
   dynamic startReading;
+  dynamic merchant;
   dynamic claimId;
-  bool? isImage;
+  dynamic isImage;
   dynamic levelTwoRemarks;
-  bool? isCheck;
+  dynamic isCheck;
+  dynamic month;
   dynamic levelFiveRemarks;
   dynamic expenseId;
   dynamic kilometer;
@@ -59,11 +63,13 @@ class Data {
         this.levelThreeappAmt,
         this.reimburName,
         this.endReading,
+        this.fromPlace,
         this.subexpenseId,
         this.odoMeter,
         this.levelFiveAppAmt,
         this.categoryName,
         this.claimAMount,
+        this.toPlace,
         this.levelOneappAmt,
         this.subExpname,
         this.levelTFourAppAmt,
@@ -72,10 +78,12 @@ class Data {
         this.levelFourRemarks,
         this.levelOneRemarks,
         this.startReading,
+        this.merchant,
         this.claimId,
         this.isImage,
         this.levelTwoRemarks,
         this.isCheck,
+        this.month,
         this.levelFiveRemarks,
         this.expenseId,
         this.kilometer,
@@ -91,11 +99,13 @@ class Data {
     levelThreeappAmt = json['levelThreeappAmt'];
     reimburName = json['reimburName'];
     endReading = json['endReading'];
+    fromPlace = json['fromPlace'];
     subexpenseId = json['subexpenseId'];
     odoMeter = json['odoMeter'];
     levelFiveAppAmt = json['levelFiveAppAmt'];
     categoryName = json['categoryName'];
     claimAMount = json['claimAMount'];
+    toPlace = json['toPlace'];
     levelOneappAmt = json['levelOneappAmt'];
     subExpname = json['subExpname'];
     levelTFourAppAmt = json['levelTFourAppAmt'];
@@ -104,10 +114,12 @@ class Data {
     levelFourRemarks = json['levelFourRemarks'];
     levelOneRemarks = json['levelOneRemarks'];
     startReading = json['startReading'];
+    merchant = json['merchant'];
     claimId = json['claimId'];
     isImage = json['isImage'];
     levelTwoRemarks = json['levelTwoRemarks'];
     isCheck = json['isCheck'];
+    month = json['month'];
     levelFiveRemarks = json['levelFiveRemarks'];
     expenseId = json['expenseId'];
     kilometer = json['kilometer'];
@@ -125,11 +137,13 @@ class Data {
     data['levelThreeappAmt'] = this.levelThreeappAmt;
     data['reimburName'] = this.reimburName;
     data['endReading'] = this.endReading;
+    data['fromPlace'] = this.fromPlace;
     data['subexpenseId'] = this.subexpenseId;
     data['odoMeter'] = this.odoMeter;
     data['levelFiveAppAmt'] = this.levelFiveAppAmt;
     data['categoryName'] = this.categoryName;
     data['claimAMount'] = this.claimAMount;
+    data['toPlace'] = this.toPlace;
     data['levelOneappAmt'] = this.levelOneappAmt;
     data['subExpname'] = this.subExpname;
     data['levelTFourAppAmt'] = this.levelTFourAppAmt;
@@ -138,10 +152,12 @@ class Data {
     data['levelFourRemarks'] = this.levelFourRemarks;
     data['levelOneRemarks'] = this.levelOneRemarks;
     data['startReading'] = this.startReading;
+    data['merchant'] = this.merchant;
     data['claimId'] = this.claimId;
     data['isImage'] = this.isImage;
     data['levelTwoRemarks'] = this.levelTwoRemarks;
     data['isCheck'] = this.isCheck;
+    data['month'] = this.month;
     data['levelFiveRemarks'] = this.levelFiveRemarks;
     data['expenseId'] = this.expenseId;
     data['kilometer'] = this.kilometer;
