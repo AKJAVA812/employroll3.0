@@ -57,8 +57,11 @@ dynamic approvedAmount = "";
 ClaimRequisitionModal? claimRequisitionLabel;
 ClaimRequisitionModal? claimRequisitionLabeled;
 String reimbursementType = "";
+String reimbursementTypeId = "";
 String expCategory = "";
+String expCategoryIdNew = "";
 String subExpCategory = "";
+String subExpCategoryIdNew = "";
 String travelFrom = "";
 String travelTo = "";
 String odometerStart = "";
@@ -66,11 +69,11 @@ String odometerEnd = "";
 String merchant = "";
 String kilometers = "";
 String month = "";
-String date = "";
+String claimDate = "";
 String claimedAmount = "";
 String remarks = "";
 String documents = "";
-String claimIdCheck = "";
+String claimIdChecking = "";
 dynamic totalDraftAmt;
 dynamic totalSubmitAmt;
 dynamic totalApprovedAmt;
@@ -689,39 +692,45 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
                       onTap: () {
                         foundDataNewDraft![i].claimRaiseId;
                         reimbursementType = foundDataNewDraft![i].reimbName!.toString();
+                        reimbursementTypeId = foundDataNewDraft![i].reimbId!.toString();
                         expCategory = foundDataNewDraft![i].expName!.toString();
+                        expCategoryIdNew = foundDataNewDraft![i].expId!.toString();
                         subExpCategory = foundDataNewDraft![i].subExpName!.toString();
-                        travelFrom = foundDataNewDraft![i].reimbName!.toString();
-                        travelTo = foundDataNewDraft![i].reimbName!.toString();
-                        odometerStart = foundDataNewDraft![i].reimbName!.toString();
-                        odometerEnd = foundDataNewDraft![i].reimbName!.toString();
-                        merchant = foundDataNewDraft![i].reimbName!.toString();
-                        kilometers = foundDataNewDraft![i].reimbName!.toString();
-                        month = foundDataNewDraft![i].reimbName!.toString();
-                        date = foundDataNewDraft![i].reqDate!.toString();
+                        subExpCategoryIdNew = foundDataNewDraft![i].subExpId!.toString();
+                        travelFrom = foundDataNewDraft![i].travelFrom!.toString();
+                        travelTo = foundDataNewDraft![i].travelTo!.toString();
+                        odometerStart = foundDataNewDraft![i].odometerStart!.toString();
+                        odometerEnd = foundDataNewDraft![i].odometerEnd!.toString();
+                        merchant = foundDataNewDraft![i].merchant!.toString();
+                        kilometers = foundDataNewDraft![i].kilometers!.toString();
+                        month = foundDataNewDraft![i].month!.toString();
+                        claimDate = foundDataNewDraft![i].reqDate!.toString();
                         claimedAmount = foundDataNewDraft![i].claimedAmt!.toString();
-                        remarks = foundDataNewDraft![i].reimbName!.toString();
-                        documents = foundDataNewDraft![i].reimbName!.toString();
-                        claimIdCheck = foundDataNewDraft![i].claimRaiseId!.toString();
+                        remarks = foundDataNewDraft![i].remarks!.toString();
+                        documents = foundDataNewDraft![i].document!.toString();
+                        claimIdChecking = foundDataNewDraft![i].claimRaiseId!.toString();
                         print("Claim id - ${foundDataNewDraft![i].claimRaiseId}");
 
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
                             TravelExpenseRequestUpdate(
-                                reimbursementType,
-                                expCategory,
-                                subExpCategory,
-                                travelFrom,
-                                travelTo,
-                                odometerStart,
-                                odometerEnd,
-                                merchant,
-                                kilometers,
-                                month,
-                                date,
-                                claimedAmount,
-                                remarks,
-                                documents,
-                                claimIdCheck,
+                              reimbursementType,
+                              reimbursementTypeId,
+                              expCategory,
+                              expCategoryIdNew,
+                              subExpCategory,
+                              subExpCategoryIdNew,
+                              travelFrom,
+                              travelTo,
+                              odometerStart,
+                              odometerEnd,
+                              merchant,
+                              kilometers,
+                              month,
+                              claimDate,
+                              claimedAmount,
+                              remarks,
+                              documents,
+                              claimIdChecking,
                             )));
                         /*Navigator.push(context,
                             MaterialPageRoute(builder: (context) => TravelExpenseRequestRaise()));*/
@@ -997,27 +1006,33 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
                       onTap: () {
                         foundDataNewDraft![i].claimRaiseId;
                         reimbursementType = foundDataNewPending![i].reimbName!.toString();
+                        reimbursementTypeId = foundDataNewPending![i].reimbId!.toString();
                         expCategory = foundDataNewPending![i].expName!.toString();
+                        expCategoryIdNew = foundDataNewPending![i].expId!.toString();
                         subExpCategory = foundDataNewPending![i].subExpName!.toString();
-                        travelFrom = foundDataNewPending![i].reimbName!.toString();
-                        travelTo = foundDataNewPending![i].reimbName!.toString();
-                        odometerStart = foundDataNewPending![i].reimbName!.toString();
-                        odometerEnd = foundDataNewPending![i].reimbName!.toString();
-                        merchant = foundDataNewPending![i].reimbName!.toString();
-                        kilometers = foundDataNewPending![i].reimbName!.toString();
-                        month = foundDataNewPending![i].reimbName!.toString();
-                        date = foundDataNewPending![i].reqDate!.toString();
+                        subExpCategoryIdNew = foundDataNewPending![i].subExpId!.toString();
+                        travelFrom = foundDataNewPending![i].travelFrom!.toString();
+                        travelTo = foundDataNewPending![i].travelTo!.toString();
+                        odometerStart = foundDataNewPending![i].odometerStart!.toString();
+                        odometerEnd = foundDataNewPending![i].odometerEnd!.toString();
+                        merchant = foundDataNewPending![i].merchant!.toString();
+                        kilometers = foundDataNewPending![i].kilometers!.toString();
+                        month = foundDataNewPending![i].month!.toString();
+                        claimDate = foundDataNewPending![i].reqDate!.toString();
                         claimedAmount = foundDataNewPending![i].claimedAmt!.toString();
-                        remarks = foundDataNewPending![i].reimbName!.toString();
-                        documents = foundDataNewPending![i].reimbName!.toString();
-                        claimIdCheck = foundDataNewPending![i].claimRaiseId!.toString();
+                        remarks = foundDataNewPending![i].remarks!.toString();
+                        documents = foundDataNewPending![i].document!.toString();
+                        claimIdChecking = foundDataNewPending![i].claimRaiseId!.toString();
                         print("Claim id - ${foundDataNewPending![i].claimRaiseId}");
 
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
                             TravelExpenseRequestUpdate(
                               reimbursementType,
+                              reimbursementTypeId,
                               expCategory,
+                              expCategoryIdNew,
                               subExpCategory,
+                              subExpCategoryIdNew,
                               travelFrom,
                               travelTo,
                               odometerStart,
@@ -1025,11 +1040,11 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
                               merchant,
                               kilometers,
                               month,
-                              date,
+                              claimDate,
                               claimedAmount,
                               remarks,
                               documents,
-                              claimIdCheck,
+                              claimIdChecking,
                             )));
                         /*Navigator.push(context,
                             MaterialPageRoute(builder: (context) => TravelExpenseRequestRaise()));*/
@@ -1257,6 +1272,48 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
 
                     return InkWell(
                       onTap: () {
+                        foundDataNewApproved![i].claimRaiseId;
+                        reimbursementType = foundDataNewApproved![i].reimbName!.toString();
+                        reimbursementTypeId = foundDataNewApproved![i].reimbId!.toString();
+                        expCategory = foundDataNewApproved![i].expName!.toString();
+                        expCategoryIdNew = foundDataNewApproved![i].expId!.toString();
+                        subExpCategory = foundDataNewApproved![i].subExpName!.toString();
+                        subExpCategoryIdNew = foundDataNewApproved![i].subExpId!.toString();
+                        travelFrom = foundDataNewApproved![i].travelFrom!.toString();
+                        travelTo = foundDataNewApproved![i].travelTo!.toString();
+                        odometerStart = foundDataNewApproved![i].odometerStart!.toString();
+                        odometerEnd = foundDataNewApproved![i].odometerEnd!.toString();
+                        merchant = foundDataNewApproved![i].merchant!.toString();
+                        kilometers = foundDataNewApproved![i].kilometers!.toString();
+                        month = foundDataNewApproved![i].month!.toString();
+                        claimDate = foundDataNewApproved![i].reqDate!.toString();
+                        claimedAmount = foundDataNewApproved![i].claimedAmt!.toString();
+                        remarks = foundDataNewApproved![i].remarks!.toString();
+                        documents = foundDataNewApproved![i].document!.toString();
+                        claimIdChecking = foundDataNewApproved![i].claimRaiseId!.toString();
+                        print("Claim id - ${foundDataNewApproved![i].claimRaiseId}");
+
+                        /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
+                            TravelExpenseRequestUpdate(
+                              reimbursementType,
+                              reimbursementTypeId,
+                              expCategory,
+                              expCategoryIdNew,
+                              subExpCategory,
+                              subExpCategoryIdNew,
+                              travelFrom,
+                              travelTo,
+                              odometerStart,
+                              odometerEnd,
+                              merchant,
+                              kilometers,
+                              month,
+                              claimDate,
+                              claimedAmount,
+                              remarks,
+                              documents,
+                              claimIdCheck,
+                            )));*/
                         /*Navigator.push(context,
                             MaterialPageRoute(builder: (context) => TravelExpenseRequestRaise()));*/
                       },
@@ -1483,7 +1540,49 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList> with RouteA
 
                     return InkWell(
                       onTap: () {
-                       /* Navigator.push(context,
+                        foundDataNewDisapproved![i].claimRaiseId;
+                        reimbursementType = foundDataNewDisapproved![i].reimbName!.toString();
+                        reimbursementTypeId = foundDataNewDisapproved![i].reimbId!.toString();
+                        expCategory = foundDataNewDisapproved![i].expName!.toString();
+                        expCategoryIdNew = foundDataNewDisapproved![i].expId!.toString();
+                        subExpCategory = foundDataNewDisapproved![i].subExpName!.toString();
+                        subExpCategoryIdNew = foundDataNewDisapproved![i].subExpId!.toString();
+                        travelFrom = foundDataNewDisapproved![i].travelFrom!.toString();
+                        travelTo = foundDataNewDisapproved![i].travelTo!.toString();
+                        odometerStart = foundDataNewDisapproved![i].odometerStart!.toString();
+                        odometerEnd = foundDataNewDisapproved![i].odometerEnd!.toString();
+                        merchant = foundDataNewDisapproved![i].merchant!.toString();
+                        kilometers = foundDataNewDisapproved![i].kilometers!.toString();
+                        month = foundDataNewDisapproved![i].month!.toString();
+                        claimDate = foundDataNewDisapproved![i].reqDate!.toString();
+                        claimedAmount = foundDataNewDisapproved![i].claimedAmt!.toString();
+                        remarks = foundDataNewDisapproved![i].remarks!.toString();
+                        documents = foundDataNewDisapproved![i].document!.toString();
+                        claimIdChecking = foundDataNewDisapproved![i].claimRaiseId!.toString();
+                        print("Claim id - ${foundDataNewDisapproved![i].claimRaiseId}");
+
+                        /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
+                            TravelExpenseRequestUpdate(
+                              reimbursementType,
+                              reimbursementTypeId,
+                              expCategory,
+                              expCategoryIdNew,
+                              subExpCategory,
+                              subExpCategoryIdNew,
+                              travelFrom,
+                              travelTo,
+                              odometerStart,
+                              odometerEnd,
+                              merchant,
+                              kilometers,
+                              month,
+                              claimDate,
+                              claimedAmount,
+                              remarks,
+                              documents,
+                              claimIdCheck,
+                            )));*/
+                        /*Navigator.push(context,
                             MaterialPageRoute(builder: (context) => TravelExpenseRequestRaise()));*/
                       },
                       child: Card(
