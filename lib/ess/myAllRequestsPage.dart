@@ -447,7 +447,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style:
-                              TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
                           ),
                         ),
                       ),
@@ -460,6 +460,62 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
         }
       }
 
+      //My Loan Requests
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+          items.add(
+            Hero(
+              tag: 'raiseLoan',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () async{
+                    bool internetCheck = await InternetConnectionChecker().hasConnection;
+                    if(internetCheck == false) {
+                      setState(() {
+                        AlertDialog(
+                          content: "Please check your internet connection".text.make(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Please check your Internet connection."),
+                        ));
+                      });
+
+                    } else {
+                      Navigator.pushNamed(context, MyRoutings.myLoanRequestListRoute);
+                    }
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                        CupertinoIcons.money_dollar_circle_fill,
+                          size: 50,
+                          color: Mythemes.successColor,
+                        ),
+                        /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'My Loans',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
 
       return items;
     }

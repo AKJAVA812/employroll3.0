@@ -311,4 +311,8 @@ class MyRoutings {
   //Incident Reporting
   static String incidentReportListRoute= "/incidentReportListRoute";
   static String incidentReportPageRoute= "/incidentReportPageRoute";
+
+  //Loan Pages
+  static String myLoanRequestListRoute= "/myLoanRequestListRoute";
+  static String myLoanRequestRaiseRoute= "/myLoanRequestRaiseRoute";
 }

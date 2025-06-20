@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:er_flutter_project/MSS_Bundle/dashboard/mssDashboard.dart';
 import 'package:er_flutter_project/MSS_Bundle/incidentReporting/incidentReportingPage.dart';
 import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
+import 'package:er_flutter_project/ess/loan&Advance/myLoanRequestList.dart';
 import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordNewCreation.dart';
@@ -99,6 +100,7 @@ import 'commanScreen/ujalaWorkDone2.dart';
 import 'ess/EssDashboarrddModel.dart';
 import 'ess/essDashboard.dart';
 import 'ess/essDashboardNavigate.dart';
+import 'ess/loan&Advance/myLoanRequestRaisePage.dart';
 import 'ess/myAllReports.dart';
 import 'ess/myAllRequestsPage.dart';
 import 'faceRecognizationAttendance/FaceRecognitionHome.dart';
@@ -770,6 +772,12 @@ class _MyHomePageState extends State<MyHomePage> {
         //Incident Reporting
         MyRoutings.incidentReportListRoute: (context) => IncidentListPage(),
         MyRoutings.incidentReportPageRoute: (context) => IncidentFormPage(),
+
+        //Loan
+        MyRoutings.myLoanRequestListRoute: (context) => MyLoanRequestList(),
+        MyRoutings.myLoanRequestRaiseRoute: (context) => LoanRequestPage(),
+
+
       },
 
     );
