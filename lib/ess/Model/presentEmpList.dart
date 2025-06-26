@@ -196,7 +196,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
                           child: Column(
                             children: [
                               Icon(
-                                Icons.touch_app, size: 35, color: Mythemes.lightBluishColor,
+                                Icons.touch_app, size: 35, color: Mythemes.dangerColor,
                               ),
                             ],
                           ),

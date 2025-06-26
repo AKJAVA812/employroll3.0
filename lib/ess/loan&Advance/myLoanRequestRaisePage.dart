@@ -49,6 +49,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     );
   }
   bool isFormExpanded = true;
+  var requestType;
   @override
   Widget build(BuildContext context) {
     return DismissKeyboard(
@@ -72,6 +73,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                     onChanged: (val) {
                       setState(() {
                         loanTypeSelected = val!;
+                        requestType = "Loan";
                       });
                     },
                   ),
@@ -82,6 +84,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                     onChanged: (val) {
                       setState(() {
                         loanTypeSelected = val!;
+                        requestType = "Advance";
                       });
                     },
                   ),
@@ -95,7 +98,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Raise Loan Request",
+                    "Raise $requestType Request",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(

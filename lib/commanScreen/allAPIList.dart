@@ -1,11 +1,11 @@
 
 class ApiDetails{
    //Base Server Address
-   static var server="http://www.employroll.com/";
+   //static var server="http://www.employroll.com/";
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://2bfb149d3489.ngrok.app/";
+   static var server="https://7f1a5ec1bdae.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -139,6 +139,7 @@ class ApiDetails{
    static var claimApproveDataApi = "restful/service/get/employee/self/claim/policy/list/level/one";
    static var claimApproveApi = "restful/service/claim/approver/level/wise/claim/approved";
    static var claimDisApproveApi = "restful/service/claim/approver/level/wise/claim/delete";
+   static var claimUpdateApi = "restful/service/self/claim/raise/update";
 
    //Induction APIs
    static var onboardingList = "restful/service/onboard/details/list";

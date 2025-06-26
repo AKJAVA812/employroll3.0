@@ -334,6 +334,113 @@ class _ReportPageState extends State<ReportPage> {
         );
       }
 
+      //My Loan Summary
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN"){
+        items.add(
+          Hero(
+            tag: 'myLoanSummary',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, MyRoutings.myLoanSummaryRoute);
+                  //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
+                  /*Fluttertoast.showToast(
+                    msg: "Not Activated",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                );*/
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.summarize,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Loan Summary',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //My Loan Ledger
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN"){
+        items.add(
+          Hero(
+            tag: 'myLoanLedger',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, MyRoutings.myLoanLedgerRoute);
+                  //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
+                  /*Fluttertoast.showToast(
+                    msg: "Not Activated",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                );*/
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.checklist_rounded,
+                        size: 50,
+                        color: Mythemes.warningColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Loan Ledger',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
 
       return items;
     }

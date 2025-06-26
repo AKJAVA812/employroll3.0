@@ -203,7 +203,7 @@ class _HalfDayEmpListState extends State<HalfDayEmpList> {
                           child: Column(
                             children: [
                               Icon(
-                                Icons.touch_app, size: 35, color: Mythemes.lightBluishColor,
+                                Icons.touch_app, size: 35, color: Mythemes.dangerColor,
                               ),
                             ],
                           ),

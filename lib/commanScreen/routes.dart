@@ -315,4 +315,8 @@ class MyRoutings {
   //Loan Pages
   static String myLoanRequestListRoute= "/myLoanRequestListRoute";
   static String myLoanRequestRaiseRoute= "/myLoanRequestRaiseRoute";
+  static String myLoanSummaryRoute= "/myLoanSummaryRoute";
+  static String myLoanLedgerRoute= "/myLoanLedgerRoute";
+  static String pendingLoanRequestListRoute= "/pendingLoanRequestListRoute";
+  static String loanApprovalPageRoute= "/loanApprovalPageRoute";
 }

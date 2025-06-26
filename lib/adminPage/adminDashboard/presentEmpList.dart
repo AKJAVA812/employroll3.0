@@ -174,7 +174,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
                       padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                       child: Column(
                         children: [
-                          Icon(Icons.touch_app, size: 35, color: Mythemes.lightBluishColor),
+                          Icon(Icons.touch_app, size: 35, color: Mythemes.dangerColor),
                         ],
                       ),
                     ),

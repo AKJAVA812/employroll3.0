@@ -56,6 +56,8 @@ import 'MSS_Bundle/leaveManagement/levelOneLeaveReq.dart';
 import 'MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import 'MSS_Bundle/leaveManagement/othersEmpRequisition.dart';
 import 'MSS_Bundle/leaveManagement/pendingRequisitionList.dart';
+import 'MSS_Bundle/loans&Advance/loanApprovalPage.dart';
+import 'MSS_Bundle/loans&Advance/pendingLoanRequestList.dart';
 import 'MSS_Bundle/reports/RoWorkDoneReportFiltering.dart' as mss;
 import 'MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import 'MSS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
@@ -100,7 +102,9 @@ import 'commanScreen/ujalaWorkDone2.dart';
 import 'ess/EssDashboarrddModel.dart';
 import 'ess/essDashboard.dart';
 import 'ess/essDashboardNavigate.dart';
+import 'ess/loan&Advance/myLoanLedger.dart';
 import 'ess/loan&Advance/myLoanRequestRaisePage.dart';
+import 'ess/loan&Advance/myLoanSummary.dart';
 import 'ess/myAllReports.dart';
 import 'ess/myAllRequestsPage.dart';
 import 'faceRecognizationAttendance/FaceRecognitionHome.dart';
@@ -776,6 +780,10 @@ class _MyHomePageState extends State<MyHomePage> {
         //Loan
         MyRoutings.myLoanRequestListRoute: (context) => MyLoanRequestList(),
         MyRoutings.myLoanRequestRaiseRoute: (context) => LoanRequestPage(),
+        MyRoutings.myLoanSummaryRoute: (context) => LoanSummaryPage(),
+        MyRoutings.myLoanLedgerRoute: (context) => MyLoanLedgerPage(),
+        MyRoutings.pendingLoanRequestListRoute: (context) => PendingLoanRequestList(),
+        MyRoutings.loanApprovalPageRoute: (context) => LoanApprovalPage(),
 
 
       },
