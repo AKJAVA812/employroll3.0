@@ -565,7 +565,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
             }
             if(index==2){
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
