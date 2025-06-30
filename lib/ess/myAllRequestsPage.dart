@@ -461,7 +461,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
       }
 
       //My Loan Requests
-      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+      if(orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'raiseLoan',

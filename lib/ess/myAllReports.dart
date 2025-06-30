@@ -339,7 +339,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
       }
 
       //My Loan Summary
-      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN"){
+      if(orgId == 3 || orgId == 145){
         items.add(
           Hero(
             tag: 'myLoanSummary',
@@ -392,7 +392,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
         );
       }
       //My Loan Ledger
-      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN"){
+      if(orgId == 3 || orgId == 145){
         items.add(
           Hero(
             tag: 'myLoanLedger',

@@ -2290,6 +2290,7 @@ class _DrawerFileState extends State<DrawerFile> {
       profileListGetter.clear();
       profileListGetter.addAll(profileListModal?.data ?? []);
 
+      print("Profile List API - ${response.request}");
       for (int i = 0; i < profileListGetter.length; i++) {
         List<String>? userPermission = profileListGetter[i].profilePermission;
 
@@ -2544,6 +2545,10 @@ class _DrawerFileState extends State<DrawerFile> {
                           String odActivateMOPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
                               ? "1"
                               : "0";
+                          // 🟢 Check if the selected profile has the Loan Activate permission
+                          String loanActivateMOPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                              ? "1"
+                              : "0";
 
                           //MSS
                           // 🟢 Check if the selected profile has the Pending Attendance Request permission
@@ -2584,6 +2589,10 @@ class _DrawerFileState extends State<DrawerFile> {
                               : "0";
                           // 🟢 Check if the selected profile has the OD Activate permission
                           String odActivatePermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                              ? "1"
+                              : "0";
+                          // 🟢 Check if the selected profile has the Loan Activate permission
+                          String loanActivatePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                               ? "1"
                               : "0";
 
@@ -2628,6 +2637,10 @@ class _DrawerFileState extends State<DrawerFile> {
                           String odActivateUISPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
                               ? "1"
                               : "0";
+                          // 🟢 Check if the selected profile has the Loan Activate permission
+                          String loanActivateUISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                              ? "1"
+                              : "0";
 
                           // 🟢 Save the MSS MO permission to SharedPreferences
                           await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
@@ -2640,6 +2653,7 @@ class _DrawerFileState extends State<DrawerFile> {
                           await shared.setClaimLevelThreeMO(pendingClaimL3MOPermission);
                           await shared.setODActivateMO(odActivateMOPermission);
                           await shared.setODPendingListMO(pendingODListMOPermission);
+                          await shared.setLoanPendingListMO(loanActivateMOPermission);
                           print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
                           print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
                           print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
@@ -2650,6 +2664,7 @@ class _DrawerFileState extends State<DrawerFile> {
                           print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3MOPermission");
                           print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateMOPermission");
                           print("✅ Pending OD Permission for profileId $selectedProfileId: $pendingODListMOPermission");
+                          print("✅ Loan Activate Permission for profileId $selectedProfileId: $loanActivateMOPermission");
 
                           // 🟢 Save the MSS permission to SharedPreferences
                           await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
@@ -2662,6 +2677,7 @@ class _DrawerFileState extends State<DrawerFile> {
                           await shared.setClaimLevelThree(pendingClaimL3Permission);
                           await shared.setODActivate(odActivatePermission);
                           await shared.setODPendingList(pendingODListPermission);
+                          await shared.setLoanPendingList(loanActivatePermission);
                           print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMSSPermValue");
                           print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMSSPermValue");
                           print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MSSPermValue");
@@ -2672,6 +2688,7 @@ class _DrawerFileState extends State<DrawerFile> {
                           print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3Permission");
                           print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivatePermission");
                           print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListPermission");
+                          print("✅ Loan Activate Permission for profileId $selectedProfileId: $loanActivatePermission");
                           // Notify global listener
                           permissionNotifier.updatePermission(pendingClaimL1Permission);
                           permissionNotifier.updatePermission(pendingClaimL2Permission);
@@ -2690,6 +2707,7 @@ class _DrawerFileState extends State<DrawerFile> {
                           await shared.setClaimLevelThreeUIS(pendingClaimL3UISPermission);
                           await shared.setODActivateUIS(odActivateUISPermission);
                           await shared.setODPendingListUIS(pendingODListUISPermission);
+                          await shared.setLoanPendingListUIS(loanActivateUISPermission);
                           print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqUISPermValue");
                           print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqUISPermValue");
                           print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1UISPermValue");

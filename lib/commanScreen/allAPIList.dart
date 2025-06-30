@@ -5,7 +5,7 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://7f1a5ec1bdae.ngrok.app/";
+   //static var server="https://574525592f30.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
