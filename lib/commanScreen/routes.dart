@@ -231,6 +231,7 @@ class MyRoutings {
   static String forgetPasswordEmailRoute= "/forgetPasswordEmailRoute";
   static String forgetPasswordOtpRoute= "/forgetPasswordOtpRoute";
   static String resetPasswordRoute= "/resetPasswordRoute";
+  static String resetPasswordPageRoute= "/resetPasswordPageRoute";
 
 
   //MSS Bundle Pages

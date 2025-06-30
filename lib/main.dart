@@ -7,6 +7,7 @@ import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordNewCreation.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordOtp.dart';
+import 'package:er_flutter_project/singUP/resetPassword/resetPasswordPage.dart';
 import 'package:er_flutter_project/tracking/geolocator/GeolocatorTracking.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:er_flutter_project/adminPage/modelClass/dashboardModel.dart';
@@ -349,7 +350,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: "Employroll",
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -360,25 +361,11 @@ class MyApp extends StatelessWidget {
         const Locale('en', 'US'), // Add other locales as needed
         const Locale('es', 'ES'), // Example of another locale (Spanish)
       ],
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-        useMaterial3: true,
-      ),
+      themeMode: ThemeMode.light,
+      theme:Mythemes.lightTheme(context),
+      darkTheme: Mythemes.darkTheme(context),
+      debugShowCheckedModeBanner: false,
+      debugShowMaterialGrid: false,
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -695,6 +682,7 @@ class _MyHomePageState extends State<MyHomePage> {
         MyRoutings.forgetPasswordEmailRoute: (context) => ForgotPasswordEmailPage(),
         MyRoutings.forgetPasswordOtpRoute: (context) => ForgotPasswordOtpPage(),
         MyRoutings.resetPasswordRoute: (context) => ForgotPasswordResetPage(),
+        MyRoutings.resetPasswordPageRoute: (context) => ResetPasswordPage(),
         MyRoutings.preOnboardItemRoute: (context) => PreOnboardingItems(),
         MyRoutings.exitEmpListRoute: (context) => ExitEmployeeListView(),
 

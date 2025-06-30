@@ -140,8 +140,8 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  sendOtp(context);
-                  //Navigator.pushNamed(context, MyRoutings.forgetPasswordOtpRoute);
+                  //sendOtp(context);
+                  Navigator.pushNamed(context, MyRoutings.forgetPasswordOtpRoute);
 
                 },
                 child: const Text('Send OTP'),

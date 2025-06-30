@@ -545,7 +545,7 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         child: Align(
                           alignment: Alignment.center,
-                          child: Text("Forget Password / Reset Password ? ",
+                          child: Text("Forget Password? ",
                               textAlign: TextAlign.right,
                               style: TextStyle(
                                 fontSize: 13,
