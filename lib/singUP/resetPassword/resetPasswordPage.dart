@@ -16,6 +16,7 @@ class ResetPasswordPage extends StatefulWidget {
 
 SessionManager shared = SessionManager();
 String? sessionId;
+String? getEmailId;
 Map<String, dynamic> mapResponse = {};
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool isOtpRequested = false;
@@ -181,6 +182,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Future getSharedPreferenceList() async{
     sessionId = await shared!.getSessionId();
+    getEmailId = await shared!.getEmailId();
   }
 
   @override
@@ -198,6 +200,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             Image.asset('assets/images/new_password.png', height: 200),
             const SizedBox(height: 2),
             if (!isOtpRequested) ...[
+              const Text(
+                'We will send a OTP to your registered email ID.',
+                textAlign: TextAlign.center,
+              ),
+               Text(
+                '$getEmailId',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ).py8(),
               ElevatedButton.icon(
                 onPressed: requestOtp,
                 icon: Icon(Icons.sms),

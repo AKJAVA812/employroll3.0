@@ -399,6 +399,7 @@ class _LoginPageState extends State<LoginPage> {
                               autofillHints: [AutofillHints.username],
                               controller: _username,
                               decoration: InputDecoration(
+                                prefixIcon: Icon(CupertinoIcons.profile_circled, size: 20, color: Mythemes.black,),
                                   hintText: "Enter User Name ",
                                   labelText: "UserName"),
                               onChanged: (value) {
@@ -417,10 +418,11 @@ class _LoginPageState extends State<LoginPage> {
                               keyboardType: TextInputType.text,
                               controller: _password,
                               decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.security, size: 20, color: Mythemes.black,),
                                   suffixIcon: IconButton(
                                     icon: Icon(_showPassword
                                         ? CupertinoIcons.eye_fill
-                                        : CupertinoIcons.eye_slash_fill),
+                                        : CupertinoIcons.eye_slash_fill, size: 20,),
                                     onPressed: () {
                                       setState(() {
                                         _showPassword = !_showPassword;
@@ -438,6 +440,19 @@ class _LoginPageState extends State<LoginPage> {
                                 }
                                 return null;
                               },
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(context, MyRoutings.forgetPasswordEmailRoute);
+                              },
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text("Forget Password? ",
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                    )),
+                              ).py4(),
                             ),
                             SizedBox(
                               height: 80,
@@ -539,19 +554,7 @@ class _LoginPageState extends State<LoginPage> {
                           ]),
                         ),
                       ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, MyRoutings.forgetPasswordEmailRoute);
-                        },
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text("Forget Password? ",
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 13,
-                              )),
-                        ).py4(),
-                      ),
+
                     ],
                   ),
                 ),
