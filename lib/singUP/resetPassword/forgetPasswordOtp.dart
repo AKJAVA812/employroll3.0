@@ -1,11 +1,135 @@
+import 'dart:convert';
+import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/routes.dart';
+import '../../themes/empThemes.dart';
+import 'forgetPasswordNewCreation.dart';
 
-class ForgotPasswordOtpPage extends StatelessWidget {
-  ForgotPasswordOtpPage({super.key});
+class ForgotPasswordOtpPage extends StatefulWidget {
+  var emailController;
 
+  ForgotPasswordOtpPage(this.emailController);
+
+  @override
+  State<ForgotPasswordOtpPage> createState() => _ForgotPasswordOtpPageState(
+      emailController);
+}
+
+class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
+  var emailControllers;
+  var otp;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    emailControllers = emailController;
+  }
+  _ForgotPasswordOtpPageState(
+      this.emailControllers);
   final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
+
   final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
+
+  Future<void> verifyOtp(BuildContext context) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.verifyOtpApi;
+    final url = Uri.parse('$conn$apiUrl?'
+        'email=${emailControllers.text}&'
+        'otp=${otp}');
+
+    print("Calling API: $url");
+
+    // Show loader
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final response = await http.post(url);
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      // Dismiss loader
+      Navigator.of(context, rootNavigator: true).pop();
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 &&
+          data['result']?.toString().toLowerCase() == 'success') {
+        // Show success dialog
+        Fluttertoast.showToast(
+            msg: "OTP verified successfully !!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Mythemes.successColor,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+            ForgotPasswordResetPage(emailControllers)));
+        /*showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Success"),
+            content: Text(data['reason'] ?? "OTP sent successfully."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  } else {
+                    print("⚠️ Warning: No route to close.");
+                  }
+                },
+                child: const Text("OK"),
+              )
+            ],
+          ),
+        );*/
+      } else {
+        // Show error dialog from response
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Error"),
+            content: Text(data['reason'] ?? "Something went wrong"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("OK"),
+              )
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      // Dismiss loader if exception occurs
+      Navigator.of(context, rootNavigator: true).pop();
+
+      // Show exception error dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Error"),
+          content: Text("Failed to send OTP. Error: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            )
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +184,16 @@ class ForgotPasswordOtpPage extends StatelessWidget {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  String otp = controllers.map((c) => c.text).join();
+                  otp = controllers.map((c) => c.text).join();
                   if (otp.length == 6) {
-                    Navigator.pushNamed(context, MyRoutings.resetPasswordRoute);
+                    verifyOtp(context);
+                    //Navigator.pushNamed(context, MyRoutings.resetPasswordRoute);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please enter complete 6-digit OTP')),
                     );
                   }
+
                 },
                 child: const Text('Verify'),
               ),

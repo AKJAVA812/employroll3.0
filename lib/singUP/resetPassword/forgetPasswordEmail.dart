@@ -1,11 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/routes.dart';
 import 'package:http/http.dart' as http;
 
+import '../../themes/empThemes.dart';
 import '../login_page.dart';
+import 'forgetPasswordOtp.dart';
 
 class ForgotPasswordEmailPage extends StatefulWidget {
   const ForgotPasswordEmailPage({super.key});
@@ -44,7 +47,20 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
       if (response.statusCode == 200 &&
           data['result']?.toString().toLowerCase() == 'success') {
         // Show success dialog
-        showDialog(
+        Fluttertoast.showToast(
+            msg: "OTP sent successfully !!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Mythemes.successColor,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
+        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+            ForgotPasswordOtpPage(emailController.text)));
+
+        /*showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text("Success"),
@@ -52,8 +68,8 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                    Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context, rootNavigator: true).pop();
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => LoginPage()));
                   } else {
@@ -64,7 +80,7 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
               )
             ],
           ),
-        );
+        );*/
       } else {
         // Show error dialog from response
         showDialog(
@@ -140,8 +156,8 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  //sendOtp(context);
-                  Navigator.pushNamed(context, MyRoutings.forgetPasswordOtpRoute);
+                  sendOtp(context);
+
 
                 },
                 child: const Text('Send OTP'),

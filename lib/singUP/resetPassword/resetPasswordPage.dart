@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/punchInOutScreen.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
+import '../../themes/empThemes.dart';
 import '../login_page.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -33,6 +34,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final TextEditingController confirmPasswordController = TextEditingController();
 
   var type = "0";
+  var resendKey = "0";
 
   Future getLogout(BuildContext buildContext) async {
     //var cameraStatus = await Permission.camera.status;
@@ -91,6 +93,246 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     }
   }
 
+  Future<void> sendOtp(BuildContext context) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.resetPasswordOtpSendApi;
+    setState(() {
+      isLoading = true;
+    });
+    final url = Uri.parse('$conn$apiUrl?'
+        'email=${getEmailId}&'
+        'resend=$resendKey');
+
+    print("Calling API: $url");
+
+    // Show loader
+/*    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );*/
+
+    try {
+      final response = await http.post(url);
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      // Dismiss loader
+      Navigator.of(context, rootNavigator: true).pop();
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 &&
+          data['result']?.toString().toLowerCase() == 'success') {
+        setState(() {
+          isLoading = false;
+          isOtpRequested = true;
+
+          newPasswordFocusNode.addListener(() {
+            setState(() {
+              showPasswordHints = newPasswordFocusNode.hasFocus;
+            });
+          });
+        });
+
+        // Show success dialog
+        Fluttertoast.showToast(
+            msg: "OTP sent successfully !!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Mythemes.successColor,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
+        /*showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Success"),
+            content: Text(data['reason'] ?? "OTP sent successfully."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  } else {
+                    print("⚠️ Warning: No route to close.");
+                  }
+                },
+                child: const Text("OK"),
+              )
+            ],
+          ),
+        );*/
+      } else {
+        // Show error dialog from response
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Error"),
+            content: Text(data['reason'] ?? "Something went wrong"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("OK"),
+              )
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      // Dismiss loader if exception occurs
+      Navigator.of(context, rootNavigator: true).pop();
+
+      // Show exception error dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Error"),
+          content: Text("Failed to send OTP. Error: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            )
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> changePassword(BuildContext context) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.changePasswordApi;
+    final url = Uri.parse('$conn$apiUrl?'
+        'email=$getEmailId&'
+        'curr=${currentPasswordController.text}&'
+        'newpass=${newPasswordController.text}&'
+        'otp=${otpController.text}');
+
+    print("Calling API: $url");
+
+    // Show loader
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final response = await http.post(url);
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      // Dismiss loader
+      Navigator.of(context, rootNavigator: true).pop();
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 &&
+          data['result']?.toString().toLowerCase() == 'success') {
+        // Show success dialog
+        /*Fluttertoast.showToast(
+            msg: "OTP verified successfully !!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Mythemes.successColor,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );*/
+        // After success:
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green),
+                  SizedBox(width: 8),
+                  Text('Success'),
+                ],
+              ),
+              content: Text('Your password has been changed successfully.'),
+              actions: [
+                TextButton(
+                  onPressed: () async{
+                    shared.setSessionId("");
+                    shared.setAdminRole(0);
+                    shared.setEmpRoll(0);
+                    shared.setRoRoll(0);
+                    shared.setMobAction(0);
+                    getLogout(this.context);
+                    final service = FlutterBackgroundService();
+                    var isRunning = await service.isRunning();
+                    print(isRunning);
+                    if (isRunning) {
+                      service.invoke("stopService");
+                      print("Background Stop");
+                    } else {
+                      service.startService();
+                      print("New service Started");
+                    }
+                    setState(() {});
+                    Navigator.of(context, rootNavigator: true).pop();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                          (route) => false,
+                    );
+                  },
+                  child: Text(
+                    'OK',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Show error dialog from response
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Error"),
+            content: Text(data['reason'] ?? "Something went wrong"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("OK"),
+              )
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      // Dismiss loader if exception occurs
+      Navigator.of(context, rootNavigator: true).pop();
+
+      // Show exception error dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Error"),
+          content: Text("Failed to send OTP. Error: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            )
+          ],
+        ),
+      );
+    }
+  }
+
   void requestOtp() async {
     setState(() {
       isLoading = true;
@@ -111,7 +353,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     });
   }
 
-  void changePassword() {
+  void changePasswords() {
     // Add validation and backend logic here
     print("OTP: ${otpController.text}");
     print("Current Password: ${currentPasswordController.text}");
@@ -183,6 +425,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Future getSharedPreferenceList() async{
     sessionId = await shared!.getSessionId();
     getEmailId = await shared!.getEmailId();
+    setState(() {
+
+    });
   }
 
   @override
@@ -210,7 +455,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 textAlign: TextAlign.center,
               ).py8(),
               ElevatedButton.icon(
-                onPressed: requestOtp,
+                onPressed: () {
+                  sendOtp(context);
+                },
                 icon: Icon(Icons.sms),
                 label: Text('Get OTP'),
                 style: ElevatedButton.styleFrom(
@@ -331,7 +578,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ),
               SizedBox(height: 15),
               ElevatedButton.icon(
-                onPressed: changePassword,
+                onPressed: () {
+                  changePassword(context);
+                },
                 icon: Icon(Icons.check_circle_outline),
                 label: Text('Change Password'),
                 style: ElevatedButton.styleFrom(
