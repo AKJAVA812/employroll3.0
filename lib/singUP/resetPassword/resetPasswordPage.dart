@@ -487,7 +487,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: requestOtp,
+                  onPressed: () {
+                    resendKey = "1";
+                    sendOtp(context);
+                  },
                   child: Text('Resend OTP'),
                 ),
               ),

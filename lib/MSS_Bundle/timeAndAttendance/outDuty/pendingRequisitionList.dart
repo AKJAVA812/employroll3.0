@@ -37,6 +37,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+dynamic userPanel;
+dynamic getProfileId;
 List<Listdata>? allUsernew=[];
 List<Listdata>? foundDataNew=[];
 bool isLoading = true;
@@ -95,6 +97,8 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingOdReqList> getEmployeeList11 =
         getPendingOdReqList(sessionId!);
@@ -136,7 +140,10 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
         "sessionId=$SessionId&"
         "odStatus=$odStatus&"
         "startDate=$startDate&"
-        "endDate=$endDate");
+        "endDate=$endDate&"
+        "userPermission=$userPanel&"
+        "profileId=$getProfileId&"
+        "orgId=0");
 
     final response = await http.post(urlapi);
     print('URL ${response.request}');
@@ -510,25 +517,33 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
                           ))
                         ],
                       ),
-                      Row(
-                        children: [
-                          Expanded(child: foundDataNew![itemCount].odaddress
-                              .toString()
-                              .text
-                              .textStyle(context.captionStyle)
-                              .make()
-                              .px8(),)
-
-                        ],
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0), // Apply padding outside
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: foundDataNew![itemCount]
+                                  .odaddress
+                                  .toString()
+                                  .text
+                                  .textStyle(context.captionStyle)
+                                  .overflow(TextOverflow.ellipsis)
+                                  .maxLines(2)
+                                  .make(),
+                            ),
+                          ],
+                        ),
                       ),
                       Row(
                         children: [
-                          foundDataNew![itemCount].remark
+                          Expanded(child: foundDataNew![itemCount].remark
                               .toString()
                               .text
                               .textStyle(context.captionStyle)
+                              .overflow(TextOverflow.ellipsis)
+                              .maxLines(2)
                               .make()
-                              .px8(),
+                              .px8())
                         ],
                       ),
                       Row(
