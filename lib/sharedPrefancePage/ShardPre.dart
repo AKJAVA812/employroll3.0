@@ -39,6 +39,20 @@ class SessionManager {
     return sessionId;
   }
 
+  setAppVersion(sessionId) async {
+    // Obtain shared preferences.
+    sharedPreferences = await SharedPreferences.getInstance();
+    // Save an String value to 'action' key.
+    await sharedPreferences.setString('appVersion', sessionId);
+  }
+
+  getAppVersion() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final String? appVersion = sharedPreferences.getString('appVersion');
+    return appVersion;
+  }
+
+
   setName(empName) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();

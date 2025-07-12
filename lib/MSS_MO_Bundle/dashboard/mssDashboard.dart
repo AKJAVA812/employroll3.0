@@ -196,252 +196,254 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.4,
+            height: MediaQuery.of(context).size.height * 0.5,
             padding: EdgeInsets.all(16),
             child: StatefulBuilder(
               builder: (context, setModalState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        margin: EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    Text(
-                      'Filter',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 16),
-
-                    /// Organization Dropdown
-                    /// Organization Dropdown
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Select Organization',
-                        border: OutlineInputBorder(),
-                      ),
-                      value: selectedOrg,
-                      items: [
-                        const DropdownMenuItem<String>(
-                          value: null,
-                          child: Text('Select'),
-                        ),
-                        ...organizations.map((org) {
-                          return DropdownMenuItem(
-                            value: org,
-                            child: Text(org),
-                          );
-                        }),
-                      ],
-                      onChanged: (value) async {
-                        sessionId = await shared!.getSessionId();
-
-                        // Step 1: Immediately show loader and reset old branch data
-                        setState(() {
-                          selectedOrg = value;
-                          selectedBranchName = null;
-                          isBranchLoading = true;
-                          storedBranchList = [];
-                        });
-
-                        // Step 2: Allow UI to update before fetching
-                        await Future.delayed(Duration(milliseconds: 100));
-
-                        // Step 3: Get Org ID
-                        matchedOrg = storedOrgList.firstWhere(
-                              (org) => org['orgName'] == value,
-                          orElse: () => {},
-                        );
-                        getOrgId = matchedOrg['id']?.toString() ?? '';
-                        print('Org Name: $selectedOrg');
-                        print('Org ID: $getOrgId');
-
-                        // Step 4: Fetch Branch Data
-                        await getBranchList(sessionId!);
-
-                        // Step 5: Populate Branch Dropdown List
-                        storedBranchList = branchListModalGloabal?.data?.map((branch) {
-                          return {
-                            'branchId': branch.branchId,
-                            'branchName': branch.branchName?.trim() ?? '',
-                          };
-                        }).toList() ?? [];
-
-                        // Step 6: Stop loader
-                        setState(() {
-                          isBranchLoading = false;
-                        });
-
-                        setModalState(() {});
-                      },
-                    ),
-
-                    SizedBox(height: 8),
-
-                    /// Branch Dropdown
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: isBranchLoading ? 'Loading Branches...' : 'Select Branch',
-                        border: OutlineInputBorder(),
-                      ),
-                      value: selectedBranchName,
-                      items: isBranchLoading
-                          ? [
-                        DropdownMenuItem<String>(
-                          value: null,
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 15,
-                                height: 15,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                              SizedBox(width: 10),
-                              Text("Loading...")
-                            ],
-                          ),
-                        )
-                      ]
-                          : [
-                        const DropdownMenuItem<String>(
-                          value: null,
-                          child: Text('Select'),
-                        ),
-                        ...storedBranchList.map((branch) {
-                          return DropdownMenuItem<String>(
-                            value: branch['branchName'],
-                            child: Text(branch['branchName']),
-                          );
-                        }),
-                      ],
-                      onChanged: isBranchLoading
-                          ? null
-                          : (value) {
-                        setState(() {
-                          selectedBranchName = value;
-
-                          final matchedBranch = storedBranchList.firstWhere(
-                                (branch) => branch['branchName'] == value,
-                            orElse: () => {},
-                          );
-
-                          selectedBranchId = matchedBranch['branchId'] ?? 0;
-                          print('Branch Name: $selectedBranchName');
-                          print('Branch ID: $selectedBranchId');
-                        });
-
-                        setModalState(() {});
-                      },
-                    ),
-                    SizedBox(height: 8),
-                    /// Date Picker Field
-                    GestureDetector(
-                      onTap: () async {
-                        date = (await showDatePicker(
-                            context: context,
-                            initialDate: date,
-                            firstDate: DateTime(1947),
-                            lastDate: DateTime.now().add(Duration(days: 0))))!;
-
-                        setState(() {
-                          loader();
-                          //getSharedPrfanceList();
-                          singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                          singleDay = DateFormat('dd').format(date!);
-                          print("SingleDateNew $singleDateString");
-                          print("singleDay $singleDay");
-                          //dateController.text = DateFormat("dd").format(date!);
-
-                          //  DateFormat.yMd().format(date!).toString();
-                        });
-                      },
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Select Date',
-                            hintText: 'dd-mm-yyyy',
-                            border: OutlineInputBorder(),
-                            suffixIcon: Icon(Icons.calendar_today),
-                          ),
-                          controller: TextEditingController(
-                            text: singleDateString ?? '',
+                return SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          margin: EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 50),
+                      Text(
+                        'Filter',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 16),
 
-                    /// Filter Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          Navigator.of(bottomSheetContext).pop();
-                          await Future.delayed(Duration(milliseconds: 100));
+                      /// Organization Dropdown
+                      /// Organization Dropdown
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: 'Select Organization',
+                          border: OutlineInputBorder(),
+                        ),
+                        value: selectedOrg,
+                        items: [
+                          const DropdownMenuItem<String>(
+                            value: null,
+                            child: Text('Select'),
+                          ),
+                          ...organizations.map((org) {
+                            return DropdownMenuItem(
+                              value: org,
+                              child: Text(org),
+                            );
+                          }),
+                        ],
+                        onChanged: (value) async {
+                          sessionId = await shared!.getSessionId();
 
+                          // Step 1: Immediately show loader and reset old branch data
                           setState(() {
-                            isLoading = true; // Start loader
+                            selectedOrg = value;
+                            selectedBranchName = null;
+                            isBranchLoading = true;
+                            storedBranchList = [];
                           });
 
-                          try {
-                            sessionId = await shared!.getSessionId();
-                            getOrgId = matchedOrg['id']?.toString() ?? '';
-                            // Fetch all data in parallel
-                            final results = await Future.wait([
-                              getDashboardData(sessionId!),
-                              //getBranchList(sessionId!),
-                              getShiftList(sessionId!),
-                              getEventData(sessionId!)
-                            ]);
+                          // Step 2: Allow UI to update before fetching
+                          await Future.delayed(Duration(milliseconds: 100));
 
-                            final dashboard = results[0] as DashboardModel;
-                            //final branchList = results[1] as BranchListModal;
-                            final shiftList = results[1] as ShiftListModal;
-                            final eventsList = results[2] as EventsListModal;
+                          // Step 3: Get Org ID
+                          matchedOrg = storedOrgList.firstWhere(
+                                (org) => org['orgName'] == value,
+                            orElse: () => {},
+                          );
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print('Org Name: $selectedOrg');
+                          print('Org ID: $getOrgId');
 
-                            final empRoleLocal = await shared!.getEmpRoll();
-                            final roRoleLocal = await shared!.getRoRole();
+                          // Step 4: Fetch Branch Data
+                          await getBranchList(sessionId!);
 
-                            // Update all state together
-                            setState(() {
-                              dashboardModelGlobal = dashboard;
-                              //branchListModalGloabal = branchList;
-                              shiftListModalGlobal = shiftList;
-                              eventsListModalGlobal = eventsList;
-                              empRole = empRoleLocal;
-                              roRole = roRoleLocal;
-                              isLoading = false; // Stop loader
-                            });
+                          // Step 5: Populate Branch Dropdown List
+                          storedBranchList = branchListModalGloabal?.data?.map((branch) {
+                            return {
+                              'branchId': branch.branchId,
+                              'branchName': branch.branchName?.trim() ?? '',
+                            };
+                          }).toList() ?? [];
 
-                          } catch (e) {
-                            print("Error while fetching dashboard data: $e");
-                            setState(() {
-                              isLoading = false; // Stop loader even on error
-                            });
+                          // Step 6: Stop loader
+                          setState(() {
+                            isBranchLoading = false;
+                          });
 
-                            // Optional: Show error message
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("Something went wrong while fetching data."),
-                            ));
-                          }
+                          setModalState(() {});
                         },
-                        icon: Icon(Icons.filter_alt),
-                        label: Text("Apply Filter"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Mythemes.successColor,
+                      ),
+
+                      SizedBox(height: 8),
+
+                      /// Branch Dropdown
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: isBranchLoading ? 'Loading Branches...' : 'Select Branch',
+                          border: OutlineInputBorder(),
+                        ),
+                        value: selectedBranchName,
+                        items: isBranchLoading
+                            ? [
+                          DropdownMenuItem<String>(
+                            value: null,
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 15,
+                                  height: 15,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                                SizedBox(width: 10),
+                                Text("Loading...")
+                              ],
+                            ),
+                          )
+                        ]
+                            : [
+                          const DropdownMenuItem<String>(
+                            value: null,
+                            child: Text('Select'),
+                          ),
+                          ...storedBranchList.map((branch) {
+                            return DropdownMenuItem<String>(
+                              value: branch['branchName'],
+                              child: Text(branch['branchName']),
+                            );
+                          }),
+                        ],
+                        onChanged: isBranchLoading
+                            ? null
+                            : (value) {
+                          setState(() {
+                            selectedBranchName = value;
+
+                            final matchedBranch = storedBranchList.firstWhere(
+                                  (branch) => branch['branchName'] == value,
+                              orElse: () => {},
+                            );
+
+                            selectedBranchId = matchedBranch['branchId'] ?? 0;
+                            print('Branch Name: $selectedBranchName');
+                            print('Branch ID: $selectedBranchId');
+                          });
+
+                          setModalState(() {});
+                        },
+                      ),
+                      SizedBox(height: 8),
+                      /// Date Picker Field
+                      GestureDetector(
+                        onTap: () async {
+                          date = (await showDatePicker(
+                              context: context,
+                              initialDate: date,
+                              firstDate: DateTime(1947),
+                              lastDate: DateTime.now().add(Duration(days: 0))))!;
+
+                          setState(() {
+                            loader();
+                            //getSharedPrfanceList();
+                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                            singleDay = DateFormat('dd').format(date!);
+                            print("SingleDateNew $singleDateString");
+                            print("singleDay $singleDay");
+                            //dateController.text = DateFormat("dd").format(date!);
+
+                            //  DateFormat.yMd().format(date!).toString();
+                          });
+                        },
+                        child: AbsorbPointer(
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              labelText: 'Select Date',
+                              hintText: 'dd-mm-yyyy',
+                              border: OutlineInputBorder(),
+                              suffixIcon: Icon(Icons.calendar_today),
+                            ),
+                            controller: TextEditingController(
+                              text: singleDateString ?? '',
+                            ),
+                          ),
                         ),
                       ),
-                    )
-                  ],
+                      SizedBox(height: 40),
+
+                      /// Filter Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            Navigator.of(bottomSheetContext).pop();
+                            await Future.delayed(Duration(milliseconds: 100));
+
+                            setState(() {
+                              isLoading = true; // Start loader
+                            });
+
+                            try {
+                              sessionId = await shared!.getSessionId();
+                              getOrgId = matchedOrg['id']?.toString() ?? '';
+                              // Fetch all data in parallel
+                              final results = await Future.wait([
+                                getDashboardData(sessionId!),
+                                //getBranchList(sessionId!),
+                                getShiftList(sessionId!),
+                                getEventData(sessionId!)
+                              ]);
+
+                              final dashboard = results[0] as DashboardModel;
+                              //final branchList = results[1] as BranchListModal;
+                              final shiftList = results[1] as ShiftListModal;
+                              final eventsList = results[2] as EventsListModal;
+
+                              final empRoleLocal = await shared!.getEmpRoll();
+                              final roRoleLocal = await shared!.getRoRole();
+
+                              // Update all state together
+                              setState(() {
+                                dashboardModelGlobal = dashboard;
+                                //branchListModalGloabal = branchList;
+                                shiftListModalGlobal = shiftList;
+                                eventsListModalGlobal = eventsList;
+                                empRole = empRoleLocal;
+                                roRole = roRoleLocal;
+                                isLoading = false; // Stop loader
+                              });
+
+                            } catch (e) {
+                              print("Error while fetching dashboard data: $e");
+                              setState(() {
+                                isLoading = false; // Stop loader even on error
+                              });
+
+                              // Optional: Show error message
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text("Something went wrong while fetching data."),
+                              ));
+                            }
+                          },
+                          icon: Icon(Icons.filter_alt),
+                          label: Text("Apply Filter"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Mythemes.successColor,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 );
               },
             ),
@@ -2480,7 +2482,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               ),
             ),
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 10),
 
           /// Filter Button
           SizedBox(

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert' show json, utf8;
+import 'dart:io';
 
 import 'package:er_flutter_project/commanScreen/accountSuspend.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../adminPage/adminPanelScreen.dart';
@@ -47,6 +49,11 @@ String? exitShow;
 String? pendingLeaveRequisitions;
 bool accountExpired = false;
 
+String appName = "";
+String packageName = "";
+String version = "";
+String buildNumber = "";
+
 class _LoginPageState extends State<LoginPage> {
   String name = "";
   bool changeButton = false;
@@ -75,6 +82,21 @@ class _LoginPageState extends State<LoginPage> {
         changeButton = false;
       });*/
     }
+  }
+
+  Future<void> getAppVersionInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    appName = packageInfo.appName;
+    packageName = packageInfo.packageName;
+    version = packageInfo.version; // e.g. 1.0.0
+    buildNumber = packageInfo.buildNumber; // e.g. 1
+
+    print("App Name: $appName");
+    print("Package Name: $packageName");
+    print("Version: $version");
+    print("Build Number: $buildNumber");
+    shared.setAppVersion(version);
   }
 
   final loading = Row(
@@ -154,6 +176,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (response.statusCode == 200) {
         setState(() {
+          print("My APP Version - $version");
           //print('response Login ${loginModel.data!.sessionId}');
           //print('response {$loginValidation.toString()}');
           accountExpired = mapResponse['data']['expired'];
@@ -328,6 +351,41 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
     //print('Response snapshot login: ${sessionId}');
+
+    getAppVersionInfo();
+
+  }
+
+  void showUpdateDialog(BuildContext context) {
+    final isAndroid = Platform.isAndroid;
+    final storeUrl = isAndroid
+        ? 'https://play.google.com/store/apps/details?id=com.employroll.employroll' // ✅ Replace with your Play Store URL
+        : 'https://apps.apple.com/in/app/employroll-2-0/id1664350846'; // ✅ Replace with your App Store ID
+
+    final message = isAndroid
+        ? 'A new version of the app is available on the Play Store. Please update your app to continue.'
+        : 'A new version of the app is available on the App Store. Please update your app to continue.';
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Update Available'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (await canLaunchUrl(Uri.parse(storeUrl))) {
+                launchUrl(Uri.parse(storeUrl), mode: LaunchMode.externalApplication);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not open store.')));
+              }
+            },
+            child: Text('Update Now'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

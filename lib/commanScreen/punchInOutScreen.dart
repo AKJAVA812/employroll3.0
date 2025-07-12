@@ -26,6 +26,7 @@ import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 //import 'package:safe_device/safe_device.dart';
 //import 'package:trust_location/trust_location.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -50,6 +51,7 @@ import '../mss_profiles/global_profile.dart';
 import '../mss_profiles/organisationListModal.dart';
 import '../mss_profiles/profileListModal.dart';
 import '../reports/reportPage.dart';
+import '../settings/checkForUpdates.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -1181,9 +1183,13 @@ class _DefaultPageState extends State<DefaultPage> {
   bool showRo = false;
 
   var attAction;
+  var appVersion;
+  var oldAppVersion;
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    appVersion = await shared!.getAppVersion();
+    print("App Version - $appVersion");
     userPanelPermissions = await shared!.getUserPanel();
     print("$userPanelPermissions");
     lat = await shared!.getLatitude();
@@ -1206,6 +1212,7 @@ class _DefaultPageState extends State<DefaultPage> {
     print('mobActions $mobAction');
 
     print('ATTACTION- $attAction');
+
     setState(() {
       if (empRole == 1) {
         showHide = true;
@@ -1410,7 +1417,7 @@ class _DefaultPageState extends State<DefaultPage> {
                         padding: const EdgeInsets.only(top: 10),
                         child: Text("Today Date"),
                       ),
-                      Container(height: 10),
+                      //Container(height: 10),
                       //Padding(padding: EdgeInsets.all(0)),
                       Container(
                         padding: EdgeInsets.all(15),
@@ -1436,7 +1443,7 @@ class _DefaultPageState extends State<DefaultPage> {
                         padding: const EdgeInsets.only(top: 10),
                         child: Text("Today Time"),
                       ),
-                      Container(height: 12, color: Mythemes.whiteShadeSeventy),
+                      //Container(height: 12, color: Mythemes.whiteShadeSeventy),
                       //Padding(padding: EdgeInsets.all(0)),
                       Container(
                         padding: EdgeInsets.all(15),
@@ -2003,6 +2010,38 @@ class _DefaultPageState extends State<DefaultPage> {
         builder: (BuildContext context) {
           return alertDialog;
         });
+  }
+
+  void showUpdateDialog(BuildContext context) {
+    final isAndroid = Platform.isAndroid;
+    final storeUrl = isAndroid
+        ? 'https://play.google.com/store/apps/details?id=com.employroll.employroll' // ✅ Replace with your Play Store URL
+        : 'https://apps.apple.com/in/app/employroll-2-0/id1664350846'; // ✅ Replace with your App Store ID
+
+    final message = isAndroid
+        ? 'A new version of the app is available on the Play Store. Please update your app to continue.'
+        : 'A new version of the app is available on the App Store. Please update your app to continue.';
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Update Available'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (await canLaunchUrl(Uri.parse(storeUrl))) {
+                launchUrl(Uri.parse(storeUrl), mode: LaunchMode.externalApplication);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not open store.')));
+              }
+            },
+            child: Text('Update Now'),
+          ),
+        ],
+      ),
+    );
   }
 
   getTimeUpdate() {
@@ -2763,6 +2802,19 @@ class _DrawerFileState extends State<DrawerFile> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ResetPasswordPage()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.security_update_good_outlined, color: Mythemes.black),
+                title: Text(
+                  'Check for Updates',
+                  style: TextStyle(color: Mythemes.black),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UpdateChecker()),
                   );
                 },
               ),
