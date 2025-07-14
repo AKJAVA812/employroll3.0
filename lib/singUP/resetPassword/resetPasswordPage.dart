@@ -117,15 +117,15 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
 
-      // Dismiss loader
-      Navigator.of(context, rootNavigator: true).pop();
+      setState(() {
+        isLoading = false;
+      });
 
       final data = json.decode(response.body);
 
       if (response.statusCode == 200 &&
           data['result']?.toString().toLowerCase() == 'success') {
         setState(() {
-          isLoading = false;
           isOtpRequested = true;
 
           newPasswordFocusNode.addListener(() {
@@ -135,40 +135,19 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           });
         });
 
-        // Show success dialog
         Fluttertoast.showToast(
-            msg: "OTP sent successfully !!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Mythemes.successColor,
-            textColor: Colors.white,
-            fontSize: 16.0
+          msg: "OTP sent successfully !!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Mythemes.successColor,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
-
-        /*showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Success"),
-            content: Text(data['reason'] ?? "OTP sent successfully."),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  if (Navigator.of(context).canPop()) {
-                    Navigator.of(context, rootNavigator: true).pop();
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => LoginPage()));
-                  } else {
-                    print("⚠️ Warning: No route to close.");
-                  }
-                },
-                child: const Text("OK"),
-              )
-            ],
-          ),
-        );*/
       } else {
-        // Show error dialog from response
+        setState(() {
+          isLoading = false;
+        });
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -184,10 +163,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         );
       }
     } catch (e) {
-      // Dismiss loader if exception occurs
-      Navigator.of(context, rootNavigator: true).pop();
+      setState(() {
+        isLoading = false;
+      });
 
-      // Show exception error dialog
       showDialog(
         context: context,
         builder: (context) => AlertDialog(

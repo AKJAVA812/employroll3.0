@@ -38,7 +38,7 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 List<Listdata>? allUsernew=[];
-List<Listdata>? foundDataNew=[];
+List<Listdata>? foundDataNewUIS=[];
 bool isLoading = true;
 PendingOdReqList? pendingOdReqListLabel;
 PendingOdReqList? pendingOdReqListLabeled;
@@ -88,7 +88,7 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
     setState(() {
       getSharedPrfanceList();
       var listLength;
-      listLength = foundDataNew!.length;
+      listLength = foundDataNewUIS!.length;
       print('listLength $listLength');
     });
   }
@@ -108,18 +108,18 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
 
     getEmployeeList11.then((value) {
       setState(() {
-        foundDataNew = allUsernew;
+        foundDataNewUIS = allUsernew;
         pendingOdReqListLabel = value;
         pendingOdReqListLabeled = pendingOdReqListLabel;
-        if(foundDataNew != null) {
-          foundDataNew!.length;
-          print("Fetch data $foundDataNew");
+        if(foundDataNewUIS != null) {
+          foundDataNewUIS!.length;
+          print("Fetch data $foundDataNewUIS");
           isLoading = false;
         } else {
           Center(
             child: "There is no data available right now".text.make(),
           );
-          foundDataNew = [];
+          foundDataNewUIS = [];
         }
       });
 
@@ -220,7 +220,7 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewUIS = results;
     });
   }
   TextEditingController searchType = TextEditingController();
@@ -440,9 +440,9 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
         return Future.value(false);
       },
       child: ListView.builder(
-        itemCount: foundDataNew!.length,
+        itemCount: foundDataNewUIS!.length,
         itemBuilder: (context, itemCount) {
-          var statusCheck = foundDataNew![itemCount].approvalstatus;
+          var statusCheck = foundDataNewUIS![itemCount].approvalstatus;
           if (statusCheck == 'Approved') {
             statusColor = Mythemes.successColor;
           } else if (statusCheck == 'DisApproved') {
@@ -488,7 +488,7 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
                     children: [
                       Row(
                         children: [
-                          foundDataNew![itemCount].name
+                          foundDataNewUIS![itemCount].name
                               .toString()
                               .text
                               .make()
@@ -499,7 +499,7 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              foundDataNew![itemCount].approvalstatus
+                              foundDataNewUIS![itemCount].approvalstatus
                                   .toString()
                                   .text.bold
                                   .color(statusColor)
@@ -512,7 +512,7 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
                       ),
                       Row(
                         children: [
-                          Expanded(child: foundDataNew![itemCount].odaddress
+                          Expanded(child: foundDataNewUIS![itemCount].odaddress
                               .toString()
                               .text
                               .textStyle(context.captionStyle)
@@ -523,7 +523,7 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
                       ),
                       Row(
                         children: [
-                          foundDataNew![itemCount].remark
+                          foundDataNewUIS![itemCount].remark
                               .toString()
                               .text
                               .textStyle(context.captionStyle)
@@ -553,12 +553,12 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
                                 top: 15, left: 5, right: 3, bottom: 18),
                             child: Column(
                               children: [
-                                foundDataNew![itemCount].odtype
+                                foundDataNewUIS![itemCount].odtype
                                     .toString()
                                     .text
                                     .sm
                                     .make(),
-                                foundDataNew![itemCount].odtime
+                                foundDataNewUIS![itemCount].odtime
                                     .toString()
                                     .text
                                     .sm
@@ -586,7 +586,7 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition> wit
                               children: [
                                 "Date".text.sm.make(),
                                 DateFormat("dd-MM-yyyy")
-                                    .format(DateTime.parse(foundDataNew![itemCount].date
+                                    .format(DateTime.parse(foundDataNewUIS![itemCount].date
                                         .toString()))
                                     .text
                                     .sm

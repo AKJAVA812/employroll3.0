@@ -199,4 +199,7 @@ class ApiDetails{
    //Organisation List
    static var orgListApi = "restful/service/org/details/master/list";
 
+   //Loan APIs
+   static var essLoanListApi = "restful/service/self/org/loans/list";
+
 }
