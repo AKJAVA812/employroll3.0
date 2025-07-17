@@ -52,6 +52,7 @@ import '../mss_profiles/organisationListModal.dart';
 import '../mss_profiles/profileListModal.dart';
 import '../reports/reportPage.dart';
 import '../settings/checkForUpdates.dart';
+import '../settings/companyPolicyList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -2815,6 +2816,19 @@ class _DrawerFileState extends State<DrawerFile> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => UpdateChecker()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.policy, color: Mythemes.black),
+                title: Text(
+                  'Company Policies',
+                  style: TextStyle(color: Mythemes.black),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CompanyPoliciesPage()),
                   );
                 },
               ),

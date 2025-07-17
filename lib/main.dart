@@ -5,6 +5,7 @@ import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
 import 'package:er_flutter_project/ess/loan&Advance/myLoanRequestList.dart';
 import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
 import 'package:er_flutter_project/settings/checkForUpdates.dart';
+import 'package:er_flutter_project/settings/companyPolicyList.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordNewCreation.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordOtp.dart';
@@ -778,6 +779,9 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.loanApprovalPageRoute: (context) => LoanApprovalPage(),
           //Check for updates
           MyRoutings.checkForUpdatesRoute: (context) => UpdateChecker(),
+
+          //Company Policy
+          MyRoutings.companyPolicyListRoute: (context) => CompanyPoliciesPage(),
 
 
 

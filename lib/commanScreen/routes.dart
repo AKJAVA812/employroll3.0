@@ -324,4 +324,7 @@ class MyRoutings {
 
   //Check for updates
   static String checkForUpdatesRoute= "/checkForUpdatesRoute";
+
+  //Company Policy
+  static String companyPolicyListRoute= "/companyPolicyListRoute";
 }
