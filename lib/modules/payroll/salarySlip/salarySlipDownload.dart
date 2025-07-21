@@ -53,12 +53,136 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     // timeString = _formatDateTime(DateTime.now());
     Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
     Future.delayed(Duration.zero, () {
-      dateSelection();
+      //dateSelection();
+      showCustomMonthPicker(
+        context: context,
+        initialDate: DateTime.now(),
+        onMonthSelected: (date) {
+          setState(() {
+            _dateController.text = DateFormat("MMMM-yy").format(date!);
+            selectedDate = _dateController.text;
+            print('MonthPicker $selectedDate');
+            getSharedPrfanceList();
+            print("New Get Salary - $salarySlip");
+            print('Selected: $date');
+            print(date);
+          });
+
+        },
+      );
       salarySlip = "";
       //FileDownload().registerPortData(setState);
     });
+    // Register port with isolate for download progress communication
+    /*IsolateNameServer.registerPortWithName(receivePort.sendPort, "downloadingPdf");
+
+    // Listen to download progress
+    receivePort.listen((message) {
+      setState(() {
+        progress = message;
+      });
+    });
+
+    // Register the callback for download progress
+    FlutterDownloader.registerCallback(downloadCallback);*/
     //startDownloading();
 
+  }
+
+  void showCustomMonthPicker({
+    required BuildContext context,
+    required Function(DateTime selectedMonth) onMonthSelected,
+    DateTime? initialDate,
+  }) {
+    final now = DateTime.now();
+    DateTime selected = initialDate ?? DateTime(now.year, now.month);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        int selectedYear = selected.year;
+        List<String> months = [
+          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ];
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Year Selector
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back_ios),
+                        onPressed: () => setState(() => selectedYear--),
+                      ),
+                      Text(
+                        '$selectedYear',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_forward_ios),
+                        onPressed: () {
+                          if (selectedYear < now.year) {
+                            setState(() => selectedYear++);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Month Grid
+                  GridView.count(
+                    crossAxisCount: 3,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    childAspectRatio: 2.5,
+                    children: List.generate(12, (index) {
+                      final isDisabled = selectedYear == now.year && index > now.month - 1;
+                      return GestureDetector(
+                        onTap: isDisabled
+                            ? null
+                            : () {
+                          final selectedDate = DateTime(selectedYear, index + 1);
+                          Navigator.pop(context);
+                          onMonthSelected(selectedDate);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: isDisabled ? Colors.grey[300] : Colors.blue[100],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.blue),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            months[index],
+                            style: TextStyle(
+                              color: isDisabled ? Colors.grey : Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
 
@@ -75,7 +199,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
       lastDate: DateTime.now(),
     );*/
 
-    date = await showMonthYearPicker(
+    /*date = await showMonthYearPicker(
       context: context,
       initialDate: date ?? DateTime.now(),
       firstDate: DateTime(1947),
@@ -96,11 +220,49 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
                 fontWeight: FontWeight.bold,
                 color: Colors.lightBlue,
               ),
-              bodyLarge: TextStyle(fontSize: 16, color: Colors.black, letterSpacing: 0), // Style for unselected items
+              bodyLarge: TextStyle(fontSize: 10, color: Colors.black, letterSpacing: 0), // Style for unselected items
 
             ),
           ),
           child: child!,
+        );
+      },
+    );*/
+    date = await showMonthYearPicker(
+      context: context,
+      initialDate: date ?? DateTime.now(),
+      firstDate: DateTime(1947),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.lightBlue,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(
+                fontSize: 14,
+                color: Colors.black,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+          child: Center(
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                padding: const EdgeInsets.all(0), // Remove padding
+                margin: const EdgeInsets.all(0),
+                constraints: const BoxConstraints(
+                  maxWidth: 480,
+                  minWidth: 480,
+                ),
+                child: child!,
+              ),
+            ),
+          ),
         );
       },
     );
@@ -177,12 +339,18 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     final response = await http.get(urlapi);
     print('URL ${response.request}');
 
+    setState(() {
+      mapResponse = json.decode(response.body);
+      var getData = mapResponse;
+      print('My Salary Slip $getData');
 
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse;
-    print('responseemployeeList $getData');
+    });
     salarySlipDownloadModal=SalarySlipDownloadModal.fromJson(mapResponse);
+    salarySlip = salarySlipDownloadModal.salarySlip;
+    print("Salary Slip Show - $salarySlip");
+    setState(() {
 
+    });
     return salarySlipDownloadModal;
   }
 
@@ -636,11 +804,45 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
           selectedDate == null ?
           IconButton(
               onPressed: () {
-                dateSelection();
+                //dateSelection();
+                showCustomMonthPicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  onMonthSelected: (date) {
+                    setState(() {
+                      _dateController.text = DateFormat("MMMM-yy").format(date!);
+                      selectedDate = _dateController.text;
+                      print('MonthPicker $selectedDate');
+                      getSharedPrfanceList();
+                      print("New Get Salary - $salarySlip");
+                      print('Selected: $date');
+                      print(date);
+                    });
+
+                  },
+
+                );
+                salarySlip = "";
               }, icon: Icon(Icons.date_range_rounded)) :
           InkWell(
             onTap: () {
-              dateSelection();
+              //dateSelection();
+              showCustomMonthPicker(
+                context: context,
+                initialDate: DateTime.now(),
+                onMonthSelected: (date) {
+                  setState(() {
+                    _dateController.text = DateFormat("MMMM-yy").format(date!);
+                    selectedDate = _dateController.text;
+                    print('MonthPicker $selectedDate');
+                    getSharedPrfanceList();
+                    print("New Get Salary - $salarySlip");
+                    print('Selected: $date');
+                    print(date);
+                  });
+                },
+              );
+              salarySlip = "";
             },
             child: "$selectedDate".text.lg.center.color(Mythemes.black).make().px8().py12(),
           )
