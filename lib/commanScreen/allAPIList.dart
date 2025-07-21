@@ -1,11 +1,11 @@
 
 class ApiDetails{
    //Base Server Address
-   static var server="http://www.employroll.com/";
+   //static var server="http://www.employroll.com/";
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://19ca90f06d2b.ngrok.app/";
+   static var server="https://7384ae90ff9a.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -201,6 +201,8 @@ class ApiDetails{
 
    //Loan APIs
    static var essLoanListApi = "restful/service/self/org/loans/list";
+   static var loanTypeMasterApi = "restful/service/loan/and/advance/master/list";
+   static var loanRequestRaiseApi = "restful/service/org/loan/and/advance/request/data/request/save";
 
    //Company Policy API
    static var companyPolicyApi = "restful/service/policy/details/list";

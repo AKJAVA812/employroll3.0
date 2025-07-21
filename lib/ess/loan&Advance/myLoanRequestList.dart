@@ -21,6 +21,7 @@ import '../../../main.dart';
 import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 import '../../modules/claimAndReimbursement/newModalClasses/selfClaimRequisitionListModal.dart';
+import 'modalClass/selfLoanRequestModal.dart';
 import 'myLoanRequestRaisePage.dart';
 
 
@@ -41,13 +42,13 @@ List<DataNew>? allUsernew=[];
 List<DataNew>? foundDataNew=[];
 List<ClaimRequisitionDraftlist>? allUsernewDraft=[];
 List pendingData =[];
-List<ClaimRequisitionPendinglist>? allUsernewPending=[];
-List<ClaimRequisitionApprovedlist>? allUsernewApproved=[];
-List<ClaimRequisitionDisapprovelist>? allUsernewDisapproved=[];
+List<LoanRequisitionPendinglist>? allUsernewPending=[];
+List<LoanRequisitionApprovedlist>? allUsernewApproved=[];
+List<LoanRequisitionDisapprovelist>? allUsernewDisapproved=[];
 List<ClaimRequisitionDraftlist>? foundDataNewDraft=[];
-List<ClaimRequisitionPendinglist>? foundDataNewPending=[];
-List<ClaimRequisitionApprovedlist>? foundDataNewApproved=[];
-List<ClaimRequisitionDisapprovelist>? foundDataNewDisapproved=[];
+List<LoanRequisitionPendinglist>? foundDataNewPending=[];
+List<LoanRequisitionApprovedlist>? foundDataNewApproved=[];
+List<LoanRequisitionDisapprovelist>? foundDataNewDisapproved=[];
 String? empName = "";
 String? status = "";
 String? reimbName = "";
@@ -55,8 +56,8 @@ String? raisedOn = "";
 String? catName = "";
 dynamic claimedAmt = "";
 dynamic approvedAmount = "";
-ClaimRequisitionModal? claimRequisitionLabel;
-ClaimRequisitionModal? claimRequisitionLabeled;
+SelfLoanRequestModal? selfLoanRequisitionLabel;
+SelfLoanRequestModal? selfLoanRequisitionLabeled;
 String reimbursementType = "";
 String reimbursementTypeId = "";
 String expCategory = "";
@@ -76,7 +77,7 @@ String remarks = "";
 String documents = "";
 String claimIdChecking = "";
 dynamic totalDraftAmt;
-dynamic totalSubmitAmt;
+dynamic totalDisapprovedAmt;
 dynamic totalApprovedAmt;
 dynamic totalPendingAmt;
 
@@ -135,7 +136,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<ClaimRequisitionModal> getEmployeeList11 = getSelfReqList(sessionId!);
+    Future<SelfLoanRequestModal> getEmployeeList11 = getSelfLoanReqList(sessionId!);
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -157,13 +158,13 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
           foundDataNewDisapproved = allUsernewDisapproved;
         }*/
 
-        claimRequisitionLabel=value;
-        claimRequisitionLabeled=claimRequisitionLabel;
+        selfLoanRequisitionLabel=value;
+        selfLoanRequisitionLabeled=selfLoanRequisitionLabel;
       });
-      print('Draft LIST - ${claimRequisitionLabel!.claimRequisitionDraftlist!.length}');
-      print('Pending LIST - ${claimRequisitionLabel!.claimRequisitionPendinglist!.length}');
-      print('Approved LIST - ${claimRequisitionLabel!.claimRequisitionApprovedlist!.length}');
-      print('Disapproved LIST - ${claimRequisitionLabel!.claimRequisitionDisapprovelist!.length}');
+      //print('Draft LIST - ${selfLoanRequisitionLabel!.claimRequisitionDraftlist!.length}');
+      print('Pending LIST - ${selfLoanRequisitionLabel!.loanRequisitionPendinglist!.length}');
+      print('Approved LIST - ${selfLoanRequisitionLabel!.loanRequisitionApprovedlist!.length}');
+      print('Disapproved LIST - ${selfLoanRequisitionLabel!.loanRequisitionDisapprovelist!.length}');
     });
 
 
@@ -207,11 +208,11 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
   }
 
 
-  Future<ClaimRequisitionModal> getSelfReqList(String SessionId) async {
+  Future<SelfLoanRequestModal> getSelfLoanReqList(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.selfClaimRequestListApi;
+    String apiUrl = ApiDetails.essLoanListApi;
     print('employeeList11: ${SessionId}');
-    ClaimRequisitionModal claimRequisitionModal;
+    SelfLoanRequestModal selfLoanRequestModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await http.post(urlapi);
 
@@ -231,25 +232,25 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
 
 
 
-    claimRequisitionModal = ClaimRequisitionModal.fromJson(mapResponse);
+    selfLoanRequestModal = SelfLoanRequestModal.fromJson(mapResponse);
     /* for (int i = 0; i < claimRequisitionModal.claimRequisitionPendinglist!.length; i++) {
       empName = mapResponse['claimRequisitionPendinglist'][i]['empName'];
       print("EMP NAME - $empName");
     }*/
     // globalListParameter = claimRequisitionModal.claimRequisitionApprovedlist;
-    totalDraftAmt = claimRequisitionModal.totaDraftAmount;
-    totalSubmitAmt = claimRequisitionModal.submittedValue;
-    totalApprovedAmt = claimRequisitionModal.approvedValue;
-    totalPendingAmt = claimRequisitionModal.pendingAmount;
+    //totalDraftAmt = selfLoanRequestModal.totaDraftAmount;
+    totalDisapprovedAmt = selfLoanRequestModal.disApprovedValue;
+    totalApprovedAmt = selfLoanRequestModal.approvedValue;
+    totalPendingAmt = selfLoanRequestModal.pendingAmount;
     if(valueChange ==0) {
-      allUsernewPending = claimRequisitionModal.claimRequisitionPendinglist!;
+      allUsernewPending = selfLoanRequestModal.loanRequisitionPendinglist;
     }
     if(valueChange == 1) {
-      allUsernewApproved = claimRequisitionModal.claimRequisitionApprovedlist!;
+      allUsernewApproved = selfLoanRequestModal.loanRequisitionApprovedlist!;
     }
     if(valueChange == 2) {
 
-      allUsernewDisapproved = claimRequisitionModal.claimRequisitionDisapprovelist!;
+      allUsernewDisapproved = selfLoanRequestModal.loanRequisitionDisapprovelist!;
     }
     /*if(valueChange == 3) {
       allUsernewDisapproved = claimRequisitionModal.claimRequisitionDisapprovelist!;
@@ -261,7 +262,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
     print("Pending List -  ${pendingData.length.toString()}");
 
 
-    return claimRequisitionModal;
+    return selfLoanRequestModal;
   }
 
   dynamic levelOnePendingStatus = false;
@@ -405,84 +406,8 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
               padding: EdgeInsets.all(6.0),
-              crossAxisCount: 4,
+              crossAxisCount: 3,
               children: <Widget>[
-                Hero(
-                  tag: 'nrCount',
-                  child: Card(
-                    color: Mythemes.alertColor,
-                    child: InkWell(
-                      onTap: () {
-                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-
-                          Center(
-                            child: isLoadingCount
-                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                :"₹$totalDraftAmt".text.bold.color(Mythemes.whitish).size(16).make(),
-                          ),
-                          Center(
-                            child: Container(
-                              //margin: EdgeInsets.only(top: 30, left: 10),
-                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 5),
-                              child: Text(
-                                'Draft',
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style:
-                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Hero(
-                  tag: 'WR',
-                  child: Card(
-                    color: Mythemes.lightBluishColor,
-                    child: InkWell(
-                      onTap: () {
-                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-
-                          Center(
-                            child: isLoadingCount
-                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                :"₹$totalSubmitAmt".text.bold.color(Mythemes.whitish).size(16).make(),
-                          ),
-                          Center(
-                            child: Container(
-                              //margin: EdgeInsets.only(top: 70, left: 10),
-                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                              child: Text(
-                                'Submit',
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style:
-                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
                 Hero(
                   tag: 'AP',
                   child: Card(
@@ -557,6 +482,46 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                     ),
                   ),
                 ),
+                Hero(
+                  tag: 'WR',
+                  child: Card(
+                    color: Mythemes.dangerColor,
+                    child: InkWell(
+                      onTap: () {
+                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+
+                          Center(
+                            child: isLoadingCount
+                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
+                                :"₹$totalDisapprovedAmt".text.bold.color(Mythemes.whitish).size(16).make(),
+                          ),
+                          Center(
+                            child: Container(
+                              //margin: EdgeInsets.only(top: 70, left: 10),
+                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                              child: Text(
+                                'Disapproved',
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style:
+                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+
 
               ],
             ),
@@ -656,9 +621,9 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
             Expanded(
               child: isLoading
                   ? Center(child: CircularProgressIndicator()) // Show loader
-                  : claimRequisitionLabeled == null
+                  : selfLoanRequisitionLabeled == null
                   ? Center(child: Text("No Data Available"))
-                  : getClaimSelfReqList(claimRequisitionLabeled!),
+                  : getLoanSelfReqList(selfLoanRequisitionLabeled!),
             ),
           ],
         ),
@@ -666,7 +631,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
     );
   }
 
-  getClaimSelfReqList(ClaimRequisitionModal claimRequisitionModal) {
+  getLoanSelfReqList(SelfLoanRequestModal selfLoanRequestModal) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
@@ -752,7 +717,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "₹ 120000",
+                                    "₹ ${foundDataNewPending![i].loanAmount}",
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -766,7 +731,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      "Level 1 Pending",
+                                      "${foundDataNewPending![i].statusShow}",
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.white,
@@ -783,7 +748,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                  Text("Requested On", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("June 17, 2025", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewPending![i].date}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -793,7 +758,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Loan Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("6", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewPending![i].approvedInstallment}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -803,7 +768,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Loan Type", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("Personal Loan", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewPending![i].loanType}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -813,7 +778,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Total Amount", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("₹ 120000", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("₹ ${foundDataNewPending![i].loanAmount}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 12),
@@ -933,7 +898,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "₹ 120000",
+                                    "₹ ${foundDataNewApproved![i].loanAmount}",
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -947,7 +912,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      "Approved",
+                                      "${foundDataNewApproved![i].statusShow}",
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.white,
@@ -964,7 +929,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                  Text("Requested On", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("June 17, 2025", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewApproved![i].date}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -974,7 +939,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Loan Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("6", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewApproved![i].approvedInstallment}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -984,7 +949,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Loan Type", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("Personal Loan", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewApproved![i].loanType}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -994,7 +959,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Total Amount", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("₹ 120000", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("₹ ${foundDataNewApproved![i].loanAmount}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 12),
@@ -1008,7 +973,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: const Text(
-                                  "Loan not approved yet",
+                                  "Loan Approved",
                                   style: TextStyle(color: Colors.black87),
                                 ),
                               ),
@@ -1114,7 +1079,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "₹ 120000",
+                                    "₹ ${foundDataNewDisapproved![i].loanAmount}",
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -1128,7 +1093,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      "Disapproved",
+                                      "${foundDataNewDisapproved![i].loanStatus}",
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.white,
@@ -1145,7 +1110,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                  Text("Requested On", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("June 17, 2025", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewDisapproved![i].date}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -1155,7 +1120,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Loan Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("6", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewDisapproved![i].approvedInstallment}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -1165,7 +1130,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text("Loan Type", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("Personal Loan", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("${foundDataNewDisapproved![i].loanType}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -1175,7 +1140,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                    Text("Total Amount", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("₹ 120000", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("₹ ${foundDataNewDisapproved![i].loanAmount}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 12),
@@ -1189,7 +1154,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: const Text(
-                                  "Loan not approved yet",
+                                  "Loan has been disapproved",
                                   style: TextStyle(color: Colors.black87),
                                 ),
                               ),

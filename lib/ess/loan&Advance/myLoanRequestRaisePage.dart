@@ -1,21 +1,40 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import '../../commanScreen/allAPIList.dart';
+import '../../commanScreen/commanNotificationPage.dart';
+import '../../sharedPrefancePage/ShardPre.dart';
 
 class LoanRequestPage extends StatefulWidget {
   @override
   _LoanRequestPageState createState() => _LoanRequestPageState();
 }
+Map<String, dynamic> mapResponse = {};
+
+SessionManager shared = SessionManager();
+
+String? sessionId;
+String? department;
+String? branch;
+String? employeeName;
 
 class _LoanRequestPageState extends State<LoanRequestPage> {
-  String loanTypeSelected = 'Loan';
+  String loanTypeSelectedRadio = 'loan';
+  String loanTypeSelected = 'loan';
   String? selectedLoanType;
   DateTime? startDate;
+  TextEditingController startDateController = TextEditingController();
 
   final TextEditingController amountController = TextEditingController();
   final TextEditingController remarkController = TextEditingController();
   final TextEditingController installmentController = TextEditingController();
 
-  List<String> loanTypes = ['Home Loan', 'Vehicle Loan', 'Education Loan'];
+  List<String?> loanTypes = [];
+  List<String?> loanTypeId = [];
+  List<String?> loanTypeSend = [];
 
 /*  List<Map<String, String>> breakupList = [
     {
@@ -49,7 +68,67 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     );
   }
   bool isFormExpanded = true;
-  var requestType;
+  var requestType = "loan";
+  var loanId = "";
+  var loanTypeSending = "";
+  TextEditingController departmentController = TextEditingController();
+  TextEditingController branchController = TextEditingController();
+  TextEditingController employeeNameController = TextEditingController();
+
+
+  Future getLoanTypeMaster(String sessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.loanTypeMasterApi;
+
+    //print('employeeList11: ${SessionId}');
+
+    var urlapi = Uri.parse("$conn$apiUrl?" "sessionId=$sessionId");
+    final response = await http.post(urlapi);
+    //print("Status $status");
+    //print(inductionListLabel!.data!.length);
+    print('LOcations ${response.request}');
+
+    mapResponse = json.decode(response.body);
+
+    for(int i=0; i<mapResponse['loandata'].length;i++){
+      loanTypes.add(mapResponse['loandata'][i]['loanName'].toString());
+      loanTypeId.add(mapResponse['loandata'][i]['loanId'].toString());
+      loanTypeSend.add(mapResponse['loandata'][i]['loantype'].toString());
+      //print('ID -  ${mapResponse['data'][i]['branchId']}');
+
+    }
+    loanTypeSelected = mapResponse['loandata'][0]['loanName'].toString();
+    setState(() {
+
+    });
+  }
+
+  @override
+  void initState() {
+    getSharedPrfanceList();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  Future getSharedPrfanceList() async {
+    sessionId = await shared.getSessionId();
+    department = await shared.getDept();
+    branch = await shared.getBranch();
+    employeeName = await shared.getempName();
+    departmentController.text = department ?? '';
+    branchController.text = branch ?? '';
+    employeeNameController.text = employeeName ?? '';
+    getLoanTypeMaster(sessionId!);
+    setState(() {
+
+    });
+
+    print("SessionId - $sessionId");
+    print("Department - $department");
+    print("Branch - $branch");
+    print("EmployeeName - $employeeName");
+  }
+
   @override
   Widget build(BuildContext context) {
     return DismissKeyboard(
@@ -68,22 +147,22 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Radio<String>(
-                    value: 'Loan',
-                    groupValue: loanTypeSelected,
+                    value: 'loan',
+                    groupValue: loanTypeSelectedRadio,
                     onChanged: (val) {
                       setState(() {
-                        loanTypeSelected = val!;
+                        loanTypeSelectedRadio = val!;
                         requestType = "Loan";
                       });
                     },
                   ),
                   const Text('Loan'),
                   Radio<String>(
-                    value: 'Advance',
-                    groupValue: loanTypeSelected,
+                    value: 'advance',
+                    groupValue: loanTypeSelectedRadio,
                     onChanged: (val) {
                       setState(() {
-                        loanTypeSelected = val!;
+                        loanTypeSelectedRadio = val!;
                         requestType = "Advance";
                       });
                     },
@@ -124,7 +203,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                         child: customReadOnlyInput(
                           icon: Icons.apartment,
                           label: "Department Name",
-                          value: "Finance Department",
+                          controller: departmentController,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -132,7 +211,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                         child: customReadOnlyInput(
                           icon: Icons.location_city,
                           label: "Branch Name",
-                          value: "Mumbai HQ",
+                          controller: branchController,
                         ),
                       ),
                     ],
@@ -142,7 +221,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                   customReadOnlyInput(
                     icon: Icons.person,
                     label: "Employee Name",
-                    value: "Bharat Rajora",
+                    controller: employeeNameController,
                   ),
 
                   // Loan Type Dropdown
@@ -150,9 +229,29 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                     icon: Icons.menu,
                     label: "Loan Type",
                     value: selectedLoanType,
-                    items: loanTypes,
-                    onChanged: (val) {
-                      setState(() => selectedLoanType = val);
+                    items: loanTypes, // Pass the raw list of strings
+                    onChanged: (newVal) {
+                      setState(() {
+                        selectedLoanType = newVal;
+
+                        // Get first matching index
+                        int i = loanTypes.indexOf(newVal);
+                        if (i != -1 && i < loanTypeId.length) {
+                          loanId = loanTypeId[i].toString();
+                          print("depart $loanTypeId");
+                        } else {
+                          loanTypeId;
+                          print("Invalid Loan selection");
+                        }
+                        int j = loanTypes.indexOf(newVal);
+                        if (i != -1 && j < loanTypeSend.length) {
+                          loanTypeSending = loanTypeSend[i].toString();
+                          print("loanType -  $loanTypeSending");
+                        } else {
+                          loanTypeSending;
+                          print("Invalid Loan selection");
+                        }
+                      });
                     },
                   ),
 
@@ -172,6 +271,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                           icon: Icons.date_range,
                           label: "Loan Start Date",
                           selectedDate: startDate,
+                          controller: startDateController,
                           onTap: () async {
                             DateTime? picked = await showDatePicker(
                               context: context,
@@ -180,7 +280,10 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                               lastDate: DateTime(2030),
                             );
                             if (picked != null) {
-                              setState(() => startDate = picked);
+                              setState(() {
+                                startDate = picked;
+                                startDateController.text = DateFormat('MMM dd, yyyy').format(picked);
+                              });
                             }
                           },
                         ),
@@ -234,7 +337,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                             "status": "Pending"
                           });
                         }
-
+                        sendLoanRequest(context);
                         setState(() {
                           breakupList = generatedList;
                           isLoading = false;
@@ -331,17 +434,100 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     );
   }
 
-  Widget customReadOnlyInput({required IconData icon, required String label, required String value}) {
+  Future<void> sendLoanRequest(BuildContext context) async {
+    // ✅ Proceed with the API call if both checks pass
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.loanRequestRaiseApi;
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse("$conn$apiUrl");
+    var request = http.MultipartRequest("POST", urlapi);
+
+    // Add static fields
+    request.fields['sessionId'] = sessionId!;
+    request.fields['Remarks'] = remarkController.text;
+    request.fields['requestRadio'] = requestType;
+    request.fields['LoanType'] = loanTypeSending;
+    request.fields['LoanAmount'] = amountController.text;
+    request.fields['LoanStartDate'] = startDateController.text;
+    request.fields['Instalments'] = installmentController.text;
+
+    try {
+      http.StreamedResponse response = await request.send();
+      http.Response httpResponse = await http.Response.fromStream(response);
+      print('URL: ${httpResponse.request}');
+      print('Status Code: ${httpResponse.statusCode}');
+      print('Response: ${httpResponse.body}');
+
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (httpResponse.statusCode == 200) {
+        var mapResponse = json.decode(httpResponse.body);
+        String reason = mapResponse['reason'];
+        String result = mapResponse['result'];
+
+        if (result.compareToIgnoringCase("Success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (result.compareToIgnoringCase("Error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, "Error");
+        }
+      }
+    } catch (e) {
+      print('❌ Exception during API call: $e');
+    }
+  }
+
+  static showDialgSucess(BuildContext buildContext, String result, String alert) {
+    if (buildContext == null) {
+      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      return;
+    }
+
+    showDialog(
+      context: buildContext,
+      barrierDismissible: false, // Prevents accidental dismiss
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+          title: Row(
+            children: [
+              Expanded(child: Text(alert)),
+            ],
+          ),
+          content: Text(result),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
+                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                  Navigator.of(buildContext).maybePop();
+                } else {
+                  print("⚠️ Warning: No route to close.");
+                }
+              },
+              child: Text("Ok"),
+            ),
+          ],
+          elevation: 24.0,
+        );
+      },
+    );
+  }
+
+  Widget customReadOnlyInput({
+    required IconData icon,
+    required String label,
+    required TextEditingController controller,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
+        controller: controller,
         readOnly: true,
-        initialValue: value,
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.blue),
           labelText: label,
-          //filled: true,
-          //fillColor: Colors.grey.shade100,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
@@ -352,7 +538,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     required IconData icon,
     required String label,
     required String? value,
-    required List<String> items,
+    required List<String?> items,
     required Function(String?) onChanged,
   }) {
     return Padding(
@@ -367,7 +553,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
         ),
         value: value,
         items: items.map((item) {
-          return DropdownMenuItem<String>(value: item, child: Text(item));
+          return DropdownMenuItem<String>(value: item, child: Text(item!));
         }).toList(),
         onChanged: onChanged,
       ),
@@ -401,6 +587,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     required String label,
     required DateTime? selectedDate,
     required Function() onTap,
+    required TextEditingController controller, // <-- Add this
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -408,15 +595,11 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
         onTap: onTap,
         child: AbsorbPointer(
           child: TextFormField(
+            controller: controller, // <-- Use controller here
             decoration: InputDecoration(
               prefixIcon: Icon(icon, color: Colors.deepOrange),
               labelText: label,
-              //filled: true,
-              //fillColor: Colors.grey.shade100,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            controller: TextEditingController(
-              text: selectedDate != null ? DateFormat('MMM dd, yyyy').format(selectedDate) : '',
             ),
           ),
         ),
