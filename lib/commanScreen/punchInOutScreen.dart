@@ -85,6 +85,7 @@ class PunchInOUtActivity extends StatefulWidget {
 }
 int pageIndex = 0;
 int currentIndex = 0;
+var orgId;
 Position? position = Position(
     longitude: 0.0,
     latitude: 0.0,
@@ -372,6 +373,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    orgId = await shared!.getOrgId();
     userType = await shared!.getUserType();
     defaultProfileName = await shared!.getDefaultProfileName();
     defaultProfileId = await shared!.getDefaultProfileId();
@@ -2286,6 +2288,7 @@ class _DrawerFileState extends State<DrawerFile> {
 
 
   Future<void> getSharedPreferences() async {
+
     final prefs = await SharedPreferences.getInstance();
     selectedProfileId = prefs.getInt('defaultProfileId');
     selectedProfileName = prefs.getString('defaultProfileName');
@@ -2296,6 +2299,11 @@ class _DrawerFileState extends State<DrawerFile> {
       setState(() {
         profileListModal = value;
       });
+    });
+    orgId = await shared!.getOrgId();
+    print("Org Id Check - $orgId");
+    setState(() {
+
     });
   }
 
@@ -2819,18 +2827,21 @@ class _DrawerFileState extends State<DrawerFile> {
                   );
                 },
               ),
-              ListTile(
-                leading: Icon(Icons.policy, color: Mythemes.black),
-                title: Text(
-                  'Company Policies',
-                  style: TextStyle(color: Mythemes.black),
+              Visibility(
+                visible: orgId == 179 || orgId == 186 || orgId == 145,
+                child: ListTile(
+                  leading: Icon(Icons.policy, color: Mythemes.black),
+                  title: Text(
+                    'Company Policies',
+                    style: TextStyle(color: Mythemes.black),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CompanyPoliciesPage()),
+                    );
+                  },
                 ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CompanyPoliciesPage()),
-                  );
-                },
               ),
             ],
           ).py32(),

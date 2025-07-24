@@ -313,36 +313,14 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                     onPressed: () async {
                       final totalAmount = double.tryParse(amountController.text) ?? 0.0;
                       final totalInstallments = int.tryParse(installmentController.text) ?? 1;
-                      final employeeName = "Bharat Rajora (EMP-1024)";
+                      //final employeeName = "Bharat Rajora (EMP-1024)";
 
                       if (startDate != null && totalAmount > 0 && totalInstallments > 0) {
-                        setState(() {
+                        /*setState(() {
                           isLoading = true;
-                        });
-
-                        // Simulate delay (e.g., API call)
-                        await Future.delayed(Duration(seconds: 2));
-
-                        final monthlyAmount = (totalAmount / totalInstallments).toStringAsFixed(2);
-
-                        List<Map<String, String>> generatedList = [];
-
-                        for (int i = 0; i < totalInstallments; i++) {
-                          final installmentDate = DateTime(startDate!.year, startDate!.month + i, startDate!.day);
-                          generatedList.add({
-                            "employee": employeeName,
-                            "months": DateFormat('MMMM yyyy').format(installmentDate),
-                            "amount": monthlyAmount,
-                            "date": DateFormat('MMM dd, yyyy').format(installmentDate),
-                            "status": "Pending"
-                          });
-                        }
+                        });*/
                         sendLoanRequest(context);
-                        setState(() {
-                          breakupList = generatedList;
-                          isLoading = false;
-                          isFormExpanded = false; // Collapse form
-                        });
+
                       } else {
                         // Optionally show error if fields are missing
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -467,6 +445,32 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
 
         if (result.compareToIgnoringCase("Success") == 0) {
           showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          final totalAmount = double.tryParse(amountController.text) ?? 0.0;
+          final totalInstallments = int.tryParse(installmentController.text) ?? 1;
+
+          // Simulate delay (e.g., API call)
+          await Future.delayed(Duration(seconds: 2));
+
+          final monthlyAmount = (totalAmount / totalInstallments).toStringAsFixed(2);
+
+          List<Map<String, String>> generatedList = [];
+
+          for (int i = 0; i < totalInstallments; i++) {
+            final installmentDate = DateTime(startDate!.year, startDate!.month + i, startDate!.day);
+            generatedList.add({
+              "employee": employeeName.toString(),
+              "months": DateFormat('MMMM yyyy').format(installmentDate),
+              "amount": monthlyAmount,
+              "date": DateFormat('MMM dd, yyyy').format(installmentDate),
+              "status": "Pending"
+            });
+          }
+
+          setState(() {
+            breakupList = generatedList;
+            isLoading = false;
+            isFormExpanded = false; // Collapse form
+          });
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
@@ -501,7 +505,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
               onPressed: () {
                 if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
                   Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
-                  Navigator.of(buildContext).maybePop();
+                  //Navigator.of(buildContext).maybePop();
                 } else {
                   print("⚠️ Warning: No route to close.");
                 }

@@ -1,15 +1,53 @@
+import 'dart:convert';
+import 'package:er_flutter_project/modules/claimAndReimbursement/mss/claimMssApprovalPage.dart';
+import 'package:velocity_x/velocity_x.dart';
+import 'package:er_flutter_project/ess/loan&Advance/modalClass/loanWiseSkipModal.dart';
 import 'package:flutter/material.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import '../../commanScreen/allAPIList.dart';
+import '../../commanScreen/commanNotificationPage.dart';
+import '../../sharedPrefancePage/ShardPre.dart';
 import '../../themes/empThemes.dart';
+import 'modalClass/loanLedgerModal.dart';
+import 'modalClass/loanSummaryModal.dart';
 
 class LoanSummaryPage extends StatefulWidget {
   @override
   State<LoanSummaryPage> createState() => _LoanSummaryPageState();
 }
 
+Map<String, dynamic> mapResponse = {};
+Map<String, dynamic> mapResponseLoanLedger = {};
+Map<String, dynamic> mapResponseLoanWiseSkip = {};
+
+SessionManager shared = SessionManager();
+
+String? sessionId;
+
 class _LoanSummaryPageState extends State<LoanSummaryPage> {
   bool _isFirstBuild = true;
   bool _isBottomSheetOpen = false;
+  bool isLoading = false;
+  bool isLoadingCount = true;
+
+  List<LoanSummary>? allUsernew=[];
+  List<LoanSummary>? foundDataNew=[];
+  List<EmpList>? loanLedgerNew=[];
+  List<EmpList>? foundLoanLedgerData=[];
+
+  List<Loandata>? loanWiseSkipNew=[];
+  List<Loandata>? foundLoanWiseSkipData=[];
+
+  LoanSummaryModal? myLoanSummaryLabel;
+  LoanSummaryModal? myLoanSummaryLabeled;
+
+  LoanLedgerModal? loanLedgerLabel;
+  LoanLedgerModal? loanLedgerLabeled;
+
+  LoanWiseSkipModal? loanWiseSkipLabel;
+  LoanWiseSkipModal? loanWiseSkipLabeled;
+
 
   final List<Map<String, dynamic>> loanSummaries = [
     {
@@ -75,6 +113,206 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
     },
   ];
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => getSharedPrfanceList());
+
+    setState(() {
+      getSharedPrfanceList();
+      var listLength;
+      var loanLedgerList;
+      listLength = foundDataNew!.length;
+      loanLedgerList = foundLoanLedgerData!.length;
+      print('listLength $listLength');
+      print('loanLedgerList $loanLedgerList');
+    });
+  }
+
+  Future getSharedPrfanceList() async {
+    sessionId = await shared!.getSessionId();
+    // await Future.delayed(Duration(seconds: 5));
+    Future<LoanSummaryModal> getEmployeeList11 = getLoanSummary(sessionId!);
+    final loading = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        CircularProgressIndicator(),
+        Text(" Login ... Please wait")
+      ],
+    );
+
+    getEmployeeList11.then((value) {
+      setState(() {
+        foundDataNew = allUsernew;
+        myLoanSummaryLabel=value;
+        myLoanSummaryLabeled=myLoanSummaryLabel;
+      });
+    });
+
+
+
+  }
+
+  showNodata(BuildContext buildContext, result,reason) {
+    var alertDialog = AlertDialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0),
+          )
+      ),
+      title: Row(
+        children: [
+          //Icon(Icons.warning),
+          Text(result),
+        ],
+      ),
+      content: Text(reason),
+      titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            Navigator.pop(buildContext);
+            setState(() {
+
+            });
+          },
+          child: Text("Ok"),
+        )
+      ],
+      elevation: 24.0,
+    );
+    showDialog(
+        context:buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        });
+  }
+
+  Future<LoanSummaryModal> getLoanSummary(String SessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.loanSummaryApi;
+    print('employeeList11: ${SessionId}');
+    LoanSummaryModal loanSummaryModal;
+    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    final response = await http.post(urlapi);
+
+    print('responseemployeeList ${response.body}');
+    setState(() {
+      isLoadingCount = true;
+    });
+    print('URL ${response.request}');
+    mapResponse = json.decode(response.body);
+    print('responseemployeeList $mapResponse');
+    var getData = mapResponse.length;
+    if (getData == 0 )  {
+      print("getData111 $getData");
+      showNodata(context, "Oops", "There is no any requisition.");
+    }
+    loanSummaryModal = LoanSummaryModal.fromJson(mapResponse);
+    allUsernew = loanSummaryModal.loanSummary;
+    /* for (int i = 0; i < claimRequisitionModal.claimRequisitionPendinglist!.length; i++) {
+      empName = mapResponse['claimRequisitionPendinglist'][i]['empName'];
+      print("EMP NAME - $empName");
+    }*/
+    // globalListParameter = claimRequisitionModal.claimRequisitionApprovedlist;
+    //totalDraftAmt = selfLoanRequestModal.totaDraftAmount;
+
+    /*if(valueChange == 3) {
+      allUsernewDisapproved = claimRequisitionModal.claimRequisitionDisapprovelist!;
+    }*/
+    setState(() {
+      isLoadingCount = false;
+    });
+
+    print("Pending List -  ${foundDataNew!.length.toString()}");
+    _expandedTiles = List.generate(foundDataNew!.length, (index) => index == 0);
+
+    return loanSummaryModal;
+  }
+
+  var openingCreditBalance;
+  var currentCreditBalance;
+  var currentDebitBalance;
+  var netCreditBalance;
+  var netDebitBalance;
+
+  Future<LoanLedgerModal> getLoanLedger(String SessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.loanLedgerApi;
+    print('employeeList11: ${SessionId}');
+    LoanLedgerModal loanLedgerModal;
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "loanId=$loanId");
+    final response = await http.post(urlapi);
+
+    print('responseemployeeList ${response.body}');
+    setState(() {
+      isLoadingCount = true;
+    });
+    print('URL ${response.request}');
+    mapResponseLoanLedger = json.decode(response.body);
+    print('responseemployeeList $mapResponseLoanLedger');
+    var getData = mapResponseLoanLedger.length;
+    if (getData == 0 )  {
+      print("getData111 $getData");
+      showNodata(context, "Oops", "There is no any requisition.");
+    }
+    loanLedgerModal = LoanLedgerModal.fromJson(mapResponseLoanLedger);
+    loanLedgerNew = loanLedgerModal.empList;
+    openingCreditBalance = loanLedgerModal.openingCreditBal;
+    currentCreditBalance = loanLedgerModal.currentCreditBal;
+    currentDebitBalance = loanLedgerModal.currentDebitBal;
+    netCreditBalance = loanLedgerModal.netCreditBal;
+    netDebitBalance = loanLedgerModal.netDebitBal;
+
+    setState(() {
+      isLoadingCount = false;
+    });
+
+    print("Loan Ledger List -  ${foundLoanLedgerData!.length.toString()}");
+
+    return loanLedgerModal;
+  }
+
+  Future<LoanWiseSkipModal> getLoanSkipList(String SessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.loanSkipListApi;
+    print('employeeList11: ${SessionId}');
+    LoanWiseSkipModal loanWiseSkipModal;
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "groupId=$loanId");
+    final response = await http.post(urlapi);
+
+    print('responseemployeeList ${response.body}');
+    setState(() {
+      isLoadingCount = true;
+    });
+    print('URL ${response.request}');
+    mapResponseLoanWiseSkip = json.decode(response.body);
+    print('responseemployeeList $mapResponseLoanWiseSkip');
+    var getData = mapResponseLoanWiseSkip.length;
+    if (getData == 0 )  {
+      print("getData111 $getData");
+      showNodata(context, "Oops", "There is no any requisition.");
+    }
+    loanWiseSkipModal = LoanWiseSkipModal.fromJson(mapResponseLoanWiseSkip);
+    loanWiseSkipNew = loanWiseSkipModal.loandata;
+
+
+    setState(() {
+      isLoadingCount = false;
+    });
+
+    print("Loan Wise Skip List -  ${foundLoanWiseSkipData!.length.toString()}");
+
+    return loanWiseSkipModal;
+  }
+
   Widget infoRow(IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -89,112 +327,88 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
     );
   }
 
-  void _showFilterBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      isDismissible: true, // <--- Make sure this is true
-      enableDrag: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext bottomSheetContext) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.6,
-            padding: EdgeInsets.all(16),
-            child: StatefulBuilder(
-              builder: (context, setModalState) {
-                return SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min, // allow shrink
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 40,
-                          height: 4,
-                          margin: EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        'Loan 1',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 16),
 
-                      /// 🛠 Make this scrollable within the scroll view
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(), // No nested scroll
-                        itemCount: breakupList.length,
-                        itemBuilder: (context, index) {
-                          final item = breakupList[index];
-                          return InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                              showSkipInstallmentPopup(context);
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              elevation: 3,
-                              margin: const EdgeInsets.only(bottom: 16),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(item['employee']!, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: item['status'] == 'Approved' ? Colors.green.shade100 : Colors.orange.shade100,
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: Text(
-                                            item['status']!,
-                                            style: TextStyle(
-                                              color: item['status'] == 'Approved' ? Colors.green.shade800 : Colors.orange.shade800,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    infoRow(Icons.calendar_today, "Installment Months", item['months']!),
-                                    infoRow(Icons.payments, "Installment Amount", "₹ ${item['amount']}"),
-                                    infoRow(Icons.date_range, "Disbursement Date", item['date']!),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+  Future<void> requestSkipInstalment(BuildContext context) async {
+    // ✅ Proceed with the API call if both checks pass
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.requestSkipInstalmentApi;
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse("$conn$apiUrl");
+    var request = http.MultipartRequest("POST", urlapi);
+
+    // Add static fields
+    request.fields['sessionId'] = sessionId!;
+    request.fields['skipMonth'] = skipMonth;
+    request.fields['remarks'] = reasonController.text;
+    request.fields['monthlyLoanId'] = loanId.toString();
+    request.fields['effectiveDate'] = dateController.text;
+
+
+    try {
+      http.StreamedResponse response = await request.send();
+      http.Response httpResponse = await http.Response.fromStream(response);
+      print('URL: ${httpResponse.request}');
+      print('Status Code: ${httpResponse.statusCode}');
+      print('Response: ${httpResponse.body}');
+
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (httpResponse.statusCode == 200) {
+        var mapResponse = json.decode(httpResponse.body);
+        String reason = mapResponse['reason'];
+        String result = mapResponse['result'];
+
+        if (result.compareToIgnoringCase("Success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (result.compareToIgnoringCase("Error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, "Error");
+        }
+      }
+    } catch (e) {
+      print('❌ Exception during API call: $e');
+    }
+  }
+
+  static showDialgSucess(BuildContext buildContext, String result, String alert) {
+    if (buildContext == null) {
+      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      return;
+    }
+
+    showDialog(
+      context: buildContext,
+      barrierDismissible: false, // Prevents accidental dismiss
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
+          title: Row(
+            children: [
+              Expanded(child: Text(alert)),
+            ],
+          ),
+          content: Text(result),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
+                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                  Navigator.of(buildContext).maybePop();
+                } else {
+                  print("⚠️ Warning: No route to close.");
+                }
+              },
+              child: Text("Ok"),
+            ),
+          ],
+          elevation: 24.0,
         );
       },
-    ).whenComplete(() {
-      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
-    });
+    );
   }
+
+  List<bool> _expandedTiles = [];
 
   void showConfirmationPopup(BuildContext context) {
     showDialog(
@@ -232,9 +446,9 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
       },
     );
   }
-
+  final TextEditingController reasonController = TextEditingController();
   void showSkipInstallmentPopup(BuildContext context) {
-    final TextEditingController reasonController = TextEditingController();
+
     DateTime? selectedRepaymentDate;
 
     showDialog(
@@ -257,33 +471,37 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                       customReadOnlyInput(
                         icon: Icons.menu,
                         label: "Loan Type",
-                        controller: TextEditingController(text: "Home Loan"),
-                        value: "Home Loan",
+                        controller: TextEditingController(text: "$loanType"),
+                        value: "$loanType",
                       ),
                       const SizedBox(height: 12),
                       customReadOnlyInput(
                         icon: Icons.calendar_today,
                         label: "Skip Month",
-                        value: "June 2025",
-                        controller: TextEditingController(text: "June 2025"),
+                        value: "$skipMonth",
+                        controller: TextEditingController(text: "$skipMonth"),
                       ),
                       const SizedBox(height: 12),
-                      customDatePicker(
-                        icon: Icons.event,
-                        label: "Repayment Date",
-                        selectedDate: selectedRepaymentDate,
-                        onTap: () async {
-                          DateTime? picked = await showDatePicker(
-                            context: dialogCtx, // 👈 safe context
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2023),
-                            lastDate: DateTime(2030),
-                          );
-                          if (picked != null) {
-                            selectedRepaymentDate = picked;
-                          }
-                        },
-                      ),
+                    customDatePicker(
+                      icon: Icons.calendar_today,
+                      label: 'Start Date',
+                      selectedDate: selectedDate,
+                      controller: dateController,
+                      onTap: () async {
+                        DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate ?? DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            selectedDate = picked;
+                            dateController.text = "${picked.day}/${picked.month}/${picked.year}";
+                          });
+                        }
+                      },
+                    ),
                       const SizedBox(height: 12),
                       customTextField(
                         icon: Icons.comment,
@@ -296,9 +514,7 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.of(dialogCtx).pop(); // ✅ safely close popup
-                            Future.delayed(const Duration(milliseconds: 100), () {
-                              showConfirmationPopup(dialogCtx); // ✅ reuses valid context
-                            });
+                            requestSkipInstalment(context);
                           },
                           icon: const Icon(Icons.send, size: 16),
                           label: const Text("Request"),
@@ -349,28 +565,384 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
       ),
     );
   }
+  TextEditingController dateController = TextEditingController();
+  DateTime? selectedDate;
 
   Widget customDatePicker({
     required IconData icon,
     required String label,
     required DateTime? selectedDate,
     required VoidCallback onTap,
+    required TextEditingController controller, // Added controller
   }) {
+    controller.text = selectedDate != null
+        ? "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}"
+        : '';
+
     return TextField(
       readOnly: true,
+      controller: controller, // Use the controller
       onTap: onTap,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
-        hintText: selectedDate != null
-            ? "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}"
-            : "Select date",
+        hintText: "Select date",
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        //filled: true,
-        //fillColor: Colors.grey.shade100,
       ),
     );
   }
+var loanId;
+var loanType;
+var skipMonth;
+
+  void _showFilterBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true, // <--- Make sure this is true
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+
+    builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.85,
+        maxChildSize: 0.95,
+        minChildSize: 0.6,
+        builder: (_, controller) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.6,
+              padding: EdgeInsets.all(16),
+              child: StatefulBuilder(
+                builder: (context, setModalState) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min, // allow shrink
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            margin: EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '$loanType',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'Click to skip instalment',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                        ),
+                        SizedBox(height: 16),
+
+                        /// 🛠 Make this scrollable within the scroll view
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(), // No nested scroll
+                          itemCount: foundLoanWiseSkipData!.length,
+                          itemBuilder: (context, index) {
+                            final item = foundLoanWiseSkipData![index];
+                            return InkWell(
+                              onTap: () {
+                                if(item.status == "Paid" ) {
+                                  Fluttertoast.showToast(
+                                      msg: "This instalment is already paid !!",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.black,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                }
+                                if (item.skipStatus == "Request") {
+                                  Fluttertoast.showToast(
+                                      msg: "This instalment is already requested !!",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.black,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0
+                                  );
+                                }
+                                else {
+                                  loanId = item.ledgerId;
+                                  skipMonth = item.monthName;
+                                  dateController.text = "";
+                                  remarksController.text = "";
+                                  showSkipInstallmentPopup(context);
+                                }
+
+                              },
+                              child: Card(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                elevation: 3,
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(item.empName!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: item.status == 'Paid' ? Colors.green.shade100 : Colors.orange.shade100,
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Text(
+                                              item.status!,
+                                              style: TextStyle(
+                                                color: item.status == 'Paid' ? Colors.green.shade800 : Colors.orange.shade800,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      infoRow(Icons.calendar_today, "Installment Months", item.monthName!),
+                                      infoRow(Icons.payments, "Installment Amount", "₹ ${item.monthlyAmt}"),
+                                      infoRow(Icons.verified_user_outlined, "Requested Status", "${item.skipStatus}"),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        }
+    ),
+    ).whenComplete(() {
+      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+    });
+  }
+
+  void showTransactionBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.85,
+        maxChildSize: 0.95,
+        minChildSize: 0.6,
+        builder: (_, controller) {
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+
+                // Opening Balance
+                Text(
+                  'Opening Balance',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '₹ $openingCreditBalance',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Scrollable Transaction List
+                Expanded(
+                  child: ListView.builder(
+                    controller: controller,
+                    itemCount: foundLoanLedgerData!.length,
+                    itemBuilder: (_, index) {
+                      final item = foundLoanLedgerData![index];
+                      final isCredit = item.eventType == "Credit";
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.eventName,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.loanType,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                    Text(
+                                      'Date: ${item.date}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[500],
+                                      ),
+                                    ),
+                                    Text(
+                                      '${item.eventDesc}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[500],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  isCredit
+                                      ? '+ ₹ ${item.creditValue}'
+                                      : '- ₹ ${item.debitValue}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: isCredit ? Colors.green : Colors.orange,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Divider(height: 20),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                // Fixed Bottom Balance Summary
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  decoration: BoxDecoration(
+                    //border: Border(top: BorderSide(color: Colors.grey[300]!)),
+                    color: Colors.transparent,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Divider(),
+                      Text(
+                        'Summary',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Total Credit:',
+                              style: TextStyle(color: Colors.black)),
+                          Text('₹ $currentCreditBalance',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green)),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Total Debit:',
+                              style: TextStyle(color: Colors.black)),
+                          Text('₹ $currentDebitBalance',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Mythemes.dangerColor)),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Net Balance:',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text(
+                            '₹ $netCreditBalance',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Mythemes.successColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  final List<Map<String, dynamic>> getColor = [
+    {
+      "color": Mythemes.deepPurple,
+    },
+    {
+      "color": Mythemes.successColor,
+    },
+    {
+      "color": Mythemes.lightBluishColor,
+    },
+    {
+      "color": Mythemes.dangerColor,
+    },
+  ];
+
+  var isFirstExpended;
 
   @override
   Widget build(BuildContext context) {
@@ -384,45 +956,52 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
           Expanded(child:
           ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: loanSummaries.length,
+            itemCount: foundDataNew!.length,
             itemBuilder: (context, index) {
-              final loan = loanSummaries[index];
+              //final loan = foundDataNew![index];
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
                 elevation: 3,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: ExpansionTile(
+                  key: Key(index.toString()),
                   shape: Border.all(color: Colors.transparent),
+                  initiallyExpanded: _expandedTiles[index],
+                  onExpansionChanged: (bool expanded) {
+                    setState(() {
+                      _expandedTiles[index] = expanded;
+                    });
+                  },
                   title: Text(
-                    loan["loanType"],
+                    foundDataNew![index].loanType.toString(),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color:  loan["color"],
+                      color:  getColor[index]['color']
                     ),
                   ),
                   children: [
                     buildSummaryRow(
                       label: "Loan Applied For",
-                      value: "₹ ${loan["appliedAmount"]}",
+                      value: "₹ ${foundDataNew![index].loanAppliedFor.toString()}",
                       color: Colors.blue,
                       isAmount: true,
                     ),
                     buildSummaryRow(
                       label: "Loan Paid Up",
-                      value: "₹ ${loan["paidAmount"]}",
+                      value: "₹ ${foundDataNew![index].loanPaidUp.toString()}",
                       color: Colors.green,
                       isAmount: true,
                     ),
                     buildSummaryRow(
                       label: "Pending Installments",
-                      value: "${loan["pendingInstallments"]}",
+                      value: foundDataNew![index].pendingInstallments.toString(),
                       color: Colors.orange,
                       isAmount: false,
                     ),
                     buildSummaryRow(
                       label: "Pending Amount",
-                      value: "₹ ${loan["pendingAmount"]}",
+                      value: "₹ ${foundDataNew![index].totalPendingAmt.toString()}",
                       color: Colors.red,
                       isAmount: true,
                     ),
@@ -430,6 +1009,38 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                       label: "View Loan Ledger",
                       valueWidget: Icon(Icons.remove_red_eye, color: Colors.lightBlue, size: 24),
                       onTap: () {
+                        loanId =  foundDataNew![index].loanReqId.toString();
+                       print("Loan Id - $loanId");
+                        Future<LoanLedgerModal> getEmployeeList11 = getLoanLedger(sessionId!);
+                        final loading = Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            CircularProgressIndicator(),
+                            Text(" Login ... Please wait")
+                          ],
+                        );
+
+                        getEmployeeList11.then((value) {
+                          setState(() {
+                            foundLoanLedgerData = loanLedgerNew;
+                            loanLedgerLabel=value;
+                            loanLedgerLabeled=loanLedgerLabel;
+                            if(foundLoanLedgerData!.isNotEmpty) {
+                              showTransactionBottomSheet(context);
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg: "There is no ledger available !!",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.black,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0
+                              );
+                            }
+
+                          });
+                        });
                         // Handle navigation to loan ledger
                       },
                     ),
@@ -437,7 +1048,40 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                       alignment: Alignment.centerRight,
                       child: TextButton.icon(
                         onPressed: () {
-                          _showFilterBottomSheet();
+                          loanId =  foundDataNew![index].loanReqId.toString();
+                          loanType =  foundDataNew![index].loanType.toString();
+                          print("Loan Id - $loanId");
+                          print("Loan Type - $loanType");
+                          Future<LoanWiseSkipModal> getEmployeeList11 = getLoanSkipList(sessionId!);
+                          final loading = Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              CircularProgressIndicator(),
+                              Text(" Login ... Please wait")
+                            ],
+                          );
+
+                          getEmployeeList11.then((value) {
+                            setState(() {
+                              foundLoanWiseSkipData = loanWiseSkipNew;
+                              loanWiseSkipLabel=value;
+                              loanWiseSkipLabeled=loanWiseSkipLabel;
+                              if(foundLoanWiseSkipData!.isNotEmpty) {
+                                _showFilterBottomSheet(context);
+                              } else {
+                                Fluttertoast.showToast(
+                                    msg: "There is no instalment skip available !!",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
+                              }
+
+                            });
+                          });
                         },
                         icon: const Icon(Icons.history, size: 18),
                         label: const Text("Skip Request"),

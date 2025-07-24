@@ -339,7 +339,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
       }
 
       //My Loan Summary
-      if(orgId == 3 || orgId == 145){
+      if(orgId == 3 || orgId == 145 || orgId == 179 || orgId == 186){
         items.add(
           Hero(
             tag: 'myLoanSummary',

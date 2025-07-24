@@ -461,7 +461,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
       }
 
       //My Loan Requests
-      if(orgId == 3 || orgId == 145) {
+      if(orgId == 3 || orgId == 145 || orgId == 179 || orgId == 186) {
           items.add(
             Hero(
               tag: 'raiseLoan',

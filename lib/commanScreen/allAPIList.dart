@@ -203,6 +203,10 @@ class ApiDetails{
    static var essLoanListApi = "restful/service/self/org/loans/list";
    static var loanTypeMasterApi = "restful/service/loan/and/advance/master/list";
    static var loanRequestRaiseApi = "restful/service/org/loan/and/advance/request/data/request/save";
+   static var loanSummaryApi = "restful/service/get/self/loan/summary";
+   static var loanLedgerApi = "restful/service/get/employee/updated/loan/ledger/debit/credit/list";
+   static var loanSkipListApi = "restful/service/get/employee/loan/ledger/details";
+   static var requestSkipInstalmentApi = "restful/service/employee/loan/skip/emp/request";
 
    //Company Policy API
    static var companyPolicyApi = "restful/service/policy/details/list";
