@@ -5,6 +5,7 @@ import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:er_flutter_project/ess/essDashboardNavigate.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/travelExpenseRequestRaise.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/updateRaisedClaim.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
@@ -21,7 +22,11 @@ import '../../../commanScreen/routes.dart';
 import '../../../main.dart';
 import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
-import '../../modules/claimAndReimbursement/newModalClasses/selfClaimRequisitionListModal.dart';
+import '../../commanScreen/commanNotificationPage.dart';
+import '../../ess/loan&Advance/myLoanRequestRaisePage.dart';
+import '../../ess/loan&Advance/myLoanRequestUpdate.dart';
+import 'modalClass/mssLoanListModal.dart';
+
 
 
 class PendingLoanRequestList extends StatefulWidget {
@@ -37,17 +42,13 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<DataNew>? allUsernew=[];
-List<DataNew>? foundDataNew=[];
-List<ClaimRequisitionDraftlist>? allUsernewDraft=[];
-List pendingData =[];
-List<ClaimRequisitionPendinglist>? allUsernewPending=[];
-List<ClaimRequisitionApprovedlist>? allUsernewApproved=[];
-List<ClaimRequisitionDisapprovelist>? allUsernewDisapproved=[];
-List<ClaimRequisitionDraftlist>? foundDataNewDraft=[];
-List<ClaimRequisitionPendinglist>? foundDataNewPending=[];
-List<ClaimRequisitionApprovedlist>? foundDataNewApproved=[];
-List<ClaimRequisitionDisapprovelist>? foundDataNewDisapproved=[];
+dynamic userPanel;
+dynamic getProfileId;
+
+List<LoanRequiDataforOthers>? allUsernew=[];
+List<LoanRequiDataforOthers>? foundDataNew=[];
+
+
 String? empName = "";
 String? status = "";
 String? reimbName = "";
@@ -55,41 +56,33 @@ String? raisedOn = "";
 String? catName = "";
 dynamic claimedAmt = "";
 dynamic approvedAmount = "";
-ClaimRequisitionModal? claimRequisitionLabel;
-ClaimRequisitionModal? claimRequisitionLabeled;
-String reimbursementType = "";
-String reimbursementTypeId = "";
-String expCategory = "";
-String expCategoryIdNew = "";
-String subExpCategory = "";
-String subExpCategoryIdNew = "";
-String travelFrom = "";
-String travelTo = "";
-String odometerStart = "";
-String odometerEnd = "";
-String merchant = "";
-String kilometers = "";
-String month = "";
-String claimDate = "";
-String claimedAmount = "";
-String remarks = "";
-String documents = "";
-String claimIdChecking = "";
+MSSLoanListModal? mssLoanListLabel;
+MSSLoanListModal? mssLoanListLabeled;
+
 dynamic totalDraftAmt;
-dynamic totalSubmitAmt;
+dynamic totalDisapprovedAmt;
 dynamic totalApprovedAmt;
 dynamic totalPendingAmt;
 
+dynamic deptName;
+dynamic branchName;
+dynamic loanType;
+dynamic loanAmount;
+dynamic loanStartDate;
+dynamic instalments;
+dynamic loanIdSend;
+
+dynamic statusCheck;
 
 var draftShow=true;
 var pendingShow=false;
 var approveShow=false;
 var disApproveShow=false;
 
-bool isLoading = false;
+bool isLoading = true;
 bool isLoadingCount = true;
-var loanStatus = "Pending";
-late ClaimRequisitionModal globalListParameter;
+
+
 class _PendingLoanRequestListState extends State<PendingLoanRequestList> with RouteAware{
   late ScrollController _controller;
 
@@ -134,8 +127,11 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<ClaimRequisitionModal> getEmployeeList11 = getSelfReqList(sessionId!);
+    Future<MSSLoanListModal> getEmployeeList11 = getMSSLoanList(sessionId!);
+    isLoading = true;
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -146,24 +142,14 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
 
     getEmployeeList11.then((value) {
       setState(() {
-        if(valueChange == 0) {
-          foundDataNewPending = allUsernewPending;
-        } if(valueChange == 1) {
-          foundDataNewApproved = allUsernewApproved;
-        } if(valueChange == 2) {
-          foundDataNewDisapproved = allUsernewDisapproved;
-        }
-        /*if(valueChange == 3) {
-          foundDataNewDisapproved = allUsernewDisapproved;
-        }*/
 
-        claimRequisitionLabel=value;
-        claimRequisitionLabeled=claimRequisitionLabel;
+        foundDataNew = allUsernew;
+        mssLoanListLabel=value;
+        mssLoanListLabeled=mssLoanListLabel;
+        isLoading = false;
+        print('MSS LOAN LIST - ${foundDataNew!.length}');
+
       });
-      print('Draft LIST - ${claimRequisitionLabel!.claimRequisitionDraftlist!.length}');
-      print('Pending LIST - ${claimRequisitionLabel!.claimRequisitionPendinglist!.length}');
-      print('Approved LIST - ${claimRequisitionLabel!.claimRequisitionApprovedlist!.length}');
-      print('Disapproved LIST - ${claimRequisitionLabel!.claimRequisitionDisapprovelist!.length}');
     });
 
 
@@ -207,17 +193,22 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
   }
 
 
-  Future<ClaimRequisitionModal> getSelfReqList(String SessionId) async {
+  Future<MSSLoanListModal> getMSSLoanList(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.selfClaimRequestListApi;
+    String apiUrl = ApiDetails.mssLoanListApi;
     print('employeeList11: ${SessionId}');
-    ClaimRequisitionModal claimRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    MSSLoanListModal mssLoanListModal;
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "status=$statusChange&"
+        "permission=$userPanel&"
+        "profId=$getProfileId");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
+      isLoading = true;
     });
     print('URL ${response.request}');
     mapResponse = json.decode(response.body);
@@ -227,41 +218,96 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
+    mssLoanListModal = MSSLoanListModal.fromJson(mapResponse);
+
+      allUsernew = mssLoanListModal.loanRequiDataforOthers;
 
 
-
-
-    claimRequisitionModal = ClaimRequisitionModal.fromJson(mapResponse);
-    /* for (int i = 0; i < claimRequisitionModal.claimRequisitionPendinglist!.length; i++) {
-      empName = mapResponse['claimRequisitionPendinglist'][i]['empName'];
-      print("EMP NAME - $empName");
-    }*/
-    // globalListParameter = claimRequisitionModal.claimRequisitionApprovedlist;
-    totalDraftAmt = claimRequisitionModal.totaDraftAmount;
-    totalSubmitAmt = claimRequisitionModal.submittedValue;
-    totalApprovedAmt = claimRequisitionModal.approvedValue;
-    totalPendingAmt = claimRequisitionModal.pendingAmount;
-    if(valueChange ==0) {
-      allUsernewPending = claimRequisitionModal.claimRequisitionPendinglist!;
-    }
-    if(valueChange == 1) {
-      allUsernewApproved = claimRequisitionModal.claimRequisitionApprovedlist!;
-    }
-    if(valueChange == 2) {
-
-      allUsernewDisapproved = claimRequisitionModal.claimRequisitionDisapprovelist!;
-    }
-    /*if(valueChange == 3) {
-      allUsernewDisapproved = claimRequisitionModal.claimRequisitionDisapprovelist!;
-    }*/
     setState(() {
       isLoadingCount = false;
+      isLoading = false;
     });
 
-    print("Pending List -  ${pendingData.length.toString()}");
+
+    return mssLoanListModal;
+  }
 
 
-    return claimRequisitionModal;
+  Future<void> deleteLoanRequest(BuildContext context) async {
+    // ✅ Proceed with the API call if both checks pass
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.loanRequestDeleteApi;
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse("$conn$apiUrl");
+    var request = http.MultipartRequest("POST", urlapi);
+
+    // Add static fields
+    request.fields['sessionId'] = sessionId!;
+    request.fields['loanReqId'] = loanIdSend.toString();
+
+    try {
+      http.StreamedResponse response = await request.send();
+      http.Response httpResponse = await http.Response.fromStream(response);
+      print('URL: ${httpResponse.request}');
+      print('Status Code: ${httpResponse.statusCode}');
+      print('Response: ${httpResponse.body}');
+
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (httpResponse.statusCode == 200) {
+        var mapResponse = json.decode(httpResponse.body);
+        String reason = mapResponse['reason'];
+        String result = mapResponse['result'];
+
+        if (result.compareToIgnoringCase("Success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (result.compareToIgnoringCase("Error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, "Error");
+        }
+      }
+    } catch (e) {
+      print('❌ Exception during API call: $e');
+    }
+  }
+
+  showDialgSucess(BuildContext buildContext, String result, String alert) {
+    if (buildContext == null) {
+      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      return;
+    }
+
+    showDialog(
+      context: buildContext,
+      barrierDismissible: false, // Prevents accidental dismiss
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+          title: Row(
+            children: [
+              Expanded(child: Text(alert)),
+            ],
+          ),
+          content: Text(result),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
+                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                  getSharedPrfanceList();
+                  //Navigator.of(buildContext).maybePop();
+                } else {
+                  print("⚠️ Warning: No route to close.");
+                }
+              },
+              child: Text("Ok"),
+            ),
+          ],
+          elevation: 24.0,
+        );
+      },
+    );
   }
 
   dynamic levelOnePendingStatus = false;
@@ -270,8 +316,9 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
   dynamic levelFourPendingStatus = false;
   dynamic levelFivePendingStatus = false;
 
+  var statusChange = "LEVEL_ONE_PENDING";
   int valueChange = 0;
-  var titleName="$loanStatus Loan Requisitions";
+  var titleName="Pending Loan Requisitions";
   TextEditingController searchType = TextEditingController();
   int currentIndex = 2;
   @override
@@ -314,6 +361,17 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
         ),
       ),
 
+      floatingActionButton: FloatingActionButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30), // Ensures circular shape
+        ),
+        mini: false,
+        onPressed: () async {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoanRequestPage()));
+        },
+        backgroundColor: Mythemes.lightBluishColor,
+        child: Icon(Icons.add, color: Mythemes.whitish,),
+      ),
 
       bottomNavigationBar:
       BottomNavigationBar (
@@ -394,84 +452,8 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
               padding: EdgeInsets.all(6.0),
-              crossAxisCount: 4,
+              crossAxisCount: 3,
               children: <Widget>[
-                Hero(
-                  tag: 'nrCount',
-                  child: Card(
-                    color: Mythemes.alertColor,
-                    child: InkWell(
-                      onTap: () {
-                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-
-                          Center(
-                            child: isLoadingCount
-                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                :"₹$totalDraftAmt".text.bold.color(Mythemes.whitish).size(16).make(),
-                          ),
-                          Center(
-                            child: Container(
-                              //margin: EdgeInsets.only(top: 30, left: 10),
-                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 5),
-                              child: Text(
-                                'Draft',
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style:
-                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Hero(
-                  tag: 'WR',
-                  child: Card(
-                    color: Mythemes.lightBluishColor,
-                    child: InkWell(
-                      onTap: () {
-                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-
-                          Center(
-                            child: isLoadingCount
-                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                :"₹$totalSubmitAmt".text.bold.color(Mythemes.whitish).size(16).make(),
-                          ),
-                          Center(
-                            child: Container(
-                              //margin: EdgeInsets.only(top: 70, left: 10),
-                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                              child: Text(
-                                'Submit',
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style:
-                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
                 Hero(
                   tag: 'AP',
                   child: Card(
@@ -546,6 +528,46 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
                     ),
                   ),
                 ),
+                Hero(
+                  tag: 'WR',
+                  child: Card(
+                    color: Mythemes.dangerColor,
+                    child: InkWell(
+                      onTap: () {
+                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+
+                          Center(
+                            child: isLoadingCount
+                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
+                                :"₹$totalDisapprovedAmt".text.bold.color(Mythemes.whitish).size(16).make(),
+                          ),
+                          Center(
+                            child: Container(
+                              //margin: EdgeInsets.only(top: 70, left: 10),
+                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                              child: Text(
+                                'Disapproved',
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style:
+                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+
 
               ],
             ),
@@ -555,7 +577,7 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
               children: [
                 AnimatedToggleSwitch<int>.size(
                   height: 30,
-                  current: min(valueChange, 3),
+                  current: min(valueChange, 5),
                   style: ToggleStyle(
                     backgroundColor: Mythemes.greyishade,
                     indicatorColor: Mythemes.lightBluishColor,
@@ -563,10 +585,10 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
                     borderRadius: BorderRadius.circular(10.0),
                     indicatorBorderRadius: BorderRadius.zero,
                   ),
-                  values: const [0, 1, 2],
+                  values: const [0, 1, 2, 3, 4],
                   iconOpacity: 1.0,
                   selectedIconScale: 1.0,
-                  indicatorSize: const Size.fromWidth(80),
+                  indicatorSize: const Size.fromWidth(65),
                   iconAnimationType: AnimationType.onHover,
                   styleAnimationType: AnimationType.onHover,
                   spacing: 4.0,
@@ -580,7 +602,7 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
                         color: Colors.white38.withOpacity(opacity));
                   },
                   customIconBuilder: (context, local, global) {
-                    final text = const ['Level 1', 'Level 2', 'Level 3'][local.index];
+                    final text = const ['L1', 'L2', 'L3', 'Approve', 'Rejected'][local.index];
                     return Center(
                         child: Text(text,
                             style: TextStyle(
@@ -589,57 +611,40 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
                                     local.animationValue))));
                   },
                   borderWidth: 0.0,
-                  onChanged: (i) {
+                  onChanged: (i) async {
                     setState(() {
-                      isLoading = true; // Show loader
+                      isLoading = true;
                       isLoadingCount = true;
                       valueChange = i;
-                      print(i);
-
                     });
-                    //Draft
-                    if(valueChange == 0) {
-                      allUsernewDraft;
-                      getSharedPrfanceList();
-                      setState(() {
-                        isLoading = false; // Hide loader
-                        isLoadingCount = false;
-                        loanStatus="Pending";
-                      });
-                      //globalListParameter = claimRequisitionModal.claimRequisitionDraftlist!;
-                      //print("length 0 - ${globalListParameter.length}");
+
+                    // Set the appropriate status
+                    switch (valueChange) {
+                      case 0:
+                        statusChange = "LEVEL_ONE_PENDING";
+                        break;
+                      case 1:
+                        statusChange = "LEVEL_TWO_PENDING";
+                        break;
+                      case 2:
+                        statusChange = "LEVEL_THREE_PENDING";
+                        break;
+                      case 3:
+                        statusChange = "APPROVED";
+                        break;
+                      case 4:
+                        statusChange = "DISAPPROVED";
+                        break;
                     }
-                    //
-                    if(valueChange == 1) {
-                      allUsernewPending;
-                      getSharedPrfanceList();
-                      setState(() {
-                        isLoading = false; // Hide loader
-                        isLoadingCount = false;
-                        loanStatus="Approved";
-                      });
-                      //globalListParameter = claimRequisitionModal.claimRequisitionDraftlist!;
-                      //print("length 1-  ${globalListParameter.length}");
-                    }
-                    //
-                    if(valueChange == 2) {
-                      allUsernewApproved;
-                      getSharedPrfanceList();
-                      setState(() {
-                        isLoading = false; // Hide loader
-                        isLoadingCount = false;
-                        loanStatus="Disapproved";
-                      });
-                    }
-                    //
-                    if(valueChange == 3) {
-                      allUsernewDisapproved;
-                      getSharedPrfanceList();
-                      setState(() {
-                        isLoading = false; // Hide loader
-                        isLoadingCount = false;
-                      });
-                    }
+
+                    // Await the data load
+                    await getSharedPrfanceList();
+
+                    // Then stop the loader
+                    setState(() {
+                      isLoading = false;
+                      isLoadingCount = false;
+                    });
                   },
                 )
               ],
@@ -647,10 +652,10 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
 
             Expanded(
               child: isLoading
-                  ? Center(child: CircularProgressIndicator()) // Show loader
-                  : claimRequisitionLabeled == null
-                  ? Center(child: Text("No Data Available"))
-                  : getClaimSelfReqList(claimRequisitionLabeled!),
+                  ? const Center(child: CircularProgressIndicator())
+                  : (mssLoanListLabeled == null || foundDataNew == null || foundDataNew!.isEmpty)
+                  ? const Center(child: Text("No Data Available"))
+                  : getLoanSelfReqList(mssLoanListLabeled!),
             ),
           ],
         ),
@@ -658,7 +663,7 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
     );
   }
 
-  getClaimSelfReqList(ClaimRequisitionModal claimRequisitionModal) {
+  getLoanSelfReqList(MSSLoanListModal mssLoanListModal) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
@@ -673,546 +678,139 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
       },
       child: Column(
         children: [
-          //Pending
-          Visibility(
-            visible: valueChange == 0,
-            child: Expanded(
-              child: ListView.builder(
-                //controller: _controller,
-                  itemCount: foundDataNewPending!.length,
-                  itemBuilder: (context , i) {
-                    foundDataNewPending![i].status;
-                    print(foundDataNewPending![i].status);
-                    return InkWell(
-                      onTap: () {
-                        /*foundDataNewDraft![i].claimRaiseId;
-                        reimbursementType = foundDataNewDraft![i].reimbName!.toString();
-                        reimbursementTypeId = foundDataNewDraft![i].reimbId!.toString();
-                        expCategory = foundDataNewDraft![i].expName!.toString();
-                        expCategoryIdNew = foundDataNewDraft![i].expId!.toString();
-                        subExpCategory = foundDataNewDraft![i].subExpName!.toString();
-                        subExpCategoryIdNew = foundDataNewDraft![i].subExpId!.toString();
-                        travelFrom = foundDataNewDraft![i].travelFrom!.toString();
-                        travelTo = foundDataNewDraft![i].travelTo!.toString();
-                        odometerStart = foundDataNewDraft![i].odometerStart!.toString();
-                        odometerEnd = foundDataNewDraft![i].odometerEnd!.toString();
-                        merchant = foundDataNewDraft![i].merchant!.toString();
-                        kilometers = foundDataNewDraft![i].kilometers!.toString();
-                        month = foundDataNewDraft![i].month!.toString();
-                        claimDate = foundDataNewDraft![i].reqDate!.toString();
-                        claimedAmount = foundDataNewDraft![i].claimedAmt!.toString();
-                        remarks = foundDataNewDraft![i].remarks!.toString();
-                        documents = foundDataNewDraft![i].document!.toString();
-                        claimIdChecking = foundDataNewDraft![i].claimRaiseId!.toString();
-                        print("Claim id - ${foundDataNewDraft![i].claimRaiseId}");*/
+          Expanded(
+            child: ListView.builder(
+              //controller: _controller,
+                itemCount: foundDataNew!.length,
+                itemBuilder: (context , i) {
 
-                        /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                            TravelExpenseRequestUpdate(
-                              reimbursementType,
-                              reimbursementTypeId,
-                              expCategory,
-                              expCategoryIdNew,
-                              subExpCategory,
-                              subExpCategoryIdNew,
-                              travelFrom,
-                              travelTo,
-                              odometerStart,
-                              odometerEnd,
-                              merchant,
-                              kilometers,
-                              month,
-                              claimDate,
-                              claimedAmount,
-                              remarks,
-                              documents,
-                              claimIdChecking,
-                            )));*/
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => LoanApprovalPage()));
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 4,
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Amount and Status
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "₹ 120000",
+                  foundDataNew![i].status;
+                  print(foundDataNew![i].status);
+          
+                  return InkWell(
+                    onTap: () {
+          
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 4,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Amount and Status
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "₹ ${foundDataNew![i].loanAmount}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueAccent,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade600,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    "${foundDataNew![i].statusShow}",
                                     style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blueAccent,
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.shade600,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      "Level 1 Pending",
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Requested Date
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Requested On", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("June 17, 2025", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // installments
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Loan Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("6", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // loanType
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Loan Type", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("Personal Loan", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // Total
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Total Amount", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("₹ 120000", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Note
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Text(
-                                  "Loan not approved yet",
-                                  style: TextStyle(color: Colors.black87),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+          
+                            // Requested Date
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Requested On", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                Text("${foundDataNew![i].date}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+          
+                            // installments
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Requested Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                Text("${foundDataNew![i].installment}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+          
+                            // loanType
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Loan Type", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                Text("${foundDataNew![i].loanType}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+          
+                            // Total
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Total Amount", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                Text("₹ ${foundDataNew![i].loanAmount}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+          
+                            // Note
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                "Loan not approved yet",
+                                style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w800),
+                              ),
+                            ),
+          
+                            //const SizedBox(height: 8),
+          
+                            // Loan Installments Link
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton.icon(
+                                onPressed: () {
+                                  loanIdSend= foundDataNew![i].loanReqId;
+                                  deleteLoanRequest(context);
+                                },
+                                icon: const Icon(Icons.delete, size: 18),
+                                label: const Text("Delete Loan"),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Mythemes.dangerColor,
                                 ),
                               ),
-
-                              //const SizedBox(height: 8),
-
-                              // Loan Installments Link
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.history, size: 18),
-                                  label: const Text("Loan Installments"),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.blue,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                            )
+                          ],
                         ),
-                      ).pLTRB(10, 10, 10, 5),
-                    );
-                  }
-              ),
+                      ),
+                    ).pLTRB(10, 10, 10, 5),
+                  );
+                }
             ),
           ),
-          //Approved
-          Visibility(
-            visible: valueChange == 1,
-            child: Expanded(
-              child: ListView.builder(
-                //controller: _controller,
-                  itemCount: foundDataNewApproved!.length,
-                  itemBuilder: (context , i) {
-                    /* foundDataNew![i].empName == null ? empName = "" :  empName = foundDataNew![i].empName;
-                    foundDataNew![i].status == null ? status = "" : status = foundDataNew![i].status;
-                    foundDataNew![i].reimbName == null ? reimbName = "" : reimbName = foundDataNew![i].reimbName;
-                    foundDataNew![i].raisedOn == null ? raisedOn = "" : raisedOn = foundDataNew![i].raisedOn;
-                    foundDataNew![i].catName == null ? catName = "" : catName = foundDataNew![i].catName;
-                    foundDataNew![i].claimedAmt == null ? claimedAmt = "" : claimedAmt = foundDataNew![i].claimedAmt;
-                    foundDataNew![i].approvedAmount == null ? approvedAmount = "" : approvedAmount = foundDataNew![i].approvedAmount;*/
-
-
-                    return InkWell(
-                      onTap: () {
-                        /*foundDataNewApproved![i].claimRaiseId;
-                        reimbursementType = foundDataNewApproved![i].reimbName!.toString();
-                        reimbursementTypeId = foundDataNewApproved![i].reimbId!.toString();
-                        expCategory = foundDataNewApproved![i].expName!.toString();
-                        expCategoryIdNew = foundDataNewApproved![i].expId!.toString();
-                        subExpCategory = foundDataNewApproved![i].subExpName!.toString();
-                        subExpCategoryIdNew = foundDataNewApproved![i].subExpId!.toString();
-                        travelFrom = foundDataNewApproved![i].travelFrom!.toString();
-                        travelTo = foundDataNewApproved![i].travelTo!.toString();
-                        odometerStart = foundDataNewApproved![i].odometerStart!.toString();
-                        odometerEnd = foundDataNewApproved![i].odometerEnd!.toString();
-                        merchant = foundDataNewApproved![i].merchant!.toString();
-                        kilometers = foundDataNewApproved![i].kilometers!.toString();
-                        month = foundDataNewApproved![i].month!.toString();
-                        claimDate = foundDataNewApproved![i].reqDate!.toString();
-                        claimedAmount = foundDataNewApproved![i].claimedAmt!.toString();
-                        remarks = foundDataNewApproved![i].remarks!.toString();
-                        documents = foundDataNewApproved![i].document!.toString();
-                        claimIdChecking = foundDataNewApproved![i].claimRaiseId!.toString();
-                        print("Claim id - ${foundDataNewApproved![i].claimRaiseId}");*/
-
-                        /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                            TravelExpenseRequestUpdate(
-                              reimbursementType,
-                              reimbursementTypeId,
-                              expCategory,
-                              expCategoryIdNew,
-                              subExpCategory,
-                              subExpCategoryIdNew,
-                              travelFrom,
-                              travelTo,
-                              odometerStart,
-                              odometerEnd,
-                              merchant,
-                              kilometers,
-                              month,
-                              claimDate,
-                              claimedAmount,
-                              remarks,
-                              documents,
-                              claimIdCheck,
-                            )));*/
-                        /*Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => TravelExpenseRequestRaise()));*/
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => LoanApprovalPage()));
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 4,
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Amount and Status
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "₹ 120000",
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blueAccent,
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.shade500,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      "Approved",
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Requested Date
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Requested On", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("June 17, 2025", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // installments
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Loan Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("6", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // loanType
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Loan Type", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("Personal Loan", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // Total
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Total Amount", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("₹ 120000", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Note
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  "Loan not approved yet",
-                                  style: TextStyle(color: Colors.black87),
-                                ),
-                              ),
-
-                              //const SizedBox(height: 8),
-
-                              // Loan Installments Link
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.history, size: 18),
-                                  label: const Text("Loan Installments"),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.blue,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ).pLTRB(10, 10, 10, 5),
-                    );
-                  }
-              ),
-            ),
-          ),
-          //Disapproved
-          Visibility(
-            visible: valueChange == 2,
-            child: Expanded(
-              child: ListView.builder(
-                //controller: _controller,
-                  itemCount: foundDataNewDisapproved!.length,
-                  itemBuilder: (context , i) {
-                    /*foundDataNew![i].empName == null ? empName = "" :  empName = foundDataNew![i].empName;
-                    foundDataNew![i].status == null ? status = "" : status = foundDataNew![i].status;
-                    foundDataNew![i].reimbName == null ? reimbName = "" : reimbName = foundDataNew![i].reimbName;
-                    foundDataNew![i].raisedOn == null ? raisedOn = "" : raisedOn = foundDataNew![i].raisedOn;
-                    foundDataNew![i].catName == null ? catName = "" : catName = foundDataNew![i].catName;
-                    foundDataNew![i].claimedAmt == null ? claimedAmt = "" : claimedAmt = foundDataNew![i].claimedAmt;
-                    foundDataNew![i].approvedAmount == null ? approvedAmount = "" : approvedAmount = foundDataNew![i].approvedAmount;*/
-
-
-                    return InkWell(
-                      onTap: () {
-                        /*foundDataNewDisapproved![i].claimRaiseId;
-                        reimbursementType = foundDataNewDisapproved![i].reimbName!.toString();
-                        reimbursementTypeId = foundDataNewDisapproved![i].reimbId!.toString();
-                        expCategory = foundDataNewDisapproved![i].expName!.toString();
-                        expCategoryIdNew = foundDataNewDisapproved![i].expId!.toString();
-                        subExpCategory = foundDataNewDisapproved![i].subExpName!.toString();
-                        subExpCategoryIdNew = foundDataNewDisapproved![i].subExpId!.toString();
-                        travelFrom = foundDataNewDisapproved![i].travelFrom!.toString();
-                        travelTo = foundDataNewDisapproved![i].travelTo!.toString();
-                        odometerStart = foundDataNewDisapproved![i].odometerStart!.toString();
-                        odometerEnd = foundDataNewDisapproved![i].odometerEnd!.toString();
-                        merchant = foundDataNewDisapproved![i].merchant!.toString();
-                        kilometers = foundDataNewDisapproved![i].kilometers!.toString();
-                        month = foundDataNewDisapproved![i].month!.toString();
-                        claimDate = foundDataNewDisapproved![i].reqDate!.toString();
-                        claimedAmount = foundDataNewDisapproved![i].claimedAmt!.toString();
-                        remarks = foundDataNewDisapproved![i].remarks!.toString();
-                        documents = foundDataNewDisapproved![i].document!.toString();
-                        claimIdChecking = foundDataNewDisapproved![i].claimRaiseId!.toString();
-                        print("Claim id - ${foundDataNewDisapproved![i].claimRaiseId}");*/
-
-                        /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                            TravelExpenseRequestUpdate(
-                              reimbursementType,
-                              reimbursementTypeId,
-                              expCategory,
-                              expCategoryIdNew,
-                              subExpCategory,
-                              subExpCategoryIdNew,
-                              travelFrom,
-                              travelTo,
-                              odometerStart,
-                              odometerEnd,
-                              merchant,
-                              kilometers,
-                              month,
-                              claimDate,
-                              claimedAmount,
-                              remarks,
-                              documents,
-                              claimIdCheck,
-                            )));*/
-                        /*Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => TravelExpenseRequestRaise()));*/
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => LoanApprovalPage()));
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 4,
-                        margin: const EdgeInsets.only(bottom: 20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Amount and Status
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "₹ 120000",
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blueAccent,
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.shade500,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      "Disapproved",
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Requested Date
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Requested On", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("June 17, 2025", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // installments
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Loan Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("6", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // loanType
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Loan Type", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("Personal Loan", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-
-                              // Total
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Total Amount", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("₹ 120000", style: const TextStyle(fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Note
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Text(
-                                  "Loan not approved yet",
-                                  style: TextStyle(color: Colors.black87),
-                                ),
-                              ),
-
-                              //const SizedBox(height: 8),
-
-                              // Loan Installments Link
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.history, size: 18),
-                                  label: const Text("Loan Installments"),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.blue,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ).pLTRB(10, 10, 10, 5),
-                    );
-                  }
-              ),
-            ),
-          ),
+         
         ],
       ),
     );

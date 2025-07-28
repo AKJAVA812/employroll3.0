@@ -86,6 +86,7 @@ class LoanRequisitionApprovedlist {
   dynamic orgId;
   dynamic approvedInstallment;
   dynamic empName;
+  dynamic requestedInstallment;
   dynamic approvedAmount;
   dynamic raisedBy;
   dynamic loanAdvId;
@@ -113,6 +114,7 @@ class LoanRequisitionApprovedlist {
         this.orgId,
         this.approvedInstallment,
         this.empName,
+        this.requestedInstallment,
         this.approvedAmount,
         this.raisedBy,
         this.loanAdvId,
@@ -140,6 +142,7 @@ class LoanRequisitionApprovedlist {
     orgId = json['orgId'];
     approvedInstallment = json['approvedInstallment'];
     empName = json['empName'];
+    requestedInstallment = json['requestedInstallment'];
     approvedAmount = json['approvedAmount'];
     raisedBy = json['raisedBy'];
     loanAdvId = json['loanAdvId'];
@@ -169,6 +172,7 @@ class LoanRequisitionApprovedlist {
     data['orgId'] = this.orgId;
     data['approvedInstallment'] = this.approvedInstallment;
     data['empName'] = this.empName;
+    data['requestedInstallment'] = this.requestedInstallment;
     data['approvedAmount'] = this.approvedAmount;
     data['raisedBy'] = this.raisedBy;
     data['loanAdvId'] = this.loanAdvId;
@@ -199,6 +203,7 @@ class LoanRequisitionDisapprovelist {
   dynamic orgId;
   dynamic approvedInstallment;
   dynamic empName;
+  dynamic requestedInstallment;
   dynamic approvedAmount;
   dynamic raisedBy;
   dynamic loanAdvId;
@@ -226,6 +231,7 @@ class LoanRequisitionDisapprovelist {
         this.orgId,
         this.approvedInstallment,
         this.empName,
+        this.requestedInstallment,
         this.approvedAmount,
         this.raisedBy,
         this.loanAdvId,
@@ -253,6 +259,7 @@ class LoanRequisitionDisapprovelist {
     orgId = json['orgId'];
     approvedInstallment = json['approvedInstallment'];
     empName = json['empName'];
+    requestedInstallment = json['requestedInstallment'];
     approvedAmount = json['approvedAmount'];
     raisedBy = json['raisedBy'];
     loanAdvId = json['loanAdvId'];
@@ -282,6 +289,7 @@ class LoanRequisitionDisapprovelist {
     data['orgId'] = this.orgId;
     data['approvedInstallment'] = this.approvedInstallment;
     data['empName'] = this.empName;
+    data['requestedInstallment'] = this.requestedInstallment;
     data['approvedAmount'] = this.approvedAmount;
     data['raisedBy'] = this.raisedBy;
     data['loanAdvId'] = this.loanAdvId;
@@ -312,6 +320,7 @@ class LoanRequiDataforOthers {
   dynamic orgId;
   dynamic approvedInstallment;
   dynamic empName;
+  dynamic requestedInstallment;
   dynamic approvedAmount;
   dynamic raisedBy;
   dynamic loanAdvId;
@@ -339,6 +348,7 @@ class LoanRequiDataforOthers {
         this.orgId,
         this.approvedInstallment,
         this.empName,
+        this.requestedInstallment,
         this.approvedAmount,
         this.raisedBy,
         this.loanAdvId,
@@ -366,6 +376,7 @@ class LoanRequiDataforOthers {
     orgId = json['orgId'];
     approvedInstallment = json['approvedInstallment'];
     empName = json['empName'];
+    requestedInstallment = json['requestedInstallment'];
     approvedAmount = json['approvedAmount'];
     raisedBy = json['raisedBy'];
     loanAdvId = json['loanAdvId'];
@@ -395,6 +406,7 @@ class LoanRequiDataforOthers {
     data['orgId'] = this.orgId;
     data['approvedInstallment'] = this.approvedInstallment;
     data['empName'] = this.empName;
+    data['requestedInstallment'] = this.requestedInstallment;
     data['approvedAmount'] = this.approvedAmount;
     data['raisedBy'] = this.raisedBy;
     data['loanAdvId'] = this.loanAdvId;
@@ -425,6 +437,7 @@ class LoanRequisitionPendinglist {
   dynamic orgId;
   dynamic approvedInstallment;
   dynamic empName;
+  dynamic requestedInstallment;
   dynamic approvedAmount;
   dynamic raisedBy;
   dynamic loanAdvId;
@@ -452,6 +465,7 @@ class LoanRequisitionPendinglist {
         this.orgId,
         this.approvedInstallment,
         this.empName,
+        this.requestedInstallment,
         this.approvedAmount,
         this.raisedBy,
         this.loanAdvId,
@@ -479,6 +493,7 @@ class LoanRequisitionPendinglist {
     orgId = json['orgId'];
     approvedInstallment = json['approvedInstallment'];
     empName = json['empName'];
+    requestedInstallment = json['requestedInstallment'];
     approvedAmount = json['approvedAmount'];
     raisedBy = json['raisedBy'];
     loanAdvId = json['loanAdvId'];
@@ -508,6 +523,7 @@ class LoanRequisitionPendinglist {
     data['orgId'] = this.orgId;
     data['approvedInstallment'] = this.approvedInstallment;
     data['empName'] = this.empName;
+    data['requestedInstallment'] = this.requestedInstallment;
     data['approvedAmount'] = this.approvedAmount;
     data['raisedBy'] = this.raisedBy;
     data['loanAdvId'] = this.loanAdvId;

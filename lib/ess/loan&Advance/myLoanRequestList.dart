@@ -4,6 +4,7 @@ import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:er_flutter_project/ess/essDashboardNavigate.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/travelExpenseRequestRaise.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/updateRaisedClaim.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
@@ -20,9 +21,11 @@ import '../../../commanScreen/routes.dart';
 import '../../../main.dart';
 import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
+import '../../commanScreen/commanNotificationPage.dart';
 import '../../modules/claimAndReimbursement/newModalClasses/selfClaimRequisitionListModal.dart';
 import 'modalClass/selfLoanRequestModal.dart';
 import 'myLoanRequestRaisePage.dart';
+import 'myLoanRequestUpdate.dart';
 
 
 class MyLoanRequestList extends StatefulWidget {
@@ -81,6 +84,15 @@ dynamic totalDisapprovedAmt;
 dynamic totalApprovedAmt;
 dynamic totalPendingAmt;
 
+dynamic deptName;
+dynamic branchName;
+dynamic loanType;
+dynamic loanAmount;
+dynamic loanStartDate;
+dynamic instalments;
+dynamic loanIdSend;
+
+dynamic statusCheck;
 
 var draftShow=true;
 var pendingShow=false;
@@ -244,6 +256,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
     totalPendingAmt = selfLoanRequestModal.pendingAmount;
     if(valueChange ==0) {
       allUsernewPending = selfLoanRequestModal.loanRequisitionPendinglist;
+
     }
     if(valueChange == 1) {
       allUsernewApproved = selfLoanRequestModal.loanRequisitionApprovedlist!;
@@ -263,6 +276,84 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
 
 
     return selfLoanRequestModal;
+  }
+
+
+  Future<void> deleteLoanRequest(BuildContext context) async {
+    // ✅ Proceed with the API call if both checks pass
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.loanRequestDeleteApi;
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse("$conn$apiUrl");
+    var request = http.MultipartRequest("POST", urlapi);
+
+    // Add static fields
+    request.fields['sessionId'] = sessionId!;
+    request.fields['loanReqId'] = loanIdSend.toString();
+
+    try {
+      http.StreamedResponse response = await request.send();
+      http.Response httpResponse = await http.Response.fromStream(response);
+      print('URL: ${httpResponse.request}');
+      print('Status Code: ${httpResponse.statusCode}');
+      print('Response: ${httpResponse.body}');
+
+      Navigator.of(context, rootNavigator: true).pop();
+
+      if (httpResponse.statusCode == 200) {
+        var mapResponse = json.decode(httpResponse.body);
+        String reason = mapResponse['reason'];
+        String result = mapResponse['result'];
+
+        if (result.compareToIgnoringCase("Success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (result.compareToIgnoringCase("Error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, "Error");
+        }
+      }
+    } catch (e) {
+      print('❌ Exception during API call: $e');
+    }
+  }
+
+   showDialgSucess(BuildContext buildContext, String result, String alert) {
+    if (buildContext == null) {
+      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      return;
+    }
+
+    showDialog(
+      context: buildContext,
+      barrierDismissible: false, // Prevents accidental dismiss
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+          title: Row(
+            children: [
+              Expanded(child: Text(alert)),
+            ],
+          ),
+          content: Text(result),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
+                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                  getSharedPrfanceList();
+                  //Navigator.of(buildContext).maybePop();
+                } else {
+                  print("⚠️ Warning: No route to close.");
+                }
+              },
+              child: Text("Ok"),
+            ),
+          ],
+          elevation: 24.0,
+        );
+      },
+    );
   }
 
   dynamic levelOnePendingStatus = false;
@@ -656,8 +747,57 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                   itemBuilder: (context , i) {
                     foundDataNewPending![i].status;
                     print(foundDataNewPending![i].status);
+
                     return InkWell(
                       onTap: () {
+                        String rawStatus = foundDataNewPending![i].statusShow;
+                        List<String> parts = rawStatus.split('_'); // ["LEVEL", "2", "PENDING"]
+                        if (parts.length >= 2) {
+                          String levelText = '${parts[0][0]}${parts[0].substring(1).toLowerCase()} ${parts[1]}'; // "Level 2"
+                          statusCheck = levelText;
+                        } else {
+                          statusCheck = rawStatus; // fallback
+                        }
+                        if(foundDataNewPending![i].statusShow == "LEVEL_2_PENDING" || foundDataNewPending![i].statusShow == "LEVEL_3_PENDING") {
+                          Fluttertoast.showToast(
+                              msg: "This loan is approved on $statusCheck !!",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        } else {
+                          deptName = foundDataNewPending![i].dept;
+                          branchName = foundDataNewPending![i].branch;
+                          empName= foundDataNewPending![i].empName;
+                          loanType= foundDataNewPending![i].loanType;
+                          loanAmount= foundDataNewPending![i].loanAmount;
+                          loanStartDate= foundDataNewPending![i].date;
+                          instalments= foundDataNewPending![i].approvedInstallment;
+                          remarks= foundDataNewPending![i].remark;
+                          loanIdSend= foundDataNewPending![i].loanReqId;
+                          /*Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => UpdateLoanRequestPage(
+
+                            )));*/
+                          print("Loan Id Sending - $loanIdSend");
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => UpdateLoanRequestPage(
+                              deptName,
+                              branchName,
+                              empName,
+                              loanType,
+                              loanAmount,
+                              loanStartDate,
+                              instalments,
+                              remarks,
+                              loanIdSend,
+                            ),
+                          ));
+                        }
+
                         /*foundDataNewDraft![i].claimRaiseId;
                         reimbursementType = foundDataNewDraft![i].reimbName!.toString();
                         reimbursementTypeId = foundDataNewDraft![i].reimbId!.toString();
@@ -757,8 +897,8 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Loan Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                  Text("${foundDataNewPending![i].approvedInstallment}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                  Text("Requested Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                  Text("${foundDataNewPending![i].requestedInstallment}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -793,7 +933,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                 ),
                                 child: const Text(
                                   "Loan not approved yet",
-                                  style: TextStyle(color: Colors.black87),
+                                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w800),
                                 ),
                               ),
 
@@ -803,11 +943,14 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.history, size: 18),
-                                  label: const Text("Loan Installments"),
+                                  onPressed: () {
+                                    loanIdSend= foundDataNewPending![i].loanReqId;
+                                    deleteLoanRequest(context);
+                                  },
+                                  icon: const Icon(Icons.delete, size: 18),
+                                  label: const Text("Delete Loan"),
                                   style: TextButton.styleFrom(
-                                    foregroundColor: Colors.blue,
+                                    foregroundColor: Mythemes.dangerColor,
                                   ),
                                 ),
                               )
@@ -938,7 +1081,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Loan Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                  Text("Approved Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
                                   Text("${foundDataNewApproved![i].approvedInstallment}", style: const TextStyle(fontWeight: FontWeight.w600)),
                                 ],
                               ),
@@ -972,16 +1115,16 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                   color: Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Text(
-                                  "Loan Approved",
-                                  style: TextStyle(color: Colors.black87),
+                                child:  Text(
+                                  "Loan has been Approved.",
+                                  style: TextStyle(color: Mythemes.successColor, fontWeight: FontWeight.w800),
                                 ),
                               ),
 
                               //const SizedBox(height: 8),
 
                               // Loan Installments Link
-                              Align(
+                              /*Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton.icon(
                                   onPressed: () {},
@@ -991,7 +1134,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                     foregroundColor: Colors.blue,
                                   ),
                                 ),
-                              )
+                              )*/
                             ],
                           ),
                         ),
@@ -1153,16 +1296,16 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                   color: Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Text(
-                                  "Loan has been disapproved",
-                                  style: TextStyle(color: Colors.black87),
+                                child:  Text(
+                                  "Loan has been disapproved.",
+                                  style: TextStyle(color: Mythemes.dangerColor,fontWeight: FontWeight.w800),
                                 ),
                               ),
 
                               //const SizedBox(height: 8),
 
                               // Loan Installments Link
-                              Align(
+                              /*Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton.icon(
                                   onPressed: () {},
@@ -1172,7 +1315,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                                     foregroundColor: Colors.blue,
                                   ),
                                 ),
-                              )
+                              )*/
                             ],
                           ),
                         ),

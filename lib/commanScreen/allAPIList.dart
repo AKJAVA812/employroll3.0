@@ -5,7 +5,7 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://7384ae90ff9a.ngrok.app/";
+   //static var server="https://549b89f1bbbf.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -207,6 +207,11 @@ class ApiDetails{
    static var loanLedgerApi = "restful/service/get/employee/updated/loan/ledger/debit/credit/list";
    static var loanSkipListApi = "restful/service/get/employee/loan/ledger/details";
    static var requestSkipInstalmentApi = "restful/service/employee/loan/skip/emp/request";
+   static var loanRequestUpdateApi = "restful/service/org/loan/and/advance/request/data/update";
+   static var loanRequestDeleteApi = "restful/service/org/loan/and/advance/pending/request/self/delete";
+
+   //MSS Loan APIs
+   static var mssLoanListApi = "restful/service/get/org/loans/and/advance/list/for/mss";
 
    //Company Policy API
    static var companyPolicyApi = "restful/service/policy/details/list";

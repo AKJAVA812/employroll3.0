@@ -287,7 +287,7 @@ class _AttListState extends State<AttList> {
       padding: const EdgeInsets.all(8.0),
       itemCount: employeeListModelglobel!.data!.length,
       itemBuilder: (context, itemCount) {
-        isAbsent = attendanceShiftDetailsModalGlobaled!.isAbsentWorkHour;
+        /*isAbsent = attendanceShiftDetailsModalGlobaled!.isAbsentWorkHour;
         isHalfDay = attendanceShiftDetailsModalGlobaled!.isHalfdayWorkHour;
         isShortLeave = attendanceShiftDetailsModalGlobaled!.isShortWorkHour;
         isPresent = attendanceShiftDetailsModalGlobaled!.isPresentWorkHour;
@@ -309,7 +309,7 @@ class _AttListState extends State<AttList> {
         print('Working Hour - $workingHrs');
         print('Shift Absent WH - $absentThreshold');
 // Extract numbers from 'workingHrs' and convert safely
-        if(workingHrs != 0 && employeeListModelglobel!.data![itemCount].status! == "Absent") {
+        if(workingHrs >= 4 && employeeListModelglobel!.data![itemCount].status! == "Absent") {
           status = "Present";
           if(isAbsent == true) {
 
@@ -328,10 +328,11 @@ class _AttListState extends State<AttList> {
               status = "Short Leave";
             }
           }
-        } else {
+        }
+        else {
           print("i am else");
           status = employeeListModelglobel!.data![itemCount].status!;
-        }
+        }*/
         return Card(
             elevation: 2,
             child: Container(
@@ -345,7 +346,7 @@ class _AttListState extends State<AttList> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              "$status".text.bold.color(status == "Absent" ? Mythemes.dangerColor : Mythemes.successColor).make().px8()
+                              "${employeeListModelglobel!.data![itemCount].status}".text.bold.color(status == "Absent" ? Mythemes.dangerColor : Mythemes.successColor).make().px8()
                               //employeeListModelglobel!.data![itemCount].status!.text.color(employeeListModelglobel!.data![itemCount].status! == "Absent" ? Mythemes.dangerColorOne : Mythemes.lightBluishColor).make().px8(),
                             ],
                           )
