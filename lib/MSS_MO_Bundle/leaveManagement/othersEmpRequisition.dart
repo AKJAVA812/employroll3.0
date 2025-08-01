@@ -129,8 +129,8 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage> w
       organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
-      selectedOrg = null;
-      getOrgId = '';
+      //selectedOrg = null;
+      //getOrgId = '';
 
       setState(() {});
     }

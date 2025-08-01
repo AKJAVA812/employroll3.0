@@ -1911,6 +1911,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
         //_currentMonth = DateFormat.yMMM().format(_targetDateTime);
         print('change date $date.month$_targetDateTime');
+        singleDateString = DateFormat('dd-MM-yyyy').format(date);
+        print("Updated Date Change - $singleDateString");
+        getSharedPrfanceList();
         setState(() {
           Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
           getCalendar.then((value) {

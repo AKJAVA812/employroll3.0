@@ -105,6 +105,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
         foundDataNew = allUsernew;
         selfRequisitionLabel = value;
         selfRequisitionLabeled = selfRequisitionLabel;
+
         if(foundDataNew != null) {
           foundDataNew!.length;
           print("Fetch data $foundDataNew");
@@ -114,11 +115,12 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
           );
           foundDataNew = [];
         }
-
+        print("Attendance Request Data - $selfRequisitionLabeled");
       });
 
       //print('employeeList00${selfRequisitionLabel!.data!.length}');
     });
+
   }
 
   showNodata(BuildContext buildContext, result,reason) {
@@ -141,7 +143,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
         TextButton(
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
-            Navigator.pop(buildContext);
+            //Navigator.pop(buildContext);
             setState(() {
 
             });
@@ -163,6 +165,9 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.selfAttRequisitionList;
     print('employeeList11: ${SessionId}');
+    setState(() {
+      _isLoading = true;
+    });
     SelfRequisitionModel selfRequisitionModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await http.post(urlapi);
@@ -178,7 +183,14 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
     }
 
     selfRequisitionModel = SelfRequisitionModel.fromJson(mapResponse);
-    allUsernew = selfRequisitionModel.data!;
+    if (selfRequisitionModel.data != null) {
+      allUsernew = selfRequisitionModel.data!;
+    } else {
+      allUsernew = []; // or handle accordingly
+    }
+    setState(() {
+      _isLoading = false;
+    });
     return selfRequisitionModel;
   }
 
@@ -215,7 +227,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
       foundDataNew = results;
     });
   }
-
+  bool _isLoading = true;
   var titleName = "My Attendance Requests";
   int pageIndex = 0;
   int currentIndex = 2;
@@ -326,9 +338,12 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
               ],
             ).py(4),
             Expanded(
-                child: selfRequisitionLabeled == null
-                    ? Center(child: CircularProgressIndicator())
-                    : getEmpReqList(selfRequisitionLabeled!)),
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : selfRequisitionLabeled == null
+                  ? Center(child: Text('Click on + icon to raise the attendance request.'))
+                  : getEmpReqList(selfRequisitionLabeled!),
+            ),
           ],
         ),
       ),

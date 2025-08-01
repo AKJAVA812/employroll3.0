@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -120,6 +121,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
+
     Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
     Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
@@ -465,8 +467,13 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     var now = DateTime.now();
     var formatter = DateFormat('dd/MM/yyyy');
     todayDate = formatter.format(now);
-
+    _scrollController = ScrollController();
+    // Delay scroll start slightly to ensure build completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startAutoScroll();
+    });
     getSharedPrfanceList();
+
     setState(() {
       if(empRole==1){
         showHide=true;
@@ -510,9 +517,70 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
   var holidayDate;
   var holidayLength;
+
+
+  final Map<String, Color> punchColors = {
+    "In": Colors.green,
+    "Out": Colors.redAccent,
+  };
+
+  final List<Map<String, String>> punches = [
+    {"type": "In", "time": "09:15 AM"},
+    {"type": "Out", "time": "01:00 PM"},
+    {"type": "In", "time": "02:00 PM"},
+    {"type": "Out", "time": "06:30 PM"},
+    {"type": "In", "time": "07:00 PM"},
+    {"type": "Out", "time": "10:00 PM"},
+  ];
+
+  late final ScrollController _scrollController;
+  late Timer _scrollTimer;
+  final double scrollStep = 1.0; // how many pixels to scroll each tick
+  final Duration scrollDuration = Duration(milliseconds: 30); // speed
+
+  void _startAutoScroll() {
+    _scrollTimer = Timer.periodic(scrollDuration, (_) {
+      if (!_scrollController.hasClients) return;
+
+     /* final maxScroll = _scrollController.position.maxScrollExtent;
+      final currentScroll = _scrollController.offset;
+
+      print("Max - $maxScroll");
+      print("Current - $currentScroll");
+      if (currentScroll >= maxScroll) {
+        _scrollController.jumpTo(0); // Reset back to start
+      } else {
+        _scrollController.jumpTo(currentScroll + scrollStep);
+      }*/
+     /* for(double i=0 ;i>=10;i++){
+        _scrollController.jumpTo(i);
+      }*/
+
+    });
+  }
+
+  void scrollToFirstPunch() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0.0,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollTimer.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
-
 
     return Scaffold(
 
@@ -607,6 +675,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     );
   }
 
+
   DashboardWidgets(EssDashboarrdModel dashboardModel) {
     paidDaysCount = essDashboardModelGlobal!.countData!.paidDaysCount;
     totalAttendance = essDashboardModelGlobal!.countData!.totalAtt;
@@ -678,8 +747,17 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       }
     }*/
 
+    //final repeatedPunches = List.generate(20, (_) => punches).expand((x) => x).toList();
+    final double cardWidth = MediaQuery.of(context).size.width * 0.3;
+
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
+// Repeat data enough times to scroll indefinitely
+    final repeatedPunches = List.generate(
+      1000,
+          (index) => punches[index % punches.length],
+    );
+
 
     return DismissKeyboard(
       child: SingleChildScrollView(
@@ -859,6 +937,125 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                     )
                   ],
                 ),
+              ),*/
+              /*Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  "Today's Punches".text.align(TextAlign.left).bold.make(),
+                ],
+              ).pLTRB(10, 10, 10, 5),*/
+
+          /*SizedBox(
+            height: 50,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              itemCount: punches.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 6),
+              itemBuilder: (context, index) {
+                final punch = punches[index];
+                final type = punch["type"]!;
+                final time = punch["time"]!;
+                final color = punchColors[type] ?? Colors.blue;
+
+                return Container(
+                  width: cardWidth,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Mythemes.lightBluishColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Mythemes.lightBluishColor, width: 1.5),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        type,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Mythemes.whitish,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        time,
+                        style:  TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Mythemes.whitish,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ).pLTRB(6, 6, 6, 2),*/
+          /*Container(
+            color: Colors.white,
+            height: 50,
+            child: ListView.builder(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              itemCount: repeatedPunches.length,
+              itemBuilder: (context, index) {
+                final item = repeatedPunches[index];
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${item['type']} - ${item['time']}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: punchColors[item['type']] ?? Colors.black,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),*/
+
+          /*Container(
+            color: Colors.white,
+            height: 50,
+            child: ListView.builder(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              physics: const AlwaysScrollableScrollPhysics(), // 💡 Enables manual scroll
+              itemCount: repeatedPunches.length,
+              itemBuilder: (context, index) {
+                final punch = repeatedPunches[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Chip(
+                    backgroundColor: Colors.grey.shade200,
+                    label: Text(
+                      "${punch['type']} - ${punch['time']}",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: punch['type'] == 'In' ? Colors.green : Colors.red,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),*/
+              /*Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(onPressed: (){
+                  scrollToFirstPunch();
+                }, icon: Icon(Icons.arrow_left_outlined)),
               ),*/
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1940,6 +2137,9 @@ CalendarShow() {
       _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
       //_currentMonth = DateFormat.yMMM().format(_targetDateTime);
       print('change date $date.month$_targetDateTime');
+      singleDateString = DateFormat('dd-MM-yyyy').format(date);
+      print("Updated Date Change - $singleDateString");
+      getSharedPrfanceList();
       setState(() {
         Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
         getCalendar.then((value) {

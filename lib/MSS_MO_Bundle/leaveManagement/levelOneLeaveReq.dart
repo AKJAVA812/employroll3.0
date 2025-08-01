@@ -104,8 +104,8 @@ class _MSS_MO_LevelOnePendingLeaveState extends State<MSS_MO_LevelOnePendingLeav
       organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
-      selectedOrg = null;
-      getOrgId = '';
+      //selectedOrg = null;
+      //getOrgId = '';
 
       setState(() {});
     }

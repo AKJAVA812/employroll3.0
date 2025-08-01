@@ -150,8 +150,8 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
       organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
-      selectedOrg = null;
-      getOrgId = '';
+      //selectedOrg = null;
+      //getOrgId = '';
 
       setState(() {});
     }
@@ -575,7 +575,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     String apiUrl = ApiDetails.branchListApi;
 
     BranchListModal branchListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "userPermission=$userPanelPermission&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
 
     print('BRANCH URL ${response.request}');
@@ -753,7 +756,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
             ),
           ),
         ),
-        actions: [
+        /*actions: [
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             onSelected: (String value) {
@@ -774,7 +777,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
               ),
             ],
           ),
-        ],
+        ],*/
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())

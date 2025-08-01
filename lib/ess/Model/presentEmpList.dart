@@ -154,7 +154,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                dashboardModelGlobal!.countData!.totalList![itemCount].status!.text.bold.size(16).color(Mythemes.successColor).make().px8(),
+                                dashboardModelGlobal!.countData!.totalList![itemCount].status!.text.bold.size(16).color(dashboardModelGlobal!.countData!.totalList![itemCount].status == "Present" ? Mythemes.successColor : Mythemes.dangerColor).make().px8(),
                                 dashboardModelGlobal!.countData!.totalList![itemCount].logDate!.text.make().px8(),
                               ],
                             )
@@ -173,6 +173,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
 
                       ],
                     ),
+                    dashboardModelGlobal!.countData!.totalList![itemCount].status! != "Week-Off" ?
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -231,7 +232,20 @@ class _PresentEmpListState extends State<PresentEmpList> {
                           ),
                         ),*/
                       ],
-                    )
+                    ) :
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Card(
+                                  color: Mythemes.lightBluishColor,
+                                  child: dashboardModelGlobal!.countData!.totalList![itemCount].status!.toString().text.bold.center.color(Mythemes.whitish).make(),
+                                ),
+                              ),
+                            )
+                          ],
+                        )
                   ],
                 ),
               )

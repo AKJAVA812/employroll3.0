@@ -53,7 +53,10 @@ var singleDay = single.format(day);
 late List<String?> list = [];
 late List<String?> branchList = [];
 late List<String?>? shiftList = [];
-
+String? userPanelPermission;
+dynamic defaultProfileId;
+String? defaultProfileName;
+dynamic getOrgId;
 dynamic valuenew = "listText";
 String shiftValue = "listText";
 class _AdminNewDashboardState extends State<AdminNewDashboard> {
@@ -81,6 +84,9 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPermission = await shared.getUserPanel();
+    defaultProfileName = await shared.getDefaultProfileName();
+    defaultProfileId = await shared.getDefaultProfileId();
     setState(() {
       isLoading = true; // Start loading
     });
@@ -170,7 +176,9 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     //print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId&"
+        "userPermission=$userPanelPermission&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');

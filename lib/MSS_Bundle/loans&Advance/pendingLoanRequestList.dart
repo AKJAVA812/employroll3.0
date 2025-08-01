@@ -361,7 +361,7 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
         ),
       ),
 
-      floatingActionButton: FloatingActionButton(
+      /*floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30), // Ensures circular shape
         ),
@@ -371,7 +371,7 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
         },
         backgroundColor: Mythemes.lightBluishColor,
         child: Icon(Icons.add, color: Mythemes.whitish,),
-      ),
+      ),*/
 
       bottomNavigationBar:
       BottomNavigationBar (
@@ -689,7 +689,8 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
           
                   return InkWell(
                     onTap: () {
-          
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => LoanApprovalPage()));
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
