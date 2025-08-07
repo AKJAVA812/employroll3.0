@@ -883,6 +883,14 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                               ),
                               const SizedBox(height: 12),
 
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Employee Name", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                  Text("${foundDataNewPending![i].empName}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
                               // Requested Date
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1067,6 +1075,14 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                               ),
                               const SizedBox(height: 12),
 
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Employee Name", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                  Text("${foundDataNewApproved![i].empName}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
                               // Requested Date
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1248,6 +1264,14 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware{
                               ),
                               const SizedBox(height: 12),
 
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Employee Name", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                  Text("${foundDataNewDisapproved![i].empName}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
                               // Requested Date
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

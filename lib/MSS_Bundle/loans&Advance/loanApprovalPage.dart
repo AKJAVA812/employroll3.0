@@ -32,6 +32,12 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 dynamic userPanel;
+dynamic loanApprovalL1Perm;
+dynamic loanApprovalL2Perm;
+dynamic loanApprovalL3Perm;
+dynamic loanDisApprovalL1Perm;
+dynamic loanDisApprovalL2Perm;
+dynamic loanDisApprovalL3Perm;
 bool isLoading = true;
 bool isLoadingCount = true;
 List<DataNew>? allUsernew=[];
@@ -150,7 +156,13 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    loanApprovalL1Perm = await shared!.getLoanApprovalL1MSS();
+    loanApprovalL2Perm = await shared!.getLoanApprovalL2MSS();
+    loanApprovalL3Perm = await shared!.getLoanApprovalL3MSS();
 
+    print("Loan Approval L1 - $loanApprovalL1Perm");
+    print("Loan Approval L2 - $loanApprovalL2Perm");
+    print("Loan Approval L3 - $loanApprovalL3Perm");
     // await Future.delayed(Duration(seconds: 5));
     Future<LoanDataShowApprovalModal> getEmployeeList11 = getLoanDataForApproval(sessionId!);
     isLoading = true;
@@ -541,7 +553,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
 // Add static fields
     request.fields['sessionId'] = sessionId!;
-    request.fields['permission'] = "LOAN_APPROVAL_LEVEL_ONE_ADD";
+    request.fields['permission'] = loanApprovalL1Perm;
     request.fields['installNum'] = _installmentsApprovedControllerL1.text;
     request.fields['dedDate'] = _deductionDateControllerL1.text;
     request.fields['loanReqId'] = loanReqIdReceived.toString();
@@ -602,7 +614,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
 // Add static fields
     request.fields['sessionId'] = sessionId!;
-    request.fields['permission'] = "LOAN_APPROVAL_LEVEL_ONE_DELETE";
+    request.fields['permission'] = loanDisApprovalL1Perm;
     request.fields['installNum'] = _installmentsApprovedControllerL1.text;
     request.fields['dedDate'] = _deductionDateControllerL1.text;
     request.fields['loanReqId'] = loanReqIdReceived.toString();
@@ -663,7 +675,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
 // Add static fields
     request.fields['sessionId'] = sessionId!;
-    request.fields['permission'] = "LOAN_APPROVAL_LEVEL_TWO_ADD";
+    request.fields['permission'] = loanApprovalL2Perm;
     request.fields['installNum'] = _installmentsApprovedControllerL1.text;
     request.fields['dedDate'] = _deductionDateControllerL1.text;
     request.fields['loanReqId'] = loanReqIdReceived.toString();
@@ -724,7 +736,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
 // Add static fields
     request.fields['sessionId'] = sessionId!;
-    request.fields['permission'] = "LOAN_APPROVAL_LEVEL_TWO_DELETE";
+    request.fields['permission'] = loanDisApprovalL2Perm;
     request.fields['installNum'] = _installmentsApprovedControllerL1.text;
     request.fields['dedDate'] = _deductionDateControllerL1.text;
     request.fields['loanReqId'] = loanReqIdReceived.toString();
@@ -785,7 +797,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
 // Add static fields
     request.fields['sessionId'] = sessionId!;
-    request.fields['permission'] = "LOAN_APPROVAL_LEVEL_THREE_ADD";
+    request.fields['permission'] = loanApprovalL3Perm;
     request.fields['installNum'] = _installmentsApprovedControllerL1.text;
     request.fields['dedDate'] = _deductionDateControllerL1.text;
     request.fields['loanReqId'] = loanReqIdReceived.toString();
@@ -846,7 +858,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
 // Add static fields
     request.fields['sessionId'] = sessionId!;
-    request.fields['permission'] = "LOAN_APPROVAL_LEVEL_THREE_DELETE";
+    request.fields['permission'] = loanDisApprovalL3Perm;
     request.fields['installNum'] = _installmentsApprovedControllerL1.text;
     request.fields['dedDate'] = _deductionDateControllerL1.text;
     request.fields['loanReqId'] = loanReqIdReceived.toString();

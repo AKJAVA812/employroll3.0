@@ -220,6 +220,9 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
       showNodata(context, "Oops", "There is no any requisition.");
     }
     mssLoanListModal = MSSLoanListModal.fromJson(mapResponse);
+    totalDisapprovedAmt = mssLoanListModal.disApprovedValue;
+    totalApprovedAmt = mssLoanListModal.approvedValue;
+    totalPendingAmt = mssLoanListModal.pendingAmount;
 
       allUsernew = mssLoanListModal.loanRequiDataforOthers;
 
@@ -735,7 +738,15 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
                               ],
                             ),
                             const SizedBox(height: 12),
-          
+                            //Employee Name
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Employee Name", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
+                                Text("${foundDataNew![i].empName}", style: const TextStyle(fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
                             // Requested Date
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -745,6 +756,7 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
                               ],
                             ),
                             const SizedBox(height: 8),
+
           
                             // installments
                             Row(

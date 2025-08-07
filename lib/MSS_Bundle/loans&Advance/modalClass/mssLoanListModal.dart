@@ -1,23 +1,36 @@
 class MSSLoanListModal {
+  dynamic approvedValue;
   List<LoanRequiDataforOthers>? loanRequiDataforOthers;
+  dynamic disApprovedValue;
+  dynamic pendingAmount;
 
-  MSSLoanListModal({this.loanRequiDataforOthers});
+  MSSLoanListModal(
+      {this.approvedValue,
+        this.loanRequiDataforOthers,
+        this.disApprovedValue,
+        this.pendingAmount});
 
   MSSLoanListModal.fromJson(Map<String, dynamic> json) {
+    approvedValue = json['approvedValue'];
     if (json['loanRequiDataforOthers'] != null) {
       loanRequiDataforOthers = <LoanRequiDataforOthers>[];
       json['loanRequiDataforOthers'].forEach((v) {
         loanRequiDataforOthers!.add(new LoanRequiDataforOthers.fromJson(v));
       });
     }
+    disApprovedValue = json['disApprovedValue'];
+    pendingAmount = json['pendingAmount'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['approvedValue'] = this.approvedValue;
     if (this.loanRequiDataforOthers != null) {
       data['loanRequiDataforOthers'] =
           this.loanRequiDataforOthers!.map((v) => v.toJson()).toList();
     }
+    data['disApprovedValue'] = this.disApprovedValue;
+    data['pendingAmount'] = this.pendingAmount;
     return data;
   }
 }
