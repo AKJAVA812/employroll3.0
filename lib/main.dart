@@ -111,6 +111,7 @@ import 'ess/loan&Advance/myLoanRequestRaisePage.dart';
 import 'ess/loan&Advance/myLoanSummary.dart';
 import 'ess/myAllReports.dart';
 import 'ess/myAllRequestsPage.dart';
+import 'ess/realtimeESSDashboard.dart';
 import 'faceRecognizationAttendance/FaceRecognitionHome.dart';
 import 'faceRecognizationAttendance/attendancMarkAi.dart';
 import 'faceRecognizationAttendance/empListFaceRegistered.dart';
@@ -776,12 +777,17 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.myLoanSummaryRoute: (context) => LoanSummaryPage(),
           MyRoutings.myLoanLedgerRoute: (context) => MyLoanLedgerPage(),
           MyRoutings.pendingLoanRequestListRoute: (context) => PendingLoanRequestList(),
-          MyRoutings.loanApprovalPageRoute: (context) => LoanApprovalPage(),
+          MyRoutings.loanApprovalPageRoute: (context) => LoanApprovalPage(loanReqId: 0,),
           //Check for updates
           MyRoutings.checkForUpdatesRoute: (context) => UpdateChecker(),
 
           //Company Policy
           MyRoutings.companyPolicyListRoute: (context) => CompanyPoliciesPage(),
+
+          //Real-Time Dashboards
+          MyRoutings.realtimeESSDashboard: (context) => RealTimeESSDashboard(EssDashboarrdModel()),
+
+
 
 
 

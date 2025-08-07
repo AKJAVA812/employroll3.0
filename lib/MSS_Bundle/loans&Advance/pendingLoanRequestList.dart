@@ -44,6 +44,7 @@ SessionManager shared = SessionManager();
 String? sessionId;
 dynamic userPanel;
 dynamic getProfileId;
+dynamic loanReqIdSend;
 
 List<LoanRequiDataforOthers>? allUsernew=[];
 List<LoanRequiDataforOthers>? foundDataNew=[];
@@ -689,8 +690,11 @@ class _PendingLoanRequestListState extends State<PendingLoanRequestList> with Ro
           
                   return InkWell(
                     onTap: () {
+                      loanReqIdSend = foundDataNew![i].loanReqId;
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => LoanApprovalPage()));
+                          MaterialPageRoute(builder: (context) => LoanApprovalPage(
+                            loanReqId:loanReqIdSend
+                          )));
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

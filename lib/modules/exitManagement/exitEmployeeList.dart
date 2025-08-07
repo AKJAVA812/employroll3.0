@@ -36,12 +36,15 @@ class ExitEmployeeListView extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+dynamic userPermission;
+dynamic getProfileId;
 List<Data>? allUsernew=[];
 List<Data>? foundDataNew=[];
 ExitEmpListModal? employeeListModelglobel;
 ExitEmpListModal? employeeListModelglobeled;
 var empNameExited;
 var empIdExited;
+
 bool isLoading = true;
 Future<ExitEmpListModal>? futureExitEmpList;
 class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteAware{
@@ -78,6 +81,8 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPermission = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<ExitEmpListModal> getEmployeeList11 = getEmployeeList(sessionId!);
     futureExitEmpList = getEmployeeList(sessionId!);
@@ -104,7 +109,11 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
     String apiUrl = ApiDetails.exitEmpListApi;
     print('employeeList11: ${SessionId}');
     ExitEmpListModal employeeListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "userPermission=$userPermission&"
+        "profileId=$getProfileId&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.body}');

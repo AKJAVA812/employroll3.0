@@ -327,4 +327,12 @@ class MyRoutings {
 
   //Company Policy
   static String companyPolicyListRoute= "/companyPolicyListRoute";
+
+
+  //Real-Time Dashboards
+  static String realtimeESSDashboard= "/realtimeESSDashboard";
+  static String realtimeMSSDashboard= "/realtimeMSSDashboard";
+
+
+
 }

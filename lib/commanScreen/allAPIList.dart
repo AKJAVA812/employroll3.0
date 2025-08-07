@@ -5,7 +5,7 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://08a0044bf65e.ngrok.app/";
+   //static var server="https://8828fc22fea7.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -209,6 +209,13 @@ class ApiDetails{
    static var requestSkipInstalmentApi = "restful/service/employee/loan/skip/emp/request";
    static var loanRequestUpdateApi = "restful/service/org/loan/and/advance/request/data/update";
    static var loanRequestDeleteApi = "restful/service/org/loan/and/advance/pending/request/self/delete";
+   static var loanApproveL1Api = "restful/service/org/loan/approval/details/for/anEmp/level/one";
+   static var loanDisApproveL1Api = "restful/service/api/org/loan/disapproved/details/for/anEmp/level/one";
+   static var loanApproveL2Api = "restful/service/org/loan/approval/details/for/anEmp/level/two";
+   static var loanDisApproveL2Api = "restful/service/org/loan/disapproved/details/for/anEmp/level/two";
+   static var loanApproveL3Api = "restful/service/org/loan/approval/details/for/anEmp/level/three";
+   static var loanDisApproveL3Api = "restful/service/org/loan/disapproved/details/for/anEmp/level/three";
+   static var loanDataViewToApproveApi = "restful/service/loan/and/advance/details/ofEmployee/raise/list";
 
    //MSS Loan APIs
    static var mssLoanListApi = "restful/service/get/org/loans/and/advance/list/for/mss";

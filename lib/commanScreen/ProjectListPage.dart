@@ -1460,7 +1460,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 child: InkWell(
                   onTap: () {
                     //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                    Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                    Navigator.pushNamed(context, MyRoutings.realtimeESSDashboard);
                     /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
@@ -1488,7 +1488,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'ESS Dash',
+                              'Real-Time',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style:

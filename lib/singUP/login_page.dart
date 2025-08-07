@@ -46,6 +46,9 @@ String? claimLevelTwo;
 String? claimLevelThree;
 String? preOnboardShow;
 String? exitShow;
+String? loanApprovalL1Show;
+String? loanApprovalL2Show;
+String? loanApprovalL3Show;
 String? pendingLeaveRequisitions;
 bool accountExpired = false;
 
@@ -821,6 +824,33 @@ class _LoginPageState extends State<LoginPage> {
             exitShow = "false";
             shared.setExitShow(exitShow);
           }
+          if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_ONE_ADD")) {
+            print("Response: LOAN_APPROVAL_LEVEL_ONE_ADD");
+            loanApprovalL1Show = "LOAN_APPROVAL_LEVEL_ONE_ADD";
+            shared.setLoanApprovalL1Show(loanApprovalL1Show);
+          } else {
+            print("loan l1 else");
+            loanApprovalL1Show = "false";
+            shared.setLoanApprovalL1Show(loanApprovalL1Show);
+          }
+          if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_TWO_ADD")) {
+            print("Response: LOAN_APPROVAL_LEVEL_TWO_ADD");
+            loanApprovalL2Show = "LOAN_APPROVAL_LEVEL_TWO_ADD";
+            shared.setLoanApprovalL2Show(loanApprovalL2Show);
+          } else {
+            print("loan l2 else");
+            loanApprovalL2Show = "false";
+            shared.setLoanApprovalL2Show(loanApprovalL2Show);
+          }
+          if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_THREE_ADD")) {
+            print("Response: LOAN_APPROVAL_LEVEL_THREE_ADD");
+            loanApprovalL3Show = "LOAN_APPROVAL_LEVEL_THREE_ADD";
+            shared.setLoanApprovalL3Show(loanApprovalL3Show);
+          } else {
+            print("loan l3 else");
+            loanApprovalL3Show = "false";
+            shared.setLoanApprovalL3Show(loanApprovalL3Show);
+          }
 
           //MSS MO
           // 🟢 Check if the selected profile has the Pending Attendance Request permission
@@ -862,6 +892,30 @@ class _LoginPageState extends State<LoginPage> {
           // 🟢 Check if the selected profile has the OD Activate permission
           String odActivateMOPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
               ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L1 permission
+          String loanApprovalL1Permission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L2 permission
+          String loanApprovalL2Permission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L3 permission
+          String loanApprovalL3Permission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+          String loanApprovalL1DeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+          String loanApprovalL2DeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+          String loanApprovalL3DeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
               : "0";
 
           //MSS
@@ -905,6 +959,30 @@ class _LoginPageState extends State<LoginPage> {
           String odActivatePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
               ? "1"
               : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L1 permission
+          String loanApprovalL1MSSPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L2 permission
+          String loanApprovalL2MSSPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L3 permission
+          String loanApprovalL3MSSPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+          String loanApprovalL1MSSDeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+          String loanApprovalL2MSSDeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+          String loanApprovalL3MSSDeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
+              : "0";
 
           //USER
           // 🟢 Check if the selected profile has the Pending Attendance Request permission
@@ -947,6 +1025,31 @@ class _LoginPageState extends State<LoginPage> {
           String odActivateUISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
               ? "1"
               : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L1 permission
+          String loanApprovalL1UISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L2 permission
+          String loanApprovalL2UISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L3 permission
+          String loanApprovalL3UISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+          String loanApprovalL1UISDeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+          String loanApprovalL2UISDeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+              : "0";
+          // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+          String loanApprovalL3UISDeletePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+              ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
+              : "0";
+
 
           // 🟢 Save the MSS MO permission to SharedPreferences
           shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
@@ -959,6 +1062,12 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThreeMO(pendingClaimL3MOPermission);
           shared.setODActivateMO(odActivateMOPermission);
           shared.setODPendingListMO(pendingODListMOPermission);
+          shared.setLoanApprovalL1MO(loanApprovalL1Permission);
+          shared.setLoanApprovalL2MO(loanApprovalL2Permission);
+          shared.setLoanApprovalL3MO(loanApprovalL3Permission);
+          shared.setLoanApprovalDeleteL1MO(loanApprovalL1DeletePermission);
+          shared.setLoanApprovalDeleteL2MO(loanApprovalL2DeletePermission);
+          shared.setLoanApprovalDeleteL3MO(loanApprovalL3DeletePermission);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqMOPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqMOPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1MOPermValue");
@@ -969,6 +1078,12 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3MOPermission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivateMOPermission");
           print("✅ Pending OD Permission for profileId $profileIdNew: $pendingODListMOPermission");
+          print("✅ Loan Approval L1 Permission for profileId $profileIdNew: $loanApprovalL1Permission");
+          print("✅ Loan Approval L2 Permission for profileId $profileIdNew: $loanApprovalL2Permission");
+          print("✅ Loan Approval L3 Permission for profileId $profileIdNew: $loanApprovalL3Permission");
+          print("✅ Loan Approval L1 Delete Permission for profileId $profileIdNew: $loanApprovalL1DeletePermission");
+          print("✅ Loan Approval L2 Delete Permission for profileId $profileIdNew: $loanApprovalL2DeletePermission");
+          print("✅ Loan Approval L3 Delete Permission for profileId $profileIdNew: $loanApprovalL3DeletePermission");
 
           // 🟢 Save the MSS permission to SharedPreferences
           shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
@@ -981,6 +1096,12 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThree(pendingClaimL3Permission);
           shared.setODActivate(odActivatePermission);
           shared.setODPendingList(pendingODListPermission);
+          shared.setLoanApprovalL1MSS(loanApprovalL1MSSPermission);
+          shared.setLoanApprovalL2MSS(loanApprovalL2MSSPermission);
+          shared.setLoanApprovalL3MSS(loanApprovalL3MSSPermission);
+          shared.setLoanApprovalDeleteL1MSS(loanApprovalL1MSSDeletePermission);
+          shared.setLoanApprovalDeleteL2MSS(loanApprovalL2MSSDeletePermission);
+          shared.setLoanApprovalDeleteL3MSS(loanApprovalL3MSSDeletePermission);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqMSSPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqMSSPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1MSSPermValue");
@@ -991,6 +1112,12 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3Permission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivatePermission");
           print("✅ Pending OD List Permission for profileId $profileIdNew: $pendingODListPermission");
+          print("✅ Loan Approval L1 Permission for profileId $profileIdNew: $loanApprovalL1MSSPermission");
+          print("✅ Loan Approval L2 Permission for profileId $profileIdNew: $loanApprovalL2MSSPermission");
+          print("✅ Loan Approval L3 Permission for profileId $profileIdNew: $loanApprovalL3MSSPermission");
+          print("✅ Loan Approval L1 Delete Permission for profileId $profileIdNew: $loanApprovalL1MSSDeletePermission");
+          print("✅ Loan Approval L2 Delete Permission for profileId $profileIdNew: $loanApprovalL2MSSDeletePermission");
+          print("✅ Loan Approval L3 Delete Permission for profileId $profileIdNew: $loanApprovalL3MSSDeletePermission");
 
           // 🟢 Save the UIS permission to SharedPreferences
           shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
@@ -1003,6 +1130,12 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThreeUIS(pendingClaimL3UISPermission);
           shared.setODActivateUIS(odActivateUISPermission);
           shared.setODPendingListUIS(pendingODListUISPermission);
+          shared.setLoanApprovalL1UIS(loanApprovalL1UISPermission);
+          shared.setLoanApprovalL2UIS(loanApprovalL2UISPermission);
+          shared.setLoanApprovalL3UIS(loanApprovalL3UISPermission);
+          shared.setLoanApprovalDeleteL1UIS(loanApprovalL1UISDeletePermission);
+          shared.setLoanApprovalDeleteL2UIS(loanApprovalL2UISDeletePermission);
+          shared.setLoanApprovalDeleteL3UIS(loanApprovalL3UISDeletePermission);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqUISPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqUISPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1UISPermValue");
@@ -1013,6 +1146,12 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3UISPermission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivateUISPermission");
           print("✅ Pending OD List Permission for profileId $profileIdNew: $pendingODListUISPermission");
+          print("✅ Loan Approval L1 Permission for profileId $profileIdNew: $loanApprovalL1UISPermission");
+          print("✅ Loan Approval L2 Permission for profileId $profileIdNew: $loanApprovalL2UISPermission");
+          print("✅ Loan Approval L3 Permission for profileId $profileIdNew: $loanApprovalL3UISPermission");
+          print("✅ Loan Approval L1 Delete Permission for profileId $profileIdNew: $loanApprovalL1UISDeletePermission");
+          print("✅ Loan Approval L2 Delete Permission for profileId $profileIdNew: $loanApprovalL2UISDeletePermission");
+          print("✅ Loan Approval L3 Delete Permission for profileId $profileIdNew: $loanApprovalL3UISDeletePermission");
         }
 
         print('Profile Name $profileName');
