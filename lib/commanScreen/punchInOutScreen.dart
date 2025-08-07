@@ -2600,6 +2600,30 @@ class _DrawerFileState extends State<DrawerFile> {
                               String loanActivateMOPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
+                              String loanApprovalL1Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
+                              String loanApprovalL2Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
+                              String loanApprovalL3Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+                              String loanApprovalL1DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+                              String loanApprovalL2DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+                              String loanApprovalL3DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
+                                  : "0";
 
                               //MSS
                               // 🟢 Check if the selected profile has the Pending Attendance Request permission
@@ -2645,6 +2669,30 @@ class _DrawerFileState extends State<DrawerFile> {
                               // 🟢 Check if the selected profile has the Loan Activate permission
                               String loanActivatePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
+                              String loanApprovalL1MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
+                              String loanApprovalL2MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
+                              String loanApprovalL3MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+                              String loanApprovalL1MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+                              String loanApprovalL2MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+                              String loanApprovalL3MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
                                   : "0";
 
                               //USER
@@ -2692,6 +2740,30 @@ class _DrawerFileState extends State<DrawerFile> {
                               String loanActivateUISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
+                              String loanApprovalL1UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
+                              String loanApprovalL2UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
+                              String loanApprovalL3UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+                              String loanApprovalL1UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+                              String loanApprovalL2UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+                              String loanApprovalL3UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
+                                  : "0";
 
                               // 🟢 Save the MSS MO permission to SharedPreferences
                               await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
@@ -2705,6 +2777,12 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setODActivateMO(odActivateMOPermission);
                               await shared.setODPendingListMO(pendingODListMOPermission);
                               await shared.setLoanPendingListMO(loanActivateMOPermission);
+                              await shared.setLoanApprovalL1MO(loanApprovalL1Permission);
+                              await shared.setLoanApprovalL2MO(loanApprovalL2Permission);
+                              await shared.setLoanApprovalL3MO(loanApprovalL3Permission);
+                              await shared.setLoanApprovalDeleteL1MO(loanApprovalL1DeletePermission);
+                              await shared.setLoanApprovalDeleteL2MO(loanApprovalL2DeletePermission);
+                              await shared.setLoanApprovalDeleteL3MO(loanApprovalL3DeletePermission);
                               print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
                               print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
                               print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
@@ -2716,6 +2794,12 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateMOPermission");
                               print("✅ Pending OD Permission for profileId $selectedProfileId: $pendingODListMOPermission");
                               print("✅ Loan Activate Permission for profileId $selectedProfileId: $loanActivateMOPermission");
+                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1Permission");
+                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2Permission");
+                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3Permission");
+                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1DeletePermission");
+                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2DeletePermission");
+                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3DeletePermission");
 
                               // 🟢 Save the MSS permission to SharedPreferences
                               await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
@@ -2729,6 +2813,12 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setODActivate(odActivatePermission);
                               await shared.setODPendingList(pendingODListPermission);
                               await shared.setLoanPendingList(loanActivatePermission);
+                              await shared.setLoanApprovalL1MSS(loanApprovalL1MSSPermission);
+                              await shared.setLoanApprovalL2MSS(loanApprovalL2MSSPermission);
+                              await shared.setLoanApprovalL3MSS(loanApprovalL3MSSPermission);
+                              await shared.setLoanApprovalDeleteL1MSS(loanApprovalL1MSSDeletePermission);
+                              await shared.setLoanApprovalDeleteL2MSS(loanApprovalL2MSSDeletePermission);
+                              await shared.setLoanApprovalDeleteL3MSS(loanApprovalL3MSSDeletePermission);
                               print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMSSPermValue");
                               print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMSSPermValue");
                               print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MSSPermValue");
@@ -2740,6 +2830,12 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivatePermission");
                               print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListPermission");
                               print("✅ Loan Activate Permission for profileId $selectedProfileId: $loanActivatePermission");
+                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1MSSPermission");
+                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2MSSPermission");
+                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3MSSPermission");
+                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1MSSDeletePermission");
+                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2MSSDeletePermission");
+                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3MSSDeletePermission");
                               // Notify global listener
                               permissionNotifier.updatePermission(pendingClaimL1Permission);
                               permissionNotifier.updatePermission(pendingClaimL2Permission);
@@ -2759,6 +2855,12 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setODActivateUIS(odActivateUISPermission);
                               await shared.setODPendingListUIS(pendingODListUISPermission);
                               await shared.setLoanPendingListUIS(loanActivateUISPermission);
+                              await shared.setLoanApprovalL1UIS(loanApprovalL1UISPermission);
+                              await shared.setLoanApprovalL2UIS(loanApprovalL2UISPermission);
+                              await shared.setLoanApprovalL3UIS(loanApprovalL3UISPermission);
+                              await shared.setLoanApprovalDeleteL1UIS(loanApprovalL1UISDeletePermission);
+                              await shared.setLoanApprovalDeleteL2UIS(loanApprovalL2UISDeletePermission);
+                              await shared.setLoanApprovalDeleteL3UIS(loanApprovalL3UISDeletePermission);
                               print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqUISPermValue");
                               print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqUISPermValue");
                               print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1UISPermValue");
@@ -2769,6 +2871,12 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3UISPermission");
                               print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateUISPermission");
                               print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListUISPermission");
+                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1UISPermission");
+                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2UISPermission");
+                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3UISPermission");
+                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1UISDeletePermission");
+                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2UISDeletePermission");
+                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3UISDeletePermission");
                               // 🟢 Save selected profile details
                               await shared.setDefaultProfileId(selectedProfileId);
                               await shared.setDefaultProfileName(selectedProfileName);
