@@ -321,6 +321,9 @@ class MyRoutings {
   static String pendingLoanRequestListRoute= "/pendingLoanRequestListRoute";
   static String loanApprovalPageRoute= "/loanApprovalPageRoute";
 
+  //Loan MSS MO
+  static String pendingLoanListMO= "/pendingLoanListMO";
+
 
   //Check for updates
   static String checkForUpdatesRoute= "/checkForUpdatesRoute";

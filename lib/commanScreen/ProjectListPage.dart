@@ -773,7 +773,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Loan
-        if(orgId == 3 || orgId == 145) {
+        if(orgId == 3 || orgId == 145 || orgId == 179) {
           items.add(
             Hero(
               tag: 'loanAdvanceReport',

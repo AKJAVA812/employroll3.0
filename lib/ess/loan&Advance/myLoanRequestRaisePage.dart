@@ -239,12 +239,13 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                         if (i != -1 && i < loanTypeId.length) {
                           loanId = loanTypeId[i].toString();
                           print("depart $loanTypeId");
+                          print("loan Id -  $loanId");
                         } else {
                           loanTypeId;
                           print("Invalid Loan selection");
                         }
                         int j = loanTypes.indexOf(newVal);
-                        if (i != -1 && j < loanTypeSend.length) {
+                        if (j != -1 && j < loanTypeSend.length) {
                           loanTypeSending = loanTypeSend[i].toString();
                           print("loanType -  $loanTypeSending");
                         } else {
@@ -424,7 +425,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     request.fields['sessionId'] = sessionId!;
     request.fields['Remarks'] = remarkController.text;
     request.fields['requestRadio'] = requestType;
-    request.fields['LoanType'] = loanTypeSending;
+    request.fields['LoanType'] = loanId;
     request.fields['LoanAmount'] = amountController.text;
     request.fields['LoanStartDate'] = startDateController.text;
     request.fields['Instalments'] = installmentController.text;

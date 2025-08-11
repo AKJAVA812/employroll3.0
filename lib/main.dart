@@ -74,6 +74,7 @@ import 'MSS_MO_Bundle/leaveManagement/levelOneLeaveReq.dart';
 import 'MSS_MO_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import 'MSS_MO_Bundle/leaveManagement/othersEmpRequisition.dart';
 import 'MSS_MO_Bundle/leaveManagement/pendingRequisitionList.dart';
+import 'MSS_MO_Bundle/loans&Advance/pendingLoanRequestList.dart';
 import 'MSS_MO_Bundle/myTeam/myTeams.dart';
 import 'MSS_MO_Bundle/reports/RoWorkDoneReportFiltering.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
@@ -740,6 +741,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //Exit List MO
           MyRoutings.exitListMORoute: (context) => ExitListViewMO(),
+          //Loan List MO
+          MyRoutings.pendingLoanListMO: (context) => PendingLoanRequestListMO(),
 
           //UIS Bundle
           MyRoutings.uisAttPendingRequestRoRoute: (context) => UIS_PendingRequisitionRo(PendingRequisitionModel()),
