@@ -151,7 +151,15 @@ class _LoanAdvanceWidgetState extends State<LoanAdvanceWidget> {
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
 
-      if(userPanelPermission == "MSS" && pendingLoanRequestMSSL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" || pendingLoanRequestMSSL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" || pendingLoanRequestMSSL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"){
+      //MSS
+      if (
+      userPanelPermission == "MSS" &&
+          (
+              pendingLoanRequestMSSL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                  pendingLoanRequestMSSL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                  pendingLoanRequestMSSL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
+          )
+      ) {
         //Pending Loan Request List
         items.add(
           Card(
@@ -200,8 +208,15 @@ class _LoanAdvanceWidgetState extends State<LoanAdvanceWidget> {
           ),
         );
       }
-
-      if(userPanelPermission == "MSS_MO_ADMIN" && pendingLoanRequestMoL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" || pendingLoanRequestMoL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" || pendingLoanRequestMoL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"){
+      //MSS MO
+      if (
+      userPanelPermission == "MSS_MO_ADMIN" &&
+          (
+              pendingLoanRequestMoL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                  pendingLoanRequestMoL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                  pendingLoanRequestMoL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
+          )
+      ) {
         //Pending Loan Request List
         items.add(
           Card(
@@ -251,7 +266,15 @@ class _LoanAdvanceWidgetState extends State<LoanAdvanceWidget> {
         );
       }
 
-      if(userPanelPermission == "USER" && pendingLoanRequestUISL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" || pendingLoanRequestUISL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" || pendingLoanRequestUISL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"){
+      //USER
+      if (
+      userPanelPermission == "USER" &&
+          (
+              pendingLoanRequestUISL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                  pendingLoanRequestUISL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                  pendingLoanRequestUISL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
+          )
+      ) {
         //Pending Loan Request List
         items.add(
           Card(
@@ -300,8 +323,7 @@ class _LoanAdvanceWidgetState extends State<LoanAdvanceWidget> {
           ),
         );
       }
-
-
+      
       return items;
     }
     return Material(

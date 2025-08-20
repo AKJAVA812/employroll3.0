@@ -903,6 +903,8 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
     );
   }
 
+  Color statusColors = Mythemes.lightBluishColor;
+
   getLoanSelfReqList(MSSLoanListModal mssLoanListModal) {
     return RefreshIndicator(
       onRefresh: () {
@@ -923,6 +925,14 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
               //controller: _controller,
                 itemCount: foundDataNew!.length,
                 itemBuilder: (context , i) {
+                if(foundDataNew![i].statusShow == "APPROVED") {
+                  statusColors = Mythemes.successColor;
+                }
+                else if(foundDataNew![i].statusShow == "DISAPPROVED") {
+                statusColors = Mythemes.dangerColor;
+              } else {
+                statusColors = Mythemes.lightBluishColor;
+              }
 
                   foundDataNew![i].status;
                   print(foundDataNew![i].status);
@@ -930,10 +940,22 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                   return InkWell(
                     onTap: () {
                       loanReqIdSend = foundDataNew![i].loanReqId;
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => LoanApprovalPage(
-                            loanReqId:loanReqIdSend
-                          )));
+                      if(foundDataNew![i].statusShow == "APPROVED" || foundDataNew![i].statusShow == "DISAPPROVED") {
+                        Fluttertoast.showToast(
+                            msg: "This loan is ${foundDataNew![i].statusShow} !!",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0
+                        );
+                      } else {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => LoanApprovalPage(
+                                loanReqId:loanReqIdSend
+                            )));
+                      }
                     },
                     child: Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -959,7 +981,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue.shade600,
+                                    color: statusColors,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(

@@ -3,6 +3,7 @@ import 'dart:convert' show json, utf8;
 import 'dart:io';
 
 import 'package:er_flutter_project/commanScreen/accountSuspend.dart';
+import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/singUP/model/loginFaild.dart';
@@ -124,8 +125,11 @@ class _LoginPageState extends State<LoginPage> {
     changeButton = true;
     LoginModel loginModel;
     LoginFaild loginFaild;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "userName=$emailId&password=$password");
+    /*var urlapi = Uri.parse("$conn$apiUrl?"
+        "userName=$emailId&password=$password");*/
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?userName=${Uri.encodeComponent(emailId)}&password=${Uri.encodeComponent(password)}"
+    );
     /*var urlapi = Uri.parse(
         "http://www.employroll.com/restful/service/login?userName=$emailId&password=$password");*/
     /*  final response= await http.get(urlapi,headers: {
@@ -335,15 +339,22 @@ class _LoginPageState extends State<LoginPage> {
         } else {
 
         }*/
+        accountExpired = mapResponse['data']['expired'];
+        print("Account Expired - $accountExpired");
+        if(accountExpired == true) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AccountSuspendPage()));
+        } else {
+          if(empLength == 1 || roLength == 1) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          }
+          else if(adminlength == 1){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => AdminPanelScreen()));
+          }
+        }
 
-        if(empLength == 1 || roLength == 1) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
-        }
-        else if(adminlength == 1){
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AdminPanelScreen()));
-        }
 
 
         /*else {
@@ -504,7 +515,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             InkWell(
                               onTap: () {
-                                Navigator.pushNamed(context, MyRoutings.forgetPasswordEmailRoute);
+                                //Navigator.pushNamed(context, MyRoutings.forgetPasswordEmailRoute);
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ForgotPasswordEmailPage()));
                               },
                               child: Align(
                                 alignment: Alignment.centerRight,

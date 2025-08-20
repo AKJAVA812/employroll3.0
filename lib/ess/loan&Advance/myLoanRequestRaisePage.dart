@@ -316,7 +316,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                       final totalInstallments = int.tryParse(installmentController.text) ?? 1;
                       //final employeeName = "Bharat Rajora (EMP-1024)";
 
-                      if (startDate != null && totalAmount > 0 && totalInstallments > 0) {
+                      if (startDate != null && totalAmount > 0 && totalInstallments > 0 && selectedLoanType != null) {
                         /*setState(() {
                           isLoading = true;
                         });*/

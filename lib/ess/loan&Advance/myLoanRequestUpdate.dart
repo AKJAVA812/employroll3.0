@@ -176,10 +176,11 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
     startDateController.text = loanStartDate;
     installmentController.text = instalments.toString();
     remarkController.text = remarks;
-    if (loanTypes.contains(loanType)) {
+    print("Loan Type Choose - $loanType");
+    if (loanType != null && loanTypes.contains(loanType)) {
       selectedLoanType = loanType;
     } else {
-      selectedLoanType = null; // or loanTypes.isNotEmpty ? loanTypes.first : null
+      selectedLoanType = null;
     }
     getLoanTypeMaster(sessionId!);
     setState(() {
@@ -292,7 +293,7 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
                       customDropdown(
                         icon: Icons.menu,
                         label: "Loan Type",
-                        value: selectedLoanType,
+                        value: selectedLoanType ?? (loanTypes.isNotEmpty ? loanTypes.first : null),
                         items: loanTypes, // Pass the raw list of strings
                         onChanged: (newVal) {
                           setState(() {

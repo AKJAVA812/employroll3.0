@@ -2093,7 +2093,7 @@ class _DefaultPageState extends State<DefaultPage> {
     String reasonSuccess = result['reason'];
     //print('result${result}');
 
-    //print('URL ${response.request}');
+    print('URL ${response.request}');
     if (response.statusCode == 200) {
       print("I m Punch in");
       Navigator.of(context, rootNavigator: true).pop();
