@@ -56,6 +56,15 @@ String? claimLevelThreeMSS;
 String? claimLevelOneUIS;
 String? claimLevelTwoUIS;
 String? claimLevelThreeUIS;
+String pendingLoanRequestMoL1Permission = "0";
+String pendingLoanRequestMoL2Permission = "0";
+String pendingLoanRequestMoL3Permission = "0";
+String pendingLoanRequestMSSL1Permission = "0";
+String pendingLoanRequestMSSL2Permission = "0";
+String pendingLoanRequestMSSL3Permission = "0";
+String pendingLoanRequestUISL1Permission = "0";
+String pendingLoanRequestUISL2Permission = "0";
+String pendingLoanRequestUISL3Permission = "0";
 class _ProjectListState extends State<ProjectList> with RouteAware{
   @override
   void didChangeDependencies() {
@@ -155,6 +164,19 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     claimLevelOneUIS = await shared!.getClaimLevelOneUIS();
     claimLevelTwoUIS = await shared!.getClaimLevelTwoUIS();
     claimLevelThreeUIS = await shared!.getClaimLevelThreeUIS();
+    pendingLoanRequestMoL1Permission = (await shared.getLoanApprovalL1MO())!;
+    pendingLoanRequestMSSL1Permission= (await shared.getLoanApprovalL1MSS())!;
+    pendingLoanRequestUISL1Permission= (await shared.getLoanApprovalL1UIS())!;
+    pendingLoanRequestMoL2Permission = (await shared.getLoanApprovalL2MO())!;
+    pendingLoanRequestMSSL2Permission= (await shared.getLoanApprovalL2MSS())!;
+    pendingLoanRequestUISL2Permission= (await shared.getLoanApprovalL2UIS())!;
+    pendingLoanRequestMoL3Permission = (await shared.getLoanApprovalL3MO())!;
+    pendingLoanRequestMSSL3Permission= (await shared.getLoanApprovalL3MSS())!;
+    pendingLoanRequestUISL3Permission= (await shared.getLoanApprovalL3UIS())!;
+    print("Pending Attendance Request MSS MO- $pendingLoanRequestMoL1Permission");
+    print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
+    print("Pending Attendance Request UIS- $pendingLoanRequestUISL1Permission");
+
     if(userPanel == "COMPANY_EMPLOYEE") {
       value = 0;
     } else {
@@ -773,16 +795,24 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Loan
-        if(orgId == 3 || orgId == 145 || orgId == 179) {
-          items.add(
-            Hero(
-              tag: 'loanAdvanceReport',
-              child: Card(
-                color: Mythemes.whitish,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
-                    /*Fluttertoast.showToast(
+          //MSS MO
+          if(
+              userPanel == "MSS_MO_ADMIN" &&
+                  (
+                      pendingLoanRequestMoL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                          pendingLoanRequestMoL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                          pendingLoanRequestMoL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
+                  )
+          ){
+            items.add(
+              Hero(
+                tag: 'loanAdvanceReport',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
+                      /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -791,39 +821,162 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.money,
-                          size: 50,
-                          color: Mythemes.lightBluishColor,
-                        ),
-                        /*Image(
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.money,
+                            size: 50,
+                            color: Mythemes.lightBluishColor,
+                          ),
+                          /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 75, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                              'Loan',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'Loan',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }
+            );
+
+          }
+
+          //MSS
+          if( userPanel == "MSS" &&
+              (
+                  pendingLoanRequestMSSL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                      pendingLoanRequestMSSL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                      pendingLoanRequestMSSL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
+              )
+          ){
+            items.add(
+              Hero(
+                tag: 'loanAdvanceReport',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
+                      /*Fluttertoast.showToast(
+                      msg: "Not Activated",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );*/
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.money,
+                            size: 50,
+                            color: Mythemes.lightBluishColor,
+                          ),
+                          /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'Loan',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+
+          }
+
+          //USER
+          if(
+          userPanel == "USER" &&
+              (
+                  pendingLoanRequestMoL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                      pendingLoanRequestMoL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                      pendingLoanRequestMoL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
+              )
+          ){
+            items.add(
+              Hero(
+                tag: 'loanAdvanceReport',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
+                      /*Fluttertoast.showToast(
+                      msg: "Not Activated",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );*/
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.money,
+                            size: 50,
+                            color: Mythemes.lightBluishColor,
+                          ),
+                          /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'Loan',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+
+          }
+
 
         //Helpdesk
         if(orgId == 3 || orgId == 145) {

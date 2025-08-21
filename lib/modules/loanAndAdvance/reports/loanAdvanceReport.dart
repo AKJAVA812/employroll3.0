@@ -152,8 +152,7 @@ class _LoanAdvanceWidgetState extends State<LoanAdvanceWidget> {
       List<Widget> items = [];
 
       //MSS
-      if (
-      userPanelPermission == "MSS" &&
+      if ( userPanelPermission == "MSS" &&
           (
               pendingLoanRequestMSSL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
                   pendingLoanRequestMSSL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
