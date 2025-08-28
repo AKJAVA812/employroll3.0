@@ -65,50 +65,76 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
     super.initState();
     getSharedPrfanceList();
   }
+  bool isLoading = true;   // 🔹 Track loading state
+  bool noData = false;
+
 
   Future getSharedPrfanceList() async {
+    setState(() {
+      isLoading = true;
+      noData = false;
+    });
+
     sessionId = await shared!.getSessionId();
     userPanelPerm = await shared!.getUserPanel();
     getProfileId = await shared!.getDefaultProfileId();
-    // await Future.delayed(Duration(seconds: 5));
-    Future<DisapprovedRequisitionModel> getAppReq11 = getDisapprovedReqList(sessionId!);
-    final loading = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        CircularProgressIndicator(),
-        Text(" Login ... Please wait")
-      ],
-    );
+
+    Future<DisapprovedRequisitionModel?> getAppReq11 =
+    getDisapprovedReqList(sessionId!);
 
     getAppReq11.then((value) {
       setState(() {
-        disapprovedRequisitionLabel=value;
+        isLoading = false;
+        if (value != null && value.data != null && value.data!.isNotEmpty) {
+          disapprovedRequisitionLabel = value;
+          noData = false;
+        } else {
+          disapprovedRequisitionLabel = null;
+          noData = true;  // 🔹 Mark as no data
+        }
       });
-      //print('employeeList00${disapprovedRequisitionLabel!.data!.length}');
     });
   }
 
-  Future<DisapprovedRequisitionModel> getDisapprovedReqList(String SessionId) async {
+  Future<DisapprovedRequisitionModel?> getDisapprovedReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.disApprovedAttReqList;
-    print('employeeList11: ${SessionId}');
-    DisapprovedRequisitionModel disapprovedRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "userPermission=$userPanelPerm&"
-        "profileId=$getProfileId&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    print('employeeList11: $SessionId');
 
-    print('responseemployeeList ${response.body}');
-    print('Attendance DisApproved APIs - ${response.request}');
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
-    disapprovedRequisitionModel=DisapprovedRequisitionModel.fromJson(mapResponse);
+    try {
+      var urlapi = Uri.parse("$conn$apiUrl?"
+          "sessionId=$SessionId&"
+          "userPermission=$userPanelPerm&"
+          "profileId=$getProfileId&"
+          "orgId=0");
 
-    return disapprovedRequisitionModel;
+      final response = await http.post(urlapi);
+
+      print('responseemployeeList ${response.body}');
+      print('Attendance DisApproved APIs - ${response.request}');
+
+      if (response.statusCode == 200) {
+        mapResponse = json.decode(response.body);
+
+        if (mapResponse != null && mapResponse['data'] != null) {
+          var getData = mapResponse['data'];
+          print('responseemployeeList $getData');
+
+          return DisapprovedRequisitionModel.fromJson(mapResponse);
+        } else {
+          print("⚠️ No data found in response");
+          return null;
+        }
+      } else {
+        print("⚠️ API Error: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("❌ Exception in getDisapprovedReqList: $e");
+      return null;
+    }
   }
+
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 2;
@@ -117,11 +143,11 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
     return Scaffold(
       appBar: AppBar(
         title: "Disapproved Requisition List".text.overflow(TextOverflow.ellipsis).maxLines(1).make(),
-        /*leading: IconButton(
+        leading: IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             },
-            icon: Icon(Icons.arrow_back_ios)),*/
+            icon: Icon(Icons.arrow_back_ios)),
         actions: [
           IconButton(
               onPressed: () {
@@ -189,7 +215,7 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
                     if(value == 1) {
-                      Navigator.pushNamed(context, MyRoutings.approvedReqRoute);
+                      Navigator.pushNamed(context, MyRoutings.essAttendanceApprovedReq);
                     }
                     if(value == 2) {
                       Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
@@ -199,10 +225,19 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
               ],
             ).py(4),
             Expanded(
-                child: disapprovedRequisitionLabel == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getDisAppList(disapprovedRequisitionLabel!)),
+              child: isLoading
+                  ? Center(
+                child: CircularProgressIndicator(),
+              )
+                  : noData
+                  ? Center(
+                child: Text(
+                  "No data found",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              )
+                  : getDisAppList(disapprovedRequisitionLabel!),
+            ),
           ],
         ),
       ),

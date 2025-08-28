@@ -115,11 +115,11 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
     return Scaffold(
       appBar: AppBar(
         title: "Approved Requisition List".text.make(),
-        /* leading: IconButton(
+         leading: IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             },
-            icon: Icon(Icons.arrow_back_ios)),*/
+            icon: Icon(Icons.arrow_back_ios)),
         actions: [
           IconButton(
               onPressed: () {
@@ -186,7 +186,7 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
                     if(value == 1) {
-                      Navigator.pushNamed(context, MyRoutings.approvedReqRoute);
+                      Navigator.pushNamed(context, MyRoutings.essAttendanceApprovedReq);
                     }
                     if(value == 2) {
                       Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
