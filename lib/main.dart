@@ -63,6 +63,9 @@ import 'MSS_Bundle/leaveManagement/pendingRequisitionList.dart';
 import 'MSS_Bundle/loans&Advance/loanApprovalPage.dart';
 import 'MSS_Bundle/loans&Advance/pendingLoanRequestList.dart';
 import 'MSS_Bundle/reports/RoWorkDoneReportFiltering.dart' as mss;
+import 'MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL1.dart';
+import 'MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL2.dart';
+import 'MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL3.dart';
 import 'MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import 'MSS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
 import 'MSS_Bundle/timeAndAttendance/pendingReqListRo.dart';
@@ -77,6 +80,8 @@ import 'MSS_MO_Bundle/leaveManagement/pendingRequisitionList.dart';
 import 'MSS_MO_Bundle/loans&Advance/pendingLoanRequestList.dart';
 import 'MSS_MO_Bundle/myTeam/myTeams.dart';
 import 'MSS_MO_Bundle/reports/RoWorkDoneReportFiltering.dart';
+import 'MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL1.dart';
+import 'MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL2.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/pendingReqListRo.dart';
@@ -113,6 +118,7 @@ import 'ess/loan&Advance/myLoanSummary.dart';
 import 'ess/myAllReports.dart';
 import 'ess/myAllRequestsPage.dart';
 import 'ess/realtimeESSDashboard.dart';
+import 'ess/time&Attendance/essAttendanceApprovedList.dart';
 import 'faceRecognizationAttendance/FaceRecognitionHome.dart';
 import 'faceRecognizationAttendance/attendancMarkAi.dart';
 import 'faceRecognizationAttendance/empListFaceRegistered.dart';
@@ -692,9 +698,13 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.resetPasswordPageRoute: (context) => ResetPasswordPage(),
           MyRoutings.preOnboardItemRoute: (context) => PreOnboardingItems(),
           MyRoutings.exitEmpListRoute: (context) => ExitEmployeeListView(),
+          MyRoutings.essAttendanceApprovedReq: (context) => ESSAttApprovedRequisiton(ApprovedRequisitionModel()),
 
           //MSS Bundle
           MyRoutings.mssAttPendingRequestRoRoute: (context) => MSS_Att_PendingRequisitionRo(PendingRequisitionModel()),
+          MyRoutings.mssAttPendingRequestL1Route: (context) => MSS_Att_PendingRequisitionL1(PendingRequisitionModel()),
+          MyRoutings.mssAttPendingRequestL2Route: (context) => MSS_Att_PendingRequisitionL2(PendingRequisitionModel()),
+          MyRoutings.mssAttPendingRequestL3Route: (context) => MSS_Att_PendingRequisitionL3(PendingRequisitionModel()),
           MyRoutings.mssPendingOdRequisitionRoute: (context) => MSS_PendingOdRequisition(PendingOdReqList()),
           MyRoutings.mssOthersAttRequestPageRoute: (context) => MSS_OthersAttendanceRequisitionPage(),
 
@@ -719,7 +729,8 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.mssMoAttPendingRequestRoRoute: (context) => MSS_MO_PendingRequisitionRo(PendingRequisitionModel()),
           MyRoutings.mssMoPendingOdRequisitionRoute: (context) => MSS_MO_PendingOdRequisition(PendingOdReqList()),
           MyRoutings.mssMoOthersAttRequestPageRoute: (context) => MSS_MO_OthersAttendanceRequisitionPage(),
-
+          MyRoutings.mssMOPendingAttReqL1: (context) => MSS_MO_Att_PendingRequisitionL1(PendingRequisitionModel()),
+          MyRoutings.mssMOPendingAttReqL2: (context) => MSS_MO_Att_PendingRequisitionL2(PendingRequisitionModel()),
           //Leave
           MyRoutings.mssMoPendingLeaveRequestRoute: (context) => MSS_MO_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
           MyRoutings.mssMoLevelOnePendingReqRoute: (context) => MSS_MO_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
@@ -748,7 +759,8 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.uisAttPendingRequestRoRoute: (context) => UIS_PendingRequisitionRo(PendingRequisitionModel()),
           MyRoutings.uisPendingOdRequisitionRoute: (context) => UIS_PendingOdRequisition(PendingOdReqList()),
           MyRoutings.uisOthersAttRequestPageRoute: (context) => UIS_OthersAttendanceRequisitionPage(),
-
+          MyRoutings.uisPendingAttReqL1: (context) => MSS_MO_Att_PendingRequisitionL1(PendingRequisitionModel()),
+          MyRoutings.uisPendingAttReqL2: (context) => MSS_MO_Att_PendingRequisitionL2(PendingRequisitionModel()),
           //Leave
           MyRoutings.uisPendingLeaveRequestRoute: (context) => UIS_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
           MyRoutings.uisLevelOnePendingReqRoute: (context) => UIS_LevelOnePendingLeave(LevelOnePendingLeaveModal()),

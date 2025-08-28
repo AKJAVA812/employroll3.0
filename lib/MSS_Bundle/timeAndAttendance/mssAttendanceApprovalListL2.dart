@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
+import 'package:er_flutter_project/MSS_Bundle/timeAndAttendance/pendingReqAppDIssL2.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/pendingRequisition/pendingReqAppDiss.dart';
 import 'package:flutter/material.dart';
@@ -22,12 +23,12 @@ import '../../../../themes/empThemes.dart';
 
 
 
-class MSS_Att_PendingRequisitionRo extends StatefulWidget {
+class MSS_Att_PendingRequisitionL2 extends StatefulWidget {
   final PendingRequisitionModel pendingRequisitionModel;
-  MSS_Att_PendingRequisitionRo (this.pendingRequisitionModel);
+  MSS_Att_PendingRequisitionL2 (this.pendingRequisitionModel);
 
   @override
-  State<MSS_Att_PendingRequisitionRo> createState() => _MSS_Att_PendingRequisitionRoState(pendingRequisitionModel);
+  State<MSS_Att_PendingRequisitionL2> createState() => _MSS_Att_PendingRequisitionL2State(pendingRequisitionModel);
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -45,9 +46,9 @@ String? userPanel;
 dynamic getProfileId;
 String? orgId;
 
-class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitionRo> with RouteAware{
+class _MSS_Att_PendingRequisitionL2State extends State<MSS_Att_PendingRequisitionL2> with RouteAware{
   final PendingRequisitionModel pendingRequisitionModel;
-  _MSS_Att_PendingRequisitionRoState(this.pendingRequisitionModel);
+  _MSS_Att_PendingRequisitionL2State(this.pendingRequisitionModel);
 
   @override
   void didChangeDependencies() {
@@ -86,7 +87,7 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
     sessionId = await shared!.getSessionId();
     userPanel = await shared!.getUserPanel();
     getProfileId = await shared!.getDefaultProfileId();
-    levelOne = await shared!.getPendingAttendanceReqL1MSS();
+    levelOne = await shared!.getPendingAttendanceReqL2MSS();
     levelTwo = await shared!.getPendingAttendanceReqL2MSS();
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
@@ -109,7 +110,9 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
       print('employeeList00${pendingRequisitionLabel!.data!.length}');
     });
   }
+
   var levelChange = "PENDING";
+
   Future<PendingRequisitionModel> getPendingReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListRo;
@@ -173,7 +176,7 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
 
   int pageIndex = 0;
   int currentIndex = 1;
-  int value = 0;
+  int value = 1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,7 +185,7 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
         child: SafeArea(
           child: Container(
             decoration: const BoxDecoration(color: Colors.white, border: Border(
-              top: BorderSide.none
+                top: BorderSide.none
             ), boxShadow: [
               BoxShadow(
                   color: Colors.grey,
@@ -218,6 +221,68 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
         padding: EdgeInsets.all(8.0),
         child: Column(
           children: [
+            Visibility(
+              visible: levelTwo == "1",
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedToggleSwitch<int>.size(
+                    height: 30,
+                    current: min(value, 2),
+                    style: ToggleStyle(
+                      backgroundColor: Mythemes.greyishade,
+                      indicatorColor: Mythemes.lightBluishColor,
+                      borderColor: Colors.transparent,
+                      borderRadius: BorderRadius.circular(10.0),
+                      indicatorBorderRadius: BorderRadius.zero,
+                    ),
+                    values: const [0, 1],
+                    iconOpacity: 1.0,
+                    selectedIconScale: 1.0,
+                    indicatorSize: const Size.fromWidth(90),
+                    iconAnimationType: AnimationType.onHover,
+                    styleAnimationType: AnimationType.onHover,
+                    spacing: 10.0,
+                    customSeparatorBuilder: (context, local, global) {
+                      final opacity =
+                      ((global.position - local.position).abs() - 0.5)
+                          .clamp(0.0, 1.0);
+                      return VerticalDivider(
+                          indent: 10.0,
+                          endIndent: 10.0,
+                          color: Colors.white38.withOpacity(opacity));
+                    },
+                    customIconBuilder: (context, local, global) {
+                      final text = const ['Level 1', 'Level 2'][local.index];
+                      return Center(
+                          child: Text(text,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color.lerp(Colors.black, Colors.white,
+                                      local.animationValue))));
+                    },
+                    borderWidth: 0.0,
+                    onChanged: (i) {
+                      setState(() {
+                        value = i;
+                        print(i);
+
+                      });
+
+                      if(value == 0) {
+                        Navigator.pushNamed(context, MyRoutings.mssAttPendingRequestL1Route);
+                        //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                      }
+                      if(value == 1) {
+                        Navigator.pushNamed(context, MyRoutings.mssAttPendingRequestL2Route);
+                        //Navigator.pushNamed(context, MyRoutings.mssLevelOnePendingReqRoute);
+                      }
+                    },
+                  )
+                ],
+              ).py(6),
+            ),
             Expanded(
                 child: pendingRequisitionLabeled == null ?
                 Center(
@@ -233,7 +298,7 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
 
           if(index==0){
@@ -308,7 +373,7 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
             context,
             PageRouteBuilder(
               pageBuilder: (a, b, c) =>
-                  MSS_Att_PendingRequisitionRo(PendingRequisitionModel()),
+                  MSS_Att_PendingRequisitionL2(PendingRequisitionModel()),
               transitionDuration: Duration(seconds: 1),
               maintainState: true,
             ));
@@ -321,22 +386,44 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
               children: [
                 // if (_isVisible)
                 Card(
-                  elevation: 3,
-                  child:
-                  ListTile(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
                     onTap: () {
                       print(foundDataNewMSS!.length);
-                      //Navigator.pushNamed(context, MyRoutings.approveDisapproveReqRoute);
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                          ApproveDisapproveReq(pendingRequisitionModel,itemCount)));
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              AttendanceApprovalPageL2(pendingRequisitionModel, itemCount)));
                     },
-                    title: foundDataNewMSS![itemCount].empName.toString().text.make(),
-                    subtitle: foundDataNewMSS![itemCount].onDate.toString().text.make(),
-                    trailing:  Icon(
-                        CupertinoIcons.chevron_forward
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue.shade100,
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.blue.shade700,
+                      ),
                     ),
+                    title: foundDataNewMSS![itemCount].empName.toString().text.bold.xl.make(),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 4),
+                        foundDataNewMSS![itemCount].onDate
+                            .toString()
+                            .text
+                            .sm
+                            .color(Colors.grey.shade700)
+                            .make(),
+                      ],
+                    ),
+                    trailing: Icon(
+                      CupertinoIcons.chevron_forward,
+                      color: Colors.grey.shade600,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),
-                ),
+                )
               ],
             );
           }),

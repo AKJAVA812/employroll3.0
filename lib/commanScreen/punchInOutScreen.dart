@@ -2625,6 +2625,15 @@ class _DrawerFileState extends State<DrawerFile> {
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
                                   : "0";
 
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingAttendanceRequestMOL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String pendingAttendanceRequestMOL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+
                               //MSS
                               // 🟢 Check if the selected profile has the Pending Attendance Request permission
                               String pendingAttReqMSSPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
@@ -2693,6 +2702,15 @@ class _DrawerFileState extends State<DrawerFile> {
                               // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
                               String loanApprovalL3MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
+                                  : "0";
+
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingAttendanceRequestMSSL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String pendingAttendanceRequestMSSL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                  ? "1"
                                   : "0";
 
                               //USER
@@ -2764,6 +2782,14 @@ class _DrawerFileState extends State<DrawerFile> {
                               String loanApprovalL3UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
                                   : "0";
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingAttendanceRequestUISL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String pendingAttendanceRequestUISL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
 
                               // 🟢 Save the MSS MO permission to SharedPreferences
                               await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
@@ -2783,6 +2809,8 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setLoanApprovalDeleteL1MO(loanApprovalL1DeletePermission);
                               await shared.setLoanApprovalDeleteL2MO(loanApprovalL2DeletePermission);
                               await shared.setLoanApprovalDeleteL3MO(loanApprovalL3DeletePermission);
+                              shared.setPendingAttendanceReqL1MO(pendingAttendanceRequestMOL1);
+                              shared.setPendingAttendanceReqL2MO(pendingAttendanceRequestMOL2);
                               print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
                               print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
                               print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
@@ -2800,6 +2828,8 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1DeletePermission");
                               print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2DeletePermission");
                               print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3DeletePermission");
+                              print("✅ Pending Attendance L1 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL1");
+                              print("✅ Pending Attendance L2 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL2");
 
                               // 🟢 Save the MSS permission to SharedPreferences
                               await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
@@ -2819,6 +2849,8 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setLoanApprovalDeleteL1MSS(loanApprovalL1MSSDeletePermission);
                               await shared.setLoanApprovalDeleteL2MSS(loanApprovalL2MSSDeletePermission);
                               await shared.setLoanApprovalDeleteL3MSS(loanApprovalL3MSSDeletePermission);
+                              shared.setPendingAttendanceReqL1MSS(pendingAttendanceRequestMSSL1);
+                              shared.setPendingAttendanceReqL2MSS(pendingAttendanceRequestMSSL2);
                               print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMSSPermValue");
                               print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMSSPermValue");
                               print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MSSPermValue");
@@ -2836,6 +2868,8 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1MSSDeletePermission");
                               print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2MSSDeletePermission");
                               print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3MSSDeletePermission");
+                              print("✅ Pending Attendance L1 MSS Permission for profileId $selectedProfileId: $pendingAttendanceRequestMSSL1");
+                              print("✅ Pending Attendance L2 MSS Permission for profileId $selectedProfileId: $pendingAttendanceRequestMSSL2");
                               // Notify global listener
                               permissionNotifier.updatePermission(pendingClaimL1Permission);
                               permissionNotifier.updatePermission(pendingClaimL2Permission);
@@ -2861,6 +2895,8 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setLoanApprovalDeleteL1UIS(loanApprovalL1UISDeletePermission);
                               await shared.setLoanApprovalDeleteL2UIS(loanApprovalL2UISDeletePermission);
                               await shared.setLoanApprovalDeleteL3UIS(loanApprovalL3UISDeletePermission);
+                              shared.setPendingAttendanceReqL1UIS(pendingAttendanceRequestUISL1);
+                              shared.setPendingAttendanceReqL2UIS(pendingAttendanceRequestUISL2);
                               print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqUISPermValue");
                               print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqUISPermValue");
                               print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1UISPermValue");
@@ -2877,6 +2913,8 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1UISDeletePermission");
                               print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2UISDeletePermission");
                               print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3UISDeletePermission");
+                              print("✅ Pending Attendance L1 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL1");
+                              print("✅ Pending Attendance L2 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL2");
                               // 🟢 Save selected profile details
                               await shared.setDefaultProfileId(selectedProfileId);
                               await shared.setDefaultProfileName(selectedProfileName);

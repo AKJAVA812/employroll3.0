@@ -32,7 +32,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
-
+dynamic userPanelPerm;
+dynamic getProfileId;
 DisapprovedRequisitionModel? disapprovedRequisitionLabel;
 
 class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with RouteAware{
@@ -67,6 +68,8 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPerm = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<DisapprovedRequisitionModel> getAppReq11 = getDisapprovedReqList(sessionId!);
     final loading = Row(
@@ -81,7 +84,7 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
       setState(() {
         disapprovedRequisitionLabel=value;
       });
-      print('employeeList00${disapprovedRequisitionLabel!.data!.length}');
+      //print('employeeList00${disapprovedRequisitionLabel!.data!.length}');
     });
   }
 
@@ -90,11 +93,15 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
     String apiUrl = ApiDetails.disApprovedAttReqList;
     print('employeeList11: ${SessionId}');
     DisapprovedRequisitionModel disapprovedRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "userPermission=$userPanelPerm&"
+        "profileId=$getProfileId&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.body}');
-
+    print('Attendance DisApproved APIs - ${response.request}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');

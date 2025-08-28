@@ -328,7 +328,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
                     if(value == 1) {
-                      Navigator.pushNamed(context, MyRoutings.approvedReqRoute);
+                      Navigator.pushNamed(context, MyRoutings.essAttendanceApprovedReq);
                     }
                     if(value == 2) {
                       Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);

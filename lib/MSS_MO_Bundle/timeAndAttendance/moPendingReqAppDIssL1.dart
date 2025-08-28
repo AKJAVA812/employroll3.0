@@ -17,21 +17,24 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
 
-class ApproveDisapproveReq extends StatefulWidget {
+import '../../MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL1.dart';
+
+
+class MO_AttendanceApprovalPageL1 extends StatefulWidget {
   PendingRequisitionModel pendingRequisitionModel;
   int itemCount;
 
-  ApproveDisapproveReq(this.pendingRequisitionModel, this.itemCount);
+  MO_AttendanceApprovalPageL1(this.pendingRequisitionModel, this.itemCount);
 
   @override
-  State<ApproveDisapproveReq> createState() => _ApproveDisapproveReqState(pendingRequisitionModel,itemCount);
+  State<MO_AttendanceApprovalPageL1> createState() => _MO_AttendanceApprovalPageL1State(pendingRequisitionModel,itemCount);
 }
 
-class _ApproveDisapproveReqState extends State<ApproveDisapproveReq> {
+class _MO_AttendanceApprovalPageL1State extends State<MO_AttendanceApprovalPageL1> {
   PendingRequisitionModel pendingRequisitionModel;
   int itemCount;
 
-  _ApproveDisapproveReqState(this.pendingRequisitionModel, this.itemCount);
+  _MO_AttendanceApprovalPageL1State(this.pendingRequisitionModel, this.itemCount);
 
   var titleName = "Attendance Approval";
   int pageIndex = 0;
@@ -149,6 +152,7 @@ class _RadioGroupsState extends State<RadioGroups> {
   Map<String, dynamic> mapResponse = {};
   var empName = "Employee Name";
   String? sessionId;
+  String? userPanel;
   var _outTimePicker;
   var _inTimePicker;
   String? dateSet;
@@ -161,24 +165,66 @@ class _RadioGroupsState extends State<RadioGroups> {
   String? commentRo;
   int? attReqId;
 
-@override
+  @override
   void initState() {
-   _inTimePicker = foundDataNew![itemCount].inTime.toString();
-   _outTimePicker = foundDataNew![itemCount].outTime.toString();
-   name=foundDataNew![itemCount].empName.toString();
-
-    dateSet= foundDataNew![itemCount].onDate;
-    actualInTimeset= foundDataNew![itemCount].actualInTime;
-    inTimeReqset= foundDataNew![itemCount].inTime;
-    inRemarkset= foundDataNew![itemCount].inRemarks;
-    actualOutTimeset= foundDataNew![itemCount].actualOutTime;
-    outTimeReqset= foundDataNew![itemCount].outTime;
-    outRemarkset= foundDataNew![itemCount].outRemarks;
-    attReqId = foundDataNew![itemCount].requestId;
-   getSharedPrfanceList();
+    getSharedPrfanceList();
 
     // TODO: implement initState
     super.initState();
+  }
+
+  Future getSharedPrfanceList() async {
+    sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    print("User Panel - $userPanel");
+
+    /*if(userPanel == "MSS") {
+      _inTimePicker = foundDataNewMSS![itemCount].inTime.toString();
+      _outTimePicker = foundDataNewMSS![itemCount].outTime.toString();
+      name=foundDataNewMSS![itemCount].empName.toString();
+
+      dateSet= foundDataNewMSS![itemCount].onDate;
+      actualInTimeset= foundDataNewMSS![itemCount].actualInTime;
+      inTimeReqset= foundDataNewMSS![itemCount].inTime;
+      inRemarkset= foundDataNewMSS![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewMSS![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewMSS![itemCount].outTime;
+      outRemarkset= foundDataNewMSS![itemCount].outRemarks;
+      attReqId = foundDataNewMSS![itemCount].requestId;
+    }*/
+
+    if(userPanel == "MSS_MO_ADMIN") {
+      _inTimePicker = foundDataNewMO![itemCount].inTime.toString();
+      _outTimePicker = foundDataNewMO![itemCount].outTime.toString();
+      name=foundDataNewMO![itemCount].empName.toString();
+
+      dateSet= foundDataNewMO![itemCount].onDate;
+      actualInTimeset= foundDataNewMO![itemCount].actualInTime;
+      inTimeReqset= foundDataNewMO![itemCount].inTime;
+      inRemarkset= foundDataNewMO![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewMO![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewMO![itemCount].outTime;
+      outRemarkset= foundDataNewMO![itemCount].outRemarks;
+      attReqId = foundDataNewMO![itemCount].requestId;
+    }
+
+    /*if(userPanel == "USER") {
+      _inTimePicker = foundDataNewUIS![itemCount].inTime.toString();
+      _outTimePicker = foundDataNewUIS![itemCount].outTime.toString();
+      name=foundDataNewUIS![itemCount].empName.toString();
+
+      dateSet= foundDataNewUIS![itemCount].onDate;
+      actualInTimeset= foundDataNewUIS![itemCount].actualInTime;
+      inTimeReqset= foundDataNewUIS![itemCount].inTime;
+      inRemarkset= foundDataNewUIS![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewUIS![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewUIS![itemCount].outTime;
+      outRemarkset= foundDataNewUIS![itemCount].outRemarks;
+      attReqId = foundDataNewUIS![itemCount].requestId;
+    }*/
+    setState(() {
+
+    });
   }
 
   @override
@@ -332,7 +378,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                         },
                         controller: _inTimeReqController,
                         enabled: false,
-                       //initialValue: _inTimePicker,
+                        //initialValue: _inTimePicker,
                         // maxLines: 3,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.all(5),
@@ -570,7 +616,7 @@ class _RadioGroupsState extends State<RadioGroups> {
         "sessionId=$sessionId&"
         "attReqId=$attReqId&"
         "comment=$text&"
-        "status=PENDING");
+        "status=LEVEL_ONE_PENDING");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');
@@ -580,12 +626,14 @@ class _RadioGroupsState extends State<RadioGroups> {
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'].toString();
+      String title = mapResponse['title'].toString();
+      String body = mapResponse['body'].toString();
       String reason = mapResponse['reason'].toString();
       print('result both $result $reason');
       print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         showDialgSucess1(
-            context, "Attendance Requisition has been Approved." + " ", "Success");
+            context, "$body" + " ", "$title");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(
             context, reason.upperCamelCase, " Error ");
@@ -616,9 +664,7 @@ class _RadioGroupsState extends State<RadioGroups> {
       }
     }
   }
-  Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-  }
+
 
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(

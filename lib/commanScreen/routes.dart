@@ -236,6 +236,9 @@ class MyRoutings {
 
   //MSS Bundle Pages
   static String mssAttPendingRequestRoRoute= "/mssAttPendingRequestRoRoute";
+  static String mssAttPendingRequestL1Route= "/mssAttPendingRequestL1Route";
+  static String mssAttPendingRequestL2Route= "/mssAttPendingRequestL2Route";
+  static String mssAttPendingRequestL3Route= "/mssAttPendingRequestL3Route";
   static String mssPendingOdRequisitionRoute= "/mssPendingOdRequisitionRoute";
   static String mssOthersAttRequestPageRoute= "/mssOthersAttRequestPageRoute";
 
@@ -337,5 +340,15 @@ class MyRoutings {
   static String realtimeMSSDashboard= "/realtimeMSSDashboard";
 
 
+  //ESS Attendance Approved Requisition
+  static String essAttendanceApprovedReq= "/essAttendanceApprovedReq";
+
+  //MSS MO
+  static String mssMOPendingAttReqL1= "/mssMOPendingAttReqL1";
+  static String mssMOPendingAttReqL2= "/mssMOPendingAttReqL2";
+
+  //USER
+  static String uisPendingAttReqL1= "/uisPendingAttReqL1";
+  static String uisPendingAttReqL2= "/uisPendingAttReqL2";
 
 }

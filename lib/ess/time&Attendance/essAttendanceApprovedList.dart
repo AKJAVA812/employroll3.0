@@ -16,15 +16,15 @@ import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import '../attendanceRequisition/getAttendanceDetails.dart';
-import 'approvedRequisitionModel.dart';
+import '../../modules/timeAndAttendance/reports/approvedRequisition/approvedRequisitionModel.dart';
+import '../../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 
-class ApprovedRequisiton extends StatefulWidget {
+class ESSAttApprovedRequisiton extends StatefulWidget {
   final ApprovedRequisitionModel approvedRequisitionModel;
-  ApprovedRequisiton (this.approvedRequisitionModel);
+  ESSAttApprovedRequisiton (this.approvedRequisitionModel);
 
   @override
-  State<ApprovedRequisiton> createState() => _ApprovedRequisitonState(approvedRequisitionModel);
+  State<ESSAttApprovedRequisiton> createState() => _ESSAttApprovedRequisitonState(approvedRequisitionModel);
 }
 Map<String, dynamic> mapResponse = {};
 
@@ -36,9 +36,9 @@ dynamic getProfileId;
 
 ApprovedRequisitionModel? approvedRequisitionLabel;
 
-class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware{
+class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> with RouteAware{
   final ApprovedRequisitionModel approvedRequisitionModel;
-  _ApprovedRequisitonState(this.approvedRequisitionModel);
+  _ESSAttApprovedRequisitonState(this.approvedRequisitionModel);
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -90,16 +90,13 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
 
   Future<ApprovedRequisitionModel> getApprovedReqList(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.approvedAttReqList;
+    String apiUrl = ApiDetails.essAttendanceApprovedList;
     print('employeeList11: ${SessionId}');
     ApprovedRequisitionModel approvedRequisitionModel;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "userPermission=$userPanelPerm&"
-        "profileId=$getProfileId&"
-        "orgId=0");
+        "sessionId=$SessionId");
     final response = await http.post(urlapi);
-    print('Attendance Approved APIs - ${response.request}');
+    print('ESS Attendance Approved APIs - ${response.request}');
 
     print('responseemployeeList ${response.body}');
 
@@ -118,7 +115,7 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
     return Scaffold(
       appBar: AppBar(
         title: "Approved Requisition List".text.make(),
-       /* leading: IconButton(
+        /* leading: IconButton(
             onPressed: () {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             },
@@ -225,7 +222,7 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
 
           if(index==0){
@@ -297,7 +294,7 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
             context,
             PageRouteBuilder(
               pageBuilder: (a, b, c) =>
-                  ApprovedRequisiton(ApprovedRequisitionModel()),
+                  ESSAttApprovedRequisiton(ApprovedRequisitionModel()),
               transitionDuration: Duration(seconds: 1),
               maintainState: true,
             ));

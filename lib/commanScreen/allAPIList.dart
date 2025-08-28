@@ -1,11 +1,11 @@
 
 class ApiDetails{
    //Base Server Address
-   static var server="http://www.employroll.com/";
+   //static var server="http://www.employroll.com/";
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://2ad6b3b892db.ngrok.app/";
+   static var server="https://68c43e521f07.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -19,6 +19,7 @@ class ApiDetails{
    static var getOtherAttDetails = "/restful/service/ondate/log/for/attendance/req/for/non/ess/employees";
    static var pendingReqListRo = "/restful/service/att/requisation/list/for/mobile";
    static var pendingReqListApprove = "/restful/service/att/requisation/list/approval";
+   static var essAttendanceApprovedList = "/restful/service/att/requisation/approved/list/for/mobile/ess";
    static var pendingReqListDisapprove = "/restful/service/att/requisiton/disapprove/one/leave/req";
    static var approvedAttReqList = "/restful/service/att/requisation/approved/list/for/mobile";
    static var disApprovedAttReqList = "/restful/service/attendance/requisition/cancel/disapproved";
