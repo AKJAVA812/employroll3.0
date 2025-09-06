@@ -20,36 +20,30 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import '../../MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL1.dart';
+import '../../modules/timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
+import '../../modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
 
-import '../reports/attendanceRequisition/model/onDateReportModel.dart';
+class ShortLeaveApprovalPage extends StatefulWidget {
+  PendingRequisitionModel pendingRequisitionModel;
+  int itemCount;
 
-class AttendanceRequisitionCalendar extends StatefulWidget {
-  AttendanceReportModel? attendanceModelGlobel;
-  OnDateAttModel? onDateAttModel;
-  int indexCont;
-  final String singleDateString;
-
-  AttendanceRequisitionCalendar(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont, this.singleDateString);
+  ShortLeaveApprovalPage(this.pendingRequisitionModel, this.itemCount);
 
   @override
-  State<AttendanceRequisitionCalendar> createState() => _AttendanceRequisitionCalendarState(
-      attendanceModelGlobel, onDateAttModel, indexCont, singleDateString);
+  State<ShortLeaveApprovalPage> createState() => _ShortLeaveApprovalPageState(
+      pendingRequisitionModel,itemCount);
 }
 
-OnDateAttModel? onDateAttModelGlobel;
-int? empId;
-
-class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCalendar> {
-  AttendanceReportModel? attendanceModelGlobel;
-  OnDateAttModel? onDateAttModel;
-  int indexCont;
-  dynamic singleDateString;
+class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with RouteAware{
+  PendingRequisitionModel pendingRequisitionModel;
+  int itemCount;
   String? _group1SelectedValue;
   String radios = "onDate";
   SessionManager shared = SessionManager();
   Map<String, dynamic> mapResponse = {};
   String? sessionId;
+  String? userPanel;
   String? branchNameset;
   String? updatedWorkHourSet;
   String? relaxationHourSet;
@@ -58,24 +52,40 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   String? departmentset;
   String? employeeNameset;
   String? onDateset;
+  String? inTimeReqset;
+  String? outTimeReqset;
   String? actualTimeset;
   String? actualOutTimeset;
   int? empId;
-  var onDate;
 
-  _AttendanceRequisitionCalendarState(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont, this.singleDateString);
+
+  _ShortLeaveApprovalPageState(this.pendingRequisitionModel, this.itemCount);
 
   @override
   void initState() {
-    //var onDateNew = attendanceModelGlobel!.data![indexCont].attendanceDate,
-    //  _group1SelectedValue = "1";
-    //String empid=onDateAttModel!.empId.toString();
-    //print('responseemployeeList $empid');
-    singleDateString;
-    print("On Date - $singleDateString");
     getSharedPrfanceList();
     super.initState();
+  }
+
+  Future getSharedPrfanceList() async {
+    sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    print("User Panel - $userPanel");
+
+    if(userPanel == "MSS") {
+      _inTimePicker = foundDataNewMSS![itemCount].inTime.toString();
+      _outTimePicker = foundDataNewMSS![itemCount].outTime.toString();
+      name=foundDataNewMSS![itemCount].empName.toString();
+      shortLeave= foundDataNewMSS![itemCount].shortLeaveRequistionType;
+      onDateset= foundDataNewMSS![itemCount].onDate;
+      actualTimeset= foundDataNewMSS![itemCount].actualInTime;
+      inTimeReqset= foundDataNewMSS![itemCount].inTime;
+      //inRemarkset= foundDataNewMSS![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewMSS![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewMSS![itemCount].outTime;
+      //outRemarkset= foundDataNewMSS![itemCount].outRemarks;
+      attReqId = foundDataNewMSS![itemCount].requestId;
+    }
   }
 
   void _group1Changes(String? value) {
@@ -83,99 +93,6 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       _group1SelectedValue = value;
     });
   }
-
-  Future<OnDateAttModel> getSingleAttList(String SessionId , String singleDate) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.getAttDetails;
-    print('employeeList11: ${SessionId}');
-    OnDateAttModel onDateAttModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&date=$singleDate");
-    final response = await http.post(urlapi);
-
-    try {
-      mapResponse = json.decode(response.body);
-      var getData = mapResponse;
-      print("My Data - $getData");
-
-      // Assign values to variables
-      branchNameset = getData['branch'] ?? '';
-      updatedWorkHourSet = getData['updatedWorkingHour'] ?? '';
-      relaxationHourSet = getData['relaxationHour'] ?? '';
-      workingHrsSet = getData['workingHrs'] ?? '';
-      shiftWorkingHourSet = getData['shiftWorkingHour'] ?? '';
-      departmentset = getData['dept'] ?? '';
-      employeeNameset = getData['empName'] ?? '';
-      onDateset = getData['date'] ?? '';
-      actualTimeset = getData['inTime'] ?? '';
-      actualOutTimeset = getData['outTime'] ?? '';
-      empId = getData['empId'] ?? 0;
-      isShortLeave = getData['isShortLeave'] ?? '';
-
-      // Log for debugging
-      print('Branch: $branchNameset');
-      print('Department: $departmentset');
-      print('Employee Name: $employeeNameset');
-      print('Date: $onDateset');
-      print('In Time: $actualTimeset');
-      print('Out Time: $actualOutTimeset');
-      print('Employee ID: $empId');
-    } catch (e) {
-      print("Error parsing API response: $e");
-    }
-    print('responseemployeeList ${response.request}');
-
-
-
-    mapResponse = json.decode(response.body);
-    onDateAttModel=OnDateAttModel.fromJson(mapResponse);
-
-    return onDateAttModel;
-  }
-
-  Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empId=await shared!.getEmpId();
-    // await Future.delayed(Duration(seconds: 5));
-    Future<OnDateAttModel> getEmployeeList11 = getSingleAttList(sessionId!,singleDateString);
-    getEmployeeList11.then((value) {
-      setState(() {
-        onDateAttModelGlobel=value;
-      });
-      // print('employeeList00${onDateAttModelGlobel!.data!.length}');
-    });
-
-    /*if(attendanceModelGlobel!=null){
-      print('attendanceModelGlobel');
-      branchNameset= attendanceModelGlobel!.data![indexCont].branchName;
-      departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
-      employeeNameset= attendanceModelGlobel!.data![indexCont].employeeName;
-      onDateset= attendanceModelGlobel!.data![indexCont].attendanceDate;
-      actualTimeset= attendanceModelGlobel!.data![indexCont].inTime;
-      actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
-      empId =attendanceModelGlobel!.data![indexCont].empId;
-
-    }else{
-
-    }*/
-    print('onModelrun');
-    branchNameset= onDateAttModel!.branch;
-    updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
-    relaxationHourSet = onDateAttModel!.relaxationHour;
-    workingHrsSet = onDateAttModel!.workingHrs;
-    shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
-    departmentset= onDateAttModel!.dept;
-    employeeNameset= onDateAttModel!.empName;
-    onDateset= onDateAttModel!.date;
-    actualTimeset= onDateAttModel!.inTime;
-    actualOutTimeset= onDateAttModel!.outTime;
-    empId= onDateAttModel!.empId;
-
-
-    print(branchNameset);
-    print(departmentset);
-    print(employeeNameset);
-  }
-
 
   //String radios = "onDate";
   String _inTimePicker = '00:00';
@@ -189,12 +106,16 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
+  List<bool> _isSelected = [false, false, false];
   bool nightShift = false;
   bool compOff = false;
   bool shortLeave = false;
   bool light0 = true;
   bool light1 = true;
-  bool isShortLeave = false;
+  bool isShortLeave = true;
+  int? attReqId;
+  var name = "Name";
+
   static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
     <WidgetStatesConstraint, Icon>{
       WidgetState.selected: Icon(Icons.check),
@@ -251,171 +172,6 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
               padding: const EdgeInsets.only(top: 10.0),
               child: Column(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedToggleSwitch<int>.size(
-                        height: 30,
-                        current: min(value, 3),
-                        style: ToggleStyle(
-                          backgroundColor: Mythemes.greyishade,
-                          indicatorColor: Mythemes.lightBluishColor,
-                          borderColor: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.0),
-                          indicatorBorderRadius: BorderRadius.zero,
-                        ),
-                        values: const [0, 1, 2],
-                        iconOpacity: 1.0,
-                        selectedIconScale: 1.0,
-                        indicatorSize: const Size.fromWidth(85),
-                        iconAnimationType: AnimationType.onHover,
-                        styleAnimationType: AnimationType.onHover,
-                        spacing: 3.0,
-                        customSeparatorBuilder: (context, local, global) {
-                          final opacity =
-                          ((global.position - local.position).abs() - 0.5)
-                              .clamp(0.0, 1.0);
-                          return VerticalDivider(
-                              indent: 10.0,
-                              endIndent: 10.0,
-                              color: Colors.white38.withOpacity(opacity));
-                        },
-                        customIconBuilder: (context, local, global) {
-                          final text = const ['Attendance', 'Leave', 'OD'][local.index];
-                          return Center(
-                              child: Text(text,
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Color.lerp(Colors.black, Colors.white,
-                                          local.animationValue))));
-                        },
-                        borderWidth: 0.0,
-                        onChanged: (i) {
-                          setState(() {
-                            value = i;
-                            print(i);
-
-                          });
-                          if(value == 0){
-                            //Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
-                          }
-                          if(value == 1) {
-                            Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
-                            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                          }
-                          if(value == 2) {
-                            Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                          }
-                         /* if(value == 3) {
-                            Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                          }*/
-                        },
-                      )
-                    ],
-                  ),
-                  /*Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Radio(
-                                value: "onDate",
-                                groupValue: radios,
-                                onChanged: (value) {
-                                  *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text("On Date Click"),
-                              ));*//*
-                                  setState(() {
-                                    onDateRadio = "1";
-                                    nextDayRadio = "0";
-                                    compOffRadio = "0";
-                                    radios = value.toString();
-                                  });
-                                },
-                              ),
-                              "On Date".text.size(13).make(),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Radio(
-                                value: "nextDay",
-                                groupValue: radios,
-                                onChanged: (value) {
-                                  *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text("Next Day Click"),
-                              ));*//*
-                                  setState(() {
-                                    onDateRadio = "0";
-                                    nextDayRadio = "1";
-                                    compOffRadio = "0";
-                                    radios = value.toString();
-                                  });
-                                },
-                              ),
-                              "Next Day".text.size(13).make(),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Radio(
-                                value: "compOff",
-                                groupValue: radios,
-                                onChanged: (value) {
-                                  *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text("Comp Off Click"),
-                              ));*//*
-                                  setState(() {
-                                    onDateRadio = "0";
-                                    nextDayRadio = "0";
-                                    compOffRadio = "1";
-                                    radios = value.toString();
-                                  });
-                                },
-                              ),
-                              "Comp".text.size(13).make(),
-                            ],
-                          ),
-                        ),
-                      ]).p(5),*/
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        buildVerticalToggle("Night Shift", nightShift, (val) {
-                          setState(() => nightShift = val);
-                          print("Night Shift - $nightShift");
-                        }),
-                        buildVerticalToggle("Compensatory Off", compOff, (val) {
-                          setState(() => compOff = val);
-                          print("Comp Off - $compOff");
-                        }),
-
-                        Visibility(
-                          visible: isShortLeave == true,
-                          child: buildVerticalToggle("Short Leave", shortLeave, (val) {
-                            setState(() => shortLeave = val);
-                            print("Short Leave - $shortLeave");
-                          }),
-                        ),
-                      ],
-                    ),
-                  ),
                   SizedBox(
                     height: 7,
                   ),
@@ -499,202 +255,8 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                       ),
                     ],
                   ),
-                  //No Short Leave Case
 
-                  Visibility(
-                    visible: shortLeave == false,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: actualTimeset),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: actualTimeset,
-                                  labelText: "Actual In Time",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              onTap: () async {
-                                //_openInTimepicker(context);
-                                final TimeOfDay? n = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.now(),
-                                    builder: (BuildContext context, Widget? child) {
-                                      return MediaQuery(
-                                        data: MediaQuery.of(context)
-                                            .copyWith(alwaysUse24HourFormat: true),
-                                        child: child!,
-                                      );
-                                    });
-                                print('timenewOut $n');
-                                setState(() {
-                                  var now = DateTime.now();
-                                  DateTime newt = DateTime(now.year, now.month,
-                                      now.day, n!.hour, n!.minute);
-                                  var nT = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
-                                  _inTimePicker = nT;
-                                });
-                              },
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: _inTimePicker),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: _inTimePicker,
-                                  labelText: "Changes In Time",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-
-                        ),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: shortLeave == false,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              maxLines: 3,
-                              style:TextStyle(fontSize:14),
-                              controller: inRemarkController,
-                              enabled: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  /*enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.greyishade),
-                                  ),*/
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: "Add Remark",
-                                  labelText: "Remarks",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: shortLeave == false,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: actualOutTimeset),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: actualOutTimeset,
-                                  labelText: "Actual Out Time",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              onTap: () async {
-                                //_openOutTimepicker(context);
-                                final TimeOfDay? o = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.now(),
-                                    builder: (BuildContext context, Widget? child) {
-                                      return MediaQuery(
-                                        data: MediaQuery.of(context)
-                                            .copyWith(alwaysUse24HourFormat: true),
-                                        child: child!,
-                                      );
-                                    });
-                                print('timenewOut $o');
-                                setState(() {
-                                  var newNow = DateTime.now();
-                                  DateTime newt = DateTime(newNow.year, newNow.month,
-                                      newNow.day, o!.hour, o!.minute);
-                                  var oT = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
-                                  _outTimePicker = oT;
-                                });
-                              },
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: _outTimePicker),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: _outTimePicker,
-                                  labelText: "Changes Out Time",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: shortLeave == false,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              maxLines: 3,
-                              style:TextStyle(fontSize:14),
-                              controller: outRemarkController,
-                              enabled: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  /*enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.greyishade),
-                                  ),*/
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: "Add Remark",
-                                  labelText: "Remarks",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  //Yes Short Leave Case
+                  //Yes Short Leave
                   Visibility(
                     visible: shortLeave == true,
                     child: Row(
@@ -820,7 +382,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                             child: TextFormField(
                               maxLines: 3,
                               style:TextStyle(fontSize:14),
-                              controller: shortLeaveRemarkController,
+                              controller: inRemarkController,
                               enabled: true,
                               //initialValue: "${branchName}",
                               decoration:  InputDecoration(
@@ -986,7 +548,9 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
               print('Attendance');
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+              );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
@@ -1031,6 +595,8 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       ),
     );
   }
+
+
 
 
 
@@ -1095,7 +661,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       var onDate) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+        "$conn$apiUrl?"
             "sessionId=$sessionId&"
             "id=$empId&"
             "onDate=$onDate&"
@@ -1140,7 +706,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       var onDate) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+        "$conn$apiUrl?"
             "sessionId=$sessionId&"
             "id=$empId&"
             "onDate=$onDate&"

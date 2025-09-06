@@ -475,7 +475,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              "Pending"
+                              foundDataNew![i].status.toString()
                                   .text.bold
                                   .color(Mythemes.lightBluishColor)
                                   .sm

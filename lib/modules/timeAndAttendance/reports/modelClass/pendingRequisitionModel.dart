@@ -22,62 +22,82 @@ class PendingRequisitionModel {
 }
 
 class Data {
-  String? inTime;
-  String? empId;
-  String? onDate;
-  int? requestId;
-  String? empName;
-  String? inRemarks;
-  String? outRemarks;
-  String? actualInTime;
-  String? actualOutTime;
-  String? department;
-  String? branch;
-  String? outTime;
+  dynamic empId;
+  dynamic attendanceRequisionType;
+  dynamic compOffRequistionType;
+  dynamic outRemarks;
+  dynamic actualInTime;
+  dynamic branch;
+  dynamic inTime;
+  dynamic nightRequistionType;
+  dynamic onDate;
+  dynamic requestId;
+  dynamic empName;
+  dynamic inRemarks;
+  dynamic actualOutTime;
+  dynamic department;
+  dynamic outTime;
+  dynamic status;
+  dynamic shortLeaveRequistionType;
 
   Data(
-      {this.inTime,
-        this.empId,
+      {this.empId,
+        this.attendanceRequisionType,
+        this.compOffRequistionType,
+        this.outRemarks,
+        this.actualInTime,
+        this.branch,
+        this.inTime,
+        this.nightRequistionType,
         this.onDate,
         this.requestId,
         this.empName,
         this.inRemarks,
-        this.outRemarks,
-        this.actualInTime,
         this.actualOutTime,
         this.department,
-        this.branch,
-        this.outTime});
+        this.outTime,
+        this.status,
+        this.shortLeaveRequistionType});
 
   Data.fromJson(Map<String, dynamic> json) {
-    inTime = json['inTime'];
     empId = json['empId'];
+    attendanceRequisionType = json['attendanceRequisionType'];
+    compOffRequistionType = json['compOffRequistionType'];
+    outRemarks = json['outRemarks'];
+    actualInTime = json['actualInTime'];
+    branch = json['branch'];
+    inTime = json['inTime'];
+    nightRequistionType = json['nightRequistionType'];
     onDate = json['onDate'];
     requestId = json['requestId'];
     empName = json['empName'];
     inRemarks = json['inRemarks'];
-    outRemarks = json['outRemarks'];
-    actualInTime = json['actualInTime'];
     actualOutTime = json['actualOutTime'];
     department = json['department'];
-    branch = json['branch'];
     outTime = json['outTime'];
+    status = json['status'];
+    shortLeaveRequistionType = json['shortLeaveRequistionType'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['inTime'] = this.inTime;
     data['empId'] = this.empId;
+    data['attendanceRequisionType'] = this.attendanceRequisionType;
+    data['compOffRequistionType'] = this.compOffRequistionType;
+    data['outRemarks'] = this.outRemarks;
+    data['actualInTime'] = this.actualInTime;
+    data['branch'] = this.branch;
+    data['inTime'] = this.inTime;
+    data['nightRequistionType'] = this.nightRequistionType;
     data['onDate'] = this.onDate;
     data['requestId'] = this.requestId;
     data['empName'] = this.empName;
     data['inRemarks'] = this.inRemarks;
-    data['outRemarks'] = this.outRemarks;
-    data['actualInTime'] = this.actualInTime;
     data['actualOutTime'] = this.actualOutTime;
     data['department'] = this.department;
-    data['branch'] = this.branch;
     data['outTime'] = this.outTime;
+    data['status'] = this.status;
+    data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;
     return data;
   }
 }

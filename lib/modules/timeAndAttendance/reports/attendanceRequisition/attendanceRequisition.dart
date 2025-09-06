@@ -36,7 +36,7 @@ class AttendanceRequisition extends StatefulWidget {
       attendanceModelGlobel, onDateAttModel, indexCont);
 }
 
-class _AttendanceRequisitionState extends State<AttendanceRequisition> {
+class _AttendanceRequisitionState extends State<AttendanceRequisition> with RouteAware{
   AttendanceReportModel? attendanceModelGlobel;
   OnDateAttModel? onDateAttModel;
   int indexCont;
@@ -46,6 +46,10 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
   Map<String, dynamic> mapResponse = {};
   String? sessionId;
   String? branchNameset;
+  String? updatedWorkHourSet;
+  String? relaxationHourSet;
+  String? workingHrsSet;
+  String? shiftWorkingHourSet;
   String? departmentset;
   String? employeeNameset;
   String? onDateset;
@@ -66,17 +70,35 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
 
     if(attendanceModelGlobel!=null){
       print('attendanceModelGlobel');
-      branchNameset= attendanceModelGlobel!.data![indexCont].branchName;
+      /*branchNameset= attendanceModelGlobel!.data![indexCont].branchName;
+      updatedWorkHourSet= attendanceModelGlobel!.data![indexCont].branchName;
       departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
       employeeNameset= attendanceModelGlobel!.data![indexCont].employeeName;
       onDateset= attendanceModelGlobel!.data![indexCont].attendanceDate;
       actualTimeset= attendanceModelGlobel!.data![indexCont].inTime;
       actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
-      empId =attendanceModelGlobel!.data![indexCont].empId;
+      empId =attendanceModelGlobel!.data![indexCont].empId;*/
 
+      branchNameset= onDateAttModel!.branch;
+      updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
+      relaxationHourSet = onDateAttModel!.relaxationHour;
+      isShortLeave = onDateAttModel!.isShortLeave!;
+      workingHrsSet = onDateAttModel!.workingHrs;
+      shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
+      departmentset= onDateAttModel!.dept;
+      employeeNameset= onDateAttModel!.empName;
+      onDateset= onDateAttModel!.date;
+      actualTimeset= onDateAttModel!.inTime;
+      actualOutTimeset= onDateAttModel!.outTime;
+      empId= onDateAttModel!.empId;
     }else{
       print('onModelrun');
       branchNameset= onDateAttModel!.branch;
+      updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
+      isShortLeave = onDateAttModel!.isShortLeave!;
+      relaxationHourSet = onDateAttModel!.relaxationHour;
+      workingHrsSet = onDateAttModel!.workingHrs;
+      shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
       departmentset= onDateAttModel!.dept;
       employeeNameset= onDateAttModel!.empName;
       onDateset= onDateAttModel!.date;
@@ -100,12 +122,58 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
   String _outTimePicker = '00:00';
   TextEditingController inRemarkController = TextEditingController();
   TextEditingController outRemarkController = TextEditingController();
+  TextEditingController shortLeaveRemarkController = TextEditingController();
   String onDateRadio = "1";
   String nextDayRadio = "0";
   String compOffRadio = "0";
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
+  List<bool> _isSelected = [false, false, false];
+  bool nightShift = false;
+  bool compOff = false;
+  bool shortLeave = false;
+  bool light0 = true;
+  bool light1 = true;
+  bool isShortLeave = true;
+  static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
+    <WidgetStatesConstraint, Icon>{
+      WidgetState.selected: Icon(Icons.check),
+      WidgetState.any: Icon(Icons.close),
+    },
+  );
+
+  Widget buildVerticalToggle(String title, bool value, ValueChanged<bool> onChanged) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Transform.scale(
+          scale: 1, // smaller switch
+          child: Switch(
+            thumbIcon: thumbIcon,
+            value: value,
+            onChanged: onChanged,
+            activeColor: Colors.white,
+            activeTrackColor: Colors.blueAccent,
+            inactiveThumbColor: Colors.white,
+            inactiveTrackColor: Mythemes.greyishade,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade800,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -130,7 +198,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                     children: [
                       AnimatedToggleSwitch<int>.size(
                         height: 30,
-                        current: min(value, 4),
+                        current: min(value, 3),
                         style: ToggleStyle(
                           backgroundColor: Mythemes.greyishade,
                           indicatorColor: Mythemes.lightBluishColor,
@@ -138,7 +206,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                           borderRadius: BorderRadius.circular(10.0),
                           indicatorBorderRadius: BorderRadius.zero,
                         ),
-                        values: const [0, 1, 2, 3],
+                        values: const [0, 1, 2],
                         iconOpacity: 1.0,
                         selectedIconScale: 1.0,
                         indicatorSize: const Size.fromWidth(90),
@@ -155,7 +223,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                               color: Colors.white38.withOpacity(opacity));
                         },
                         customIconBuilder: (context, local, global) {
-                          final text = const ['Attendance', 'Leave', 'OD', 'Tour'][local.index];
+                          final text = const ['Attendance', 'Leave', 'OD'][local.index];
                           return Center(
                               child: Text(text,
                                   style: TextStyle(
@@ -180,18 +248,43 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                           if(value == 2) {
                             Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
                           }
-                          if(value == 3) {
+                          /*if(value == 3) {
                             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                          }
+                          }*/
                         },
                       )
                     ],
                   ).py16(),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        buildVerticalToggle("Night Shift", nightShift, (val) {
+                          setState(() => nightShift = val);
+                          print("Night Shift - $nightShift");
+                        }),
+                        buildVerticalToggle("Compensatory Off", compOff, (val) {
+                          setState(() => compOff = val);
+                          print("Comp Off - $compOff");
+                        }),
+
+                        Visibility(
+                          visible: isShortLeave == true,
+                          child: buildVerticalToggle("Short Leave", shortLeave, (val) {
+                            setState(() => shortLeave = val);
+                            print("Short Leave - $shortLeave");
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                    Expanded(
+                    /*Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -200,9 +293,9 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                             value: "onDate",
                             groupValue: radios,
                             onChanged: (value) {
-                              /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("On Date Click"),
-                              ));*/
+                              ));*//*
                               setState(() {
                                 onDateRadio = "1";
                                 nextDayRadio = "0";
@@ -214,8 +307,8 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                           "On Date".text.size(13).make(),
                         ],
                       ),
-                    ),
-                    Expanded(
+                    ),*/
+                    /*Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -224,9 +317,9 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                             value: "nextDay",
                             groupValue: radios,
                             onChanged: (value) {
-                              /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Next Day Click"),
-                              ));*/
+                              ));*//*
                               setState(() {
                                 onDateRadio = "0";
                                 nextDayRadio = "1";
@@ -235,7 +328,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                               });
                             },
                           ),
-                          "Next Day".text.size(13).make(),
+                          "Night Shift".text.size(13).make(),
                         ],
                       ),
                     ),
@@ -248,9 +341,9 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                             value: "compOff",
                             groupValue: radios,
                             onChanged: (value) {
-                              /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Comp Off Click"),
-                              ));*/
+                              ));*//*
                               setState(() {
                                 onDateRadio = "0";
                                 nextDayRadio = "0";
@@ -262,7 +355,8 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                           "Comp".text.size(13).make(),
                         ],
                       ),
-                    ),
+                    ),*/
+
                   ]).p(5),
                   SizedBox(
                     height: 7,
@@ -279,7 +373,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                             //initialValue: "${branchName}",
                             decoration:  InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
                                 hintText: branchNameset,
                                 labelText: "Branch Name",
                                 labelStyle: TextStyle(fontSize: 15)
@@ -298,7 +391,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                             //initialValue: "${branchName}",
                             decoration:  InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
                                 hintText: departmentset,
                                 labelText: "Department",
                                 labelStyle: TextStyle(fontSize: 15)
@@ -321,7 +413,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                             //initialValue: "${branchName}",
                             decoration:  InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
                                 hintText: employeeNameset,
                                 labelText: "Employee Name",
                                 labelStyle: TextStyle(fontSize: 15)
@@ -341,7 +432,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                             //initialValue: "${branchName}",
                             decoration:  InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
                                 hintText: onDateset,
                                 labelText: "On Date",
                                 labelStyle: TextStyle(fontSize: 15)
@@ -351,157 +441,157 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child:
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: actualTimeset),
-                            readOnly: true,
-                            //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: actualTimeset,
-                                labelText: "Actual In Time",
-                                labelStyle: TextStyle(fontSize: 15)
+                  //No Short Leave Case
+                  Visibility(
+                    visible: shortLeave == false,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child:
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                style:TextStyle(fontSize:14),
+                                controller: TextEditingController(text: actualTimeset),
+                                readOnly: true,
+                                //initialValue: "${branchName}",
+                                decoration:  InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 8.0),
+                                    hintText: actualTimeset,
+                                    labelText: "Actual In Time",
+                                    labelStyle: TextStyle(fontSize: 15)
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        child:
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: InkWell(
-                            onTap: () async {
-                              //_openInTimepicker(context);
-                              final TimeOfDay? n = await showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                  builder: (BuildContext context, Widget? child) {
-                                    return MediaQuery(
-                                      data: MediaQuery.of(context)
-                                          .copyWith(alwaysUse24HourFormat: true),
-                                      child: child!,
-                                    );
+                          Expanded(
+                            child:
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                onTap: () async {
+                                  //_openInTimepicker(context);
+                                  final TimeOfDay? n = await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.now(),
+                                      builder: (BuildContext context, Widget? child) {
+                                        return MediaQuery(
+                                          data: MediaQuery.of(context)
+                                              .copyWith(alwaysUse24HourFormat: true),
+                                          child: child!,
+                                        );
+                                      });
+                                  print('timenewOut $n');
+                                  setState(() {
+                                    var now = DateTime.now();
+                                    DateTime newt = DateTime(now.year, now.month,
+                                        now.day, n!.hour, n!.minute);
+                                    var nT = DateFormat('HH:mm').format(newt);
+                                    print(DateFormat('HH:mm').format(newt));
+                                    _inTimePicker = nT;
                                   });
-                              print('timenewOut $n');
-                              setState(() {
-                                var now = DateTime.now();
-                                DateTime newt = DateTime(now.year, now.month,
-                                    now.day, n!.hour, n!.minute);
-                                var nT = DateFormat('HH:mm').format(newt);
-                                print(DateFormat('HH:mm').format(newt));
-                                _inTimePicker = nT;
-                              });
-                            },
+                                },
+                                style:TextStyle(fontSize:14),
+                                controller: TextEditingController(text: _inTimePicker),
+                                readOnly: true,
+                                //initialValue: "${branchName}",
+                                decoration:  InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 8.0),
+                                    hintText: _inTimePicker,
+                                    labelText: "Changes In Time",
+                                    labelStyle: TextStyle(fontSize: 15)
+                                ),
+                              ),
+                            ),
+
+                          ),
+                        ],
+                      ),),
+                  Visibility(
+                    visible: shortLeave == false,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
                             child: TextFormField(
+                              maxLines: 3,
                               style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: _inTimePicker),
-                              readOnly: true,
+                              controller: inRemarkController,
+                              enabled: true,
                               //initialValue: "${branchName}",
                               decoration:  InputDecoration(
+                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                        width: 1, color: Mythemes.greyishade),
+                                  ),
                                   contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: _inTimePicker,
-                                  labelText: "Changes In Time",
+                                  hintText: "Add Remark",
+                                  labelText: "Remarks",
                                   labelStyle: TextStyle(fontSize: 15)
                               ),
                             ),
                           ),
                         ),
-
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child:
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            maxLines: 3,
-                            style:TextStyle(fontSize:14),
-                            controller: inRemarkController,
-                            enabled: true,
-                            //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.greyishade),
-                                ),
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: "Add Remark",
-                                labelText: "Remarks",
-                                labelStyle: TextStyle(fontSize: 15)
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child:
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: actualOutTimeset),
-                            readOnly: true,
-                            //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: actualOutTimeset,
-                                labelText: "Actual Out Time",
-                                labelStyle: TextStyle(fontSize: 15)
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child:
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: InkWell(
-                            onTap: () async {
-                              //_openOutTimepicker(context);
-                              final TimeOfDay? o = await showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                  builder: (BuildContext context, Widget? child) {
-                                    return MediaQuery(
-                                      data: MediaQuery.of(context)
-                                          .copyWith(alwaysUse24HourFormat: true),
-                                      child: child!,
-                                    );
-                                  });
-                              print('timenewOut $o');
-                              setState(() {
-                                var newNow = DateTime.now();
-                                DateTime newt = DateTime(newNow.year, newNow.month,
-                                    newNow.day, o!.hour, o!.minute);
-                                var oT = DateFormat('HH:mm').format(newt);
-                                print(DateFormat('HH:mm').format(newt));
-                                _outTimePicker = oT;
-                              });
-                            },
+                  Visibility(
+                    visible: shortLeave == false,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
                             child: TextFormField(
+                              style:TextStyle(fontSize:14),
+                              controller: TextEditingController(text: actualOutTimeset),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: actualOutTimeset,
+                                  labelText: "Actual Out Time",
+                                  labelStyle: TextStyle(fontSize: 15)
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              onTap: () async {
+                                //_openOutTimepicker(context);
+                                final TimeOfDay? o = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                    builder: (BuildContext context, Widget? child) {
+                                      return MediaQuery(
+                                        data: MediaQuery.of(context)
+                                            .copyWith(alwaysUse24HourFormat: true),
+                                        child: child!,
+                                      );
+                                    });
+                                print('timenewOut $o');
+                                setState(() {
+                                  var newNow = DateTime.now();
+                                  DateTime newt = DateTime(newNow.year, newNow.month,
+                                      newNow.day, o!.hour, o!.minute);
+                                  var oT = DateFormat('HH:mm').format(newt);
+                                  print(DateFormat('HH:mm').format(newt));
+                                  _outTimePicker = oT;
+                                });
+                              },
                               style:TextStyle(fontSize:14),
                               controller: TextEditingController(text: _outTimePicker),
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration:  InputDecoration(
                                   contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
                                   hintText: _outTimePicker,
                                   labelText: "Changes Out Time",
                                   labelStyle: TextStyle(fontSize: 15)
@@ -509,36 +599,186 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child:
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            maxLines: 3,
-                            style:TextStyle(fontSize:14),
-                            controller: outRemarkController,
-                            enabled: true,
-                            //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.greyishade),
-                                ),
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: "Add Remark",
-                                labelText: "Remarks",
-                                labelStyle: TextStyle(fontSize: 15)
+                  Visibility(
+                    visible: shortLeave == false,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              maxLines: 3,
+                              style:TextStyle(fontSize:14),
+                              controller: outRemarkController,
+                              enabled: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                        width: 1, color: Mythemes.greyishade),
+                                  ),
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: "Add Remark",
+                                  labelText: "Remarks",
+                                  labelStyle: TextStyle(fontSize: 15)
+                              ),
+                            ),
+                          ),
+
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  //Yes Short Leave
+                  Visibility(
+                    visible: shortLeave == true,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style:TextStyle(fontSize:14, color: Mythemes.successColor, fontWeight: FontWeight.bold),
+                              controller: TextEditingController(text: actualTimeset),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: actualTimeset,
+                                  labelText: "In Time",
+                                  labelStyle: TextStyle(fontSize: 15)
+                              ),
                             ),
                           ),
                         ),
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style:TextStyle(fontSize:14, color: Mythemes.warningColor, fontWeight: FontWeight.bold),
+                              controller: TextEditingController(text: actualOutTimeset),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: actualOutTimeset,
+                                  labelText: "Out Time",
+                                  labelStyle: TextStyle(fontSize: 15)
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-                      ),
-                    ],
+                  Visibility(
+                    visible: shortLeave == true,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
+                              controller: TextEditingController(text: workingHrsSet),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: workingHrsSet,
+                                  labelText: "Actual Work Hours",
+                                  labelStyle: TextStyle(fontSize: 15)
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
+                              controller: TextEditingController(text: relaxationHourSet),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: relaxationHourSet,
+                                  labelText: "Short Leave Relaxation Hour",
+                                  labelStyle: TextStyle(fontSize: 15)
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Visibility(
+                    visible: shortLeave == true,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
+                              controller: TextEditingController(text: updatedWorkHourSet),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: updatedWorkHourSet,
+                                  labelText: "Updated Work Hour",
+                                  labelStyle: TextStyle(fontSize: 15)
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Visibility(
+                    visible: shortLeave == true,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              maxLines: 3,
+                              style:TextStyle(fontSize:14),
+                              controller: inRemarkController,
+                              enabled: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                        width: 1, color: Mythemes.greyishade),
+                                  ),
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: "Add Remark",
+                                  labelText: "Remarks",
+                                  labelStyle: TextStyle(fontSize: 15)
+                              ),
+                            ),
+                          ),
+
+                        ),
+                      ],
+                    ),
                   ),
 
                   Row(
@@ -558,38 +798,75 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                                 String onDate = DateFormat("dd-MM-yyyy").format(DateTime.parse(onDateset!));
                                 var dateformat = onDate;
 
-                                if (_outTimePicker!.compareToIgnoringCase("00:00") == 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text(" Please Select Out Time "),
-                                  ));
-                                } else {
-                                  //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
-                                  if(onDateset!.compareToIgnoringCase("--:--")==0){
-                                    inTimeReq = onDateset.toString().compareToIgnoringCase("--:--") == 0 ? _inTimePicker :_inTimePicker;
-                                  }
-                                  else{
-                                    inTimeReq = onDateset.toString().compareToIgnoringCase("N/A") == 0 ? _inTimePicker :_inTimePicker;
-                                  }
-                                  outTimeReq = _outTimePicker;
-                                  if (radios.compareToIgnoringCase("next") == 0) {
+                                if(shortLeave == true){
+                                  inTimeReq= actualTimeset;
+                                  outTimeReq= actualOutTimeset;
+                                  inRemarkString="";
+                                  outRemarkString="";
+                                  sendRequsitionToServerShortLeave(
+                                      context,
+                                      empId!,
+                                      inRemarkString,
+                                      outRemarkString,
+                                      inTimeReq!,
+                                      outTimeReq!,
+                                      logid,
+                                      dateformat);
+                                }else{
+                                  if (_outTimePicker!.compareToIgnoringCase("00:00") == 0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text(" Please Select Out Time "),
+                                    ));
                                   } else {
-                                    if (inTimeReq.compareToIgnoringCase("00:00") == 0) {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select In Time "),
-                                      ));
+                                    //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
+                                    if(onDateset!.compareToIgnoringCase("--:--")==0){
+                                      inTimeReq = onDateset.toString().compareToIgnoringCase("--:--") == 0 ? _inTimePicker :_inTimePicker;
+                                    }
+                                    else{
+                                      inTimeReq = onDateset.toString().compareToIgnoringCase("N/A") == 0 ? _inTimePicker :_inTimePicker;
+                                    }
+                                    outTimeReq = _outTimePicker;
+                                    if (radios.compareToIgnoringCase("next") == 0) {
                                     } else {
-                                      if(onDateRadio.compareToIgnoringCase("1")==0){
-                                        if (inTimeReq.compareTo(outTimeReq) > 0) {
-                                          return setState(() {
-                                            CommonNotificationPage.showWorkDoneSuccess(
+                                      if (inTimeReq.compareToIgnoringCase("00:00") == 0) {
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(" Please Select In Time "),
+                                        ));
+                                      } else {
+                                        if (onDateRadio.compareToIgnoringCase("1") == 0) {
+                                          if (inTimeReq.compareTo(outTimeReq) > 0) {
+                                            return setState(() {
+                                              CommonNotificationPage.showWorkDoneSuccess(
+                                                  context,
+                                                  "Your working hours going to negative, Please select requisition time correctly."
+                                                      .upperCamelCase +
+                                                      " ",
+                                                  "Alert Message");
+                                            });
+                                          } else {
+                                            sendRequsitionToServer(
                                                 context,
-                                                "Your working hours going to negative, Please select requisition time correctly."
-                                                    .upperCamelCase +
-                                                    " ",
-                                                "Alert Message");
-                                          });
-                                        } else {
-                                          sendRequsitionToServer(
+                                                empId!,
+                                                inRemarkString,
+                                                outRemarkString,
+                                                inTimeReq,
+                                                outTimeReq,
+                                                logid,
+                                                dateformat);
+                                          }
+                                        }
+                                        else if (nightShift == true) {
+                                          sendRequsitionToServernextDay(
+                                              context,
+                                              empId!,
+                                              inRemarkString,
+                                              outRemarkString,
+                                              inTimeReq,
+                                              outTimeReq,
+                                              logid,
+                                              dateformat);
+                                        } else if (compOff == true) {
+                                          sendRequsitionToServerCompOff(
                                               context,
                                               empId!,
                                               inRemarkString,
@@ -599,31 +876,11 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
                                               logid,
                                               dateformat);
                                         }
-                                      }else if(nextDayRadio.compareToIgnoringCase("1")==0){
-                                        sendRequsitionToServernextDay(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq,
-                                            outTimeReq,
-                                            logid,
-                                            dateformat);
-                                      }else if(compOffRadio.compareToIgnoringCase("1")==0){
-                                        sendRequsitionToServerCompOff(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq,
-                                            outTimeReq,
-                                            logid,
-                                            dateformat);
                                       }
-
                                     }
                                   }
                                 }
+
                               },
                               style: ButtonStyle(
                                 backgroundColor:
@@ -784,7 +1041,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
       var onDate) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+        "$conn$apiUrl?"
             "sessionId=$sessionId&"
             "id=$empId&"
             "onDate=$onDate&"
@@ -829,7 +1086,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
       var onDate) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+        "$conn$apiUrl?"
             "sessionId=$sessionId&"
             "id=$empId&"
             "onDate=$onDate&"
@@ -837,6 +1094,51 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> {
             "outTimeRemarks=$outRemarkString&"
             "inTime=$inTimeReq&"
             "compOff=true&"
+            "outTime=$outTimeReq");
+    final response = await http.post(urlapi);
+
+    print('URL ${response.request}');
+    if (response.statusCode == 200) {
+      Navigator.of(context, rootNavigator: true).pop();
+      String result = "";
+      String reason = "";
+      mapResponse = json.decode(response.body);
+      if (mapResponse.containsKey("reason")) {
+        result = mapResponse['result'];
+        reason = mapResponse['reason'];
+        CommonNotificationPage.showDialgSucess(context, reason, result);
+      } else {
+        result = mapResponse['result'];
+        if (result.compareToIgnoringCase("success") == 0) {
+          reason = "you have submit Requisition for $onDate";
+          showDialgSucess1(context, reason, "Success");
+        } else {
+          showDialgSucess1(context, result, "Error");
+        }
+      }
+      print('result ${result} reason ${reason}');
+    }
+  }
+
+  Future<void> sendRequsitionToServerShortLeave(
+      BuildContext context,
+      int empId,
+      String inRemarkString,
+      String outRemarkString,
+      String inTimeReq,
+      String outTimeReq,
+      String logid,
+      var onDate) async {
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?"
+            "sessionId=$sessionId&"
+            "id=$empId&"
+            "onDate=$onDate&"
+            "inTimeRemarks=$inRemarkString&"
+            "outTimeRemarks=$outRemarkString&"
+            "inTime=$inTimeReq&"
+            "shortLeave=1&"
             "outTime=$outTimeReq");
     final response = await http.post(urlapi);
 

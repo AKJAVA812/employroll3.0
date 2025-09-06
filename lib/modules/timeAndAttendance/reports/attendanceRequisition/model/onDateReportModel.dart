@@ -1,33 +1,45 @@
 class OnDateAttModel {
   String? date;
-  String? inTime;
   int? empId;
   String? workingHrs;
-  String? empName;
+  dynamic isShortLeave;
   String? dept;
   String? branch;
+  String? inTime;
+  String? updatedWorkingHour;
+  String? relaxationHour;
+  String? empName;
+  String? shiftWorkingHour;
   String? outTime;
   String? status;
 
   OnDateAttModel(
       {this.date,
-        this.inTime,
         this.empId,
         this.workingHrs,
-        this.empName,
+        this.isShortLeave,
         this.dept,
         this.branch,
+        this.inTime,
+        this.updatedWorkingHour,
+        this.relaxationHour,
+        this.empName,
+        this.shiftWorkingHour,
         this.outTime,
         this.status});
 
   OnDateAttModel.fromJson(Map<String, dynamic> json) {
     date = json['date'];
-    inTime = json['inTime'];
     empId = json['empId'];
     workingHrs = json['workingHrs'];
-    empName = json['empName'];
+    isShortLeave = json['isShortLeave'];
     dept = json['dept'];
     branch = json['branch'];
+    inTime = json['inTime'];
+    updatedWorkingHour = json['updatedWorkingHour'];
+    relaxationHour = json['relaxationHour'];
+    empName = json['empName'];
+    shiftWorkingHour = json['shiftWorkingHour'];
     outTime = json['outTime'];
     status = json['status'];
   }
@@ -35,12 +47,16 @@ class OnDateAttModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['date'] = this.date;
-    data['inTime'] = this.inTime;
     data['empId'] = this.empId;
     data['workingHrs'] = this.workingHrs;
-    data['empName'] = this.empName;
+    data['isShortLeave'] = this.isShortLeave;
     data['dept'] = this.dept;
     data['branch'] = this.branch;
+    data['inTime'] = this.inTime;
+    data['updatedWorkingHour'] = this.updatedWorkingHour;
+    data['relaxationHour'] = this.relaxationHour;
+    data['empName'] = this.empName;
+    data['shiftWorkingHour'] = this.shiftWorkingHour;
     data['outTime'] = this.outTime;
     data['status'] = this.status;
     return data;

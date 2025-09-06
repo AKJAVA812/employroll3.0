@@ -34,7 +34,7 @@ String valuenew="listText";
 List<String> leavereqIdGlobel=[];
 late List<String?> list = [];
 late List<String?> leaveTypeList = [];
-class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> {
+class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteAware{
   var titleName = "Leave Requisition";
   String? branchName;
   String? deptName;
@@ -258,7 +258,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> {
                   children: [
                     AnimatedToggleSwitch<int>.size(
                       height: 30,
-                      current: min(value, 4),
+                      current: min(value, 3),
                       style: ToggleStyle(
                         backgroundColor: Mythemes.greyishade,
                         indicatorColor: Mythemes.lightBluishColor,
@@ -266,7 +266,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> {
                         borderRadius: BorderRadius.circular(10.0),
                         indicatorBorderRadius: BorderRadius.zero,
                       ),
-                      values: const [0, 1, 2, 3],
+                      values: const [0, 1, 2],
                       iconOpacity: 1.0,
                       selectedIconScale: 1.0,
                       indicatorSize: const Size.fromWidth(80),
@@ -283,7 +283,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> {
                             color: Colors.white38.withOpacity(opacity));
                       },
                       customIconBuilder: (context, local, global) {
-                        final text = const ['Attendance', 'Leave', 'OD', 'Tour'][local.index];
+                        final text = const ['Attendance', 'Leave', 'OD'][local.index];
                         return Center(
                             child: Text(text,
                                 style: TextStyle(
@@ -310,9 +310,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> {
                         if(value == 2) {
                           Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
                         }
-                        if(value == 3) {
+                        /*if(value == 3) {
                           Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                        }
+                        }*/
                       },
                     )
                   ],

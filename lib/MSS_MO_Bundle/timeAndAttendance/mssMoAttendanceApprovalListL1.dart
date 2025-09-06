@@ -46,6 +46,7 @@ String? levelTwo;
 String? userPanel;
 dynamic getProfileId;
 String? orgId;
+var reqType = "Short Leave";
 dynamic matchedOrg;
 class _MSS_MO_Att_PendingRequisitionL1State extends State<MSS_MO_Att_PendingRequisitionL1> with RouteAware{
   final PendingRequisitionModel pendingRequisitionModel;
@@ -320,12 +321,53 @@ class _MSS_MO_Att_PendingRequisitionL1State extends State<MSS_MO_Att_PendingRequ
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
+    if (getData.length == 0 )  {
+      print("getData111 $getData");
+      showNodata(context, "Oops", "There is no any requisition.");
+    }
     pendingRequisitionModel=PendingRequisitionModel.fromJson(mapResponse);
 
     allUsernew = pendingRequisitionModel!.data;
 
     return pendingRequisitionModel;
   }
+  showNodata(BuildContext buildContext, result,reason) {
+    var alertDialog = AlertDialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0),
+          )
+      ),
+      title: Row(
+        children: [
+          //Icon(Icons.warning),
+          Text(result),
+        ],
+      ),
+      content: Text(reason),
+      titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            Navigator.pop(buildContext);
+            setState(() {
+
+            });
+          },
+          child: Text("Ok"),
+        )
+      ],
+      elevation: 24.0,
+    );
+    showDialog(
+        context:buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        });
+  }
+
   var titleName = "Pending Requisition List";
 
   TextEditingController searchType = TextEditingController();
@@ -414,7 +456,71 @@ class _MSS_MO_Att_PendingRequisitionL1State extends State<MSS_MO_Att_PendingRequ
         child: Column(
           children: [
             Visibility(
-              visible: levelOne == "1",
+              visible: levelOne == "1" && levelTwo == "0",
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedToggleSwitch<int>.size(
+                    height: 30,
+                    current: min(value, 1),
+                    style: ToggleStyle(
+                      backgroundColor: Mythemes.greyishade,
+                      indicatorColor: Mythemes.lightBluishColor,
+                      borderColor: Colors.transparent,
+                      borderRadius: BorderRadius.circular(10.0),
+                      indicatorBorderRadius: BorderRadius.zero,
+                    ),
+                    values: const [0],
+                    iconOpacity: 1.0,
+                    selectedIconScale: 1.0,
+                    indicatorSize: const Size.fromWidth(90),
+                    iconAnimationType: AnimationType.onHover,
+                    styleAnimationType: AnimationType.onHover,
+                    spacing: 10.0,
+                    customSeparatorBuilder: (context, local, global) {
+                      final opacity =
+                      ((global.position - local.position).abs() - 0.5)
+                          .clamp(0.0, 1.0);
+                      return VerticalDivider(
+                          indent: 10.0,
+                          endIndent: 10.0,
+                          color: Colors.white38.withOpacity(opacity));
+                    },
+                    customIconBuilder: (context, local, global) {
+                      final text = const ['Level 1'][local.index];
+                      return Center(
+                          child: Text(text,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color.lerp(Colors.black, Colors.white,
+                                      local.animationValue))));
+                    },
+                    borderWidth: 0.0,
+                    onChanged: (i) {
+                      setState(() {
+                        value = i;
+                        print(i);
+
+                      });
+                      if(value == 0) {
+                        levelChange = "LEVEL_ONE_PENDING";
+                        Navigator.pushNamed(context, MyRoutings.mssMOPendingAttReqL1);
+                        //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                      }
+                      /*if(value == 1) {
+                        levelChange = "LEVEL_TWO_PENDING";
+                        Navigator.pushNamed(context, MyRoutings.mssAttPendingRequestL2Route);
+                        //Navigator.pushNamed(context, MyRoutings.mssLevelOnePendingReqRoute);
+                      }*/
+                    },
+                  )
+                ],
+              ).py(6),
+            ),
+
+            Visibility(
+              visible: levelOne == "1" && levelTwo == "1",
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -603,6 +709,13 @@ class _MSS_MO_Att_PendingRequisitionL1State extends State<MSS_MO_Att_PendingRequ
                       children: [
                         SizedBox(height: 4),
                         foundDataNewMO![itemCount].onDate
+                            .toString()
+                            .text
+                            .sm
+                            .color(Colors.grey.shade700)
+                            .make(),
+                        SizedBox(height: 4),
+                        "Request Type: $reqType"
                             .toString()
                             .text
                             .sm
