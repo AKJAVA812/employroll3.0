@@ -68,18 +68,18 @@ class CommonNotificationPage{
         });
   }
 
-  static showDialgSucess(BuildContext buildContext, String result, String alert) {
-    if (buildContext == null) {
-      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+  static void showDialgSucess(BuildContext buildContext, String result, String alert) {
+    if (!buildContext.mounted) {
+      print("⚠️ Warning: context is not mounted, cannot show dialog.");
       return;
     }
 
     showDialog(
       context: buildContext,
-      barrierDismissible: false, // Prevents accidental dismiss
-      builder: (context) {
+      barrierDismissible: false, // Prevent accidental dismiss
+      builder: (dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
           title: Row(
@@ -91,13 +91,14 @@ class CommonNotificationPage{
           actions: [
             TextButton(
               onPressed: () {
-                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                  Navigator.of(context, rootNavigator: true).pop();
+                // ✅ Always close using original buildContext (not dialogContext)
+                if (Navigator.of(buildContext, rootNavigator: true).canPop()) {
+                  Navigator.of(buildContext, rootNavigator: true).pop();
                 } else {
                   print("⚠️ Warning: No route to close.");
                 }
               },
-              child: Text("Ok"),
+              child: const Text("Ok"),
             ),
           ],
           elevation: 24.0,

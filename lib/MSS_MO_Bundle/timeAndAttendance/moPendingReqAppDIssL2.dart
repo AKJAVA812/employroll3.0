@@ -36,7 +36,7 @@ class _MO_AttendanceApprovalPageL2State extends State<MO_AttendanceApprovalPageL
 
   _MO_AttendanceApprovalPageL2State(this.pendingRequisitionModel, this.itemCount);
 
-  var titleName = "Attendance Approval";
+  var titleName = "L2 Attendance Approval";
   int pageIndex = 0;
   int currentIndex = 2;
   @override
@@ -284,7 +284,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     title: "Name".text.maxFontSize(12).make().px4().py2(),
                     subtitle: TextFormField(
                       //controller: _locationController,
-                      enabled: false,
+                      readOnly: true,
                       // initialValue: "Head Office",
                       //maxLines: 3,
                       decoration: InputDecoration(
@@ -306,7 +306,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     title: "Date".text.maxFontSize(12).sm.make().px4().py2(),
                     subtitle: TextFormField(
                       //controller: _locationController,
-                      enabled: false,
+                      readOnly: true,
                       // initialValue: "Head Office",
                       // maxLines: 3,
                       decoration: InputDecoration(
@@ -332,7 +332,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     title: "Actual In Time".text.maxFontSize(12).make().px4().py2(),
                     subtitle: TextFormField(
                       //controller: _locationController,
-                      enabled: false,
+                      readOnly: true,
                       // initialValue: "Head Office",
                       //maxLines: 3,
                       decoration: InputDecoration(
@@ -355,7 +355,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     subtitle: InkWell(
                       onTap: () async{
                         //_openInTimepicker(context);
-                        final TimeOfDay? n = await showTimePicker(
+                        /*final TimeOfDay? n = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.now(),
                             builder: (BuildContext context, Widget? child) {
@@ -371,13 +371,13 @@ class _RadioGroupsState extends State<RadioGroups> {
                           var nT= DateFormat('HH:mm').format(t);
                           print(DateFormat('HH:mm').format(t));
                           _inTimePicker = nT;
-                        });
+                        });*/
                       },
                       child: TextFormField(
                         onTap: () async {
                         },
                         controller: _inTimeReqController,
-                        enabled: false,
+                        readOnly: true,
                         //initialValue: _inTimePicker,
                         // maxLines: 3,
                         decoration: InputDecoration(
@@ -404,9 +404,9 @@ class _RadioGroupsState extends State<RadioGroups> {
                     title: "In Remarks".text.maxFontSize(12).make().px4().py2(),
                     subtitle: TextFormField(
                       //controller: _locationController,
-                      enabled: false,
+                      readOnly: true,
                       // initialValue: "Head Office",
-                      maxLines: 4,
+                      maxLines: 2,
                       decoration: InputDecoration(
                         hintText: inRemarkset,
                         hintStyle: TextStyle(
@@ -437,7 +437,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     "Actual Out Time".text.maxFontSize(12).make().px4().py2(),
                     subtitle: TextFormField(
                       //controller: _locationController,
-                      enabled: false,
+                      readOnly: true,
                       // initialValue: "Head Office",
                       //maxLines: 3,
                       decoration: InputDecoration(
@@ -466,7 +466,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     subtitle: InkWell(
                       onTap: () async{
                         //_openOutTimepicker(context);
-                        final TimeOfDay? o = await showTimePicker(
+                        /*final TimeOfDay? o = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.now(),
                             builder: (BuildContext context, Widget? child) {
@@ -482,7 +482,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                           var oT= DateFormat('HH:mm').format(newt);
                           print(DateFormat('HH:mm').format(newt));
                           _outTimePicker = oT;
-                        });
+                        });*/
                       },
                       child: TextFormField(
                         onTap: () async {
@@ -490,7 +490,7 @@ class _RadioGroupsState extends State<RadioGroups> {
 
                         },
                         controller: _outTimeController,
-                        enabled: false,
+                        readOnly: true,
                         //initialValue: _outTimePicker,
                         // maxLines: 3,
                         decoration: InputDecoration(
@@ -518,9 +518,9 @@ class _RadioGroupsState extends State<RadioGroups> {
                     title: "Out Remarks".text.maxFontSize(12).make().px4().py2(),
                     subtitle: TextFormField(
                       //controller: _locationController,
-                      enabled: false,
+                      readOnly: true,
                       // initialValue: "Head Office",
-                      maxLines: 4,
+                      maxLines: 2,
                       decoration: InputDecoration(
                         hintText: outRemarkset,
                         hintStyle: TextStyle(
@@ -549,7 +549,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     subtitle: TextFormField(
                       controller: _commentController,
                       // initialValue: "Head Office",
-                      maxLines: 4,
+                      maxLines: 3,
                       decoration: InputDecoration(
                         hintText: "Add Comments",
                         hintStyle: TextStyle(

@@ -23,20 +23,20 @@ import 'package:http/http.dart' as http;
 
 import '../../../timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 
-class AttendanceRequisition extends StatefulWidget {
+class AttendanceRequestCurrentMonth extends StatefulWidget {
   AttendanceReportModel? attendanceModelGlobel;
   OnDateAttModel? onDateAttModel;
   int indexCont;
 
-  AttendanceRequisition(
+  AttendanceRequestCurrentMonth(
       this.attendanceModelGlobel, this.onDateAttModel, this.indexCont);
 
   @override
-  State<AttendanceRequisition> createState() => _AttendanceRequisitionState(
+  State<AttendanceRequestCurrentMonth> createState() => _AttendanceRequestCurrentMonthState(
       attendanceModelGlobel, onDateAttModel, indexCont);
 }
 
-class _AttendanceRequisitionState extends State<AttendanceRequisition> with RouteAware{
+class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrentMonth> with RouteAware{
   AttendanceReportModel? attendanceModelGlobel;
   OnDateAttModel? onDateAttModel;
   int indexCont;
@@ -58,7 +58,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   int? empId;
 
 
-  _AttendanceRequisitionState(
+  _AttendanceRequestCurrentMonthState(
       this.attendanceModelGlobel, this.onDateAttModel, this.indexCont);
 
   @override
@@ -79,32 +79,32 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
       empId =attendanceModelGlobel!.data![indexCont].empId;*/
 
-      branchNameset= onDateAttModel!.branch;
-      updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
-      relaxationHourSet = onDateAttModel!.relaxationHour;
-      shortLeave = onDateAttModel!.isShortLeave == true ? true : false;
-      workingHrsSet = onDateAttModel!.workingHrs;
-      shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
-      departmentset= onDateAttModel!.dept;
-      employeeNameset= onDateAttModel!.empName;
-      onDateset= onDateAttModel!.date;
-      actualTimeset= onDateAttModel!.inTime;
-      actualOutTimeset= onDateAttModel!.outTime;
-      empId= onDateAttModel!.empId;
+      branchNameset=  attendanceModelGlobel!.data![indexCont].branchName.toString();
+      updatedWorkHourSet = attendanceModelGlobel!.data![indexCont].updatedWorkingHour;
+      relaxationHourSet = attendanceModelGlobel!.data![indexCont].relaxationHour;
+      shortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave == true ? true : false;
+      workingHrsSet = attendanceModelGlobel!.data![indexCont].workingHrs;
+      shiftWorkingHourSet = attendanceModelGlobel!.data![indexCont].shiftWorkingHour;
+      departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
+      employeeNameset= attendanceModelGlobel!.data![indexCont].employeeName;
+      onDateset= attendanceModelGlobel!.data![indexCont].attendanceDate;
+      actualTimeset= attendanceModelGlobel!.data![indexCont].inTime;
+      actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
+      empId= attendanceModelGlobel!.data![indexCont].empId;
     }else{
       print('onModelrun');
-      branchNameset= onDateAttModel!.branch;
-      updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
-      isShortLeave = onDateAttModel!.isShortLeave == true ? true : false;
-      relaxationHourSet = onDateAttModel!.relaxationHour;
-      workingHrsSet = onDateAttModel!.workingHrs;
-      shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
-      departmentset= onDateAttModel!.dept;
-      employeeNameset= onDateAttModel!.empName;
-      onDateset= onDateAttModel!.date;
-      actualTimeset= onDateAttModel!.inTime;
-      actualOutTimeset= onDateAttModel!.outTime;
-      empId= onDateAttModel!.empId;
+      branchNameset=  attendanceModelGlobel!.data![indexCont].branchName.toString();
+      updatedWorkHourSet = attendanceModelGlobel!.data![indexCont].updatedWorkingHour;
+      relaxationHourSet = attendanceModelGlobel!.data![indexCont].relaxationHour;
+      shortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave == true ? true : false;
+      workingHrsSet = attendanceModelGlobel!.data![indexCont].workingHrs;
+      shiftWorkingHourSet = attendanceModelGlobel!.data![indexCont].shiftWorkingHour;
+      departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
+      employeeNameset= attendanceModelGlobel!.data![indexCont].employeeName;
+      onDateset= attendanceModelGlobel!.data![indexCont].attendanceDate;
+      actualTimeset= attendanceModelGlobel!.data![indexCont].inTime;
+      actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
+      empId= attendanceModelGlobel!.data![indexCont].empId;
     }
 
     getSharedPrfanceList();
@@ -283,10 +283,10 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                     ),
                   ),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                    /*Expanded(
+                        /*Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -310,7 +310,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                         ],
                       ),
                     ),*/
-                    /*Expanded(
+                        /*Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -359,7 +359,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                       ),
                     ),*/
 
-                  ]).p(5),
+                      ]).p(5),
                   SizedBox(
                     height: 7,
                   ),
@@ -446,69 +446,69 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                   //No Short Leave Case
                   Visibility(
                     visible: shortLeave == false,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child:
-                            Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: TextFormField(
-                                style:TextStyle(fontSize:14),
-                                controller: TextEditingController(text: actualTimeset),
-                                readOnly: true,
-                                //initialValue: "${branchName}",
-                                decoration:  InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 8.0),
-                                    hintText: actualTimeset,
-                                    labelText: "Actual In Time",
-                                    labelStyle: TextStyle(fontSize: 15)
-                                ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style:TextStyle(fontSize:14),
+                              controller: TextEditingController(text: actualTimeset),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: actualTimeset,
+                                  labelText: "Actual In Time",
+                                  labelStyle: TextStyle(fontSize: 15)
                               ),
                             ),
                           ),
-                          Expanded(
-                            child:
-                            Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: TextFormField(
-                                onTap: () async {
-                                  //_openInTimepicker(context);
-                                  final TimeOfDay? n = await showTimePicker(
-                                      context: context,
-                                      initialTime: TimeOfDay.now(),
-                                      builder: (BuildContext context, Widget? child) {
-                                        return MediaQuery(
-                                          data: MediaQuery.of(context)
-                                              .copyWith(alwaysUse24HourFormat: true),
-                                          child: child!,
-                                        );
-                                      });
-                                  print('timenewOut $n');
-                                  setState(() {
-                                    var now = DateTime.now();
-                                    DateTime newt = DateTime(now.year, now.month,
-                                        now.day, n!.hour, n!.minute);
-                                    var nT = DateFormat('HH:mm').format(newt);
-                                    print(DateFormat('HH:mm').format(newt));
-                                    _inTimePicker = nT;
-                                  });
-                                },
-                                style:TextStyle(fontSize:14),
-                                controller: TextEditingController(text: _inTimePicker),
-                                readOnly: true,
-                                //initialValue: "${branchName}",
-                                decoration:  InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 8.0),
-                                    hintText: _inTimePicker,
-                                    labelText: "Changes In Time",
-                                    labelStyle: TextStyle(fontSize: 15)
-                                ),
+                        ),
+                        Expanded(
+                          child:
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              onTap: () async {
+                                //_openInTimepicker(context);
+                                final TimeOfDay? n = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                    builder: (BuildContext context, Widget? child) {
+                                      return MediaQuery(
+                                        data: MediaQuery.of(context)
+                                            .copyWith(alwaysUse24HourFormat: true),
+                                        child: child!,
+                                      );
+                                    });
+                                print('timenewOut $n');
+                                setState(() {
+                                  var now = DateTime.now();
+                                  DateTime newt = DateTime(now.year, now.month,
+                                      now.day, n!.hour, n!.minute);
+                                  var nT = DateFormat('HH:mm').format(newt);
+                                  print(DateFormat('HH:mm').format(newt));
+                                  _inTimePicker = nT;
+                                });
+                              },
+                              style:TextStyle(fontSize:14),
+                              controller: TextEditingController(text: _inTimePicker),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration:  InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: _inTimePicker,
+                                  labelText: "Changes In Time",
+                                  labelStyle: TextStyle(fontSize: 15)
                               ),
                             ),
+                          ),
 
-                          ),
-                        ],
-                      ),),
+                        ),
+                      ],
+                    ),),
                   Visibility(
                     visible: shortLeave == false,
                     child: Row(
@@ -995,7 +995,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       var onDate) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-      "$conn$apiUrl?"
+        "$conn$apiUrl?"
             "sessionId=$sessionId&"
             "id=$empId&"
             "onDate=$onDate&"
@@ -1189,7 +1189,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
             Navigator.of(context).pop();
-           /* Navigator.pop(
+            /* Navigator.pop(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (a, b, c) =>

@@ -20,22 +20,22 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
-import '../../MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL1.dart';
+import '../../MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL2.dart';
 import '../../modules/timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 import '../../modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
 
-class ShortLeaveApprovalPage extends StatefulWidget {
+class ShortLeaveApprovalL2Page extends StatefulWidget {
   PendingRequisitionModel pendingRequisitionModel;
   int itemCount;
 
-  ShortLeaveApprovalPage(this.pendingRequisitionModel, this.itemCount);
+  ShortLeaveApprovalL2Page(this.pendingRequisitionModel, this.itemCount);
 
   @override
-  State<ShortLeaveApprovalPage> createState() => _ShortLeaveApprovalPageState(
+  State<ShortLeaveApprovalL2Page> createState() => _ShortLeaveApprovalL2PageState(
       pendingRequisitionModel,itemCount);
 }
 
-class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with RouteAware{
+class _ShortLeaveApprovalL2PageState extends State<ShortLeaveApprovalL2Page> with RouteAware{
   PendingRequisitionModel pendingRequisitionModel;
   int itemCount;
   String? _group1SelectedValue;
@@ -59,7 +59,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
   int? empId;
 
 
-  _ShortLeaveApprovalPageState(this.pendingRequisitionModel, this.itemCount);
+  _ShortLeaveApprovalL2PageState(this.pendingRequisitionModel, this.itemCount);
 
   @override
   void initState() {
@@ -558,7 +558,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
         "sessionId=$sessionId&"
         "attReqId=$attReqId&"
         "comment=$text&"
-        "status=LEVEL_ONE_PENDING");
+        "status=PENDING");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');
@@ -575,7 +575,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
       print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         showDialgSucess1(
-            context, "$reason" + " ", "Success");
+            context, "$body" + " ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(
             context, reason.upperCamelCase, " Error ");

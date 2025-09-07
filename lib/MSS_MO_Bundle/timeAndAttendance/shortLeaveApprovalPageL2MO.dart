@@ -20,22 +20,23 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
-import '../../MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL1.dart';
+
+import '../../MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL2.dart';
 import '../../modules/timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 import '../../modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
 
-class ShortLeaveApprovalPage extends StatefulWidget {
+class ShortLeaveApprovalPageL2MO extends StatefulWidget {
   PendingRequisitionModel pendingRequisitionModel;
   int itemCount;
 
-  ShortLeaveApprovalPage(this.pendingRequisitionModel, this.itemCount);
+  ShortLeaveApprovalPageL2MO(this.pendingRequisitionModel, this.itemCount);
 
   @override
-  State<ShortLeaveApprovalPage> createState() => _ShortLeaveApprovalPageState(
+  State<ShortLeaveApprovalPageL2MO> createState() => _ShortLeaveApprovalPageL2MOState(
       pendingRequisitionModel,itemCount);
 }
 
-class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with RouteAware{
+class _ShortLeaveApprovalPageL2MOState extends State<ShortLeaveApprovalPageL2MO> with RouteAware{
   PendingRequisitionModel pendingRequisitionModel;
   int itemCount;
   String? _group1SelectedValue;
@@ -59,7 +60,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
   int? empId;
 
 
-  _ShortLeaveApprovalPageState(this.pendingRequisitionModel, this.itemCount);
+  _ShortLeaveApprovalPageL2MOState(this.pendingRequisitionModel, this.itemCount);
 
   @override
   void initState() {
@@ -76,44 +77,44 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
 
     });
     if(userPanel == "MSS") {
-      _inTimePicker = foundDataNewMSS![itemCount].inTime.toString();
+      _inTimePicker = foundDataNewMO![itemCount].inTime.toString();
       print("Intime - $_inTimePicker");
-      _outTimePicker = foundDataNewMSS![itemCount].outTime.toString();
-      employeeNameset=foundDataNewMSS![itemCount].empName.toString();
-      departmentset=foundDataNewMSS![itemCount].department.toString();
-      branchNameset=foundDataNewMSS![itemCount].branch.toString();
-      onDateset=foundDataNewMSS![itemCount].onDate.toString();
-      updatedWorkHourSet=foundDataNewMSS![itemCount].updatedWorkingHour.toString();
-      relaxationHourSet=foundDataNewMSS![itemCount].relaxationHour.toString();
-      workingHrsSet=foundDataNewMSS![itemCount].shiftWorkingHour.toString();
-      shortLeave= foundDataNewMSS![itemCount].shortLeaveRequistionType;
+      _outTimePicker = foundDataNewMO![itemCount].outTime.toString();
+      employeeNameset=foundDataNewMO![itemCount].empName.toString();
+      departmentset=foundDataNewMO![itemCount].department.toString();
+      branchNameset=foundDataNewMO![itemCount].branch.toString();
+      onDateset=foundDataNewMO![itemCount].onDate.toString();
+      updatedWorkHourSet=foundDataNewMO![itemCount].updatedWorkingHour.toString();
+      relaxationHourSet=foundDataNewMO![itemCount].relaxationHour.toString();
+      workingHrsSet=foundDataNewMO![itemCount].shiftWorkingHour.toString();
+      shortLeave= foundDataNewMO![itemCount].shortLeaveRequistionType;
       print("Short Leave Fields - $shortLeave");
-      actualTimeset= foundDataNewMSS![itemCount].actualInTime;
-      inTimeReqset= foundDataNewMSS![itemCount].inTime;
-      //inRemarkset= foundDataNewMSS![itemCount].inRemarks;
-      actualOutTimeset= foundDataNewMSS![itemCount].actualOutTime;
-      outTimeReqset= foundDataNewMSS![itemCount].outTime;
-      //outRemarkset= foundDataNewMSS![itemCount].outRemarks;
-      attReqId = foundDataNewMSS![itemCount].requestId;
+      actualTimeset= foundDataNewMO![itemCount].actualInTime;
+      inTimeReqset= foundDataNewMO![itemCount].inTime;
+      //inRemarkset= foundDataNewMO![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewMO![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewMO![itemCount].outTime;
+      //outRemarkset= foundDataNewMO![itemCount].outRemarks;
+      attReqId = foundDataNewMO![itemCount].requestId;
     } else {
-      _inTimePicker = foundDataNewMSS![itemCount].inTime.toString();
-      _outTimePicker = foundDataNewMSS![itemCount].outTime.toString();
-      employeeNameset=foundDataNewMSS![itemCount].empName.toString();
-      departmentset=foundDataNewMSS![itemCount].department.toString();
-      branchNameset=foundDataNewMSS![itemCount].branch.toString();
-      onDateset=foundDataNewMSS![itemCount].onDate.toString();
-      updatedWorkHourSet=foundDataNewMSS![itemCount].updatedWorkingHour.toString();
-      relaxationHourSet=foundDataNewMSS![itemCount].relaxationHour.toString();
-      workingHrsSet=foundDataNewMSS![itemCount].shiftWorkingHour.toString();
-      shortLeave= foundDataNewMSS![itemCount].shortLeaveRequistionType;
+      _inTimePicker = foundDataNewMO![itemCount].inTime.toString();
+      _outTimePicker = foundDataNewMO![itemCount].outTime.toString();
+      employeeNameset=foundDataNewMO![itemCount].empName.toString();
+      departmentset=foundDataNewMO![itemCount].department.toString();
+      branchNameset=foundDataNewMO![itemCount].branch.toString();
+      onDateset=foundDataNewMO![itemCount].onDate.toString();
+      updatedWorkHourSet=foundDataNewMO![itemCount].updatedWorkingHour.toString();
+      relaxationHourSet=foundDataNewMO![itemCount].relaxationHour.toString();
+      workingHrsSet=foundDataNewMO![itemCount].shiftWorkingHour.toString();
+      shortLeave= foundDataNewMO![itemCount].shortLeaveRequistionType;
       print("Short Leave Fields - $shortLeave");
-      actualTimeset= foundDataNewMSS![itemCount].actualInTime;
-      inTimeReqset= foundDataNewMSS![itemCount].inTime;
-      //inRemarkset= foundDataNewMSS![itemCount].inRemarks;
-      actualOutTimeset= foundDataNewMSS![itemCount].actualOutTime;
-      outTimeReqset= foundDataNewMSS![itemCount].outTime;
-      //outRemarkset= foundDataNewMSS![itemCount].outRemarks;
-      attReqId = foundDataNewMSS![itemCount].requestId;
+      actualTimeset= foundDataNewMO![itemCount].actualInTime;
+      inTimeReqset= foundDataNewMO![itemCount].inTime;
+      //inRemarkset= foundDataNewMO![itemCount].inRemarks;
+      actualOutTimeset= foundDataNewMO![itemCount].actualOutTime;
+      outTimeReqset= foundDataNewMO![itemCount].outTime;
+      //outRemarkset= foundDataNewMO![itemCount].outRemarks;
+      attReqId = foundDataNewMO![itemCount].requestId;
     }
   }
 
@@ -558,7 +559,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
         "sessionId=$sessionId&"
         "attReqId=$attReqId&"
         "comment=$text&"
-        "status=LEVEL_ONE_PENDING");
+        "status=PENDING");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');
@@ -575,7 +576,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
       print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         showDialgSucess1(
-            context, "$reason" + " ", "Success");
+            context, "$body" + " ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(
             context, reason.upperCamelCase, " Error ");

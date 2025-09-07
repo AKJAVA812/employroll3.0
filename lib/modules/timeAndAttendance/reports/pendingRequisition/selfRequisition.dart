@@ -536,7 +536,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                                 Icon(
                                   Icons.touch_app,
                                   size: 35,
-                                  color: Mythemes.lightBluishColor,
+                                  color: Mythemes.dangerColor,
                                 ),
                               ],
                             ),
@@ -630,6 +630,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                     maintainState: true,
                   ));
               cancelSelfAttRequisition(reqId.toString());
+              Navigator.of(buildContext, rootNavigator: true).pop();
             },
             child: Container(
               child: Text(
@@ -650,34 +651,68 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
   Future<void> cancelSelfAttRequisition(String reqId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.cancelSelfAttReqList;
-    CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "reqId=$reqId");
-    final response = await http.post(urlapi);
-    print('URL ${response.request}');
-    if (response.statusCode == 200) {
-      var responseResult = response.body;
-      print('Response: $responseResult');
 
+    if (!mounted) return;
+    CommonNotificationPage.showLoaderDialog(context);
+    print("🔄 Loader shown...");
+
+    try {
+      var urlapi = Uri.parse("$conn$apiUrl?"
+          "sessionId=$sessionId&"
+          "reqId=$reqId");
+
+      final response = await http.post(urlapi);
+      print('🌍 URL: ${response.request}');
+      print('📩 Raw Response: ${response.body}');
+
+      String result = "unknown";
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> mapResponse = json.decode(response.body);
+        result = mapResponse['result']?.toString() ?? "unknown";
+        print("📌 API Result: $result");
+      } else {
+        print("❌ API Error ${response.statusCode}");
+      }
+
+      // ✅ Always close loader no matter success/failure
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
       }
-        Map<String, dynamic> mapResponse = json.decode(response.body); // ✅ Parse JSON properly
-        String result = mapResponse['result'].toString(); // ✅ Extract result
 
-        print('API Result: $result');
-
+      // ✅ Now show popup depending on result
+      if (mounted) {
         if (result.compareToIgnoringCase("success") == 0) {
-          CommonNotificationPage.showDialgSucess(context, "Requisition Deleted Successfully !", "Success.");
-          Future.delayed(Duration(seconds: 1), () {
-            if (mounted) {
-              Navigator.of(context, rootNavigator: true).pop();
-            }
+          CommonNotificationPage.showDialgSucess(
+            context,
+            "Requisition Deleted Successfully !",
+            "Success.",
+          );
+          // Close current screen after success
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) Navigator.pop(context);
           });
         } else if (result.compareToIgnoringCase("failed") == 0) {
-          CommonNotificationPage.showDialgSucess(context, "Please check the network connection!", "Failed"); // ✅ Show dialog on failure
+          CommonNotificationPage.showDialgSucess(
+            context,
+            "Please check the network connection!",
+            "Failed",
+          );
+        } else {
+          CommonNotificationPage.showDialgSucess(
+            context,
+            "Unexpected response: $result",
+            "Error",
+          );
         }
+      }
+
+    } catch (e) {
+      print("❌ Exception: $e");
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop(); // ✅ close loader
+        CommonNotificationPage.showDialgSucess(context, "Exception: $e", "Error");
+      }
     }
   }
 }

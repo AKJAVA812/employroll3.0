@@ -27,8 +27,11 @@ class Data {
   dynamic compOffRequistionType;
   dynamic outRemarks;
   dynamic actualInTime;
+  dynamic isShortLeave;
   dynamic branch;
   dynamic inTime;
+  dynamic updatedWorkingHour;
+  dynamic relaxationHour;
   dynamic nightRequistionType;
   dynamic onDate;
   dynamic requestId;
@@ -36,6 +39,7 @@ class Data {
   dynamic inRemarks;
   dynamic actualOutTime;
   dynamic department;
+  dynamic shiftWorkingHour;
   dynamic outTime;
   dynamic status;
   dynamic shortLeaveRequistionType;
@@ -46,8 +50,11 @@ class Data {
         this.compOffRequistionType,
         this.outRemarks,
         this.actualInTime,
+        this.isShortLeave,
         this.branch,
         this.inTime,
+        this.updatedWorkingHour,
+        this.relaxationHour,
         this.nightRequistionType,
         this.onDate,
         this.requestId,
@@ -55,6 +62,7 @@ class Data {
         this.inRemarks,
         this.actualOutTime,
         this.department,
+        this.shiftWorkingHour,
         this.outTime,
         this.status,
         this.shortLeaveRequistionType});
@@ -65,8 +73,11 @@ class Data {
     compOffRequistionType = json['compOffRequistionType'];
     outRemarks = json['outRemarks'];
     actualInTime = json['actualInTime'];
+    isShortLeave = json['isShortLeave'];
     branch = json['branch'];
     inTime = json['inTime'];
+    updatedWorkingHour = json['updatedWorkingHour'];
+    relaxationHour = json['relaxationHour'];
     nightRequistionType = json['nightRequistionType'];
     onDate = json['onDate'];
     requestId = json['requestId'];
@@ -74,6 +85,7 @@ class Data {
     inRemarks = json['inRemarks'];
     actualOutTime = json['actualOutTime'];
     department = json['department'];
+    shiftWorkingHour = json['shiftWorkingHour'];
     outTime = json['outTime'];
     status = json['status'];
     shortLeaveRequistionType = json['shortLeaveRequistionType'];
@@ -86,8 +98,11 @@ class Data {
     data['compOffRequistionType'] = this.compOffRequistionType;
     data['outRemarks'] = this.outRemarks;
     data['actualInTime'] = this.actualInTime;
+    data['isShortLeave'] = this.isShortLeave;
     data['branch'] = this.branch;
     data['inTime'] = this.inTime;
+    data['updatedWorkingHour'] = this.updatedWorkingHour;
+    data['relaxationHour'] = this.relaxationHour;
     data['nightRequistionType'] = this.nightRequistionType;
     data['onDate'] = this.onDate;
     data['requestId'] = this.requestId;
@@ -95,6 +110,7 @@ class Data {
     data['inRemarks'] = this.inRemarks;
     data['actualOutTime'] = this.actualOutTime;
     data['department'] = this.department;
+    data['shiftWorkingHour'] = this.shiftWorkingHour;
     data['outTime'] = this.outTime;
     data['status'] = this.status;
     data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;

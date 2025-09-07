@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
+import 'package:er_flutter_project/MSS_MO_Bundle/timeAndAttendance/shortLeaveApprovalPageL2MO.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/pendingRequisition/pendingReqAppDiss.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../../modules/timeAndAttendance/reports/timeAndAttReports.dart';
 import 'moPendingReqAppDIssL2.dart';
 
 
@@ -437,6 +439,7 @@ class _MSS_MO_Att_PendingRequisitionL2State extends State<MSS_MO_Att_PendingRequ
                 },
                 horizontalPadding: 8,
                 searchIconColor: Mythemes.black,
+                previousScreen: TimeAndAttendanceReports(),
                 centerTitle: titleName,
                 verticalPadding: 3,
                 centerTitleStyle: TextStyle(
@@ -583,11 +586,15 @@ class _MSS_MO_Att_PendingRequisitionL2State extends State<MSS_MO_Att_PendingRequ
                 ],
               ).py(6),
             ),
-            Expanded(
+           /* Expanded(
                 child: pendingRequisitionLabeled == null ?
                 Center(
                     child: CircularProgressIndicator()):
-                getPendingRequisitionRo(pendingRequisitionLabeled!)),
+                getPendingRequisitionRo(pendingRequisitionLabeled!)),*/
+        Expanded(child:
+        pendingRequisitionLabeled == null ? Center(child: "Please select Organisation first!".text.bold.center.make()) :
+        getPendingRequisitionRo(pendingRequisitionLabeled!),
+        )
           ],
         ),
       ) ,
@@ -682,6 +689,18 @@ class _MSS_MO_Att_PendingRequisitionL2State extends State<MSS_MO_Att_PendingRequ
       child: ListView.builder(
           itemCount: foundDataNewMO!.length,
           itemBuilder: (context, itemCount) {
+            if(foundDataNewMO![itemCount].attendanceRequisionType == true) {
+              reqType = "Attendance Request";
+            }
+            if (foundDataNewMO![itemCount].compOffRequistionType == true) {
+              reqType = "Compensatory Off Request";
+            }
+            if (foundDataNewMO![itemCount].nightRequistionType == true) {
+              reqType = "Night Shift Request";
+            }
+            if (foundDataNewMO![itemCount].shortLeaveRequistionType == true) {
+              reqType = "Short Leave Request";
+            }
             return  Column(
               children: [
                 // if (_isVisible)
@@ -692,10 +711,18 @@ class _MSS_MO_Att_PendingRequisitionL2State extends State<MSS_MO_Att_PendingRequ
                   ),
                   child: ListTile(
                     onTap: () {
-                      print(foundDataNewMO!.length);
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              MO_AttendanceApprovalPageL2(pendingRequisitionModel, itemCount)));
+                      if(foundDataNewMO![itemCount].shortLeaveRequistionType == true) {
+                        print(foundDataNewMO!.length);
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                ShortLeaveApprovalPageL2MO(pendingRequisitionModel, itemCount)));
+                      } else {
+                        print(foundDataNewMO!.length);
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                MO_AttendanceApprovalPageL2(pendingRequisitionModel, itemCount)));
+                      }
+
                     },
                     leading: CircleAvatar(
                       backgroundColor: Colors.blue.shade100,

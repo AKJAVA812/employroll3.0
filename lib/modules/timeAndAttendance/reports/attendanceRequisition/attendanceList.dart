@@ -18,6 +18,7 @@ import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'attendanceRequisitionCurrentMonth.dart';
 import 'model/onDateReportModel.dart';
 
 
@@ -219,7 +220,7 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
             onTap: () {
               print('attendanceReport$attendanceModelGlobel!.data![itemCount]');
               Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                  AttendanceRequisition(attendanceModelGlobel,onDateAttModel,itemCount)));
+                  AttendanceRequestCurrentMonth(attendanceModelGlobel,onDateAttModel,itemCount)));
             },
             child: Card(
                 elevation: 2,
@@ -282,7 +283,7 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
                             child: Column(
                               children: [
                                 Icon(
-                                  Icons.touch_app, size: 25, color: Mythemes.lightBluishColor,
+                                  Icons.touch_app, size: 25, color: Mythemes.dangerColor,
                                 ),
                               ],
                             ),
@@ -312,7 +313,7 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
                             child: Column(
                               children: [
 
-                                "Working Hours".text.sm.make(),
+                                "Work Hours".text.sm.make(),
                                 attendanceModelGlobel!.data![itemCount].workingHrs!.text.sm.make()
                               ],
                             ),

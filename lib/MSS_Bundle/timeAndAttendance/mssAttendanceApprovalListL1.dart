@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:er_flutter_project/MSS_Bundle/timeAndAttendance/pendingReqAppDIssL1.dart';
+import 'package:er_flutter_project/MSS_Bundle/timeAndAttendance/shortLeaveApprovalPage.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/pendingRequisition/pendingReqAppDiss.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../../modules/timeAndAttendance/reports/timeAndAttReports.dart';
 
 
 
@@ -45,7 +47,7 @@ String? levelTwo = "0";
 String? userPanel;
 dynamic getProfileId;
 String? orgId;
-var reqType = "Short Leave";
+var reqType = "";
 class _MSS_Att_PendingRequisitionL1State extends State<MSS_Att_PendingRequisitionL1> with RouteAware{
   final PendingRequisitionModel pendingRequisitionModel;
   _MSS_Att_PendingRequisitionL1State(this.pendingRequisitionModel);
@@ -215,6 +217,8 @@ class _MSS_Att_PendingRequisitionL1State extends State<MSS_Att_PendingRequisitio
     });
   }
 
+
+
   int pageIndex = 0;
   int currentIndex = 1;
   int value = 0;
@@ -247,6 +251,7 @@ class _MSS_Att_PendingRequisitionL1State extends State<MSS_Att_PendingRequisitio
                 },
                 horizontalPadding: 8,
                 searchIconColor: Mythemes.black,
+                previousScreen: TimeAndAttendanceReports(),
                 centerTitle: titleName,
                 verticalPadding: 3,
                 centerTitleStyle: TextStyle(
@@ -488,6 +493,18 @@ class _MSS_Att_PendingRequisitionL1State extends State<MSS_Att_PendingRequisitio
       child: ListView.builder(
           itemCount: foundDataNewMSS!.length,
           itemBuilder: (context, itemCount) {
+            if(foundDataNewMSS![itemCount].attendanceRequisionType == true) {
+              reqType = "Attendance Request";
+            }
+            if (foundDataNewMSS![itemCount].compOffRequistionType == true) {
+              reqType = "Compensatory Off Request";
+            }
+            if (foundDataNewMSS![itemCount].nightRequistionType == true) {
+              reqType = "Night Shift Request";
+            }
+            if (foundDataNewMSS![itemCount].shortLeaveRequistionType == true) {
+              reqType = "Short Leave Request";
+            }
             return  Column(
               children: [
                 // if (_isVisible)
@@ -498,10 +515,18 @@ class _MSS_Att_PendingRequisitionL1State extends State<MSS_Att_PendingRequisitio
                   ),
                   child: ListTile(
                     onTap: () {
-                      print(foundDataNewMSS!.length);
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              AttendanceApprovalPageL1(pendingRequisitionModel, itemCount)));
+                      if(foundDataNewMSS![itemCount].shortLeaveRequistionType == true) {
+                        print(foundDataNewMSS!.length);
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                ShortLeaveApprovalPage(pendingRequisitionModel, itemCount)));
+                      } else {
+                        print(foundDataNewMSS!.length);
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>
+                                AttendanceApprovalPageL1(pendingRequisitionModel, itemCount)));
+                      }
+
                     },
                     leading: CircleAvatar(
                       backgroundColor: Colors.blue.shade100,
