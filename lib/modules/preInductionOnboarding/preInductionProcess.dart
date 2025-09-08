@@ -35,13 +35,13 @@ class PreInductionProcess extends StatefulWidget {
 
 
 
-late List<String?> onboardBranchList = [];
-late List<String?> onboardDeptList = [];
-late List<String?> onboardDesignationList = [];
-late List<String?> onboardUserTypeList = [];
-late List<String?> onboardDocTypeList = [];
-late List<String?> queryTypeList = [];
-late List<String?> subQueryTypeList = [];
+ List<String?> onboardBranchList = [];
+ List<String?> onboardDeptList = [];
+ List<String?> onboardDesignationList = [];
+ List<String?> onboardUserTypeList = [];
+ List<String?> onboardDocTypeList = [];
+ List<String?> queryTypeList = [];
+ List<String?> subQueryTypeList = [];
 
 SessionManager sessionManager=SessionManager();
 Map<String, dynamic> mapResponse = {};
@@ -335,7 +335,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     final response = await http.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
+    print('branch List ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];

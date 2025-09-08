@@ -134,27 +134,27 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
     });
     print("User Type - $userType");
-    setShowPayroll = await shared!.getShowPayroll();
-    orgId = await shared!.getOrgId();
-    emailId = await shared!.getEmailId();
-    empIdNew = await shared!.getEmpId();
-    orgName = await shared!.getOrgName();
+    setShowPayroll = await shared.getShowPayroll();
+    orgId = await shared.getOrgId();
+    emailId = await shared.getEmailId();
+    empIdNew = await shared.getEmpId();
+    orgName = await shared.getOrgName();
     empRoles= await shared.getEmpRoll();
     roRoles= await shared.getRoRole();
     adminRoles= await shared.getAdminRole();
     setPreOnboardShow= await shared.getPreOnboardShow();
     setExitShow= await shared.getExitShow();
     userPanel= await shared.getUserPanel();
-    claimLevelOneMSS = await shared!.getClaimLevelOne();
+    claimLevelOneMSS = await shared.getClaimLevelOne();
     print("CLAIM APPROVAL L1 - $claimLevelOneMSS");
-    claimLevelTwoMSS = await shared!.getClaimLevelTwo();
-    claimLevelThreeMSS = await shared!.getClaimLevelThree();
-    claimLevelOneMO = await shared!.getClaimLevelOneMO();
-    claimLevelTwoMO = await shared!.getClaimLevelTwoMO();
-    claimLevelThreeMO = await shared!.getClaimLevelThreeMO();
-    claimLevelOneUIS = await shared!.getClaimLevelOneUIS();
-    claimLevelTwoUIS = await shared!.getClaimLevelTwoUIS();
-    claimLevelThreeUIS = await shared!.getClaimLevelThreeUIS();
+    claimLevelTwoMSS = await shared.getClaimLevelTwo();
+    claimLevelThreeMSS = await shared.getClaimLevelThree();
+    claimLevelOneMO = await shared.getClaimLevelOneMO();
+    claimLevelTwoMO = await shared.getClaimLevelTwoMO();
+    claimLevelThreeMO = await shared.getClaimLevelThreeMO();
+    claimLevelOneUIS = await shared.getClaimLevelOneUIS();
+    claimLevelTwoUIS = await shared.getClaimLevelTwoUIS();
+    claimLevelThreeUIS = await shared.getClaimLevelThreeUIS();
     if(userPanel == "COMPANY_EMPLOYEE") {
       value = 0;
     } else {
@@ -162,7 +162,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     }
     profileName= await shared.getDefaultProfileName();
     profileId= await shared.getDefaultProfileId();
-    print("Default Profile Name - $profileName");
+/*    print("Default Profile Name - $profileName");
     print("Default Profile Id - $profileId");
     print("User Panel - $userPanel");
     print('Pre-Onboard $setPreOnboardShow');
@@ -173,7 +173,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     print('Response snapshot: ${sessionId}');
     print('Show Payroll: ${setShowPayroll}');
     print('OrgId -  ${orgId}');
-    print('OrgName - : ${orgName}');
+    print('OrgName - : ${orgName}');*/
     setState(() {
 
     });

@@ -413,7 +413,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
   Future<void> uploadImage(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchIn;
-    print("I am hit 1 time");
     CommonNotificationPage.showLoaderDialog(context);
 
     bool internetCheck = await InternetConnectionChecker().hasConnection;
@@ -437,10 +436,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     });
     var length = await value!.length();
-    print('Response status - Image: ${length}');
-    print('Response Date: ${currentDateFormatString}');
-    print('Response body: ${stream}');
-    print('Response body: ${currentAddress}');
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Sucessfully Run"+formattedDate!),
       ));*/

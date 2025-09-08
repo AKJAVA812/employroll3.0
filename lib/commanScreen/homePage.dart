@@ -324,13 +324,13 @@ class _HomePageState extends State<HomePage> {
 
   Future getSharedPrfanceList() async {
 
-    sessionId = await shared!.getSessionId();
-    userType = await shared!.getUserType();
-    defaultProfileName = await shared!.getDefaultProfileName();
-    defaultProfileId = await shared!.getDefaultProfileId();
+    sessionId = await shared.getSessionId();
+    userType = await shared.getUserType();
+    defaultProfileName = await shared.getDefaultProfileName();
+    defaultProfileId = await shared.getDefaultProfileId();
     print("Default Profile Name - $defaultProfileName");
     print("Default Profile Id - $defaultProfileId");
-    userPanelPermission = await shared!.getUserPanel();
+    userPanelPermission = await shared.getUserPanel();
     Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
     getOrgList.then((value) {
       setState(() {
@@ -342,11 +342,11 @@ class _HomePageState extends State<HomePage> {
 
     });
     print("User Type - $userType");
-    imageStringNew = await shared!.getProfileImage();
-    UserName = await shared!.getempName();
-    employeeCode = await shared!.getEmpCode();
-    lat= await shared!.getLatitude();
-    lng = await shared!.getLongitude();
+    imageStringNew = await shared.getProfileImage();
+    UserName = await shared.getempName();
+    employeeCode = await shared.getEmpCode();
+    lat= await shared.getLatitude();
+    lng = await shared.getLongitude();
     //currentPostion = LatLng(lat, lng);
     //print('Response snapshot: ${sessionId}');
   }
@@ -839,8 +839,8 @@ class _DefaultPageState extends State<DefaultPage> {
   var attAction;
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    lat = await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    lat = await shared.getLatitude();
     //position= Position(longitude: shared.getLongitude(), latitude: shared.getLatitude(), timestamp: date, accuracy: 1, altitude: 1, altitudeAccuracy: 1, heading: 1, headingAccuracy: 1, speed: 1, speedAccuracy: 1);
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
