@@ -1025,7 +1025,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "Error");
+          showDialgSucess1(context, result, "⚠️Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1071,7 +1071,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "Error");
+          showDialgSucess1(context, result, "⚠️Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1116,7 +1116,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "Error");
+          showDialgSucess1(context, result, "⚠️Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1161,7 +1161,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "Error");
+          showDialgSucess1(context, result, "⚠️Warning");
         }
       }
       print('result ${result} reason ${reason}');

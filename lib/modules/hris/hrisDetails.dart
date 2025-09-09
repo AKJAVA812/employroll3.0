@@ -300,7 +300,7 @@ class _HRISDetailsState extends State<HRISDetails> {
 
                     )
                         :
-                    /*Container(
+                    Container(
                       padding: EdgeInsets.all(10.0),
                       width: MediaQuery.of(context).size.width/2,
                       height: MediaQuery.of(context).size.width/2,
@@ -311,12 +311,12 @@ class _HRISDetailsState extends State<HRISDetails> {
                         image: DecorationImage(
                           fit: BoxFit.scaleDown,
                           image:  NetworkImage(urlImage),
-                          *//*FileImage(file!)*//*
+                          //FileImage(file!)
                         ),
                       ),
 
-                    ),*/
-                    Stack(
+                    ),
+                    /*Stack(
                       alignment: Alignment.center,
                       children: [
                         Container(
@@ -355,7 +355,7 @@ class _HRISDetailsState extends State<HRISDetails> {
                           ),
                         ),
                       ],
-                    ),
+                    ),*/
                     Center(
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8),
