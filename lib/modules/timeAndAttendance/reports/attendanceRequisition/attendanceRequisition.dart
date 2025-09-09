@@ -82,7 +82,8 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       branchNameset= onDateAttModel!.branch;
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
       relaxationHourSet = onDateAttModel!.relaxationHour;
-      shortLeave = onDateAttModel!.isShortLeave == true ? true : false;
+      isShortLeave = onDateAttModel!.isShortLeave ?? false;
+      print("Short Leave Check - $isShortLeave");
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
       departmentset= onDateAttModel!.dept;
@@ -95,7 +96,8 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       print('onModelrun');
       branchNameset= onDateAttModel!.branch;
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
-      isShortLeave = onDateAttModel!.isShortLeave == true ? true : false;
+      isShortLeave = onDateAttModel!.isShortLeave ?? false;
+      print("Short Leave Check - $isShortLeave");
       relaxationHourSet = onDateAttModel!.relaxationHour;
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
@@ -135,7 +137,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   bool shortLeave = false;
   bool light0 = true;
   bool light1 = true;
-  bool isShortLeave = true;
+  bool isShortLeave = false;
   static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
     <WidgetStatesConstraint, Icon>{
       WidgetState.selected: Icon(Icons.check),
@@ -272,8 +274,9 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                           print("Comp Off - $compOff");
                         }),
                         SizedBox(width: 20,),
+
                         Visibility(
-                          visible: shortLeave == true,
+                          visible: isShortLeave,
                           child: buildVerticalToggle("Short Leave", shortLeave, (val) {
                             setState(() => shortLeave = val);
                             print("Short Leave - $shortLeave");

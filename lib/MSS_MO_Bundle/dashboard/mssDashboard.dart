@@ -158,7 +158,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
   }
 
   // Variables you'll need to define
-  int? selectedBranchId;
+  int? selectedBranchId = 0;
   String? selectedBranchName;
   List<Map<String, dynamic>> storedBranchList = [];
   bool isBranchLoading = false;
