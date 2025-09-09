@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/pendingRequisition/pendingReqAppDiss.dart';
@@ -37,7 +39,8 @@ List<Data>? allUsernew=[];
 List<Data>? foundDataNewMSS=[];
 PendingRequisitionModel? pendingRequisitionLabel;
 PendingRequisitionModel? pendingRequisitionLabeled;
-
+String? levelOne;
+String? levelTwo;
 String? userPanel;
 dynamic getProfileId;
 String? orgId;
@@ -83,6 +86,10 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
     sessionId = await shared!.getSessionId();
     userPanel = await shared!.getUserPanel();
     getProfileId = await shared!.getDefaultProfileId();
+    levelOne = await shared!.getPendingAttendanceReqL1MSS();
+    levelTwo = await shared!.getPendingAttendanceReqL2MSS();
+    print("Level 1 - $levelOne");
+    print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingRequisitionModel> getEmployeeList11 = getPendingReqList(sessionId!);
     final loading = Row(
@@ -102,7 +109,7 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
       print('employeeList00${pendingRequisitionLabel!.data!.length}');
     });
   }
-
+  var levelChange = "PENDING";
   Future<PendingRequisitionModel> getPendingReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListRo;
@@ -112,7 +119,8 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
         "sessionId=$SessionId&"
         "userPermission=$userPanel&"
         "profileId=$getProfileId&"
-        "orgId=0");
+        "orgId=0&"
+        "status=$levelChange");
 
     final response = await http.post(urlapi);
 
@@ -165,7 +173,7 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
 
   int pageIndex = 0;
   int currentIndex = 1;
-
+  int value = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -205,6 +213,7 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
           ),
         ),
       ),
+
       body:  Container(
         padding: EdgeInsets.all(8.0),
         child: Column(
@@ -312,22 +321,44 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
               children: [
                 // if (_isVisible)
                 Card(
-                  elevation: 3,
-                  child:
-                  ListTile(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
                     onTap: () {
                       print(foundDataNewMSS!.length);
                       //Navigator.pushNamed(context, MyRoutings.approveDisapproveReqRoute);
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
                           ApproveDisapproveReq(pendingRequisitionModel,itemCount)));
                     },
-                    title: foundDataNewMSS![itemCount].empName.toString().text.make(),
-                    subtitle: foundDataNewMSS![itemCount].onDate.toString().text.make(),
-                    trailing:  Icon(
-                        CupertinoIcons.chevron_forward
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue.shade100,
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.blue.shade700,
+                      ),
                     ),
+                    title: foundDataNewMSS![itemCount].empName.toString().text.bold.xl.make(),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 4),
+                        foundDataNewMSS![itemCount].onDate
+                            .toString()
+                            .text
+                            .sm
+                            .color(Colors.grey.shade700)
+                            .make(),
+                      ],
+                    ),
+                    trailing: Icon(
+                      CupertinoIcons.chevron_forward,
+                      color: Colors.grey.shade600,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),
-                ),
+                )
               ],
             );
           }),

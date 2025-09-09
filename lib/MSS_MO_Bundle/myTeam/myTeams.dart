@@ -156,8 +156,8 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware{
       organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
-      selectedOrg = null;
-      getOrgId = '';
+      //selectedOrg = null;
+      //getOrgId = '';
 
       setState(() {});
     }

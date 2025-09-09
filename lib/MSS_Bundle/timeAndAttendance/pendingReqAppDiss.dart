@@ -569,7 +569,8 @@ class _RadioGroupsState extends State<RadioGroups> {
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "attReqId=$attReqId&"
-        "comment=$text");
+        "comment=$text&"
+        "status=PENDING");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');

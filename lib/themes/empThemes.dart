@@ -116,6 +116,7 @@ class Mythemes {
   static Color black = Colors.black87;
   static Color blackishade = Colors.black38;
   static Color purplish = Colors.purple.shade700;
+  static Color deepPurple = Colors.deepPurple.shade700;
   static Color dangerColor = Colors.red;
   static Color dangerColorOne = Colors.redAccent;
   static Color warningColor = Color(0xfffcc44d);

@@ -32,6 +32,12 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
   String pendingAttRequestMOPermission = "0";
   String pendingAttRequestMSSPermission = "0";
   String pendingAttRequestUISPermission = "0";
+  String pendingAttReqL1MSS = "0";
+  String pendingAttReqL2MSS = "0";
+  String pendingAttReqL1MSSMO = "0";
+  String pendingAttReqL2MSSMO = "0";
+  String pendingAttReqL1UIS = "0";
+  String pendingAttReqL2UIS = "0";
   @override
   void initState() {
     getSharedPrfanceList();
@@ -45,9 +51,16 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
       pendingAttRequestMOPermission= (await shared.getPendingAttendanceReqMSSMOPermission())!;
       pendingAttRequestMSSPermission= (await shared.getPendingAttendanceReqMSSPermission())!;
       pendingAttRequestUISPermission= (await shared.getPendingAttendanceReqUISPermission())!;
+      pendingAttReqL1MSS= (await shared.getPendingAttendanceReqL1MSS())!;
+      pendingAttReqL2MSS= (await shared.getPendingAttendanceReqL2MSS())!;
+      pendingAttReqL1MSSMO= (await shared.getPendingAttendanceReqL1MO())!;
+      pendingAttReqL2MSSMO= (await shared.getPendingAttendanceReqL2MO())!;
+      pendingAttReqL1UIS= (await shared.getPendingAttendanceReqL1UIS())!;
+      pendingAttReqL2UIS= (await shared.getPendingAttendanceReqL2UIS())!;
       print("Pending Attendance Request MSS MO- $pendingAttRequestMOPermission");
       print("Pending Attendance Request MSS- $pendingAttRequestMSSPermission");
       print("Pending Attendance Request UIS- $pendingAttRequestUISPermission");
+      print("Pending Attendance Request MSS L1- $pendingAttReqL1MSS");
       print("User Panel - $userPanelPermission");
       adminRole= await shared.getAdminRole();
     print('empRole $empRole');
@@ -228,6 +241,175 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
           ),
         );
       }
+
+      //L1 MSS
+      if(userPanelPermission == "MSS" && pendingAttReqL1MSS == "1") {
+        items.add(
+          Hero(
+            tag: 'myTeamPendingReqL1',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.mssAttPendingRequestL1Route);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        "L1",style: TextStyle(fontSize: 50, color: Mythemes.warningColor),
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending L1',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      //L2 MSS
+      if(userPanelPermission == "MSS" && pendingAttReqL2MSS == "1") {
+        items.add(
+          Hero(
+            tag: 'myTeamPendingReqL2',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.mssAttPendingRequestL2Route);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        "L2",style: TextStyle(fontSize: 50, color: Mythemes.successColor),
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending L2',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //L1 MO
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingAttReqL1MSSMO == "1") {
+        items.add(
+          Hero(
+            tag: 'myTeamPendingReqL1',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.mssMOPendingAttReqL1);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        "L1",style: TextStyle(fontSize: 50, color: Mythemes.warningColor),
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending L1',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //L2 MO
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingAttReqL2MSSMO == "1") {
+        items.add(
+          Hero(
+            tag: 'myTeamPendingReqL2',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.mssMOPendingAttReqL2);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        "L2",style: TextStyle(fontSize: 50, color: Mythemes.successColor),
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending L2',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+
       //Other Employee Requisition
       if(userPanelPermission == "MSS" && pendingAttRequestMSSPermission == "1") {
         items.add(

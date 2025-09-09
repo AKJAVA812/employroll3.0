@@ -26,6 +26,7 @@ import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 //import 'package:safe_device/safe_device.dart';
 //import 'package:trust_location/trust_location.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -50,11 +51,14 @@ import '../mss_profiles/global_profile.dart';
 import '../mss_profiles/organisationListModal.dart';
 import '../mss_profiles/profileListModal.dart';
 import '../reports/reportPage.dart';
+import '../settings/checkForUpdates.dart';
+import '../settings/companyPolicyList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../singUP/resetPassword/resetPasswordPage.dart';
 import '../tracking/LocationPermissionRequest.dart';
 import 'allAPIList.dart';
 import 'commanNotificationPage.dart';
@@ -81,6 +85,7 @@ class PunchInOUtActivity extends StatefulWidget {
 }
 int pageIndex = 0;
 int currentIndex = 0;
+var orgId;
 Position? position = Position(
     longitude: 0.0,
     latitude: 0.0,
@@ -368,6 +373,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    orgId = await shared!.getOrgId();
     userType = await shared!.getUserType();
     defaultProfileName = await shared!.getDefaultProfileName();
     defaultProfileId = await shared!.getDefaultProfileId();
@@ -805,7 +811,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
                         valueListenable: selectedProfileNameNotifier,
                         builder: (context, value, _) {
                           final displayText = (userPanelPermissions == "COMPANY_EMPLOYEE")
-                              ? "COMPANY_EMPLOYEE"
+                              ? "ESS"
                               : value;
 
                           return Text(
@@ -1180,9 +1186,13 @@ class _DefaultPageState extends State<DefaultPage> {
   bool showRo = false;
 
   var attAction;
+  var appVersion;
+  var oldAppVersion;
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    appVersion = await shared!.getAppVersion();
+    print("App Version - $appVersion");
     userPanelPermissions = await shared!.getUserPanel();
     print("$userPanelPermissions");
     lat = await shared!.getLatitude();
@@ -1205,6 +1215,7 @@ class _DefaultPageState extends State<DefaultPage> {
     print('mobActions $mobAction');
 
     print('ATTACTION- $attAction');
+
     setState(() {
       if (empRole == 1) {
         showHide = true;
@@ -1409,7 +1420,7 @@ class _DefaultPageState extends State<DefaultPage> {
                         padding: const EdgeInsets.only(top: 10),
                         child: Text("Today Date"),
                       ),
-                      Container(height: 10),
+                      //Container(height: 10),
                       //Padding(padding: EdgeInsets.all(0)),
                       Container(
                         padding: EdgeInsets.all(15),
@@ -1435,7 +1446,7 @@ class _DefaultPageState extends State<DefaultPage> {
                         padding: const EdgeInsets.only(top: 10),
                         child: Text("Today Time"),
                       ),
-                      Container(height: 12, color: Mythemes.whiteShadeSeventy),
+                      //Container(height: 12, color: Mythemes.whiteShadeSeventy),
                       //Padding(padding: EdgeInsets.all(0)),
                       Container(
                         padding: EdgeInsets.all(15),
@@ -2004,6 +2015,38 @@ class _DefaultPageState extends State<DefaultPage> {
         });
   }
 
+  void showUpdateDialog(BuildContext context) {
+    final isAndroid = Platform.isAndroid;
+    final storeUrl = isAndroid
+        ? 'https://play.google.com/store/apps/details?id=com.employroll.employroll' // ✅ Replace with your Play Store URL
+        : 'https://apps.apple.com/in/app/employroll-2-0/id1664350846'; // ✅ Replace with your App Store ID
+
+    final message = isAndroid
+        ? 'A new version of the app is available on the Play Store. Please update your app to continue.'
+        : 'A new version of the app is available on the App Store. Please update your app to continue.';
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Update Available'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (await canLaunchUrl(Uri.parse(storeUrl))) {
+                launchUrl(Uri.parse(storeUrl), mode: LaunchMode.externalApplication);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not open store.')));
+              }
+            },
+            child: Text('Update Now'),
+          ),
+        ],
+      ),
+    );
+  }
+
   getTimeUpdate() {
     setState(() {
       var now = DateTime.now();
@@ -2050,7 +2093,7 @@ class _DefaultPageState extends State<DefaultPage> {
     String reasonSuccess = result['reason'];
     //print('result${result}');
 
-    //print('URL ${response.request}');
+    print('URL ${response.request}');
     if (response.statusCode == 200) {
       print("I m Punch in");
       Navigator.of(context, rootNavigator: true).pop();
@@ -2245,6 +2288,7 @@ class _DrawerFileState extends State<DrawerFile> {
 
 
   Future<void> getSharedPreferences() async {
+
     final prefs = await SharedPreferences.getInstance();
     selectedProfileId = prefs.getInt('defaultProfileId');
     selectedProfileName = prefs.getString('defaultProfileName');
@@ -2255,6 +2299,11 @@ class _DrawerFileState extends State<DrawerFile> {
       setState(() {
         profileListModal = value;
       });
+    });
+    orgId = await shared!.getOrgId();
+    print("Org Id Check - $orgId");
+    setState(() {
+
     });
   }
 
@@ -2290,6 +2339,7 @@ class _DrawerFileState extends State<DrawerFile> {
       profileListGetter.clear();
       profileListGetter.addAll(profileListModal?.data ?? []);
 
+      print("Profile List API - ${response.request}");
       for (int i = 0; i < profileListGetter.length; i++) {
         List<String>? userPermission = profileListGetter[i].profilePermission;
 
@@ -2414,34 +2464,36 @@ class _DrawerFileState extends State<DrawerFile> {
   Widget build(BuildContext context) {
     //timeDilation = 1.8;
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // ✅ Pushes bottom content down
         children: [
-          DrawerHeader(
-            decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
-            padding: EdgeInsets.zero,
-            child: UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
-              accountName: Text(name, style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.bold)),
-              accountEmail: Text(emailid, style: TextStyle(color: Mythemes.black)),
-              margin: EdgeInsets.zero,
-              currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage(profileImage),
-                backgroundColor: Mythemes.greyish,
-              ),
-            ),
-          ),
-          Visibility(
-            visible: userPanelPermissions == "MSS" || userPanelPermissions == "MSS_MO_ADMIN" || userPanelPermissions == "USER",
-            child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
+          Column(
             children: [
-              "Profiles".text.bold.size(17).make()
-            ],
-          ).p8(),),
+              DrawerHeader(
+                decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
+                padding: EdgeInsets.zero,
+                child: UserAccountsDrawerHeader(
+                  decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
+                  accountName: Text(name, style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.bold)),
+                  accountEmail: Text(emailid, style: TextStyle(color: Mythemes.black)),
+                  margin: EdgeInsets.zero,
+                  currentAccountPicture: CircleAvatar(
+                    backgroundImage: NetworkImage(profileImage),
+                    backgroundColor: Mythemes.greyish,
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: userPanelPermissions == "MSS" || userPanelPermissions == "MSS_MO_ADMIN" || userPanelPermissions == "USER",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    "Profiles".text.bold.size(17).make()
+                  ],
+                ).p8(),),
 
-          /*Visibility(
+              /*Visibility(
             visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN",
             child: ValueListenableBuilder<int>(
               valueListenable: selectedProfileIdNotifier,
@@ -2475,252 +2527,470 @@ class _DrawerFileState extends State<DrawerFile> {
               },
             ),
           ),*/
-          Visibility(
-            visible: userPanelPermissions == "MSS" || userPanelPermissions == "MSS_MO_ADMIN" || userPanelPermissions == "USER",
-            child: isLoadingProfiles
-                ? Center(child: CircularProgressIndicator()).p12()
-                : ValueListenableBuilder<int>(
-              valueListenable: selectedProfileIdNotifier,
-              builder: (context, currentSelectedId, _) {
-                return Column(
-                  children: profileListGetter.map((profile) {
-                    bool isSelected = currentSelectedId == profile.profileId;
+              Visibility(
+                visible: userPanelPermissions == "MSS" || userPanelPermissions == "MSS_MO_ADMIN" || userPanelPermissions == "USER",
+                child: isLoadingProfiles
+                    ? Center(child: CircularProgressIndicator()).p12()
+                    : ValueListenableBuilder<int>(
+                  valueListenable: selectedProfileIdNotifier,
+                  builder: (context, currentSelectedId, _) {
+                    return Column(
+                      children: profileListGetter.map((profile) {
+                        bool isSelected = currentSelectedId == profile.profileId;
 
-                    return ListTile(
-                      title: Text(
-                        profile.profileName ?? '',
-                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-                      ),
-                      trailing: isSelected ? Icon(Icons.check, color: Colors.green) : null,
-                      tileColor: isSelected ? Colors.grey.shade200 : null,
-                        onTap: () async {
-                          selectedProfileId = profile.profileId!;
-                          selectedProfileName = profile.profileName!;
+                        return ListTile(
+                            title: Text(
+                              profile.profileName ?? '',
+                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                            ),
+                            trailing: isSelected ? Icon(Icons.check, color: Colors.green) : null,
+                            tileColor: isSelected ? Colors.grey.shade200 : null,
+                            onTap: () async {
+                              selectedProfileId = profile.profileId!;
+                              selectedProfileName = profile.profileName!;
 
-                          // 🟢 Find the selected profile from the list using profileId
-                          final selected = profileListGetter.firstWhere(
-                                (p) => p.profileId == selectedProfileId,
-                            orElse: () => profile,
-                          );
+                              // 🟢 Find the selected profile from the list using profileId
+                              final selected = profileListGetter.firstWhere(
+                                    (p) => p.profileId == selectedProfileId,
+                                orElse: () => profile,
+                              );
 
-                          //MSS MO
-                          // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                          String pendingAttReqMOPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request permission
-                          String leaveReqMOPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L1 permission
-                          String leaveReqL1MOPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L2 permission
-                          String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L2 permission
-                          String othersLeaveReqMOPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L1 permission
-                          String pendingClaimL1MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L2 permission
-                          String pendingClaimL2MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L3 permission
-                          String pendingClaimL3MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the OD Pending List permission
-                          String pendingODListMOPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the OD Activate permission
-                          String odActivateMOPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
-                              ? "1"
-                              : "0";
+                              //MSS MO
+                              // 🟢 Check if the selected profile has the Pending Attendance Request permission
+                              String pendingAttReqMOPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request permission
+                              String leaveReqMOPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L1 permission
+                              String leaveReqL1MOPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L2 permission
+                              String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L2 permission
+                              String othersLeaveReqMOPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L1 permission
+                              String pendingClaimL1MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L2 permission
+                              String pendingClaimL2MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L3 permission
+                              String pendingClaimL3MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingODListMOPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String odActivateMOPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Activate permission
+                              String loanActivateMOPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
+                              String loanApprovalL1Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
+                              String loanApprovalL2Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
+                              String loanApprovalL3Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+                              String loanApprovalL1DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+                              String loanApprovalL2DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+                              String loanApprovalL3DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
+                                  : "0";
 
-                          //MSS
-                          // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                          String pendingAttReqMSSPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request permission
-                          String leaveReqMSSPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L1 permission
-                          String leaveReqL1MSSPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L2 permission
-                          String leaveReqL2MSSPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L2 permission
-                          String othersLeaveReqMSSPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L1 permission
-                          String pendingClaimL1Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L2 permission
-                          String pendingClaimL2Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L3 permission
-                          String pendingClaimL3Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the OD Pending List permission
-                          String pendingODListPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the OD Activate permission
-                          String odActivatePermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
-                              ? "1"
-                              : "0";
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingAttendanceRequestMOL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String pendingAttendanceRequestMOL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
 
-                          //USER
-                          // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                          String pendingAttReqUISPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request permission
-                          String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L1 permission
-                          String leaveReqL1UISPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L2 permission
-                          String leaveReqL2UISPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Leave Request L2 permission
-                          String othersLeaveReqUISPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L1 permission
-                          String pendingClaimL1UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L2 permission
-                          String pendingClaimL2UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the Claim L3 permission
-                          String pendingClaimL3UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the OD Pending List permission
-                          String pendingODListUISPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
-                              ? "1"
-                              : "0";
-                          // 🟢 Check if the selected profile has the OD Activate permission
-                          String odActivateUISPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
-                              ? "1"
-                              : "0";
+                              //MSS
+                              // 🟢 Check if the selected profile has the Pending Attendance Request permission
+                              String pendingAttReqMSSPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request permission
+                              String leaveReqMSSPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L1 permission
+                              String leaveReqL1MSSPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L2 permission
+                              String leaveReqL2MSSPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L2 permission
+                              String othersLeaveReqMSSPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L1 permission
+                              String pendingClaimL1Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L2 permission
+                              String pendingClaimL2Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L3 permission
+                              String pendingClaimL3Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingODListPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String odActivatePermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Activate permission
+                              String loanActivatePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
+                              String loanApprovalL1MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
+                              String loanApprovalL2MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
+                              String loanApprovalL3MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+                              String loanApprovalL1MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+                              String loanApprovalL2MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+                              String loanApprovalL3MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
+                                  : "0";
 
-                          // 🟢 Save the MSS MO permission to SharedPreferences
-                          await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
-                          await shared.setPendingLeaveReqMSSMOPermission(leaveReqMOPermValue);
-                          await shared.setPendingLeaveReqL1MSSMOPermission(leaveReqL1MOPermValue);
-                          await shared.setPendingLeaveReqL2MSSMOPermission(leaveReqL2MOPermValue);
-                          await shared.setOthersLeaveReqMSSMOPermission(othersLeaveReqMOPermValue);
-                          await shared.setClaimLevelOneMO(pendingClaimL1MOPermission);
-                          await shared.setClaimLevelTwoMO(pendingClaimL2MOPermission);
-                          await shared.setClaimLevelThreeMO(pendingClaimL3MOPermission);
-                          await shared.setODActivateMO(odActivateMOPermission);
-                          await shared.setODPendingListMO(pendingODListMOPermission);
-                          print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
-                          print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
-                          print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
-                          print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MOPermValue");
-                          print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMOPermValue");
-                          print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1MOPermission");
-                          print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2MOPermission");
-                          print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3MOPermission");
-                          print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateMOPermission");
-                          print("✅ Pending OD Permission for profileId $selectedProfileId: $pendingODListMOPermission");
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingAttendanceRequestMSSL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String pendingAttendanceRequestMSSL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
 
-                          // 🟢 Save the MSS permission to SharedPreferences
-                          await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
-                          await shared.setPendingLeaveReqMSSPermission(leaveReqMSSPermValue);
-                          await shared.setPendingLeaveReqL1MSSPermission(leaveReqL1MSSPermValue);
-                          await shared.setPendingLeaveReqL2MSSPermission(leaveReqL2MSSPermValue);
-                          await shared.setOthersLeaveReqMSSPermission(othersLeaveReqMSSPermValue);
-                          await shared.setClaimLevelOne(pendingClaimL1Permission);
-                          await shared.setClaimLevelTwo(pendingClaimL2Permission);
-                          await shared.setClaimLevelThree(pendingClaimL3Permission);
-                          await shared.setODActivate(odActivatePermission);
-                          await shared.setODPendingList(pendingODListPermission);
-                          print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMSSPermValue");
-                          print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMSSPermValue");
-                          print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MSSPermValue");
-                          print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MSSPermValue");
-                          print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMSSPermValue");
-                          print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1Permission");
-                          print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2Permission");
-                          print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3Permission");
-                          print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivatePermission");
-                          print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListPermission");
-                          // Notify global listener
-                          permissionNotifier.updatePermission(pendingClaimL1Permission);
-                          permissionNotifier.updatePermission(pendingClaimL2Permission);
-                          permissionNotifier.updatePermission(pendingClaimL3Permission);
-                          permissionNotifier.updatePermission(pendingClaimL1MOPermission);
-                          permissionNotifier.updatePermission(pendingClaimL2MOPermission);
-                          permissionNotifier.updatePermission(pendingClaimL3MOPermission);
-                          // 🟢 Save the UIS permission to SharedPreferences
-                          await shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
-                          await shared.setPendingLeaveReqUISPermission(leaveReqUISPermValue);
-                          await shared.setPendingLeaveReqL1UISPermission(leaveReqL1UISPermValue);
-                          await shared.setPendingLeaveReqL2UISPermission(leaveReqL2UISPermValue);
-                          await shared.setOthersLeaveReqUISPermission(othersLeaveReqUISPermValue);
-                          await shared.setClaimLevelOneUIS(pendingClaimL1UISPermission);
-                          await shared.setClaimLevelTwoUIS(pendingClaimL2UISPermission);
-                          await shared.setClaimLevelThreeUIS(pendingClaimL3UISPermission);
-                          await shared.setODActivateUIS(odActivateUISPermission);
-                          await shared.setODPendingListUIS(pendingODListUISPermission);
-                          print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqUISPermValue");
-                          print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqUISPermValue");
-                          print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1UISPermValue");
-                          print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2UISPermValue");
-                          print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqUISPermValue");
-                          print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1UISPermission");
-                          print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2UISPermission");
-                          print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3UISPermission");
-                          print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateUISPermission");
-                          print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListUISPermission");
-                          // 🟢 Save selected profile details
-                          await shared.setDefaultProfileId(selectedProfileId);
-                          await shared.setDefaultProfileName(selectedProfileName);
+                              //USER
+                              // 🟢 Check if the selected profile has the Pending Attendance Request permission
+                              String pendingAttReqUISPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request permission
+                              String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L1 permission
+                              String leaveReqL1UISPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L2 permission
+                              String leaveReqL2UISPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L2 permission
+                              String othersLeaveReqUISPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L1 permission
+                              String pendingClaimL1UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L2 permission
+                              String pendingClaimL2UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Claim L3 permission
+                              String pendingClaimL3UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingODListUISPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String odActivateUISPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Activate permission
+                              String loanActivateUISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
+                              String loanApprovalL1UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
+                              String loanApprovalL2UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
+                              String loanApprovalL3UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
+                              String loanApprovalL1UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
+                              String loanApprovalL2UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
+                              String loanApprovalL3UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                  ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Pending List permission
+                              String pendingAttendanceRequestUISL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the OD Activate permission
+                              String pendingAttendanceRequestUISL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";
 
-                          selectedProfileIdNotifier.value = selectedProfileId!;
-                          selectedProfileNameNotifier.value = selectedProfileName!;
-                          setState(() {
+                              // 🟢 Save the MSS MO permission to SharedPreferences
+                              await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
+                              await shared.setPendingLeaveReqMSSMOPermission(leaveReqMOPermValue);
+                              await shared.setPendingLeaveReqL1MSSMOPermission(leaveReqL1MOPermValue);
+                              await shared.setPendingLeaveReqL2MSSMOPermission(leaveReqL2MOPermValue);
+                              await shared.setOthersLeaveReqMSSMOPermission(othersLeaveReqMOPermValue);
+                              await shared.setClaimLevelOneMO(pendingClaimL1MOPermission);
+                              await shared.setClaimLevelTwoMO(pendingClaimL2MOPermission);
+                              await shared.setClaimLevelThreeMO(pendingClaimL3MOPermission);
+                              await shared.setODActivateMO(odActivateMOPermission);
+                              await shared.setODPendingListMO(pendingODListMOPermission);
+                              await shared.setLoanPendingListMO(loanActivateMOPermission);
+                              await shared.setLoanApprovalL1MO(loanApprovalL1Permission);
+                              await shared.setLoanApprovalL2MO(loanApprovalL2Permission);
+                              await shared.setLoanApprovalL3MO(loanApprovalL3Permission);
+                              await shared.setLoanApprovalDeleteL1MO(loanApprovalL1DeletePermission);
+                              await shared.setLoanApprovalDeleteL2MO(loanApprovalL2DeletePermission);
+                              await shared.setLoanApprovalDeleteL3MO(loanApprovalL3DeletePermission);
+                              shared.setPendingAttendanceReqL1MO(pendingAttendanceRequestMOL1);
+                              shared.setPendingAttendanceReqL2MO(pendingAttendanceRequestMOL2);
+                              print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
+                              print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
+                              print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
+                              print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MOPermValue");
+                              print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMOPermValue");
+                              print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1MOPermission");
+                              print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2MOPermission");
+                              print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3MOPermission");
+                              print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateMOPermission");
+                              print("✅ Pending OD Permission for profileId $selectedProfileId: $pendingODListMOPermission");
+                              print("✅ Loan Activate Permission for profileId $selectedProfileId: $loanActivateMOPermission");
+                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1Permission");
+                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2Permission");
+                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3Permission");
+                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1DeletePermission");
+                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2DeletePermission");
+                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3DeletePermission");
+                              print("✅ Pending Attendance L1 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL1");
+                              print("✅ Pending Attendance L2 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL2");
 
-                          });
+                              // 🟢 Save the MSS permission to SharedPreferences
+                              await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
+                              await shared.setPendingLeaveReqMSSPermission(leaveReqMSSPermValue);
+                              await shared.setPendingLeaveReqL1MSSPermission(leaveReqL1MSSPermValue);
+                              await shared.setPendingLeaveReqL2MSSPermission(leaveReqL2MSSPermValue);
+                              await shared.setOthersLeaveReqMSSPermission(othersLeaveReqMSSPermValue);
+                              await shared.setClaimLevelOne(pendingClaimL1Permission);
+                              await shared.setClaimLevelTwo(pendingClaimL2Permission);
+                              await shared.setClaimLevelThree(pendingClaimL3Permission);
+                              await shared.setODActivate(odActivatePermission);
+                              await shared.setODPendingList(pendingODListPermission);
+                              await shared.setLoanPendingList(loanActivatePermission);
+                              await shared.setLoanApprovalL1MSS(loanApprovalL1MSSPermission);
+                              await shared.setLoanApprovalL2MSS(loanApprovalL2MSSPermission);
+                              await shared.setLoanApprovalL3MSS(loanApprovalL3MSSPermission);
+                              await shared.setLoanApprovalDeleteL1MSS(loanApprovalL1MSSDeletePermission);
+                              await shared.setLoanApprovalDeleteL2MSS(loanApprovalL2MSSDeletePermission);
+                              await shared.setLoanApprovalDeleteL3MSS(loanApprovalL3MSSDeletePermission);
+                              shared.setPendingAttendanceReqL1MSS(pendingAttendanceRequestMSSL1);
+                              shared.setPendingAttendanceReqL2MSS(pendingAttendanceRequestMSSL2);
+                              print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMSSPermValue");
+                              print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMSSPermValue");
+                              print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MSSPermValue");
+                              print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MSSPermValue");
+                              print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMSSPermValue");
+                              print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1Permission");
+                              print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2Permission");
+                              print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3Permission");
+                              print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivatePermission");
+                              print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListPermission");
+                              print("✅ Loan Activate Permission for profileId $selectedProfileId: $loanActivatePermission");
+                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1MSSPermission");
+                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2MSSPermission");
+                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3MSSPermission");
+                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1MSSDeletePermission");
+                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2MSSDeletePermission");
+                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3MSSDeletePermission");
+                              print("✅ Pending Attendance L1 MSS Permission for profileId $selectedProfileId: $pendingAttendanceRequestMSSL1");
+                              print("✅ Pending Attendance L2 MSS Permission for profileId $selectedProfileId: $pendingAttendanceRequestMSSL2");
+                              // Notify global listener
+                              permissionNotifier.updatePermission(pendingClaimL1Permission);
+                              permissionNotifier.updatePermission(pendingClaimL2Permission);
+                              permissionNotifier.updatePermission(pendingClaimL3Permission);
+                              permissionNotifier.updatePermission(pendingClaimL1MOPermission);
+                              permissionNotifier.updatePermission(pendingClaimL2MOPermission);
+                              permissionNotifier.updatePermission(pendingClaimL3MOPermission);
+                              // 🟢 Save the UIS permission to SharedPreferences
+                              await shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
+                              await shared.setPendingLeaveReqUISPermission(leaveReqUISPermValue);
+                              await shared.setPendingLeaveReqL1UISPermission(leaveReqL1UISPermValue);
+                              await shared.setPendingLeaveReqL2UISPermission(leaveReqL2UISPermValue);
+                              await shared.setOthersLeaveReqUISPermission(othersLeaveReqUISPermValue);
+                              await shared.setClaimLevelOneUIS(pendingClaimL1UISPermission);
+                              await shared.setClaimLevelTwoUIS(pendingClaimL2UISPermission);
+                              await shared.setClaimLevelThreeUIS(pendingClaimL3UISPermission);
+                              await shared.setODActivateUIS(odActivateUISPermission);
+                              await shared.setODPendingListUIS(pendingODListUISPermission);
+                              await shared.setLoanPendingListUIS(loanActivateUISPermission);
+                              await shared.setLoanApprovalL1UIS(loanApprovalL1UISPermission);
+                              await shared.setLoanApprovalL2UIS(loanApprovalL2UISPermission);
+                              await shared.setLoanApprovalL3UIS(loanApprovalL3UISPermission);
+                              await shared.setLoanApprovalDeleteL1UIS(loanApprovalL1UISDeletePermission);
+                              await shared.setLoanApprovalDeleteL2UIS(loanApprovalL2UISDeletePermission);
+                              await shared.setLoanApprovalDeleteL3UIS(loanApprovalL3UISDeletePermission);
+                              shared.setPendingAttendanceReqL1UIS(pendingAttendanceRequestUISL1);
+                              shared.setPendingAttendanceReqL2UIS(pendingAttendanceRequestUISL2);
+                              print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqUISPermValue");
+                              print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqUISPermValue");
+                              print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1UISPermValue");
+                              print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2UISPermValue");
+                              print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqUISPermValue");
+                              print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1UISPermission");
+                              print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2UISPermission");
+                              print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3UISPermission");
+                              print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateUISPermission");
+                              print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListUISPermission");
+                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1UISPermission");
+                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2UISPermission");
+                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3UISPermission");
+                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1UISDeletePermission");
+                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2UISDeletePermission");
+                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3UISDeletePermission");
+                              print("✅ Pending Attendance L1 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL1");
+                              print("✅ Pending Attendance L2 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL2");
+                              // 🟢 Save selected profile details
+                              await shared.setDefaultProfileId(selectedProfileId);
+                              await shared.setDefaultProfileName(selectedProfileName);
 
-                          Navigator.pop(context);
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,))
-                          );
-                        }
+                              selectedProfileIdNotifier.value = selectedProfileId!;
+                              selectedProfileNameNotifier.value = selectedProfileName!;
+                              setState(() {
+
+                              });
+
+                              Navigator.pop(context);
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,))
+                              );
+                            }
+                        );
+                      }).toList(),
                     );
-                  }).toList(),
-                );
-              },
-            ),
+                  },
+                ),
+              ),
+            ],
           ),
+
+
+
+          // 🔽 Bottom section (Settings)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Divider(height: 1, thickness: 1, color: Colors.grey.shade300),
+
+              ListTile(
+                leading: Icon(Icons.lock_reset, color: Mythemes.black),
+                title: Text(
+                  'Reset Password',
+                  style: TextStyle(color: Mythemes.black),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ResetPasswordPage()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.security_update_good_outlined, color: Mythemes.black),
+                title: Text(
+                  'Check for Updates',
+                  style: TextStyle(color: Mythemes.black),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UpdateChecker()),
+                  );
+                },
+              ),
+              Visibility(
+                visible: orgId == 179 || orgId == 186 || orgId == 145,
+                child: ListTile(
+                  leading: Icon(Icons.policy, color: Mythemes.black),
+                  title: Text(
+                    'Company Policies',
+                    style: TextStyle(color: Mythemes.black),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CompanyPoliciesPage()),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ).py32(),
 
           /*...profileListGetter.map((profile) {
             bool isSelected = selectedProfileId == profile.profileId;

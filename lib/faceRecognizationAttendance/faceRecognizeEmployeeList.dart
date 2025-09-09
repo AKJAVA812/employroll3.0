@@ -38,6 +38,7 @@ List<Data>? foundDataNew=[];
 EmployeeListFaceModel? employeeListModelglobel;
 EmployeeListFaceModel? employeeListModelglobeled;
 var empName;
+var empFace;
 var empId;
 class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
   @override
@@ -359,12 +360,13 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 setState(() {
                   empId = foundDataNew![i].empId;
                   empName = foundDataNew![i].empName;
+                  empFace = foundDataNew![i].empPhoto;
                   print('emID $empId');
                   print('name $empName');
                   print("Emp list clicked");
                 });
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>MarkAttendanceAIMSS(
-                    empId: empId
+                    empId: empId,empName: empName,empFace:empFace
                 )));
               }
 

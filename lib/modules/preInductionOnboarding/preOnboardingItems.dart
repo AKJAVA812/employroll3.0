@@ -230,10 +230,7 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
       }
 
       //Permission activated on Shivank, SID, Privado, Thumbmatic MSS MO
-      if (empId == 75324 ||
-          emailId == "sid@voyageofwellness.co.in" ||
-          orgId == 145 ||
-          orgId == 3 || userPanelPermission == "MSS_MO_ADMIN") {
+      if (userPanelPermission == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'pendingPreOnboardList',

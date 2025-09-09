@@ -30,8 +30,11 @@ import '../../newModalClasses/reimbursementTypeModal.dart';
 
 class TravelExpenseRequestUpdate extends StatefulWidget {
   String? reimbursementType;
+  String? reimbursementTypeId;
   String? expCategory;
+  String? expCategoryId;
   String? subExpCategory;
+  String? subExpCategoryId;
   String? travelFrom;
   String? travelTo;
   String? odometerStart;
@@ -39,7 +42,7 @@ class TravelExpenseRequestUpdate extends StatefulWidget {
   String? merchant;
   String? kilometers;
   String? month;
-  String? date;
+  String? claimDate;
   String? claimedAmount;
   String? remarks;
   String? documents;
@@ -47,8 +50,11 @@ class TravelExpenseRequestUpdate extends StatefulWidget {
 
   TravelExpenseRequestUpdate(
       this.reimbursementType,
+      this.reimbursementTypeId,
       this.expCategory,
+      this.expCategoryId,
       this.subExpCategory,
+      this.subExpCategoryId,
       this.travelFrom,
       this.travelTo,
       this.odometerStart,
@@ -56,7 +62,7 @@ class TravelExpenseRequestUpdate extends StatefulWidget {
       this.merchant,
       this.kilometers,
       this.month,
-      this.date,
+      this.claimDate,
       this.claimedAmount,
       this.remarks,
       this.documents,
@@ -66,8 +72,11 @@ class TravelExpenseRequestUpdate extends StatefulWidget {
   @override
   State<TravelExpenseRequestUpdate> createState() => _TravelExpenseRequestUpdateState(
     reimbursementType,
+    reimbursementTypeId,
     expCategory,
+    expCategoryId,
     subExpCategory,
+    subExpCategoryId,
     travelFrom,
     travelTo,
     odometerStart,
@@ -75,7 +84,7 @@ class TravelExpenseRequestUpdate extends StatefulWidget {
     merchant,
     kilometers,
     month,
-    date,
+    claimDate,
     claimedAmount,
     remarks,
     documents,
@@ -121,8 +130,11 @@ dynamic addDocShow = false;
 class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate> {
   _TravelExpenseRequestUpdateState(
       String? reimbursementType,
+      String? reimbursementTypeId,
       String? expCategory,
+      String? expCategoryId,
       String? subExpCategory,
+      String? subExpCategoryId,
       String? travelFrom,
       String? travelTo,
       String? odometerStart,
@@ -130,7 +142,7 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
       String? merchant,
       String? kilometers,
       String? month,
-      String? date,
+      String? claimDate,
       String? claimedAmount,
       String? remarks,
       String? documents,
@@ -189,6 +201,25 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
     );
   }
 
+  String reimbursementTypeCheck = "";
+  String reimbursementTypeIdCheck = "";
+  String expCategoryCheck = "";
+  String expCategoryIdCheck = "";
+  String subExpCategoryCheck = "";
+  String subExpCategoryIdCheck = "";
+  String travelFromCheck = "";
+  String travelToCheck = "";
+  String odometerStartCheck = "";
+  String odometerEndCheck = "";
+  String merchantCheck = "";
+  String kilometersCheck = "";
+  String monthCheck = "";
+  String claimDateCheck = "";
+  String claimedAmountCheck = "";
+  String remarksCheck = "";
+  String documentsCheck = "";
+  String claimIdCheck = "";
+
   @override
   void initState() {
     cardList = [];
@@ -199,6 +230,7 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
     super.initState();
   }
 
+
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     empId = await shared!.getEmpId();
@@ -207,6 +239,43 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
       setState(() {
         reimbursementTypeListModal=value;
       });
+      reimbursementTypeCheck = reimbursementType;
+      print("Reimbursement Type Check - $reimbursementTypeCheck");
+      reimbursementTypeIdCheck = reimbursementTypeId;
+      print("Reimbursement Type ID Check - $reimbursementTypeIdCheck");
+      expCategoryCheck = expCategory;
+      print("Expense Category - $expCategoryCheck");
+      expCategoryIdCheck = expCategoryIdNew;
+
+      subExpCategoryCheck = subExpCategory;
+      print("Sub Expense Category - $subExpCategoryCheck");
+      subExpCategoryIdCheck = subExpCategoryIdNew;
+      travelFromCheck = travelFrom;
+      print("Travel From - $travelFromCheck");
+      travelToCheck = travelTo;
+      print("Travel To - $travelToCheck");
+      odometerStartCheck = odometerStart;
+      print("ODOMETER START - $odometerStartCheck");
+      odometerEndCheck = odometerEnd;
+      print("ODOMETER End - $odometerEndCheck");
+      merchantCheck = merchant;
+      print("MERCHANT - $merchantCheck");
+      kilometersCheck = kilometers;
+      print("KM - $kilometersCheck");
+      monthCheck = month;
+      print("Month - $monthCheck");
+      claimDateCheck = claimDate;
+      print("Claim Date - $claimDateCheck");
+      claimedAmountCheck = claimedAmount;
+      print("Claim Amount - $claimedAmountCheck");
+      remarksCheck = remarks;
+      print("Remarks - $remarksCheck");
+      documentsCheck = documents;
+      print("Document - $documentsCheck");
+      claimIdChecks = claimIdChecking;
+      print("Claim Id - $claimIdChecks");
+
+
 
       expenseCatShow = false;
       subExpenseCatShow = false;
@@ -227,7 +296,7 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
   var localConveyanceTaxi = false;
   var conveyance_policy = false;
   var mobileReimbursement = false;
-  var claimIdCheck;
+  var claimIdChecks;
   var claimedAmtCheck;
   var endReading;
   var odometer;
@@ -283,16 +352,16 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
         Map<String, dynamic> mapResponse = json.decode(response.body);
 
         // Extract the required values
-        claimIdCheck = mapResponse['claimId'];
+        claimIdChecks = mapResponse['claimId'];
 
         localConveyanceTaxi = mapResponse['localConveyanceTaxi'] ?? false;
         conveyance_policy = mapResponse['conveyance_policy'] ?? false;
         mobileReimbursement = mapResponse['mobileReimbursement'] ?? false;
         String status = mapResponse['status'];
-        claimIdCheck = mapResponse['claimId'];
+        claimIdChecks = mapResponse['claimId'];
 
         // Print the values to confirm they are retrieved correctly
-        print('Claim ID: $claimIdCheck');
+        print('Claim ID: $claimIdChecks');
         print('Local Conveyance Taxi: $localConveyanceTaxi');
         print('Mobile Reimbursement: $mobileReimbursement');
         print('Conveyance Policy: $conveyance_policy');
@@ -508,7 +577,7 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
           ],*/
           title: titleName.text.make(),
         ),
-        floatingActionButton: FloatingActionButton(
+        /*floatingActionButton: FloatingActionButton(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30), // Ensures circular shape
           ),
@@ -520,42 +589,31 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
           },
           backgroundColor: Mythemes.lightBluishColor,
           child: Icon(Icons.add, color: Mythemes.whitish,),
-        ),
+        ),*/
 
         body: Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: cardList.length,
+                itemCount: 1,
                 itemBuilder: (context, index) {
                   final cardData = cardList[index];
-                  void calculateKilometers() {
-                    final startText = cardData.odometerStartController.text;
-                    final endText = cardData.odometerEndController.text;
-
-                    if (startText.isNotEmpty && endText.isNotEmpty) {
-                      final start = int.tryParse(startText);
-                      final end = int.tryParse(endText);
-                      print("Run 1");
-                      if (start != null && end != null && end >= start) {
-                        final kms = end - start;
-                        cardData.kilometerController.text = kms.toString();
-                        print("Run 2");
-                      } else {
-                        // Invalid range, clear kilometer field
-                        cardData.kilometerController.text = '';
-                      }
-                    } else {
-                      // One of the fields is empty, clear kilometer field
-                      cardData.kilometerController.text = '';
-                    }
-                  }
+                  _fromPlaceController.text = travelFromCheck;
+                  _toPlaceController.text = travelToCheck;
+                  _odometerStartController.text = odometerStartCheck;
+                  _odometerEndController.text = odometerEndCheck;
+                  _merchantController.text = merchantCheck;
+                  _kmController.text = kilometersCheck;
+                  _monthController.text = monthCheck;
+                  _dateController.text = claimDateCheck;
+                  _claimAmtController.text = claimedAmountCheck;
+                  _remarksController.text = remarksCheck;
                   return Card(
                       elevation: 2,
                       child: ExpansionTile(
                           initiallyExpanded: isExpanded,
                           childrenPadding: EdgeInsets.all(16).copyWith(top: 0),
-                          title: "Claim ${index+1}"
+                          title: "Update Claim ${index+1}"
                               .text
                               .make(),
                           trailing: IconButton(
@@ -573,71 +631,36 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      "Update Claim".text.bold.size(16).make()
-                                    ],
-                                  ),
-                                  Row(
                                     children: [
                                       Expanded(
-                                        child: DropdownButtonFormField(
-                                          value: cardData.dropdownValue.isEmpty ? null : cardData.dropdownValue,
+                                        child: TextFormField(
+                                          controller: TextEditingController(text: reimbursementTypeCheck),
+                                          readOnly: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
                                           decoration: InputDecoration(
-                                            //enabled: true,
+                                            prefixIcon: Icon(
+                                                Icons.text_snippet_rounded
+                                            ),
                                             enabledBorder: UnderlineInputBorder( //<-- SEE HERE
                                               borderSide: BorderSide(
                                                   width: 1, color: Mythemes.blackishade),
                                             ),
                                             //labelText: "Select Department",
-                                            hintText: "Select",
+                                            hintText: "Reimbursement Type",
                                             labelText: "Reimbursement Type",
                                             hintStyle: TextStyle(
                                               fontSize: 14,
                                             ),
                                             contentPadding: EdgeInsets.all(5),
-                                            /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                BorderRadius.all(Radius.circular(8))),
                                             // labelText: "Location",
                                             labelStyle: TextStyle(
-                                                fontWeight: FontWeight.w500,fontSize: 12,
+                                                fontWeight: FontWeight.w500,fontSize: 13,
                                                 color: Mythemes.blackish),
                                           ),
-                                          items: reimbursementTypeList.map<DropdownMenuItem<String>>((String? value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value! , style: TextStyle(fontSize: 12), maxLines: 2),
-                                            );
-
-                                          }).toList(),
-
-                                          onChanged: (newVal) {
-                                            valuenew = newVal.toString();
-                                            print("Type - $valuenew");
-                                            for(int i=0; i<reimbursementTypeListModal!.claimDataList!.length;i++){
-                                              if(reimbursementTypeListModal!.claimDataList![i].policyName.toString().compareToIgnoringCase(newVal.toString()) ==0)
-                                              {
-                                                reimbursementId = reimbursementTypeListModal!.claimDataList![i].policyId!.toString();
-                                                print("Reimbursement Id $reimbursementId");
-                                              }
-                                            }
-                                            setState(() {
-                                              dropdownNewvalueNew = newVal;
-                                              defaultApiCheck(sessionId!, reimbursementId);
-                                            });
-                                            if(valuenew != ""){
-                                              expenseCatShow = true;
-                                              subExpenseCatShow = true;
-                                              subSubExpenseCatShow = true;
-                                            }
-
-
-
-
-                                          },
-
                                         ).p8(),
 
                                       )
@@ -645,661 +668,574 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
                                   ),
                                   Row(
                                     children: [
-                                      Visibility(
-                                        visible: expenseCatShow,
-                                        child: Expanded(
-                                          child:  DropdownButtonFormField(
-                                            value: cardData.catDropType.isEmpty ? null : cardData.catDropType,
-                                            decoration: InputDecoration(
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Select",
-                                              labelText: "Expense Category",
-                                              hintStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  overflow: TextOverflow.ellipsis
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                        borderRadius:
-                                                        BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 12,
-                                                  color: Mythemes.blackish),
+                                      Expanded(
+                                        child:  TextFormField(
+                                          controller: TextEditingController(text: expCategoryCheck),
+                                          readOnly: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.textsms_outlined
                                             ),
-                                            items: expCategoryList.map<DropdownMenuItem<String>>((String? value) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Text(value! , style: TextStyle(fontSize: 10), maxLines: 2),
-                                              );
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Expense Category",
+                                            labelText: "Expense Category",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                BorderRadius.all(Radius.circular(8))),
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                            }).toList(),
-
-                                            onChanged: (newVal) {
-                                              valuenew = newVal.toString();
-                                              for(int i=0; i<categoriesModalClass!.expenseDataList!.length;i++){
-                                                if(categoriesModalClass!.expenseDataList![i].expenseName.toString().compareToIgnoringCase(newVal.toString()) ==0)
-                                                {
-                                                  expCategoryId = categoriesModalClass!.expenseDataList![i].expenseId!.toString();
-                                                  print("Exp Id $expCategoryId");
-                                                }
-                                              }
-                                              setState(() {
-                                                dropdownExpCatValue = newVal;
-                                              });
-
-                                            },
-
-                                          ).p8(),
-
-                                        ),
                                       ),
-                                      Visibility(
-                                        visible: subExpenseCatShow,
-                                        child: Expanded(
-                                          child:  DropdownButtonFormField(
-                                            value: cardData.subCatDropType.isEmpty ? null : cardData.subCatDropType,
-                                            decoration: InputDecoration(
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Select",
-                                              labelText: "Sub Expense Category",
-                                              hintStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  overflow: TextOverflow.ellipsis
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                        borderRadius:
-                                                        BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 12,
-                                                  color: Mythemes.blackish),
+                                      Expanded(
+                                        child:  TextFormField(
+                                          controller: TextEditingController(text: subExpCategoryCheck),
+                                          readOnly: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.textsms_outlined
                                             ),
-                                            items: subExpCategoryList.map<DropdownMenuItem<String>>((String? value) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Text(value! , style: TextStyle(fontSize: 10), maxLines: 2),
-                                              );
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Sub Exp. Category",
+                                            labelText: "Sub Exp. Category",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                BorderRadius.all(Radius.circular(8))),
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                            }).toList(),
-
-                                            onChanged: (newVal) {
-                                              valuenew = newVal.toString();
-                                              for(int i=0; i<categoriesModalClass!.subExpDataList!.length;i++){
-                                                if(categoriesModalClass!.subExpDataList![i].subExpName.toString().compareToIgnoringCase(newVal.toString()) ==0)
-                                                {
-                                                  subExpCategoryId = categoriesModalClass!.subExpDataList![i].subExpId!.toString();
-                                                  print("Exp Id $subExpCategoryId");
-                                                }
-                                              }
-                                              setState(() {
-                                                dropdownSubExpCatValue = newVal;
-                                              });
-
-                                            },
-
-                                          ).p8(),
-
-                                        ),
                                       ),
                                     ],
                                   ),
-                                  Visibility(
-                                    visible: subSubExpenseCatShow,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child:  DropdownButtonFormField(
-                                            value: cardData.subSubCatDropType.isEmpty ? null : cardData.subSubCatDropType,
-                                            decoration: InputDecoration(
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Select",
-                                              labelText: "Sub Sub Category",
-                                              hintStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  overflow: TextOverflow.ellipsis
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                        borderRadius:
-                                                        BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 12,
-                                                  color: Mythemes.blackish),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child:  TextFormField(
+                                          controller: TextEditingController(text: subExpCategoryCheck),
+                                          readOnly: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.subject
                                             ),
-                                            items: subSubExpCategoryList.map<DropdownMenuItem<String>>((String? value) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Text(value! , style: TextStyle(fontSize: 10), maxLines: 2),
-                                              );
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Sub Sub Exp. Category",
+                                            labelText: "Sub Sub Exp. Category",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                BorderRadius.all(Radius.circular(8))),
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                            }).toList(),
-
-                                            onChanged: (newVal) {
-                                              valuenew = newVal.toString();
-                                              for(int i=0; i<categoriesModalClass!.catDataList!.length;i++){
-                                                if(categoriesModalClass!.catDataList![i].catName.toString().compareToIgnoringCase(newVal.toString()) ==0)
-                                                {
-                                                  subSubExpCategoryId = categoriesModalClass!.catDataList![i].catId!.toString();
-                                                  print("Sub Sub Exp Id $subSubExpCategoryId");
-                                                }
-                                              }
-                                              setState(() {
-                                                dropdownSubSubExpCatValue = newVal;
-                                              });
-
-                                            },
-
-                                          ).p8(),
-
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                   //Travel From & To
-                                  Visibility(
-                                    visible: travelFromToShow,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: cardData.fromPlaceController.text.isEmpty ? null : cardData.fromPlaceController,
-                                            enabled: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _fromPlaceController.text = value;
-                                              print("$value");
-                                            },
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.airplanemode_active
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Travel From",
-                                              labelText: "Travel From",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _fromPlaceController,
+                                          enabled: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _fromPlaceController.text = value;
+                                            print("$value");
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.airplanemode_active
                                             ),
-                                          ).p8(),
-
-                                        ),
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: cardData.toPlaceController.text.isEmpty ? null : cardData.toPlaceController,
-                                            enabled: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _toPlaceController.text = value;
-                                              print("$value");
-                                            },
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.airplanemode_active
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Travel To",
-                                              labelText: "Travel To",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
                                             ),
-                                          ).p8(),
+                                            //labelText: "Select Department",
+                                            hintText: "Travel From",
+                                            labelText: "Travel From",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _toPlaceController,
+                                          enabled: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _toPlaceController.text = value;
+                                            print("$value");
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.airplanemode_active
+                                            ),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Travel To",
+                                            labelText: "Travel To",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
+
+                                      ),
+                                    ],
                                   ),
                                   //Odometer Row
-                                  Visibility(
-                                    visible: odometerRowShow,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: cardData.odometerStartController,
-                                            enabled: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            keyboardType: TextInputType.number,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _odometerStartController.text = value;
-                                              calculateKilometers();
-                                              print("$value");
-                                            },
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.electric_meter
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Odometer Start",
-                                              labelText: "Odometer Start",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _odometerStartController,
+                                          enabled: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          keyboardType: TextInputType.number,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _odometerStartController.text = value;
+                                            //calculateKilometers();
+                                            print("$value");
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.electric_meter
                                             ),
-                                          ).p8(),
-
-                                        ),
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: cardData.odometerEndController,
-                                            enabled: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            keyboardType: TextInputType.number,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _odometerEndController.text = value;
-                                              calculateKilometers();
-                                              print("$value");
-                                            },
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.electric_meter
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Odometer End",
-                                              labelText: "Odometer End",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
                                             ),
-                                          ).p8(),
+                                            //labelText: "Select Department",
+                                            hintText: "Odometer Start",
+                                            labelText: "Odometer Start",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _odometerEndController,
+                                          enabled: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          keyboardType: TextInputType.number,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _odometerEndController.text = value;
+                                            //calculateKilometers();
+                                            print("$value");
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.electric_meter
+                                            ),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Odometer End",
+                                            labelText: "Odometer End",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
+
+                                      ),
+                                    ],
                                   ),
                                   //Merchant & Km
                                   Row(
                                     children: [
-                                      Visibility(
-                                        visible: merchantShow,
-                                        child: Expanded(
-                                          child: TextFormField(
-                                            controller: cardData.merchantController.text.isEmpty ? null : cardData.merchantController,
-                                            enabled: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _merchantController.text = value;
-                                              print("$value");
-                                            },
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.business_center
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Merchant",
-                                              labelText: "Merchant",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _merchantController,
+                                          enabled: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _merchantController.text = value;
+                                            print("$value");
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.business_center
                                             ),
-                                          ).p8(),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Merchant",
+                                            labelText: "Merchant",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                        ),
                                       ),
-                                      Visibility(
-                                        visible: kmShow,
-                                        child: Expanded(
-                                          child: TextFormField(
-                                            controller: cardData.kilometerController.text.isEmpty ? null : cardData.kilometerController,
-                                            enabled: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            keyboardType: TextInputType.number,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _kmController.text = value;
-                                              print("$value");
-                                            },
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.car_crash_rounded
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Kilometers",
-                                              labelText: "Kilometers",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _kmController,
+                                          enabled: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          keyboardType: TextInputType.number,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _kmController.text = value;
+                                            print("$value");
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.car_crash_rounded
                                             ),
-                                          ).p8(),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Kilometers",
+                                            labelText: "Kilometers",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                        ),
                                       ),
                                     ],
                                   ),
                                   //Month & Date
                                   Row(
                                     children: [
-                                      Visibility(
-                                        visible: monthShow,
-                                        child: Expanded(
-                                          child: TextFormField(
+                                      Expanded(
+                                        child: TextFormField(
 
-                                            onTap: () async{
-                                              DateTime? date = DateTime.now();
-                                              FocusScope.of(context).requestFocus(new FocusNode());
-                                              date = (await showMonthYearPicker(
+                                          onTap: () async{
+                                            DateTime? date = DateTime.now();
+                                            FocusScope.of(context).requestFocus(new FocusNode());
+                                            date = (await showMonthYearPicker(
 
-                                                context: context,
-                                                initialDate: date ?? DateTime.now(),
-                                                firstDate: DateTime(1947),
-                                                lastDate: DateTime(2070),
-                                                builder: (context, child) {
-                                                  return Theme(
-                                                    data: ThemeData(
-                                                      primaryColor: Colors.lightBlue,
-                                                      dialogBackgroundColor: Colors.white,
-                                                      colorScheme: ColorScheme.light(
-                                                        primary: Colors.lightBlue,                         // Color for selected month/year
-                                                        onPrimary: Colors.white,                            // Text color on selected month/year
-                                                        onSurface: Colors.black,                            // Color for unselected month/year
-                                                      ),
-                                                      textTheme: TextTheme(
-                                                        headlineMedium: TextStyle(                          // Text style for the month/year
-                                                          fontSize: 24,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: Colors.lightBlue,
-                                                        ),
-                                                        bodyLarge: TextStyle(fontSize: 16, color: Colors.black, letterSpacing: 0), // Style for unselected items
-
-                                                      ),
+                                              context: context,
+                                              initialDate: date ?? DateTime.now(),
+                                              firstDate: DateTime(1947),
+                                              lastDate: DateTime(2070),
+                                              builder: (context, child) {
+                                                return Theme(
+                                                  data: ThemeData(
+                                                    primaryColor: Colors.lightBlue,
+                                                    dialogBackgroundColor: Colors.white,
+                                                    colorScheme: ColorScheme.light(
+                                                      primary: Colors.lightBlue,                         // Color for selected month/year
+                                                      onPrimary: Colors.white,                            // Text color on selected month/year
+                                                      onSurface: Colors.black,                            // Color for unselected month/year
                                                     ),
-                                                    child: child!,
-                                                  );
-                                                },
-                                              ))!;
-                                              setState(() {
-                                                cardData.monthController.text = DateFormat("MMMM-yy").format(date!);
-                                                selectedDate = cardData.monthController.text;
-                                                print('MonthPicker $selectedDate');
-                                              });
-                                            },
-                                            controller: cardData.monthController.text.isEmpty ? null : cardData.monthController,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _monthController.text = value;
-                                              print("$value");
-                                            },
-                                            readOnly: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.calendar_month
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Month",
-                                              labelText: "Month",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
-                                            ),
-                                          ).p8(),
+                                                    textTheme: TextTheme(
+                                                      headlineMedium: TextStyle(                          // Text style for the month/year
+                                                        fontSize: 24,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.lightBlue,
+                                                      ),
+                                                      bodyLarge: TextStyle(fontSize: 16, color: Colors.black, letterSpacing: 0), // Style for unselected items
 
-                                        ),
+                                                    ),
+                                                  ),
+                                                  child: child!,
+                                                );
+                                              },
+                                            ))!;
+                                            setState(() {
+                                              cardData.monthController.text = DateFormat("MMMM-yy").format(date!);
+                                              selectedDate = cardData.monthController.text;
+                                              print('MonthPicker $selectedDate');
+                                            });
+                                          },
+                                          controller: _monthController,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _monthController.text = value;
+                                            print("$value");
+                                          },
+                                          readOnly: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.calendar_month
+                                            ),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Month",
+                                            labelText: "Month",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
+
                                       ),
-                                      Visibility(
-                                        visible: dateShow,
-                                        child: Expanded(
-                                          child: TextFormField(
-                                            onTap: () async{
-                                              DateTime? date = DateTime.now();
-                                              FocusScope.of(context).requestFocus(new FocusNode());
+                                      Expanded(
+                                        child: TextFormField(
+                                          onTap: () async{
+                                            DateTime? date = DateTime.now();
+                                            FocusScope.of(context).requestFocus(new FocusNode());
 
-                                              date = await showDatePicker(
-                                                  context: context,
-                                                  initialDate: date,
-                                                  firstDate:DateTime(1947),
-                                                  lastDate: DateTime(2070).add(Duration(days: 0)));
-                                              setState(() {
-                                                singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                                                cardData.dateController.text = DateFormat("dd-MM-yyyy").format(date!);
-                                                _dateController.text = cardData.dateController.text;
-                                                print('Date ${_dateController.text}');
+                                            date = await showDatePicker(
+                                                context: context,
+                                                initialDate: date,
+                                                firstDate:DateTime(1947),
+                                                lastDate: DateTime(2070).add(Duration(days: 0)));
+                                            setState(() {
+                                              singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                                              cardData.dateController.text = DateFormat("dd-MM-yyyy").format(date!);
+                                              _dateController.text = cardData.dateController.text;
+                                              print('Date ${_dateController.text}');
 
-                                                //  DateFormat.yMd().format(date!).toString();
-                                              });
+                                              //  DateFormat.yMd().format(date!).toString();
+                                            });
 
-                                              print(date);
-                                            },
-                                            controller: cardData.dateController.text.isEmpty ? null : cardData.dateController,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _dateController.text = value;
-                                              print("$value");
-                                            },
-                                            readOnly: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.date_range
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Date",
-                                              labelText: "Date",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                            print(date);
+                                          },
+                                          controller: _dateController,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _dateController.text = value;
+                                            print("$value");
+                                          },
+                                          readOnly: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.date_range
                                             ),
-                                          ).p8(),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Date",
+                                            labelText: "Date",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                        ),
                                       ),
                                     ],
                                   ),
                                   //Claim Amt Show
-                                  Visibility(
-                                    visible: claimAmtShow,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: cardData.claimedAmtController.text.isEmpty ? null : cardData.claimedAmtController,
-                                            enabled: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            keyboardType: TextInputType.number,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _claimAmtController.text = value;
-                                              print("$value");
-                                            },
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.currency_rupee
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Claimed Amount",
-                                              labelText: "Claimed Amount",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _claimAmtController,
+                                          enabled: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          keyboardType: TextInputType.number,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _claimAmtController.text = value;
+                                            print("$value");
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.currency_rupee
                                             ),
-                                          ).p8(),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Claimed Amount",
+                                            labelText: "Claimed Amount",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
 
                                   //Remarks Show
-                                  Visibility(
-                                    visible: remarksShow,
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextFormField(
-                                            controller: cardData.remarksController.text.isEmpty ? null : cardData.remarksController,
-                                            enabled: true,
-                                            // initialValue: "Head Office",
-                                            //maxLines: 3,
-                                            onChanged: (value) {
-                                              //value = cardData.fromPlaceController.text;
-                                              _remarksController.text = value;
-                                              print("$value");
-                                            },
-                                            decoration: InputDecoration(
-                                              prefixIcon: Icon(
-                                                  Icons.textsms_outlined
-                                              ),
-                                              enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                                borderSide: BorderSide(
-                                                    width: 1, color: Mythemes.blackishade),
-                                              ),
-                                              //labelText: "Select Department",
-                                              hintText: "Remarks",
-                                              labelText: "Remarks",
-                                              hintStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                              contentPadding: EdgeInsets.all(5),
-                                              /*border: OutlineInputBorder(
-                                                      borderRadius:
-                                                      BorderRadius.all(Radius.circular(8))),*/
-                                              // labelText: "Location",
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.w500,fontSize: 13,
-                                                  color: Mythemes.blackish),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _remarksController,
+                                          enabled: true,
+                                          // initialValue: "Head Office",
+                                          //maxLines: 3,
+                                          onChanged: (value) {
+                                            //value = cardData.fromPlaceController.text;
+                                            _remarksController.text = value;
+                                            print("$value");
+                                          },
+                                          decoration: InputDecoration(
+                                            prefixIcon: Icon(
+                                                Icons.textsms_outlined
                                             ),
-                                          ).p8(),
+                                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                              borderSide: BorderSide(
+                                                  width: 1, color: Mythemes.blackishade),
+                                            ),
+                                            //labelText: "Select Department",
+                                            hintText: "Remarks",
+                                            labelText: "Remarks",
+                                            hintStyle: TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                            contentPadding: EdgeInsets.all(5),
+                                            /*border: OutlineInputBorder(
+                                                    borderRadius:
+                                                    BorderRadius.all(Radius.circular(8))),*/
+                                            // labelText: "Location",
+                                            labelStyle: TextStyle(
+                                                fontWeight: FontWeight.w500,fontSize: 13,
+                                                color: Mythemes.blackish),
+                                          ),
+                                        ).p8(),
 
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
 
                                   /*Row(
@@ -1313,18 +1249,15 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
                                         //"Add Documents".text.size(17).bold.make()
                                       ],
                                     ),*/
-                                  Visibility(
-                                    visible: expenseCatShow,
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () => _showUploadOptions(context),
-                                          child: Text('Add Document'),
-                                        ),
-                                      ],
-                                    ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () => _showUploadOptions(context),
+                                        child: Text('Add Document'),
+                                      ),
+                                    ],
                                   ),
                                   if (uploadedFile != null) // Show the uploaded document
                                     Card(
@@ -1345,158 +1278,84 @@ class _TravelExpenseRequestUpdateState extends State<TravelExpenseRequestUpdate>
                                       onPressed: _uploadDocumentToServer,
                                       child: Text('Upload Document'),
                                     ),*/
-
-
-
-                                  /*Row(
-                                      children: [
-                                        Expanded(
-                            child: SizedBox(
-                              height: files.length == 0 ? 0 : 440,
-                              child: ListView.builder(
-                                itemCount: files.length,
-                                itemBuilder: (context, index) {
-                                  final file = files[index];
-                                  return Card(
-                                    margin: EdgeInsets.all(8.0),
-                                    child: ListTile(
-                                      leading: file['type'] == 'image'
-                                          ? Image.file(
-                                        File(file['path']),
-                                        width: 50,
-                                        filterQuality: FilterQuality.low,
-                                        height: 50,
-                                        fit: BoxFit.cover,
-                                      )
-                                          : Icon(
-                                        _getFileIcon(file['type']),
-                                        size: 40,
-                                        color: Colors.blue,
-                                      ),
-                                      title: Text(
-                                        file['name'],
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      subtitle: Text('${file['size']} - ${file['status']}'),
-                                      trailing: IconButton(
-                                        icon: Icon(Icons.delete, color: Colors.red),
-                                        onPressed: () => _deleteFile(index),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                                      ],
-                                    )*/
                                 ]
                             ),
-                            Visibility(
-                              visible: expenseCatShow,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      ButtonBar(
-                                          alignment: MainAxisAlignment.center,
-                                          //buttonPadding: Vx.mOnly(right: 16),
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                //draftInductionData(context);
-                                                finalRaiseClaimRequest(
-                                                  sessionId!,
-                                                  empId!,
-                                                  _claimAmtController.text,
-                                                  claimIdCheck = claimIdCheck,
-                                                  claimRaiseId = "0",
-                                                  claimReqId = "0",
-                                                  _odometerEndController.text,
-                                                  expCategoryId,
-                                                  _merchantController.text,
-                                                  selectedDate!,
-                                                  odometer = true,
-                                                  _kmController.text,
-                                                  reimbursementId,
-                                                  _remarksController.text,
-                                                  _dateController.text,
-                                                  _odometerStartController.text,
-                                                  subExpCategoryId,
-                                                  subSubExpCategoryId,
-                                                  _fromPlaceController.text,
-                                                  _toPlaceController.text,
-                                                  status = "DRAFT",
-                                                  uploadedFile == null ? "" : uploadedFile!.path,
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    ButtonBar(
+                                        alignment: MainAxisAlignment.center,
+                                        //buttonPadding: Vx.mOnly(right: 16),
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                              MaterialStateProperty.all(Mythemes.dangerColorOne),
+                                            ),
+                                            child: "Cancel".text.make(),
+                                          ).wh(120, 40).py12(),
+
+
+
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              /*if (uploadedFile == null) {
+                                                Fluttertoast.showToast(
+                                                    msg: "Please select document.",
+                                                    toastLength: Toast.LENGTH_SHORT,
+                                                    gravity: ToastGravity.BOTTOM,
+                                                    timeInSecForIosWeb: 1,
+                                                    backgroundColor: Colors.black,
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0
                                                 );
-                                              },
-                                              style: ButtonStyle(
-                                                backgroundColor:
-                                                MaterialStateProperty.all(Mythemes.alertColor),
-                                              ),
-                                              child: "Draft".text.make(),
-                                            ).wh(120, 40).py12(),
+                                                print("No document selected.");
+                                                return;
+                                              }*/
+                                              finalRaiseClaimRequest(
+                                                sessionId!,
+                                                empId!,
+                                                _claimAmtController.text,
+                                                claimIdChecks,
+                                                claimRaiseId = "0",
+                                                claimIdChecks,
+                                                _odometerEndController.text,
+                                                expCategoryIdCheck,
+                                                _merchantController.text,
+                                                selectedDate!,
+                                                odometer = true,
+                                                _kmController.text,
+                                                reimbursementTypeIdCheck,
+                                                _remarksController.text,
+                                                _dateController.text,
+                                                _odometerStartController.text,
+                                                subExpCategoryIdCheck,
+                                                subExpCategoryIdCheck,
+                                                _fromPlaceController.text,
+                                                _toPlaceController.text,
+                                                status = "PENDING",
+                                                uploadedFile == null ? "" : uploadedFile!.path,
+                                              );
 
-
-
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                /*if (uploadedFile == null) {
-                                                  Fluttertoast.showToast(
-                                                      msg: "Please select document.",
-                                                      toastLength: Toast.LENGTH_SHORT,
-                                                      gravity: ToastGravity.BOTTOM,
-                                                      timeInSecForIosWeb: 1,
-                                                      backgroundColor: Colors.black,
-                                                      textColor: Colors.white,
-                                                      fontSize: 16.0
-                                                  );
-                                                  print("No document selected.");
-                                                  return;
-                                                }*/
-                                                finalRaiseClaimRequest(
-                                                  sessionId!,
-                                                  empId!,
-                                                  _claimAmtController.text,
-                                                  claimIdCheck = claimIdCheck,
-                                                  claimRaiseId = "0",
-                                                  claimReqId = "0",
-                                                  _odometerEndController.text,
-                                                  expCategoryId,
-                                                  _merchantController.text,
-                                                  selectedDate!,
-                                                  odometer = true,
-                                                  _kmController.text,
-                                                  reimbursementId,
-                                                  _remarksController.text,
-                                                  _dateController.text,
-                                                  _odometerStartController.text,
-                                                  subExpCategoryId,
-                                                  subSubExpCategoryId,
-                                                  _fromPlaceController.text,
-                                                  _toPlaceController.text,
-                                                  status = "PENDING",
-                                                  uploadedFile == null ? "" : uploadedFile!.path,
-                                                );
-
-                                              },
-                                              style: ButtonStyle(
-                                                backgroundColor:
-                                                MaterialStateProperty.all(Mythemes.successColor),
-                                              ),
-                                              child: "Save".text.make(),
-                                            ).wh(120, 40).py12()
-                                          ]),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                            },
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                              MaterialStateProperty.all(Mythemes.successColor),
+                                            ),
+                                            child: "Save".text.make(),
+                                          ).wh(120, 40).py12()
+                                        ]),
+                                  ],
+                                ),
+                              ],
                             ),
                           ]
                       ));

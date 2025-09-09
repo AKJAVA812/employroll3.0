@@ -83,9 +83,13 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
 
     getAppReq11.then((value) {
       setState(() {
-        selfLeaveRequisitionLabel=value;
+        selfLeaveRequisitionLabel = value;
       });
-      print('employeeList00${selfLeaveRequisitionLabel!.data!.length}');
+      if (selfLeaveRequisitionLabel?.data != null) {
+        print('employeeList00: ${selfLeaveRequisitionLabel!.data!.length}');
+      } else {
+        print('employeeList00: No data found');
+      }
     });
   }
 
@@ -109,7 +113,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
         TextButton(
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
-            Navigator.pop(buildContext);
+            //Navigator.pop(buildContext);
             setState(() {
 
             });
@@ -125,11 +129,14 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
           return alertDialog;
         });
   }
-
+  bool _isLoading = true;
   Future<SelfLeaveRequisitionListModal> getSelfLeaveReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.requestedReqList;
     print('employeeList11: ${SessionId}');
+    setState(() {
+      _isLoading = true;
+    });
     SelfLeaveRequisitionListModal approvedLeaveReqModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await http.post(urlapi);
@@ -138,7 +145,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
     print('API ${response.request}');
 
     mapResponse = json.decode(response.body);
-    var getData = mapResponse['data'].length;
+    var getData = mapResponse.length;
     if (getData == 0 )  {
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
@@ -146,10 +153,13 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
     print('responseemployeeList $getData');
     approvedLeaveReqModal=SelfLeaveRequisitionListModal.fromJson(mapResponse);
 
+    setState(() {
+      _isLoading = false;
+    });
     return approvedLeaveReqModal;
   }
 
-  var titleName = "My Requisition";
+  var titleName = "My Leave Requests";
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
@@ -257,12 +267,20 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                     )
                   ],
                 ).py(4),
-                Expanded(child:
-                selfLeaveRequisitionLabel == null ?
+              /*  Expanded(
+                  child: selfLeaveRequisitionLabel == null ?
                 Center(
                     child: CircularProgressIndicator()):
                 getSelfReqRequisitionList(selfLeaveRequisitionLabel!) ,
-                )
+                )*/
+
+                Expanded(
+                  child: _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : (selfLeaveRequisitionLabel == null || selfLeaveRequisitionLabel!.data == null)
+                      ? Center(child: Text('Click on + icon to raise the leave request.'))
+                      : getSelfReqRequisitionList(selfLeaveRequisitionLabel!),
+                ),
 
               ],
             ),

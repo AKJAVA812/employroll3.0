@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert' show json, utf8;
+import 'dart:io';
 
 import 'package:er_flutter_project/commanScreen/accountSuspend.dart';
+import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/singUP/model/loginFaild.dart';
@@ -13,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../adminPage/adminPanelScreen.dart';
@@ -44,8 +47,16 @@ String? claimLevelTwo;
 String? claimLevelThree;
 String? preOnboardShow;
 String? exitShow;
+String? loanApprovalL1Show;
+String? loanApprovalL2Show;
+String? loanApprovalL3Show;
 String? pendingLeaveRequisitions;
 bool accountExpired = false;
+
+String appName = "";
+String packageName = "";
+String version = "";
+String buildNumber = "";
 
 class _LoginPageState extends State<LoginPage> {
   String name = "";
@@ -77,6 +88,21 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> getAppVersionInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    appName = packageInfo.appName;
+    packageName = packageInfo.packageName;
+    version = packageInfo.version; // e.g. 1.0.0
+    buildNumber = packageInfo.buildNumber; // e.g. 1
+
+    print("App Name: $appName");
+    print("Package Name: $packageName");
+    print("Version: $version");
+    print("Build Number: $buildNumber");
+    shared.setAppVersion(version);
+  }
+
   final loading = Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
@@ -99,8 +125,11 @@ class _LoginPageState extends State<LoginPage> {
     changeButton = true;
     LoginModel loginModel;
     LoginFaild loginFaild;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "userName=$emailId&password=$password");
+    /*var urlapi = Uri.parse("$conn$apiUrl?"
+        "userName=$emailId&password=$password");*/
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?userName=${Uri.encodeComponent(emailId)}&password=${Uri.encodeComponent(password)}"
+    );
     /*var urlapi = Uri.parse(
         "http://www.employroll.com/restful/service/login?userName=$emailId&password=$password");*/
     /*  final response= await http.get(urlapi,headers: {
@@ -154,18 +183,25 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (response.statusCode == 200) {
         setState(() {
-          //print('response Login ${loginModel.data!.sessionId}');
-          //print('response {$loginValidation.toString()}');
-          accountExpired = mapResponse['data']['expired'];
+          print("My APP Version - $version");
+          accountExpired = mapResponse['data']['expired'] ?? false;
           print("Account Expired - $accountExpired");
-          if(accountExpired == true) {
+
+          if (accountExpired == true) {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => AccountSuspendPage()));
           } else {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
-          }
+            // call shared prefs loader AFTER login
+            getSharedPrfanceList();
 
+            if (empLength == 1 || roLength == 1) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            } else if (adminlength == 1) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AdminPanelScreen()));
+            }
+          }
         });
       } else {
         Fluttertoast.showToast(
@@ -278,6 +314,9 @@ class _LoginPageState extends State<LoginPage> {
     sessionId = await shared!.getSessionId();
     userPanel = await shared!.getUserPanel();
     print("User Panel - $userPanel");
+    setState(() {
+
+    });
     levelOne =await shared!.getLevelOne();
     levelTwo =await shared!.getLevelTwo();
     empLength=await shared!.getEmpRoll();
@@ -309,15 +348,24 @@ class _LoginPageState extends State<LoginPage> {
         } else {
 
         }*/
+        if (mapResponse != null && mapResponse['data'] != null) {
+          accountExpired = mapResponse['data']['expired'] ?? false;
+          print("Account Expired - $accountExpired");
+          if (accountExpired == true) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => AccountSuspendPage()));
+          }
+        } else {
+          if(empLength == 1 || roLength == 1) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          }
+          else if(adminlength == 1){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => AdminPanelScreen()));
+          }
+        }
 
-        if(empLength == 1 || roLength == 1) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
-        }
-        else if(adminlength == 1){
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AdminPanelScreen()));
-        }
 
 
         /*else {
@@ -328,6 +376,41 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
     //print('Response snapshot login: ${sessionId}');
+
+    getAppVersionInfo();
+
+  }
+
+  void showUpdateDialog(BuildContext context) {
+    final isAndroid = Platform.isAndroid;
+    final storeUrl = isAndroid
+        ? 'https://play.google.com/store/apps/details?id=com.employroll.employroll' // ✅ Replace with your Play Store URL
+        : 'https://apps.apple.com/in/app/employroll-2-0/id1664350846'; // ✅ Replace with your App Store ID
+
+    final message = isAndroid
+        ? 'A new version of the app is available on the Play Store. Please update your app to continue.'
+        : 'A new version of the app is available on the App Store. Please update your app to continue.';
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Update Available'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              if (await canLaunchUrl(Uri.parse(storeUrl))) {
+                launchUrl(Uri.parse(storeUrl), mode: LaunchMode.externalApplication);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not open store.')));
+              }
+            },
+            child: Text('Update Now'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -399,6 +482,7 @@ class _LoginPageState extends State<LoginPage> {
                               autofillHints: [AutofillHints.username],
                               controller: _username,
                               decoration: InputDecoration(
+                                prefixIcon: Icon(CupertinoIcons.profile_circled, size: 20, color: Mythemes.black,),
                                   hintText: "Enter User Name ",
                                   labelText: "UserName"),
                               onChanged: (value) {
@@ -417,10 +501,11 @@ class _LoginPageState extends State<LoginPage> {
                               keyboardType: TextInputType.text,
                               controller: _password,
                               decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.security, size: 20, color: Mythemes.black,),
                                   suffixIcon: IconButton(
                                     icon: Icon(_showPassword
                                         ? CupertinoIcons.eye_fill
-                                        : CupertinoIcons.eye_slash_fill),
+                                        : CupertinoIcons.eye_slash_fill, size: 20,),
                                     onPressed: () {
                                       setState(() {
                                         _showPassword = !_showPassword;
@@ -438,6 +523,20 @@ class _LoginPageState extends State<LoginPage> {
                                 }
                                 return null;
                               },
+                            ),
+                            InkWell(
+                              onTap: () {
+                                //Navigator.pushNamed(context, MyRoutings.forgetPasswordEmailRoute);
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ForgotPasswordEmailPage()));
+                              },
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text("Forget Password? ",
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                    )),
+                              ).py4(),
                             ),
                             SizedBox(
                               height: 80,
@@ -539,19 +638,7 @@ class _LoginPageState extends State<LoginPage> {
                           ]),
                         ),
                       ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, MyRoutings.forgetPasswordEmailRoute);
-                        },
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text("Forget Password / Reset Password ? ",
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 13,
-                              )),
-                        ).py4(),
-                      ),
+
                     ],
                   ),
                 ),
@@ -623,6 +710,9 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     print("Check User Panel - $userPanel");
+    setState(() {
+
+    });
 
 
     shared.setEmpRoll(loginModelglobal!.data!.empRole!.length);
@@ -688,51 +778,51 @@ class _LoginPageState extends State<LoginPage> {
         if (defaultProfile == true || loginModelglobal!.data!.profileList![i].isDefaultProfile == true) {
           String profileNameNew = loginModelglobal!.data!.profileList![i].profileName ?? '';
           dynamic profileIdNew = loginModelglobal!.data!.profileList![i].profileId;
-           shared.setDefaultProfileName(profileNameNew);
-           shared.setDefaultProfileId(profileIdNew);
+          shared.setDefaultProfileName(profileNameNew);
+          shared.setDefaultProfileId(profileIdNew);
 
-           if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD")) {
-             print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
-             levelOne = "true";
-             shared.setLevelOne(levelOne);
-           } else {
-             print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
-             levelOne = "false";
-             shared.setLevelOne(levelOne);
-           }
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD")) {
+            print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
+            levelOne = "true";
+            shared.setLevelOne(levelOne);
+          } else {
+            print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
+            levelOne = "false";
+            shared.setLevelOne(levelOne);
+          }
 
-           if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD")) {
-             print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
-             levelTwo = "true";
-             shared.setLevelTwo(levelTwo);
-           } else {
-             print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
-             levelTwo = "false";
-             shared.setLevelTwo(levelTwo);
-           }
-           if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD")) {
-             print("resopnse LEAVE_REQ_APPROVAL_ADD");
-             pendingLeaveRequisitions = "true";
-             shared.setPendingLeaveReq(pendingLeaveRequisitions);
-           }
-           if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW")) {
-             print("resopnse CLAIM_APPROVAL_LEVEL_ONE_VIEW");
-             claimLevelOne = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
-             shared.setClaimLevelOne(claimLevelOne);
-           } else {
-             print("claimLevelOne else");
-             claimLevelOne = "";
-             shared.setClaimLevelOne(claimLevelOne);
-           }
-           if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW")) {
-             print("resopnse CLAIM_APPROVAL_LEVEL_TWO_VIEW");
-             claimLevelTwo = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
-             shared.setClaimLevelTwo(claimLevelTwo);
-           } else {
-             print("claimLevelTwo else");
-             claimLevelTwo = "";
-             shared.setClaimLevelTwo(claimLevelTwo);
-           }
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD")) {
+            print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
+            levelTwo = "true";
+            shared.setLevelTwo(levelTwo);
+          } else {
+            print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
+            levelTwo = "false";
+            shared.setLevelTwo(levelTwo);
+          }
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD")) {
+            print("resopnse LEAVE_REQ_APPROVAL_ADD");
+            pendingLeaveRequisitions = "true";
+            shared.setPendingLeaveReq(pendingLeaveRequisitions);
+          }
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW")) {
+            print("resopnse CLAIM_APPROVAL_LEVEL_ONE_VIEW");
+            claimLevelOne = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
+            shared.setClaimLevelOne(claimLevelOne);
+          } else {
+            print("claimLevelOne else");
+            claimLevelOne = "";
+            shared.setClaimLevelOne(claimLevelOne);
+          }
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW")) {
+            print("resopnse CLAIM_APPROVAL_LEVEL_TWO_VIEW");
+            claimLevelTwo = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
+            shared.setClaimLevelTwo(claimLevelTwo);
+          } else {
+            print("claimLevelTwo else");
+            claimLevelTwo = "";
+            shared.setClaimLevelTwo(claimLevelTwo);
+          }
           if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW")) {
             print("Response: CLAIM_APPROVAL_LEVEL_THREE_VIEW");
             claimLevelThree = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
@@ -802,6 +892,14 @@ class _LoginPageState extends State<LoginPage> {
           String odActivateMOPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
               ? "1"
               : "0";
+          // 🟢 Check if the selected profile has the OD Pending List permission
+          String pendingAttendanceRequestMOL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the OD Activate permission
+          String pendingAttendanceRequestMOL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
+              ? "1"
+              : "0";
 
           //MSS
           // 🟢 Check if the selected profile has the Pending Attendance Request permission
@@ -842,6 +940,14 @@ class _LoginPageState extends State<LoginPage> {
               : "0";
           // 🟢 Check if the selected profile has the OD Activate permission
           String odActivatePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+              ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the OD Pending List permission
+          String pendingAttendanceRequestMSSL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the OD Activate permission
+          String pendingAttendanceRequestMSSL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
               ? "1"
               : "0";
 
@@ -886,6 +992,16 @@ class _LoginPageState extends State<LoginPage> {
           String odActivateUISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
               ? "1"
               : "0";
+          // 🟢 Check if the selected profile has the OD Pending List permission
+          String pendingAttendanceRequestUISL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the OD Activate permission
+          String pendingAttendanceRequestUISL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
+              ? "1"
+              : "0";
+
+
 
           // 🟢 Save the MSS MO permission to SharedPreferences
           shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
@@ -898,6 +1014,8 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThreeMO(pendingClaimL3MOPermission);
           shared.setODActivateMO(odActivateMOPermission);
           shared.setODPendingListMO(pendingODListMOPermission);
+          shared.setPendingAttendanceReqL1MO(pendingAttendanceRequestMOL1);
+          shared.setPendingAttendanceReqL2MO(pendingAttendanceRequestMOL2);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqMOPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqMOPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1MOPermValue");
@@ -908,6 +1026,8 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3MOPermission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivateMOPermission");
           print("✅ Pending OD Permission for profileId $profileIdNew: $pendingODListMOPermission");
+          print("✅ Pending Attendance L1 MO Permission for profileId $profileIdNew: $pendingAttendanceRequestMOL1");
+          print("✅ Pending Attendance L2 MO Permission for profileId $profileIdNew: $pendingAttendanceRequestMOL2");
 
           // 🟢 Save the MSS permission to SharedPreferences
           shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
@@ -920,6 +1040,8 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThree(pendingClaimL3Permission);
           shared.setODActivate(odActivatePermission);
           shared.setODPendingList(pendingODListPermission);
+          shared.setPendingAttendanceReqL1MSS(pendingAttendanceRequestMSSL1);
+          shared.setPendingAttendanceReqL2MSS(pendingAttendanceRequestMSSL2);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqMSSPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqMSSPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1MSSPermValue");
@@ -930,6 +1052,8 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3Permission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivatePermission");
           print("✅ Pending OD List Permission for profileId $profileIdNew: $pendingODListPermission");
+          print("✅ Pending Attendance L1 MSS Permission for profileId $profileIdNew: $pendingAttendanceRequestMSSL1");
+          print("✅ Pending Attendance L2 MSS Permission for profileId $profileIdNew: $pendingAttendanceRequestMSSL2");
 
           // 🟢 Save the UIS permission to SharedPreferences
           shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
@@ -942,6 +1066,8 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThreeUIS(pendingClaimL3UISPermission);
           shared.setODActivateUIS(odActivateUISPermission);
           shared.setODPendingListUIS(pendingODListUISPermission);
+          shared.setPendingAttendanceReqL1UIS(pendingAttendanceRequestUISL1);
+          shared.setPendingAttendanceReqL2UIS(pendingAttendanceRequestUISL2);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqUISPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqUISPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1UISPermValue");
@@ -952,6 +1078,8 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3UISPermission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivateUISPermission");
           print("✅ Pending OD List Permission for profileId $profileIdNew: $pendingODListUISPermission");
+          print("✅ Pending Attendance L1 UIS Permission for profileId $profileIdNew: $pendingAttendanceRequestUISL1");
+          print("✅ Pending Attendance L2 UIS Permission for profileId $profileIdNew: $pendingAttendanceRequestUISL2");
         }
 
         print('Profile Name $profileName');
@@ -1186,6 +1314,14 @@ class _LoginPageState extends State<LoginPage> {
           String odActivateMOPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
               ? "1"
               : "0";
+          // 🟢 Check if the selected profile has the OD Pending List permission
+          String pendingAttendanceRequestMOL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the OD Activate permission
+          String pendingAttendanceRequestMOL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
+              ? "1"
+              : "0";
 
           //MSS
           // 🟢 Check if the selected profile has the Pending Attendance Request permission
@@ -1226,6 +1362,14 @@ class _LoginPageState extends State<LoginPage> {
               : "0";
           // 🟢 Check if the selected profile has the OD Activate permission
           String odActivatePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+              ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the OD Pending List permission
+          String pendingAttendanceRequestMSSL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the OD Activate permission
+          String pendingAttendanceRequestMSSL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
               ? "1"
               : "0";
 
@@ -1270,6 +1414,16 @@ class _LoginPageState extends State<LoginPage> {
           String odActivateUISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
               ? "1"
               : "0";
+          // 🟢 Check if the selected profile has the OD Pending List permission
+          String pendingAttendanceRequestUISL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";
+          // 🟢 Check if the selected profile has the OD Activate permission
+          String pendingAttendanceRequestUISL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
+              ? "1"
+              : "0";
+
+
 
           // 🟢 Save the MSS MO permission to SharedPreferences
           shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
@@ -1282,6 +1436,8 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThreeMO(pendingClaimL3MOPermission);
           shared.setODActivateMO(odActivateMOPermission);
           shared.setODPendingListMO(pendingODListMOPermission);
+          shared.setPendingAttendanceReqL1MO(pendingAttendanceRequestMOL1);
+          shared.setPendingAttendanceReqL2MO(pendingAttendanceRequestMOL2);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqMOPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqMOPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1MOPermValue");
@@ -1292,6 +1448,8 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3MOPermission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivateMOPermission");
           print("✅ Pending OD Permission for profileId $profileIdNew: $pendingODListMOPermission");
+          print("✅ Pending Attendance L1 MO Permission for profileId $profileIdNew: $pendingAttendanceRequestMOL1");
+          print("✅ Pending Attendance L2 MO Permission for profileId $profileIdNew: $pendingAttendanceRequestMOL2");
 
           // 🟢 Save the MSS permission to SharedPreferences
           shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
@@ -1304,6 +1462,8 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThree(pendingClaimL3Permission);
           shared.setODActivate(odActivatePermission);
           shared.setODPendingList(pendingODListPermission);
+          shared.setPendingAttendanceReqL1MSS(pendingAttendanceRequestMSSL1);
+          shared.setPendingAttendanceReqL2MSS(pendingAttendanceRequestMSSL2);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqMSSPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqMSSPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1MSSPermValue");
@@ -1314,6 +1474,8 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3Permission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivatePermission");
           print("✅ Pending OD List Permission for profileId $profileIdNew: $pendingODListPermission");
+          print("✅ Pending Attendance L1 MSS Permission for profileId $profileIdNew: $pendingAttendanceRequestMSSL1");
+          print("✅ Pending Attendance L2 MSS Permission for profileId $profileIdNew: $pendingAttendanceRequestMSSL2");
 
           // 🟢 Save the UIS permission to SharedPreferences
           shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
@@ -1326,6 +1488,8 @@ class _LoginPageState extends State<LoginPage> {
           shared.setClaimLevelThreeUIS(pendingClaimL3UISPermission);
           shared.setODActivateUIS(odActivateUISPermission);
           shared.setODPendingListUIS(pendingODListUISPermission);
+          shared.setPendingAttendanceReqL1UIS(pendingAttendanceRequestUISL1);
+          shared.setPendingAttendanceReqL2UIS(pendingAttendanceRequestUISL2);
           print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqUISPermValue");
           print("✅ Leave Permission for profileId $profileIdNew: $leaveReqUISPermValue");
           print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1UISPermValue");
@@ -1336,6 +1500,8 @@ class _LoginPageState extends State<LoginPage> {
           print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3UISPermission");
           print("✅ OD Activate Permission for profileId $profileIdNew: $odActivateUISPermission");
           print("✅ Pending OD List Permission for profileId $profileIdNew: $pendingODListUISPermission");
+          print("✅ Pending Attendance L1 UIS Permission for profileId $profileIdNew: $pendingAttendanceRequestUISL1");
+          print("✅ Pending Attendance L2 UIS Permission for profileId $profileIdNew: $pendingAttendanceRequestUISL2");
         }
 
         print('Profile Name $profileName');

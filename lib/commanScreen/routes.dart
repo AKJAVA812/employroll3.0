@@ -231,10 +231,14 @@ class MyRoutings {
   static String forgetPasswordEmailRoute= "/forgetPasswordEmailRoute";
   static String forgetPasswordOtpRoute= "/forgetPasswordOtpRoute";
   static String resetPasswordRoute= "/resetPasswordRoute";
+  static String resetPasswordPageRoute= "/resetPasswordPageRoute";
 
 
   //MSS Bundle Pages
   static String mssAttPendingRequestRoRoute= "/mssAttPendingRequestRoRoute";
+  static String mssAttPendingRequestL1Route= "/mssAttPendingRequestL1Route";
+  static String mssAttPendingRequestL2Route= "/mssAttPendingRequestL2Route";
+  static String mssAttPendingRequestL3Route= "/mssAttPendingRequestL3Route";
   static String mssPendingOdRequisitionRoute= "/mssPendingOdRequisitionRoute";
   static String mssOthersAttRequestPageRoute= "/mssOthersAttRequestPageRoute";
 
@@ -311,4 +315,40 @@ class MyRoutings {
   //Incident Reporting
   static String incidentReportListRoute= "/incidentReportListRoute";
   static String incidentReportPageRoute= "/incidentReportPageRoute";
+
+  //Loan Pages
+  static String myLoanRequestListRoute= "/myLoanRequestListRoute";
+  static String myLoanRequestRaiseRoute= "/myLoanRequestRaiseRoute";
+  static String myLoanSummaryRoute= "/myLoanSummaryRoute";
+  static String myLoanLedgerRoute= "/myLoanLedgerRoute";
+  static String pendingLoanRequestListRoute= "/pendingLoanRequestListRoute";
+  static String loanApprovalPageRoute= "/loanApprovalPageRoute";
+
+  //Loan MSS MO
+  static String pendingLoanListMO= "/pendingLoanListMO";
+
+
+  //Check for updates
+  static String checkForUpdatesRoute= "/checkForUpdatesRoute";
+
+  //Company Policy
+  static String companyPolicyListRoute= "/companyPolicyListRoute";
+
+
+  //Real-Time Dashboards
+  static String realtimeESSDashboard= "/realtimeESSDashboard";
+  static String realtimeMSSDashboard= "/realtimeMSSDashboard";
+
+
+  //ESS Attendance Approved Requisition
+  static String essAttendanceApprovedReq= "/essAttendanceApprovedReq";
+
+  //MSS MO
+  static String mssMOPendingAttReqL1= "/mssMOPendingAttReqL1";
+  static String mssMOPendingAttReqL2= "/mssMOPendingAttReqL2";
+
+  //USER
+  static String uisPendingAttReqL1= "/uisPendingAttReqL1";
+  static String uisPendingAttReqL2= "/uisPendingAttReqL2";
+
 }

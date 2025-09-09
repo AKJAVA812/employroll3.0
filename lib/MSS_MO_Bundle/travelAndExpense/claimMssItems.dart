@@ -229,8 +229,8 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
       organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
-      selectedOrg = null;
-      getOrgId = '';
+      //selectedOrg = null;
+      //getOrgId = '';
 
       setState(() {});
     }

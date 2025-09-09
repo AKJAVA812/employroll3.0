@@ -321,14 +321,16 @@ class _AttListState extends State<AttList> {
                             ],
                           ),
                         ),
-                        Padding(
-                          padding:  EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
+                        Expanded(
+                          child: Padding(
+                            padding:  EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
+                            child: Column(
+                              children: [
 
-                              "Working Hours".text.sm.make(),
-                              onDateAttModelGlobel!.workingHrs!.text.sm.make()
-                            ],
+                                "Work Hours".text.sm.make(),
+                                onDateAttModelGlobel!.workingHrs!.text.sm.make()
+                              ],
+                            ),
                           ),
                         ),
                       ],

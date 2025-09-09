@@ -22,60 +22,82 @@ class AttendanceReportModel {
 }
 
 class Data {
-  String? inTime;
   String? departmentName;
-  int? empId;
+  dynamic empId;
   String? employeeName;
   String? workingHrs;
   String? branchName;
-  var logId;
+  dynamic isShortLeave;
+  String? branch;
+  String? inTime;
+  String? updatedWorkingHour;
+  String? relaxationHour;
+  dynamic logId;
   String? attendanceDate;
+  String? shiftWorkingHour;
   String? outTime;
   String? applicationDate;
   String? status;
+  String? empCode;
 
   Data(
-      {
-        this.inTime,
-        this.departmentName,
+      {this.departmentName,
         this.empId,
         this.employeeName,
         this.workingHrs,
         this.branchName,
+        this.isShortLeave,
+        this.branch,
+        this.inTime,
+        this.updatedWorkingHour,
+        this.relaxationHour,
         this.logId,
         this.attendanceDate,
+        this.shiftWorkingHour,
         this.outTime,
         this.applicationDate,
-        this.status
-      });
+        this.status,
+        this.empCode});
 
   Data.fromJson(Map<String, dynamic> json) {
-    inTime = json['inTime'];
     departmentName = json['departmentName'];
     empId = json['empId'];
     employeeName = json['employeeName'];
     workingHrs = json['workingHrs'];
     branchName = json['branchName'];
+    isShortLeave = json['isShortLeave'];
+    branch = json['branch'];
+    inTime = json['inTime'];
+    updatedWorkingHour = json['updatedWorkingHour'];
+    relaxationHour = json['relaxationHour'];
     logId = json['logId'];
     attendanceDate = json['attendanceDate'];
+    shiftWorkingHour = json['shiftWorkingHour'];
     outTime = json['outTime'];
     applicationDate = json['applicationDate'];
     status = json['status'];
+    empCode = json['empCode'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['inTime'] = this.inTime;
     data['departmentName'] = this.departmentName;
     data['empId'] = this.empId;
     data['employeeName'] = this.employeeName;
     data['workingHrs'] = this.workingHrs;
     data['branchName'] = this.branchName;
+    data['isShortLeave'] = this.isShortLeave;
+    data['branch'] = this.branch;
+    data['inTime'] = this.inTime;
+    data['updatedWorkingHour'] = this.updatedWorkingHour;
+    data['relaxationHour'] = this.relaxationHour;
     data['logId'] = this.logId;
     data['attendanceDate'] = this.attendanceDate;
+    data['shiftWorkingHour'] = this.shiftWorkingHour;
     data['outTime'] = this.outTime;
     data['applicationDate'] = this.applicationDate;
     data['status'] = this.status;
+    data['empCode'] = this.empCode;
     return data;
   }
 }

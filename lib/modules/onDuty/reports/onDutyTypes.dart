@@ -358,7 +358,7 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
             leading: IconButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => HomePage()));
+                      MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
                 },
                 icon: Icon(Icons.arrow_back_ios)),
           ),

@@ -1,11 +1,11 @@
 
 class ApiDetails{
    //Base Server Address
-   //static var server="http://www.employroll.com/";
+   static var server="http://www.employroll.com/";
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   static var server="https://2bfb149d3489.ngrok.app/";
+   //static var server="https://405a725ce9ea.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -19,6 +19,7 @@ class ApiDetails{
    static var getOtherAttDetails = "/restful/service/ondate/log/for/attendance/req/for/non/ess/employees";
    static var pendingReqListRo = "/restful/service/att/requisation/list/for/mobile";
    static var pendingReqListApprove = "/restful/service/att/requisation/list/approval";
+   static var essAttendanceApprovedList = "/restful/service/att/requisation/approved/list/for/mobile/ess";
    static var pendingReqListDisapprove = "/restful/service/att/requisiton/disapprove/one/leave/req";
    static var approvedAttReqList = "/restful/service/att/requisation/approved/list/for/mobile";
    static var disApprovedAttReqList = "/restful/service/attendance/requisition/cancel/disapproved";
@@ -139,6 +140,7 @@ class ApiDetails{
    static var claimApproveDataApi = "restful/service/get/employee/self/claim/policy/list/level/one";
    static var claimApproveApi = "restful/service/claim/approver/level/wise/claim/approved";
    static var claimDisApproveApi = "restful/service/claim/approver/level/wise/claim/delete";
+   static var claimUpdateApi = "restful/service/self/claim/raise/update";
 
    //Induction APIs
    static var onboardingList = "restful/service/onboard/details/list";
@@ -171,7 +173,14 @@ class ApiDetails{
    static var reportingOfficerList = "restful/service/get/ro/list/of/an/emp";
 
    //Forget Password OTP Send API
-   static var otpSendApi = "restful/service/password/forget";
+   //static var otpSendApi = "restful/service/password/forget";
+   static var otpSendApi = "restful/service/send/password/forget/otp";
+   static var verifyOtpApi = "restful/service/forgot/password/verify/otp";
+   static var resetPasswordApi = "restful/service/forgot/password/update";
+
+   //Reset Password APIs
+   static var resetPasswordOtpSendApi = "restful/service/change/password/send/otp";
+   static var changePasswordApi = "restful/service/change/password/update";
 
    //Exit Process APIs
    static var exitSeparationListApi = "restful/service/workflow/base/sepration/mode/list";
@@ -190,5 +199,29 @@ class ApiDetails{
 
    //Organisation List
    static var orgListApi = "restful/service/org/details/master/list";
+
+   //Loan APIs
+   static var essLoanListApi = "restful/service/self/org/loans/list";
+   static var loanTypeMasterApi = "restful/service/loan/and/advance/master/list";
+   static var loanRequestRaiseApi = "restful/service/org/loan/and/advance/request/data/request/save";
+   static var loanSummaryApi = "restful/service/get/self/loan/summary";
+   static var loanLedgerApi = "restful/service/get/employee/updated/loan/ledger/debit/credit/list";
+   static var loanSkipListApi = "restful/service/get/employee/loan/ledger/details";
+   static var requestSkipInstalmentApi = "restful/service/employee/loan/skip/emp/request";
+   static var loanRequestUpdateApi = "restful/service/org/loan/and/advance/request/data/update";
+   static var loanRequestDeleteApi = "restful/service/org/loan/and/advance/pending/request/self/delete";
+   static var loanApproveL1Api = "restful/service/org/loan/approval/details/for/anEmp/level/one";
+   static var loanDisApproveL1Api = "restful/service/api/org/loan/disapproved/details/for/anEmp/level/one";
+   static var loanApproveL2Api = "restful/service/org/loan/approval/details/for/anEmp/level/two";
+   static var loanDisApproveL2Api = "restful/service/org/loan/disapproved/details/for/anEmp/level/two";
+   static var loanApproveL3Api = "restful/service/org/loan/approval/details/for/anEmp/level/three";
+   static var loanDisApproveL3Api = "restful/service/org/loan/disapproved/details/for/anEmp/level/three";
+   static var loanDataViewToApproveApi = "restful/service/loan/and/advance/details/ofEmployee/raise/list";
+
+   //MSS Loan APIs
+   static var mssLoanListApi = "restful/service/get/org/loans/and/advance/list/for/mss";
+
+   //Company Policy API
+   static var companyPolicyApi = "restful/service/policy/details/list";
 
 }

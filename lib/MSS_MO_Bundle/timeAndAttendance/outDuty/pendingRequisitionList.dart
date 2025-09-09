@@ -39,7 +39,7 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 List<Listdata>? allUsernew=[];
-List<Listdata>? foundDataNew=[];
+List<Listdata>? foundDataNewMO=[];
 bool isLoading = true;
 PendingOdReqList? pendingOdReqListLabel;
 PendingOdReqList? pendingOdReqListLabeled;
@@ -91,7 +91,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
         super.initState();
         setState(() {
           var listLength;
-          listLength = foundDataNew!.length;
+          listLength = foundDataNewMO!.length;
           print('listLength $listLength');
         });
       });
@@ -128,8 +128,8 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
       organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
-      selectedOrg = null;
-      getOrgId = '';
+      //selectedOrg = null;
+      //getOrgId = '';
 
       setState(() {});
     }
@@ -257,18 +257,18 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
 
                           getEmployeeList11.then((value) {
                             setState(() {
-                              foundDataNew = allUsernew;
+                              foundDataNewMO = allUsernew;
                               pendingOdReqListLabel = value;
                               pendingOdReqListLabeled = pendingOdReqListLabel;
-                              if(foundDataNew != null) {
-                                foundDataNew!.length;
-                                print("Fetch data $foundDataNew");
+                              if(foundDataNewMO != null) {
+                                foundDataNewMO!.length;
+                                print("Fetch data $foundDataNewMO");
                                 isLoading = false;
                               } else {
                                 Center(
                                   child: "There is no data available right now".text.make(),
                                 );
-                                foundDataNew = [];
+                                foundDataNewMO = [];
                               }
                             });
 
@@ -309,18 +309,18 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
 
     getEmployeeList11.then((value) {
       setState(() {
-        foundDataNew = allUsernew;
+        foundDataNewMO = allUsernew;
         pendingOdReqListLabel = value;
         pendingOdReqListLabeled = pendingOdReqListLabel;
-        if(foundDataNew != null) {
-          foundDataNew!.length;
-          print("Fetch data $foundDataNew");
+        if(foundDataNewMO != null) {
+          foundDataNewMO!.length;
+          print("Fetch data $foundDataNewMO");
           isLoading = false;
         } else {
           Center(
             child: "There is no data available right now".text.make(),
           );
-          foundDataNew = [];
+          foundDataNewMO = [];
         }
       });
 
@@ -424,7 +424,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewMO = results;
     });
   }
   TextEditingController searchType = TextEditingController();
@@ -644,9 +644,9 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
         return Future.value(false);
       },
       child: ListView.builder(
-        itemCount: foundDataNew!.length,
+        itemCount: foundDataNewMO!.length,
         itemBuilder: (context, itemCount) {
-          var statusCheck = foundDataNew![itemCount].approvalstatus;
+          var statusCheck = foundDataNewMO![itemCount].approvalstatus;
           if (statusCheck == 'Approved') {
             statusColor = Mythemes.successColor;
           } else if (statusCheck == 'DisApproved') {
@@ -692,7 +692,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                     children: [
                       Row(
                         children: [
-                          foundDataNew![itemCount].name
+                          foundDataNewMO![itemCount].name
                               .toString()
                               .text
                               .make()
@@ -703,7 +703,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              foundDataNew![itemCount].approvalstatus
+                              foundDataNewMO![itemCount].approvalstatus
                                   .toString()
                                   .text.bold
                                   .color(statusColor)
@@ -716,7 +716,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                       ),
                       Row(
                         children: [
-                          Expanded(child: foundDataNew![itemCount].odaddress
+                          Expanded(child: foundDataNewMO![itemCount].odaddress
                               .toString()
                               .text
                               .textStyle(context.captionStyle)
@@ -727,7 +727,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                       ),
                       Row(
                         children: [
-                          foundDataNew![itemCount].remark
+                          foundDataNewMO![itemCount].remark
                               .toString()
                               .text
                               .textStyle(context.captionStyle)
@@ -757,12 +757,12 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                                 top: 15, left: 5, right: 3, bottom: 18),
                             child: Column(
                               children: [
-                                foundDataNew![itemCount].odtype
+                                foundDataNewMO![itemCount].odtype
                                     .toString()
                                     .text
                                     .sm
                                     .make(),
-                                foundDataNew![itemCount].odtime
+                                foundDataNewMO![itemCount].odtime
                                     .toString()
                                     .text
                                     .sm
@@ -790,7 +790,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                               children: [
                                 "Date".text.sm.make(),
                                 DateFormat("dd-MM-yyyy")
-                                    .format(DateTime.parse(foundDataNew![itemCount].date
+                                    .format(DateTime.parse(foundDataNewMO![itemCount].date
                                         .toString()))
                                     .text
                                     .sm

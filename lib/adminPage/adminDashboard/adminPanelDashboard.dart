@@ -34,6 +34,9 @@ class AdminPanelDashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanelPermission;
+dynamic defaultProfileId;
+String? defaultProfileName;
 DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
@@ -79,6 +82,9 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPermission = await shared.getUserPanel();
+    defaultProfileName = await shared.getDefaultProfileName();
+    defaultProfileId = await shared.getDefaultProfileId();
     Future<DashboardModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
@@ -163,7 +169,9 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId"
+        "userPermission=$userPanelPermission&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');

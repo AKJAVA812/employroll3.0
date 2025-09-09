@@ -37,6 +37,10 @@ class Admin_MSS_MO_Dashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanelPermission;
+dynamic getOrgId;
+dynamic defaultProfileId;
+String? defaultProfileName;
 DashboardModel? dashboardModelGlobal;
 BranchListModal? branchListModalGloabal;
 ShiftListModal? shiftListModalGlobal;
@@ -81,6 +85,9 @@ class _Admin_MSS_MO_DashboardState extends State<Admin_MSS_MO_Dashboard> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPermission = await shared.getUserPanel();
+    defaultProfileName = await shared.getDefaultProfileName();
+    defaultProfileId = await shared.getDefaultProfileId();
     setState(() {
       isLoading = true; // Start loading
     });
@@ -170,7 +177,9 @@ class _Admin_MSS_MO_DashboardState extends State<Admin_MSS_MO_Dashboard> {
     //print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId"
+        "userPermission=$userPanelPermission&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');

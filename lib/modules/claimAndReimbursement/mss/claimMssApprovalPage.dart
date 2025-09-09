@@ -777,7 +777,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                   color: Mythemes.blackish),
                             ),
                           ).p8(),
-
                         ),
                       ],
                     ),

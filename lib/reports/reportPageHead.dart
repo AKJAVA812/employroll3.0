@@ -40,6 +40,9 @@ int? adminRoles;
 bool showHide = false;
 bool showAdmin = false;
 bool showRo = false;
+String? userPanel;
+String? profileName;
+dynamic profileId;
 
 class _ReportPageHeadState extends State<ReportPageHead> {
   int currentIndex = 0;
@@ -64,6 +67,9 @@ class _ReportPageHeadState extends State<ReportPageHead> {
     print('Show Payroll: ${setShowPayroll}');
     print('OrgId -  ${orgId}');
     print('OrgName - : ${orgName}');
+    userPanel= await shared.getUserPanel();
+    profileName= await shared.getDefaultProfileName();
+    profileId= await shared.getDefaultProfileId();
     setState(() {
 
     });
@@ -125,7 +131,7 @@ class _ReportPageHeadState extends State<ReportPageHead> {
       print("CheckOrg - $orgId");
       List<Widget> items = [];
 
-      if(showHide || showAdmin){
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN"){
         items.add(
           Hero(
             tag: 'myAttendance',
@@ -168,7 +174,7 @@ class _ReportPageHeadState extends State<ReportPageHead> {
         );
       }
 
-      if(showHide) {
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
         items.add(
           Hero(
             tag: 'leaveBalance',
@@ -274,17 +280,17 @@ class _ReportPageHeadState extends State<ReportPageHead> {
         );
       }
 
-
-      items.add(
-        Hero(
-          tag: 'workDoneReport',
-          child: Card(
-            color: Mythemes.whitish,
-            child: InkWell(
-              onTap: (){
-                Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
-                //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
-                /*Fluttertoast.showToast(
+      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+        items.add(
+          Hero(
+            tag: 'workDoneReport',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
+                  //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
+                  /*Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
@@ -293,38 +299,147 @@ class _ReportPageHeadState extends State<ReportPageHead> {
                     textColor: Colors.white,
                     fontSize: 16.0
                 );*/
-              },
-              child: Stack(
-                children: <Widget>[
-                  Center(
-                    child: Icon(
-                      Icons.work_history,
-                      size: 50,
-                      color: Mythemes.successColor,
-                    ),
-                    /*Image(
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.work_history,
+                        size: 50,
+                        color: Mythemes.successColor,
+                      ),
+                      /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                  ),
-                  Center(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 75, left: 10),
-                      padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                      child: Text(
-                          'Work Done',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style:
-                          TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Work Done',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
+      }
+
+      //My Loan Summary
+      if(orgId == 3 || orgId == 145){
+        items.add(
+          Hero(
+            tag: 'myLoanSummary',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, MyRoutings.myLoanSummaryRoute);
+                  //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
+                  /*Fluttertoast.showToast(
+                    msg: "Not Activated",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                );*/
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.summarize,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Loan Summary',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //My Loan Ledger
+      if(orgId == 3 || orgId == 145){
+        items.add(
+          Hero(
+            tag: 'myLoanLedger',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, MyRoutings.myLoanLedgerRoute);
+                  //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
+                  /*Fluttertoast.showToast(
+                    msg: "Not Activated",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black,
+                    textColor: Colors.white,
+                    fontSize: 16.0
+                );*/
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.checklist_rounded,
+                        size: 50,
+                        color: Mythemes.warningColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Loan Ledger',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
 
 
       /*if(showRo  || showAdmin) {
@@ -430,7 +545,7 @@ class _ReportPageHeadState extends State<ReportPageHead> {
     return Material(
       child: Scaffold(
         appBar: AppBar(
-          title: "Reports".text.make(),
+          title: "My Reports".text.make(),
         ),
         body: GridView.count(
           crossAxisCount: 3,

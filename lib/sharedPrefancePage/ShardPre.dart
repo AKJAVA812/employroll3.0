@@ -39,6 +39,20 @@ class SessionManager {
     return sessionId;
   }
 
+  setAppVersion(sessionId) async {
+    // Obtain shared preferences.
+    sharedPreferences = await SharedPreferences.getInstance();
+    // Save an String value to 'action' key.
+    await sharedPreferences.setString('appVersion', sessionId);
+  }
+
+  getAppVersion() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final String? appVersion = sharedPreferences.getString('appVersion');
+    return appVersion;
+  }
+
+
   setName(empName) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -536,6 +550,37 @@ class SessionManager {
     final String? exitShow = prefs.getString('exitShow');
     return exitShow;
   }
+  setLoanApprovalL1Show(loanApprovalL1Show) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loanApprovalL1Show', loanApprovalL1Show);
+  }
+
+  getLoanApprovalL1Show() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? loanApprovalL1Show = prefs.getString('loanApprovalL1Show');
+    return loanApprovalL1Show;
+  }
+  setLoanApprovalL2Show(loanApprovalL2Show) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loanApprovalL2Show', loanApprovalL2Show);
+  }
+
+  getLoanApprovalL2Show() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? loanApprovalL2Show = prefs.getString('loanApprovalL2Show');
+    return loanApprovalL2Show;
+  }
+
+  setLoanApprovalL3Show(loanApprovalL3Show) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loanApprovalL3Show', loanApprovalL3Show);
+  }
+
+  getLoanApprovalL3Show() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? loanApprovalL3Show = prefs.getString('loanApprovalL3Show');
+    return loanApprovalL3Show;
+  }
 
   setUserPanel(userPanel) async {
     // Obtain shared preferences.
@@ -649,6 +694,93 @@ class SessionManager {
     return prefs.getString('od_pending_mo_permission');
   }
 
+  //Loan Pending List Permission
+  Future<void> setLoanPendingListMO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_pending_mo_permission', value);
+  }
+
+  Future<String?> getLoanPendingListMO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_pending_mo_permission');
+  }
+  Future<void> setLoanApprovalL1MO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l1_mo_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL1MO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l1_mo_permission');
+  }
+  Future<void> setLoanApprovalDeleteL1MO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l1_delete_mo_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL1MO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l1_delete_mo_permission');
+  }
+  Future<void> setLoanApprovalL2MO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l2_mo_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL2MO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l2_mo_permission');
+  }
+  Future<void> setLoanApprovalDeleteL2MO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l2_delete_mo_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL2MO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l2_delete_mo_permission');
+  }
+  Future<void> setLoanApprovalL3MO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l3_mo_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL3MO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l3_mo_permission');
+  }
+  Future<void> setLoanApprovalDeleteL3MO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l3_delete_mo_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL3MO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l3_delete_mo_permission');
+  }
+
+  //Pending Attendance L1
+  Future<void> setPendingAttendanceReqL1MO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_att_mo_l1_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqL1MO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_att_mo_l1_permission');
+  }
+
+  //Pending Attendance L2
+  Future<void> setPendingAttendanceReqL2MO(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_att_mo_l2_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqL2MO() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_att_mo_l2_permission');
+  }
+
   //MSS Permissions
   //Pending Attendance Request Permission & Others Attendance Request Permission
   Future<void> setPendingAttendanceReqMSSPermission(String value) async {
@@ -721,6 +853,94 @@ class SessionManager {
   Future<String?> getODPendingList() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('od_pending_permission');
+  }
+  //OD Pending List Permission
+  Future<void> setLoanPendingList(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_pending_permission', value);
+  }
+
+  Future<String?> getLoanPendingList() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_pending_permission');
+  }
+
+  Future<void> setLoanApprovalL1MSS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l1_mss_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL1MSS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l1_mss_permission');
+  }
+  Future<void> setLoanApprovalDeleteL1MSS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l1_delete_mss_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL1MSS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l1_delete_mss_permission');
+  }
+  Future<void> setLoanApprovalL2MSS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l2_mss_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL2MSS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l2_mss_permission');
+  }
+  Future<void> setLoanApprovalDeleteL2MSS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l2_delete_mss_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL2MSS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l2_delete_mss_permission');
+  }
+  Future<void> setLoanApprovalL3MSS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l3_mss_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL3MSS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l3_mss_permission');
+  }
+  Future<void> setLoanApprovalDeleteL3MSS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l3_delete_mss_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL3MSS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l3_delete_mss_permission');
+  }
+
+
+  //Pending Attendance L1
+  Future<void> setPendingAttendanceReqL1MSS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_att_mss_l1_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqL1MSS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_att_mss_l1_permission');
+  }
+
+  //Pending Attendance L2
+  Future<void> setPendingAttendanceReqL2MSS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_att_mss_l2_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqL2MSS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_att_mss_l2_permission');
   }
 
   //UIS Permissions
@@ -795,5 +1015,93 @@ class SessionManager {
   Future<String?> getODPendingListUIS() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('od_pending_uis_permission');
+  }
+  //OD Pending List Permission
+  Future<void> setLoanPendingListUIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_pending_uis_permission', value);
+  }
+
+  Future<String?> getLoanPendingListUIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_pending_uis_permission');
+  }
+
+  Future<void> setLoanApprovalL1UIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l1_uis_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL1UIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l1_uis_permission');
+  }
+  Future<void> setLoanApprovalDeleteL1UIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l1_delete_uis_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL1UIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l1_delete_uis_permission');
+  }
+  Future<void> setLoanApprovalL2UIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l2_uis_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL2UIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l2_uis_permission');
+  }
+  Future<void> setLoanApprovalDeleteL2UIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l2_delete_uis_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL2UIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l2_delete_uis_permission');
+  }
+  Future<void> setLoanApprovalL3UIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l3_uis_permission', value);
+  }
+
+  Future<String?> getLoanApprovalL3UIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l3_uis_permission');
+  }
+  Future<void> setLoanApprovalDeleteL3UIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('loan_approval_l3_delete_uis_permission', value);
+  }
+
+  Future<String?> getLoanApprovalDeleteL3UIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('loan_approval_l3_delete_uis_permission');
+  }
+
+
+  //Pending Attendance L1
+  Future<void> setPendingAttendanceReqL1UIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_att_uis_l1_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqL1UIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_att_uis_l1_permission');
+  }
+
+  //Pending Attendance L2
+  Future<void> setPendingAttendanceReqL2UIS(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('pending_att_uis_l2_permission', value);
+  }
+
+  Future<String?> getPendingAttendanceReqL2UIS() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('pending_att_uis_l2_permission');
   }
 }

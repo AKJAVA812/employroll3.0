@@ -21,7 +21,6 @@ import '../../../../themes/empThemes.dart';
 import '../../../modules/onDuty/reports/onDutyTypes.dart';
 import '../../../modules/onDuty/reports/pendingRequisition/modalClass/pendingOdReqList.dart';
 import '../../../modules/onDuty/reports/pendingRequisition/odAttendanceApproval.dart';
-
 class MSS_PendingOdRequisition extends StatefulWidget {
   final PendingOdReqList pendingOdReqList;
 
@@ -37,8 +36,10 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+dynamic userPanel;
+dynamic getProfileId;
 List<Listdata>? allUsernew=[];
-List<Listdata>? foundDataNew=[];
+List<Listdata>? foundDataNewMSS=[];
 bool isLoading = true;
 PendingOdReqList? pendingOdReqListLabel;
 PendingOdReqList? pendingOdReqListLabeled;
@@ -88,13 +89,15 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
     setState(() {
       getSharedPrfanceList();
       var listLength;
-      listLength = foundDataNew!.length;
+      listLength = foundDataNewMSS!.length;
       print('listLength $listLength');
     });
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingOdReqList> getEmployeeList11 =
         getPendingOdReqList(sessionId!);
@@ -108,18 +111,18 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
 
     getEmployeeList11.then((value) {
       setState(() {
-        foundDataNew = allUsernew;
+        foundDataNewMSS = allUsernew;
         pendingOdReqListLabel = value;
         pendingOdReqListLabeled = pendingOdReqListLabel;
-        if(foundDataNew != null) {
-          foundDataNew!.length;
-          print("Fetch data $foundDataNew");
+        if(foundDataNewMSS != null) {
+          foundDataNewMSS!.length;
+          print("Fetch data $foundDataNewMSS");
           isLoading = false;
         } else {
           Center(
             child: "There is no data available right now".text.make(),
           );
-          foundDataNew = [];
+          foundDataNewMSS = [];
         }
       });
 
@@ -136,7 +139,10 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
         "sessionId=$SessionId&"
         "odStatus=$odStatus&"
         "startDate=$startDate&"
-        "endDate=$endDate");
+        "endDate=$endDate&"
+        "userPermission=$userPanel&"
+        "profileId=$getProfileId&"
+        "orgId=0");
 
     final response = await http.post(urlapi);
     print('URL ${response.request}');
@@ -220,7 +226,7 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNewMSS = results;
     });
   }
   TextEditingController searchType = TextEditingController();
@@ -440,9 +446,9 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
         return Future.value(false);
       },
       child: ListView.builder(
-        itemCount: foundDataNew!.length,
+        itemCount: foundDataNewMSS!.length,
         itemBuilder: (context, itemCount) {
-          var statusCheck = foundDataNew![itemCount].approvalstatus;
+          var statusCheck = foundDataNewMSS![itemCount].approvalstatus;
           if (statusCheck == 'Approved') {
             statusColor = Mythemes.successColor;
           } else if (statusCheck == 'DisApproved') {
@@ -488,7 +494,7 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
                     children: [
                       Row(
                         children: [
-                          foundDataNew![itemCount].name
+                          foundDataNewMSS![itemCount].name
                               .toString()
                               .text
                               .make()
@@ -499,7 +505,7 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              foundDataNew![itemCount].approvalstatus
+                              foundDataNewMSS![itemCount].approvalstatus
                                   .toString()
                                   .text.bold
                                   .color(statusColor)
@@ -510,25 +516,33 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
                           ))
                         ],
                       ),
-                      Row(
-                        children: [
-                          Expanded(child: foundDataNew![itemCount].odaddress
-                              .toString()
-                              .text
-                              .textStyle(context.captionStyle)
-                              .make()
-                              .px8(),)
-
-                        ],
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0), // Apply padding outside
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: foundDataNewMSS![itemCount]
+                                  .odaddress
+                                  .toString()
+                                  .text
+                                  .textStyle(context.captionStyle)
+                                  .overflow(TextOverflow.ellipsis)
+                                  .maxLines(2)
+                                  .make(),
+                            ),
+                          ],
+                        ),
                       ),
                       Row(
                         children: [
-                          foundDataNew![itemCount].remark
+                          Expanded(child: foundDataNewMSS![itemCount].remark
                               .toString()
                               .text
                               .textStyle(context.captionStyle)
+                              .overflow(TextOverflow.ellipsis)
+                              .maxLines(2)
                               .make()
-                              .px8(),
+                              .px8())
                         ],
                       ),
                       Row(
@@ -553,12 +567,12 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
                                 top: 15, left: 5, right: 3, bottom: 18),
                             child: Column(
                               children: [
-                                foundDataNew![itemCount].odtype
+                                foundDataNewMSS![itemCount].odtype
                                     .toString()
                                     .text
                                     .sm
                                     .make(),
-                                foundDataNew![itemCount].odtime
+                                foundDataNewMSS![itemCount].odtime
                                     .toString()
                                     .text
                                     .sm
@@ -586,7 +600,7 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
                               children: [
                                 "Date".text.sm.make(),
                                 DateFormat("dd-MM-yyyy")
-                                    .format(DateTime.parse(foundDataNew![itemCount].date
+                                    .format(DateTime.parse(foundDataNewMSS![itemCount].date
                                         .toString()))
                                     .text
                                     .sm

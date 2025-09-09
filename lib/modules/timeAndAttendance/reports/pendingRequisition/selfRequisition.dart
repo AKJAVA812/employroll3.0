@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
+import 'package:er_flutter_project/ess/myAllRequestsPage.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_app/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
@@ -105,6 +106,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
         foundDataNew = allUsernew;
         selfRequisitionLabel = value;
         selfRequisitionLabeled = selfRequisitionLabel;
+
         if(foundDataNew != null) {
           foundDataNew!.length;
           print("Fetch data $foundDataNew");
@@ -114,11 +116,12 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
           );
           foundDataNew = [];
         }
-
+        print("Attendance Request Data - $selfRequisitionLabeled");
       });
 
       //print('employeeList00${selfRequisitionLabel!.data!.length}');
     });
+
   }
 
   showNodata(BuildContext buildContext, result,reason) {
@@ -141,7 +144,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
         TextButton(
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
-            Navigator.pop(buildContext);
+            //Navigator.pop(buildContext);
             setState(() {
 
             });
@@ -163,6 +166,9 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.selfAttRequisitionList;
     print('employeeList11: ${SessionId}');
+    setState(() {
+      _isLoading = true;
+    });
     SelfRequisitionModel selfRequisitionModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await http.post(urlapi);
@@ -178,7 +184,14 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
     }
 
     selfRequisitionModel = SelfRequisitionModel.fromJson(mapResponse);
-    allUsernew = selfRequisitionModel.data!;
+    if (selfRequisitionModel.data != null) {
+      allUsernew = selfRequisitionModel.data!;
+    } else {
+      allUsernew = []; // or handle accordingly
+    }
+    setState(() {
+      _isLoading = false;
+    });
     return selfRequisitionModel;
   }
 
@@ -215,7 +228,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
       foundDataNew = results;
     });
   }
-
+  bool _isLoading = true;
   var titleName = "My Attendance Requests";
   int pageIndex = 0;
   int currentIndex = 2;
@@ -244,7 +257,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                 ),
                 backIcon: Icons.arrow_back_ios,
                 backIconColor: Mythemes.black,
-                //previousScreen:  TimeAndAttendanceReports(),
+                previousScreen:  MyAllRequestPage(),
                 textStyle: TextStyle(fontSize: 14),
                 onChanged: (value) {
                   _runFilter(value);
@@ -316,7 +329,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
                     if(value == 1) {
-                      Navigator.pushNamed(context, MyRoutings.approvedReqRoute);
+                      Navigator.pushNamed(context, MyRoutings.essAttendanceApprovedReq);
                     }
                     if(value == 2) {
                       Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
@@ -326,9 +339,12 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
               ],
             ).py(4),
             Expanded(
-                child: selfRequisitionLabeled == null
-                    ? Center(child: CircularProgressIndicator())
-                    : getEmpReqList(selfRequisitionLabeled!)),
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : selfRequisitionLabeled == null
+                  ? Center(child: Text('Click on + icon to raise the attendance request.'))
+                  : getEmpReqList(selfRequisitionLabeled!),
+            ),
           ],
         ),
       ),
@@ -459,7 +475,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              "Pending"
+                              foundDataNew![i].status.toString()
                                   .text.bold
                                   .color(Mythemes.lightBluishColor)
                                   .sm
@@ -520,7 +536,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                                 Icon(
                                   Icons.touch_app,
                                   size: 35,
-                                  color: Mythemes.lightBluishColor,
+                                  color: Mythemes.dangerColor,
                                 ),
                               ],
                             ),
@@ -614,6 +630,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                     maintainState: true,
                   ));
               cancelSelfAttRequisition(reqId.toString());
+              Navigator.of(buildContext, rootNavigator: true).pop();
             },
             child: Container(
               child: Text(
@@ -634,34 +651,68 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
   Future<void> cancelSelfAttRequisition(String reqId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.cancelSelfAttReqList;
-    CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "reqId=$reqId");
-    final response = await http.post(urlapi);
-    print('URL ${response.request}');
-    if (response.statusCode == 200) {
-      var responseResult = response.body;
-      print('Response: $responseResult');
 
+    if (!mounted) return;
+    CommonNotificationPage.showLoaderDialog(context);
+    print("🔄 Loader shown...");
+
+    try {
+      var urlapi = Uri.parse("$conn$apiUrl?"
+          "sessionId=$sessionId&"
+          "reqId=$reqId");
+
+      final response = await http.post(urlapi);
+      print('🌍 URL: ${response.request}');
+      print('📩 Raw Response: ${response.body}');
+
+      String result = "unknown";
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> mapResponse = json.decode(response.body);
+        result = mapResponse['result']?.toString() ?? "unknown";
+        print("📌 API Result: $result");
+      } else {
+        print("❌ API Error ${response.statusCode}");
+      }
+
+      // ✅ Always close loader no matter success/failure
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
       }
-        Map<String, dynamic> mapResponse = json.decode(response.body); // ✅ Parse JSON properly
-        String result = mapResponse['result'].toString(); // ✅ Extract result
 
-        print('API Result: $result');
-
+      // ✅ Now show popup depending on result
+      if (mounted) {
         if (result.compareToIgnoringCase("success") == 0) {
-          CommonNotificationPage.showDialgSucess(context, "Requisition Deleted Successfully !", "Success.");
-          Future.delayed(Duration(seconds: 1), () {
-            if (mounted) {
-              Navigator.of(context, rootNavigator: true).pop();
-            }
+          CommonNotificationPage.showDialgSucess(
+            context,
+            "Requisition Deleted Successfully !",
+            "Success.",
+          );
+          // Close current screen after success
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) Navigator.pop(context);
           });
         } else if (result.compareToIgnoringCase("failed") == 0) {
-          CommonNotificationPage.showDialgSucess(context, "Please check the network connection!", "Failed"); // ✅ Show dialog on failure
+          CommonNotificationPage.showDialgSucess(
+            context,
+            "Please check the network connection!",
+            "Failed",
+          );
+        } else {
+          CommonNotificationPage.showDialgSucess(
+            context,
+            "Unexpected response: $result",
+            "Error",
+          );
         }
+      }
+
+    } catch (e) {
+      print("❌ Exception: $e");
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop(); // ✅ close loader
+        CommonNotificationPage.showDialgSucess(context, "Exception: $e", "Error");
+      }
     }
   }
 }

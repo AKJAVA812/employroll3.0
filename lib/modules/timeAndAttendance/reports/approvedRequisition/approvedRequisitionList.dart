@@ -31,6 +31,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+dynamic userPanelPerm;
+dynamic getProfileId;
 
 ApprovedRequisitionModel? approvedRequisitionLabel;
 
@@ -66,6 +68,8 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanelPerm = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<ApprovedRequisitionModel> getAppReq11 = getApprovedReqList(sessionId!);
     final loading = Row(
@@ -89,8 +93,13 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
     String apiUrl = ApiDetails.approvedAttReqList;
     print('employeeList11: ${SessionId}');
     ApprovedRequisitionModel approvedRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "userPermission=$userPanelPerm&"
+        "profileId=$getProfileId&"
+        "orgId=0");
     final response = await http.post(urlapi);
+    print('Attendance Approved APIs - ${response.request}');
 
     print('responseemployeeList ${response.body}');
 

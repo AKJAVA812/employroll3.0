@@ -40,6 +40,7 @@ class MSSDashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+String? userPanel;
 String? defaultProfileName;
 dynamic defaultProfileId;
 DashboardModel? dashboardModelGlobal;
@@ -90,6 +91,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
       isLoading = true; // Start loading
     });
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
     defaultProfileName = await shared!.getDefaultProfileName();
     defaultProfileId = await shared!.getDefaultProfileId();
     print("Default Profile Name - $defaultProfileName");
@@ -181,7 +183,9 @@ class _MSSDashboardState extends State<MSSDashboard> {
     //print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('BRANCH URL ${response.request}');
@@ -364,7 +368,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
             ],
           ),
         ),
-        actions: [
+        /*actions: [
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert),
             onSelected: (String value) {
@@ -385,7 +389,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
               ),
             ],
           ),
-        ],
+        ],*/
       ),
       body: dashboardModelGlobal == null
           ? loader()

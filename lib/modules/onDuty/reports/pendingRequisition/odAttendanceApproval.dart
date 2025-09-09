@@ -17,7 +17,9 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:er_flutter_project/MSS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
+import 'package:er_flutter_project/MSS_MO_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
+import 'package:er_flutter_project/UIS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
 class OdApproveDisapproveReq extends StatefulWidget {
   PendingOdReqList? pendingOdReqList;
   int indexCont;
@@ -27,6 +29,9 @@ class OdApproveDisapproveReq extends StatefulWidget {
   State<OdApproveDisapproveReq> createState() => _OdApproveDisapproveReqState(pendingOdReqList, indexCont);
 }
 
+dynamic userPanel;
+dynamic getProfileId;
+
 class _OdApproveDisapproveReqState extends State<OdApproveDisapproveReq> {
   PendingOdReqList? pendingOdReqList;
   int indexCont;
@@ -35,6 +40,7 @@ class _OdApproveDisapproveReqState extends State<OdApproveDisapproveReq> {
   var titleName = "Approved OD Requisition";
   int pageIndex = 0;
   int currentIndex = 2;
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -161,13 +167,6 @@ class _RadioGroupsState extends State<RadioGroups> {
 
   @override
   void initState() {
-    empName = foundDataNew![indexCont].name;
-    odDate = foundDataNew![indexCont].date;
-    odType = foundDataNew![indexCont].odtype;
-    odTime = foundDataNew![indexCont].odtime;
-    odAddress = foundDataNew![indexCont].odaddress;
-    odRemark = foundDataNew![indexCont].remark;
-    odId = foundDataNew![indexCont].id;
     getSharedPrfanceList();
     // TODO: implement initState
     super.initState();
@@ -176,16 +175,43 @@ class _RadioGroupsState extends State<RadioGroups> {
   Future getSharedPrfanceList() async {
     //await Future.delayed(Duration(seconds: 1));
     sessionId = await shared!.getSessionId()??"N/A";
+    userPanel = await shared!.getUserPanel()??"N/A";
+    getProfileId = await shared!.getDefaultProfileId()??"N/A";
+
+
     setState(() {
-      print('ResponseAttendance: ${sessionId}' );
+      if(userPanel == "MSS") {
+        empName = foundDataNewMSS![indexCont].name;
+        odDate = foundDataNewMSS![indexCont].date;
+        odType = foundDataNewMSS![indexCont].odtype;
+        odTime = foundDataNewMSS![indexCont].odtime;
+        odAddress = foundDataNewMSS![indexCont].odaddress;
+        odRemark = foundDataNewMSS![indexCont].remark;
+        odId = foundDataNewMSS![indexCont].id;
+      }
+      if(userPanel == "MSS_MO") {
+        empName = foundDataNewMO![indexCont].name;
+        odDate = foundDataNewMO![indexCont].date;
+        odType = foundDataNewMO![indexCont].odtype;
+        odTime = foundDataNewMO![indexCont].odtime;
+        odAddress = foundDataNewMO![indexCont].odaddress;
+        odRemark = foundDataNewMO![indexCont].remark;
+        odId = foundDataNewMO![indexCont].id;
+      }
+      if(userPanel == "USER") {
+        empName = foundDataNewUIS![indexCont].name;
+        odDate = foundDataNewUIS![indexCont].date;
+        odType = foundDataNewUIS![indexCont].odtype;
+        odTime = foundDataNewUIS![indexCont].odtime;
+        odAddress = foundDataNewUIS![indexCont].odaddress;
+        odRemark = foundDataNewUIS![indexCont].remark;
+        odId = foundDataNewUIS![indexCont].id;
+      }
     });
 
   }
   @override
   Widget build(BuildContext context) {
-
-
-
 
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),

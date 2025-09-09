@@ -22,62 +22,98 @@ class PendingRequisitionModel {
 }
 
 class Data {
-  String? inTime;
-  String? empId;
-  String? onDate;
-  int? requestId;
-  String? empName;
-  String? inRemarks;
-  String? outRemarks;
-  String? actualInTime;
-  String? actualOutTime;
-  String? department;
-  String? branch;
-  String? outTime;
+  dynamic empId;
+  dynamic attendanceRequisionType;
+  dynamic compOffRequistionType;
+  dynamic outRemarks;
+  dynamic actualInTime;
+  dynamic isShortLeave;
+  dynamic branch;
+  dynamic inTime;
+  dynamic updatedWorkingHour;
+  dynamic relaxationHour;
+  dynamic nightRequistionType;
+  dynamic onDate;
+  dynamic requestId;
+  dynamic empName;
+  dynamic inRemarks;
+  dynamic actualOutTime;
+  dynamic department;
+  dynamic shiftWorkingHour;
+  dynamic outTime;
+  dynamic status;
+  dynamic shortLeaveRequistionType;
 
   Data(
-      {this.inTime,
-        this.empId,
+      {this.empId,
+        this.attendanceRequisionType,
+        this.compOffRequistionType,
+        this.outRemarks,
+        this.actualInTime,
+        this.isShortLeave,
+        this.branch,
+        this.inTime,
+        this.updatedWorkingHour,
+        this.relaxationHour,
+        this.nightRequistionType,
         this.onDate,
         this.requestId,
         this.empName,
         this.inRemarks,
-        this.outRemarks,
-        this.actualInTime,
         this.actualOutTime,
         this.department,
-        this.branch,
-        this.outTime});
+        this.shiftWorkingHour,
+        this.outTime,
+        this.status,
+        this.shortLeaveRequistionType});
 
   Data.fromJson(Map<String, dynamic> json) {
-    inTime = json['inTime'];
     empId = json['empId'];
+    attendanceRequisionType = json['attendanceRequisionType'];
+    compOffRequistionType = json['compOffRequistionType'];
+    outRemarks = json['outRemarks'];
+    actualInTime = json['actualInTime'];
+    isShortLeave = json['isShortLeave'];
+    branch = json['branch'];
+    inTime = json['inTime'];
+    updatedWorkingHour = json['updatedWorkingHour'];
+    relaxationHour = json['relaxationHour'];
+    nightRequistionType = json['nightRequistionType'];
     onDate = json['onDate'];
     requestId = json['requestId'];
     empName = json['empName'];
     inRemarks = json['inRemarks'];
-    outRemarks = json['outRemarks'];
-    actualInTime = json['actualInTime'];
     actualOutTime = json['actualOutTime'];
     department = json['department'];
-    branch = json['branch'];
+    shiftWorkingHour = json['shiftWorkingHour'];
     outTime = json['outTime'];
+    status = json['status'];
+    shortLeaveRequistionType = json['shortLeaveRequistionType'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['inTime'] = this.inTime;
     data['empId'] = this.empId;
+    data['attendanceRequisionType'] = this.attendanceRequisionType;
+    data['compOffRequistionType'] = this.compOffRequistionType;
+    data['outRemarks'] = this.outRemarks;
+    data['actualInTime'] = this.actualInTime;
+    data['isShortLeave'] = this.isShortLeave;
+    data['branch'] = this.branch;
+    data['inTime'] = this.inTime;
+    data['updatedWorkingHour'] = this.updatedWorkingHour;
+    data['relaxationHour'] = this.relaxationHour;
+    data['nightRequistionType'] = this.nightRequistionType;
     data['onDate'] = this.onDate;
     data['requestId'] = this.requestId;
     data['empName'] = this.empName;
     data['inRemarks'] = this.inRemarks;
-    data['outRemarks'] = this.outRemarks;
-    data['actualInTime'] = this.actualInTime;
     data['actualOutTime'] = this.actualOutTime;
     data['department'] = this.department;
-    data['branch'] = this.branch;
+    data['shiftWorkingHour'] = this.shiftWorkingHour;
     data['outTime'] = this.outTime;
+    data['status'] = this.status;
+    data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;
     return data;
   }
 }

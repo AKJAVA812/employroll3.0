@@ -45,19 +45,28 @@ import 'package:http_parser/http_parser.dart';
 
 class MarkAttendanceAIMSS extends StatefulWidget {
   final dynamic empId;
+  final dynamic empName;
+  final dynamic empFace;
   const MarkAttendanceAIMSS(
-      {super.key, required this.empId});
+      {super.key, required this.empId, this.empName,this.empFace});
   @override
-  State<MarkAttendanceAIMSS> createState() => _MarkAttendanceAIMSSState(empId.toString());
+  State<MarkAttendanceAIMSS> createState() => _MarkAttendanceAIMSSState(empId.toString(),empName.toString(),empFace.toString());
 }
 dynamic empIdReceived;
-
+dynamic empNameReceived;
+dynamic empFaceReceived;
+dynamic selfEmpName;
+dynamic selfEmpPhoto;
 class _MarkAttendanceAIMSSState extends State<MarkAttendanceAIMSS> {
   final dynamic  empIdReceive;
-  _MarkAttendanceAIMSSState(this.empIdReceive);
+  final dynamic  empNameReceive;
+  final dynamic  empFaceReceive;
+  _MarkAttendanceAIMSSState(this.empIdReceive, this.empNameReceive,this.empFaceReceive);
   int pageIndex = 0;
   int currentIndex = 2;
   dynamic empIdSelfReceive;
+  dynamic empNameSelfReceive;
+  dynamic empFaceSelfReceive;
   @override
   void initState() {
     getSharedPrfanceList();
@@ -74,7 +83,11 @@ class _MarkAttendanceAIMSSState extends State<MarkAttendanceAIMSS> {
     print('roRole $roRole');
     print('adminRole $adminRole');
     empIdReceived = empId;
+    empNameReceived = empName;
+    empFaceReceived = empFace;
     empIdSelfReceive = empIdSelf;
+    selfEmpName = await shared.getempName();
+    selfEmpPhoto = await shared.getProfileImage();
     print("EMP ID REC -$empId");
     setState(() {
       if(empRole==1){
@@ -832,15 +845,15 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
                 Card(
                   child: ListTile(
                     //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
-                    //title: Text(UserName),
-                    title: Text(currentAddress),
+                    title: value == 1 ? Text(empNameReceived) :  Text(selfEmpName),
+                    subtitle: Text(currentAddress),
                     //subtitle: Text('$currentAddress'),
                     leading: Container(
                       child:CircleAvatar(
                         radius: 30,
-                        //backgroundImage: Icon(Icons.pin_drop),
-                        backgroundColor: Mythemes.whitish,
-                        child: Icon(Icons.pin_drop, size: 40, color: Mythemes.lightBluishColor,),
+                        backgroundImage: value == 1 ? NetworkImage(empFaceReceived!) : NetworkImage(selfEmpPhoto!),
+                        backgroundColor: Colors.grey,
+                        // child: Image.network(imageString!),
                       ),
                     ),
                   ),

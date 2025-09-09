@@ -32,18 +32,20 @@ class Data {
   String? creationDate;
   String? outTime;
   int? reqId;
+  String? status;
 
   Data(
       {this.inTime,
-      this.empId,
-      this.employeeName,
-      this.inTimeRemark,
-      this.reqDate,
-      this.empDetailsId,
-      this.outTimeRemark,
-      this.creationDate,
-      this.outTime,
-      this.reqId});
+        this.empId,
+        this.employeeName,
+        this.inTimeRemark,
+        this.reqDate,
+        this.empDetailsId,
+        this.outTimeRemark,
+        this.creationDate,
+        this.outTime,
+        this.reqId,
+        this.status});
 
   Data.fromJson(Map<String, dynamic> json) {
     inTime = json['inTime'];
@@ -56,6 +58,7 @@ class Data {
     creationDate = json['creationDate'];
     outTime = json['outTime'];
     reqId = json['reqId'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -70,6 +73,7 @@ class Data {
     data['creationDate'] = this.creationDate;
     data['outTime'] = this.outTime;
     data['reqId'] = this.reqId;
+    data['status'] = this.status;
     return data;
   }
 }
