@@ -300,7 +300,7 @@ class _HRISDetailsState extends State<HRISDetails> {
 
                     )
                         :
-                    Container(
+                    /*Container(
                       padding: EdgeInsets.all(10.0),
                       width: MediaQuery.of(context).size.width/2,
                       height: MediaQuery.of(context).size.width/2,
@@ -311,10 +311,50 @@ class _HRISDetailsState extends State<HRISDetails> {
                         image: DecorationImage(
                           fit: BoxFit.scaleDown,
                           image:  NetworkImage(urlImage),
-                          /*FileImage(file!)*/
+                          *//*FileImage(file!)*//*
                         ),
                       ),
 
+                    ),*/
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          width: MediaQuery.of(context).size.width / 2,
+                          height: MediaQuery.of(context).size.width / 2,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Mythemes.lightBluishColor, width: 3),
+                            shape: BoxShape.circle,
+                            color: Mythemes.whitish,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: file != null
+                                  ? FileImage(file!) as ImageProvider   // ✅ Local file
+                                  : NetworkImage(urlImage),             // ✅ Fallback to network image
+                            ),
+                          ),
+                        ),
+
+                        /// Positioned edit button
+                        Positioned(
+                          bottom: 8,
+                          right: MediaQuery.of(context).size.width / 2 - 60, // auto-aligns near circle border
+                          child: CircleAvatar(
+                            backgroundColor: Mythemes.successColor,
+                            radius: 20,
+                            child: IconButton(
+                              icon: Icon(Icons.edit, color: Colors.white, size: 18),
+                              onPressed: () {
+                                imagePickerModal(context,
+                                    onCameraTap: () {}, onGalleryTap: () {});
+                                // TODO: Open image picker or profile update method
+                                print("Edit profile picture clicked!");
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     Center(
                         child: Padding(
@@ -342,7 +382,7 @@ class _HRISDetailsState extends State<HRISDetails> {
                                           onCameraTap: () {}, onGalleryTap: () {});
                                     },
                                     icon: Icon(
-                                      Icons.add, color: Mythemes.lightBluishColor,
+                                      Icons.edit, color: Mythemes.successColor,
                                     )
                                 )
 

@@ -407,7 +407,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                         }),
 
                         Visibility(
-                          visible: isShortLeave == true,
+                          visible: isShortLeave,
                           child: buildVerticalToggle("Short Leave", shortLeave, (val) {
                             setState(() => shortLeave = val);
                             print("Short Leave - $shortLeave");

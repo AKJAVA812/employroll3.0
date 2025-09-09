@@ -82,7 +82,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
       branchNameset=  attendanceModelGlobel!.data![indexCont].branchName.toString();
       updatedWorkHourSet = attendanceModelGlobel!.data![indexCont].updatedWorkingHour;
       relaxationHourSet = attendanceModelGlobel!.data![indexCont].relaxationHour;
-      shortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave == true ? true : false;
+      isShortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave ?? false;
       workingHrsSet = attendanceModelGlobel!.data![indexCont].workingHrs;
       shiftWorkingHourSet = attendanceModelGlobel!.data![indexCont].shiftWorkingHour;
       departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
@@ -96,7 +96,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
       branchNameset=  attendanceModelGlobel!.data![indexCont].branchName.toString();
       updatedWorkHourSet = attendanceModelGlobel!.data![indexCont].updatedWorkingHour;
       relaxationHourSet = attendanceModelGlobel!.data![indexCont].relaxationHour;
-      shortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave == true ? true : false;
+      isShortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave ?? false;
       workingHrsSet = attendanceModelGlobel!.data![indexCont].workingHrs;
       shiftWorkingHourSet = attendanceModelGlobel!.data![indexCont].shiftWorkingHour;
       departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
@@ -135,7 +135,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
   bool shortLeave = false;
   bool light0 = true;
   bool light1 = true;
-  bool isShortLeave = true;
+  bool isShortLeave = false;
   static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
     <WidgetStatesConstraint, Icon>{
       WidgetState.selected: Icon(Icons.check),
@@ -272,8 +272,9 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
                           print("Comp Off - $compOff");
                         }),
                         SizedBox(width: 20,),
+
                         Visibility(
-                          visible: shortLeave == true,
+                          visible: isShortLeave,
                           child: buildVerticalToggle("Short Leave", shortLeave, (val) {
                             setState(() => shortLeave = val);
                             print("Short Leave - $shortLeave");
