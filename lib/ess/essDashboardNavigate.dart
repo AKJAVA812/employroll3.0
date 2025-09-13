@@ -67,6 +67,7 @@ var day = new DateTime.now();
 var single = new DateFormat('dd');
 var singleDay = single.format(day);
 bool isLoading = true;
+bool isLoadingEvent = true;
 String valuenew = "listText";
 String shiftValue = "listText";
 
@@ -331,7 +332,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   Future<EssEventsListModal> getEventData(String SessionId) async {
     setState(() {
-      isLoading = true; // Hide loader always
+      isLoadingEvent = true; // Hide loader always
     });
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalESSApi;
@@ -342,7 +343,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         "sessionId=$sessionId&"
         "branch=$branchId&"
         "shift=$shift&"
-        "date=$singleDateString");
+        "date=$singleDateString&"
+        "userPermission=COMPANY_EMPLOYEE");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');
@@ -353,7 +355,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     //print('Body Data $getData');
     eventsListModal = EssEventsListModal.fromJson(mapResponse);
     setState(() {
-      isLoading = false; // Hide loader always
+      isLoadingEvent = false; // Hide loader always
     });
     return eventsListModal;
   }
@@ -1493,7 +1495,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             CalendarShow(),
 
             empRole == 1 || roRole == 1 ?
-            DefaultTabController(
+            /*DefaultTabController(
               length: 4,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1809,7 +1811,85 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                   )
                 ],
               ),
-            ) :
+            )*/
+            DefaultTabController(
+              length: 3,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  // TabBar
+                  Material(
+                    color: Mythemes.whitish,
+                    child: TabBar(
+                      indicatorColor: Colors.deepPurple,
+                      indicatorWeight: 3,
+                      labelColor: Colors.deepPurple,
+                      unselectedLabelColor: Mythemes.blackishade,
+                      tabs: const [
+                        Tab(icon: Icon(Icons.celebration), text: "Birthday"),
+                        Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
+                        Tab(icon: Icon(Icons.today), text: "Today Events"),
+                      ],
+                    ),
+                  ),
+
+                  // Tab Views
+                  SizedBox(
+                    height: 400,
+                    child: TabBarView(
+                      children: [
+                        // 🎂 Birthday Tab
+                        buildEventList(
+                          isLoading: isLoadingEvent,
+                          items: eventsListModalGlobal?.bdayList ?? [],
+                          emptyText: "No birthdays today 🎉",
+                          titleBuilder: (item) => item.fullName,
+                          subtitleBuilder: (item) => item.department,
+                          trailingBuilder: (item) => item.dob,
+                          imageBuilder: (item) => item.image,
+                        ),
+
+                        // 🏅 Anniversary Tab
+                        buildEventList(
+                          isLoading: isLoadingEvent,
+                          items: eventsListModalGlobal?.joblist ?? [],
+                          emptyText: "No anniversaries today 🎊",
+                          titleBuilder: (item) => item.fullName,
+                          subtitleBuilder: (item) => item.department,
+                          trailingBuilder: (item) => item.doj,
+                          imageBuilder: (item) => item.image,
+                        ),
+
+                        // 📅 Today Events Tab (combine lists)
+                        ListView(
+                          children: [
+                            buildEventList(
+                              isLoading: isLoadingEvent,
+                              items: eventsListModalGlobal?.bdayList ?? [],
+                              emptyText: "No birthday events today 🎂",
+                              titleBuilder: (item) => item.fullName,
+                              subtitleBuilder: (item) => item.department,
+                              trailingBuilder: (item) => item.dob,
+                              imageBuilder: (item) => item.image,
+                            ),
+                            buildEventList(
+                              isLoading: isLoadingEvent,
+                              items: eventsListModalGlobal?.joblist ?? [],
+                              emptyText: "No work anniversaries today 🎉",
+                              titleBuilder: (item) => item.fullName,
+                              subtitleBuilder: (item) => item.department,
+                              trailingBuilder: (item) => item.doj,
+                              imageBuilder: (item) => item.image,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            )
+                 :
             //TabSection(EventsListModal()!) :
             SizedBox(
               height: 0,
@@ -1821,6 +1901,78 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     );
   }
 
+  Widget buildEventList<T>({
+    required bool isLoading,
+    required List<T> items,
+    required String emptyText,
+    required String Function(T) titleBuilder,
+    required String Function(T) subtitleBuilder,
+    required String Function(T) trailingBuilder,
+    required String Function(T) imageBuilder,
+  }) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(strokeWidth: 3),
+      );
+    }
+
+    if (items.isEmpty) {
+      return Center(
+        child: Text(
+          emptyText,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(12),
+            leading: CircleAvatar(
+              radius: 28,
+              backgroundImage: NetworkImage(imageBuilder(item)),
+              backgroundColor: Colors.grey[200],
+            ),
+            title: Text(
+              titleBuilder(item),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+            subtitle: Text(
+              subtitleBuilder(item),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black54,
+              ),
+            ),
+            trailing: Text(
+              trailingBuilder(item),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.deepPurple,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   CalendarShow() {
     /// Example with custom icon

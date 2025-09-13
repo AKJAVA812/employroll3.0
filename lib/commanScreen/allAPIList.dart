@@ -83,7 +83,7 @@ class ApiDetails{
 
    //ESS Dashboard
    static var essDashboardAPi = "restful/service/dashboard/present/absent/count/ess";
-   static var eventListModalESSApi = "restful/service/get/emp/event/ess";
+   static var eventListModalESSApi = "restful/service/get/emp/event/ess/new";
 
    //Customer workDone API
    static var skyWorkDoneClientApi = "restful/service/get/mobile/task/client/details";
