@@ -1715,7 +1715,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
             );
           }
 
-          if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+          /*if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
             items.add(
               Hero(
                 tag: 'mySharedTeams',
@@ -1760,7 +1760,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 ),
               ),
             );
-          }
+          }*/
 
 
 
