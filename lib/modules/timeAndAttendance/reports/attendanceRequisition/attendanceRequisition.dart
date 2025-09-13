@@ -1027,7 +1027,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "Error");
+          showDialgSucess1(context, result, "⚠️Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1073,7 +1073,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "Error");
+          showDialgSucess1(context, result, "⚠️Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1118,7 +1118,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "Error");
+          showDialgSucess1(context, result, "⚠️Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1163,7 +1163,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "Error");
+          showDialgSucess1(context, result, "⚠️Warning");
         }
       }
       print('result ${result} reason ${reason}');

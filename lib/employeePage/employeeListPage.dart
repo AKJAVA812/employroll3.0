@@ -10,18 +10,18 @@ import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 
-import '../../adminPage/modelClass/dashboardModel.dart';
 import '../../adminPage/mssDashboard.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
 import '../../commanScreen/routes.dart';
-import '../../employeePage/employeeListModel.dart';
 import '../../employeePage/liveMapView.dart';
 import '../../employeePage/mapView.dart';
 import '../../main.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../themes/empThemes.dart';
+import '../adminPage/modelClass/dashboardModel.dart';
+import 'myTeamListModal.dart';
 
 class EmpListView extends StatefulWidget {
   const EmpListView({Key? key}) : super(key: key);
@@ -35,10 +35,19 @@ class EmpListView extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
-EmployeeListModel? employeeListModelglobel;
-EmployeeListModel? employeeListModelglobeled;
+List<ListData>? allUsernew=[];
+List<ListData>? foundDataNew=[];
+List<DottedEmpList>? allUsernewDotted=[];
+List pendingData =[];
+List<SharedEmpList>? allUsernewShared=[];
+List<DirectEmpList>? allUsernewDirect=[];
+List<DesignatedEmpList>? allUsernewDesignated=[];
+List<DottedEmpList>? foundDataNewDotted=[];
+List<SharedEmpList>? foundDataNewShared=[];
+List<DirectEmpList>? foundDataNewDirect=[];
+List<DesignatedEmpList>? foundDataNewDesignated=[];
+MyTeamsListModal? employeeListModelglobel;
+MyTeamsListModal? employeeListModelglobeled;
 var empName;
 var empId;
 String? userPanel;
@@ -82,7 +91,8 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
     userPanel = await shared!.getUserPanel();
     getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<EmployeeListModel> getEmployeeList11 = getEmployeeList(sessionId!);
+
+    Future<MyTeamsListModal> getEmployeeList11 = getEmployeeList(sessionId!);
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -90,57 +100,125 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
         Text(" Login ... Please wait")
       ],
     );
-
     getEmployeeList11.then((value) {
       setState(() {
-        foundDataNew = allUsernew;
+        if(selectedFilter == "All") {
+          foundDataNew = allUsernew;
+        } if(selectedFilter == "Direct") {
+          foundDataNewDirect = allUsernewDirect;
+        } if(selectedFilter == "Dotted") {
+          foundDataNewDotted = allUsernewDotted;
+        } if(selectedFilter == "Shared") {
+          foundDataNewShared = allUsernewShared;
+        } if(selectedFilter == "Designated") {
+          foundDataNewDesignated = allUsernewDesignated;
+        }
+
         employeeListModelglobel=value;
         employeeListModelglobeled=employeeListModelglobel;
+
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
+      print('All LIST - ${employeeListModelglobel!.listData!.length}');
+      print('Direct LIST - ${employeeListModelglobel!.directEmpList!.length}');
+      print('Dotted LIST - ${employeeListModelglobel!.dottedEmpList!.length}');
+      print('Shared LIST - ${employeeListModelglobel!.sharedEmpList!.length}');
+      print('Designated LIST - ${employeeListModelglobel!.designatedEmpList!.length}');
     });
   }
 
-  Future<EmployeeListModel> getEmployeeList(String SessionId) async {
+  Future<MyTeamsListModal> getEmployeeList(String sessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.getEmpList;
-    print('employeeList11: ${SessionId}');
-    EmployeeListModel employeeListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "profileId=$getProfileId&"
-        "orgId=0&"
-        "userPermission=$userPanel");
-    final response = await http.post(urlapi);
+    String apiUrl = ApiDetails.myTeamListApi;
 
-    print('responseemployeeList ${response.body}');
-    print('emp list api - ${response.request}');
+    setState(() {
+      isLoading = true; // Show loader
+    });
 
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
-    employeeListModel=EmployeeListModel.fromJson(mapResponse);
-    allUsernew = employeeListModel.data;
+    try {
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?"
+            "sessionId=$sessionId&"
+            "profileId=$getProfileId&"
+            "orgId=0&"
+            "userPermission=$userPanel",
+      );
 
-    return employeeListModel;
+      final response = await http.post(urlapi);
+
+      mapResponse = json.decode(response.body);
+
+      /// ✅ Always update the main model
+      employeeListModelglobel = MyTeamsListModal.fromJson(mapResponse);
+
+      setState(() {
+        if (selectedFilter == "All") {
+          allUsernew = employeeListModelglobel!.listData!;
+        } else if (selectedFilter == "Dotted") {
+          allUsernewDotted = employeeListModelglobel!.dottedEmpList!;
+        } else if (selectedFilter == "Shared") {
+          allUsernewShared = employeeListModelglobel!.sharedEmpList!;
+        } else if (selectedFilter == "Direct") {
+          allUsernewDirect = employeeListModelglobel!.directEmpList!;
+        } else if (selectedFilter == "Designated") {
+          allUsernewDesignated = employeeListModelglobel!.designatedEmpList!;
+        }
+      });
+
+    } catch (e) {
+      print("Error fetching employee list: ${e.toString()}");
+    } finally {
+      setState(() {
+        isLoading = false; // Hide loader always
+      });
+    }
+
+    return employeeListModelglobel!;
   }
 
+  bool isLoading = true;
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<ListData>?  resultsAll = [];
+    List<SharedEmpList>?  resultsShared = [];
+    List<DirectEmpList>?  resultsDirect = [];
+    List<DottedEmpList>?  resultsDotted = [];
+    List<DesignatedEmpList>?  resultsDesignated = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
       //results = _allUsers;
       setState(() {
-        results = allUsernew;
+        //results = allUsernew;
+        if (selectedFilter == "All") {
+          resultsAll = allUsernew;
+        } else if (selectedFilter == "Dotted") {
+          resultsDotted = allUsernewDotted;
+        } else if (selectedFilter == "Shared") {
+          resultsShared = allUsernewShared;
+        } else if (selectedFilter == "Direct") {
+          resultsDirect = allUsernewDirect;
+        } else if (selectedFilter == "Designated") {
+          resultsDesignated = allUsernewDesignated;
+        }
       });
     } else {
       /*results = allUsernew.where((user) =>
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
+      resultsAll = allUsernew?.where((element) =>
+          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+
+      resultsShared = allUsernewShared?.where((element) =>
+          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+
+      resultsDotted = allUsernewDotted?.where((element) =>
+          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+
+      resultsDirect = allUsernewDirect?.where((element) =>
+          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+
+      resultsDesignated = allUsernewDesignated?.where((element) =>
           element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
@@ -152,7 +230,11 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
     }
     // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      foundDataNew = resultsAll;
+      foundDataNewDirect = resultsDirect;
+      foundDataNewDotted = resultsDotted;
+      foundDataNewDesignated = resultsDesignated;
+      foundDataNewShared = resultsShared;
     });
   }
   TextEditingController searchType = TextEditingController();
@@ -162,6 +244,31 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
   int pageIndex = 0;
   int currentIndex = 2;
   var dropdownvalue;
+
+  String selectedFilter = "All";
+  Widget filterChip(String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: ChoiceChip(
+        checkmarkColor: selectedFilter == label ? Colors.white : Colors.black87,
+        label: Text(label,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: selectedFilter == label ? Colors.white : Colors.black87,
+            )),
+        selected: selectedFilter == label,
+        selectedColor: Colors.deepPurple,
+        onSelected: (val) {
+          setState(() {
+            selectedFilter = label;
+            getSharedPrfanceList();
+            print("Selected Filter - $selectedFilter");
+          });
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
@@ -287,13 +394,847 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
           color: Mythemes.whitish,
           child: Column(
             children: [
-              Expanded(child: employeeListModelglobeled == null ?
-              Center(child: CircularProgressIndicator()): MyStatelessWidget(employeeListModelglobeled!)),
+              GridView.count(
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                padding: EdgeInsets.all(6.0),
+                crossAxisCount: 5,
+                children: <Widget>[
+                  Hero(
+                    tag: 'nrCount',
+                    child: Card(
+                      color: Mythemes.alertColor,
+                      child: InkWell(
+                        onTap: () {
+                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+
+                            Center(
+                              child: isLoading
+                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
+                                  :"${employeeListModelglobel!.listData!.length}".text.bold.color(Mythemes.whitish).size(16).make(),
+                            ),
+                            Center(
+                              child: Container(
+                                //margin: EdgeInsets.only(top: 30, left: 10),
+                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 5),
+                                child: Text(
+                                  'Total',
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style:
+                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Hero(
+                    tag: 'WR',
+                    child: Card(
+                      color: Mythemes.lightBluishColor,
+                      child: InkWell(
+                        onTap: () {
+                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+
+                            Center(
+                              child: isLoading
+                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
+                                  :"${employeeListModelglobel!.directEmpList!.length}".text.bold.color(Mythemes.whitish).size(16).make(),
+                            ),
+                            Center(
+                              child: Container(
+                                //margin: EdgeInsets.only(top: 70, left: 10),
+                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                                child: Text(
+                                  'Direct',
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style:
+                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Hero(
+                    tag: 'AP',
+                    child: Card(
+                      color: Mythemes.warningColor,
+                      child: InkWell(
+                        onTap: () {
+                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Center(
+                              child: isLoading
+                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
+                                  :"${employeeListModelglobel!.sharedEmpList!.length}".text.bold.color(Mythemes.whitish).size(16).make(),
+                            ),
+                            Center(
+                              child: Container(
+                                //margin: EdgeInsets.only(top: 70, left: 10),
+                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                                child: Text(
+                                  'Shared',
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style:
+                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Hero(
+                    tag: 'PR',
+                    child: Card(
+                      color: Mythemes.successColor,
+                      child: InkWell(
+                        onTap: () {
+                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Center(
+                              child: isLoading
+                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
+                                  :"${employeeListModelglobel!.dottedEmpList!.length}".text.bold.color(Mythemes.whitish).size(16).make(),
+                            ),
+                            Center(
+                              child: Container(
+                                //margin: EdgeInsets.only(top: 70, left: 10),
+                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                                child: Text(
+                                  'Dotted',
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style:
+                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Hero(
+                    tag: 'Designated',
+                    child: Card(
+                      color: Mythemes.lightBluishColor,
+                      child: InkWell(
+                        onTap: () {
+                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Center(
+                              child: isLoading
+                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
+                                  :"${employeeListModelglobel!.designatedEmpList!.length}".text.bold.color(Mythemes.whitish).size(16).make(),
+                            ),
+                            Center(
+                              child: Container(
+                                //margin: EdgeInsets.only(top: 70, left: 10),
+                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                                child: Text(
+                                  'Assigned',
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style:
+                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                ],
+              ),
+
+              Expanded(
+                child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : (employeeListModelglobel == null
+                    ? Center(child: Text("No data found"))
+                    : getMyReportings(employeeListModelglobel!)),
+              ),
             ],
           ),
         )
     );
   }
+
+  getMyReportings(MyTeamsListModal myTeamsListModal) {
+    return RefreshIndicator(
+      onRefresh: () {
+        Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (a, b, c) =>
+                  EmpListView(),
+              transitionDuration: Duration(seconds: 1),
+              maintainState: true,
+            ));
+        return Future.value(false);
+      },
+      child: Column(
+        children: [
+          // List
+          Container(
+            padding: EdgeInsets.all(8),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  filterChip("All"),
+                  filterChip("Direct"),
+                  filterChip("Shared"),
+                  filterChip("Dotted"),
+                  filterChip("Designated"),
+                ],
+              ),
+            ),
+          ),
+          //Divider(thickness: 1),
+          Visibility(
+      visible: selectedFilter == "All",
+        child: Expanded(
+          child: foundDataNew == null || foundDataNew!.isEmpty
+              ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.inbox, // No data icon
+                  size: 80,
+                  color: Colors.grey.shade400,
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "No Employees Available !!",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          )
+              : ListView.builder(
+            itemCount: foundDataNew!.length,
+            itemBuilder: (context, index) {
+              var officer = foundDataNew![index];
+              return Card(
+                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 4,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border(
+                      left: BorderSide(
+                        color: Mythemes.successColor,
+                        width: 6, // Left colored curved border
+                      ),
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Employee Photo
+                            CircleAvatar(
+                              radius: 32,
+                              backgroundColor: Mythemes.greyish,
+                              backgroundImage: (foundDataNew![index].empPhoto != null &&
+                                  foundDataNew![index].empPhoto!.isNotEmpty)
+                                  ? NetworkImage(foundDataNew![index].empPhoto!)
+                                  : null,
+                              child: (foundDataNew![index].empPhoto == null ||
+                                  foundDataNew![index].empPhoto!.isEmpty)
+                                  ? Icon(Icons.person, size: 32, color: Colors.white)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12),
+
+                            // Employee details
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    foundDataNew![index].empName.toString(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "Type: ${foundDataNew![index].reportieeType.toString()}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.deepPurple,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text("📞 ${foundDataNew![index].empContact ?? '-'}"),
+                                  Text("🆔 ${foundDataNew![index].empDetId ?? '-'}"),
+                                  Text("✉️ ${foundDataNew![index].empEmailId ?? '-'}"),
+                                  Text("🏢 ${foundDataNew![index].empDeptName ?? '-'}"),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Trailing status text in TOP-RIGHT corner
+                      Positioned(
+                        top: 8,
+                        right: 12,
+                        child: Text(
+                          "EMP_STATUS",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Mythemes.successColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+
+          Visibility(
+            visible: selectedFilter == "Direct",
+            child: Expanded(
+             child:  foundDataNewDirect == null || foundDataNewDirect!.isEmpty
+                  ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.inbox, // No data icon
+                      size: 80,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "No Employee Available !",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ) :
+              ListView.builder(
+                itemCount: foundDataNewDirect!.length,
+                itemBuilder: (context, index) {
+                  var officer = foundDataNewDirect![index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border(
+                          left: BorderSide(
+                            color: Mythemes.successColor,
+                            width: 6, // Left colored curved border
+                          ),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Employee Photo
+                                CircleAvatar(
+                                  radius: 32,
+                                  backgroundColor: Mythemes.greyish,
+                                  backgroundImage: (foundDataNewDirect![index].empPhoto != null &&
+                                      foundDataNewDirect![index].empPhoto!.isNotEmpty)
+                                      ? NetworkImage(foundDataNewDirect![index].empPhoto!)
+                                      : null,
+                                  child: (foundDataNewDirect![index].empPhoto == null ||
+                                      foundDataNewDirect![index].empPhoto!.isEmpty)
+                                      ? Icon(Icons.person, size: 32, color: Colors.white)
+                                      : null,
+                                ),
+                                const SizedBox(width: 12),
+
+                                // Employee details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        foundDataNewDirect![index].empName.toString(),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "Type: ${foundDataNewDirect![index].reportieeType.toString()}",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.deepPurple,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text("📞 ${foundDataNewDirect![index].empContact ?? '-'}"),
+                                      Text("🆔 ${foundDataNewDirect![index].empDetId ?? '-'}"),
+                                      Text("✉️ ${foundDataNewDirect![index].empEmailId ?? '-'}"),
+                                      Text("🏢 ${foundDataNewDirect![index].empDeptName ?? '-'}"),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Trailing status text in TOP-RIGHT corner
+                          Positioned(
+                            top: 8,
+                            right: 12,
+                            child: Text(
+                              "EMP_STATUS",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Mythemes.successColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          Visibility(
+            visible: selectedFilter == "Designated",
+            child: Expanded(
+              child:  foundDataNewDesignated == null || foundDataNewDesignated!.isEmpty
+                  ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.inbox, // No data icon
+                      size: 80,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "No Employee Available !",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ) : ListView.builder(
+                itemCount: foundDataNewDesignated!.length,
+                itemBuilder: (context, index) {
+                  var officer = foundDataNewDesignated![index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border(
+                          left: BorderSide(
+                            color: Mythemes.successColor,
+                            width: 6, // Left colored curved border
+                          ),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Employee Photo
+                                CircleAvatar(
+                                  radius: 32,
+                                  backgroundColor: Mythemes.greyish,
+                                  backgroundImage: (foundDataNewDesignated![index].empPhoto != null &&
+                                      foundDataNewDesignated![index].empPhoto!.isNotEmpty)
+                                      ? NetworkImage(foundDataNewDesignated![index].empPhoto!)
+                                      : null,
+                                  child: (foundDataNewDesignated![index].empPhoto == null ||
+                                      foundDataNewDesignated![index].empPhoto!.isEmpty)
+                                      ? Icon(Icons.person, size: 32, color: Colors.white)
+                                      : null,
+                                ),
+                                const SizedBox(width: 12),
+
+                                // Employee details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        foundDataNewDesignated![index].empName.toString(),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "Type: ${foundDataNewDesignated![index].reportieeType.toString()}",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.deepPurple,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text("📞 ${foundDataNewDesignated![index].empContact ?? '-'}"),
+                                      Text("🆔 ${foundDataNewDesignated![index].empDetId ?? '-'}"),
+                                      Text("✉️ ${foundDataNewDesignated![index].empEmailId ?? '-'}"),
+                                      Text("🏢 ${foundDataNewDesignated![index].empDeptName ?? '-'}"),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Trailing status text in TOP-RIGHT corner
+                          Positioned(
+                            top: 8,
+                            right: 12,
+                            child: Text(
+                              "EMP_STATUS",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Mythemes.successColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          Visibility(
+            visible: selectedFilter == "Shared",
+            child: Expanded(
+              child:  foundDataNewShared == null || foundDataNewShared!.isEmpty
+                  ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.inbox, // No data icon
+                      size: 80,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "No Employee Available !",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ) :  ListView.builder(
+                itemCount: foundDataNewShared!.length,
+                itemBuilder: (context, index) {
+                  var officer = foundDataNewShared![index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border(
+                          left: BorderSide(
+                            color: Mythemes.successColor,
+                            width: 6, // Left colored curved border
+                          ),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Employee Photo
+                                CircleAvatar(
+                                  radius: 32,
+                                  backgroundColor: Mythemes.greyish,
+                                  backgroundImage: (foundDataNewShared![index].empPhoto != null &&
+                                      foundDataNewShared![index].empPhoto!.isNotEmpty)
+                                      ? NetworkImage(foundDataNewShared![index].empPhoto!)
+                                      : null,
+                                  child: (foundDataNewShared![index].empPhoto == null ||
+                                      foundDataNewShared![index].empPhoto!.isEmpty)
+                                      ? Icon(Icons.person, size: 32, color: Colors.white)
+                                      : null,
+                                ),
+                                const SizedBox(width: 12),
+
+                                // Employee details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        foundDataNewShared![index].empName.toString(),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "Type: ${foundDataNewShared![index].reportieeType.toString()}",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.deepPurple,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text("📞 ${foundDataNewShared![index].empContact ?? '-'}"),
+                                      Text("🆔 ${foundDataNewShared![index].empDetId ?? '-'}"),
+                                      Text("✉️ ${foundDataNewShared![index].empEmailId ?? '-'}"),
+                                      Text("🏢 ${foundDataNewShared![index].empDeptName ?? '-'}"),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Trailing status text in TOP-RIGHT corner
+                          Positioned(
+                            top: 8,
+                            right: 12,
+                            child: Text(
+                              "EMP_STATUS",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Mythemes.successColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          Visibility(
+            visible: selectedFilter == "Dotted",
+            child: Expanded(
+              child:  foundDataNewDotted == null || foundDataNewDotted!.isEmpty
+                  ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.inbox, // No data icon
+                      size: 80,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "No Employee Available !",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ) : ListView.builder(
+                itemCount: foundDataNewDotted!.length,
+                itemBuilder: (context, index) {
+                  var officer = foundDataNewDotted![index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border(
+                          left: BorderSide(
+                            color: Mythemes.successColor,
+                            width: 6, // Left colored curved border
+                          ),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Employee Photo
+                                CircleAvatar(
+                                  radius: 32,
+                                  backgroundColor: Mythemes.greyish,
+                                  backgroundImage: (foundDataNewDotted![index].empPhoto != null &&
+                                      foundDataNewDotted![index].empPhoto!.isNotEmpty)
+                                      ? NetworkImage(foundDataNewDotted![index].empPhoto!)
+                                      : null,
+                                  child: (foundDataNewDotted![index].empPhoto == null ||
+                                      foundDataNewDotted![index].empPhoto!.isEmpty)
+                                      ? Icon(Icons.person, size: 32, color: Colors.white)
+                                      : null,
+                                ),
+                                const SizedBox(width: 12),
+
+                                // Employee details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        foundDataNewDotted![index].empName.toString(),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "Type: ${foundDataNewDotted![index].reportieeType.toString()}",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.deepPurple,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text("📞 ${foundDataNewDotted![index].empContact ?? '-'}"),
+                                      Text("🆔 ${foundDataNewDotted![index].empDetId ?? '-'}"),
+                                      Text("✉️ ${foundDataNewDotted![index].empEmailId ?? '-'}"),
+                                      Text("🏢 ${foundDataNewDotted![index].empDeptName ?? '-'}"),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Trailing status text in TOP-RIGHT corner
+                          Positioned(
+                            top: 8,
+                            right: 12,
+                            child: Text(
+                              "EMP_STATUS",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Mythemes.successColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 
   Widget getFAB() {
     return
@@ -311,7 +1252,7 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
 
 
 class MyStatelessWidget extends StatefulWidget {
-  final EmployeeListModel employeeListModel;
+  final MyTeamsListModal employeeListModel;
 
   MyStatelessWidget(this.employeeListModel);
   @override
@@ -320,7 +1261,7 @@ class MyStatelessWidget extends StatefulWidget {
 
 
 class _MyStatelessWidgetState extends State<MyStatelessWidget> {
-  final EmployeeListModel employeeListModel;
+  final MyTeamsListModal employeeListModel;
   _MyStatelessWidgetState(this.employeeListModel);
 
   var status;
@@ -403,7 +1344,9 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             return alertDialog;
           });
     }
-    return ListView.builder(
+    return
+
+      ListView.builder(
       padding: const EdgeInsets.all(8),
       itemCount: foundDataNew!.length,
       itemBuilder: (context, i) {
@@ -422,7 +1365,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
           ),
           child: InkWell(
             onTap: () {
-              empId = foundDataNew![i].empdetailsId;
+              empId = foundDataNew![i].empDetId;
               empName = foundDataNew![i].empName;
               print('ID $empId');
               print('NameCheck $empName');
@@ -454,14 +1397,20 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 4),
-                              Text("📞 ${foundDataNew![i].empContactNo ?? '-'}"),
-                              Text("🆔${foundDataNew![i].empId ?? '-'}"),
-                              Text("✉️ ${foundDataNew![i].empEmail ?? '-'}"),
-                              Text("🏢 ${foundDataNew![i].empDept ?? '-'}"),
+                              Text("📞 ${foundDataNew![i].empContact ?? '-'}"),
+                              Text("🆔${foundDataNew![i].empDetId ?? '-'}"),
+                              Text("✉️ ${foundDataNew![i].empEmailId ?? '-'}"),
+                              Text("🏢 ${foundDataNew![i].empDeptName ?? '-'}"),
                             ],
                           ),
                         ),
-                        Expanded(
+                       Expanded(child: Column(
+                         crossAxisAlignment: CrossAxisAlignment.end,
+                         children: [
+                           "${foundDataNew![i].reportieeType}".text.bold.color(Mythemes.lightBluishColor).make().px4()
+                         ],
+                       ))
+                       /* Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
@@ -485,7 +1434,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                               ),
                             ],
                           ),
-                        ),
+                        ),*/
                       ],
                     ),
                   ),

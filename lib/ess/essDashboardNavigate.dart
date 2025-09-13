@@ -330,6 +330,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
   Future<EssEventsListModal> getEventData(String SessionId) async {
+    setState(() {
+      isLoading = true; // Hide loader always
+    });
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalESSApi;
 
@@ -349,6 +352,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     //var getData = mapResponse;
     //print('Body Data $getData');
     eventsListModal = EssEventsListModal.fromJson(mapResponse);
+    setState(() {
+      isLoading = false; // Hide loader always
+    });
     return eventsListModal;
   }
 
@@ -582,11 +588,17 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     }*/
 
     if (eventsListModalGlobal?.bdayList != null) {
+      setState(() {
+        isLoading = true;
+      });
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
         print("oldEvent $oldEvent");
       }
+      setState(() {
+        isLoading = false;
+      });
     } else {
       print("bdayList is null");
     }

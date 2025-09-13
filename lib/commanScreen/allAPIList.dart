@@ -1,11 +1,11 @@
 
 class ApiDetails{
    //Base Server Address
-   static var server="http://www.employroll.com/";
+   //static var server="http://www.employroll.com/";
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://74893fa79028.ngrok.app/";
+   static var server="https://4f9649512c90.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -38,6 +38,7 @@ class ApiDetails{
    static var selfOdReqList = "/restful/service/odlist/via/mobile";
    //HRIS employee list
    static var getEmpList = "/restful/service/employeelist";
+   static var myTeamListApi = "/restful/service/employeelist/for/my/team";
    //QR based attendance
    static var qrBasedAttendance = "/restful/service/attendance/via/mobile/qr/code/scanner";
    //Leave management
@@ -71,6 +72,7 @@ class ApiDetails{
    static var cancelAdvRequisition = "/restful/service/employee/self/advance/cancel";
    static var claimApprovalListDataApi = "/restful/service/employee/self/advance/cancel";
 
+
    //Admin dashboard API
    static var adminDashboardAPi = "restful/service/dashboard/present/absent/count";
    static var adminDashboardNewAPi = "restful/service/dashboard/present/absent/count/new";
@@ -103,6 +105,7 @@ class ApiDetails{
    static var advanceRequest = "restful/service/get/advance/master/list";
    static var loanAdvReqSend = "restful/service/org/loan/and/advance/request/data/save";
 
+
    //Helpdesk API's
    static var departmentListApi = "employroll/api/third/party/query/policy/all/mobile/departments";
    static var queryTypeListApi = "employroll/api/third/party/get/ticket/type/list/new/mobile";
@@ -117,6 +120,7 @@ class ApiDetails{
    static var logoutAPi = "restful/service/employee/logout";
 
    static var tourRequisitionApi = "/restful/service/requisition/tour";
+
 
    //HR_IS Update API
    static var updateHRISApi = "/restful/service/hris/detail/update/request";
@@ -220,5 +224,12 @@ class ApiDetails{
 
    //Company Policy API
    static var companyPolicyApi = "restful/service/policy/details/list";
+
+   //My Managers List
+   static var myManagersApi = "/restful/service/get/ro/list/of/an/all/ro/emp/list";
+
+   //Requisition Count API
+   static var reqCountApi = "/restful/service/get/pending/requisition/count";
+
 
 }

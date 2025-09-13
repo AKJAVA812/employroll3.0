@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:dio/dio.dart';
@@ -20,6 +21,8 @@ import '../widgets/drawer_file.dart';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:er_flutter_project/main.dart';
+import '../mss_profiles/global_profile.dart';
+import 'allAPIList.dart';
 class ProjectList extends StatefulWidget {
   const ProjectList({Key? key}) : super(key: key);
 
@@ -65,6 +68,11 @@ String pendingLoanRequestMSSL3Permission = "0";
 String pendingLoanRequestUISL1Permission = "0";
 String pendingLoanRequestUISL2Permission = "0";
 String pendingLoanRequestUISL3Permission = "0";
+dynamic mobOdCount;
+dynamic odReqCount;
+dynamic tourReqCount;
+dynamic attReqCount;
+dynamic leaveReqCount;
 class _ProjectListState extends State<ProjectList> with RouteAware{
   @override
   void didChangeDependencies() {
@@ -88,6 +96,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
   int currentIndex = 0;
   final ImagePicker _picker = ImagePicker();
   File? image;
+
+  var attendaceReqCount;
+  var leaveReqCount;
+  var odReqCount;
 
 
 
@@ -139,6 +151,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     sessionId = await shared!.getSessionId();
     userType = await shared!.getUserType();
 
+
     setState(() {
 
     });
@@ -154,6 +167,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     setPreOnboardShow= await shared.getPreOnboardShow();
     setExitShow= await shared.getExitShow();
     userPanel= await shared.getUserPanel();
+    print("USER PANEL - $userPanel");
     claimLevelOneMSS = await shared!.getClaimLevelOne();
     print("CLAIM APPROVAL L1 - $claimLevelOneMSS");
     claimLevelTwoMSS = await shared!.getClaimLevelTwo();
@@ -184,6 +198,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     }
     profileName= await shared.getDefaultProfileName();
     profileId= await shared.getDefaultProfileId();
+    getRequisitionCounts(sessionId!);
     print("Default Profile Name - $profileName");
     print("Default Profile Id - $profileId");
     print("User Panel - $userPanel");
@@ -354,6 +369,66 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     });
   }
 
+  Future<void> getRequisitionCounts(String sessionId) async {
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.reqCountApi;
+
+      var urlapi = Uri.parse("$conn$apiUrl?"
+          "sessionId=$sessionId&"
+          "profileId=$profileId&"
+          "userPermission=$userPanel");
+
+      final response = await http.post(urlapi);
+
+      print("Requisition Count API - ${response.request}");
+      print("Response Body - ${response.body}");
+
+      Map<String, dynamic> mapResponse = json.decode(response.body);
+
+      // After decoding response
+      int attReqCount = mapResponse['attReqCount'] ?? 0;
+      int leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
+      int mobOdCount = mapResponse['mobOdCount'] ?? 0;
+
+// ✅ Update global notifiers
+      attReqCountNotifier.value = attReqCount;
+      leaveReqCountNotifier.value = leaveReqCount;
+      odReqCountNotifier.value = mobOdCount;
+
+// ✅ Also persist in SharedPreferences for app relaunch
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt("attReqCount", attReqCount);
+      await prefs.setInt("leaveReqCount", leaveReqCount);
+      await prefs.setInt("mobOdCount", mobOdCount);
+
+      // ✅ Assign values to variables
+      mobOdCount = mapResponse['mobOdCount'] ?? 0;
+      leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
+      odReqCount = mapResponse['odReqCount'] ?? 0;
+      tourReqCount = mapResponse['tourReqCount'] ?? 0;
+      attReqCount = mapResponse['attReqCount'] ?? 0;
+
+
+      // ✅ Save all data into SharedPreferences
+      //final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt("mobOdCount", mobOdCount);
+      await prefs.setInt("leaveReqCount", leaveReqCount);
+      await prefs.setInt("odReqCount", odReqCount);
+      await prefs.setInt("tourReqCount", tourReqCount);
+      await prefs.setInt("attReqCount", attReqCount);
+
+      print("Saved Requisition Counts to SharedPreferences ✅");
+
+    } catch (e) {
+      print("Error fetching requisition counts: $e");
+    } finally {
+      setState(() {
+        //isLoading = false; // hide loader always
+      });
+    }
+  }
+
   @override
   void initState() {
     getSharedPrfanceList();
@@ -497,6 +572,46 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         );
       }
 
+      if(value == 0) {
+        items.add(
+          Hero(
+            tag: 'myReporting',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: (){
+                  Navigator.pushNamed(context, MyRoutings.reportingOfficerPageRoute);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.manage_accounts_rounded,
+                        size: 50,
+                        color: Colors.purpleAccent,
+                      ),
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'My Managers',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
       //HRIS Requisition
       if(userType != 'COMPANY_ADMIN' && value == 0 && value != 1) {
         items.add(
@@ -586,6 +701,38 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                             ),
                           ),
                         ),
+                        // 🔹 Badge at top-right
+                        Positioned(
+                          top: 6,
+                          right: 8,
+                          child: Container(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.redAccent, // badge background color
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            child: Center(
+                              child: ValueListenableBuilder(
+                                valueListenable: attReqCountNotifier,
+                                builder: (context, value, _) {
+                                  return Text(
+                                    "$value", // your dynamic count variable
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -627,6 +774,37 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                               maxLines: 1,
                               style:
                               TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 6,
+                        right: 8,
+                        child: Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent, // badge background color
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 24,
+                            minHeight: 24,
+                          ),
+                          child: Center(
+                            child: ValueListenableBuilder(
+                              valueListenable: leaveReqCountNotifier,
+                              builder: (context, value, _) {
+                                return Text(
+                                  "$value", // your dynamic count variable
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -678,6 +856,37 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                                 maxLines: 1,
                                 style:
                                 TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 6,
+                          right: 8,
+                          child: Container(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.redAccent, // badge background color
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: BoxConstraints(
+                              minWidth: 24,
+                              minHeight: 24,
+                            ),
+                            child: Center(
+                              child: ValueListenableBuilder(
+                                valueListenable: odReqCountNotifier,
+                                builder: (context, value, _) {
+                                  return Text(
+                                    "$value", // your dynamic count variable
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -1464,6 +1673,55 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 child: Card(
                   color: Mythemes.whitish,
                   child: InkWell(
+                    onTap: () {
+                      if (userPanel == "MSS" || userPanel == "USER") {
+                        Navigator.pushNamed(context, MyRoutings.empListRoute);
+                      }
+                      if (userPanel == "MSS_MO_ADMIN") {
+                        Navigator.pushNamed(context, MyRoutings.myTeamMORoute);
+                      }
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        // Main content
+                        Center(
+                          child: Icon(
+                            Icons.supervised_user_circle_sharp,
+                            size: 50,
+                            color: Colors.purpleAccent,
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                              'My Team',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: Mythemes.black,
+                                fontSize: boxText,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ),
+            );
+          }
+
+          if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+            items.add(
+              Hero(
+                tag: 'mySharedTeams',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
                     onTap: (){
                       if(userPanel == "MSS" || userPanel == "USER") {
                         Navigator.pushNamed(context, MyRoutings.empListRoute);
@@ -1476,19 +1734,19 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                     child: Stack(
                       children: <Widget>[
                         Center(
-                          child: Icon(
-                            Icons.supervised_user_circle_sharp,
-                            size: 50,
-                            color: Colors.purpleAccent,
+                          child: Image.network(
+                            "https://s3.ap-south-1.amazonaws.com/employroll.com/images/1757493772177.png",
+                            fit: BoxFit.contain,
+                            width: 50,   // adjust as per your design
+                            height: 50,  // adjust as per your design
                           ),
-
                         ),
                         Center(
                           child: Container(
                             margin: EdgeInsets.only(top: 75, left: 10),
                             padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                             child: Text(
-                                'My Team',
+                                'Shared Team',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style:
@@ -1503,6 +1761,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
               ),
             );
           }
+
+
 
           if(orgId == 3 || orgId == 145) {
             items.add(
@@ -1803,10 +2063,12 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                         borderWidth: 0.0,
                         onChanged: (i) {
                           setState(() {
+
                             value = i;
                             print(i);
                           });
                           if(value == 1) {
+                            getRequisitionCounts(sessionId!);
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
                         },
@@ -1862,6 +2124,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
                           });
                           if(value == 1) {
+                            getRequisitionCounts(sessionId!);
                             //Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
                           }
                         },

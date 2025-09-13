@@ -22,57 +22,73 @@ class SelfRequisitionModel {
 }
 
 class Data {
-  String? inTime;
   String? empId;
   String? employeeName;
   String? inTimeRemark;
-  String? reqDate;
-  int? empDetailsId;
+  bool? attendanceRequisionType;
+  bool? compOffRequistionType;
   String? outTimeRemark;
   String? creationDate;
-  String? outTime;
   int? reqId;
+  String? inTime;
+  String? reqDate;
+  bool? nightRequistionType;
+  int? empDetailsId;
+  String? outTime;
+  bool? shortLeaveRequistionType;
   String? status;
 
   Data(
-      {this.inTime,
-        this.empId,
+      {this.empId,
         this.employeeName,
         this.inTimeRemark,
-        this.reqDate,
-        this.empDetailsId,
+        this.attendanceRequisionType,
+        this.compOffRequistionType,
         this.outTimeRemark,
         this.creationDate,
-        this.outTime,
         this.reqId,
+        this.inTime,
+        this.reqDate,
+        this.nightRequistionType,
+        this.empDetailsId,
+        this.outTime,
+        this.shortLeaveRequistionType,
         this.status});
 
   Data.fromJson(Map<String, dynamic> json) {
-    inTime = json['inTime'];
     empId = json['empId'];
     employeeName = json['employeeName'];
     inTimeRemark = json['inTimeRemark'];
-    reqDate = json['reqDate'];
-    empDetailsId = json['empDetailsId'];
+    attendanceRequisionType = json['attendanceRequisionType'];
+    compOffRequistionType = json['compOffRequistionType'];
     outTimeRemark = json['outTimeRemark'];
     creationDate = json['creationDate'];
-    outTime = json['outTime'];
     reqId = json['reqId'];
+    inTime = json['inTime'];
+    reqDate = json['reqDate'];
+    nightRequistionType = json['nightRequistionType'];
+    empDetailsId = json['empDetailsId'];
+    outTime = json['outTime'];
+    shortLeaveRequistionType = json['shortLeaveRequistionType'];
     status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['inTime'] = this.inTime;
     data['empId'] = this.empId;
     data['employeeName'] = this.employeeName;
     data['inTimeRemark'] = this.inTimeRemark;
-    data['reqDate'] = this.reqDate;
-    data['empDetailsId'] = this.empDetailsId;
+    data['attendanceRequisionType'] = this.attendanceRequisionType;
+    data['compOffRequistionType'] = this.compOffRequistionType;
     data['outTimeRemark'] = this.outTimeRemark;
     data['creationDate'] = this.creationDate;
-    data['outTime'] = this.outTime;
     data['reqId'] = this.reqId;
+    data['inTime'] = this.inTime;
+    data['reqDate'] = this.reqDate;
+    data['nightRequistionType'] = this.nightRequistionType;
+    data['empDetailsId'] = this.empDetailsId;
+    data['outTime'] = this.outTime;
+    data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;
     data['status'] = this.status;
     return data;
   }

@@ -161,6 +161,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
         });
   }
 
+  var reqType;
 
   Future<SelfRequisitionModel> getSelfReqList(String SessionId) async {
     String conn = ApiDetails.server;
@@ -448,6 +449,18 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
         padding: const EdgeInsets.all(4.0),
         itemCount: foundDataNew!.length,
         itemBuilder: (context, i) {
+          if(foundDataNew![i].attendanceRequisionType == true) {
+            reqType = "Attendance Request";
+          }
+          if (foundDataNew![i].compOffRequistionType == true) {
+            reqType = "Compensatory Off Request";
+          }
+          if (foundDataNew![i].nightRequistionType == true) {
+            reqType = "Night Shift Request";
+          }
+          if (foundDataNew![i].shortLeaveRequistionType == true) {
+            reqType = "Short Leave Request";
+          }
           return InkWell(
             onTap: () {
               for (int i = 0; i < foundDataNew!.length; i++) {
@@ -492,6 +505,15 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                                   .data![i].reqDate
                                   .toString()))
                               .text
+                              .textStyle(context.captionStyle)
+                              .make()
+                              .px8(),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          "Request Type: $reqType"
+                              .text.bold
                               .textStyle(context.captionStyle)
                               .make()
                               .px8(),

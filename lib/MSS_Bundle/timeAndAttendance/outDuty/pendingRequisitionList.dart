@@ -263,7 +263,7 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
                 },
                 horizontalPadding: 8,
                 searchIconColor: Mythemes.black,
-                centerTitle: titleName,
+                centerTitle: "$titleName - ${foundDataNewMSS!.length}",
                 verticalPadding: 3,
                 centerTitleStyle: TextStyle(
                     fontSize: 19,
@@ -328,7 +328,7 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
                       isLoading = true;
                       titleName = "OD Pending List";
                       odStatus = "Pending";
-                      Navigator.pushNamed(context, MyRoutings.pendingRequisitionListRoute);
+                      Navigator.pushNamed(context, MyRoutings.mssPendingOdRequisitionRoute);
                       getSharedPrfanceList();
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
@@ -488,131 +488,186 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition> wit
               }
             },
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          foundDataNewMSS![itemCount].name
-                              .toString()
-                              .text
-                              .make()
-                              .px8()
-                              .py4(),
-                          Expanded(
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top row: Avatar | Name + address | Status
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Avatar
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: (foundDataNewMSS![itemCount].image != null &&
+                              foundDataNewMSS![itemCount].image.toString().isNotEmpty)
+                              ? NetworkImage(foundDataNewMSS![itemCount].image.toString())
+                          as ImageProvider
+                              : AssetImage('assets/images/avtar7.png'),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        // Name + address (left, expandable)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              foundDataNewMSS![itemCount].approvalstatus
-                                  .toString()
-                                  .text.bold
-                                  .color(statusColor)
-                                  .sm
-                                  .make()
-                                  .px8(),
+                              // Name
+                              Text(
+                                foundDataNewMSS![itemCount].name.toString(),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Address row with icon. The Expanded text prevents overflow and ellipsizes.
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.location_on, size: 16, color: Colors.redAccent),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      foundDataNewMSS![itemCount].odaddress.toString(),
+                                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.redAccent),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      foundDataNewMSS![itemCount].remark.toString(),
+                                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
-                          ))
-                        ],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0), // Apply padding outside
-                        child: Row(
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        // Status (right aligned, stays vertically at the top)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Expanded(
-                              child: foundDataNewMSS![itemCount]
-                                  .odaddress
-                                  .toString()
-                                  .text
-                                  .textStyle(context.captionStyle)
-                                  .overflow(TextOverflow.ellipsis)
-                                  .maxLines(2)
-                                  .make(),
+                            Text(
+                              foundDataNewMSS![itemCount].approvalstatus.toString(),
+                              style: TextStyle(
+                                color: statusColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(child: foundDataNewMSS![itemCount].remark
-                              .toString()
-                              .text
-                              .textStyle(context.captionStyle)
-                              .overflow(TextOverflow.ellipsis)
-                              .maxLines(2)
-                              .make()
-                              .px8())
-                        ],
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.touch_app,
-                                  size: 35,
-                                  color: Mythemes.lightBluishColor,
-                                ),
-                              ],
-                            ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Remark row
+                    /*Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.teal),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            foundDataNewMSS![itemCount].remark.toString(),
+                            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                foundDataNewMSS![itemCount].odtype
-                                    .toString()
-                                    .text
-                                    .sm
-                                    .make(),
-                                foundDataNewMSS![itemCount].odtime
-                                    .toString()
-                                    .text
-                                    .sm
-                                    .make()
-                              ],
-                            ),
+                        )
+                      ],
+                    ),*/
+
+                    const SizedBox(height: 12),
+                    const Divider(height: 1),
+
+                    const SizedBox(height: 10),
+
+                    // Bottom icons row (In/Out + Date)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Left block - In/Out and time
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.touch_app, size: 32, color: Mythemes.lightBluishColor),
+                              const SizedBox(width: 6),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    foundDataNewMSS![itemCount].odtype.toString(),
+                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    foundDataNewMSS![itemCount].odtime.toString(),
+                                    style: const TextStyle(color: Colors.black87, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.date_range,
-                                  size: 35,
-                                  color: Mythemes.lightBluishColor,
-                                ),
-                              ],
-                            ),
+                        ),
+
+                        // Right block - Date
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.date_range, size: 32, color: Mythemes.lightBluishColor),
+                              const SizedBox(width: 6),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Date',
+                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    DateFormat("dd-MM-yyyy")
+                                        .format(DateTime.parse(foundDataNewMSS![itemCount].date.toString())),
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Date".text.sm.make(),
-                                DateFormat("dd-MM-yyyy")
-                                    .format(DateTime.parse(foundDataNewMSS![itemCount].date
-                                        .toString()))
-                                    .text
-                                    .sm
-                                    .make()
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                )),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),

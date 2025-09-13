@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:er_flutter_project/MSS_Bundle/dashboard/mssDashboard.dart';
+import 'package:er_flutter_project/MSS_Bundle/hris/fnfListMSS.dart';
+import 'package:er_flutter_project/MSS_Bundle/hris/inactiveListMSS.dart';
 import 'package:er_flutter_project/MSS_Bundle/incidentReporting/incidentReportingPage.dart';
 import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
 import 'package:er_flutter_project/ess/loan&Advance/myLoanRequestList.dart';
@@ -110,6 +112,7 @@ import 'commanScreen/realTimeLocation.dart';
 import 'commanScreen/ujalaCreditWorkdone.dart';
 import 'commanScreen/ujalaWorkDone2.dart';
 import 'ess/EssDashboarrddModel.dart';
+import 'ess/MyReportingOfficers.dart';
 import 'ess/essDashboard.dart';
 import 'ess/essDashboardNavigate.dart';
 import 'ess/loan&Advance/myLoanLedger.dart';
@@ -802,8 +805,13 @@ class _MyHomePageState extends State<MyHomePage> {
           //Real-Time Dashboards
           MyRoutings.realtimeESSDashboard: (context) => RealTimeESSDashboard(EssDashboarrdModel()),
 
+          //Reporting Officer Page
+          MyRoutings.reportingOfficerPageRoute: (context) => ReportingOfficersPage(),
 
 
+          //HRIS
+          MyRoutings.inactiveListMSSRoute: (context) => InactiveListMSS(),
+          MyRoutings.fnfListMSSRoute: (context) => FNFListMSS(),
 
 
         },

@@ -351,4 +351,11 @@ class MyRoutings {
   static String uisPendingAttReqL1= "/uisPendingAttReqL1";
   static String uisPendingAttReqL2= "/uisPendingAttReqL2";
 
+
+  //Reporting Officer Page
+  static String reportingOfficerPageRoute= "/reportingOfficerPageRoute";
+
+  //HRIS
+  static String inactiveListMSSRoute= "/inactiveListMSSRoute";
+  static String fnfListMSSRoute= "/fnfListMSSRoute";
 }
