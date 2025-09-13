@@ -77,6 +77,7 @@ class ListData {
   String? empContact;
   int? empDetId;
   String? empBranchName;
+  String? employeeStatus;
   String? empDesignationName;
   String? reportingOfficerName;
   String? empCode;
@@ -93,6 +94,7 @@ class ListData {
         this.empContact,
         this.empDetId,
         this.empBranchName,
+        this.employeeStatus,
         this.empDesignationName,
         this.reportingOfficerName,
         this.empCode,
@@ -109,6 +111,7 @@ class ListData {
     empContact = json['empContact'];
     empDetId = json['empDetId'];
     empBranchName = json['empBranchName'];
+    employeeStatus = json['employeeStatus'];
     empDesignationName = json['empDesignationName'];
     reportingOfficerName = json['reportingOfficerName'];
     empCode = json['empCode'];
@@ -127,6 +130,7 @@ class ListData {
     data['empContact'] = this.empContact;
     data['empDetId'] = this.empDetId;
     data['empBranchName'] = this.empBranchName;
+    data['employeeStatus'] = this.employeeStatus;
     data['empDesignationName'] = this.empDesignationName;
     data['reportingOfficerName'] = this.reportingOfficerName;
     data['empCode'] = this.empCode;
@@ -146,6 +150,7 @@ class DottedEmpList {
   String? empContact;
   int? empDetId;
   String? empBranchName;
+  String? employeeStatus;
   String? empDesignationName;
   String? reportingOfficerName;
   String? empCode;
@@ -162,6 +167,7 @@ class DottedEmpList {
         this.empContact,
         this.empDetId,
         this.empBranchName,
+        this.employeeStatus,
         this.empDesignationName,
         this.reportingOfficerName,
         this.empCode,
@@ -178,6 +184,7 @@ class DottedEmpList {
     empContact = json['empContact'];
     empDetId = json['empDetId'];
     empBranchName = json['empBranchName'];
+    employeeStatus = json['employeeStatus'];
     empDesignationName = json['empDesignationName'];
     reportingOfficerName = json['reportingOfficerName'];
     empCode = json['empCode'];
@@ -196,6 +203,7 @@ class DottedEmpList {
     data['empContact'] = this.empContact;
     data['empDetId'] = this.empDetId;
     data['empBranchName'] = this.empBranchName;
+    data['employeeStatus'] = this.employeeStatus;
     data['empDesignationName'] = this.empDesignationName;
     data['reportingOfficerName'] = this.reportingOfficerName;
     data['empCode'] = this.empCode;
@@ -215,6 +223,7 @@ class DirectEmpList {
   String? empContact;
   int? empDetId;
   String? empBranchName;
+  String? employeeStatus;
   String? empDesignationName;
   String? reportingOfficerName;
   String? empCode;
@@ -231,6 +240,7 @@ class DirectEmpList {
         this.empContact,
         this.empDetId,
         this.empBranchName,
+        this.employeeStatus,
         this.empDesignationName,
         this.reportingOfficerName,
         this.empCode,
@@ -248,6 +258,7 @@ class DirectEmpList {
     empContact = json['empContact'];
     empDetId = json['empDetId'];
     empBranchName = json['empBranchName'];
+    employeeStatus = json['employeeStatus'];
     empDesignationName = json['empDesignationName'];
     reportingOfficerName = json['reportingOfficerName'];
     empCode = json['empCode'];
@@ -266,6 +277,7 @@ class DirectEmpList {
     data['empContact'] = this.empContact;
     data['empDetId'] = this.empDetId;
     data['empBranchName'] = this.empBranchName;
+    data['employeeStatus'] = this.employeeStatus;
     data['empDesignationName'] = this.empDesignationName;
     data['reportingOfficerName'] = this.reportingOfficerName;
     data['empCode'] = this.empCode;
@@ -285,6 +297,7 @@ class SharedEmpList {
   String? empContact;
   int? empDetId;
   String? empBranchName;
+  String? employeeStatus;
   String? empDesignationName;
   String? reportingOfficerName;
   String? empCode;
@@ -301,6 +314,7 @@ class SharedEmpList {
         this.empContact,
         this.empDetId,
         this.empBranchName,
+        this.employeeStatus,
         this.empDesignationName,
         this.reportingOfficerName,
         this.empCode,
@@ -318,6 +332,7 @@ class SharedEmpList {
     empContact = json['empContact'];
     empDetId = json['empDetId'];
     empBranchName = json['empBranchName'];
+    employeeStatus = json['employeeStatus'];
     empDesignationName = json['empDesignationName'];
     reportingOfficerName = json['reportingOfficerName'];
     empCode = json['empCode'];
@@ -336,6 +351,7 @@ class SharedEmpList {
     data['empContact'] = this.empContact;
     data['empDetId'] = this.empDetId;
     data['empBranchName'] = this.empBranchName;
+    data['employeeStatus'] = this.employeeStatus;
     data['empDesignationName'] = this.empDesignationName;
     data['reportingOfficerName'] = this.reportingOfficerName;
     data['empCode'] = this.empCode;
@@ -355,6 +371,7 @@ class DesignatedEmpList {
   String? empContact;
   int? empDetId;
   String? empBranchName;
+  String? employeeStatus;
   String? empDesignationName;
   String? reportingOfficerName;
   String? empCode;
@@ -371,6 +388,7 @@ class DesignatedEmpList {
         this.empContact,
         this.empDetId,
         this.empBranchName,
+        this.employeeStatus,
         this.empDesignationName,
         this.reportingOfficerName,
         this.empCode,
@@ -388,6 +406,7 @@ class DesignatedEmpList {
     empContact = json['empContact'];
     empDetId = json['empDetId'];
     empBranchName = json['empBranchName'];
+    employeeStatus = json['employeeStatus'];
     empDesignationName = json['empDesignationName'];
     reportingOfficerName = json['reportingOfficerName'];
     empCode = json['empCode'];
@@ -406,6 +425,7 @@ class DesignatedEmpList {
     data['empContact'] = this.empContact;
     data['empDetId'] = this.empDetId;
     data['empBranchName'] = this.empBranchName;
+    data['employeeStatus'] = this.employeeStatus;
     data['empDesignationName'] = this.empDesignationName;
     data['reportingOfficerName'] = this.reportingOfficerName;
     data['empCode'] = this.empCode;
