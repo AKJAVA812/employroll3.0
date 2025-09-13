@@ -205,6 +205,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     getSharedPrfanceList();
     currentIndex = widget.selectedIndex;
     loadProfileFromPrefs();
+    loadRequisitionCountsFromPrefs();
     var now = new DateTime.now();
     //var now =  ntpTime.toUtc();
 
@@ -224,6 +225,13 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     selectedProfileIdNotifier.value = id ?? 0;
   }
 
+  void loadRequisitionCountsFromPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    attReqCountNotifier.value = prefs.getInt("attReqCount") ?? 0;
+    leaveReqCountNotifier.value = prefs.getInt("leaveReqCount") ?? 0;
+    odReqCountNotifier.value = prefs.getInt("mobOdCount") ?? 0;
+  }
 
 
   var type = "0";
@@ -2277,6 +2285,11 @@ class _DrawerFileState extends State<DrawerFile> {
   bool showRo = false;
   dynamic selectedProfileId;
   dynamic selectedProfileName;
+  dynamic mobOdCount;
+  dynamic odReqCount;
+  dynamic tourReqCount;
+  dynamic attReqCount;
+  dynamic leaveReqCount;
   @override
   void initState() {
     getUserRoles();
@@ -2423,6 +2436,80 @@ class _DrawerFileState extends State<DrawerFile> {
       });
     }
   }
+
+  Future<void> loadRequisitionCounts() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    mobOdCount = prefs.getInt("mobOdCount") ?? 0;
+    leaveReqCount = prefs.getInt("leaveReqCount") ?? 0;
+    odReqCount = prefs.getInt("odReqCount") ?? 0;
+    tourReqCount = prefs.getInt("tourReqCount") ?? 0;
+    attReqCount = prefs.getInt("attReqCount") ?? 0;
+
+    print("Loaded counts → attReqCount: $attReqCount, leaveReqCount: $leaveReqCount");
+  }
+
+
+  Future<void> getRequisitionCounts(String sessionId) async {
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.reqCountApi;
+
+      var urlapi = Uri.parse("$conn$apiUrl?"
+          "sessionId=$sessionId&"
+          "profileId=$selectedProfileId&"
+          "userPermission=$userPanelPermissions");
+
+      final response = await http.post(urlapi);
+
+      print("Requisition Count API - ${response.request}");
+      print("Response Body - ${response.body}");
+
+      Map<String, dynamic> mapResponse = json.decode(response.body);
+
+      // After decoding response
+      int attReqCount = mapResponse['attReqCount'] ?? 0;
+      int leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
+      int mobOdCount = mapResponse['mobOdCount'] ?? 0;
+
+// ✅ Update global notifiers
+      attReqCountNotifier.value = attReqCount;
+      leaveReqCountNotifier.value = leaveReqCount;
+      odReqCountNotifier.value = mobOdCount;
+
+// ✅ Also persist in SharedPreferences for app relaunch
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setInt("attReqCount", attReqCount);
+      await prefs.setInt("leaveReqCount", leaveReqCount);
+      await prefs.setInt("mobOdCount", mobOdCount);
+
+      // ✅ Assign values to variables
+      mobOdCount = mapResponse['mobOdCount'] ?? 0;
+      leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
+      odReqCount = mapResponse['odReqCount'] ?? 0;
+      tourReqCount = mapResponse['tourReqCount'] ?? 0;
+      attReqCount = mapResponse['attReqCount'] ?? 0;
+
+
+      // ✅ Save all data into SharedPreferences
+      //final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt("mobOdCount", mobOdCount);
+      await prefs.setInt("leaveReqCount", leaveReqCount);
+      await prefs.setInt("odReqCount", odReqCount);
+      await prefs.setInt("tourReqCount", tourReqCount);
+      await prefs.setInt("attReqCount", attReqCount);
+
+      print("Saved Requisition Counts to SharedPreferences ✅");
+
+    } catch (e) {
+      print("Error fetching requisition counts: $e");
+    } finally {
+      setState(() {
+        //isLoading = false; // hide loader always
+      });
+    }
+  }
+
   bool isLoadingProfiles = false;
 
   getUserRoles() async {
@@ -2924,7 +3011,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               setState(() {
 
                               });
-
+                              getRequisitionCounts(sessionId!);
                               Navigator.pop(context);
                               Navigator.push(context,
                                   MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,))
@@ -2973,21 +3060,18 @@ class _DrawerFileState extends State<DrawerFile> {
                   );
                 },
               ),
-              Visibility(
-                visible: orgId == 179 || orgId == 186 || orgId == 145,
-                child: ListTile(
-                  leading: Icon(Icons.policy, color: Mythemes.black),
-                  title: Text(
-                    'Company Policies',
-                    style: TextStyle(color: Mythemes.black),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CompanyPoliciesPage()),
-                    );
-                  },
+              ListTile(
+                leading: Icon(Icons.policy, color: Mythemes.black),
+                title: Text(
+                  'Company Policies',
+                  style: TextStyle(color: Mythemes.black),
                 ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CompanyPoliciesPage()),
+                  );
+                },
               ),
             ],
           ).py32(),

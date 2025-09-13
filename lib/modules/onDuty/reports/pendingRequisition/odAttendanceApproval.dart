@@ -149,6 +149,7 @@ class _RadioGroupsState extends State<RadioGroups> {
 
   _RadioGroupsState(this.pendingOdReqList, this.indexCont);
   var empName;
+  var image;
   var odDate;
   var odType;
   var odTime;
@@ -182,6 +183,7 @@ class _RadioGroupsState extends State<RadioGroups> {
     setState(() {
       if(userPanel == "MSS") {
         empName = foundDataNewMSS![indexCont].name;
+        image = foundDataNewMSS![indexCont].image;
         odDate = foundDataNewMSS![indexCont].date;
         odType = foundDataNewMSS![indexCont].odtype;
         odTime = foundDataNewMSS![indexCont].odtime;
@@ -191,6 +193,7 @@ class _RadioGroupsState extends State<RadioGroups> {
       }
       if(userPanel == "MSS_MO") {
         empName = foundDataNewMO![indexCont].name;
+        image = foundDataNewMO![indexCont].image;
         odDate = foundDataNewMO![indexCont].date;
         odType = foundDataNewMO![indexCont].odtype;
         odTime = foundDataNewMO![indexCont].odtime;
@@ -200,6 +203,7 @@ class _RadioGroupsState extends State<RadioGroups> {
       }
       if(userPanel == "USER") {
         empName = foundDataNewUIS![indexCont].name;
+        image = foundDataNewUIS![indexCont].image;
         odDate = foundDataNewUIS![indexCont].date;
         odType = foundDataNewUIS![indexCont].odtype;
         odTime = foundDataNewUIS![indexCont].odtime;
@@ -217,6 +221,21 @@ class _RadioGroupsState extends State<RadioGroups> {
       padding: const EdgeInsets.only(top: 10.0),
       child: Column(
         children: [
+          Container(
+            padding: EdgeInsets.all(10.0),
+            width: MediaQuery.of(context).size.width/3,
+            height: MediaQuery.of(context).size.width/3,
+            decoration: BoxDecoration(
+              border: Border.all(color: Mythemes.lightBluishColor, width: 3),
+              shape: BoxShape.circle,
+              color: Mythemes.whitish,
+              image: DecorationImage(
+                fit: BoxFit.scaleDown,
+                image:  NetworkImage('$image'),
+                //FileImage(file!)
+              ),
+            ),
+          ),
           Row(
             children: [
               Expanded(
@@ -309,7 +328,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     padding: EdgeInsets.all(10.0),
                     child: TextFormField(
                       controller: TextEditingController(text: odAddress),
-                      maxLines: 4,
+                      maxLines: 3,
                       style:TextStyle(fontSize:14),
                       enabled: false,
                       //initialValue: "${branchName}",
@@ -336,7 +355,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     padding: EdgeInsets.all(10.0),
                     child: TextFormField(
                       controller: TextEditingController(text: odRemark),
-                      maxLines: 4,
+                      maxLines: 3,
                       style:TextStyle(fontSize:14),
                       enabled: false,
                       //initialValue: "${branchName}",
@@ -363,7 +382,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                     padding: EdgeInsets.all(10.0),
                     child: TextFormField(
                       controller: _commentController,
-                      maxLines: 4,
+                      maxLines: 3,
                       style:TextStyle(fontSize:14),
                       enabled: true,
                       //initialValue: "${branchName}",

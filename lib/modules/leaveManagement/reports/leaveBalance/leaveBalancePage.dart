@@ -295,9 +295,10 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
 
               var splitLeave = leaveTypeName.split("-")[2];
               var newListLeave = leaveTypeName.split("-")[1];
+              var nameOnly= leaveTypeName.split("-")[0];
               var newString = "$newListLeave-" + "$splitLeave";
               //print("$newListLeave-" + "$splitLeave");
-              print("$newString");
+              print("Leave Type - $nameOnly");
 
               var leaveTypeShort = mapResponse['leaveData']['$newString']['leavesTaken'];
               //var leaveTypeShort = ;
@@ -309,14 +310,14 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
                   initiallyExpanded: isExpanded,
                   childrenPadding: EdgeInsets.all(16).copyWith(top: 0),
 
-                  title: leaveBalLabel!.leaveData!.leaveTypeList!.leaveTypelist![itemCount].toString()
+                  title: nameOnly.toString()
                       .text
                       .make(),
                   subtitle: "DOJ - $doj"
                       .text
                       .make(),
                   children: [
-                    Row(
+                    /*Row(
                         children: [
                           "Carry Forward (Last Ledger)".text.bold.color(Mythemes.lightBluishColor).make(),
                           Expanded(
@@ -331,8 +332,8 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
 
                           )
                         ]
-                    ).pLTRB(0, 0, 0, 8.0),
-                    Row(
+                    ).pLTRB(0, 0, 0, 8.0),*/
+                    /*Row(
                         children: [
                           "Leave Credit (Current)".text.bold.color(Mythemes.activeStepColor).make(),
                           Expanded(
@@ -341,18 +342,18 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   mapResponse['leaveData']['$newString']['currentYearLeaves'].toString().text.bold.color(Mythemes.activeStepColor).make().px8(),
-                                  /* if (leaveTypeName == 'Sick Leave-SL-606')
+                                  *//* if (leaveTypeName == 'Sick Leave-SL-606')
                                   leaveBalLabel!.leaveData!.sL606!.currentYearLeaves!.toString().text.make().px8(),
                                 if(leaveTypeName == 'Casual Leave-CL-607')
                                   leaveBalLabel!.leaveData!.cL607!.currentYearLeaves!.toString().text.make().px8(),
                                 if(leaveTypeName == 'Earn Leave-EL-608')
-                                  leaveBalLabel!.leaveData!.eL608!.currentYearLeaves!.toString().text.make().px8(),*/
+                                  leaveBalLabel!.leaveData!.eL608!.currentYearLeaves!.toString().text.make().px8(),*//*
                                 ],
                               )
 
                           )
                         ]
-                    ).pLTRB(0, 0, 0, 8.0),
+                    ).pLTRB(0, 0, 0, 8.0),*/
                     Row(
                         children: [
                           "Total Leave Enjoyed".text.bold.color(Mythemes.warningColor).make(),
@@ -368,7 +369,7 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
                           )
                         ]
                     ).pLTRB(0, 0, 0, 8.0),
-                    Row(
+                    /*Row(
                         children: [
                           "Leave Without Pay".text.bold.color(Mythemes.dangerColor).make(),
                           Expanded(
@@ -382,8 +383,8 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
 
                           )
                         ]
-                    ).pLTRB(0, 0, 0, 8.0),
-                    Row(
+                    ).pLTRB(0, 0, 0, 8.0),*/
+                    /*Row(
                         children: [
                           "Balance Leaves".text.bold.color(Mythemes.alertColor).make(),
                           Expanded(
@@ -397,10 +398,10 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
 
                           )
                         ]
-                    ).pLTRB(0, 0, 0, 8.0),
+                    ).pLTRB(0, 0, 0, 8.0),*/
                     Row(
                         children: [
-                          "Total Leave Pending(1+2+3)".text.bold.color(Mythemes.successColor).make(),
+                          "Total Leave Pending".text.bold.color(Mythemes.successColor).make(),
                           Expanded(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,

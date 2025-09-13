@@ -5,7 +5,7 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   static var server="https://74893fa79028.ngrok.app/";
+   static var server="https://4f9649512c90.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -38,6 +38,7 @@ class ApiDetails{
    static var selfOdReqList = "/restful/service/odlist/via/mobile";
    //HRIS employee list
    static var getEmpList = "/restful/service/employeelist";
+   static var myTeamListApi = "/restful/service/employeelist/for/my/team";
    //QR based attendance
    static var qrBasedAttendance = "/restful/service/attendance/via/mobile/qr/code/scanner";
    //Leave management
@@ -223,5 +224,12 @@ class ApiDetails{
 
    //Company Policy API
    static var companyPolicyApi = "restful/service/policy/details/list";
+
+   //My Managers List
+   static var myManagersApi = "/restful/service/get/ro/list/of/an/all/ro/emp/list";
+
+   //Requisition Count API
+   static var reqCountApi = "/restful/service/get/pending/requisition/count";
+
 
 }

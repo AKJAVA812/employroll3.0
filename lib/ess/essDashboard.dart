@@ -369,26 +369,37 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     );
   }
 
-  Future<EssEventsListModal> getEventData(String SessionId) async {
+
+  Future<EssEventsListModal> getEventData(String sessionId) async {
+    setState(() {
+      isLoading = true; // Show loader before fetching
+    });
+
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalESSApi;
 
-    print('employeeList11: ${SessionId}');
-    EssEventsListModal eventsListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "branch=$branchId&"
-        "shift=$shift&"
-        "date=$singleDateString");
-    final response = await http.post(urlapi);
+    print('employeeList11: $sessionId');
 
+    EssEventsListModal eventsListModal;
+
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&branch=$branchId&shift=$shift&date=$singleDateString");
+
+    final response = await http.post(urlapi);
     print('responseemployeeList ${response.request}');
-    //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
-    var getData = mapResponse;
-    print('Body Data $getData');
+    print('Body Data $mapResponse');
+
     eventsListModal = EssEventsListModal.fromJson(mapResponse);
+
+    // assign to global
+    eventsListModalGlobal = eventsListModal;
+
+    setState(() {
+      isLoading = false; // Hide loader AFTER everything is ready
+    });
+
     return eventsListModal;
   }
 
@@ -1769,21 +1780,21 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                           tabs: [
                             Tab(
                               icon: Icon(
-                                Icons.cake,
+                                Icons.celebration,
                                 color: Mythemes.blackishade,
                               ),
                               text: "Birthday",
                             ),
                             Tab(
                               icon: Icon(
-                                Icons.cake,
+                                Icons.workspace_premium_rounded,
                                 color: Mythemes.blackishade,
                               ),
-                              text: "Anniversary",
+                              text: "Work Anniversary",
                             ),
                             Tab(
                               icon: Icon(
-                                Icons.calendar_month,
+                                Icons.today,
                                 color: Mythemes.blackishade,
                               ),
                               text: "Today events",
@@ -1803,6 +1814,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                       height: 400,
                       child: TabBarView(children: [
 
+                        //Birthday
                         Container(
                           // height: 1,
                           child: Padding(
@@ -1849,6 +1861,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                                 }),
                           ),
                         ),
+                        //Work Anievarsary
                         Container(
                           // height: 1,
                           child: Padding(
@@ -1893,6 +1906,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                                 }),
                           ),
                         ),
+                        //Today Events
                         Container(
                           // height: 1,
                           child: Column(
@@ -1984,6 +1998,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                             ],
                           ),
                         ),
+                        //Holiday
                         Container(
                           // height: 1,
                           child: Padding(
@@ -2260,17 +2275,17 @@ CalendarShow() {
                 tabs: [
                   Tab(
                     icon: Icon(
-                      Icons.cake,
+                      Icons.celebration,
                       color: Mythemes.blackishade,
                     ),
                     text: "Birthday",
                   ),
                   Tab(
                     icon: Icon(
-                      Icons.cake,
+                      Icons.workspace_premium_rounded,
                       color: Mythemes.blackishade,
                     ),
-                    text: "Anniversary",
+                    text: "Work Anniversary",
                   ),
                   Tab(
                     icon: Icon(
