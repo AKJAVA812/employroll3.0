@@ -5,7 +5,6 @@ import 'package:er_flutter_project/MSS_Bundle/hris/inactiveListMSS.dart';
 import 'package:er_flutter_project/MSS_Bundle/incidentReporting/incidentReportingPage.dart';
 import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
 import 'package:er_flutter_project/ess/loan&Advance/myLoanRequestList.dart';
-import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
 import 'package:er_flutter_project/settings/checkForUpdates.dart';
 import 'package:er_flutter_project/settings/companyPolicyList.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
