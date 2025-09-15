@@ -5,7 +5,7 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //static var server="https://4f9649512c90.ngrok.app/";
+   //static var server="https://99c1b9ad7cae.ngrok.app/";
 
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
@@ -232,4 +232,6 @@ class ApiDetails{
    static var reqCountApi = "/restful/service/get/pending/requisition/count";
 
 
+   //Firebase Token Send API
+   static var firebaseApiSend = "/restful/service/get/user/firebase/id";
 }

@@ -6,6 +6,7 @@ import 'package:er_flutter_project/MSS_Bundle/incidentReporting/incidentReportin
 import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
 import 'package:er_flutter_project/ess/loan&Advance/myLoanRequestList.dart';
 import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
+import 'package:er_flutter_project/firebase_options.dart';
 import 'package:er_flutter_project/settings/checkForUpdates.dart';
 import 'package:er_flutter_project/settings/companyPolicyList.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
@@ -13,6 +14,8 @@ import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordNewCreatio
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordOtp.dart';
 import 'package:er_flutter_project/singUP/resetPassword/resetPasswordPage.dart';
 import 'package:er_flutter_project/tracking/geolocator/GeolocatorTracking.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:er_flutter_project/adminPage/modelClass/dashboardModel.dart';
 import 'package:er_flutter_project/commanScreen/ProjectListPage.dart';
@@ -266,6 +269,14 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
 }*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+  );
+
+  final notificationService = NotificationService();
+  await notificationService.initFCM();
+
+  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
   //await initializeService();
   await Hive.initFlutter();
   WidgetsFlutterBinding.ensureInitialized();
@@ -289,6 +300,8 @@ void main() async {
 
   runApp(const MyApp());
 }
+
+
 
 /*void requestPermission() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -819,4 +832,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+Future<void> handleBackgroundMessage(RemoteMessage message) async{
+  print('Title: ${message.notification?.title}');
+  print('Body: ${message.notification?.body}');
+  print('Payload: ${message.data}');
+
 }
