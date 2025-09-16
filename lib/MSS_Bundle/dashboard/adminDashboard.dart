@@ -1257,21 +1257,21 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                           tabs: [
                             Tab(
                               icon: Icon(
-                                Icons.cake,
+                                Icons.celebration,
                                 color: Mythemes.blackishade,
                               ),
                               text: "Birthday",
                             ),
                             Tab(
                               icon: Icon(
-                                Icons.cake,
+                                Icons.workspace_premium_outlined,
                                 color: Mythemes.blackishade,
                               ),
                               text: "Anniversary",
                             ),
                             Tab(
                               icon: Icon(
-                                Icons.calendar_month,
+                                Icons.today,
                                 color: Mythemes.blackishade,
                               ),
                               text: "Today events",
@@ -1501,21 +1501,21 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                 tabs: [
                   Tab(
                     icon: Icon(
-                      Icons.cake,
+                      Icons.celebration,
                       color: Mythemes.blackishade,
                     ),
                     text: "Birthday",
                   ),
                   Tab(
                     icon: Icon(
-                      Icons.cake,
+                      Icons.workspace_premium_outlined,
                       color: Mythemes.blackishade,
                     ),
                     text: "Anniversary",
                   ),
                   Tab(
                     icon: Icon(
-                      Icons.calendar_month,
+                      Icons.today,
                       color: Mythemes.blackishade,
                     ),
                     text: "Today events",

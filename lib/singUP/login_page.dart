@@ -23,6 +23,7 @@ import '../commanScreen/allAPIList.dart';
 import '../commanScreen/commanNotificationPage.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../commanScreen/routes.dart';
+import '../firebasePushNotification/firebase_api.dart';
 import '../main.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
@@ -58,6 +59,7 @@ String packageName = "";
 String version = "";
 String buildNumber = "";
 
+String? fcmToken;
 class _LoginPageState extends State<LoginPage> {
   String name = "";
   bool changeButton = false;
@@ -313,6 +315,7 @@ class _LoginPageState extends State<LoginPage> {
     }*/
     sessionId = await shared!.getSessionId();
     userPanel = await shared!.getUserPanel();
+    fcmToken = await NotificationService.getToken();
     print("User Panel - $userPanel");
     setState(() {
 
@@ -442,6 +445,39 @@ class _LoginPageState extends State<LoginPage> {
     //Table name mention here
     passwordChange = await Hive.openBox("SavePass");
     getCredentials();
+  }
+
+  Future<void> sendGeoFenceId(String sessionId, String geofenceTokenId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.firebaseApiSend;
+    try {
+      // Build the URL
+      var urlapi = Uri.parse(
+          "$conn$apiUrl?sessionId=$sessionId&"
+              "firebaseId=$fcmToken"
+      );
+
+      print("Geofence URL: $urlapi");
+
+      // Send POST request
+      final response = await http.post(urlapi);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        print("Success: $jsonResponse");
+      } else {
+        print("Failed with status: ${response.statusCode}");
+        print("Response body: ${response.body}");
+
+        // Retry logic (similar to your Android code)
+        //await sendGeoFenceId(sessionId, geofenceTokenId);
+      }
+    } catch (e) {
+      print("Error sending GeoFence ID: $e");
+
+      // Retry on error
+      //await sendGeoFenceId(sessionId, geofenceTokenId);
+    }
   }
 
   @override
@@ -603,8 +639,10 @@ class _LoginPageState extends State<LoginPage> {
                                             shared.setEmpRoll(value!.data!.empRole!.length);
                                             shared.setRoRoll(value!.data!.roRole!.length);
                                             shared.setShowPayroll(loginModelglobal!.data!.userLoginned!.showPayroll);
+                                            //sendGeoFenceId(value.data!.sessionId!, fcmToken!);
                                             if(adminRole==1){
                                               setAdminSharedPrefValue(loginModelglobal);
+
                                             }else{
                                               setSharedPrefanceValue(loginModelglobal);
                                             }
@@ -649,6 +687,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
 
   void showDialgErro(BuildContext buildContext, result) {
     var alertDialog = AlertDialog(

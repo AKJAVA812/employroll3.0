@@ -61,6 +61,7 @@ late List<String?> list = [];
 late List<String?> branchList = [];
 late List<String?>? shiftList = [];
 bool isLoading = true;
+bool isLoadingEvent = true;
 String valuenew = "listText";
 String shiftValue = "listText";
 class _UIS_DashboardState extends State<UIS_Dashboard> {
@@ -239,6 +240,9 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 
     print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
+    setState(() {
+      isLoadingEvent = true;
+    });
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "branch=$branchId&"
@@ -256,6 +260,9 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     var getData = mapResponse;
     print('Body Data $getData');
     eventsListModal = EventsListModal.fromJson(mapResponse);
+    setState(() {
+      isLoadingEvent = false;
+    });
     return eventsListModal;
   }
 
@@ -1551,225 +1558,74 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Container(
-                      constraints: BoxConstraints(maxHeight: 150.0),
-                      child: Material(
-                        color: Mythemes.whitish,
-                        child: TabBar(
-                          tabs: [
-                            Tab(
-                              icon: Icon(
-                                Icons.cake,
-                                color: Mythemes.blackishade,
-                              ),
-                              text: "Birthday",
-                            ),
-                            Tab(
-                              icon: Icon(
-                                Icons.cake,
-                                color: Mythemes.blackishade,
-                              ),
-                              text: "Anniversary",
-                            ),
-                            Tab(
-                              icon: Icon(
-                                Icons.calendar_month,
-                                color: Mythemes.blackishade,
-                              ),
-                              text: "Today events",
-                            ),
-                          ],
-                        ),
+                    // TabBar
+                    Material(
+                      color: Mythemes.whitish,
+                      child: TabBar(
+                        indicatorColor: Colors.deepPurple,
+                        indicatorWeight: 3,
+                        labelColor: Colors.deepPurple,
+                        unselectedLabelColor: Mythemes.blackishade,
+                        tabs: const [
+                          Tab(icon: Icon(Icons.celebration), text: "Birthday"),
+                          Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
+                          Tab(icon: Icon(Icons.today), text: "Today Events"),
+                        ],
                       ),
                     ),
+
+                    // Tab Views
                     SizedBox(
                       height: 400,
-                      child: TabBarView(children: [
+                      child: TabBarView(
+                        children: [
+                          // 🎂 Birthday Tab
+                          buildEventList(
+                            isLoading: isLoadingEvent,
+                            items: eventsListModalGlobal?.bdayList ?? [],
+                            emptyText: "No birthdays today 🎉",
+                            titleBuilder: (item) => item.fullName,
+                            subtitleBuilder: (item) => item.department,
+                            trailingBuilder: (item) => item.dob,
+                            imageBuilder: (item) => item.image,
+                          ),
 
-                        Container(
-                          // height: 1,
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child:
-                            isLoading
-                                ? SizedBox(
-                              width: 24, // Set width
-                              height: 24, // Set height
-                                  child: CircularProgressIndicator(strokeWidth: 3).centered(),
-                                ):
-                            oldEventLength == null ? "There is no data available.".text.center.make().py16() :
-                            ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: eventsListModalGlobal!.bdayList!.length,
-                                itemBuilder: (context, itemCount) {
-                                  return Card(
-                                    child: ListTile(
-                                      //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
-                                      title: Text(eventsListModalGlobal!
-                                          .bdayList![itemCount].fullName
-                                          .toString()),
-                                      subtitle: Text(eventsListModalGlobal!
-                                          .bdayList![itemCount].department
-                                          .toString()),
-                                      trailing: Text(eventsListModalGlobal!
-                                          .bdayList![itemCount].dob
-                                          .toString()),
-                                      leading: Container(
-                                        width: 40,
-                                        height: 40,
-                                        child: CircleAvatar(
-                                          radius: 30,
-                                          backgroundImage: NetworkImage(
-                                              eventsListModalGlobal!
-                                                  .bdayList![itemCount].image
-                                                  .toString()),
-                                          backgroundColor: Colors.grey,
-                                          // child: Image.network(imageString!),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
+                          // 🏅 Anniversary Tab
+                          buildEventList(
+                            isLoading: isLoadingEvent,
+                            items: eventsListModalGlobal?.joblist ?? [],
+                            emptyText: "No anniversaries today 🎊",
+                            titleBuilder: (item) => item.fullName,
+                            subtitleBuilder: (item) => item.department,
+                            trailingBuilder: (item) => item.doj,
+                            imageBuilder: (item) => item.image,
                           ),
-                        ),
-                        Container(
-                          // height: 1,
-                          child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child:
-                            isLoading
-                                ? CircularProgressIndicator()
-                                .centered()
-                                .py1():
-                            oldJobLength == null ? "There is no data available.".text.center.make().py16() :
-                            ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: eventsListModalGlobal!.joblist!.length,
-                                itemBuilder: (context, itemCount) {
-                                  return Card(
-                                    child: ListTile(
-                                      title: Text(eventsListModalGlobal!
-                                          .joblist![itemCount].fullName
-                                          .toString()),
-                                      subtitle: Text(eventsListModalGlobal!
-                                          .joblist![itemCount].department
-                                          .toString()),
-                                      trailing: Text(eventsListModalGlobal!
-                                          .joblist![itemCount].doj
-                                          .toString()),
-                                      leading: Container(
-                                        width: 40,
-                                        height: 40,
-                                        child: CircleAvatar(
-                                          radius: 30,
-                                          backgroundImage: NetworkImage(
-                                              eventsListModalGlobal!
-                                                  .joblist![itemCount].image
-                                                  .toString()),
-                                          backgroundColor: Colors.grey,
-                                          // child: Image.network(imageString!),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ),
-                        ),
-                        Container(
-                          // height: 1,
-                          child: Column(
+
+                          // 📅 Today Events Tab (combine lists)
+                          ListView(
                             children: [
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child:
-                                isLoading
-                                    ? CircularProgressIndicator()
-                                    .centered()
-                                    .py1():
-                                oldEvent != todayEvent ? "There is no data available.".text.make().py16() :
-
-                                ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    itemCount: eventsListModalGlobal!.bdayList!.length,
-                                    itemBuilder: (context, itemCount) {
-
-                                      return Card(
-                                        child: ListTile(
-                                          title: Text(eventsListModalGlobal!
-                                              .bdayList![itemCount].fullName
-                                              .toString()),
-                                          subtitle: Text(eventsListModalGlobal!
-                                              .bdayList![itemCount].department
-                                              .toString()),
-                                          trailing: Text(eventsListModalGlobal!
-                                              .bdayList![itemCount].dob
-                                              .toString()),
-                                          leading: Container(
-                                            width: 40,
-                                            height: 40,
-                                            child: CircleAvatar(
-                                              radius: 30,
-                                              backgroundImage: NetworkImage(
-                                                  eventsListModalGlobal!
-                                                      .bdayList![itemCount].image
-                                                      .toString()),
-                                              backgroundColor: Colors.grey,
-                                              // child: Image.network(imageString!),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }),
+                              buildEventList(
+                                isLoading: isLoadingEvent,
+                                items: eventsListModalGlobal?.bdayList ?? [],
+                                emptyText: "No birthday events today 🎂",
+                                titleBuilder: (item) => item.fullName,
+                                subtitleBuilder: (item) => item.department,
+                                trailingBuilder: (item) => item.dob,
+                                imageBuilder: (item) => item.image,
                               ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child:
-                                isLoading
-                                    ? CircularProgressIndicator()
-                                    .centered()
-                                    .py8() :
-                                oldJobEvent != todayEvent ? "".text.make() :
-
-                                ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    itemCount: eventsListModalGlobal!.joblist!.length,
-                                    itemBuilder: (context, itemCount) {
-                                      return Card(
-                                        child: ListTile(
-                                          title: Text(eventsListModalGlobal!
-                                              .joblist![itemCount].fullName
-                                              .toString()),
-                                          subtitle: Text(eventsListModalGlobal!
-                                              .joblist![itemCount].department
-                                              .toString()),
-                                          trailing: Text(eventsListModalGlobal!
-                                              .joblist![itemCount].doj
-                                              .toString()),
-                                          leading: Container(
-                                            width: 40,
-                                            height: 40,
-                                            child: CircleAvatar(
-                                              radius: 30,
-                                              backgroundImage: NetworkImage(
-                                                  eventsListModalGlobal!
-                                                      .bdayList![itemCount].image
-                                                      .toString()),
-                                              backgroundColor: Colors.grey,
-                                              // child: Image.network(imageString!),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }),
+                              buildEventList(
+                                isLoading: isLoadingEvent,
+                                items: eventsListModalGlobal?.joblist ?? [],
+                                emptyText: "No work anniversaries today 🎉",
+                                titleBuilder: (item) => item.fullName,
+                                subtitleBuilder: (item) => item.department,
+                                trailingBuilder: (item) => item.doj,
+                                imageBuilder: (item) => item.image,
                               ),
                             ],
                           ),
-                        ),
-                      ]),
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -1783,6 +1639,79 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildEventList<T>({
+    required bool isLoading,
+    required List<T> items,
+    required String emptyText,
+    required String Function(T) titleBuilder,
+    required String Function(T) subtitleBuilder,
+    required String Function(T) trailingBuilder,
+    required String Function(T) imageBuilder,
+  }) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(strokeWidth: 3),
+      );
+    }
+
+    if (items.isEmpty) {
+      return Center(
+        child: Text(
+          emptyText,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(12),
+            leading: CircleAvatar(
+              radius: 28,
+              backgroundImage: NetworkImage(imageBuilder(item)),
+              backgroundColor: Colors.grey[200],
+            ),
+            title: Text(
+              titleBuilder(item),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+            subtitle: Text(
+              subtitleBuilder(item),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black54,
+              ),
+            ),
+            trailing: Text(
+              trailingBuilder(item),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.deepPurple,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

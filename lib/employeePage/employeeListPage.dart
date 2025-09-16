@@ -150,6 +150,7 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
       /// ✅ Always update the main model
       employeeListModelglobel = MyTeamsListModal.fromJson(mapResponse);
 
+      print("Employee List API - ${response.request}");
       setState(() {
         if (selectedFilter == "All") {
           allUsernew = employeeListModelglobel!.listData!;
@@ -676,7 +677,9 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                     borderRadius: BorderRadius.circular(12),
                     border: Border(
                       left: BorderSide(
-                        color: Mythemes.successColor,
+                        color: foundDataNew![index].employeeStatus == "ACTIVE"
+                            ? Colors.green
+                            : Colors.red,
                         width: 6, // Left colored curved border
                       ),
                     ),
@@ -726,7 +729,7 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                                   ),
                                   const SizedBox(height: 2),
                                   Text("📞 ${foundDataNew![index].empContact ?? '-'}"),
-                                  Text("🆔 ${foundDataNew![index].empDetId ?? '-'}"),
+                                  Text("🆔 ${foundDataNew![index].empCode ?? '-'}"),
                                   Text("✉️ ${foundDataNew![index].empEmailId ?? '-'}"),
                                   Text("🏢 ${foundDataNew![index].empDeptName ?? '-'}"),
                                 ],
@@ -741,10 +744,12 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                         top: 8,
                         right: 12,
                         child: Text(
-                          "EMP_STATUS",
+                          foundDataNew![index].employeeStatus ?? '-',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: Mythemes.successColor,
+                            color: foundDataNew![index].employeeStatus == "ACTIVE"
+                                ? Colors.green
+                                : Colors.red,
                           ),
                         ),
                       ),
@@ -795,7 +800,9 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                         borderRadius: BorderRadius.circular(12),
                         border: Border(
                           left: BorderSide(
-                            color: Mythemes.successColor,
+                            color: foundDataNewDirect![index].employeeStatus == "ACTIVE"
+                                ? Colors.green
+                                : Colors.red,
                             width: 6, // Left colored curved border
                           ),
                         ),
@@ -845,7 +852,7 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                                       ),
                                       const SizedBox(height: 2),
                                       Text("📞 ${foundDataNewDirect![index].empContact ?? '-'}"),
-                                      Text("🆔 ${foundDataNewDirect![index].empDetId ?? '-'}"),
+                                      Text("🆔 ${foundDataNewDirect![index].empCode ?? '-'}"),
                                       Text("✉️ ${foundDataNewDirect![index].empEmailId ?? '-'}"),
                                       Text("🏢 ${foundDataNewDirect![index].empDeptName ?? '-'}"),
                                     ],
@@ -860,10 +867,12 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                             top: 8,
                             right: 12,
                             child: Text(
-                              "EMP_STATUS",
+                              foundDataNewDirect![index].employeeStatus ?? '-',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: Mythemes.successColor,
+                                color: foundDataNewDirect![index].employeeStatus == "ACTIVE"
+                                    ? Colors.green
+                                    : Colors.red,
                               ),
                             ),
                           ),
@@ -913,7 +922,9 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                         borderRadius: BorderRadius.circular(12),
                         border: Border(
                           left: BorderSide(
-                            color: Mythemes.successColor,
+                            color: foundDataNewDesignated![index].employeeStatus == "ACTIVE"
+                                ? Colors.green
+                                : Colors.red,
                             width: 6, // Left colored curved border
                           ),
                         ),
@@ -963,7 +974,7 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                                       ),
                                       const SizedBox(height: 2),
                                       Text("📞 ${foundDataNewDesignated![index].empContact ?? '-'}"),
-                                      Text("🆔 ${foundDataNewDesignated![index].empDetId ?? '-'}"),
+                                      Text("🆔 ${foundDataNewDesignated![index].empCode ?? '-'}"),
                                       Text("✉️ ${foundDataNewDesignated![index].empEmailId ?? '-'}"),
                                       Text("🏢 ${foundDataNewDesignated![index].empDeptName ?? '-'}"),
                                     ],
@@ -978,10 +989,12 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                             top: 8,
                             right: 12,
                             child: Text(
-                              "EMP_STATUS",
+                              foundDataNewDesignated![index].employeeStatus ?? '-',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: Mythemes.successColor,
+                                color: foundDataNewDesignated![index].employeeStatus == "ACTIVE"
+                                    ? Colors.green
+                                    : Colors.red,
                               ),
                             ),
                           ),
@@ -1031,7 +1044,9 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                         borderRadius: BorderRadius.circular(12),
                         border: Border(
                           left: BorderSide(
-                            color: Mythemes.successColor,
+                            color: foundDataNewShared![index].employeeStatus == "ACTIVE"
+                                ? Colors.green
+                                : Colors.red,
                             width: 6, // Left colored curved border
                           ),
                         ),
@@ -1081,7 +1096,7 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                                       ),
                                       const SizedBox(height: 2),
                                       Text("📞 ${foundDataNewShared![index].empContact ?? '-'}"),
-                                      Text("🆔 ${foundDataNewShared![index].empDetId ?? '-'}"),
+                                      Text("🆔 ${foundDataNewShared![index].empCode ?? '-'}"),
                                       Text("✉️ ${foundDataNewShared![index].empEmailId ?? '-'}"),
                                       Text("🏢 ${foundDataNewShared![index].empDeptName ?? '-'}"),
                                     ],
@@ -1096,10 +1111,12 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                             top: 8,
                             right: 12,
                             child: Text(
-                              "EMP_STATUS",
+                              foundDataNewShared![index].employeeStatus ?? '-',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: Mythemes.successColor,
+                                color: foundDataNewShared![index].employeeStatus == "ACTIVE"
+                                    ? Colors.green
+                                    : Colors.red,
                               ),
                             ),
                           ),
@@ -1149,7 +1166,9 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                         borderRadius: BorderRadius.circular(12),
                         border: Border(
                           left: BorderSide(
-                            color: Mythemes.successColor,
+                            color: foundDataNewDotted![index].employeeStatus == "ACTIVE"
+                                ? Colors.green
+                                : Colors.red,
                             width: 6, // Left colored curved border
                           ),
                         ),
@@ -1199,7 +1218,7 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                                       ),
                                       const SizedBox(height: 2),
                                       Text("📞 ${foundDataNewDotted![index].empContact ?? '-'}"),
-                                      Text("🆔 ${foundDataNewDotted![index].empDetId ?? '-'}"),
+                                      Text("🆔 ${foundDataNewDotted![index].empCode ?? '-'}"),
                                       Text("✉️ ${foundDataNewDotted![index].empEmailId ?? '-'}"),
                                       Text("🏢 ${foundDataNewDotted![index].empDeptName ?? '-'}"),
                                     ],
@@ -1214,10 +1233,12 @@ class _EmpListViewState extends State<EmpListView> with RouteAware{
                             top: 8,
                             right: 12,
                             child: Text(
-                              "EMP_STATUS",
+                              foundDataNewDotted![index].employeeStatus ?? '-',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: Mythemes.successColor,
+                                color: foundDataNewDotted![index].employeeStatus == "ACTIVE"
+                                    ? Colors.green
+                                    : Colors.red,
                               ),
                             ),
                           ),

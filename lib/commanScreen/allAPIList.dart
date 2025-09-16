@@ -5,8 +5,7 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   static var server="https://4f9649512c90.ngrok.app/";
-
+   static var server="https://c0d7a5b27a5d.ngrok.app/";
    //Attendance Punch in and Punch out
    static String login="/restful/service/login";
    static String punchIn="/restful/service/attendance/via/mobile";
@@ -83,7 +82,7 @@ class ApiDetails{
 
    //ESS Dashboard
    static var essDashboardAPi = "restful/service/dashboard/present/absent/count/ess";
-   static var eventListModalESSApi = "restful/service/get/emp/event/ess";
+   static var eventListModalESSApi = "restful/service/get/emp/event/ess/new";
 
    //Customer workDone API
    static var skyWorkDoneClientApi = "restful/service/get/mobile/task/client/details";
@@ -232,4 +231,6 @@ class ApiDetails{
    static var reqCountApi = "/restful/service/get/pending/requisition/count";
 
 
+   //Firebase Token Send API
+   static var firebaseApiSend = "/restful/service/get/user/firebase/id";
 }

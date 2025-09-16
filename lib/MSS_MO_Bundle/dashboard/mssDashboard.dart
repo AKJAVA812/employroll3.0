@@ -62,6 +62,7 @@ late List<String?> list = [];
 late List<String?> branchList = [];
 late List<String?>? shiftList = [];
 bool isLoading = false;
+bool isLoadingEvent = true;
 String valuenew = "listText";
 String shiftValue = "listText";
 dynamic matchedOrg;
@@ -627,8 +628,12 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalNewApi;
 
+
     print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
+    setState(() {
+      isLoadingEvent=true;
+    });
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "branch=$selectedBranchId&"
@@ -637,6 +642,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
         "profileId=$defaultProfileId&"
         "userPermission=$userPanelPermission&"
         "orgId=$getOrgId");
+
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');
@@ -646,6 +652,9 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     var getData = mapResponse;
     print('Body Data $getData');
     eventsListModal = EventsListModal.fromJson(mapResponse);
+    setState(() {
+      isLoadingEvent=false;
+    });
     return eventsListModal;
   }
 
@@ -899,22 +908,40 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     var oldJobLength;
     var oldJobEvent;
     if (eventsListModalGlobal != null && eventsListModalGlobal!.bdayList != null) {
+      setState(() {
+        isLoadingEvent=true;
+      });
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
         print("oldEvent $oldEvent");
+        setState(() {
+          isLoadingEvent=false;
+        });
       }
     } else {
+      setState(() {
+        isLoadingEvent=false;
+      });
       print("bdayList is null or eventsListModalGlobal is null");
     }
 
     if (eventsListModalGlobal != null && eventsListModalGlobal!.joblist != null) {
+      setState(() {
+        isLoadingEvent=true;
+      });
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
         print("oldJobEvent $oldJobEvent");
+        setState(() {
+          isLoadingEvent=false;
+        });
       }
     } else {
+      setState(() {
+        isLoadingEvent=false;
+      });
       print("job list is null or eventsListModalGlobal is null");
     }
 
@@ -1922,7 +1949,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                 ],
               ).pLTRB(0, 0, 0, 10.0),
               empRole == 1 || roRole == 1 ?
-              DefaultTabController(
+              /*DefaultTabController(
                 length: 3,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -1935,21 +1962,21 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                           tabs: [
                             Tab(
                               icon: Icon(
-                                Icons.cake,
+                                Icons.celebration,
                                 color: Mythemes.blackishade,
                               ),
                               text: "Birthday",
                             ),
                             Tab(
                               icon: Icon(
-                                Icons.cake,
+                                Icons.workspace_premium_outlined,
                                 color: Mythemes.blackishade,
                               ),
                               text: "Anniversary",
                             ),
                             Tab(
                               icon: Icon(
-                                Icons.calendar_month,
+                                Icons.today,
                                 color: Mythemes.blackishade,
                               ),
                               text: "Today events",
@@ -1965,9 +1992,9 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                         Container(
                           // height: 1,
                           child: Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(2.0),
                             child:
-                            isLoading
+                            isLoadingEvent
                                 ? SizedBox(
                               width: 24, // Set width
                               height: 24, // Set height
@@ -2014,7 +2041,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
                             child:
-                            isLoading
+                            isLoadingEvent
                                 ? CircularProgressIndicator()
                                 .centered()
                                 .py1():
@@ -2060,7 +2087,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                               Padding(
                                 padding: EdgeInsets.all(8.0),
                                 child:
-                                isLoading
+                                isLoadingEvent
                                     ? CircularProgressIndicator()
                                     .centered()
                                     .py1():
@@ -2103,7 +2130,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                               Padding(
                                 padding: EdgeInsets.all(8.0),
                                 child:
-                                isLoading
+                                isLoadingEvent
                                     ? CircularProgressIndicator()
                                     .centered()
                                     .py8() :
@@ -2149,6 +2176,83 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                     )
                   ],
                 ),
+              )*/
+              DefaultTabController(
+                length: 3,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    // TabBar
+                    Material(
+                      color: Mythemes.whitish,
+                      child: TabBar(
+                        indicatorColor: Colors.deepPurple,
+                        indicatorWeight: 3,
+                        labelColor: Colors.deepPurple,
+                        unselectedLabelColor: Mythemes.blackishade,
+                        tabs: const [
+                          Tab(icon: Icon(Icons.celebration), text: "Birthday"),
+                          Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
+                          Tab(icon: Icon(Icons.today), text: "Today Events"),
+                        ],
+                      ),
+                    ),
+
+                    // Tab Views
+                    SizedBox(
+                      height: 400,
+                      child: TabBarView(
+                        children: [
+                          // 🎂 Birthday Tab
+                          buildEventList(
+                            isLoading: isLoadingEvent,
+                            items: eventsListModalGlobal?.bdayList ?? [],
+                            emptyText: "No birthdays today 🎉",
+                            titleBuilder: (item) => item.fullName,
+                            subtitleBuilder: (item) => item.department,
+                            trailingBuilder: (item) => item.dob,
+                            imageBuilder: (item) => item.image,
+                          ),
+
+                          // 🏅 Anniversary Tab
+                          buildEventList(
+                            isLoading: isLoadingEvent,
+                            items: eventsListModalGlobal?.joblist ?? [],
+                            emptyText: "No anniversaries today 🎊",
+                            titleBuilder: (item) => item.fullName,
+                            subtitleBuilder: (item) => item.department,
+                            trailingBuilder: (item) => item.doj,
+                            imageBuilder: (item) => item.image,
+                          ),
+
+                          // 📅 Today Events Tab (combine lists)
+                          ListView(
+                            children: [
+                              buildEventList(
+                                isLoading: isLoadingEvent,
+                                items: eventsListModalGlobal?.bdayList ?? [],
+                                emptyText: "No birthday events today 🎂",
+                                titleBuilder: (item) => item.fullName,
+                                subtitleBuilder: (item) => item.department,
+                                trailingBuilder: (item) => item.dob,
+                                imageBuilder: (item) => item.image,
+                              ),
+                              buildEventList(
+                                isLoading: isLoadingEvent,
+                                items: eventsListModalGlobal?.joblist ?? [],
+                                emptyText: "No work anniversaries today 🎉",
+                                titleBuilder: (item) => item.fullName,
+                                subtitleBuilder: (item) => item.department,
+                                trailingBuilder: (item) => item.doj,
+                                imageBuilder: (item) => item.image,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ) :
               //TabSection(EventsListModal()!) :
               SizedBox(
@@ -2161,6 +2265,80 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
       ),
     );
   }
+
+  Widget buildEventList<T>({
+    required bool isLoading,
+    required List<T> items,
+    required String emptyText,
+    required String Function(T) titleBuilder,
+    required String Function(T) subtitleBuilder,
+    required String Function(T) trailingBuilder,
+    required String Function(T) imageBuilder,
+  }) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(strokeWidth: 3),
+      );
+    }
+
+    if (items.isEmpty) {
+      return Center(
+        child: Text(
+          emptyText,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(12),
+            leading: CircleAvatar(
+              radius: 28,
+              backgroundImage: NetworkImage(imageBuilder(item)),
+              backgroundColor: Colors.grey[200],
+            ),
+            title: Text(
+              titleBuilder(item),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+            subtitle: Text(
+              subtitleBuilder(item),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black54,
+              ),
+            ),
+            trailing: Text(
+              trailingBuilder(item),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.deepPurple,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   TabSection(EventsListModal eventsListModal) {
     var todayEvent;
@@ -2197,21 +2375,21 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                 tabs: [
                   Tab(
                     icon: Icon(
-                      Icons.cake,
+                      Icons.celebration,
                       color: Mythemes.blackishade,
                     ),
                     text: "Birthday",
                   ),
                   Tab(
                     icon: Icon(
-                      Icons.cake,
+                      Icons.workspace_premium_outlined,
                       color: Mythemes.blackishade,
                     ),
                     text: "Anniversary",
                   ),
                   Tab(
                     icon: Icon(
-                      Icons.calendar_month,
+                      Icons.today,
                       color: Mythemes.blackishade,
                     ),
                     text: "Today events",
