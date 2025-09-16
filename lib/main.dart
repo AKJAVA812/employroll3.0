@@ -279,6 +279,15 @@ void main() async {
   //await initializeService();
   await Hive.initFlutter();
   WidgetsFlutterBinding.ensureInitialized();
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings =
+  InitializationSettings(android: initializationSettingsAndroid);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
   //await Firebase.initializeApp();
   //await FirebaseApi().initNotifications();
   //await setupNotificationChannel();
@@ -431,7 +440,35 @@ class _MyHomePageState extends State<MyHomePage> {
     //_startLocationTracking();
     //requestStoragePermission();
     // TODO: implement initState
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message in foreground: ${message.notification?.title}');
+
+      // Show local notification
+      if (message.notification != null) {
+        _showNotification(message.notification!);
+      }
+    });
     super.initState();
+  }
+  Future<void> _showNotification(RemoteNotification notification) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'default_channel', // id
+      'General Notifications', // title
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+    );
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      notification.title,
+      notification.body,
+      platformChannelSpecifics,
+      payload: 'Default_Sound',
+    );
   }
 
 /*  Future<void> _startLocationTracking() async {

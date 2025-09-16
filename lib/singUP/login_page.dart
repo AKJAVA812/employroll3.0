@@ -470,13 +470,13 @@ class _LoginPageState extends State<LoginPage> {
         print("Response body: ${response.body}");
 
         // Retry logic (similar to your Android code)
-        //await sendGeoFenceId(sessionId, geofenceTokenId);
+        await sendGeoFenceId(sessionId, geofenceTokenId);
       }
     } catch (e) {
       print("Error sending GeoFence ID: $e");
 
       // Retry on error
-      //await sendGeoFenceId(sessionId, geofenceTokenId);
+      await sendGeoFenceId(sessionId, geofenceTokenId);
     }
   }
 
@@ -639,7 +639,7 @@ class _LoginPageState extends State<LoginPage> {
                                             shared.setEmpRoll(value!.data!.empRole!.length);
                                             shared.setRoRoll(value!.data!.roRole!.length);
                                             shared.setShowPayroll(loginModelglobal!.data!.userLoginned!.showPayroll);
-                                            //sendGeoFenceId(value.data!.sessionId!, fcmToken!);
+                                            sendGeoFenceId(value.data!.sessionId!, fcmToken!);
                                             if(adminRole==1){
                                               setAdminSharedPrefValue(loginModelglobal);
 
