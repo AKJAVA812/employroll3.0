@@ -500,10 +500,9 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                       ),
                       Row(
                         children: [
-                          DateFormat("dd-MM-yyyy")
-                              .format(DateTime.parse(selfRequisitionModel
+                          selfRequisitionModel
                                   .data![i].reqDate
-                                  .toString()))
+                                  .toString()
                               .text
                               .textStyle(context.captionStyle)
                               .make()
