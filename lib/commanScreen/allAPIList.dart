@@ -71,7 +71,6 @@ class ApiDetails{
    static var cancelAdvRequisition = "/restful/service/employee/self/advance/cancel";
    static var claimApprovalListDataApi = "/restful/service/employee/self/advance/cancel";
 
-
    //Admin dashboard API
    static var adminDashboardAPi = "restful/service/dashboard/present/absent/count";
    static var adminDashboardNewAPi = "restful/service/dashboard/present/absent/count/new";
