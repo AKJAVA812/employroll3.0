@@ -55,7 +55,6 @@ import 'package:month_year_picker/month_year_picker.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:workmanager/workmanager.dart';
 /*import 'ESS_Bundle/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
 import 'ESS_Bundle/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';*/
 import 'EZNew/landingPage.dart';
@@ -269,11 +268,11 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
 }*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
+ /* await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform
   );
   final notificationService = NotificationService();
-  await notificationService.initFCM();
+  await notificationService.initFCM();*/
 
   FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
   //await initializeService();
@@ -286,7 +285,7 @@ void main() async {
   const InitializationSettings initializationSettings =
   InitializationSettings(android: initializationSettingsAndroid);
 
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  //await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   //await Firebase.initializeApp();
   //await FirebaseApi().initNotifications();

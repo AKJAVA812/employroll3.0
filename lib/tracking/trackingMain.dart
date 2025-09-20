@@ -12,7 +12,6 @@ import 'package:location/location.dart';
 import 'dart:math' show asin, cos, sqrt;
 import 'dart:developer';
 
-import 'package:workmanager/workmanager.dart';
 
 import '../main.dart';
 import 'LocationPermissionRequest.dart';
