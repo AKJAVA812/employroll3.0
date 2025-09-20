@@ -189,6 +189,17 @@ class SessionManager {
     final String? emailId=prefs.getString('emailId');
     return emailId;
   }
+
+  setEnrollId(enrollId) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('enrollId', enrollId);
+  }
+
+  getEnrollId() async{
+    final prefs = await SharedPreferences.getInstance();
+    final String? enrollId=prefs.getString('enrollId');
+    return enrollId;
+  }
   setMobileNo(mobileNo) async{
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('mobileNO', mobileNo);

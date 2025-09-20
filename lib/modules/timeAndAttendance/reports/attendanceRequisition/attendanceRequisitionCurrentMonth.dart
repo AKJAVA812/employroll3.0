@@ -91,6 +91,15 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
       actualTimeset= attendanceModelGlobel!.data![indexCont].inTime;
       actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
       empId= attendanceModelGlobel!.data![indexCont].empId;
+
+      // Log for debugging
+      print('Branch: $branchNameset');
+      print('Department: $departmentset');
+      print('Employee Name: $employeeNameset');
+      print('Date: $onDateset');
+      print('In Time: $actualTimeset');
+      print('Out Time: $actualOutTimeset');
+      print('Employee ID: $empId');
     }else{
       print('onModelrun');
       branchNameset=  attendanceModelGlobel!.data![indexCont].branchName.toString();
@@ -105,6 +114,15 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
       actualTimeset= attendanceModelGlobel!.data![indexCont].inTime;
       actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
       empId= attendanceModelGlobel!.data![indexCont].empId;
+
+      // Log for debugging
+      print('Branch: $branchNameset');
+      print('Department: $departmentset');
+      print('Employee Name: $employeeNameset');
+      print('Date: $onDateset');
+      print('In Time: $actualTimeset');
+      print('Out Time: $actualOutTimeset');
+      print('Employee ID: $empId');
     }
 
     getSharedPrfanceList();
@@ -258,25 +276,28 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min, // shrink row to fit children
-                      mainAxisAlignment: MainAxisAlignment.center, // center alignment
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         buildVerticalToggle("Night Shift", nightShift, (val) {
                           setState(() => nightShift = val);
+                          compOff=false;
+                          shortLeave=false;
                           print("Night Shift - $nightShift");
                         }),
-                        SizedBox(width: 20,),
-                        buildVerticalToggle("Comp Off", compOff, (val) {
+                        buildVerticalToggle("Compensatory Off", compOff, (val) {
                           setState(() => compOff = val);
+                          nightShift=false;
+                          shortLeave=false;
                           print("Comp Off - $compOff");
                         }),
-                        SizedBox(width: 20,),
 
                         Visibility(
                           visible: isShortLeave,
                           child: buildVerticalToggle("Short Leave", shortLeave, (val) {
                             setState(() => shortLeave = val);
+                            compOff=false;
+                            nightShift=false;
                             print("Short Leave - $shortLeave");
                           }),
                         ),
@@ -467,46 +488,49 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
                             ),
                           ),
                         ),
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              onTap: () async {
-                                //_openInTimepicker(context);
-                                final TimeOfDay? n = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.now(),
-                                    builder: (BuildContext context, Widget? child) {
-                                      return MediaQuery(
-                                        data: MediaQuery.of(context)
-                                            .copyWith(alwaysUse24HourFormat: true),
-                                        child: child!,
-                                      );
-                                    });
-                                print('timenewOut $n');
-                                setState(() {
-                                  var now = DateTime.now();
-                                  DateTime newt = DateTime(now.year, now.month,
-                                      now.day, n!.hour, n!.minute);
-                                  var nT = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
-                                  _inTimePicker = nT;
-                                });
-                              },
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: _inTimePicker),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: _inTimePicker,
-                                  labelText: "Changes In Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                        Visibility(
+                          visible:  compOff != true,
+                          child: Expanded(
+                            child:
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                onTap: () async {
+                                  //_openInTimepicker(context);
+                                  final TimeOfDay? n = await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.now(),
+                                      builder: (BuildContext context, Widget? child) {
+                                        return MediaQuery(
+                                          data: MediaQuery.of(context)
+                                              .copyWith(alwaysUse24HourFormat: true),
+                                          child: child!,
+                                        );
+                                      });
+                                  print('timenewOut $n');
+                                  setState(() {
+                                    var now = DateTime.now();
+                                    DateTime newt = DateTime(now.year, now.month,
+                                        now.day, n!.hour, n!.minute);
+                                    var nT = DateFormat('HH:mm').format(newt);
+                                    print(DateFormat('HH:mm').format(newt));
+                                    _inTimePicker = nT;
+                                  });
+                                },
+                                style:TextStyle(fontSize:14),
+                                controller: TextEditingController(text: _inTimePicker),
+                                readOnly: true,
+                                //initialValue: "${branchName}",
+                                decoration:  InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 8.0),
+                                    hintText: _inTimePicker,
+                                    labelText: "Changes In Time",
+                                    labelStyle: TextStyle(fontSize: 15)
+                                ),
                               ),
                             ),
-                          ),
 
+                          ),
                         ),
                       ],
                     ),),
@@ -562,42 +586,45 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
                             ),
                           ),
                         ),
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              onTap: () async {
-                                //_openOutTimepicker(context);
-                                final TimeOfDay? o = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.now(),
-                                    builder: (BuildContext context, Widget? child) {
-                                      return MediaQuery(
-                                        data: MediaQuery.of(context)
-                                            .copyWith(alwaysUse24HourFormat: true),
-                                        child: child!,
-                                      );
-                                    });
-                                print('timenewOut $o');
-                                setState(() {
-                                  var newNow = DateTime.now();
-                                  DateTime newt = DateTime(newNow.year, newNow.month,
-                                      newNow.day, o!.hour, o!.minute);
-                                  var oT = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
-                                  _outTimePicker = oT;
-                                });
-                              },
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: _outTimePicker),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: _outTimePicker,
-                                  labelText: "Changes Out Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                        Visibility(
+                          visible:  compOff != true,
+                          child: Expanded(
+                            child:
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                onTap: () async {
+                                  //_openOutTimepicker(context);
+                                  final TimeOfDay? o = await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.now(),
+                                      builder: (BuildContext context, Widget? child) {
+                                        return MediaQuery(
+                                          data: MediaQuery.of(context)
+                                              .copyWith(alwaysUse24HourFormat: true),
+                                          child: child!,
+                                        );
+                                      });
+                                  print('timenewOut $o');
+                                  setState(() {
+                                    var newNow = DateTime.now();
+                                    DateTime newt = DateTime(newNow.year, newNow.month,
+                                        newNow.day, o!.hour, o!.minute);
+                                    var oT = DateFormat('HH:mm').format(newt);
+                                    print(DateFormat('HH:mm').format(newt));
+                                    _outTimePicker = oT;
+                                  });
+                                },
+                                style:TextStyle(fontSize:14),
+                                controller: TextEditingController(text: _outTimePicker),
+                                readOnly: true,
+                                //initialValue: "${branchName}",
+                                decoration:  InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 8.0),
+                                    hintText: _outTimePicker,
+                                    labelText: "Changes Out Time",
+                                    labelStyle: TextStyle(fontSize: 15)
+                                ),
                               ),
                             ),
                           ),
@@ -793,6 +820,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
                           children: [
                             ElevatedButton(
                               onPressed: () {
+
                                 String? inTimeReq;
                                 String? outTimeReq;
                                 String logid ="0";
@@ -815,12 +843,144 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
                                       outTimeReq!,
                                       logid,
                                       dateformat);
-                                }else{
-                                  if (_outTimePicker!.compareToIgnoringCase("00:00") == 0) {
+                                }
+                                else
+                                {
+                                  if(_inTimePicker.compareToIgnoringCase("00:00")==0){
+                                    if(actualTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0){
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text(" Please Select In Time "),
+                                      ));
+                                    }else{
+                                      inTimeReq=actualTimeset;
+                                    }
+                                  }else{
+                                    inTimeReq=_inTimePicker;
+                                  }
+                                  if(actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualOutTimeset!.compareToIgnoringCase("--:--")==0)
+                                  {
+                                    if(_outTimePicker!.compareToIgnoringCase("00:00")==0)
+                                    {
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text(" Please Select Out Time "),
+                                      ));
+                                    }
+                                    else
+                                    {
+                                      outTimeReq = _outTimePicker;
+                                      print("outtime $outTimeReq");
+                                    }
+                                  }
+                                  else
+                                  {
+                                    if(_outTimePicker!.compareToIgnoringCase("00:00")!=0)
+                                    {
+                                      outTimeReq=_outTimePicker;
+                                    }else{
+                                      outTimeReq=actualOutTimeset;
+                                    }
+
+                                  }
+
+                                  if(actualTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0){
+                                    if(_inTimePicker!.compareToIgnoringCase("00:00")==0){
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text(" Please Select In Time "),
+                                      ));
+                                    }else{
+                                      inTimeReq=_inTimePicker;
+                                    }
+                                    if(_outTimePicker!.compareToIgnoringCase("00:00")==0){
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text(" Please Select Out Time "),
+                                      ));
+                                    }else{
+                                      outTimeReq=_outTimePicker;
+                                    }
+                                  }
+                                  if(nightShift==false && compOff == false)
+                                  {
+                                    print("intime $inTimeReq");
+                                    print("outtime $outTimeReq");
+                                    print("night shift  $nightShift");
+                                    print("compoff $compOff");
+
+                                    if (inTimeReq!.compareTo(outTimeReq!) > 0) {
+                                      return setState(() {
+                                        CommonNotificationPage
+                                            .showWorkDoneSuccess(
+                                            context,
+                                            "Your working hours going to negative, Please select requisition time correctly."
+                                                .upperCamelCase +
+                                                " ",
+                                            "Alert Message");
+                                      });
+                                    }
+                                    else{
+                                      print("intime $inTimeReq");
+                                      print("outtime $outTimeReq");
+                                      print("night shift  $nightShift");
+                                      print("compoff $compOff");
+                                      sendRequsitionToServer(
+                                          context,
+                                          empId!,
+                                          inRemarkString,
+                                          outRemarkString,
+                                          inTimeReq,
+                                          outTimeReq,
+                                          logid,
+                                          dateformat);
+                                    }
+                                  }
+                                  else if (nightShift == true){
+                                    print("intime $inTimeReq");
+                                    print("outtime $outTimeReq");
+                                    print("night shift  $nightShift");
+                                    print("compoff $compOff");
+                                    sendRequsitionToServernextDay(
+                                        context,
+                                        empId!,
+                                        inRemarkString,
+                                        outRemarkString,
+                                        inTimeReq!,
+                                        outTimeReq!,
+                                        logid,
+                                        dateformat);
+                                  }else if (compOff==true)
+                                  {
+                                    print("intime $inTimeReq");
+                                    print("outtime $outTimeReq");
+                                    print("night shift  $nightShift");
+                                    print("compoff $compOff");
+                                    if(actualTimeset!.compareToIgnoringCase("N/A")==0||
+                                        actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0||
+                                        actualOutTimeset!.compareToIgnoringCase("--:--")==0){
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text(" Please Handle Attendance Requisition "),
+                                      ));
+                                    }
+                                    else{
+                                      sendRequsitionToServerCompOff(
+                                          context,
+                                          empId!,
+                                          inRemarkString,
+                                          outRemarkString,
+                                          inTimeReq!,
+                                          outTimeReq!,
+                                          logid,
+                                          dateformat);
+                                    }
+                                  }
+
+
+
+                                  /*if (_outTimePicker!.compareToIgnoringCase("00:00") == 0)
+                                  {
                                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                       content: Text(" Please Select Out Time "),
                                     ));
-                                  } else {
+                                  }*/
+                                  /*else {
                                     //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
                                     if(onDateset!.compareToIgnoringCase("--:--")==0){
                                       inTimeReq = onDateset.toString().compareToIgnoringCase("--:--") == 0 ? _inTimePicker :_inTimePicker;
@@ -829,13 +989,14 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
                                       inTimeReq = onDateset.toString().compareToIgnoringCase("N/A") == 0 ? _inTimePicker :_inTimePicker;
                                     }
                                     outTimeReq = _outTimePicker;
-                                    if (radios.compareToIgnoringCase("next") == 0) {
+                                    if (nightShift == true) {
                                     } else {
                                       if (inTimeReq.compareToIgnoringCase("00:00") == 0) {
                                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                           content: Text(" Please Select In Time "),
                                         ));
-                                      } else {
+                                      }
+                                      else {
                                         if (onDateRadio.compareToIgnoringCase("1") == 0) {
                                           if (inTimeReq.compareTo(outTimeReq) > 0) {
                                             return setState(() {
@@ -881,7 +1042,7 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
                                         }
                                       }
                                     }
-                                  }
+                                  }*/
                                 }
 
                               },
