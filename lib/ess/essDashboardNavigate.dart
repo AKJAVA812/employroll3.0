@@ -39,6 +39,7 @@ import '../modules/timeAndAttendance/reports/attendanceRequisition/model/onDateR
 import '../modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import '../profiles/profilePageWithHead.dart';
 import 'Model/calendarModalClass.dart';
+import 'Model/holidaylistEssModal.dart';
 
 
 
@@ -58,6 +59,7 @@ String? userPanelPermission;
 EssDashboarrdModel? essDashboardModelGlobal;
 CalendarModalClass? calendarModalGlobal;
 EssEventsListModal? eventsListModalGlobal;
+HolidayESSModal? holidayListModalGlobal;
 DateTime date = DateTime.now();
 var branchId = 0;
 var shift = 0;
@@ -121,7 +123,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
     Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
-
+    Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
     getEmployeeList11.then((value) {
       setState(() {
         essDashboardModelGlobal = value;
@@ -141,6 +143,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     getEmployeeList14.then((value) {
       setState(() {
         eventsListModalGlobal = value;
+        setState(() {
+          isLoading = false; // End loading
+        });
+      });
+      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
+    });
+
+    getHolidayList.then((value) {
+      setState(() {
+        holidayListModalGlobal = value;
         setState(() {
           isLoading = false; // End loading
         });
@@ -243,6 +255,31 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     calendarModalClass = CalendarModalClass.fromJson(mapResponse);
     return calendarModalClass;
   }*/
+  var showNoData;
+  Future<HolidayESSModal> getHolidayData(String sessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.holidayListEss;
+
+    //print('employeeList11: ${SessionId}');
+    HolidayESSModal holidayESSModal;
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId");
+    final response = await http.post(urlapi);
+    setState(() {
+      isLoading = true; // Start loading
+    });
+    print('Holiday URL ${response.request}');
+    print('response body ${response.body}');
+    developer.log("response:- " ,name: response.body);
+    mapResponse = json.decode(response.body);
+    var getData = mapResponse.length;
+    if (getData == 0 )  {
+      print("getData111 $getData");
+      showNoData = true;
+    }
+    holidayESSModal = HolidayESSModal.fromJson(mapResponse);
+    return holidayESSModal;
+  }
 
   Future<CalendarModalClass> getCalendarData(String sessionId) async {
     String conn = ApiDetails.server;
@@ -565,7 +602,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     shortLeaveCount = essDashboardModelGlobal!.countData!.shortlev;
 
     presentCount = (totalDays ?? 0) - (totalAbsentEmp ?? 0);
-
+    var holidayDate;
+    var holidayLength;
     print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
@@ -613,6 +651,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       }
     } else {
       print("joblist is null");
+    }
+
+    if (holidayListModalGlobal?.result == "success") {
+      for (int i = 0; i < holidayListModalGlobal!.viewHolidayList!.length; i++) {
+        holidayDate = holidayListModalGlobal!.viewHolidayList![i].dateOfHoliday;
+        holidayLength = holidayListModalGlobal!.viewHolidayList!.length;
+        print("Holiday Length $holidayLength");
+      }
+    } else {
+      print("holiday list is null");
     }
 
     todayEvent = DateTime.now();
@@ -1813,7 +1861,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               ),
             )*/
             DefaultTabController(
-              length: 3,
+              length: 4,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -1822,13 +1870,14 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     color: Mythemes.whitish,
                     child: TabBar(
                       indicatorColor: Colors.deepPurple,
-                      indicatorWeight: 3,
+                      indicatorWeight: 4,
                       labelColor: Colors.deepPurple,
                       unselectedLabelColor: Mythemes.blackishade,
                       tabs: const [
                         Tab(icon: Icon(Icons.celebration), text: "Birthday"),
                         Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
                         Tab(icon: Icon(Icons.today), text: "Today Events"),
+                        Tab(icon: Icon(Icons.holiday_village), text: "Holidays"),
                       ],
                     ),
                   ),
@@ -1860,29 +1909,40 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                           imageBuilder: (item) => item.image,
                         ),
 
+
+
                         // 📅 Today Events Tab (combine lists)
-                        ListView(
-                          children: [
-                            buildEventList(
-                              isLoading: isLoadingEvent,
-                              items: eventsListModalGlobal?.bdayList ?? [],
-                              emptyText: "No birthday events today 🎂",
-                              titleBuilder: (item) => item.fullName,
-                              subtitleBuilder: (item) => item.department,
-                              trailingBuilder: (item) => item.dob,
-                              imageBuilder: (item) => item.image,
-                            ),
-                            buildEventList(
-                              isLoading: isLoadingEvent,
-                              items: eventsListModalGlobal?.joblist ?? [],
-                              emptyText: "No work anniversaries today 🎉",
-                              titleBuilder: (item) => item.fullName,
-                              subtitleBuilder: (item) => item.department,
-                              trailingBuilder: (item) => item.doj,
-                              imageBuilder: (item) => item.image,
-                            ),
-                          ],
+
+                        /*  buildEventList(
+                                isLoading: isLoadingEvent,
+                                items: eventsListModalGlobal?.bdayList ?? [],
+                                emptyText: "No events today 🎂",
+                                titleBuilder: (item) => item.fullName,
+                                subtitleBuilder: (item) => item.department,
+                                trailingBuilder: (item) => item.dob,
+                                imageBuilder: (item) => item.image,
+                              ),*/
+
+                        buildEventList(
+                          isLoading: isLoadingEvent,
+                          items: eventsListModalGlobal?.joblist ?? [],
+                          emptyText: "No events today 🎂",
+                          titleBuilder: (item) => item.fullName,
+                          subtitleBuilder: (item) => item.department,
+                          trailingBuilder: (item) => item.doj,
+                          imageBuilder: (item) => item.image,
                         ),
+
+                        buildHolidayList(
+                          isLoading: isLoadingEvent,
+                          items: holidayListModalGlobal!
+                              .viewHolidayList ?? [],
+                          emptyText: "No Holidays",
+                          holidayName: (item) => item.holidayName,
+                          holidayDate: (item) => item.dateOfHoliday,
+                          holidayType: (item) => item.holidayType,
+                        ),
+
                       ],
                     ),
                   )
@@ -1898,6 +1958,74 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildHolidayList<T>({
+    required bool isLoading,
+    required List<T> items,
+    required String emptyText,
+    required String Function(T) holidayName,
+    required String Function(T) holidayType,
+    required String Function(T) holidayDate,
+  }) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(strokeWidth: 3),
+      );
+    }
+
+    if (items.isEmpty) {
+      return Center(
+        child: Text(
+          emptyText,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+            fontSize: 16,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(12),
+
+            title: Text(
+              holidayName(item),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+            subtitle: Text(
+              holidayDate(item),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black54,
+              ),
+            ),
+            trailing: Text(
+              holidayType(item),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.deepPurple,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

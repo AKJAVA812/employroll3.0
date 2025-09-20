@@ -13,7 +13,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 SessionManager shared= SessionManager();
-
+dynamic orgId;
 class _ProfilePageState extends State<ProfilePage> {
   late String name=" ",designation="",mobileNo="",emailId="",dept="",branch="",dateOfBirth="",urlImage="";
   Future getUserDetails() async {
@@ -27,6 +27,8 @@ class _ProfilePageState extends State<ProfilePage> {
     dateOfBirth=await shared.getDob();
     mobileNo=await shared.getMobileNo();
     designation=await shared.getDesignation();
+    paycode = await shared!.getEnrollId();
+    orgId = await shared!.getOrgId();
     if (dateOfBirth.isNotEmpty) {
       try {
         String formattedDate = DateFormat("dd-MM-yyyy")
@@ -69,6 +71,8 @@ class _ProfilePageState extends State<ProfilePage> {
     // TODO: implement initState
     super.initState();
   }
+
+  var paycode = "";
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +170,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           name.text.xl2.make(),
                           designation.text.textStyle(context.captionStyle).make(),
+                          orgId == 190 || orgId == 191 ?
+                          "Paycode: $paycode".text.bold.textStyle(context.captionStyle).make():
+                          SizedBox(width: 0,)
                         ],
                       ),
                     )

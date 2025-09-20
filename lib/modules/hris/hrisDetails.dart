@@ -44,6 +44,7 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+dynamic orgId;
 
 Future<File> _fileFromImageUrl() async {
   final response = await http.get(Uri.parse('https://s3.ap-south-1.amazonaws.com/employroll.com/images/1705814809103.jpg'));
@@ -130,11 +131,16 @@ class _HRISDetailsState extends State<HRISDetails> {
                             //picker.dispose();
                             if(imageValue==null) return;
                             print("Heloo ji ""$imageValue");
-                            setState(() {
+                            /*setState(() {
                               final imagePath= File(imageValue!.path);
                               //this._workDoneImage=imagePath;
                               file= File(imageValue!.path);
                               urlImage = file.toString();
+                              print("IMAGE Change - $urlImage");
+                            });*/
+                            setState(() {
+                              file = File(imageValue!.path);
+                              urlImage = imageValue!.path; // ✅ keep the actual path, not file.toString()
                               print("IMAGE Change - $urlImage");
                             });
                             imageValue=null;
@@ -156,13 +162,18 @@ class _HRISDetailsState extends State<HRISDetails> {
                             //picker.dispose();
                             if(imageValue==null) return;
                             print("Heloo ji ""$imageValue");
-                            setState(() {
+                            /*setState(() {
                               final imagePath= File(imageValue!.path);
                               //this._workDoneImage=imagePath;
                               file= File(imageValue!.path);
                               urlImage = file.toString();
                               print("IMAGE Change - $urlImage");
 
+                            });*/
+                            setState(() {
+                              file = File(imageValue!.path);
+                              urlImage = imageValue!.path; // ✅ keep the actual path, not file.toString()
+                              print("IMAGE Change - $urlImage");
                             });
                             imageValue=null;
                             //imageCache.clear();
@@ -180,6 +191,8 @@ class _HRISDetailsState extends State<HRISDetails> {
           );
         });
   }
+
+  var paycode = "";
 
   String dateOfBir="";
   String dateOfJoinn="";
@@ -282,7 +295,7 @@ class _HRISDetailsState extends State<HRISDetails> {
                       ),
 
                     ),*/
-                    urlImage == null ?
+                   urlImage == null ?
                     Container(
                       padding: EdgeInsets.all(10.0),
                       width: MediaQuery.of(context).size.width/2,
@@ -294,7 +307,7 @@ class _HRISDetailsState extends State<HRISDetails> {
                         image: DecorationImage(
                           fit: BoxFit.scaleDown,
                           image:  NetworkImage("https://s3.ap-south-1.amazonaws.com/employroll.com/images/1705814809103.jpg"),
-                          /*FileImage(file!)*/
+
                         ),
                       ),
 
@@ -363,6 +376,9 @@ class _HRISDetailsState extends State<HRISDetails> {
                             children: [
                               name.text.xl2.make(),
                               designation.text.textStyle(context.captionStyle).make(),
+                              orgId == 190 || orgId == 191 ?
+                              "Paycode: $paycode".text.bold.textStyle(context.captionStyle).make():
+                                  SizedBox(width: 0,)
                             ],
                           ),
                         )
@@ -985,6 +1001,8 @@ class _HRISDetailsState extends State<HRISDetails> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    paycode = await shared!.getEnrollId();
+    orgId = await shared!.getOrgId();
   }
 
   showDialgSucess1(BuildContext context, result, alert) {

@@ -746,6 +746,7 @@ class _LoginPageState extends State<LoginPage> {
 
       shared.setUserPanel(loginModelglobal!.data!.userPanel);
       userPanel = loginModelglobal!.data!.userPanel;
+      shared.setEnrollId(loginModelglobal!.data!.enrollId);
     });
 
     print("Check User Panel - $userPanel");
@@ -1171,6 +1172,7 @@ class _LoginPageState extends State<LoginPage> {
 
       shared.setUserPanel(loginModelglobal!.data!.userPanel);
       userPanel = loginModelglobal!.data!.userPanel;
+      shared.setEnrollId(loginModelglobal!.data!.enrollId);
     });
 
     print("Check User Panel - $userPanel");
@@ -1180,6 +1182,7 @@ class _LoginPageState extends State<LoginPage> {
     shared.setMobAction(loginModelglobal!.data!.mobAction!.length);
     shared.setDoj(loginModelglobal!.data!.doj);
     shared.setShowPayroll(loginModelglobal!.data!.userLoginned!.showPayroll);
+    shared.setEmpCode(loginModelglobal!.data!.empCode);
     shared.setEmpCode(loginModelglobal!.data!.empCode);
 
     var mobAction = loginModelglobal!.data!.mobAction!.length;

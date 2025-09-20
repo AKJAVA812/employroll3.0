@@ -52,6 +52,7 @@ class Data {
   String? designation;
   int? needUpdation;
   String? doj;
+  String? enrollId;
 
   Data(
       {this.empId,
@@ -87,7 +88,9 @@ class Data {
         this.empRole,
         this.designation,
         this.needUpdation,
-        this.doj});
+        this.doj,
+        this.enrollId,
+      });
 
   Data.fromJson(Map<String, dynamic> json) {
     empId = json['empId'];
@@ -137,6 +140,7 @@ class Data {
     designation = json['designation'];
     needUpdation = json['need_updation'];
     doj = json['doj'];
+    enrollId = json['enrollId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -179,6 +183,7 @@ class Data {
     data['designation'] = this.designation;
     data['need_updation'] = this.needUpdation;
     data['doj'] = this.doj;
+    data['enrollId'] = this.enrollId;
     return data;
   }
 }

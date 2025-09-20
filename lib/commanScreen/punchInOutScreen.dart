@@ -1291,7 +1291,7 @@ class _DefaultPageState extends State<DefaultPage> {
   @override
   Widget build(BuildContext context) {
 
-    getImageForWorkdone() async {
+    /*getImageForWorkdone() async {
       try {
         final imageValue = await ImagePicker()
             .pickImage(source: ImageSource.camera,imageQuality: 20)
@@ -1303,9 +1303,9 @@ class _DefaultPageState extends State<DefaultPage> {
             //Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
           } else {
             setState(() {
-             /*File image = File(value.path);
+             *//*File image = File(value.path);
              final bytearray = image.readAsBytesSync().lengthInBytes;
-             print("workdone image:- $bytearray");*/
+             print("workdone image:- $bytearray");*//*
               if (orgnizationID == 108) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => UjalaCreditWorkdone(
@@ -1331,17 +1331,84 @@ class _DefaultPageState extends State<DefaultPage> {
           }
         });
 
-        /*final File image = File(imageValue!.path);
+        *//*final File image = File(imageValue!.path);
         final bytearray = image.readAsBytesSync().lengthInBytes;
-        print("workdone image$bytearray");*/
-       /* if(imageValue==null) return;
+        print("workdone image$bytearray");*//*
+       *//* if(imageValue==null) return;
         final imagePath= File(imageValue.path);
-        print("workdone image$imagePath");*/
+        print("workdone image$imagePath");*//*
       } on PlatformException catch (e) {
         //print('failed to upload: $e');
       }
     }
+*/
+    Future<void> getImageForWorkdone(BuildContext context) async {
+      try {
+        final picker = ImagePicker();
+        final XFile? value = await picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 20,
+        );
 
+        if (value == null) {
+          // User cancelled → navigate if widget still exists
+          if (context.mounted) {
+            Navigator.pushNamed(context, MyRoutings.punchInRoute);
+          }
+          return;
+        }
+
+        // Convert XFile → File
+        _workDoneImage = File(value.path);
+
+        if (!context.mounted) return;
+
+        // Update UI safely
+        setState(() {
+          if (orgnizationID == 108) {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => UjalaCreditWorkdone(
+                value: _workDoneImage,
+                address: currentAddress,
+                time: timeString,
+              ),
+            ));
+          } else if (orgnizationID == 110) {
+            // Example:
+            // Navigator.of(context).push(MaterialPageRoute(
+            //   builder: (context) => SkyDecorWorkDone(
+            //     value: _workDoneImage,
+            //     address: currentAddress,
+            //     time: timeString,
+            //   ),
+            // ));
+          } else if (orgnizationID == 119) {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => DigiWeighWorkDone(
+                value: _workDoneImage,
+                address: currentAddress,
+                time: timeString,
+              ),
+            ));
+          } else {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => WorkDonePage(
+                value: _workDoneImage,
+                address: currentAddress,
+                time: timeString,
+              ),
+            ));
+          }
+        });
+      } on PlatformException catch (e) {
+        debugPrint("Failed to pick image: $e");
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Camera error: $e")),
+          );
+        }
+      }
+    }
     getImagePunchOut() async {
       try {
         //Navigator.pushNamed(context, MyRoutings.cameraPageRoute);
@@ -1785,12 +1852,12 @@ class _DefaultPageState extends State<DefaultPage> {
                                             "Your mobile timing not updated, please change time setting to auto.",
                                             "Info ");
                                       } else {
-                                        getImageForWorkdone();
+                                        getImageForWorkdone(context);
                                       }
                                     }
 
                                   } else {
-                                    getImageForWorkdone();
+                                    getImageForWorkdone(context);
                                   }
                                 },
                                 child: Column(
