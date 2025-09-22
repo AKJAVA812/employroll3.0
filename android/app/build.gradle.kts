@@ -58,7 +58,14 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+    buildFeatures {
+        buildConfig = true
+    }
+
 }
+
+// Force enable BuildConfig for firebase_core
+android.buildFeatures.buildConfig = true
 
 flutter {
     source = "../.."
@@ -66,4 +73,9 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+}
+
+// Force enable BuildConfig for firebase_core / AGP 8+
+extensions.configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension>("android") {
+    buildFeatures.buildConfig = true
 }
