@@ -116,7 +116,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
     }
     loadOrgListFromPrefs();
   }
-
+  var levelChange = "PENDING";
   Future<PendingRequisitionModel> getPendingReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListRo;
@@ -126,7 +126,8 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
         "sessionId=$SessionId&"
         "userPermission=$userPanel&"
         "profileId=$getProfileId&"
-        "orgId=$getOrgId");
+        "orgId=$getOrgId&"
+        "status=$levelChange");
 
     final response = await http.post(urlapi);
 

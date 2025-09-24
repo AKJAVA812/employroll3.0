@@ -14,6 +14,8 @@ import 'package:er_flutter_project/ess/Model/missPunchempList.dart';
 import 'package:er_flutter_project/ess/Model/onDutyEmpList.dart';
 import 'package:er_flutter_project/ess/Model/overTimeEmpList.dart';
 import 'package:er_flutter_project/ess/Model/presentEmpList.dart';
+import 'package:er_flutter_project/ess/todayEventListModal.dart';
+import 'package:er_flutter_project/ess/todayPunchesModal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -55,11 +57,14 @@ class EssAdminDashboardHead extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+dynamic orgId;
 String? userPanelPermission;
 EssDashboarrdModel? essDashboardModelGlobal;
 CalendarModalClass? calendarModalGlobal;
 EssEventsListModal? eventsListModalGlobal;
 HolidayESSModal? holidayListModalGlobal;
+TodayEventListModal? todayEventModalGlobal;
+TodayPunchesModal? todayPunchesModalGlobal;
 DateTime date = DateTime.now();
 var branchId = 0;
 var shift = 0;
@@ -70,6 +75,8 @@ var single = new DateFormat('dd');
 var singleDay = single.format(day);
 bool isLoading = true;
 bool isLoadingEvent = true;
+bool isLoadingTodayEvent = true;
+bool isLoadingTodayPunch = true;
 String valuenew = "listText";
 String shiftValue = "listText";
 
@@ -113,6 +120,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
+    sessionId = await shared.getOrgId();
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
@@ -121,12 +129,22 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     print('roRole $roRole');
     print('adminRole $adminRole');
     Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
+    Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
     Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
+    Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);
     Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
     Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
     getEmployeeList11.then((value) {
       setState(() {
         essDashboardModelGlobal = value;
+        isLoading = false;
+      });
+      //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
+    });
+
+    getTodayPunch.then((value) {
+      setState(() {
+        todayPunchesModalGlobal = value;
         isLoading = false;
       });
       //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
@@ -143,6 +161,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     getEmployeeList14.then((value) {
       setState(() {
         eventsListModalGlobal = value;
+        setState(() {
+          isLoading = false; // End loading
+        });
+      });
+      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
+    });
+
+    getTodayEventList.then((value) {
+      setState(() {
+        todayEventModalGlobal = value;
         setState(() {
           isLoading = false; // End loading
         });
@@ -397,6 +425,104 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     return eventsListModal;
   }
 
+  Future<TodayEventListModal> getTodayEventData(String sessionId) async {
+    setState(() {
+      isLoadingTodayEvent = true; // Show loader before fetching
+    });
+
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.todayEventApi;
+
+    print('employeeList11: $sessionId');
+
+    TodayEventListModal todayEventListModal;
+
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&"
+            "shift=$shift&"
+            "date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE");
+
+    final response = await http.post(urlapi);
+    print('responseemployeeList ${response.request}');
+
+    mapResponse = json.decode(response.body);
+    print('Body Data $mapResponse');
+
+    todayEventListModal = TodayEventListModal.fromJson(mapResponse);
+
+    // assign to global
+    todayEventModalGlobal = todayEventListModal;
+
+    setState(() {
+      isLoadingEvent = false; // Hide loader AFTER everything is ready
+    });
+
+    return todayEventListModal;
+  }
+
+  Future<TodayPunchesModal> getTodayPunchData(String sessionId) async {
+    setState(() {
+      isLoadingTodayPunch = true; // Show loader before fetching
+    });
+
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.todayPunchesApiESS;
+
+    print('employeeList11: $sessionId');
+
+    TodayPunchesModal todayPunchesModal;
+
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "date=$singleDateString");
+
+    final response = await http.post(urlapi);
+    print('responseemployeeList ${response.request}');
+
+    mapResponse = json.decode(response.body);
+    print('Body Data $mapResponse');
+
+    todayPunchesModal = TodayPunchesModal.fromJson(mapResponse);
+
+    // assign to global
+    todayPunchesModalGlobal = todayPunchesModal;
+    // 👇 after parsing response
+    setPunchData(todayPunchesModal.data);
+
+
+    setState(() {
+      isLoadingTodayPunch = false; // Hide loader AFTER everything is ready
+    });
+
+    return todayPunchesModal;
+  }
+
+  List<Map<String, dynamic>> todayPunches = [];
+
+  void setPunchData(List<TodayData>? apiData) {
+    if (apiData == null) return; // in case it's null
+
+    todayPunches = apiData.asMap().entries.map((entry) {
+      int index = entry.key;
+      TodayData punch = entry.value; // now it's strongly typed
+
+      return {
+        "time": punch.time, // directly from your model
+
+        "punchType": punch.punchType,
+
+        // Green for the first punch, Red for others
+        "color": index == 0 ? Colors.green : Colors.red,
+
+        // Show arrow only for first punch
+        "isStart": index == 0
+      };
+    }).toList();
+  }
+
+
   loader() {
     return Center(
       child: Row(
@@ -643,6 +769,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       print("bdayList is null");
     }
 
+    if (todayEventModalGlobal?.todayEventList != null) {
+      for (int i = 0; i < todayEventModalGlobal!.todayEventList!.length; i++) {
+        oldJobEvent = todayEventModalGlobal!.todayEventList![i].dob;
+        oldJobLength = todayEventModalGlobal!.todayEventList!.length;
+        print("oldJobEvent $oldJobEvent");
+      }
+    } else {
+      print("joblist is null");
+    }
+
     if (eventsListModalGlobal?.joblist != null) {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
@@ -844,6 +980,101 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                 ],
               ),
             ),*/
+
+            Padding(
+              padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Today's Punches",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+
+                  // 👇 Show loader or punches
+                  isLoadingTodayPunch
+                      ? SizedBox(
+                    height: 60, // match approx. punch card height
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.green,
+                      ),
+                    ),
+                  )
+                      : todayPunches.isEmpty
+                      ? const Text(
+                    "No punches found",
+                    style: TextStyle(color: Colors.grey),
+                  )
+                      : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        // Arrow always at the start
+                        Padding(
+                          padding:
+                          const EdgeInsets.only(right: 8.0, bottom: 10),
+                          child: Icon(
+                            Icons.arrow_forward_outlined,
+                            size: 30,
+                            color: Colors.green,
+                          ),
+                        ),
+
+                        // Punch cards
+                        ...todayPunches.map((punch) {
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                right: 12, bottom: 5),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                border: Border.all(color: Mythemes.greyishade),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(2, 2),
+                                  )
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    punch["punchType"] == "DEVICE"
+                                        ? Icons.touch_app
+                                        : Icons.smartphone,
+                                    color: punch["color"],
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    punch["time"],
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: punch["color"],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -1924,12 +2155,12 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                               ),*/
 
                         buildEventList(
-                          isLoading: isLoadingEvent,
-                          items: eventsListModalGlobal?.joblist ?? [],
+                          isLoading: isLoadingTodayEvent,
+                          items: todayEventModalGlobal?.todayEventList ?? [],
                           emptyText: "No events today 🎂",
                           titleBuilder: (item) => item.fullName,
                           subtitleBuilder: (item) => item.department,
-                          trailingBuilder: (item) => item.doj,
+                          trailingBuilder: (item) => item.dob,
                           imageBuilder: (item) => item.image,
                         ),
 

@@ -268,12 +268,12 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
 }*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
- /* await Firebase.initializeApp(
+  await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform
   );
   final notificationService = NotificationService();
-  await notificationService.initFCM();*/
-
+  await notificationService.initFCM();
+  _requestPermission();
   FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
   //await initializeService();
   await Hive.initFlutter();
@@ -282,10 +282,22 @@ void main() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
   AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  const InitializationSettings initializationSettings =
-  InitializationSettings(android: initializationSettingsAndroid);
+  //iOS-specific initialization settings with permission requests
+  final iosInitializationSettings = const DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
 
-  //await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  InitializationSettings initializationSettings =
+  InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: iosInitializationSettings
+  );
+
+
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   //await Firebase.initializeApp();
   //await FirebaseApi().initNotifications();
@@ -319,6 +331,19 @@ void main() async {
 
   print('User granted permission: ${settings.authorizationStatus}');
 }*/
+
+/// Requests notification permission from the user
+Future<void> _requestPermission() async {
+  // Request permission for alerts, badges, and sounds
+  final result = await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  // Log the user's permission decision
+  print('User granted permission: ${result.authorizationStatus}');
+}
 
 void openAppSettingsDialog() {
   showDialog(

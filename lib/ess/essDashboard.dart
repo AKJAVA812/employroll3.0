@@ -15,6 +15,8 @@ import 'package:er_flutter_project/ess/Model/missPunchempList.dart';
 import 'package:er_flutter_project/ess/Model/onDutyEmpList.dart';
 import 'package:er_flutter_project/ess/Model/overTimeEmpList.dart';
 import 'package:er_flutter_project/ess/Model/presentEmpList.dart';
+import 'package:er_flutter_project/ess/todayEventListModal.dart';
+import 'package:er_flutter_project/ess/todayPunchesModal.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -56,11 +58,14 @@ class EssAdminDashboard extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+dynamic orgId;
 String? userPanel;
 EssDashboarrdModel? essDashboardModelGlobal;
 CalendarModalClass? calendarModalGlobal;
 EssEventsListModal? eventsListModalGlobal;
 HolidayESSModal? holidayListModalGlobal;
+TodayEventListModal? todayEventModalGlobal;
+TodayPunchesModal? todayPunchesModalGlobal;
 DateTime date = DateTime.now();
 var branchId = 0;
 var shift = 0;
@@ -71,6 +76,8 @@ var single = new DateFormat('dd');
 var singleDay = single.format(day);
 bool isLoading = true;
 bool isLoadingEvent = true;
+bool isLoadingTodayEvent = true;
+bool isLoadingTodayPunch = true;
 String valuenew = "listText";
 String shiftValue = "listText";
 
@@ -114,6 +121,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
+    orgId = await shared.getOrgId();
     userPanel = await shared.getUserPanel();
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
@@ -124,13 +132,22 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     print('adminRole $adminRole');
 
     Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
+    Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
     Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
     Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
+    Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);
     Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
 
     getEmployeeList11.then((value) {
       setState(() {
         essDashboardModelGlobal = value;
+        isLoading = false;
+      });
+      //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
+    });
+    getTodayPunch.then((value) {
+      setState(() {
+        todayPunchesModalGlobal = value;
         isLoading = false;
       });
       //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
@@ -156,6 +173,15 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     getHolidayList.then((value) {
       setState(() {
         holidayListModalGlobal = value;
+        setState(() {
+          isLoading = false; // End loading
+        });
+      });
+      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
+    });
+    getTodayEventList.then((value) {
+      setState(() {
+        todayEventModalGlobal = value;
         setState(() {
           isLoading = false; // End loading
         });
@@ -407,6 +433,104 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
     return eventsListModal;
   }
+
+  Future<TodayEventListModal> getTodayEventData(String sessionId) async {
+    setState(() {
+      isLoadingTodayEvent = true; // Show loader before fetching
+    });
+
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.todayEventApi;
+
+    print('employeeList11: $sessionId');
+
+    TodayEventListModal todayEventListModal;
+
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&"
+            "shift=$shift&"
+            "date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE");
+
+    final response = await http.post(urlapi);
+    print('responseemployeeList ${response.request}');
+
+    mapResponse = json.decode(response.body);
+    print('Body Data $mapResponse');
+
+    todayEventListModal = TodayEventListModal.fromJson(mapResponse);
+
+    // assign to global
+    todayEventModalGlobal = todayEventListModal;
+
+    setState(() {
+      isLoadingTodayEvent = false; // Hide loader AFTER everything is ready
+    });
+
+    return todayEventListModal;
+  }
+
+  Future<TodayPunchesModal> getTodayPunchData(String sessionId) async {
+    setState(() {
+      isLoadingTodayPunch = true; // Show loader before fetching
+    });
+
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.todayPunchesApiESS;
+
+    print('employeeList11: $sessionId');
+
+    TodayPunchesModal todayPunchesModal;
+
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "date=$singleDateString");
+
+    final response = await http.post(urlapi);
+    print('responseemployeeList ${response.request}');
+
+    mapResponse = json.decode(response.body);
+    print('Body Data $mapResponse');
+
+    todayPunchesModal = TodayPunchesModal.fromJson(mapResponse);
+
+    // assign to global
+    todayPunchesModalGlobal = todayPunchesModal;
+    // 👇 after parsing response
+    setPunchData(todayPunchesModal.data);
+
+
+    setState(() {
+      isLoadingTodayPunch = false; // Hide loader AFTER everything is ready
+    });
+
+    return todayPunchesModal;
+  }
+
+  List<Map<String, dynamic>> todayPunches = [];
+
+  void setPunchData(List<TodayData>? apiData) {
+    if (apiData == null) return; // in case it's null
+
+    todayPunches = apiData.asMap().entries.map((entry) {
+      int index = entry.key;
+      TodayData punch = entry.value; // now it's strongly typed
+
+      return {
+        "time": punch.time, // directly from your model
+
+        "punchType": punch.punchType,
+
+        // Green for the first punch, Red for others
+        "color": index == 0 ? Colors.green : Colors.red,
+
+        // Show arrow only for first punch
+        "isStart": index == 0
+      };
+    }).toList();
+  }
+
 
   loader() {
     return Center(
@@ -691,6 +815,15 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     );
   }
 
+  late Future<List<Map<String, dynamic>>> punchesFuture;
+
+/*  final List<Map<String, dynamic>> todayPunches = [
+    {"time": "09:15 AM", "color": Colors.green, "isStart": true},
+    {"time": "01:00 PM", "color": Colors.red, "isStart": false},
+    {"time": "02:00 PM", "color": Colors.red, "isStart": false},
+    {"time": "02:00 PM", "color": Colors.red, "isStart": false},
+  ];*/
+
 
   DashboardWidgets(EssDashboarrdModel dashboardModel) {
     paidDaysCount = essDashboardModelGlobal!.countData!.paidDaysCount;
@@ -737,10 +870,20 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       print("bdayList is null");
     }
 
+
     if (eventsListModalGlobal?.joblist != null) {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
+        print("oldJobEvent $oldJobEvent");
+      }
+    } else {
+      print("joblist is null");
+    }
+    if (todayEventModalGlobal?.todayEventList != null) {
+      for (int i = 0; i < todayEventModalGlobal!.todayEventList!.length; i++) {
+        oldJobEvent = todayEventModalGlobal!.todayEventList![i].dob;
+        oldJobLength = todayEventModalGlobal!.todayEventList!.length;
         print("oldJobEvent $oldJobEvent");
       }
     } else {
@@ -1073,6 +1216,284 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                   scrollToFirstPunch();
                 }, icon: Icon(Icons.arrow_left_outlined)),
               ),*/
+              /*Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  "Today's Punches".text.align(TextAlign.left).bold.make(),
+                ],
+              ).pLTRB(10, 10, 10, 5),
+              Container(
+                color: Colors.white,
+                height: 50,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const AlwaysScrollableScrollPhysics(), // 💡 Enables manual scroll
+                  itemCount: repeatedPunches.length,
+                  itemBuilder: (context, index) {
+                    final punch = repeatedPunches[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Chip(
+                        backgroundColor: Colors.grey.shade200,
+                        label: Text(
+                          "${punch['type']} - ${punch['time']}",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: punch['type'] == 'In' ? Colors.green : Colors.red,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),*/
+             /* Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  "Today's Punches".text.align(TextAlign.left).bold.make(),
+                ],
+              ).pLTRB(10, 10, 10, 5),
+
+              Container(
+                color: Colors.white,
+                height: 50,
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+                  future: punchesFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text("No punches found"));
+                    }
+
+                    final punches = snapshot.data!;
+
+                    return ListView.builder(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: punches.length,
+                      itemBuilder: (context, index) {
+                        final punch = punches[index];
+
+                        // Decide which icon to show
+                        final IconData punchIcon = punch['punchType'] == 'DEVICE'
+                            ? Icons.pan_tool_alt   // hand icon
+                            : Icons.smartphone;    // mobile icon
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Chip(
+                            backgroundColor: Colors.grey.shade200,
+                            label: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  punchIcon,
+                                  size: 18,
+                                  color: punches.length == 1 ? Colors.green : Colors.red,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  punch['time'],
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: punch['type'] == 'In'
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),*/
+          /*Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Today's Punches",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: todayPunches.map((punch) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 12, bottom: 10),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    border: Border.all(color: Mythemes.greyishade,),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                        offset: Offset(2, 2),
+                                      )
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        punch["punchType"] == "DEVICE"?  Icons.touch_app : Icons.smartphone,
+                                        color: punch["color"],
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        punch["time"],
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: punch["color"],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Arrow for the first punch
+                                *//*if (punch["isStart"])
+                                  Positioned(
+                                    left: -10,
+                                    top: 10,
+                                    child: Icon(
+                                      Icons.arrow_forward_outlined,
+                                      size: 30,
+                                      color: Colors.green,
+                                    ),
+                                  )*//*
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),*/
+          Padding(
+            padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Today's Punches",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 5),
+
+                // 👇 Show loader or punches
+                isLoadingTodayPunch
+                    ? SizedBox(
+                  height: 60, // match approx. punch card height
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.green,
+                    ),
+                  ),
+                )
+                    : todayPunches.isEmpty
+                    ? const Text(
+                  "No punches found",
+                  style: TextStyle(color: Colors.grey),
+                )
+                    : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // Arrow always at the start
+                      Padding(
+                        padding:
+                        const EdgeInsets.only(right: 8.0, bottom: 10),
+                        child: Icon(
+                          Icons.arrow_back,
+                          size: 30,
+                          color: Colors.black,
+                        ),
+                      ),
+
+                      // Punch cards
+                      ...todayPunches.map((punch) {
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              right: 12, bottom: 5),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              border: Border.all(color: Mythemes.greyishade),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 4,
+                                  offset: Offset(2, 2),
+                                )
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  punch["punchType"] == "DEVICE"
+                                      ? Icons.touch_app
+                                      : Icons.smartphone,
+                                  color: punch["color"],
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  punch["time"],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: punch["color"],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -2106,12 +2527,12 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                               ),*/
 
                               buildEventList(
-                                isLoading: isLoadingEvent,
-                                items: eventsListModalGlobal?.joblist ?? [],
+                                isLoading: isLoadingTodayEvent,
+                                items: todayEventModalGlobal?.todayEventList ?? [],
                                 emptyText: "No events today 🎂",
                                 titleBuilder: (item) => item.fullName,
                                 subtitleBuilder: (item) => item.department,
-                                trailingBuilder: (item) => item.doj,
+                                trailingBuilder: (item) => item.dob,
                                 imageBuilder: (item) => item.image,
                               ),
 

@@ -1552,7 +1552,13 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Pre-Onboard
-        if(setPreOnboardShow == "true" || empIdNew == 75324 || emailId == "sid@voyageofwellness.co.in" || orgId == 3 || orgId == 145) {
+        if((
+            setPreOnboardShow == "true" ||
+                empIdNew == 75324 ||
+                emailId == "sid@voyageofwellness.co.in" ||
+                orgId == 3 ||
+                orgId == 145
+        ) && !(orgId == 190 || orgId == 191 || orgId == 198)) {
           items.add(
             Hero(
               tag: 'preInduction',
@@ -1606,7 +1612,11 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Exit
-        if(setExitShow == "true" || orgId == 3 || orgId == 145) {
+        if((
+            setExitShow == "true" ||
+                orgId == 3 ||
+                orgId == 145
+        ) && !(orgId == 190 || orgId == 191 || orgId == 198)) {
           items.add(
             Hero(
               tag: 'exit',
