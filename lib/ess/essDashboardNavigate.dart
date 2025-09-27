@@ -120,7 +120,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
-    sessionId = await shared.getOrgId();
+    orgId = await shared.getOrgId();
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
@@ -129,7 +129,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     print('roRole $roRole');
     print('adminRole $adminRole');
     Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
-    Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+    //Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+    getRealTimeAttButtonShow = true;
+    getRealTimeAttShow = false;
     Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
     Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);
     Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
@@ -142,13 +144,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
     });
 
-    getTodayPunch.then((value) {
+    /*getTodayPunch.then((value) {
       setState(() {
         todayPunchesModalGlobal = value;
         isLoading = false;
       });
       //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
-    });
+    });*/
 
     getCalendar.then((value) {
       setState(() {
@@ -609,6 +611,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   int pageIndex = 0;
   int currentIndex = 3;
   var titleName = "My Dashboard";
+  var getRealTimeAttButtonShow = true;
+  var getRealTimeAttShow = false;
 
   @override
   Widget build(BuildContext context) {
@@ -981,97 +985,144 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               ),
             ),*/
 
-            Padding(
-              padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Today's Punches",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
+            Visibility(
+              visible: getRealTimeAttButtonShow,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+                child: SizedBox(
+                  width: double.infinity, // 👈 full width
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      getRealTimeAttButtonShow = false;
+                      getRealTimeAttShow = true;
+                      Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+                      getTodayPunch.then((value) {
+                        setState(() {
+                          todayPunchesModalGlobal = value;
+                          isLoadingTodayPunch = false;
+                        });
 
-                  // 👇 Show loader or punches
-                  isLoadingTodayPunch
-                      ? SizedBox(
-                    height: 60, // match approx. punch card height
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.green,
+                      });
+                      // 👇 Your action here
+                      print("Get Real-Time Attendance clicked");
+                    },
+                    icon: const Icon(Icons.access_time, color: Colors.white, size: 22,),
+                    label: const Text(
+                      "Get Real-Time Attendance",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  )
-                      : todayPunches.isEmpty
-                      ? const Text(
-                    "No punches found",
-                    style: TextStyle(color: Colors.grey),
-                  )
-                      : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        // Arrow always at the start
-                        Padding(
-                          padding:
-                          const EdgeInsets.only(right: 8.0, bottom: 10),
-                          child: Icon(
-                            Icons.arrow_forward_outlined,
-                            size: 30,
-                            color: Colors.green,
-                          ),
-                        ),
-
-                        // Punch cards
-                        ...todayPunches.map((punch) {
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                                right: 12, bottom: 5),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                border: Border.all(color: Mythemes.greyishade),
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 4,
-                                    offset: Offset(2, 2),
-                                  )
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    punch["punchType"] == "DEVICE"
-                                        ? Icons.touch_app
-                                        : Icons.smartphone,
-                                    color: punch["color"],
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    punch["time"],
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: punch["color"],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ],
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.lightBlue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14), // height
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
                     ),
                   ),
-                ],
+                ),
+              ),
+            ),
+
+            Visibility(
+              visible: getRealTimeAttShow,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Today's Punches",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+
+                    // 👇 Loader or punches
+                    isLoadingTodayPunch
+                        ? SizedBox(
+                      height: 60, // match approx. punch card height
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.green,
+                        ),
+                      ),
+                    )
+                        : todayPunches.isEmpty
+                        ? const Text(
+                      "No punches found",
+                      style: TextStyle(color: Colors.grey),
+                    )
+                        : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          // Arrow always at the start
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                right: 8.0, bottom: 10,top: 5.0),
+                            child: Icon(
+                              Icons.arrow_back,
+                              size: 30,
+                              color: Colors.black,
+                            ),
+                          ),
+                          // Punch cards
+                          ...todayPunches.map((punch) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 12, bottom: 5),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  border: Border.all(color: Mythemes.greyishade),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 4,
+                                      offset: Offset(2, 2),
+                                    )
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      punch["punchType"] == "DEVICE"
+                                          ? Icons.touch_app
+                                          : Icons.smartphone,
+                                      color: punch["color"],
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      punch["time"],
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: punch["color"],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 

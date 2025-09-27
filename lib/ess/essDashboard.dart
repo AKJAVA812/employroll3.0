@@ -70,6 +70,7 @@ DateTime date = DateTime.now();
 var branchId = 0;
 var shift = 0;
 var singleDateString;
+var todayDateFetch;
 var eventSingleDateString;
 var day = new DateTime.now();
 var single = new DateFormat('dd');
@@ -132,7 +133,10 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     print('adminRole $adminRole');
 
     Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
-    Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+    getRealTimeAttButtonShow = true;
+    getRealTimeAttShow = false;
+
+    //Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
     Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
     Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
     Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);
@@ -145,13 +149,13 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       });
       //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
     });
-    getTodayPunch.then((value) {
+    /*getTodayPunch.then((value) {
       setState(() {
         todayPunchesModalGlobal = value;
         isLoading = false;
       });
-      //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
-    });
+
+    });*/
 
     getCalendar.then((value) {
       setState(() {
@@ -231,7 +235,9 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
   Future getTodayDate() async {
     singleDateString = DateTime.now();
+    todayDateFetch = DateTime.now();
     singleDateString = DateFormat('dd-MM-yyyy').format(date);
+    todayDateFetch = DateFormat('dd-MM-yyyy').format(date);
     //print("SingleDate $singleDateString");
     //dateController.text = DateFormat("dd-MM-yyyy").format(date);
     //  DateFormat.yMd().format(date!).toString();
@@ -485,7 +491,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
     var urlapi = Uri.parse(
         "$conn$apiUrl?sessionId=$sessionId&"
-            "date=$singleDateString");
+            "date=$todayDateFetch");
 
     final response = await http.post(urlapi);
     print('responseemployeeList ${response.request}');
@@ -493,13 +499,13 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     mapResponse = json.decode(response.body);
     print('Body Data $mapResponse');
 
+
     todayPunchesModal = TodayPunchesModal.fromJson(mapResponse);
 
     // assign to global
     todayPunchesModalGlobal = todayPunchesModal;
     // 👇 after parsing response
     setPunchData(todayPunchesModal.data);
-
 
     setState(() {
       isLoadingTodayPunch = false; // Hide loader AFTER everything is ready
@@ -718,38 +724,14 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
 
 
+  var getRealTimeAttButtonShow = true;
+  var getRealTimeAttShow = false;
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
 
-     /* appBar: AppBar(
-        title: titleName.text.make(),
-      ),*/
-      /*floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          date = (await showDatePicker(
-              context: context,
-              initialDate: date,
-              firstDate: DateTime(1947),
-              lastDate: DateTime.now().add(Duration(days: 0))))!;
-
-          setState(() {
-            loader();
-            getSharedPrfanceList();
-            singleDateString = DateFormat('dd-MM-yyyy').format(date);
-            singleDay = DateFormat('dd').format(date);
-            print("SingleDateNew $singleDateString");
-            print("singleDay $singleDay");
-            //dateController.text = DateFormat("dd").format(date!);
-
-            //  DateFormat.yMd().format(date!).toString();
-          });
-        },
-        backgroundColor: Mythemes.lightBluishColor,
-        child: singleDay.toString().text.color(Mythemes.whitish).make(),
-      ),*/
       body: essDashboardModelGlobal == null
           ? loader()
           : RefreshIndicator(
@@ -758,71 +740,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
           },
           child: DashboardWidgets(essDashboardModelGlobal!)),
 
-      /*bottomNavigationBar:
-      BottomNavigationBar (
-        type: BottomNavigationBarType.fixed,
-        currentIndex: currentIndex,
-        iconSize: 25,
-        selectedFontSize: 12,
-        unselectedFontSize: 10,
-        onTap: (index) {
-
-          if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
-            //Navigator.pop(context);
-            print('home tab');
-          }
-          if(index==1){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
-          }
-          if(index==2){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
-          }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
-            print('Profile');
-          }
-
-          setState(() => currentIndex = index);
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
-            //backgroundColor: Colors.blue,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
-            //backgroundColor: Colors.blue,
-          ),
-        ],
-      ),*/
     );
   }
 
   late Future<List<Map<String, dynamic>>> punchesFuture;
 
-/*  final List<Map<String, dynamic>> todayPunches = [
-    {"time": "09:15 AM", "color": Colors.green, "isStart": true},
-    {"time": "01:00 PM", "color": Colors.red, "isStart": false},
-    {"time": "02:00 PM", "color": Colors.red, "isStart": false},
-    {"time": "02:00 PM", "color": Colors.red, "isStart": false},
-  ];*/
 
 
   DashboardWidgets(EssDashboarrdModel dashboardModel) {
@@ -847,18 +769,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     var oldEventLength;
     var oldJobLength;
     var oldJobEvent;
-
-    /*for(int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
-      oldEvent = eventsListModalGlobal!.bdayList![i].dob;
-      oldEventLength = eventsListModalGlobal!.bdayList!.length;
-      print("oldEvent $oldEvent");
-    }
-
-    for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
-      oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
-      oldJobLength = eventsListModalGlobal!.joblist!.length;
-      print("oldJobEvent $oldJobEvent");
-    }*/
 
     if (eventsListModalGlobal?.bdayList != null) {
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
@@ -900,13 +810,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       print("holiday list is null");
     }
 
-    /*if(holidayListModalGlobal?.viewHolidayList!.length != null) {
-      for (int i = 0; i < holidayListModalGlobal!.viewHolidayList!.length; i++) {
-        holidayLength = holidayListModalGlobal!.viewHolidayList!.length;
-      }
-    }*/
-
-    //final repeatedPunches = List.generate(20, (_) => punches).expand((x) => x).toList();
     final double cardWidth = MediaQuery.of(context).size.width * 0.3;
 
     todayEvent = DateTime.now();
@@ -1042,457 +945,147 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                   ],
                 ),
               ),
-             /* Visibility(
-                visible: showRo  || showAdmin,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedToggleSwitch<int>.size(
-                      height: 30,
-                      current: min(value, 2),
-                      style: ToggleStyle(
-                        backgroundColor: Mythemes.greyishade,
-                        indicatorColor: Mythemes.lightBluishColor,
-                        borderColor: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20.0),
-                        indicatorBorderRadius: BorderRadius.zero,
-                      ),
-                      values: const [0, 1],
-                      iconOpacity: 1.0,
-                      selectedIconScale: 1.0,
-                      indicatorSize: const Size.fromWidth(150),
-                      iconAnimationType: AnimationType.onHover,
-                      styleAnimationType: AnimationType.onHover,
-                      spacing: 2.0,
-                      customSeparatorBuilder: (context, local, global) {
-                        final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
-                        return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
-                      },
-                      customIconBuilder: (context, local, global) {
-                        final text = const ['ESS', 'MSS'][local.index];
-                        return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
-                      },
-                      borderWidth: 0.0,
-                      onChanged: (i) {
-                        setState(() {
-                          value = i;
-                          print(i);
+
+              Visibility(
+                visible: getRealTimeAttButtonShow,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+                  child: SizedBox(
+                    width: double.infinity, // 👈 full width
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        getRealTimeAttButtonShow = false;
+                        getRealTimeAttShow = true;
+                        Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+                        getTodayPunch.then((value) {
+                          setState(() {
+                            todayPunchesModalGlobal = value;
+                            isLoadingTodayPunch = false;
+                          });
 
                         });
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                        }
+                        // 👇 Your action here
+                        print("Get Real-Time Attendance clicked");
                       },
-                    )
-                  ],
-                ),
-              ),*/
-              /*Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  "Today's Punches".text.align(TextAlign.left).bold.make(),
-                ],
-              ).pLTRB(10, 10, 10, 5),*/
-
-          /*SizedBox(
-            height: 50,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              itemCount: punches.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 6),
-              itemBuilder: (context, index) {
-                final punch = punches[index];
-                final type = punch["type"]!;
-                final time = punch["time"]!;
-                final color = punchColors[type] ?? Colors.blue;
-
-                return Container(
-                  width: cardWidth,
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Mythemes.lightBluishColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Mythemes.lightBluishColor, width: 1.5),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        type,
+                      icon: const Icon(Icons.access_time, color: Colors.white, size: 22,),
+                      label: const Text(
+                        "Get Real-Time Attendance",
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Mythemes.whitish,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        time,
-                        style:  TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Mythemes.whitish,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.lightBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14), // height
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ).pLTRB(6, 6, 6, 2),*/
-          /*Container(
-            color: Colors.white,
-            height: 50,
-            child: ListView.builder(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              itemCount: repeatedPunches.length,
-              itemBuilder: (context, index) {
-                final item = repeatedPunches[index];
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${item['type']} - ${item['time']}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: punchColors[item['type']] ?? Colors.black,
+                        elevation: 4,
                       ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),*/
+                ),
+              ),
 
-          /*Container(
-            color: Colors.white,
-            height: 50,
-            child: ListView.builder(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              physics: const AlwaysScrollableScrollPhysics(), // 💡 Enables manual scroll
-              itemCount: repeatedPunches.length,
-              itemBuilder: (context, index) {
-                final punch = repeatedPunches[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Chip(
-                    backgroundColor: Colors.grey.shade200,
-                    label: Text(
-                      "${punch['type']} - ${punch['time']}",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: punch['type'] == 'In' ? Colors.green : Colors.red,
-                      ),
+              Visibility(
+                visible: getRealTimeAttShow,
+                child: Padding(
+                            padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
+                            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Today's Punches",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
-                );
-              },
-            ),
-          ),*/
-              /*Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(onPressed: (){
-                  scrollToFirstPunch();
-                }, icon: Icon(Icons.arrow_left_outlined)),
-              ),*/
-              /*Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  "Today's Punches".text.align(TextAlign.left).bold.make(),
-                ],
-              ).pLTRB(10, 10, 10, 5),
-              Container(
-                color: Colors.white,
-                height: 50,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  physics: const AlwaysScrollableScrollPhysics(), // 💡 Enables manual scroll
-                  itemCount: repeatedPunches.length,
-                  itemBuilder: (context, index) {
-                    final punch = repeatedPunches[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Chip(
-                        backgroundColor: Colors.grey.shade200,
-                        label: Text(
-                          "${punch['type']} - ${punch['time']}",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: punch['type'] == 'In' ? Colors.green : Colors.red,
+                  const SizedBox(height: 5),
+
+                  // 👇 Loader or punches
+                  isLoadingTodayPunch
+                      ? SizedBox(
+                    height: 60, // match approx. punch card height
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.green,
+                      ),
+                    ),
+                  )
+                      : todayPunches.isEmpty
+                      ? const Text(
+                    "No punches found",
+                    style: TextStyle(color: Colors.grey),
+                  )
+                      : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        // Arrow always at the start
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              right: 8.0, bottom: 10,top: 5.0),
+                          child: Icon(
+                            Icons.arrow_back,
+                            size: 30,
+                            color: Colors.black,
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ),*/
-             /* Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  "Today's Punches".text.align(TextAlign.left).bold.make(),
-                ],
-              ).pLTRB(10, 10, 10, 5),
-
-              Container(
-                color: Colors.white,
-                height: 50,
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: punchesFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text("No punches found"));
-                    }
-
-                    final punches = snapshot.data!;
-
-                    return ListView.builder(
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      itemCount: punches.length,
-                      itemBuilder: (context, index) {
-                        final punch = punches[index];
-
-                        // Decide which icon to show
-                        final IconData punchIcon = punch['punchType'] == 'DEVICE'
-                            ? Icons.pan_tool_alt   // hand icon
-                            : Icons.smartphone;    // mobile icon
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                          child: Chip(
-                            backgroundColor: Colors.grey.shade200,
-                            label: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  punchIcon,
-                                  size: 18,
-                                  color: punches.length == 1 ? Colors.green : Colors.red,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  punch['time'],
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: punch['type'] == 'In'
-                                        ? Colors.green
-                                        : Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),*/
-          /*Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Today's Punches",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: todayPunches.map((punch) {
+                        // Punch cards
+                        ...todayPunches.map((punch) {
                           return Padding(
-                            padding: const EdgeInsets.only(right: 12, bottom: 10),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    border: Border.all(color: Mythemes.greyishade,),
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 4,
-                                        offset: Offset(2, 2),
-                                      )
-                                    ],
+                            padding: const EdgeInsets.only(
+                                right: 12, bottom: 5),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                border: Border.all(color: Mythemes.greyishade),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    offset: Offset(2, 2),
+                                  )
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    punch["punchType"] == "DEVICE"
+                                        ? Icons.touch_app
+                                        : Icons.smartphone,
+                                    color: punch["color"],
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        punch["punchType"] == "DEVICE"?  Icons.touch_app : Icons.smartphone,
-                                        color: punch["color"],
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        punch["time"],
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: punch["color"],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Arrow for the first punch
-                                *//*if (punch["isStart"])
-                                  Positioned(
-                                    left: -10,
-                                    top: 10,
-                                    child: Icon(
-                                      Icons.arrow_forward_outlined,
-                                      size: 30,
-                                      color: Colors.green,
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    punch["time"],
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: punch["color"],
                                     ),
-                                  )*//*
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         }).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),*/
-          Padding(
-            padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Today's Punches",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 5),
-
-                // 👇 Show loader or punches
-                isLoadingTodayPunch
-                    ? SizedBox(
-                  height: 60, // match approx. punch card height
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.green,
+                      ],
                     ),
                   ),
-                )
-                    : todayPunches.isEmpty
-                    ? const Text(
-                  "No punches found",
-                  style: TextStyle(color: Colors.grey),
-                )
-                    : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      // Arrow always at the start
-                      Padding(
-                        padding:
-                        const EdgeInsets.only(right: 8.0, bottom: 10),
-                        child: Icon(
-                          Icons.arrow_back,
-                          size: 30,
-                          color: Colors.black,
-                        ),
-                      ),
-
-                      // Punch cards
-                      ...todayPunches.map((punch) {
-                        return Padding(
-                          padding: const EdgeInsets.only(
-                              right: 12, bottom: 5),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              border: Border.all(color: Mythemes.greyishade),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 4,
-                                  offset: Offset(2, 2),
-                                )
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  punch["punchType"] == "DEVICE"
-                                      ? Icons.touch_app
-                                      : Icons.smartphone,
-                                  color: punch["color"],
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  punch["time"],
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: punch["color"],
-                                  ),
-                                ),
-                              ],
+                ],
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

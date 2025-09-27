@@ -44,7 +44,7 @@ String? levelTwo;
 String? userPanel;
 dynamic getProfileId;
 String? orgId;
-
+var reqType = "";
 class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitionRo> with RouteAware{
   final PendingRequisitionModel pendingRequisitionModel;
   _MSS_Att_PendingRequisitionRoState(this.pendingRequisitionModel);
@@ -317,6 +317,21 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
       child: ListView.builder(
           itemCount: foundDataNewMSS!.length,
           itemBuilder: (context, itemCount) {
+            if(foundDataNewMSS![itemCount].attendanceRequisionType == true) {
+              reqType = "Attendance Request";
+            }
+            if (foundDataNewMSS![itemCount].compOffRequistionType == true) {
+              reqType = "Compensatory Off Request";
+            }
+            if (foundDataNewMSS![itemCount].nightRequistionType == true) {
+              reqType = "Night Shift Request";
+            }
+            if (foundDataNewMSS![itemCount].shortLeaveRequistionType == true) {
+              reqType = "Short Leave Request";
+            }
+            if (foundDataNewMSS![itemCount].odRequistionType == true) {
+              reqType = "Out Duty Request";
+            }
             return  Column(
               children: [
                 // if (_isVisible)
@@ -345,6 +360,13 @@ class _MSS_Att_PendingRequisitionRoState extends State<MSS_Att_PendingRequisitio
                       children: [
                         SizedBox(height: 4),
                         foundDataNewMSS![itemCount].onDate
+                            .toString()
+                            .text
+                            .sm
+                            .color(Colors.grey.shade700)
+                            .make(),
+                        SizedBox(height: 4),
+                        "Request Type: $reqType"
                             .toString()
                             .text
                             .sm

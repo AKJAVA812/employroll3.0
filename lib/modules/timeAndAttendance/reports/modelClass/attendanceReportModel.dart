@@ -28,6 +28,7 @@ class Data {
   String? workingHrs;
   String? branchName;
   dynamic isShortLeave;
+  dynamic isOdReq;
   String? branch;
   String? inTime;
   String? updatedWorkingHour;
@@ -47,6 +48,7 @@ class Data {
         this.workingHrs,
         this.branchName,
         this.isShortLeave,
+        this.isOdReq,
         this.branch,
         this.inTime,
         this.updatedWorkingHour,
@@ -66,6 +68,7 @@ class Data {
     workingHrs = json['workingHrs'];
     branchName = json['branchName'];
     isShortLeave = json['isShortLeave'];
+    isOdReq = json['isOdReq'];
     branch = json['branch'];
     inTime = json['inTime'];
     updatedWorkingHour = json['updatedWorkingHour'];
@@ -87,6 +90,7 @@ class Data {
     data['workingHrs'] = this.workingHrs;
     data['branchName'] = this.branchName;
     data['isShortLeave'] = this.isShortLeave;
+    data['isOdReq'] = this.isOdReq;
     data['branch'] = this.branch;
     data['inTime'] = this.inTime;
     data['updatedWorkingHour'] = this.updatedWorkingHour;

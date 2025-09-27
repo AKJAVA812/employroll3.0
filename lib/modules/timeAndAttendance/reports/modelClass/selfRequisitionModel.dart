@@ -36,6 +36,7 @@ class Data {
   int? empDetailsId;
   String? outTime;
   bool? shortLeaveRequistionType;
+  bool? odRequistionType;
   String? status;
 
   Data(
@@ -53,6 +54,7 @@ class Data {
         this.empDetailsId,
         this.outTime,
         this.shortLeaveRequistionType,
+        this.odRequistionType,
         this.status});
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -70,6 +72,7 @@ class Data {
     empDetailsId = json['empDetailsId'];
     outTime = json['outTime'];
     shortLeaveRequistionType = json['shortLeaveRequistionType'];
+    odRequistionType = json['odRequistionType'];
     status = json['status'];
   }
 
@@ -89,6 +92,7 @@ class Data {
     data['empDetailsId'] = this.empDetailsId;
     data['outTime'] = this.outTime;
     data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;
+    data['odRequistionType'] = this.odRequistionType;
     data['status'] = this.status;
     return data;
   }

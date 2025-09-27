@@ -45,6 +45,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   SessionManager shared = SessionManager();
   Map<String, dynamic> mapResponse = {};
   String? sessionId;
+  dynamic orgId;
   String? branchNameset;
   String? updatedWorkHourSet;
   String? relaxationHourSet;
@@ -83,6 +84,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
       relaxationHourSet = onDateAttModel!.relaxationHour;
       isShortLeave = onDateAttModel!.isShortLeave ?? false;
+      isOutDuty = onDateAttModel!.isOdReq ?? false;
       print("Short Leave Check - $isShortLeave");
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
@@ -107,6 +109,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       branchNameset= onDateAttModel!.branch;
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
       isShortLeave = onDateAttModel!.isShortLeave ?? false;
+      isOutDuty = onDateAttModel!.isOdReq ?? false;
       print("Short Leave Check - $isShortLeave");
       relaxationHourSet = onDateAttModel!.relaxationHour;
       workingHrsSet = onDateAttModel!.workingHrs;
@@ -154,9 +157,11 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   bool nightShift = false;
   bool compOff = false;
   bool shortLeave = false;
+  bool outDuty = false;
   bool light0 = true;
   bool light1 = true;
   bool isShortLeave = false;
+  bool isOutDuty = false;
   static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
     <WidgetStatesConstraint, Icon>{
       WidgetState.selected: Icon(Icons.check),
@@ -213,69 +218,140 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
               padding: const EdgeInsets.only(top: 10.0),
               child: Column(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedToggleSwitch<int>.size(
-                        height: 30,
-                        current: min(value, 3),
-                        style: ToggleStyle(
-                          backgroundColor: Mythemes.greyishade,
-                          indicatorColor: Mythemes.lightBluishColor,
-                          borderColor: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.0),
-                          indicatorBorderRadius: BorderRadius.zero,
-                        ),
-                        values: const [0, 1, 2],
-                        iconOpacity: 1.0,
-                        selectedIconScale: 1.0,
-                        indicatorSize: const Size.fromWidth(90),
-                        iconAnimationType: AnimationType.onHover,
-                        styleAnimationType: AnimationType.onHover,
-                        spacing: 3.0,
-                        customSeparatorBuilder: (context, local, global) {
-                          final opacity =
-                          ((global.position - local.position).abs() - 0.5)
-                              .clamp(0.0, 1.0);
-                          return VerticalDivider(
-                              indent: 10.0,
-                              endIndent: 10.0,
-                              color: Colors.white38.withOpacity(opacity));
-                        },
-                        customIconBuilder: (context, local, global) {
-                          final text = const ['Attendance', 'Leave', 'OD'][local.index];
-                          return Center(
-                              child: Text(text,
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Color.lerp(Colors.black, Colors.white,
-                                          local.animationValue))));
-                        },
-                        borderWidth: 0.0,
-                        onChanged: (i) {
-                          setState(() {
-                            value = i;
-                            print(i);
+                  Visibility(
+                    visible: orgId != 190 && orgId != 191 && orgId != 198,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedToggleSwitch<int>.size(
+                          height: 30,
+                          current: min(value, 3),
+                          style: ToggleStyle(
+                            backgroundColor: Mythemes.greyishade,
+                            indicatorColor: Mythemes.lightBluishColor,
+                            borderColor: Colors.transparent,
+                            borderRadius: BorderRadius.circular(10.0),
+                            indicatorBorderRadius: BorderRadius.zero,
+                          ),
+                          values: const [0, 1, 2],
+                          iconOpacity: 1.0,
+                          selectedIconScale: 1.0,
+                          indicatorSize: const Size.fromWidth(90),
+                          iconAnimationType: AnimationType.onHover,
+                          styleAnimationType: AnimationType.onHover,
+                          spacing: 3.0,
+                          customSeparatorBuilder: (context, local, global) {
+                            final opacity =
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
+                            return VerticalDivider(
+                                indent: 10.0,
+                                endIndent: 10.0,
+                                color: Colors.white38.withOpacity(opacity));
+                          },
+                          customIconBuilder: (context, local, global) {
+                            final text = const ['Attendance', 'Leave', 'OD'][local.index];
+                            return Center(
+                                child: Text(text,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color.lerp(Colors.black, Colors.white,
+                                            local.animationValue))));
+                          },
+                          borderWidth: 0.0,
+                          onChanged: (i) {
+                            setState(() {
+                              value = i;
+                              print(i);
 
-                          });
-                          if(value == 0){
+                            });
+                            if(value == 0){
 
-                          }
-                          if(value == 1) {
-                            Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
-                            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                          }
-                          if(value == 2) {
-                            Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                          }
-                          /*if(value == 3) {
-                            Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                          }*/
-                        },
-                      )
-                    ],
-                  ).py16(),
+                            }
+                            if(value == 1) {
+                              Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                            }
+                            if(value == 2) {
+                              Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                            }
+                            /*if(value == 3) {
+                              Navigator.pushNamed(context, MyRoutings.onDutyTypes);
+                            }*/
+                          },
+                        )
+                      ],
+                    ).py16(),
+                  ),
+
+                  Visibility(
+                    visible: orgId == 190 || orgId == 191 || orgId == 198,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedToggleSwitch<int>.size(
+                          height: 30,
+                          current: min(value, 2),
+                          style: ToggleStyle(
+                            backgroundColor: Mythemes.greyishade,
+                            indicatorColor: Mythemes.lightBluishColor,
+                            borderColor: Colors.transparent,
+                            borderRadius: BorderRadius.circular(10.0),
+                            indicatorBorderRadius: BorderRadius.zero,
+                          ),
+                          values: const [0, 1],
+                          iconOpacity: 1.0,
+                          selectedIconScale: 1.0,
+                          indicatorSize: const Size.fromWidth(85),
+                          iconAnimationType: AnimationType.onHover,
+                          styleAnimationType: AnimationType.onHover,
+                          spacing: 3.0,
+                          customSeparatorBuilder: (context, local, global) {
+                            final opacity =
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
+                            return VerticalDivider(
+                                indent: 10.0,
+                                endIndent: 10.0,
+                                color: Colors.white38.withOpacity(opacity));
+                          },
+                          customIconBuilder: (context, local, global) {
+                            final text = const ['Attendance', 'Leave'][local.index];
+                            return Center(
+                                child: Text(text,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color.lerp(Colors.black, Colors.white,
+                                            local.animationValue))));
+                          },
+                          borderWidth: 0.0,
+                          onChanged: (i) {
+                            setState(() {
+                              value = i;
+                              print(i);
+
+                            });
+                            if(value == 0){
+                              //Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                            }
+                            if(value == 1) {
+                              Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                            }
+                            /* if(value == 2) {
+                              Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                            }*/
+                            /* if(value == 3) {
+                              Navigator.pushNamed(context, MyRoutings.onDutyTypes);
+                            }*/
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Row(
@@ -286,12 +362,14 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                           setState(() => nightShift = val);
                           compOff=false;
                           shortLeave=false;
+                          outDuty=false;
                           print("Night Shift - $nightShift");
                         }),
-                        buildVerticalToggle("Compensatory Off", compOff, (val) {
+                        buildVerticalToggle("Comp. Off", compOff, (val) {
                           setState(() => compOff = val);
                           nightShift=false;
                           shortLeave=false;
+                          outDuty=false;
                           print("Comp Off - $compOff");
                         }),
 
@@ -301,7 +379,18 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                             setState(() => shortLeave = val);
                             compOff=false;
                             nightShift=false;
+                            outDuty=false;
                             print("Short Leave - $shortLeave");
+                          }),
+                        ),
+                        Visibility(
+                          visible: isOutDuty,
+                          child: buildVerticalToggle("OD", outDuty, (val) {
+                            setState(() => outDuty = val);
+                            compOff=false;
+                            nightShift=false;
+                            shortLeave=false;
+                            print("Out Duty - $outDuty");
                           }),
                         ),
                       ],
@@ -901,7 +990,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                                       outTimeReq=_outTimePicker;
                                     }
                                   }
-                                  if(nightShift==false && compOff == false)
+                                  if(nightShift==false && compOff == false && outDuty == false)
                                   {
                                     print("intime $inTimeReq");
                                     print("outtime $outTimeReq");
@@ -949,7 +1038,24 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                                         outTimeReq!,
                                         logid,
                                         dateformat);
-                                  }else if (compOff==true)
+                                  }
+                                  else if (outDuty == true){
+                                    print("intime $inTimeReq");
+                                    print("outtime $outTimeReq");
+                                    print("night shift  $nightShift");
+                                    print("compoff $compOff");
+                                    print("outDuty $outDuty");
+                                    sendRequsitionToServerOutDuty(
+                                        context,
+                                        empId!,
+                                        inRemarkString,
+                                        outRemarkString,
+                                        inTimeReq!,
+                                        outTimeReq!,
+                                        logid,
+                                        dateformat);
+                                  }
+                                  else if (compOff==true)
                                   {
                                     print("intime $inTimeReq");
                                     print("outtime $outTimeReq");
@@ -1143,6 +1249,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    orgId = await shared!.getOrgId();
   }
 
 
@@ -1216,6 +1323,51 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
             "outTimeRemarks=$outRemarkString&"
             "inTime=$inTimeReq&"
             "nextday=true&"
+            "outTime=$outTimeReq");
+    final response = await http.post(urlapi);
+
+    print('URL ${response.request}');
+    if (response.statusCode == 200) {
+      Navigator.of(context, rootNavigator: true).pop();
+      String result = "";
+      String reason = "";
+      mapResponse = json.decode(response.body);
+      if (mapResponse.containsKey("reason")) {
+        result = mapResponse['result'];
+        reason = mapResponse['reason'];
+        showDialgSucess1(context, reason, result);
+      } else {
+        result = mapResponse['result'];
+        if (result.compareToIgnoringCase("success") == 0) {
+          reason = "you have submit Requisition for $onDate";
+          showDialgSucess1(context, reason, "Success");
+        } else {
+          showDialgSucess1(context, result, "⚠️Warning");
+        }
+      }
+      print('result ${result} reason ${reason}');
+    }
+  }
+
+  Future<void> sendRequsitionToServerOutDuty(
+      BuildContext context,
+      int empId,
+      String inRemarkString,
+      String outRemarkString,
+      String inTimeReq,
+      String outTimeReq,
+      String logid,
+      var onDate) async {
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?"
+            "sessionId=$sessionId&"
+            "id=$empId&"
+            "onDate=$onDate&"
+            "inTimeRemarks=$inRemarkString&"
+            "outTimeRemarks=$outRemarkString&"
+            "inTime=$inTimeReq&"
+            "isOdReq=1&"
             "outTime=$outTimeReq");
     final response = await http.post(urlapi);
 

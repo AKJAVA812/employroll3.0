@@ -43,6 +43,7 @@ class Data {
   dynamic outTime;
   dynamic status;
   dynamic shortLeaveRequistionType;
+  dynamic odRequistionType;
 
   Data(
       {this.empId,
@@ -65,7 +66,9 @@ class Data {
         this.shiftWorkingHour,
         this.outTime,
         this.status,
-        this.shortLeaveRequistionType});
+        this.shortLeaveRequistionType,
+        this.odRequistionType,
+      });
 
   Data.fromJson(Map<String, dynamic> json) {
     empId = json['empId'];
@@ -89,6 +92,7 @@ class Data {
     outTime = json['outTime'];
     status = json['status'];
     shortLeaveRequistionType = json['shortLeaveRequistionType'];
+    odRequistionType = json['odRequistionType'];
   }
 
   Map<String, dynamic> toJson() {
@@ -114,6 +118,7 @@ class Data {
     data['outTime'] = this.outTime;
     data['status'] = this.status;
     data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;
+    data['odRequistionType'] = this.odRequistionType;
     return data;
   }
 }

@@ -48,7 +48,7 @@ String? levelTwo;
 String? userPanel;
 dynamic getProfileId;
 String? orgId;
-var reqType = "Short Leave";
+var reqType = "";
 dynamic matchedOrg;
 class _MSS_MO_Att_PendingRequisitionL1State extends State<MSS_MO_Att_PendingRequisitionL1> with RouteAware{
   final PendingRequisitionModel pendingRequisitionModel;
@@ -699,6 +699,9 @@ class _MSS_MO_Att_PendingRequisitionL1State extends State<MSS_MO_Att_PendingRequ
             }
             if (foundDataNewMO![itemCount].shortLeaveRequistionType == true) {
               reqType = "Short Leave Request";
+            }
+            if (foundDataNewMO![itemCount].odRequistionType == true) {
+              reqType = "Out Duty Request";
             }
             return  Column(
               children: [

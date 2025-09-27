@@ -3,6 +3,7 @@ class OnDateAttModel {
   int? empId;
   String? workingHrs;
   dynamic isShortLeave;
+  dynamic isOdReq;
   String? dept;
   String? branch;
   String? inTime;
@@ -18,6 +19,7 @@ class OnDateAttModel {
         this.empId,
         this.workingHrs,
         this.isShortLeave,
+        this.isOdReq,
         this.dept,
         this.branch,
         this.inTime,
@@ -33,6 +35,7 @@ class OnDateAttModel {
     empId = json['empId'];
     workingHrs = json['workingHrs'];
     isShortLeave = json['isShortLeave'];
+    isOdReq = json['isOdReq'];
     dept = json['dept'];
     branch = json['branch'];
     inTime = json['inTime'];
@@ -50,6 +53,7 @@ class OnDateAttModel {
     data['empId'] = this.empId;
     data['workingHrs'] = this.workingHrs;
     data['isShortLeave'] = this.isShortLeave;
+    data['isOdReq'] = this.isOdReq;
     data['dept'] = this.dept;
     data['branch'] = this.branch;
     data['inTime'] = this.inTime;

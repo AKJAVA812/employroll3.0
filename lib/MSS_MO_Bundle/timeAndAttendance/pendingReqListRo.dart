@@ -42,6 +42,7 @@ PendingRequisitionModel? pendingRequisitionLabeled;
 String? userPanel;
 dynamic getProfileId;
 String? orgId;
+var reqType = "";
 dynamic matchedOrg;
 class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionRo> with RouteAware{
   final PendingRequisitionModel pendingRequisitionModel;
@@ -467,29 +468,74 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
             ));
         return Future.value(false);
       },
-      child: ListView.builder(
+      child:
+      ListView.builder(
           itemCount: foundDataNewMO!.length,
           itemBuilder: (context, itemCount) {
+            if(foundDataNewMO![itemCount].attendanceRequisionType == true) {
+              reqType = "Attendance Request";
+            }
+            if (foundDataNewMO![itemCount].compOffRequistionType == true) {
+              reqType = "Compensatory Off Request";
+            }
+            if (foundDataNewMO![itemCount].nightRequistionType == true) {
+              reqType = "Night Shift Request";
+            }
+            if (foundDataNewMO![itemCount].shortLeaveRequistionType == true) {
+              reqType = "Short Leave Request";
+            }
+            if (foundDataNewMO![itemCount].odRequistionType == true) {
+              reqType = "Out Duty Request";
+            }
             return  Column(
               children: [
                 // if (_isVisible)
                 Card(
-                  elevation: 3,
-                  child:
-                  ListTile(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
                     onTap: () {
                       print(foundDataNewMO!.length);
                       //Navigator.pushNamed(context, MyRoutings.approveDisapproveReqRoute);
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
                           ApproveDisapproveReq(pendingRequisitionModel,itemCount)));
                     },
-                    title: foundDataNewMO![itemCount].empName.toString().text.make(),
-                    subtitle: foundDataNewMO![itemCount].onDate.toString().text.make(),
-                    trailing:  Icon(
-                        CupertinoIcons.chevron_forward
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue.shade100,
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.blue.shade700,
+                      ),
                     ),
+                    title: foundDataNewMO![itemCount].empName.toString().text.bold.xl.make(),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 4),
+                        foundDataNewMO![itemCount].onDate
+                            .toString()
+                            .text
+                            .sm
+                            .color(Colors.grey.shade700)
+                            .make(),
+                        SizedBox(height: 4),
+                        "Request Type: $reqType"
+                            .toString()
+                            .text
+                            .sm
+                            .color(Colors.grey.shade700)
+                            .make(),
+                      ],
+                    ),
+                    trailing: Icon(
+                      CupertinoIcons.chevron_forward,
+                      color: Colors.grey.shade600,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),
-                ),
+                )
               ],
             );
           }),

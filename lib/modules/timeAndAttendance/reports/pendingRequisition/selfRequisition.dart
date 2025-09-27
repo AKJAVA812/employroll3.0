@@ -461,6 +461,9 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
           if (foundDataNew![i].shortLeaveRequistionType == true) {
             reqType = "Short Leave Request";
           }
+          if (foundDataNew![i].odRequistionType == true) {
+            reqType = "Out Duty Request";
+          }
           return InkWell(
             onTap: () {
               for (int i = 0; i < foundDataNew!.length; i++) {

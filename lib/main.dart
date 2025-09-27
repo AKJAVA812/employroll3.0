@@ -268,18 +268,21 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
 }*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
+  //Need to uncomment this
+/*  await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform
   );
   final notificationService = NotificationService();
   await notificationService.initFCM();
   _requestPermission();
-  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);*/
+  //Need to uncomment this
   //await initializeService();
   await Hive.initFlutter();
   WidgetsFlutterBinding.ensureInitialized();
 
-  const AndroidInitializationSettings initializationSettingsAndroid =
+  //Need to un comment this
+/*  const AndroidInitializationSettings initializationSettingsAndroid =
   AndroidInitializationSettings('@mipmap/ic_launcher');
 
   //iOS-specific initialization settings with permission requests
@@ -293,11 +296,12 @@ void main() async {
   InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: iosInitializationSettings
-  );
+  );*/
+  //await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  //Need to un comment this
 
 
 
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   //await Firebase.initializeApp();
   //await FirebaseApi().initNotifications();

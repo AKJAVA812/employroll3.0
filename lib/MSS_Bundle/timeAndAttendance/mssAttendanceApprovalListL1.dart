@@ -505,6 +505,9 @@ class _MSS_Att_PendingRequisitionL1State extends State<MSS_Att_PendingRequisitio
             if (foundDataNewMSS![itemCount].shortLeaveRequistionType == true) {
               reqType = "Short Leave Request";
             }
+            if (foundDataNewMSS![itemCount].odRequistionType == true) {
+              reqType = "Out Duty Request";
+            }
             return  Column(
               children: [
                 // if (_isVisible)

@@ -50,6 +50,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   SessionManager shared = SessionManager();
   Map<String, dynamic> mapResponse = {};
   String? sessionId;
+  dynamic orgId;
   String? branchNameset;
   String? updatedWorkHourSet;
   String? relaxationHourSet;
@@ -110,6 +111,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       actualOutTimeset = getData['outTime'] ?? '';
       empId = getData['empId'] ?? 0;
       isShortLeave = getData['isShortLeave'] ?? '';
+      isOutDuty = getData['isOdReq'] ?? '';
 
       // Log for debugging
       print('Branch: $branchNameset');
@@ -134,6 +136,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    orgId = await shared!.getOrgId();
     empId=await shared!.getEmpId();
     // await Future.delayed(Duration(seconds: 5));
     Future<OnDateAttModel> getEmployeeList11 = getSingleAttList(sessionId!,singleDateString);
@@ -192,9 +195,11 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   bool nightShift = false;
   bool compOff = false;
   bool shortLeave = false;
+  bool outDuty = false;
   bool light0 = true;
   bool light1 = true;
   bool isShortLeave = false;
+  bool isOutDuty = false;
   static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
     <WidgetStatesConstraint, Icon>{
       WidgetState.selected: Icon(Icons.check),
@@ -251,68 +256,138 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
               padding: const EdgeInsets.only(top: 10.0),
               child: Column(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedToggleSwitch<int>.size(
-                        height: 30,
-                        current: min(value, 3),
-                        style: ToggleStyle(
-                          backgroundColor: Mythemes.greyishade,
-                          indicatorColor: Mythemes.lightBluishColor,
-                          borderColor: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.0),
-                          indicatorBorderRadius: BorderRadius.zero,
-                        ),
-                        values: const [0, 1, 2],
-                        iconOpacity: 1.0,
-                        selectedIconScale: 1.0,
-                        indicatorSize: const Size.fromWidth(85),
-                        iconAnimationType: AnimationType.onHover,
-                        styleAnimationType: AnimationType.onHover,
-                        spacing: 3.0,
-                        customSeparatorBuilder: (context, local, global) {
-                          final opacity =
-                          ((global.position - local.position).abs() - 0.5)
-                              .clamp(0.0, 1.0);
-                          return VerticalDivider(
-                              indent: 10.0,
-                              endIndent: 10.0,
-                              color: Colors.white38.withOpacity(opacity));
-                        },
-                        customIconBuilder: (context, local, global) {
-                          final text = const ['Attendance', 'Leave', 'OD'][local.index];
-                          return Center(
-                              child: Text(text,
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Color.lerp(Colors.black, Colors.white,
-                                          local.animationValue))));
-                        },
-                        borderWidth: 0.0,
-                        onChanged: (i) {
-                          setState(() {
-                            value = i;
-                            print(i);
+                  Visibility(
+                    visible: orgId != 190 && orgId != 191 && orgId != 198,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedToggleSwitch<int>.size(
+                          height: 30,
+                          current: min(value, 3),
+                          style: ToggleStyle(
+                            backgroundColor: Mythemes.greyishade,
+                            indicatorColor: Mythemes.lightBluishColor,
+                            borderColor: Colors.transparent,
+                            borderRadius: BorderRadius.circular(10.0),
+                            indicatorBorderRadius: BorderRadius.zero,
+                          ),
+                          values: const [0, 1, 2],
+                          iconOpacity: 1.0,
+                          selectedIconScale: 1.0,
+                          indicatorSize: const Size.fromWidth(85),
+                          iconAnimationType: AnimationType.onHover,
+                          styleAnimationType: AnimationType.onHover,
+                          spacing: 3.0,
+                          customSeparatorBuilder: (context, local, global) {
+                            final opacity =
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
+                            return VerticalDivider(
+                                indent: 10.0,
+                                endIndent: 10.0,
+                                color: Colors.white38.withOpacity(opacity));
+                          },
+                          customIconBuilder: (context, local, global) {
+                            final text = const ['Attendance', 'Leave', 'OD'][local.index];
+                            return Center(
+                                child: Text(text,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color.lerp(Colors.black, Colors.white,
+                                            local.animationValue))));
+                          },
+                          borderWidth: 0.0,
+                          onChanged: (i) {
+                            setState(() {
+                              value = i;
+                              print(i);
 
-                          });
-                          if(value == 0){
-                            //Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
-                          }
-                          if(value == 1) {
-                            Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
-                            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                          }
-                          if(value == 2) {
-                            Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                          }
-                         /* if(value == 3) {
-                            Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                          }*/
-                        },
-                      )
-                    ],
+                            });
+                            if(value == 0){
+                              //Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                            }
+                            if(value == 1) {
+                              Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                            }
+                            if(value == 2) {
+                              Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                            }
+                           /* if(value == 3) {
+                              Navigator.pushNamed(context, MyRoutings.onDutyTypes);
+                            }*/
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+
+                  Visibility(
+                    visible: orgId == 190 || orgId == 191 || orgId == 198,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedToggleSwitch<int>.size(
+                          height: 30,
+                          current: min(value, 2),
+                          style: ToggleStyle(
+                            backgroundColor: Mythemes.greyishade,
+                            indicatorColor: Mythemes.lightBluishColor,
+                            borderColor: Colors.transparent,
+                            borderRadius: BorderRadius.circular(10.0),
+                            indicatorBorderRadius: BorderRadius.zero,
+                          ),
+                          values: const [0, 1],
+                          iconOpacity: 1.0,
+                          selectedIconScale: 1.0,
+                          indicatorSize: const Size.fromWidth(85),
+                          iconAnimationType: AnimationType.onHover,
+                          styleAnimationType: AnimationType.onHover,
+                          spacing: 3.0,
+                          customSeparatorBuilder: (context, local, global) {
+                            final opacity =
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
+                            return VerticalDivider(
+                                indent: 10.0,
+                                endIndent: 10.0,
+                                color: Colors.white38.withOpacity(opacity));
+                          },
+                          customIconBuilder: (context, local, global) {
+                            final text = const ['Attendance', 'Leave'][local.index];
+                            return Center(
+                                child: Text(text,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color.lerp(Colors.black, Colors.white,
+                                            local.animationValue))));
+                          },
+                          borderWidth: 0.0,
+                          onChanged: (i) {
+                            setState(() {
+                              value = i;
+                              print(i);
+
+                            });
+                            if(value == 0){
+                              //Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                            }
+                            if(value == 1) {
+                              Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                            }
+                           /* if(value == 2) {
+                              Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                            }*/
+                           /* if(value == 3) {
+                              Navigator.pushNamed(context, MyRoutings.onDutyTypes);
+                            }*/
+                          },
+                        )
+                      ],
+                    ),
                   ),
                   /*Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,12 +476,14 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                           setState(() => nightShift = val);
                           compOff=false;
                           shortLeave=false;
+                          outDuty=false;
                           print("Night Shift - $nightShift");
                         }),
-                        buildVerticalToggle("Compensatory Off", compOff, (val) {
+                        buildVerticalToggle("Comp. Off", compOff, (val) {
                           setState(() => compOff = val);
                           nightShift=false;
                           shortLeave=false;
+                          outDuty=false;
                           print("Comp Off - $compOff");
                         }),
 
@@ -416,7 +493,18 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                             setState(() => shortLeave = val);
                             compOff=false;
                             nightShift=false;
+                            outDuty=false;
                             print("Short Leave - $shortLeave");
+                          }),
+                        ),
+                        Visibility(
+                          visible: isOutDuty,
+                          child: buildVerticalToggle("OD", outDuty, (val) {
+                            setState(() => outDuty = val);
+                            compOff=false;
+                            nightShift=false;
+                            shortLeave=false;
+                            print("Out Duty - $outDuty");
                           }),
                         ),
                       ],
@@ -941,12 +1029,13 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                       outTimeReq=_outTimePicker;
                                     }
                                   }
-                                 if(nightShift==false && compOff == false)
+                                 if(nightShift==false && compOff == false && outDuty == false)
                                  {
                                    print("intime $inTimeReq");
                                    print("outtime $outTimeReq");
                                    print("night shift  $nightShift");
                                    print("compoff $compOff");
+                                   print("compoff $outDuty");
 
                                    if (inTimeReq!.compareTo(outTimeReq!) > 0) {
                                      return setState(() {
@@ -989,12 +1078,30 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                             outTimeReq!,
                                             logid,
                                             dateformat);
-                                      }else if (compOff==true)
+                                      }
+                                   else if (outDuty == true){
+                                        print("intime $inTimeReq");
+                                        print("outtime $outTimeReq");
+                                        print("night shift  $nightShift");
+                                        print("compoff $compOff");
+                                        print("outDuty $outDuty");
+                                        sendRequsitionToServerOutDuty(
+                                            context,
+                                            empId!,
+                                            inRemarkString,
+                                            outRemarkString,
+                                            inTimeReq!,
+                                            outTimeReq!,
+                                            logid,
+                                            dateformat);
+                                      }
+                                   else if (compOff==true)
                                       {
                                         print("intime $inTimeReq");
                                         print("outtime $outTimeReq");
                                         print("night shift  $nightShift");
                                         print("compoff $compOff");
+                                        print("outDuty $outDuty");
                                         if(actualTimeset!.compareToIgnoringCase("N/A")==0||
                                             actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0||
                                             actualOutTimeset!.compareToIgnoringCase("--:--")==0){
@@ -1242,7 +1349,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       var onDate) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+        "$conn$apiUrl?"
             "sessionId=$sessionId&"
             "id=$empId&"
             "onDate=$onDate&"
@@ -1276,6 +1383,51 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
     }
   }
 
+  Future<void> sendRequsitionToServerOutDuty(
+      BuildContext context,
+      int empId,
+      String inRemarkString,
+      String outRemarkString,
+      String inTimeReq,
+      String outTimeReq,
+      String logid,
+      var onDate) async {
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?"
+            "sessionId=$sessionId&"
+            "id=$empId&"
+            "onDate=$onDate&"
+            "inTimeRemarks=$inRemarkString&"
+            "outTimeRemarks=$outRemarkString&"
+            "inTime=$inTimeReq&"
+            "isOdReq=1&"
+            "outTime=$outTimeReq");
+    final response = await http.post(urlapi);
+
+    print('URL ${response.request}');
+    if (response.statusCode == 200) {
+      Navigator.of(context, rootNavigator: true).pop();
+      String result = "";
+      String reason = "";
+      mapResponse = json.decode(response.body);
+      if (mapResponse.containsKey("reason")) {
+        result = mapResponse['result'];
+        reason = mapResponse['reason'];
+        showDialgSucess1(context, reason, result);
+      } else {
+        result = mapResponse['result'];
+        if (result.compareToIgnoringCase("success") == 0) {
+          reason = "You have submit Requisition for $onDate";
+          showDialgSucess1(context, reason, "Success");
+        } else {
+          showDialgSucess1(context, result, "⚠️Warning");
+        }
+      }
+      print('result ${result} reason ${reason}');
+    }
+  }
+
   Future<void> sendRequsitionToServerCompOff(
       BuildContext context,
       int empId,
@@ -1287,7 +1439,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       var onDate) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+        "$conn$apiUrl?"
             "sessionId=$sessionId&"
             "id=$empId&"
             "onDate=$onDate&"
@@ -1311,7 +1463,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       } else {
         result = mapResponse['result'];
         if (result.compareToIgnoringCase("success") == 0) {
-          reason = "you have submit Requisition for $onDate";
+          reason = "You have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
           showDialgSucess1(context, result, "⚠️Warning");
