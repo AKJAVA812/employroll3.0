@@ -963,17 +963,24 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                 if(shortLeave == true){
                                   inTimeReq= actualTimeset;
                                   outTimeReq= actualOutTimeset;
-                                  inRemarkString="";
+                                  inRemarkString= shortLeaveRemarkController.text;
                                   outRemarkString="";
-                                  sendRequsitionToServerShortLeave(
-                                      context,
-                                      empId!,
-                                      inRemarkString,
-                                      outRemarkString,
-                                      inTimeReq!,
-                                      outTimeReq!,
-                                      logid,
-                                      dateformat);
+                                  if(inRemarkString == ""){
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text(" Please fill remarks !! "),
+                                    ));
+                                  } else {
+                                    sendRequsitionToServerShortLeave(
+                                        context,
+                                        empId!,
+                                        inRemarkString,
+                                        outRemarkString,
+                                        inTimeReq!,
+                                        outTimeReq!,
+                                        logid,
+                                        dateformat);
+                                  }
+
                                 }
                                 else
                                 {
@@ -1053,15 +1060,22 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                      print("outtime $outTimeReq");
                                      print("night shift  $nightShift");
                                      print("compoff $compOff");
-                                     sendRequsitionToServer(
-                                         context,
-                                         empId!,
-                                         inRemarkString,
-                                         outRemarkString,
-                                         inTimeReq,
-                                         outTimeReq,
-                                         logid,
-                                         dateformat);
+                                     if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
+                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                         content: Text(" Please fill remarks !! "),
+                                       ));
+                                     } else {
+                                       sendRequsitionToServer(
+                                           context,
+                                           empId!,
+                                           inRemarkString,
+                                           outRemarkString,
+                                           inTimeReq,
+                                           outTimeReq,
+                                           logid,
+                                           dateformat);
+                                     }
+
                                    }
                                  }
                                    else if (nightShift == true){
@@ -1069,15 +1083,22 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                         print("outtime $outTimeReq");
                                         print("night shift  $nightShift");
                                         print("compoff $compOff");
-                                        sendRequsitionToServernextDay(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq!,
-                                            outTimeReq!,
-                                            logid,
-                                            dateformat);
+                                        if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                            content: Text(" Please fill remarks !! "),
+                                          ));
+                                        }else {
+                                          sendRequsitionToServernextDay(
+                                              context,
+                                              empId!,
+                                              inRemarkString,
+                                              outRemarkString,
+                                              inTimeReq!,
+                                              outTimeReq!,
+                                              logid,
+                                              dateformat);
+                                        }
+
                                       }
                                    else if (outDuty == true){
                                         print("intime $inTimeReq");
@@ -1085,15 +1106,22 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                         print("night shift  $nightShift");
                                         print("compoff $compOff");
                                         print("outDuty $outDuty");
-                                        sendRequsitionToServerOutDuty(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq!,
-                                            outTimeReq!,
-                                            logid,
-                                            dateformat);
+                                        if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                            content: Text(" Please fill remarks !! "),
+                                          ));
+                                        } else {
+                                          sendRequsitionToServerOutDuty(
+                                              context,
+                                              empId!,
+                                              inRemarkString,
+                                              outRemarkString,
+                                              inTimeReq!,
+                                              outTimeReq!,
+                                              logid,
+                                              dateformat);
+                                        }
+
                                       }
                                    else if (compOff==true)
                                       {
@@ -1110,15 +1138,22 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                           ));
                                         }
                                         else{
-                                          sendRequsitionToServerCompOff(
-                                              context,
-                                              empId!,
-                                              inRemarkString,
-                                              outRemarkString,
-                                              inTimeReq!,
-                                              outTimeReq!,
-                                              logid,
-                                              dateformat);
+                                          if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
+                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                              content: Text(" Please fill remarks !! "),
+                                            ));
+                                          } else {
+                                            sendRequsitionToServerCompOff(
+                                                context,
+                                                empId!,
+                                                inRemarkString,
+                                                outRemarkString,
+                                                inTimeReq!,
+                                                outTimeReq!,
+                                                logid,
+                                                dateformat);
+                                          }
+
                                         }
                                       }
 
