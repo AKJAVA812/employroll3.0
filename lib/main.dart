@@ -4,6 +4,7 @@ import 'package:er_flutter_project/MSS_Bundle/hris/fnfListMSS.dart';
 import 'package:er_flutter_project/MSS_Bundle/hris/inactiveListMSS.dart';
 import 'package:er_flutter_project/MSS_Bundle/incidentReporting/incidentReportingPage.dart';
 import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
+import 'package:er_flutter_project/commanScreen/modalClass/attendance_punch.dart';
 import 'package:er_flutter_project/ess/loan&Advance/myLoanRequestList.dart';
 import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
 import 'package:er_flutter_project/firebase_options.dart';
@@ -280,7 +281,8 @@ void main() async {
   //await initializeService();
   await Hive.initFlutter();
   WidgetsFlutterBinding.ensureInitialized();
-
+  Hive.registerAdapter(AttendancePunchAdapter());
+  await Hive.openBox<AttendancePunch>('attendanceBox');
   //Need to comment this
   /*const AndroidInitializationSettings initializationSettingsAndroid =
   AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -299,9 +301,6 @@ void main() async {
   );
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);*/
   //Need to comment this
-
-
-
 
   //await Firebase.initializeApp();
   //await FirebaseApi().initNotifications();
