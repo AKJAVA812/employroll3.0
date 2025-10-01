@@ -33,6 +33,7 @@ class ImageUploaded extends StatefulWidget {
   @override
   State<ImageUploaded> createState() => _ImageUploadedState(value,time,address,punchType);
 }
+final attendanceBox = Hive.box('attendanceBox');
 late String? sessionId ;
 int? orgnizationID=0;
 SessionManager shared = SessionManager();
@@ -410,7 +411,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
     }
   }
 
-  Future<void> uploadImage(BuildContext context) async {
+  /*Future<void> uploadImage(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchIn;
     CommonNotificationPage.showLoaderDialog(context);
@@ -436,9 +437,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     });
     var length = await value!.length();
-    /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    *//* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Sucessfully Run"+formattedDate!),
-      ));*/
+      ));*//*
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/attendance/via/mobile");
     var uri = Uri.parse("$conn$apiUrl");
     var request = new http.MultipartRequest("Post", uri);
@@ -457,9 +458,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     //print("stream.length");
     //print(stream.length.toString());
-    /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Sucessfully Run"+orgnizationID.toString()!),
-      ));*/
+      ));*//*
     var multipart = new http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
     request.files.add(multipart);
@@ -488,24 +489,24 @@ class _ImageUploadedState extends State<ImageUploaded> {
       print('result${result}');
       print("Reason: ${result['reason']}, Type: ${result['reason'].runtimeType}");
       print("Result: ${result['result']}, Type: ${result['result'].runtimeType}");
-      /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+result['result']),
-    ));*/
-      /*Timer(const Duration(seconds: 10), () {
+    ));*//*
+      *//*Timer(const Duration(seconds: 10), () {
       print("Timer is done");
       Navigator.of(context, rootNavigator: true).pop();
       showDialgError(context, "Alert", "Please Try again !");
-    },);*/
+    },);*//*
       print('Response body: ${result}');
 
       //var response = await request.send();
       // listen for response
-      /* response.stream.transform(utf8.decoder).listen((value) {
+      *//* response.stream.transform(utf8.decoder).listen((value) {
         //var body = json.decoder(value);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Sucessfully Run" + value),
         ));
-      });*/
+      });*//*
       //var responseData = await response.stream.bytesToString();
 
 
@@ -534,7 +535,152 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
 
 
+  }*/
+
+  Future<void> uploadImage(BuildContext context) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.punchIn;
+    CommonNotificationPage.showLoaderDialog(context);
+
+    bool internetCheck = await InternetConnectionChecker().hasConnection;
+    if (internetCheck == false) {
+      setState(() {
+        Navigator.of(context, rootNavigator: true).pop();
+        slowInternetPop(
+            context,
+            "Slow Internet Connection !" + "",
+            "Your Punch in not submitted, Please try again.");
+      });
+      return;
+    }
+
+    DateTime now = DateTime.now();
+    DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
+    String formattedDate = dateFormat.format(now);
+    DateFormat currentDateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
+    String currentDateFormatString = currentDateFormat.format(now);
+
+    // ✅ Convert image file to Base64 string
+    List<int> imageBytes = await value!.readAsBytes();
+    String base64Image = base64Encode(imageBytes);
+
+    var uri = Uri.parse("$conn$apiUrl");
+
+    // ✅ Prepare JSON body
+    Map<String, dynamic> body = {
+      "sessionId": sessionId!,
+      "currentDate": currentDateFormatString,
+      "address": currentAddress,
+      "clockingType": clockingType!,
+      "lat": lat.toString(),
+      "lng": lng.toString(),
+      "firstImei": sessionId!,
+      "secondImei": sessionId!,
+      "macAddress": deviceId!,
+      "deviceId": deviceId!,
+      "battery": sessionId!,
+      "image": base64Image, // ✅ sending as base64 string
+    };
+
+    // Print API with parameters (except image, just for debug readability)
+    String apiWithParams = uri.toString() +
+        '?' +
+        body.entries
+            .where((e) => e.key != "image")
+            .map((e) =>
+        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .join('&');
+    print('API URL with Parameters: $apiWithParams');
+    print('Image length (Base64 chars): ${base64Image.length}');
+
+    try {
+      http.Response response = await http
+          .post(
+        uri,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(body),
+      )
+          .timeout(const Duration(seconds: 30));
+
+      print('Response received: ${response.body}');
+
+      if (response.statusCode == 500) {
+        Navigator.of(context, rootNavigator: true).pop();
+        slowInternetPop(
+            context,
+            "Slow Internet Connection !" + "",
+            "Your Punch in not submitted, Please try again.");
+      }
+
+      result = json.decode(response.body.toString());
+      String resultSuccess = result['result'];
+      String reasonSuccess = result['reason'];
+
+      print('URL ${response.request}');
+      print('result $result');
+      print("Reason: ${result['reason']}, Type: ${result['reason'].runtimeType}");
+      print("Result: ${result['result']}, Type: ${result['result'].runtimeType}");
+
+      if (response.statusCode == 200) {
+        Navigator.of(context, rootNavigator: true).pop();
+        if (resultSuccess.compareToIgnoringCase("success") == 0) {
+          showSuccessGo(
+              context,
+              reasonSuccess.upperCamelCase + " " + formattedDate,
+              "Successfully Punch $clockingType");
+        } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
+          if (reasonSuccess == "non-geofence area") {
+            showSuccessGo(context,
+                reasonSuccess.upperCamelCase + " " + formattedDate, " Non Geofence Area ");
+          } else {
+            showSuccessGo(context, reasonSuccess.upperCamelCase, "Failed");
+          }
+        }
+      } else {
+        showDialgError(context, result, "Your Punch Not Submitted, Please Try Again");
+      }
+    } on TimeoutException catch (_) {
+      // Timeout
+      // showDialgError(context, "Alert", "Please Try again !");
+    }
   }
+  //code commit
+/*
+
+  // Save Punch Offline
+  void savePunchOffline(Map<String, dynamic> punch) async {
+    await attendanceBox.add(punch); // list style save
+   */
+/* ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Punch saved offline!")),
+    );*//*
+
+    setState(() {}); // Refresh UI
+  }
+
+  // Delete Punch after sync
+  void deletePunch(int index) async {
+    await attendanceBox.deleteAt(index);
+    setState(() {});
+  }
+
+  // Mock Sync Function (Replace with API Call)
+  Future<void> syncPunch(int index, Map<String, dynamic> punch) async {
+    // TODO: Replace with your actual API POST call
+    print("Syncing to server: $punch");
+
+    await Future.delayed(Duration(seconds: 2)); // simulate API call
+
+    // अगर सफल हुआ तो delete कर दें
+    deletePunch(index);
+
+   */
+/* ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Punch synced successfully!")),
+    );*//*
+
+  }
+*/
 
   showSuccessGo(BuildContext buildContext, result,alert) {
     var alertDialog = AlertDialog(
