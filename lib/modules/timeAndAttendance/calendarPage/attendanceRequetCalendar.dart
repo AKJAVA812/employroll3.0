@@ -59,8 +59,8 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   String? departmentset;
   String? employeeNameset;
   String? onDateset;
-  String? actualTimeset;
-  String? actualOutTimeset;
+  String? actualTimeset = "N/A";
+  String? actualOutTimeset = "N/A";
   int? empId;
   var onDate;
 
@@ -110,8 +110,8 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       actualTimeset = getData['inTime'] ?? '';
       actualOutTimeset = getData['outTime'] ?? '';
       empId = getData['empId'] ?? 0;
-      isShortLeave = getData['isShortLeave'] ?? '';
-      isOutDuty = getData['isOdReq'] ?? '';
+      isShortLeave = getData['isShortLeave'] ?? isShortLeave;
+      isOutDuty = getData['isOdReq'] ?? isOutDuty;
 
       // Log for debugging
       print('Branch: $branchNameset');

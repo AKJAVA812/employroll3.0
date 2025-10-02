@@ -84,7 +84,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
       relaxationHourSet = onDateAttModel!.relaxationHour;
       isShortLeave = onDateAttModel!.isShortLeave ?? false;
-      isOutDuty = onDateAttModel!.isOdReq ?? false;
+      isOutDuty = onDateAttModel!.isOdReq ?? isOutDuty;
       print("Short Leave Check - $isShortLeave");
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
@@ -108,8 +108,8 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       print('onModelrun');
       branchNameset= onDateAttModel!.branch;
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
-      isShortLeave = onDateAttModel!.isShortLeave ?? false;
-      isOutDuty = onDateAttModel!.isOdReq ?? false;
+      isShortLeave = onDateAttModel!.isShortLeave ?? isShortLeave;
+      isOutDuty = onDateAttModel!.isOdReq ?? isOutDuty;
       print("Short Leave Check - $isShortLeave");
       relaxationHourSet = onDateAttModel!.relaxationHour;
       workingHrsSet = onDateAttModel!.workingHrs;

@@ -83,8 +83,8 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
       branchNameset=  attendanceModelGlobel!.data![indexCont].branchName.toString();
       updatedWorkHourSet = attendanceModelGlobel!.data![indexCont].updatedWorkingHour;
       relaxationHourSet = attendanceModelGlobel!.data![indexCont].relaxationHour;
-      isShortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave ?? false;
-      isOutDuty = attendanceModelGlobel!.data![indexCont].isOdReq ?? false;
+      isShortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave ?? isShortLeave;
+      isOutDuty = attendanceModelGlobel!.data![indexCont].isOdReq ?? isOutDuty;
       workingHrsSet = attendanceModelGlobel!.data![indexCont].workingHrs;
       shiftWorkingHourSet = attendanceModelGlobel!.data![indexCont].shiftWorkingHour;
       departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
@@ -107,8 +107,8 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
       branchNameset=  attendanceModelGlobel!.data![indexCont].branchName.toString();
       updatedWorkHourSet = attendanceModelGlobel!.data![indexCont].updatedWorkingHour;
       relaxationHourSet = attendanceModelGlobel!.data![indexCont].relaxationHour;
-      isShortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave ?? false;
-      isOutDuty = attendanceModelGlobel!.data![indexCont].isOdReq ?? false;
+      isShortLeave = attendanceModelGlobel!.data![indexCont].isShortLeave ?? isShortLeave;
+      isOutDuty = attendanceModelGlobel!.data![indexCont].isOdReq ?? isOutDuty;
       workingHrsSet = attendanceModelGlobel!.data![indexCont].workingHrs;
       shiftWorkingHourSet = attendanceModelGlobel!.data![indexCont].shiftWorkingHour;
       departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
