@@ -510,8 +510,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
       });*/
       //var responseData = await response.stream.bytesToString();
 
-
-
       if(response.statusCode==200){
         print("I am hit 2 times");
         Navigator.of(context, rootNavigator: true).pop();

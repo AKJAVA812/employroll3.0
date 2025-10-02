@@ -1815,6 +1815,47 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
             );
           }
 
+          if(orgId == 3 || orgId == 145) {
+            items.add(
+              Hero(
+                tag: 'offlineAttendance',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: (){
+                      Navigator.pushNamed(context, MyRoutings.offlineAttendanceRoute);
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.offline_share_sharp,
+                            size: 50,
+                            color: Colors.blueGrey,
+                          ),
+
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'Sync My Attendance',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
 
         //Location
         if(orgId == 3 || orgId == 145) {
