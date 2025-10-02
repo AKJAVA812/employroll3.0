@@ -326,7 +326,7 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              foundDataNew![index].policytype,
+                              foundDataNew![index].policytype.toString(),
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey.shade600,

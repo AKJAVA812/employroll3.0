@@ -411,7 +411,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
     }
   }
 
-  /*Future<void> uploadImage(BuildContext context) async {
+  Future<void> uploadImage(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchIn;
     CommonNotificationPage.showLoaderDialog(context);
@@ -437,9 +437,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     });
     var length = await value!.length();
-    *//* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Sucessfully Run"+formattedDate!),
-      ));*//*
+
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/attendance/via/mobile");
     var uri = Uri.parse("$conn$apiUrl");
     var request = new http.MultipartRequest("Post", uri);
@@ -458,9 +456,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     //print("stream.length");
     //print(stream.length.toString());
-    *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Sucessfully Run"+orgnizationID.toString()!),
-      ));*//*
+
     var multipart = new http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
     request.files.add(multipart);
@@ -489,24 +485,13 @@ class _ImageUploadedState extends State<ImageUploaded> {
       print('result${result}');
       print("Reason: ${result['reason']}, Type: ${result['reason'].runtimeType}");
       print("Result: ${result['result']}, Type: ${result['result'].runtimeType}");
-      *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Sucessfully Run"+result['result']),
-    ));*//*
-      *//*Timer(const Duration(seconds: 10), () {
-      print("Timer is done");
-      Navigator.of(context, rootNavigator: true).pop();
-      showDialgError(context, "Alert", "Please Try again !");
-    },);*//*
+
+
       print('Response body: ${result}');
 
       //var response = await request.send();
       // listen for response
-      *//* response.stream.transform(utf8.decoder).listen((value) {
-        //var body = json.decoder(value);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Sucessfully Run" + value),
-        ));
-      });*//*
+
       //var responseData = await response.stream.bytesToString();
 
 
@@ -535,9 +520,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
 
 
-  }*/
+  }
 
-  Future<void> uploadImage(BuildContext context) async {
+  /*Future<void> uploadImage(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchIn;
     CommonNotificationPage.showLoaderDialog(context);
@@ -643,7 +628,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       // Timeout
       // showDialgError(context, "Alert", "Please Try again !");
     }
-  }
+  }*/
   //code commit
 /*
 

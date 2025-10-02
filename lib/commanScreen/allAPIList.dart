@@ -25,7 +25,7 @@ class ApiDetails{
    static var workDoneReport = "restful/service/get/self/mobile/task/list";
    static var roWorkDoneReport = "restful/service/get/self/mobile/task/list/ro/wise";
    static var attendanceReport = "restful/service/get/attendance/logs/multiple";
-   //static var punchWithoutSelfie = "/restful/service/attendance/via/mobile/without/image";
+   //static var punchWithoutSelfie = "restful/service/attendance/via/mobile/without/image";
    static var punchWithoutSelfie = "restful/service/attendance/via/mobile/without/image/with/status";
    static var cancelSelfAttReqList = "restful/service/own/attandace/request/cancellation";
    //OD Attendance
@@ -117,7 +117,7 @@ class ApiDetails{
 
    static var logoutAPi = "restful/service/employee/logout";
 
-   static var tourRequisitionApi = "/restful/service/requisition/tour";
+   static var tourRequisitionApi = "restful/service/requisition/tour";
 
 
    //HR_IS Update API

@@ -457,7 +457,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
       ),
     );
   }
-
+  var statusColor;
   showNullDialog(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
@@ -505,6 +505,14 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
       itemBuilder: (context, itemCount) {
         length = selfOdReqListModal.listdata!.length;
         print("length of data $length");
+        var statusCheck = selfOdReqListModal.listdata![itemCount].approvalstatus;
+        if (statusCheck == 'Approved') {
+          statusColor = Mythemes.successColor;
+        } else if (statusCheck == 'DisApproved') {
+          statusColor = Mythemes.dangerColor;
+        } else {
+          statusColor = Mythemes.alertColor;
+        }
         if (length == null) {
           return showNullDialog(
               context,
@@ -526,131 +534,197 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                   OdApproveDisapproveReq(pendingOdReqList, itemCount)));*/
           },
           child: Card(
-              elevation: 2,
-              child: Container(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        selfOdReqListModal.listdata![itemCount].name
-                            .toString()
-                            .text
-                            .make()
-                            .px8()
-                            .py4(),
-                        Expanded(
-                            child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top row: Avatar | Name + address | Status
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Avatar
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.grey.shade200,
+                        child: ClipOval(
+                          child: Image.network(
+                            selfOdReqListModal.listdata![itemCount].image ?? "",
+                            fit: BoxFit.cover,
+                            width: 56,
+                            height: 56,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/images/avtar7.png',
+                                fit: BoxFit.cover,
+                                width: 56,
+                                height: 56,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      // Name + address (left, expandable)
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            selfOdReqListModal
-                                .listdata![itemCount].approvalstatus
-                                .toString()
-                                .text
-                                .color(Mythemes.lightBluishColor)
-                                .sm
-                                .make()
-                                .px8(),
+                            // Name
+                            Text(
+                              selfOdReqListModal.listdata![itemCount].name.toString(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Address row with icon. The Expanded text prevents overflow and ellipsizes.
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.location_on, size: 16, color: Colors.redAccent),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    selfOdReqListModal.listdata![itemCount].odaddress.toString(),
+                                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.redAccent),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    selfOdReqListModal.listdata![itemCount].remark.toString(),
+                                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
-                        ))
-                      ],
-                    ),
-                    Row(
-                      //mainAxisAlignment: MainAxisAlignment.start,
-                      //crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Expanded(
-                          child: selfOdReqListModal
-                              .listdata![itemCount].odaddress
-                              .toString()
-                              .text
-                              .overflow(TextOverflow.ellipsis)
-                              .maxLines(1)
-                              .textStyle(context.captionStyle)
-                              .make(),
                         ),
-                      ],
-                    ).px8(),
-                    Row(
-                      children: [
-                        selfOdReqListModal.listdata![itemCount].remark
-                            .toString()
-                            .text
-                            .textStyle(context.captionStyle)
-                            .make()
-                            .px8(),
-                      ],
-                    ),
-                    Row(
+                      ),
+
+                      const SizedBox(width: 8),
+
+                      // Status (right aligned, stays vertically at the top)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            selfOdReqListModal.listdata![itemCount].approvalstatus.toString(),
+                            style: TextStyle(
+                              color: statusColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Remark row
+                  /*Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.touch_app,
-                                size: 35,
-                                color: Mythemes.lightBluishColor,
-                              ),
-                            ],
+                        const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.teal),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            foundDataNewMSS![itemCount].remark.toString(),
+                            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              selfOdReqListModal.listdata![itemCount].odtype
-                                  .toString()
-                                  .text
-                                  .sm
-                                  .make(),
-                              selfOdReqListModal.listdata![itemCount].odtime
-                                  .toString()
-                                  .text
-                                  .sm
-                                  .make()
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.date_range,
-                                size: 35,
-                                color: Mythemes.lightBluishColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              "Date".text.sm.make(),
-                              DateFormat("dd-MM-yyyy")
-                                  .format(DateTime.parse(selfOdReqListModal
-                                      .listdata![itemCount].date
-                                      .toString()))
-                                  .text
-                                  .sm
-                                  .make()
-                            ],
-                          ),
-                        ),
+                        )
                       ],
-                    )
-                  ],
-                ),
-              )),
+                    ),*/
+
+                  const SizedBox(height: 12),
+                  const Divider(height: 1),
+
+                  const SizedBox(height: 10),
+
+                  // Bottom icons row (In/Out + Date)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Left block - In/Out and time
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.touch_app, size: 32, color: Mythemes.lightBluishColor),
+                            const SizedBox(width: 6),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  selfOdReqListModal.listdata![itemCount].odtype.toString(),
+                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  selfOdReqListModal.listdata![itemCount].odtime.toString(),
+                                  style: const TextStyle(color: Colors.black87, fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Right block - Date
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.date_range, size: 32, color: Mythemes.lightBluishColor),
+                            const SizedBox(width: 6),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Date',
+                                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  DateFormat("dd-MM-yyyy")
+                                      .format(DateTime.parse(selfOdReqListModal.listdata![itemCount].date.toString())),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
