@@ -982,7 +982,7 @@ class _HRISDetailsState extends State<HRISDetails> {
     if (response.statusCode == 200) {
       var responseResult = response.body;
       print('success $responseResult');
-      Navigator.pop(this.context);
+      Navigator.of(this.context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'].toString();
       String status = mapResponse['status'].toString();
@@ -1026,7 +1026,10 @@ class _HRISDetailsState extends State<HRISDetails> {
           onPressed: () {
 
             Navigator.of(context, rootNavigator: true).pop();
-            Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,))
+            );
+            //Navigator.pop(context);
           },
           child: Text("Ok"),
         ),

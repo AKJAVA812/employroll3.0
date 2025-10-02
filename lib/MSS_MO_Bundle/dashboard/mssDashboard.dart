@@ -606,7 +606,9 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId&"
+        "userPermission=$userPanelPermission&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');

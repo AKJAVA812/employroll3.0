@@ -5,10 +5,7 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //Himanshu Ngrok
-   //static var server="https://unforfeitable-unvaunted-domenica.ngrok-free.dev/";
-   //Adnan Ngrok
-   //static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
+   //static var server="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
    //Attendance Punch in and Punch out
    static String login="restful/service/login";
    static String punchIn="restful/service/attendance/via/mobile";
@@ -28,7 +25,7 @@ class ApiDetails{
    static var workDoneReport = "restful/service/get/self/mobile/task/list";
    static var roWorkDoneReport = "restful/service/get/self/mobile/task/list/ro/wise";
    static var attendanceReport = "restful/service/get/attendance/logs/multiple";
-   //static var punchWithoutSelfie = "/restful/service/attendance/via/mobile/without/image";
+   //static var punchWithoutSelfie = "restful/service/attendance/via/mobile/without/image";
    static var punchWithoutSelfie = "restful/service/attendance/via/mobile/without/image/with/status";
    static var cancelSelfAttReqList = "restful/service/own/attandace/request/cancellation";
    //OD Attendance
@@ -106,6 +103,7 @@ class ApiDetails{
    static var advanceRequest = "restful/service/get/advance/master/list";
    static var loanAdvReqSend = "restful/service/org/loan/and/advance/request/data/save";
 
+
    //Helpdesk API's
    static var departmentListApi = "employroll/api/third/party/query/policy/all/mobile/departments";
    static var queryTypeListApi = "employroll/api/third/party/get/ticket/type/list/new/mobile";
@@ -118,7 +116,9 @@ class ApiDetails{
    static var documentDetApi = "employroll/api/third/party/org/get/employee/on/filter/base/document/list";
 
    static var logoutAPi = "restful/service/employee/logout";
-   static var tourRequisitionApi = "/restful/service/requisition/tour";
+
+   static var tourRequisitionApi = "restful/service/requisition/tour";
+
 
    //HR_IS Update API
    static var updateHRISApi = "restful/service/hris/detail/update/request";
@@ -150,6 +150,7 @@ class ApiDetails{
    static var onboardUserTypeList = "restful/service/fetch/userType/list";
    static var onboardDocTypeList = "restful/service/get/doc/type/list";
 
+
    //Holiday ESS
    static var holidayListEss = "restful/service/get/emp/holiday/ess";
 
@@ -162,6 +163,7 @@ class ApiDetails{
    static var faceRecognizeOtherMss = "restful/service/attendance/via/face/recognize/mobile/other/emp/wise";
    static var faceRecognizeSelf = "restful/service/attendance/via/face/recognize/mobile/self";
    static var getEmpFaceList = "restful/service/employeelist/face/reco/det";
+
 
    //Tracking
    static var saveTrackingData = "restful/service/new/mobile/tracking/new";

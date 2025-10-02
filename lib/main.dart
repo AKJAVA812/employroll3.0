@@ -272,13 +272,13 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Need to comment this
-  await Firebase.initializeApp(
+/*  await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform
   );
   final notificationService = NotificationService();
   await notificationService.initFCM();
   _requestPermission();
-  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);*/
   //Need to comment this
   //await initializeService();
   await Hive.initFlutter();
@@ -286,7 +286,7 @@ void main() async {
   Hive.registerAdapter(AttendancePunchAdapter());
   await Hive.openBox<AttendancePunch>('attendanceBox');
   //Need to comment this
-  const AndroidInitializationSettings initializationSettingsAndroid =
+/*  const AndroidInitializationSettings initializationSettingsAndroid =
   AndroidInitializationSettings('@mipmap/ic_launcher');
 
   //iOS-specific initialization settings with permission requests
@@ -301,7 +301,7 @@ void main() async {
       android: initializationSettingsAndroid,
       iOS: iosInitializationSettings
   );
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);*/
   //Need to comment this
 
   //await Firebase.initializeApp();

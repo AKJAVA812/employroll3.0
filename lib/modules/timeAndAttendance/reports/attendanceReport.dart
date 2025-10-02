@@ -346,7 +346,7 @@ class _AttListState extends State<AttList> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              "${employeeListModelglobel!.data![itemCount].status}".text.bold.color(status == "Absent" ? Mythemes.dangerColor : Mythemes.successColor).make().px8()
+                              "${employeeListModelglobel!.data![itemCount].status}".text.bold.color(employeeListModelglobel!.data![itemCount].status == "Absent" ? Mythemes.dangerColor : Mythemes.successColor).make().px8()
                               //employeeListModelglobel!.data![itemCount].status!.text.color(employeeListModelglobel!.data![itemCount].status! == "Absent" ? Mythemes.dangerColorOne : Mythemes.lightBluishColor).make().px8(),
                             ],
                           )
