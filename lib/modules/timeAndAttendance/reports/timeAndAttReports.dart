@@ -637,13 +637,14 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.5,
+        automaticallyImplyLeading: true,
         title: "Time and Attendance".text.make(),
-       /* leading: IconButton(
+        leading: IconButton(
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 1,)));
             },
-            icon: Icon(Icons.arrow_back_ios)),*/
+            icon: Icon(Icons.arrow_back_ios)),
       ),
       body:   GridView.count(
           crossAxisCount: 3,
