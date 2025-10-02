@@ -44,12 +44,13 @@ class _OfflineAttendanceSyncPageState extends State<OfflineAttendanceSyncPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 2,
         title: Text(
           "Offline Attendance Sync",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        //backgroundColor: Colors.blueAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

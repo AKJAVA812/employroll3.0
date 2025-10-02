@@ -639,7 +639,7 @@ class _LoginPageState extends State<LoginPage> {
                                             shared.setEmpRoll(value!.data!.empRole!.length);
                                             shared.setRoRoll(value!.data!.roRole!.length);
                                             shared.setShowPayroll(loginModelglobal!.data!.userLoginned!.showPayroll);
-                                            //sendGeoFenceId(value.data!.sessionId!, fcmToken!);
+                                            sendGeoFenceId(value.data!.sessionId!, fcmToken!);
                                             if(adminRole==1){
                                               setAdminSharedPrefValue(loginModelglobal);
 

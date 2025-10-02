@@ -358,4 +358,9 @@ class MyRoutings {
   //HRIS
   static String inactiveListMSSRoute= "/inactiveListMSSRoute";
   static String fnfListMSSRoute= "/fnfListMSSRoute";
+
+  //Offline Attendance
+  static String offlineAttendanceRoute= "/offlineAttendanceRoute";
+
+
 }
