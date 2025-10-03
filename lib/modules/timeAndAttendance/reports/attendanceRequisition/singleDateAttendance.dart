@@ -328,7 +328,7 @@ class _AttListState extends State<AttList> {
                               children: [
 
                                 "Work Hours".text.sm.make(),
-                                onDateAttModelGlobel!.workingHrs!.text.sm.make()
+                                onDateAttModelGlobel!.workingHrs!.toString().text.sm.make()
                               ],
                             ),
                           ),

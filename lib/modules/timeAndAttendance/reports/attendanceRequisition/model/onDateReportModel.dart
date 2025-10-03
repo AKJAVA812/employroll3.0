@@ -1,7 +1,7 @@
 class OnDateAttModel {
   String? date;
   int? empId;
-  String? workingHrs;
+  dynamic workingHrs;
   dynamic isShortLeave;
   dynamic isOdReq;
   String? dept;

@@ -265,7 +265,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                 },
                 horizontalPadding: 8,
                 searchIconColor: Mythemes.black,
-                centerTitle: titleName,
+                centerTitle: "$titleName - ${foundDataNew!.length}",
                 verticalPadding: 3,
                 centerTitleStyle: TextStyle(
                     fontSize: 19,
@@ -466,9 +466,9 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
           }
           return InkWell(
             onTap: () {
-              for (int i = 0; i < foundDataNew!.length; i++) {
-                reqId = foundDataNew![i].reqId;
-              }
+              reqId = foundDataNew![i].reqId;
+
+              print("Req ID - $reqId");
 
               showDialgCancel(context, context, context);
               //CommonNotificationPage.showDeleteMessage(context, context, context);
