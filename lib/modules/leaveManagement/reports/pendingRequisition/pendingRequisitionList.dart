@@ -35,6 +35,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+dynamic getProfileId;
+dynamic userPanel;
 List<Data>? allUsernew=[];
 List<Data>? foundDataNew=[];
 String? levelOne;
@@ -115,6 +117,8 @@ class _PendingLeaveRequisitionListState extends State<PendingLeaveRequisitionLis
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    getProfileId = await shared!.getDefaultProfileId();
     levelOne = await shared!.getLevelOne();
     levelTwo = await shared!.getLevelTwo();
     print("Level 1 - $levelOne");
@@ -153,7 +157,12 @@ class _PendingLeaveRequisitionListState extends State<PendingLeaveRequisitionLis
     String apiUrl = ApiDetails.pendingLeaveReqList;
     print('employeeList11: ${SessionId}');
     PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanel&"
+        "orgId=0"
+    );
     final response = await http.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
