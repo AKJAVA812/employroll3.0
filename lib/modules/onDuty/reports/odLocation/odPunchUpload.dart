@@ -121,16 +121,11 @@ class _ODImageUploadState extends State<ODImageUpload> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    lat=await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    lat=await shared.getLatitude();
 
-    lng=await shared!.getLongitude();
+    lng=await shared.getLongitude();
     orgnizationID=await shared.getOrgId();
-
-    print('Response snapshot: ${sessionId}');
-    print('Response snapshot: ${lat}');
-    print('Response snapshot: ${lng}');
-    print('Response snapshot: ${orgnizationID}');
 
   }
   showDialgError(BuildContext buildContext, result,reason) {
@@ -170,6 +165,7 @@ class _ODImageUploadState extends State<ODImageUpload> {
   }
 
   Future<void> odUploadImage(BuildContext context) async {
+    print("Od API Hit");
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.odInOtApi;
     CommonNotificationPage.showLoaderDialog(context);
@@ -183,14 +179,8 @@ class _ODImageUploadState extends State<ODImageUpload> {
     String currentDateFormatString = currentDateFormat.format(now);
     String currentTimeFormatString = currentTimeFormat.format(now);
     var length = await value!.length();
-    print('Length: ${length}');
-    print('Current Date: ${currentDateFormatString}');
-    print('Current Time: ${currentTimeFormatString}');
-    print('Response body: ${stream}');
-    print('Response body: ${value}');
     var multipart = new http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
-
     var uri = Uri.parse("$conn$apiUrl");
     var request = new http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
@@ -210,9 +200,7 @@ class _ODImageUploadState extends State<ODImageUpload> {
     result= json.decode(response.body.toString());
     String resultSuccess=result['result'];
     String reasonSuccess=result['reason'];
-    print('result${result}');
-    print('URL ${response.request}');
-    print('Response body: ${result}');
+
     if(response.statusCode==200){
       Navigator.of(context, rootNavigator: true).pop();
       if(resultSuccess.compareToIgnoringCase("success")==0){

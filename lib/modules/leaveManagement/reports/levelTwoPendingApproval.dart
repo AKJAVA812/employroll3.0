@@ -36,7 +36,7 @@ class _LevelTwoPendingApprovalState extends State<LevelTwoPendingApproval> {
   LevelTwoPendingLeaveModal? pendingLeaveRequisitionModal;
   int itemCount;
   _LevelTwoPendingApprovalState(this.pendingLeaveRequisitionModal, this.itemCount);
-  var titleName = "Level One Approval";
+  var titleName = "Level Two Approval";
   int pageIndex = 0;
   int currentIndex = 2;
   @override
@@ -148,7 +148,7 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
   SessionManager shared = SessionManager();
   Map<String, dynamic> mapResponse = {};
   String? sessionId;
-  String? leaveType = "Sick Leave";
+  String? leaveType = "";
   var lBalance;
   String? branchName;
   String? department;
@@ -445,7 +445,7 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
 
   Future<void> approveLeaveRequisition(String getComment, int? leaveReqId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.leaveApprovalApi;
+    String apiUrl = ApiDetails.leaveApprovalLevel2Api;
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"

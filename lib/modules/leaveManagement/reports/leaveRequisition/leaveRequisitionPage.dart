@@ -921,7 +921,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         TextButton(
             onPressed: () async {
               confirmYes = "YES";
-
+              Navigator.of(buildContext, rootNavigator: true).pop();
               if(_fromDateController.text == "" ) {
                 Fluttertoast.showToast(
                     msg: "Please Select Date range !",

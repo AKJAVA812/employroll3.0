@@ -206,7 +206,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
         child:
             Column(
               children: [
-                Row(
+              /*  Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -260,13 +260,10 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                         if(value == 1) {
                           Navigator.pushNamed(context, MyRoutings.approvedLeaveReqListRoute);
                         }
-                       /* if(value == 2) {
-                          Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
-                        }*/
                       },
                     )
                   ],
-                ).py(4),
+                ).py(4),*/
               /*  Expanded(
                   child: selfLeaveRequisitionLabel == null ?
                 Center(

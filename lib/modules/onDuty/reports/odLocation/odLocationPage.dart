@@ -32,6 +32,8 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import 'odPunchUpload.dart';
 import 'odWorkDonePage.dart';
+import 'package:path/path.dart' as path;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 
 class ODLocationView extends StatefulWidget {
@@ -164,7 +166,36 @@ class _ODPageViewState extends State<ODPageView> {
   @override
   Widget build(BuildContext context) {
 
-    getImageODIn() async{
+    Future<void> getImageODIn() async {
+      try {
+        final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera,imageQuality: 20);
+
+        if (pickedFile == null) return;
+
+        final imagePath = File(pickedFile.path);
+
+        setState(() => _workDoneImage = imagePath);
+
+        if (!mounted) return; // ✅ Avoid calling Navigator after widget dispose
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ODImageUpload(
+              value: _workDoneImage,
+              address: currentAddress,
+              time: timeString,
+              punchType: clockingType,
+            ),
+          ),
+        );
+      } on PlatformException catch (e) {
+        debugPrint('Image pick failed: $e'); // ✅ debugPrint is better for logs
+      } catch (e, s) {
+        debugPrint('Unexpected error: $e\n$s'); // ✅ Catch any unexpected exception
+      }
+    }
+
+    /*getImageODIn() async{
       try{
         final imageValue = await ImagePicker().pickImage(source: ImageSource.camera);
         if(imageValue==null) return;
@@ -179,11 +210,11 @@ class _ODPageViewState extends State<ODPageView> {
       }on PlatformException catch (e) {
         print('failed to upload: $e');
       }
-    }
+    }*/
     getImageForWorkdone() async {
       try{
 
-        final imageValue = await ImagePicker().pickImage(source: ImageSource.camera);
+        final imageValue = await ImagePicker().pickImage(source: ImageSource.camera,imageQuality: 20);
         if(imageValue==null) return;
 
         final imagePath= File(imageValue.path);
@@ -198,7 +229,7 @@ class _ODPageViewState extends State<ODPageView> {
         print('failed to upload: $e');
       }
     }
-    getImageODOut() async{
+    /*getImageODOut() async{
       try{
         final imageValue = await ImagePicker().pickImage(source: ImageSource.camera);
         if(imageValue==null) return;
@@ -211,6 +242,37 @@ class _ODPageViewState extends State<ODPageView> {
         =>ODImageUpload(value: _workDoneImage, address: currentAddress, time: timeString,punchType:clockingType )));
       }on PlatformException catch (e) {
         print('failed to upload: $e');
+      }
+    }*/
+    Future<void> getImageODOut() async {
+      try {
+        // Step 1: Pick image from camera
+        final XFile? pickedFile = await ImagePicker().pickImage(source: ImageSource.camera,
+        imageQuality: 20);
+        if (pickedFile == null) return;
+
+        // Step 2: Convert XFile → File
+        final File imageFile = File(pickedFile.path);
+
+        // Step 3: Update state
+        if (!mounted) return; // avoid setState after widget dispose
+        setState(() => _workDoneImage = imageFile);
+
+        // Step 4: Navigate to upload page
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ODImageUpload(
+              value: _workDoneImage,
+              address: currentAddress,
+              time: timeString,
+              punchType: clockingType,
+            ),
+          ),
+        );
+      } on PlatformException catch (e) {
+        debugPrint('❌ Failed to pick image: $e');
+      } catch (e, s) {
+        debugPrint('⚠️ Unexpected error: $e\n$s');
       }
     }
 

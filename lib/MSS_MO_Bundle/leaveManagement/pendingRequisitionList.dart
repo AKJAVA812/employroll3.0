@@ -327,7 +327,7 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                             orElse: () => {},
                           );
 
-                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          getOrgId = matchedOrg['id']?.toString() ?? '0';
                           print('Org Name: $selectedOrg');
                           print('Org ID: $getOrgId');
                         });
@@ -352,13 +352,13 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
                             isLoading = true;
                           });
 
-                          sessionId = await shared!.getSessionId();
-                          levelOne = await shared!.getLevelOne();
-                          levelTwo = await shared!.getLevelTwo();
+                          sessionId = await shared.getSessionId();
+                          levelOne = await shared.getLevelOne();
+                          levelTwo = await shared.getLevelTwo();
                           print("Level 1 - $levelOne");
                           print("Level 2 - $levelTwo");
-                          userPanel = await shared!.getUserPanel();
-                          getProfileId = await shared!.getDefaultProfileId();
+                          userPanel = await shared.getUserPanel();
+                          getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           print("ORG ID - $getOrgId");
                           try {

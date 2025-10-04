@@ -243,8 +243,8 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     var getData = mapResponse;
     print('Body Data $getData');
     shiftListModal = ShiftListModal.fromJson(mapResponse);
-    for (int i = 0; i < shiftListModal!.data!.length; i++) {
-      var shiftName = shiftListModal!.data![i].shiftName;
+    for (int i = 0; i < shiftListModal.data!.length; i++) {
+      var shiftName = shiftListModal.data![i].shiftName;
       shiftList?.add(shiftListModal!.data![i].shiftName);
       //print('shiftNames $shiftName');
     }
@@ -498,7 +498,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                               }).toList(),
                               onChanged: (newVal) {
                                 valuenew = newVal.toString();
-                                var i = branchList!.indexOf(valuenew)+1;
+                                var i = branchList.indexOf(valuenew)+1;
                                 branchId = branchListModalGloabal!.data![i].branchId!;
                                 print("Branch ID $branchId");
                                 setState(() {

@@ -67,9 +67,9 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanelPerm = await shared!.getUserPanel();
-    getProfileId = await shared!.getDefaultProfileId();
+    sessionId = await shared.getSessionId();
+    userPanelPerm = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
     Future<ApprovedRequisitionModel> getAppReq11 = getApprovedReqList(sessionId!);
     final loading = Row(
@@ -305,7 +305,7 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: approvedRequisitionModel!.data!.length,
+        itemCount: approvedRequisitionModel.data!.length,
         itemBuilder: (context, i) {
           return Card(
               elevation: 2,

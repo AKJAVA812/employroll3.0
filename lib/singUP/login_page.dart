@@ -313,22 +313,21 @@ class _LoginPageState extends State<LoginPage> {
       CommonNotificationPage.showWorkDoneSuccess(
           context, "Your mobile timing is not updated, please change time settings", "Info ");
     }*/
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
-    fcmToken = await NotificationService.getToken();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    //fcmToken = await NotificationService.getToken();
     print("User Panel - $userPanel");
     setState(() {
-
     });
-    levelOne =await shared!.getLevelOne();
-    levelTwo =await shared!.getLevelTwo();
-    empLength=await shared!.getEmpRoll();
-    roLength=await shared!.getRoRole();
-    adminlength=await shared!.getAdminRole();
+    levelOne =await shared.getLevelOne();
+    levelTwo =await shared.getLevelTwo();
+    empLength=await shared.getEmpRoll();
+    roLength=await shared.getRoRole();
+    adminlength=await shared.getAdminRole();
 
-    claimLevelOne = await shared!.getClaimLevelOne();
-    claimLevelTwo = await shared!.getClaimLevelTwo();
-    claimLevelThree = await shared!.getClaimLevelThree();
+    claimLevelOne = await shared.getClaimLevelOne();
+    claimLevelTwo = await shared.getClaimLevelTwo();
+    claimLevelThree = await shared.getClaimLevelThree();
 
 
     if (sessionId != null && sessionId != "") {
@@ -470,13 +469,13 @@ class _LoginPageState extends State<LoginPage> {
         print("Response body: ${response.body}");
 
         // Retry logic (similar to your Android code)
-        await sendGeoFenceId(sessionId, geofenceTokenId);
+        //await sendGeoFenceId(sessionId, geofenceTokenId);
       }
     } catch (e) {
       print("Error sending GeoFence ID: $e");
 
       // Retry on error
-      await sendGeoFenceId(sessionId, geofenceTokenId);
+      //await sendGeoFenceId(sessionId, geofenceTokenId);
     }
   }
 

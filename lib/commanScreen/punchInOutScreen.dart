@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:datetime_setting/datetime_setting.dart';
 import 'package:detect_fake_location/detect_fake_location.dart';
+import 'package:er_flutter_project/commanScreen/modalClass/attendance_punch.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/commanScreen/ProjectListPage.dart';
 import 'package:er_flutter_project/commanScreen/punchInUploadPage.dart';
@@ -17,6 +18,7 @@ import 'package:er_flutter_project/profiles/profilePage.dart';
 import 'package:er_flutter_project/singUP/model/loginModel.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hive/hive.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:ntp/ntp.dart';
@@ -180,11 +182,12 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
   final databaseLatlngSave = SaveLatlng();
   SaveLatlng databaseLatlngDelete = SaveLatlng();
 
+
   void setupDatabaseAndDelete(int id) async {
     await databaseLatlngDelete.init(); // ✅ Initialize before use
     await databaseLatlngDelete.deleteLatlng(id);
     print("🗑️ Deleted uniqueID: $id from local database");
-    getLatlngAll();
+    //getLatlngAll();
   }
   //Tracking end variables
 
@@ -453,7 +456,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   initDBLatlng() async {
     await databaseLatlngSave.init();
-    getLatlngAll();
+    //getLatlngAll();
     //startTrackingTimer(context);
     String deviceIdString = await getUniqueDeviceId();
     //print('deviceIdString $deviceIdString');
@@ -543,7 +546,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     log('data $allLatlng');
     //print("My latlongs  $allLatlng");
     //saveTrackingData(context);
-     startTrackingTimer(context);
+     //startTrackingTimer(context);
     for (final row in allLatlng) {
       print("latlng id ${row[SaveLatlng.id]}");
       print("latlng ${row[SaveLatlng.latlng]}");
@@ -559,7 +562,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
     trackingTimer = Timer.periodic(Duration(minutes: 1), (timer) {
       //initDBLatlng();
-      getLatlngAll();
+      //getLatlngAll();
       print("Running Too");
       if (allLatlng.length != 0) {
         print("Running ALSO");

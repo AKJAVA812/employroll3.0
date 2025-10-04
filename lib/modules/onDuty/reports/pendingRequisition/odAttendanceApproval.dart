@@ -411,8 +411,8 @@ class _RadioGroupsState extends State<RadioGroups> {
 
                     ElevatedButton(
                       onPressed: () {
-                        disApproveODReq(_commentController.text);
                         type = "DisApproved";
+                        disApproveODReq(_commentController.text);
                         //disapprovedRequisition(_commentController.text, attReqId);
                       },
                       style: ButtonStyle(

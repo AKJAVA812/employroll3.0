@@ -99,7 +99,7 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave> wit
         TextButton(
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
-            Navigator.pop(buildContext);
+            Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
             setState(() {
 
             });

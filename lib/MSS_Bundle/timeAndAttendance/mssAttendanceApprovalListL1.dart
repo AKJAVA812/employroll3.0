@@ -122,11 +122,11 @@ class _MSS_Att_PendingRequisitionL1State extends State<MSS_Att_PendingRequisitio
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
-    getProfileId = await shared!.getDefaultProfileId();
-    levelOne = await shared!.getPendingAttendanceReqL1MSS();
-    levelTwo = await shared!.getPendingAttendanceReqL2MSS();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
+    levelOne = await shared.getPendingAttendanceReqL1MSS();
+    levelTwo = await shared.getPendingAttendanceReqL2MSS();
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));

@@ -154,7 +154,7 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave> with RouteA
     String apiUrl = ApiDetails.levelOneLeaveList;
     print('employeeList11: ${SessionId}');
     LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId"
+    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId&"
         "profileId=$getProfileId&"
         "userPermission=$userPanel&"
         "orgId=0");

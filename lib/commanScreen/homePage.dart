@@ -346,14 +346,15 @@ class _HomePageState extends State<HomePage> {
 
   Future getSharedPrfanceList() async {
 
-    sessionId = await shared!.getSessionId();
-    orgId = await shared!.getOrgId();
-    userType = await shared!.getUserType();
-    defaultProfileName = await shared!.getDefaultProfileName();
-    defaultProfileId = await shared!.getDefaultProfileId();
+    sessionId = await shared.getSessionId();
+    orgId = await shared.getOrgId();
+    userType = await shared.getUserType();
+    defaultProfileName = await shared.getDefaultProfileName();
+    defaultProfileId = await shared.getDefaultProfileId();
     print("Default Profile Name - $defaultProfileName");
     print("Default Profile Id - $defaultProfileId");
-    userPanelPermission = await shared!.getUserPanel();
+    userPanelPermission = await shared.getUserPanel();
+    print("Default userPanelPermission - $userPanelPermission");
     Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
     getOrgList.then((value) {
       setState(() {
@@ -365,11 +366,11 @@ class _HomePageState extends State<HomePage> {
 
     });
     print("User Type - $userType");
-    imageStringNew = await shared!.getProfileImage();
-    UserName = await shared!.getempName();
-    employeeCode = await shared!.getEmpCode();
-    lat= await shared!.getLatitude();
-    lng = await shared!.getLongitude();
+    imageStringNew = await shared.getProfileImage();
+    UserName = await shared.getempName();
+    employeeCode = await shared.getEmpCode();
+    lat= await shared.getLatitude();
+    lng = await shared.getLongitude();
     //currentPostion = LatLng(lat, lng);
     //print('Response snapshot: ${sessionId}');
   }

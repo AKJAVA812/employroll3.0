@@ -468,7 +468,7 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       print('result both $result $reason');
       print('result${result}');
       if (result.toString().toLowerCase() == "success") {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Leave Requisition Approval");
+        showDialgSucess1(context, reason + " ", "Success");
       } else if (result.toString().toLowerCase() == "error") {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       } else if (result.toString().toLowerCase() == "null") {
