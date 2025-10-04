@@ -155,7 +155,7 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
     String apiUrl = ApiDetails.levelTwoLeaveList;
     print('employeeList11: ${SessionId}');
     LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId"
+    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId&"
         "profileId=$getProfileId&"
         "userPermission=$userPanel&"
         "orgId=0");

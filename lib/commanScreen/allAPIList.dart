@@ -5,12 +5,12 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //Himanshu
-   //static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
    //Adnan
+   static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
+   //Himanshu
    //static var server="https://elma-unrestrainable-leda.ngrok-free.dev/";
-   //
-   static var server="https://elma-unrestrainable-leda.ngrok-free.dev/";
+   //Saumaya
+   //static var server="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
    //Attendance Punch in and Punch out
    static String login="restful/service/login";
    static String punchIn="restful/service/attendance/via/mobile";
