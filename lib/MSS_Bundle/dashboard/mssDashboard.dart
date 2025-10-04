@@ -89,14 +89,15 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
 
 
   Future getSharedPrfanceList() async {
+    sessionId = await shared!.getSessionId();
+    userPanel = await shared!.getUserPanel();
+    print("userPanel Check - $userPanel");
     defaultProfileId = await shared!.getDefaultProfileId();
     defaultProfileName = await shared!.getDefaultProfileName();
     setState(() {
       isLoading = true; // Start loading
     });
-    sessionId = await shared!.getSessionId();
 
-    userPanel = await shared!.getUserPanel();
     Future<DashboardModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
@@ -187,8 +188,8 @@ class _MSSNewDashboardState extends State<MSSNewDashboard> {
     //print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId"
-        "userPermission=$userPanelPermission&"
+        "sessionId=$sessionId&"
+        "userPermission=$userPanel&"
         "orgId=0");
     final response = await http.post(urlapi);
 

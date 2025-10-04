@@ -231,7 +231,9 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId&"
+        "userPermission=$userPanelPermission&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');
