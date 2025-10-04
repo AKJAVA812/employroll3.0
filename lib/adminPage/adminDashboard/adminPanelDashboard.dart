@@ -169,7 +169,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId"
+        "sessionId=$sessionId&"
         "userPermission=$userPanelPermission&"
         "orgId=0");
     final response = await http.post(urlapi);
@@ -197,7 +197,9 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId&"
+        "userPermission=$userPanelPermission&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('URL ${response.request}');

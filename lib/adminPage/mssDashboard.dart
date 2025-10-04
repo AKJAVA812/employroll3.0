@@ -183,7 +183,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
     //print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId"
+        "sessionId=$sessionId&"
         "userPermission=$userPanel&"
         "orgId=0");
     final response = await http.post(urlapi);
@@ -211,7 +211,9 @@ class _MSSDashboardState extends State<MSSDashboard> {
     print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId&"
+        "userPermission=$userPanel&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');

@@ -296,7 +296,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                     ElevatedButton(
                       onPressed: () {
                         //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
-                        if(singleDateString.compareToIgnoringCase("")==0){
+                        if(_dateController.text.compareToIgnoringCase("")==0){
                           print('responseemployeeList');
                           setState(() {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -306,7 +306,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                         }else{
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => SingleDateAttendance(
-                                singleDateString: singleDateString!,
+                                singleDateString: _dateController.text,
                               )));
 
                         }

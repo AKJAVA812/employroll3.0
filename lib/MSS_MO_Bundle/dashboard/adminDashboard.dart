@@ -86,6 +86,7 @@ class _Admin_MSS_MO_DashboardState extends State<Admin_MSS_MO_Dashboard> {
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     userPanelPermission = await shared.getUserPanel();
+    getOrgId = await shared.getOrgId();
     defaultProfileName = await shared.getDefaultProfileName();
     defaultProfileId = await shared.getDefaultProfileId();
     setState(() {
@@ -177,7 +178,7 @@ class _Admin_MSS_MO_DashboardState extends State<Admin_MSS_MO_Dashboard> {
     //print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId"
+        "sessionId=$sessionId&"
         "userPermission=$userPanelPermission&"
         "orgId=$getOrgId");
     final response = await http.post(urlapi);
@@ -232,7 +233,9 @@ class _Admin_MSS_MO_DashboardState extends State<Admin_MSS_MO_Dashboard> {
     print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
+        "sessionId=$sessionId&"
+        "userPermission=$userPanelPermission&"
+        "orgId=$getOrgId");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.request}');

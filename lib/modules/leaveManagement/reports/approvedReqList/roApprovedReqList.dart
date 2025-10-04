@@ -32,6 +32,9 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+dynamic getProfileId;
+dynamic getOrgId;
+dynamic userPanelPerm;
 
 ApprovedLeaveReqModal? approvedLeaveReqLabel;
 
@@ -67,6 +70,9 @@ class _ApprovedLeaveRequisitionListState extends State<ApprovedLeaveRequisitionL
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    getProfileId = await shared!.getDefaultProfileId();
+    getOrgId = await shared!.getOrgId();
+    userPanelPerm = await shared!.getUserPanel();
     // await Future.delayed(Duration(seconds: 5));
     Future<ApprovedLeaveReqModal> getAppReq11 = getApprovedLeaveReqList(sessionId!);
     final loading = Row(
@@ -90,7 +96,10 @@ class _ApprovedLeaveRequisitionListState extends State<ApprovedLeaveRequisitionL
     String apiUrl = ApiDetails.roApprovedReqList;
     print('employeeList11: ${SessionId}');
     ApprovedLeaveReqModal approvedLeaveReqModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId&"
+        "profileId=$getProfileId&"
+        "userPermission=$userPanelPerm&"
+        "orgId=0");
     final response = await http.post(urlapi);
 
     print('responseemployeeList ${response.body}');
