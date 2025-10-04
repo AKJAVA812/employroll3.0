@@ -114,9 +114,9 @@ class _PendingLeaveRequisitionListState extends State<PendingLeaveRequisitionLis
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    levelOne = await shared!.getLevelOne();
-    levelTwo = await shared!.getLevelTwo();
+    sessionId = await shared.getSessionId();
+    levelOne = await shared.getLevelOne();
+    levelTwo = await shared.getLevelTwo();
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));

@@ -241,8 +241,8 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     var getData = mapResponse;
     print('Body Data $getData');
     shiftListModal = ShiftListModal.fromJson(mapResponse);
-    for (int i = 0; i < shiftListModal!.data!.length; i++) {
-      var shiftName = shiftListModal!.data![i].shiftName;
+    for (int i = 0; i < shiftListModal.data!.length; i++) {
+      var shiftName = shiftListModal.data![i].shiftName;
       shiftList?.add(shiftListModal!.data![i].shiftName);
       //print('shiftNames $shiftName');
     }
