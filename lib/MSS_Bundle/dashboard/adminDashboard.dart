@@ -498,7 +498,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                               }).toList(),
                               onChanged: (newVal) {
                                 valuenew = newVal.toString();
-                                var i = branchList!.indexOf(valuenew)+1;
+                                var i = branchList.indexOf(valuenew)+1;
                                 branchId = branchListModalGloabal!.data![i].branchId!;
                                 print("Branch ID $branchId");
                                 setState(() {

@@ -164,7 +164,36 @@ class _ODPageViewState extends State<ODPageView> {
   @override
   Widget build(BuildContext context) {
 
-    getImageODIn() async{
+    Future<void> getImageODIn() async {
+      try {
+        final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
+
+        if (pickedFile == null) return;
+
+        final imagePath = File(pickedFile.path);
+
+        setState(() => _workDoneImage = imagePath);
+
+        if (!mounted) return; // ✅ Avoid calling Navigator after widget dispose
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ODImageUpload(
+              value: _workDoneImage,
+              address: currentAddress,
+              time: timeString,
+              punchType: clockingType,
+            ),
+          ),
+        );
+      } on PlatformException catch (e) {
+        debugPrint('Image pick failed: $e'); // ✅ debugPrint is better for logs
+      } catch (e, s) {
+        debugPrint('Unexpected error: $e\n$s'); // ✅ Catch any unexpected exception
+      }
+    }
+
+    /*getImageODIn() async{
       try{
         final imageValue = await ImagePicker().pickImage(source: ImageSource.camera);
         if(imageValue==null) return;
@@ -179,7 +208,7 @@ class _ODPageViewState extends State<ODPageView> {
       }on PlatformException catch (e) {
         print('failed to upload: $e');
       }
-    }
+    }*/
     getImageForWorkdone() async {
       try{
 
