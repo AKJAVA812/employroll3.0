@@ -5,6 +5,7 @@ import 'package:er_flutter_project/modules/exitManagement/exitList.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:im_stepper/stepper.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -214,7 +215,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                     ElevatedButton(
                         onPressed: () async {
                           //_openCamera();
-                          final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+                          final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 15);
                           if (pickedFile != null) {
                             setState(() {
                               uploadedFile = File(pickedFile.path);
@@ -237,7 +238,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                         onPressed: () async {
                           //_browseFiles();
                           Navigator.pop(context); // Close the modal
-                          final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+                          final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 15);
                           if (pickedFile != null) {
                             setState(() {
                               uploadedFile = File(pickedFile.path);
@@ -362,7 +363,20 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                         activeStep++;
                       });
                     }*/
-                    saveExitFormality(context);
+                    if(lastWorkDate.text == "") {
+                      Fluttertoast.showToast(
+                      msg: "Please fill Last Working Date !",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                    } else {
+                      saveExitFormality(context);
+                    }
+
 
                   },
                   style: ButtonStyle(
@@ -676,7 +690,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-              ElevatedButton(
+                          ElevatedButton(
                 onPressed: () => _showUploadOptions(context),
                 child: Text('Add Document'),
               ),
@@ -3613,6 +3627,72 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
       print('Error occurred: $e');
     }
   }
+
+  /*Future<void> saveExitFormality(BuildContext context) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.exitFormalitySaveApi;
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse("$conn$apiUrl");
+
+    // Prepare document as base64 (if uploadedFile is not null)
+    String documentBase64 = "";
+    if (uploadedFile != null) {
+      List<int> fileBytes = await uploadedFile!.readAsBytes();
+      documentBase64 = base64Encode(fileBytes);
+    }
+
+    // Build JSON body
+    Map<String, dynamic> requestBody = {
+      'sessionId': sessionId!,
+      'empid': empIds.toString(),
+      'seprationId': separationListId.toString(),
+      'noticePayServeActive': noticePeriodCheck.toString(),
+      'partialDaysActive': partialDaysCheck.toString(),
+      'partialDaysValue': noticePeriodDaysController.text,
+      'resignData': registrationDate.text,
+      'lastworkingData': lastWorkDate.text,
+      'document': documentBase64, // send as base64 string in JSON
+    };
+
+    // Construct API with parameters (debug print only)
+    String apiWithParams = urlapi.toString() +
+        '?' +
+        requestBody.entries
+            .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}')
+            .join('&');
+    print('API URL with Parameters: $apiWithParams');
+
+    try {
+      // Send as JSON POST
+      http.Response httpResponse = await http.post(
+        urlapi,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(requestBody),
+      );
+
+      print('URL: ${httpResponse.request}');
+      print('Response Status Code: ${httpResponse.statusCode}');
+      print('Response Body: ${httpResponse.body}');
+
+      if (httpResponse.statusCode == 200) {
+        Navigator.of(context, rootNavigator: true).pop();
+        var mapResponse = json.decode(httpResponse.body);
+        String reason = mapResponse['reason'];
+        String status = mapResponse['status'];
+
+        if (status.compareToIgnoringCase("Success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (status.compareToIgnoringCase("Error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, "Error");
+        }
+      } else {
+        print('API Call Failed: ${httpResponse.statusCode}');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }*/
+
 
 
 /*  IconData _getFileIcon(String type) {
