@@ -1066,9 +1066,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                             child: Expanded(
                               child: DropdownButtonFormField(
                                 /*disabledHint: Container(
-                                  width: 110,
-                                  child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
-                                ),*/
+                                width: 110,
+                                child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
+                              ),*/
                                   decoration: InputDecoration(
                                     enabledBorder: UnderlineInputBorder( //<-- SEE HERE
                                       borderSide: BorderSide(
@@ -1078,12 +1078,12 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     hintText: "Employee Status",
                                     labelText: "Employee Status",
                                     hintStyle: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 13,
                                     ),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
-                                                borderRadius:
-                                                BorderRadius.all(Radius.circular(8))),*/
+                                              borderRadius:
+                                              BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
                                         fontWeight: FontWeight.w500,fontSize: 13,

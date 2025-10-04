@@ -1039,7 +1039,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                             visible: true,
                             child:Expanded(
                               child: TextFormField(
-                                controller: departmentNameController,
+                                controller: designationNameController,
                                 readOnly: true,
                                 // initialValue: "Head Office",
                                 //maxLines: 3,
