@@ -41,21 +41,21 @@ class Result {
 }
 
 class Data {
-  String? summary;
-  String? employeeName;
-  int? empId;
-  String? endDate;
-  int? count;
-  String? branchName;
-  String? leaveLength;
-  int? reqId;
-  int? totalLeave;
-  String? leaveType;
-  String? nominee;
-  String? department;
-  String? startDate;
-  String? applicationDate;
-  String? status;
+  dynamic summary;
+  dynamic employeeName;
+  dynamic empId;
+  dynamic endDate;
+  dynamic count;
+  dynamic branchName;
+  dynamic leaveLength;
+  dynamic reqId;
+  dynamic totalLeave;
+  dynamic leaveType;
+  dynamic nominee;
+  dynamic department;
+  dynamic startDate;
+  dynamic applicationDate;
+  dynamic status;
 
   Data(
       {this.summary,
