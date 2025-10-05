@@ -624,7 +624,7 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
                                           .make()
                                           .px1()
                                           .py2(),
-                                      foundDataNew![i].resignData
+                                      foundDataNew![i].lastworkingData
                                           .toString()
                                           .text
                                           .size(13)
@@ -1085,7 +1085,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                       .make()
                                       .px1()
                                       .py2(),
-                                  foundDataNew![i].resignData
+                                  foundDataNew![i].lastworkingData
                                       .toString()
                                       .text
                                       .size(13)
