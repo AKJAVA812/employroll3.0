@@ -284,7 +284,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
               children: [
                 AnimatedToggleSwitch<int>.size(
                   height: 30,
-                  current: min(value, 3),
+                  current: min(value, 2),
                   style: ToggleStyle(
                     backgroundColor: Mythemes.greyishade,
                     indicatorColor: Mythemes.lightBluishColor,
@@ -292,7 +292,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                     borderRadius: BorderRadius.circular(10.0),
                     indicatorBorderRadius: BorderRadius.zero,
                   ),
-                  values: const [0, 1, 2],
+                  values: const [0, 1],
                   iconOpacity: 1.0,
                   selectedIconScale: 1.0,
                   indicatorSize: const Size.fromWidth(90),
@@ -309,7 +309,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                         color: Colors.white38.withOpacity(opacity));
                   },
                   customIconBuilder: (context, local, global) {
-                    final text = const ['Pending', 'Approved', 'Disapproved'][local.index];
+                    final text = const ['Pending', 'Approved'][local.index];
                     return Center(
                         child: Text(text,
                             style: TextStyle(
@@ -332,9 +332,9 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
                     if(value == 1) {
                       Navigator.pushNamed(context, MyRoutings.essAttendanceApprovedReq);
                     }
-                    if(value == 2) {
+                   /* if(value == 2) {
                       Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
-                    }
+                    }*/
                   },
                 )
               ],

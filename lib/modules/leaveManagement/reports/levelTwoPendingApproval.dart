@@ -172,6 +172,7 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
   void initState() {
       leaveType = foundDataNewMSSL2![itemCount].leaveType;
       branchName = foundDataNewMSSL2![itemCount].branchName;
+      lBalance = foundDataNewMSSL2![itemCount].totalLeave;
       department = foundDataNewMSSL2![itemCount].department;
       empName = foundDataNewMSSL2![itemCount].employeeName;
       applicationDate = foundDataNewMSSL2![itemCount].applicationDate;

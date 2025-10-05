@@ -1,11 +1,11 @@
 class LevelOnePendingLeaveModal {
-  Result1? result;
+  Result? result;
 
   LevelOnePendingLeaveModal({this.result});
 
   LevelOnePendingLeaveModal.fromJson(Map<String, dynamic> json) {
     result =
-    json['result'] != null ? new Result1.fromJson(json['result']) : null;
+    json['result'] != null ? new Result.fromJson(json['result']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -17,12 +17,12 @@ class LevelOnePendingLeaveModal {
   }
 }
 
-class Result1 {
+class Result {
   List<Data>? data;
 
-  Result1({this.data});
+  Result({this.data});
 
-  Result1.fromJson(Map<String, dynamic> json) {
+  Result.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
@@ -45,10 +45,11 @@ class Data {
   String? employeeName;
   int? empId;
   String? endDate;
-  var count;
+  int? count;
   String? branchName;
   String? leaveLength;
   int? reqId;
+  int? totalLeave;
   String? leaveType;
   String? nominee;
   String? department;
@@ -65,6 +66,7 @@ class Data {
         this.branchName,
         this.leaveLength,
         this.reqId,
+        this.totalLeave,
         this.leaveType,
         this.nominee,
         this.department,
@@ -81,6 +83,7 @@ class Data {
     branchName = json['branchName'];
     leaveLength = json['leaveLength'];
     reqId = json['reqId'];
+    totalLeave = json['totalLeave'];
     leaveType = json['leaveType'];
     nominee = json['nominee'];
     department = json['department'];
@@ -99,6 +102,7 @@ class Data {
     data['branchName'] = this.branchName;
     data['leaveLength'] = this.leaveLength;
     data['reqId'] = this.reqId;
+    data['totalLeave'] = this.totalLeave;
     data['leaveType'] = this.leaveType;
     data['nominee'] = this.nominee;
     data['department'] = this.department;

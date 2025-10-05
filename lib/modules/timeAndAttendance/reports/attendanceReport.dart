@@ -94,8 +94,8 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
     Future<AttendanceReportModel> getEmployeeList11 =
         getEmployeeList(sessionId!, toDateString, forDateString);
     //Shift Check
-    Future<AttendanceShiftDetailsModal> getEmployeeList12 =
-      getStatus(sessionId!);
+  /*  Future<AttendanceShiftDetailsModal> getEmployeeList12 =
+      getStatus(sessionId!);*/
     if (getEmployeeList11 == null) {
       return Center(child: "HIi".text.make()
           //CircularProgressIndicator()
@@ -108,26 +108,19 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
       print('employeeList00${employeeListModelglobel!.data!.length}');
     });
 
-    getEmployeeList12.then((value) {
+    /*getEmployeeList12.then((value) {
       setState(() {
         attendanceShiftDetailsModalGlobaled = value;
       });
-
-      /*print('Shift Result - ${attendanceShiftDetailsModalGlobaled!.result}');
-      print('Shift Absent - ${attendanceShiftDetailsModalGlobaled!.isAbsentWorkHour}');
-      print('Shift Half Day- ${attendanceShiftDetailsModalGlobaled!.isHalfdayWorkHour}');
-      print('Shift Short Leave WH - ${attendanceShiftDetailsModalGlobaled!.isShortWorkHour}');
-      print('Shift Absent WH - ${attendanceShiftDetailsModalGlobaled!.absentWorkHour}');
-      print('Shift Half Day Max WH- ${attendanceShiftDetailsModalGlobaled!.halfdayMaxWorkHour}');
-      print('Shift Half Day Min WH- ${attendanceShiftDetailsModalGlobaled!.halfdayMinWorkHour}');
-      print('Shift Present WH - ${attendanceShiftDetailsModalGlobaled!.presentWorkHour}');*/
-    });
+    });*/
   }
 
   Future<AttendanceShiftDetailsModal> getStatus(
       String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.outPunchStatusCheck;
+
+
     print('employeeList11: ${sessionId}');
     AttendanceShiftDetailsModal employeeListModel;
     var urlapi = Uri.parse(
@@ -142,6 +135,7 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
     mapResponse = json.decode(response.body);
     employeeListModel = AttendanceShiftDetailsModal.fromJson(mapResponse);
 
+
     return employeeListModel;
   }
 
@@ -150,6 +144,9 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
       String sessionId, String fromdate, String toDate) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.attendanceReport;
+    setState(() {
+      isLoading = true;
+    });
     print('employeeList11: ${sessionId}');
     AttendanceReportModel employeeListModel;
     var urlapi = Uri.parse(
@@ -164,14 +161,16 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
     employeeListModel = AttendanceReportModel.fromJson(mapResponse);
-
+    setState(() {
+      isLoading = false;
+    });
     return employeeListModel;
   }
 
   int pageIndex = 0;
   int currentIndex = 2;
 
-
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,7 +190,13 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
 
       body: Container(
         color: context.canvasColor,
-        child: Center(child: employeeListModelglobel==null?CircularProgressIndicator():AttList(employeeListModelglobel!)),
+        child: Center(
+          child: isLoading
+              ? const CircularProgressIndicator()
+              : (employeeListModelglobel == null
+              ? const Text("No data available")
+              : AttList(employeeListModelglobel!)),
+        ),
       ),
 
       bottomNavigationBar:
