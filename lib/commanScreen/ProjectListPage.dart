@@ -816,6 +816,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
           );
 
           //OUT DUTY
+          if(orgId != 190 && orgId != 191){
             items.add(
               Hero(
                 tag: 'odReport',
@@ -896,6 +897,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 ),
               ),
             );
+          }
+
 
         //TRAVEL & EXPENSE
         if(claimLevelOneMSS == "1" || claimLevelTwoMSS == "1" || claimLevelThreeMSS == "1") {
