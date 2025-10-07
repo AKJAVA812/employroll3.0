@@ -275,68 +275,71 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
       }
 
       //OD Punch ESS
-      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
-        items.add(
-          Hero(
-            tag: 'odPunch',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () async{
-                  bool internetCheck =
-                  await InternetConnectionChecker().hasConnection;
-                  if (internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection"
-                            .text
-                            .make(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            "Please check your Internet connection."),
-                      ));
-                    });
-                  } else {
-                    Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                    /*  Navigator.pushNamed(
+      if(orgId != 190 && orgId != 191 && (userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN")) {
+
+          items.add(
+            Hero(
+              tag: 'odPunch',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () async{
+                    bool internetCheck =
+                    await InternetConnectionChecker().hasConnection;
+                    if (internetCheck == false) {
+                      setState(() {
+                        AlertDialog(
+                          content: "Please check your internet connection"
+                              .text
+                              .make(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              "Please check your Internet connection."),
+                        ));
+                      });
+                    } else {
+                      Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                      /*  Navigator.pushNamed(
                         context, MyRoutings.odSelfReqDateSelectRoute);*/
-                  }
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.location_on,
-                        size: 50,
-                        color: Mythemes.lightBluishColor,
-                      ),
-                      /*Image(
+                    }
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.location_on,
+                          size: 50,
+                          color: Mythemes.lightBluishColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'OD Punch',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                              'OD Punch',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style:
+                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
+          );
+
+
       }
       //My OD Requests ESS
-      if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+      if(orgId != 190 && orgId != 191 && (userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN")) {
         items.add(
           Hero(
             tag: 'myOdRequest',
