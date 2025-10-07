@@ -14,6 +14,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 
+import 'allAPIList.dart';
+
 class WorkDonePage extends StatefulWidget {
   final File? value;
   final String time;
@@ -113,9 +115,12 @@ class _WorkDonePageState extends State<WorkDonePage> {
     print('Response status: ${length}');
     print('Response body: ${stream}');
     print('Response body: ${value}');
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.customWorkDoneApi;
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
-    var uri = Uri.parse("https://ming-nonponderous-efren.ngrok-free.dev/restful/service/task/via/mobile");
+    var uri = Uri.parse("$conn$apiUrl");
+    //var uri = Uri.parse("http://www.employroll.com/restful/service/task/via/mobile");
     var request = new http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.fields['taskTime'] = formattedDate;

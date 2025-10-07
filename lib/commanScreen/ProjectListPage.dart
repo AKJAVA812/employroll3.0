@@ -102,9 +102,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
   var odReqCount;
 
 
-
-
-
   Future<LoginModel> monthAttendance(String emailId, String password) async {
     LoginModel loginModel;
     var urlapi = Uri.parse(

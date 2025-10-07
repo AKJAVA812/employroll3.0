@@ -633,19 +633,17 @@ class _LoginPageState extends State<LoginPage> {
                                             loginModelglobal = value;
                                             value.data!.sessionId;
                                             print('session id ${value.data!.sessionId}');
-                                            shared.setAdminRole(value!.data!.adminrole!.length);
-                                            shared.setMobAction(value!.data!.mobAction!.length);
-                                            shared.setEmpRoll(value!.data!.empRole!.length);
-                                            shared.setRoRoll(value!.data!.roRole!.length);
+                                            shared.setAdminRole(value.data!.adminrole!.length);
+                                            shared.setMobAction(value.data!.mobAction!.length);
+                                            shared.setEmpRoll(value.data!.empRole!.length);
+                                            shared.setRoRoll(value.data!.roRole!.length);
                                             shared.setShowPayroll(loginModelglobal!.data!.userLoginned!.showPayroll);
                                             //sendGeoFenceId(value.data!.sessionId!, fcmToken!);
                                             if(adminRole==1){
                                               setAdminSharedPrefValue(loginModelglobal);
-
                                             }else{
                                               setSharedPrefanceValue(loginModelglobal);
                                             }
-
                                           });
                                         });
                                       }
