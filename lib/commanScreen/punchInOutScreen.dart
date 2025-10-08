@@ -88,6 +88,7 @@ class PunchInOUtActivity extends StatefulWidget {
 int pageIndex = 0;
 int currentIndex = 0;
 var orgId;
+var myTeamShow = "0";
 Position? position = Position(
     longitude: 0.0,
     latitude: 0.0,
@@ -2790,6 +2791,11 @@ class _DrawerFileState extends State<DrawerFile> {
                               String pendingAttendanceRequestMOL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
                                   ? "1"
                                   : "0";
+                              // 🟢 Check if the selected profile has the MY Team Activate permission
+                              myTeamShow = (selected.profilePermission?.contains("HRIS_EMP_LIST_VIEW") ?? false)
+                                  ? "1"
+                                  : "0";
+
 
                               //MSS
                               // 🟢 Check if the selected profile has the Pending Attendance Request permission
@@ -2948,6 +2954,7 @@ class _DrawerFileState extends State<DrawerFile> {
                                   ? "1"
                                   : "0";
 
+
                               // 🟢 Save the MSS MO permission to SharedPreferences
                               await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
                               await shared.setPendingLeaveReqMSSMOPermission(leaveReqMOPermValue);
@@ -2968,6 +2975,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setLoanApprovalDeleteL3MO(loanApprovalL3DeletePermission);
                               shared.setPendingAttendanceReqL1MO(pendingAttendanceRequestMOL1);
                               shared.setPendingAttendanceReqL2MO(pendingAttendanceRequestMOL2);
+                              shared.setMyTeamPageShow(myTeamShow);
                               print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
                               print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
                               print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
@@ -2987,6 +2995,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3DeletePermission");
                               print("✅ Pending Attendance L1 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL1");
                               print("✅ Pending Attendance L2 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL2");
+                              print("✅ My Team MO Permission for profileId $selectedProfileId: $myTeamShow");
 
                               // 🟢 Save the MSS permission to SharedPreferences
                               await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);

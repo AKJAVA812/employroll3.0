@@ -561,6 +561,16 @@ class SessionManager {
     final String? exitShow = prefs.getString('exitShow');
     return exitShow;
   }
+  setMyTeamShow(myTeamShow) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('myTeamShow', myTeamShow);
+  }
+
+  getMyTeamShow() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? myTeamShow = prefs.getString('myTeamShow');
+    return myTeamShow;
+  }
   setLoanApprovalL1Show(loanApprovalL1Show) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loanApprovalL1Show', loanApprovalL1Show);
@@ -792,6 +802,7 @@ class SessionManager {
     return prefs.getString('pending_att_mo_l2_permission');
   }
 
+
   //MSS Permissions
   //Pending Attendance Request Permission & Others Attendance Request Permission
   Future<void> setPendingAttendanceReqMSSPermission(String value) async {
@@ -954,6 +965,8 @@ class SessionManager {
     return prefs.getString('pending_att_mss_l2_permission');
   }
 
+
+
   //UIS Permissions
   //Pending Attendance Request Permission & Others Attendance Request Permission
   Future<void> setPendingAttendanceReqUISPermission(String value) async {
@@ -1114,5 +1127,16 @@ class SessionManager {
   Future<String?> getPendingAttendanceReqL2UIS() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_att_uis_l2_permission');
+  }
+
+  //MY Team Show
+  Future<void> setMyTeamPageShow(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('my_team_permission', value);
+  }
+
+  Future<String?> getMyTeamPageShow() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('my_team_permission');
   }
 }

@@ -48,6 +48,7 @@ String? claimLevelTwo;
 String? claimLevelThree;
 String? preOnboardShow;
 String? exitShow;
+String? myTeamShow;
 String? loanApprovalL1Show;
 String? loanApprovalL2Show;
 String? loanApprovalL3Show;
@@ -889,6 +890,15 @@ class _LoginPageState extends State<LoginPage> {
             exitShow = "false";
             shared.setExitShow(exitShow);
           }
+          if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("HRIS_EMP_LIST_VIEW")) {
+            print("Response: HRIS_EMP_LIST_VIEW");
+            myTeamShow = "true";
+            shared.setMyTeamShow(myTeamShow);
+          } else {
+            print("My Team else");
+            myTeamShow = "false";
+            shared.setMyTeamShow(myTeamShow);
+          }
 
           //MSS MO
           // 🟢 Check if the selected profile has the Pending Attendance Request permission
@@ -1312,6 +1322,15 @@ class _LoginPageState extends State<LoginPage> {
             print("exitShow else");
             exitShow = "false";
             shared.setExitShow(exitShow);
+          }
+          if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("HRIS_EMP_LIST_VIEW")) {
+            print("Response: HRIS_EMP_LIST_VIEW");
+            myTeamShow = "true";
+            shared.setMyTeamShow(myTeamShow);
+          } else {
+            print("My Team else");
+            myTeamShow = "false";
+            shared.setMyTeamShow(myTeamShow);
           }
 
           //MSS MO

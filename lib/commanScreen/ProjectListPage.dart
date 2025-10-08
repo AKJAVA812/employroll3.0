@@ -42,6 +42,8 @@ dynamic empIdNew;
 bool? setShowPayroll;
 String? setPreOnboardShow;
 String? setExitShow;
+String? setMyTeamShow;
+String? setMyTeamPageShow;
 int? orgId;
 String? orgName;
 int? empRoles;
@@ -166,6 +168,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     adminRoles= await shared.getAdminRole();
     setPreOnboardShow= await shared.getPreOnboardShow();
     setExitShow= await shared.getExitShow();
+    setMyTeamShow= await shared.getMyTeamShow();
+    print("MY TEAM SHOW - $setMyTeamShow");
     userPanel= await shared.getUserPanel();
     print("USER PANEL - $userPanel");
     claimLevelOneMSS = await shared!.getClaimLevelOne();
@@ -187,6 +191,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     pendingLoanRequestMoL3Permission = (await shared.getLoanApprovalL3MO())!;
     pendingLoanRequestMSSL3Permission= (await shared.getLoanApprovalL3MSS())!;
     pendingLoanRequestUISL3Permission= (await shared.getLoanApprovalL3UIS())!;
+    setMyTeamPageShow= (await shared.getMyTeamPageShow())!;
+    print("MY TEAM SHOW NEW - $setMyTeamPageShow");
     print("Pending Attendance Request MSS MO- $pendingLoanRequestMoL1Permission");
     print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
     print("Pending Attendance Request UIS- $pendingLoanRequestUISL1Permission");
@@ -1679,7 +1685,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //My Teams
-        if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+        if(setMyTeamShow == "true" || setMyTeamPageShow == "1") {
             items.add(
               Hero(
                 tag: 'myTeams',
