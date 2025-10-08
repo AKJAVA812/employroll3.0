@@ -1,7 +1,7 @@
 
 class ApiDetails{
    //Base Server Address
-   //static var server="http://www.employroll.com/";
+   static var server="http://www.employroll.com/";
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
@@ -12,7 +12,7 @@ class ApiDetails{
    //Saumaya
    //static var server="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
    //Ankur
-   static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
+   //static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
 
    //Attendance Punch in and Punch out
    static String login="restful/service/login";
