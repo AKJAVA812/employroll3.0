@@ -35,6 +35,10 @@ class AttendanceRequisition extends StatefulWidget {
   State<AttendanceRequisition> createState() => _AttendanceRequisitionState(
       attendanceModelGlobel, onDateAttModel, indexCont);
 }
+SessionManager shared = SessionManager();
+Map<String, dynamic> mapResponse = {};
+String? sessionId;
+dynamic orgId;
 
 class _AttendanceRequisitionState extends State<AttendanceRequisition> with RouteAware{
   AttendanceReportModel? attendanceModelGlobel;
@@ -42,10 +46,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   int indexCont;
   String? _group1SelectedValue;
   String radios = "onDate";
-  SessionManager shared = SessionManager();
-  Map<String, dynamic> mapResponse = {};
-  String? sessionId;
-  dynamic orgId;
+
   String? branchNameset;
   String? updatedWorkHourSet;
   String? relaxationHourSet;
@@ -64,6 +65,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
 
   @override
   void initState() {
+    getSharedPrfanceList();
     //var onDateNew = attendanceModelGlobel!.data![indexCont].attendanceDate,
     //  _group1SelectedValue = "1";
     //String empid=onDateAttModel!.empId.toString();
@@ -131,8 +133,17 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       print('Employee ID: $empId');
     }
 
-    getSharedPrfanceList();
+
     super.initState();
+  }
+
+  Future getSharedPrfanceList() async {
+    sessionId = await shared!.getSessionId();
+    orgId = await shared!.getOrgId();
+    print("orgIDCHECK - $orgId");
+    setState(() {
+
+    });
   }
 
   void _group1Changes(String? value) {
@@ -1282,10 +1293,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
     );
   }
 
-  Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    orgId = await shared!.getOrgId();
-  }
+
 
 
 
