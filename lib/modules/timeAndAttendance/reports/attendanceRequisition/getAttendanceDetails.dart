@@ -89,7 +89,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         elevation: 0.5,
       ),
 
-      floatingActionButton: FloatingActionButton(
+     /* floatingActionButton: FloatingActionButton(
         onPressed: (){
           Navigator.pushNamed(context, MyRoutings.attendanceListRoute);
         },
@@ -97,7 +97,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         child: Icon(
           Icons.list, color: Mythemes.whitish, size: 28,
         ),
-      ),
+      ),*/
 
      /* bottomNavigationBar: Container(
         height: 90,

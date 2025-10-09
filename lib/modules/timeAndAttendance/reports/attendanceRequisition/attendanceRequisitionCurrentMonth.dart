@@ -1281,6 +1281,9 @@ class _AttendanceRequestCurrentMonthState extends State<AttendanceRequestCurrent
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     orgId = await shared!.getOrgId();
+    setState(() {
+
+    });
   }
 
 
