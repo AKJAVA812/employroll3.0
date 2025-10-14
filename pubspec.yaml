@@ -110,6 +110,7 @@ dependencies:
   firebase_messaging: 14.6.7
   velocity_x: ^4.2.1
   flutter_image_compress: ^2.3.0
+  dropdown_search: ^6.0.1
 
 dev_dependencies:
   flutter_test:
