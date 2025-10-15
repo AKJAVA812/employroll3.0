@@ -4,6 +4,7 @@ class ApiDetails{
    //static var server="http://www.employroll.com/";
 
    static var serverTwo="http://super.employroll.com:8081/";
+
    //static var serverTwo="https://14368a81b89e.ngrok.app/";
    //Adnan
    static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
@@ -12,6 +13,9 @@ class ApiDetails{
    //Saumaya
    //static var server="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
    //Ankur
+   //static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
+
+   //static var serverTwo="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
    //static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
 
    //Attendance Punch in and Punch out
@@ -241,4 +245,12 @@ class ApiDetails{
    static var todayEventApi = "restful/service/get/emp/todays/events";
 
    static var todayPunchesApiESS = "restful/service/get/realtime/punches";
+
+   //Geofence List API
+   static var geofenceListApi = "restful/service/get/tracking/employeemappedgeo/list";
+   //Punch Without Selfie With Geofence
+   static var punchWithGeofence = "restful/service/attendance/via/mobile/without/image/with/status/with/geofence";
+
+   //Punch With Selfie With Geofence
+   static var punchWithGeofenceSelfie = "restful/service/attendance/via/mobile/with/geofence";
 }
