@@ -1,23 +1,11 @@
 
 class ApiDetails{
    //Base Server Address
-   //static var server="http://www.employroll.com/";
+   static var server="http://www.employroll.com/";
 
    static var serverTwo="http://super.employroll.com:8081/";
-
-   //static var serverTwo="https://14368a81b89e.ngrok.app/";
-   //Adnan
-   static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
-   //Himanshu
-   //static var server="https://elma-unrestrainable-leda.ngrok-free.dev/";
-   //Saumaya
-   //static var server="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
-   //Ankur
-   //static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
-
    //static var serverTwo="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
    //static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
-
    //Attendance Punch in and Punch out
    static String login="restful/service/login";
    static String punchIn="restful/service/attendance/via/mobile";
@@ -37,7 +25,7 @@ class ApiDetails{
    static var workDoneReport = "restful/service/get/self/mobile/task/list";
    static var roWorkDoneReport = "restful/service/get/self/mobile/task/list/ro/wise";
    static var attendanceReport = "restful/service/get/attendance/logs/multiple";
-   //static var punchWithoutSelfie = "restful/service/attendance/via/mobile/without/image";
+   //static var punchWithoutSelfie = "/restful/service/attendance/via/mobile/without/image";
    static var punchWithoutSelfie = "restful/service/attendance/via/mobile/without/image/with/status";
    static var cancelSelfAttReqList = "restful/service/own/attandace/request/cancellation";
    //OD Attendance
@@ -105,7 +93,7 @@ class ApiDetails{
 
    //Payroll
    //static var salarySlipDownload = "restful/service/get/employee/salary/slip";
-   static var salarySlipDownload = "employroll/api/third/party/get/employee/salary/slip";
+   static var salarySlipDownload = "restful/service/get/employee/salary/slip";
 
    //Loan Advance
    static var loanAdvanceReqList = "restful/service/org/loan/and/advance/requested/list";
@@ -124,10 +112,14 @@ class ApiDetails{
    static var queryRaisedList = "employroll/api/third/party/mobile/org/emp/raised/ticket/list";
 
    //Documents
-   static var documentListApi = "employroll/api/third/party/get/org/Doc/type/master/list";
-   static var documentDetApi = "employroll/api/third/party/org/get/employee/on/filter/base/document/list";
+   static var documentListApi = "restful/service/get/org/Doc/type/master/list";
+   static var documentDetApi = "restful/service/org/get/employee/on/filter/base/document/list";
+
    static var logoutAPi = "restful/service/employee/logout";
-   static var tourRequisitionApi = "restful/service/requisition/tour";
+
+   static var tourRequisitionApi = "/restful/service/requisition/tour";
+
+
    //HR_IS Update API
    static var updateHRISApi = "restful/service/hris/detail/update/request";
 
