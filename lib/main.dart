@@ -118,6 +118,7 @@ import 'ess/EssDashboarrddModel.dart';
 import 'ess/MyReportingOfficers.dart';
 import 'ess/essDashboard.dart';
 import 'ess/essDashboardNavigate.dart';
+import 'ess/exitResignationRequisition.dart';
 import 'ess/loan&Advance/myLoanLedger.dart';
 import 'ess/loan&Advance/myLoanRequestRaisePage.dart';
 import 'ess/loan&Advance/myLoanSummary.dart';
@@ -891,6 +892,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //Offline Attendance
           MyRoutings.offlineAttendanceRoute: (context) => OfflineAttendanceSyncPage(),
+
+          //Resignation Requisition Page
+          MyRoutings.resignationRequisitionRoute: (context) => ResignationRequisitionPage(),
 
 
 

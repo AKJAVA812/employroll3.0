@@ -362,5 +362,10 @@ class MyRoutings {
   //Offline Attendance
   static String offlineAttendanceRoute= "/offlineAttendanceRoute";
 
+  //Resignation Requisition
+  static String resignationRequisitionRoute= "/resignationRequisitionRoute";
+
+
+
 
 }
