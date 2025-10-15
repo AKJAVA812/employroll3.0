@@ -87,6 +87,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       relaxationHourSet = onDateAttModel!.relaxationHour;
       isShortLeave = onDateAttModel!.isShortLeave ?? false;
       isOutDuty = onDateAttModel!.isOdReq ?? isOutDuty;
+      isCompOff = onDateAttModel!.isNormalCoff ?? isCompOff;
       print("Short Leave Check - $isShortLeave");
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
@@ -112,6 +113,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
       isShortLeave = onDateAttModel!.isShortLeave ?? isShortLeave;
       isOutDuty = onDateAttModel!.isOdReq ?? isOutDuty;
+      isCompOff = onDateAttModel!.isNormalCoff ?? isCompOff;
       print("Short Leave Check - $isShortLeave");
       relaxationHourSet = onDateAttModel!.relaxationHour;
       workingHrsSet = onDateAttModel!.workingHrs;
@@ -173,6 +175,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   bool light1 = true;
   bool isShortLeave = false;
   bool isOutDuty = false;
+  bool isCompOff = false;
   static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
     <WidgetStatesConstraint, Icon>{
       WidgetState.selected: Icon(Icons.check),
@@ -376,13 +379,16 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                           outDuty=false;
                           print("Night Shift - $nightShift");
                         }),
-                        buildVerticalToggle("Comp. Off", compOff, (val) {
+                        Visibility(
+                          visible: isCompOff,
+                          child:  buildVerticalToggle("Comp. Off", compOff, (val) {
                           setState(() => compOff = val);
                           nightShift=false;
                           shortLeave=false;
                           outDuty=false;
                           print("Comp Off - $compOff");
-                        }),
+                        }),),
+
 
                         Visibility(
                           visible: isShortLeave,

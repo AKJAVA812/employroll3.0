@@ -728,7 +728,10 @@ class _ImageUploadedState extends State<ImageUploaded> {
   Future<void> uploadImageWithGeofence(BuildContext context, dynamic selectedGeofenceId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchWithGeofenceSelfie;
-    CommonNotificationPage.showLoaderDialog(context);
+    // ✅ Use root context to show dialogs safely
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
+
+    CommonNotificationPage.showLoaderDialog(rootContext);
 
     bool internetCheck = await InternetConnectionChecker().hasConnection;
     if(internetCheck == false) {
@@ -766,7 +769,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
     request.fields['macAddress'] = deviceId!;
     request.fields['deviceId'] = deviceId!;
     request.fields['battery'] = sessionId!;
-    request.fields['geofenceId'] = sessionId!;
+    request.fields['geofenceId'] = selectedGeofenceId!.toString();
 
 
     //print("stream.length");
@@ -813,20 +816,23 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
       if(response.statusCode==200){
         print("I am hit 2 times");
-        Navigator.of(context, rootNavigator: true).pop();
+        // ✅ Always pop loader safely
+        if (rootContext.mounted) {
+          Navigator.of(rootContext, rootNavigator: true).pop();
+        }
         if(resultSuccess.compareToIgnoringCase("success")==0){
-          showSuccessGo(context,reasonSuccess.upperCamelCase+" "+formattedDate,"Successfully Punch $clockingType");
+          showSuccessGo(rootContext,reasonSuccess.upperCamelCase+" "+formattedDate,"Successfully Punch $clockingType");
         }else if(resultSuccess.compareToIgnoringCase("failed")==0){
           if (reasonSuccess == "non-geofence area") {
-            showSuccessGo(context, reasonSuccess.upperCamelCase+" "+formattedDate, " Non Geofence Area ");
+            showSuccessGo(rootContext, reasonSuccess.upperCamelCase+" "+formattedDate, " Non Geofence Area ");
           } else {
-            showSuccessGo(context,reasonSuccess.upperCamelCase, "Failed");
+            showSuccessGo(rootContext,reasonSuccess.upperCamelCase, "Failed");
           }
 
         }
       }else {
         //Navigator.pop(context);
-        showDialgError(context, result,"Your Punch Not Submitted, Please Try Again");
+        showDialgError(rootContext, result,"Your Punch Not Submitted, Please Try Again");
       }
     } on TimeoutException catch (_) {
       // Show retry popup if the request times out
@@ -1026,7 +1032,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
         TextButton(
             onPressed: () {
               Navigator.of(buildContext, rootNavigator: true).pop();
-              Navigator.pushNamed(buildContext, MyRoutings.punchInRoute);
+              Navigator.push(buildContext,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,))
+              );
             },
             child: Container(
               child: Text("Ok"),
@@ -1084,7 +1092,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
         required dynamic orgId,
       }) async {
     GeofenceListModal? geofenceList;
-    int? selectedGeofenceId; // ✅ Store ID instead of name
+   dynamic selectedGeofenceId; // ✅ Store ID instead of name
     bool isLoading = true;
 
     // ✅ Fetch geofences
@@ -1189,6 +1197,8 @@ class _ImageUploadedState extends State<ImageUploaded> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1217,7 +1227,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
                   //getUploadImage();
 
                   print("ORGID - $orgId");
-                  if (orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202) {
+                  if (orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145) {
                     /*showDialog(
                       context: context,
                       barrierDismissible: false, // user can't close by tapping outside

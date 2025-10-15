@@ -112,6 +112,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       empId = getData['empId'] ?? 0;
       isShortLeave = getData['isShortLeave'] ?? isShortLeave;
       isOutDuty = getData['isOdReq'] ?? isOutDuty;
+      isCompOff = getData['isNormalCoff'] ?? isCompOff;
 
       // Log for debugging
       print('Branch: $branchNameset');
@@ -200,6 +201,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   bool light1 = true;
   bool isShortLeave = false;
   bool isOutDuty = false;
+  bool isCompOff = false;
   static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
     <WidgetStatesConstraint, Icon>{
       WidgetState.selected: Icon(Icons.check),
@@ -479,13 +481,16 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                           outDuty=false;
                           print("Night Shift - $nightShift");
                         }),
-                        buildVerticalToggle("Comp. Off", compOff, (val) {
-                          setState(() => compOff = val);
-                          nightShift=false;
-                          shortLeave=false;
-                          outDuty=false;
-                          print("Comp Off - $compOff");
-                        }),
+                        Visibility(
+                            visible: isCompOff,
+                            child:  buildVerticalToggle("Comp. Off", compOff, (val) {
+                              setState(() => compOff = val);
+                              nightShift=false;
+                              shortLeave=false;
+                              outDuty=false;
+                              print("Comp Off - $compOff");
+                            }),),
+
 
                         Visibility(
                           visible: isShortLeave,

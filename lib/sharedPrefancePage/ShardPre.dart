@@ -239,6 +239,16 @@ class SessionManager {
     return time;
   }
 
+  setGeofenceActive(geofenceActive) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('geofenceActive', geofenceActive);
+  }
+  getGeofenceActive() async{
+    final prefs = await SharedPreferences.getInstance();
+    final String? geofenceActive=prefs.getString('geofenceActive');
+    return geofenceActive;
+  }
+
   setDesignation(designation) async{
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('designation', designation);

@@ -259,14 +259,16 @@ class UserLoginned {
 
 class MobAction {
   String? distance;
+  dynamic geofenceActive;
   String? mobAction;
   String? attAction;
   String? time;
 
-  MobAction({this.distance, this.mobAction, this.attAction, this.time});
+  MobAction({this.distance, this.geofenceActive, this.mobAction, this.attAction, this.time});
 
   MobAction.fromJson(Map<String, dynamic> json) {
     distance = json['distance'];
+    geofenceActive = json['geofenceActive'];
     mobAction = json['mobAction'];
     attAction = json['attAction'];
     time = json['time'];
@@ -275,6 +277,7 @@ class MobAction {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['distance'] = this.distance;
+    data['geofenceActive'] = this.geofenceActive;
     data['mobAction'] = this.mobAction;
     data['attAction'] = this.attAction;
     data['time'] = this.time;

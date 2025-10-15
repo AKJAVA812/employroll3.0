@@ -117,6 +117,7 @@ class _LoginPageState extends State<LoginPage> {
   var attAction;
   var mobileActions;
   var mobileTrackTime;
+  var geofenceActive;
 
   var profileName;
   var userPanel;
@@ -778,12 +779,14 @@ class _LoginPageState extends State<LoginPage> {
     adminRoleChcker = loginModelglobal!.data!.adminrole!.length;
     print('adminRolesCheckss $adminRoleChcker');
     for(int i=0; i<loginModelglobal!.data!.mobAction!.length;i++){
+      geofenceActive = loginModelglobal!.data!.mobAction![i].geofenceActive;
       attAction = shared.setAttAction(loginModelglobal!.data!.mobAction![i].attAction);
       mobileActions = shared.setMobAttAction(loginModelglobal!.data!.mobAction![i].mobAction);
       mobileTrackTime = shared.setMobTrackTime(loginModelglobal!.data!.mobAction![i].time);
       print('attActionSet $attAction');
       print('MobActionSet $mobileActions');
       print('MobTrackTime $mobileTrackTime');
+      print('Geofence Active $geofenceActive');
     }
 
     /*for(int i=0; i<loginModelglobal!.data!.profileList!.length;i++){
@@ -1211,12 +1214,14 @@ class _LoginPageState extends State<LoginPage> {
     adminRoleChcker = loginModelglobal!.data!.adminrole!.length;
     print('adminRolesCheckss $adminRoleChcker');
     for(int i=0; i<loginModelglobal!.data!.mobAction!.length;i++){
+      geofenceActive = loginModelglobal!.data!.mobAction![i].geofenceActive;
       attAction = shared.setAttAction(loginModelglobal!.data!.mobAction![i].attAction);
       mobileActions = shared.setMobAttAction(loginModelglobal!.data!.mobAction![i].mobAction);
       mobileTrackTime = shared.setMobTrackTime(loginModelglobal!.data!.mobAction![i].time);
       print('attActionSet $attAction');
       print('MobActionSet $mobileActions');
       print('MobTrackTime $mobileTrackTime');
+      print('Geofence Active $geofenceActive');
     }
 
     /*for(int i=0; i<loginModelglobal!.data!.profileList!.length;i++){
