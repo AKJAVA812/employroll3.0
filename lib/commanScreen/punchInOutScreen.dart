@@ -1749,14 +1749,14 @@ class _DefaultPageState extends State<DefaultPage> {
   var oldAppVersion;
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empIdGet = await shared!.getEmpId();
-    appVersion = await shared!.getAppVersion();
+    sessionId = await shared.getSessionId();
+    empIdGet = await shared.getEmpId();
+    appVersion = await shared.getAppVersion();
     print("App Version - $appVersion");
-    userPanelPermissions = await shared!.getUserPanel();
-    getGeofenceList(sessionId!);
+    userPanelPermissions = await shared.getUserPanel();
+    //getGeofenceList(sessionId!);
     print("$userPanelPermissions");
-    lat = await shared!.getLatitude();
+    lat = await shared.getLatitude();
     //position= Position(longitude: shared.getLongitude(), latitude: shared.getLatitude(), timestamp: date, accuracy: 1, altitude: 1, altitudeAccuracy: 1, heading: 1, headingAccuracy: 1, speed: 1, speedAccuracy: 1);
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
