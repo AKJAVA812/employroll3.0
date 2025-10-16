@@ -667,7 +667,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       }
 
       //Exit Resignation Requisition
-      if(value == 0) {
+      if(value == 0 && orgId == 145) {
         items.add(
           Hero(
             tag: 'exitResigReq',
