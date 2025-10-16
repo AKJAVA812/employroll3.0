@@ -779,7 +779,7 @@ class _LoginPageState extends State<LoginPage> {
     adminRoleChcker = loginModelglobal!.data!.adminrole!.length;
     print('adminRolesCheckss $adminRoleChcker');
     for(int i=0; i<loginModelglobal!.data!.mobAction!.length;i++){
-      geofenceActive = loginModelglobal!.data!.mobAction![i].geofenceActive;
+      geofenceActive = shared.setGeofenceActive(loginModelglobal!.data!.mobAction![i].geofenceActive);
       attAction = shared.setAttAction(loginModelglobal!.data!.mobAction![i].attAction);
       mobileActions = shared.setMobAttAction(loginModelglobal!.data!.mobAction![i].mobAction);
       mobileTrackTime = shared.setMobTrackTime(loginModelglobal!.data!.mobAction![i].time);
@@ -1214,7 +1214,7 @@ class _LoginPageState extends State<LoginPage> {
     adminRoleChcker = loginModelglobal!.data!.adminrole!.length;
     print('adminRolesCheckss $adminRoleChcker');
     for(int i=0; i<loginModelglobal!.data!.mobAction!.length;i++){
-      geofenceActive = loginModelglobal!.data!.mobAction![i].geofenceActive;
+      geofenceActive = shared.setGeofenceActive(loginModelglobal!.data!.mobAction![i].geofenceActive);
       attAction = shared.setAttAction(loginModelglobal!.data!.mobAction![i].attAction);
       mobileActions = shared.setMobAttAction(loginModelglobal!.data!.mobAction![i].mobAction);
       mobileTrackTime = shared.setMobTrackTime(loginModelglobal!.data!.mobAction![i].time);

@@ -35,7 +35,9 @@ class ImageUploaded extends StatefulWidget {
   State<ImageUploaded> createState() => _ImageUploadedState(value,time,address,punchType);
 }
 final attendanceBox = Hive.box('attendanceBox');
-late String? sessionId ;
+late String? sessionId;
+dynamic orgId;
+dynamic setGeofenceActive;
 int? orgnizationID=0;
 SessionManager shared = SessionManager();
 String? deviceId = "Unknown";
@@ -214,6 +216,8 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    orgId = await shared!.getOrgId();
+    setGeofenceActive = await shared!.getGeofenceActive();
     lat=await shared!.getLatitude();
     getGeofenceList(sessionId!);
     lng=await shared!.getLongitude();
@@ -246,98 +250,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
             print("ORGID - $orgId");
-            if (orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202) {
-              /*showDialog(
-                      context: context,
-                      barrierDismissible: false, // user can't close by tapping outside
-                      builder: (BuildContext context) {
-                        String? selectedGeofence;
-                        List<String> geofenceList = [
-                          "Office - Main Gate",
-                          "Office - Back Gate",
-                          "Warehouse Zone",
-                          "Factory Area",
-                          "Guest Parking",
-                          "HR Building",
-                        ];
-                        List<String> filteredList = List.from(geofenceList);
-                        final TextEditingController searchController = TextEditingController();
+            if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
+                && setGeofenceActive == true) {
 
-                        return StatefulBuilder(
-                          builder: (context, setState) {
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: const Text(
-                                "Select Geofence",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: SizedBox(
-                                width: double.maxFinite,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // 📍 Dropdown List
-                                    DropdownButtonFormField<String>(
-                                      value: selectedGeofence,
-                                      isExpanded: true,
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: "Select Geofence",
-                                      ),
-                                      items: filteredList
-                                          .map((geo) => DropdownMenuItem<String>(
-                                        value: geo,
-                                        child: Text(geo),
-                                      ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          selectedGeofence = value;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // 🔘 Buttons
-                              actions: [
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.red,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text("Cancel"),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  onPressed: () {
-                                    print("SELECTED GEOFENCE - $selectedGeofence");
-                                    if (selectedGeofence != null) {
-                                      Navigator.pop(context, selectedGeofence);
-                                      uploadImage(context);
-                                      // tu yahan apna attendance method call kar sakta hai
-                                      // getPunchIn(context, selectedGeofence);
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Please select a geofence")),
-                                      );
-                                    }
-                                  },
-                                  child: const Text("Submit"),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    );*/
               showGeofenceDialog(
                 context,
                 sessionId: sessionId!,
@@ -404,98 +319,8 @@ class _ImageUploadedState extends State<ImageUploaded> {
               //readData();
             } else {
               print("ORGID - $orgId");
-              if (orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202) {
-                /*showDialog(
-                      context: context,
-                      barrierDismissible: false, // user can't close by tapping outside
-                      builder: (BuildContext context) {
-                        String? selectedGeofence;
-                        List<String> geofenceList = [
-                          "Office - Main Gate",
-                          "Office - Back Gate",
-                          "Warehouse Zone",
-                          "Factory Area",
-                          "Guest Parking",
-                          "HR Building",
-                        ];
-                        List<String> filteredList = List.from(geofenceList);
-                        final TextEditingController searchController = TextEditingController();
-
-                        return StatefulBuilder(
-                          builder: (context, setState) {
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: const Text(
-                                "Select Geofence",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: SizedBox(
-                                width: double.maxFinite,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // 📍 Dropdown List
-                                    DropdownButtonFormField<String>(
-                                      value: selectedGeofence,
-                                      isExpanded: true,
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: "Select Geofence",
-                                      ),
-                                      items: filteredList
-                                          .map((geo) => DropdownMenuItem<String>(
-                                        value: geo,
-                                        child: Text(geo),
-                                      ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          selectedGeofence = value;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // 🔘 Buttons
-                              actions: [
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.red,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text("Cancel"),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  onPressed: () {
-                                    print("SELECTED GEOFENCE - $selectedGeofence");
-                                    if (selectedGeofence != null) {
-                                      Navigator.pop(context, selectedGeofence);
-                                      uploadImage(context);
-                                      // tu yahan apna attendance method call kar sakta hai
-                                      // getPunchIn(context, selectedGeofence);
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Please select a geofence")),
-                                      );
-                                    }
-                                  },
-                                  child: const Text("Submit"),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    );*/
+              if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
+                  && setGeofenceActive == true) {
                 showGeofenceDialog(
                   context,
                   sessionId: sessionId!,
@@ -1227,98 +1052,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
                   //getUploadImage();
 
                   print("ORGID - $orgId");
-                  if (orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145) {
-                    /*showDialog(
-                      context: context,
-                      barrierDismissible: false, // user can't close by tapping outside
-                      builder: (BuildContext context) {
-                        String? selectedGeofence;
-                        List<String> geofenceList = [
-                          "Office - Main Gate",
-                          "Office - Back Gate",
-                          "Warehouse Zone",
-                          "Factory Area",
-                          "Guest Parking",
-                          "HR Building",
-                        ];
-                        List<String> filteredList = List.from(geofenceList);
-                        final TextEditingController searchController = TextEditingController();
+                  if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
+                      && setGeofenceActive == true) {
 
-                        return StatefulBuilder(
-                          builder: (context, setState) {
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: const Text(
-                                "Select Geofence",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: SizedBox(
-                                width: double.maxFinite,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // 📍 Dropdown List
-                                    DropdownButtonFormField<String>(
-                                      value: selectedGeofence,
-                                      isExpanded: true,
-                                      decoration: const InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: "Select Geofence",
-                                      ),
-                                      items: filteredList
-                                          .map((geo) => DropdownMenuItem<String>(
-                                        value: geo,
-                                        child: Text(geo),
-                                      ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          selectedGeofence = value;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // 🔘 Buttons
-                              actions: [
-                                TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.red,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text("Cancel"),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  onPressed: () {
-                                    print("SELECTED GEOFENCE - $selectedGeofence");
-                                    if (selectedGeofence != null) {
-                                      Navigator.pop(context, selectedGeofence);
-                                      uploadImage(context);
-                                      // tu yahan apna attendance method call kar sakta hai
-                                      // getPunchIn(context, selectedGeofence);
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Please select a geofence")),
-                                      );
-                                    }
-                                  },
-                                  child: const Text("Submit"),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    );*/
                     showGeofenceDialog(
                       context,
                       sessionId: sessionId!,

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -241,11 +243,11 @@ class SessionManager {
 
   setGeofenceActive(geofenceActive) async{
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('geofenceActive', geofenceActive);
+    await prefs.setBool('geofenceActive', geofenceActive);
   }
   getGeofenceActive() async{
     final prefs = await SharedPreferences.getInstance();
-    final String? geofenceActive=prefs.getString('geofenceActive');
+    final bool? geofenceActive=prefs.getBool('geofenceActive');
     return geofenceActive;
   }
 
