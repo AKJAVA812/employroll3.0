@@ -13,6 +13,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 
@@ -907,10 +908,157 @@ class _ImageUploadedState extends State<ImageUploaded> {
     }
   }
 
+  static const String _kSavedGeofenceKey = 'savedGeofenceId';
+  // Helper to get saved geofence id (nullable)
+  Future<int?> _getSavedGeofenceId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_kSavedGeofenceKey);
+  }
 
+// Helper to save geofence id
+  Future<void> _saveGeofenceId(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kSavedGeofenceKey, id);
+  }
+
+  Future<void> showGeofenceDialog(
+      BuildContext context, {
+        required dynamic sessionId,
+        required dynamic empId,
+        required dynamic orgId,
+      }) async {
+
+    // Load saved id first
+    int? savedGeofenceId = await _getSavedGeofenceId();
+
+    // Fetch geofences
+    GeofenceListModal geofenceList = await getGeofenceList(sessionId);
+
+    // If no geofences, show dialog with message
+    if (geofenceList.userdata == null || geofenceList.userdata!.isEmpty) {
+      if (!context.mounted) return;
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Select Your Location"),
+          content: const Text("No geofence data available"),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Ensure saved id exists in fetched list; otherwise ignore it
+    bool savedExists = savedGeofenceId != null &&
+        geofenceList.userdata!.any((g) => g.id == savedGeofenceId);
+
+    int? selectedGeofenceId = savedExists ? savedGeofenceId : null;
+
+    if (!context.mounted) return;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text(
+                "Select Your Location",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<int>(
+                      value: selectedGeofenceId,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: "Select Geofence",
+                      ),
+                      items: geofenceList.userdata!
+                          .map(
+                            (geo) => DropdownMenuItem<int>(
+                          value: geo.id,
+                          child: Text("${geo.name ?? 'Unnamed'}"),
+                        ),
+                      )
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedGeofenceId = value;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Optional: show currently saved selection info
+                    if (savedGeofenceId != null)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          savedExists
+                              ? "Saved location will be pre-selected"
+                              : "Previously saved location not available in list",
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () async {
+                    if (selectedGeofenceId != null) {
+                      // Save selected id to shared preferences
+                      await _saveGeofenceId(selectedGeofenceId!);
+
+                      // Close dialog and trigger punch-in (as you had)
+                      Navigator.pop(context, selectedGeofenceId);
+
+                      // Call your punch-in method with selected id
+                      if (context.mounted) {
+                        uploadImageWithGeofence(context, selectedGeofenceId);
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Please select a geofence")),
+                      );
+                    }
+                  },
+                  child: const Text("Submit"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
 // ✅ Widget Method to show Geofence Dialog
-  Future<void> showGeofenceDialog(
+/*  Future<void> showGeofenceDialog(
       BuildContext context, {
         required dynamic sessionId,
         required dynamic empId,
@@ -1020,7 +1168,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
         },
       );
     }
-  }
+  }*/
 
 
 
