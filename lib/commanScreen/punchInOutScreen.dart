@@ -411,13 +411,13 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     setState(() {
 
     });
-    imageString = await shared!.getProfileImage();
-    UserName = await shared!.getempName();
-    employeeCode = await shared!.getEmpCode();
-    lat= await shared!.getLatitude();
-    lng = await shared!.getLongitude();
-    getMobActions = await shared!.getMobAttAction();
-    getMobTrackTime = await shared!.getMobTrackTime();
+    imageString = await shared.getProfileImage();
+    UserName = await shared.getempName();
+    employeeCode = await shared.getEmpCode();
+    lat= await shared.getLatitude();
+    lng = await shared.getLongitude();
+    getMobActions = await shared.getMobAttAction();
+    getMobTrackTime = await shared.getMobTrackTime();
     print("GetMobAction - $getMobActions");
     print("GetMobTrackTime - $getMobTrackTime");
     //startTracking();
@@ -788,8 +788,6 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   @override
   Widget build(BuildContext context) {
-    late CameraController controller;
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
