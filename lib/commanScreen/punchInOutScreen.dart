@@ -392,6 +392,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     sessionId = await shared!.getSessionId();
     orgId = await shared!.getOrgId();
     setGeofenceActive = await shared!.getGeofenceActive();
+    print("Geofence Permission - $setGeofenceActive");
     userType = await shared!.getUserType();
     defaultProfileName = await shared!.getDefaultProfileName();
     defaultProfileId = await shared!.getDefaultProfileId();
@@ -2252,104 +2253,16 @@ class _DefaultPageState extends State<DefaultPage> {
                                         clockingType = "Out";
                                         if (attAction == '0') {
                                           print("ORGID - $orgId");
-                                          if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145) || setGeofenceActive == true) {
-                                            /*showDialog(
-                                              context: context,
-                                              barrierDismissible: false, // user can't close by tapping outside
-                                              builder: (BuildContext context) {
-                                                String? selectedGeofence;
-                                                List<String> geofenceList = [
-                                                  "Office - Main Gate",
-                                                  "Office - Back Gate",
-                                                  "Warehouse Zone",
-                                                  "Factory Area",
-                                                  "Guest Parking",
-                                                  "HR Building",
-                                                ];
-                                                List<String> filteredList = List.from(geofenceList);
-                                                final TextEditingController searchController = TextEditingController();
+                                          if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
+                                              && setGeofenceActive == true) {
 
-                                                return StatefulBuilder(
-                                                  builder: (context, setState) {
-                                                    return AlertDialog(
-                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                      title: const Text(
-                                                        "Select Geofence",
-                                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                                      ),
-                                                      content: SizedBox(
-                                                        width: double.maxFinite,
-                                                        child: Column(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            // 📍 Dropdown List
-                                                            DropdownButtonFormField<String>(
-                                                              value: selectedGeofence,
-                                                              isExpanded: true,
-                                                              decoration: const InputDecoration(
-                                                                border: OutlineInputBorder(),
-                                                                labelText: "Select Geofence",
-                                                              ),
-                                                              items: filteredList
-                                                                  .map((geo) => DropdownMenuItem<String>(
-                                                                value: geo,
-                                                                child: Text(geo),
-                                                              ))
-                                                                  .toList(),
-                                                              onChanged: (value) {
-                                                                setState(() {
-                                                                  selectedGeofence = value;
-                                                                });
-                                                              },
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-
-                                                      // 🔘 Buttons
-                                                      actions: [
-                                                        TextButton(
-                                                          style: TextButton.styleFrom(
-                                                            foregroundColor: Colors.white,
-                                                            backgroundColor: Colors.red,
-                                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                                          ),
-                                                          onPressed: () => Navigator.pop(context),
-                                                          child: const Text("Cancel"),
-                                                        ),
-                                                        ElevatedButton(
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.green,
-                                                            foregroundColor: Colors.white,
-                                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                                          ),
-                                                          onPressed: () {
-                                                            print("SELECTED GEOFENCE - $selectedGeofence");
-                                                            if (selectedGeofence != null) {
-                                                              Navigator.pop(context, selectedGeofence);
-                                                              getPunchOut(context);
-                                                              // tu yahan apna attendance method call kar sakta hai
-                                                              // getPunchIn(context, selectedGeofence);
-                                                            } else {
-                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                const SnackBar(content: Text("Please select a geofence")),
-                                                              );
-                                                            }
-                                                          },
-                                                          child: const Text("Submit"),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            );*/
                                             showGeofenceDialogPunchOut(
                                               context,
                                               sessionId: sessionId!,
                                               empId: empIdGet,
                                               orgId: orgId,
                                             );
+
                                           } else {
                                             getPunchOut(context);
                                           }
