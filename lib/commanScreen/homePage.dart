@@ -1062,7 +1062,7 @@ class _DefaultPageState extends State<DefaultPage> {
           title: const Text("Select Your Location"),
           content: const Text("No geofence data available"),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))
+            TextButton(onPressed: () =>  Navigator.of(context, rootNavigator: true).pop(), child: const Text("OK"))
           ],
         ),
       );
@@ -1198,7 +1198,7 @@ class _DefaultPageState extends State<DefaultPage> {
           title: const Text("Select Your Location"),
           content: const Text("No geofence data available"),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))
+            TextButton(onPressed: () => Navigator.of(context, rootNavigator: true).pop(), child: const Text("OK"))
           ],
         ),
       );
