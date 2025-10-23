@@ -5,7 +5,7 @@ class ApiDetails{
 
    static var serverTwo="http://super.employroll.com:8081/";
    //static var serverTwo="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
-   //static var server="https://ming-nonponderous-efren.ngrok-free.dev/";
+   //static var server="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
    //Attendance Punch in and Punch out
    static String login="restful/service/login";
    static String punchIn="restful/service/attendance/via/mobile";
@@ -245,4 +245,10 @@ class ApiDetails{
 
    //Punch With Selfie With Geofence
    static var punchWithGeofenceSelfie = "restful/service/attendance/via/mobile/with/geofence";
+
+   //Resignation Requisition APIs
+   static var reasonForLeavingListApi = "restful/service/ess/reason/for/leaving/list";
+   static var resignationRequisitionSaveApi = "restful/service/save/self/ess/employee";
+   static var employeeResignationList = "restful/service/get/self/resignation/list";
+
 }
