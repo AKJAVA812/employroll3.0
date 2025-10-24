@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../commanScreen/allAPIList.dart';
 import '../commanScreen/commanNotificationPage.dart';
@@ -351,6 +353,10 @@ String valuenew="listText";
   }
 
   void showAttachmentBottomSheet(BuildContext context, String attachmentUrl) {
+    final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
+    final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
+        attachmentUrl.toLowerCase().endsWith('.jpeg') ||
+        attachmentUrl.toLowerCase().endsWith('.png');
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -359,6 +365,7 @@ String valuenew="listText";
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => SizedBox(
+
         height: MediaQuery.of(context).size.height * 0.85,
         child: Column(
           children: [
@@ -380,13 +387,29 @@ String valuenew="listText";
                 ],
               ),
             ),
+            // File content viewer
             Expanded(
-              child: PDF().cachedFromUrl(
+              child: isPdf
+                  ? SfPdfViewer.network(
                 attachmentUrl,
-                placeholder: (progress) =>
-                    Center(child: Text("Loading... ${progress.toStringAsFixed(0)}%")),
-                errorWidget: (error) =>
-                const Center(child: Text("❌ Failed to load document")),
+                canShowScrollStatus: true,
+                canShowPaginationDialog: true,
+              )
+                  : isImage
+                  ? CachedNetworkImage(
+                imageUrl: attachmentUrl,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) =>
+                const Center(child: Text("❌ Failed to load image")),
+              )
+                  : const Center(
+                child: Text(
+                  "⚠️ Unsupported file format",
+                  style: TextStyle(fontSize: 16, color: Colors.redAccent),
+                ),
               ),
             ),
           ],
@@ -522,7 +545,7 @@ String valuenew="listText";
                           fromDate = await showDatePicker(
                             context: context,
                             initialDate: fromDate,
-                            firstDate: DateTime(1947),
+                            firstDate: DateTime.now(),
                             lastDate: DateTime(2060),
                           );
                           setState(() {
