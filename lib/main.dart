@@ -60,6 +60,7 @@ import 'package:upgrader/upgrader.dart';
 import 'ESS_Bundle/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';*/
 import 'EZNew/landingPage.dart';
 import 'MSS_Bundle/dashboard/adminDashboard.dart';
+import 'MSS_Bundle/exitResignation/exitResignationReqList.dart';
 import 'MSS_Bundle/incidentReporting/incidentReportList.dart';
 import 'MSS_Bundle/leaveManagement/levelOneLeaveReq.dart';
 import 'MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
@@ -895,6 +896,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //Resignation Requisition Page
           MyRoutings.resignationRequisitionRoute: (context) => ResignationRequisitionPage(),
+
+          //Resignation Requisition Page
+          MyRoutings.exitResignationRequestListRoute: (context) => ExitResignationRequestPage(),
 
 
 

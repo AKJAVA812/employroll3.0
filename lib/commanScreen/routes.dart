@@ -365,6 +365,10 @@ class MyRoutings {
   //Resignation Requisition
   static String resignationRequisitionRoute= "/resignationRequisitionRoute";
 
+  //Resignation Requisition
+  static String exitResignationRequestListRoute= "/exitResignationRequestListRoute";
+
+
 
 
 

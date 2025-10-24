@@ -1734,6 +1734,55 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
           );
         }
 
+          //Exit Resignation Approval
+          if(( orgId == 3 || orgId == 145)) {
+            items.add(
+              Hero(
+                tag: 'exitResignationApproval',
+                child: Card(
+                  color: Mythemes.whitish,
+                  child: InkWell(
+                    onTap: () {
+                      if(userPanel == "MSS" || userPanel == "USER") {
+                        Navigator.pushNamed(context, MyRoutings.exitResignationRequestListRoute);
+                      }
+                      if(userPanel == "MSS_MO_ADMIN") {
+                        Navigator.pushNamed(context, MyRoutings.exitResignationRequestListRoute);
+                      }
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: Icon(
+                            Icons.do_not_disturb_off,
+                            size: 50,
+                            color: Mythemes.dangerColor,
+                          ),
+                          /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 75, left: 10),
+                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                            child: Text(
+                                'Resignation',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style:
+                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
         //My Teams
         if(setMyTeamShow == "true" || setMyTeamPageShow == "1") {
             items.add(
