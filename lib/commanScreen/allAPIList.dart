@@ -118,8 +118,6 @@ class ApiDetails{
    static var logoutAPi = "restful/service/employee/logout";
 
    static var tourRequisitionApi = "/restful/service/requisition/tour";
-
-
    //HR_IS Update API
    static var updateHRISApi = "restful/service/hris/detail/update/request";
 
@@ -150,7 +148,6 @@ class ApiDetails{
    static var onboardUserTypeList = "restful/service/fetch/userType/list";
    static var onboardDocTypeList = "restful/service/get/doc/type/list";
 
-
    //Holiday ESS
    static var holidayListEss = "restful/service/get/emp/holiday/ess";
 
@@ -163,7 +160,6 @@ class ApiDetails{
    static var faceRecognizeOtherMss = "restful/service/attendance/via/face/recognize/mobile/other/emp/wise";
    static var faceRecognizeSelf = "restful/service/attendance/via/face/recognize/mobile/self";
    static var getEmpFaceList = "restful/service/employeelist/face/reco/det";
-
 
    //Tracking
    static var saveTrackingData = "restful/service/new/mobile/tracking/new";
@@ -228,7 +224,6 @@ class ApiDetails{
 
    //Requisition Count API
    static var reqCountApi = "restful/service/get/pending/requisition/count";
-
 
    //Firebase Token Send API
    static var firebaseApiSend = "restful/service/get/user/firebase/id";
