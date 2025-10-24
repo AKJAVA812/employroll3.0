@@ -49,6 +49,7 @@ String valuenew="listText";
     super.initState();
     setState(() {
       getSharedPrfanceList();
+      noticePeriodController = TextEditingController(text: noticePeriod);
       var listLength;
 
       print('listLength $listLength');
@@ -156,7 +157,8 @@ String valuenew="listText";
   DateTime? resignationDate;
   DateTime? lastWorkingDate;
   bool noticeServing = false;
-  var noticePeriod = "";
+  String noticePeriod = "";
+  late TextEditingController noticePeriodController;
   String? reason;
   var remarks = "";
   File? uploadedFile;
@@ -260,7 +262,7 @@ String valuenew="listText";
     request.fields['resign_date'] = registrationDate.text;
     request.fields['last_working_date'] = lastWorkDate.text;
     request.fields['noticePeriodServing'] = noticeServing.toString();
-    request.fields['noticePeriod'] = noticePeriod;
+    request.fields['noticePeriod'] = noticePeriod.toString();
     request.fields['remarks'] = remarks;
     request.fields['separationMode'] = reasonForLeavingId;
 
@@ -668,7 +670,11 @@ String valuenew="listText";
                           decoration: const InputDecoration(
                             labelText: "Notice Period (To be served in Days)",
                           ),
-                          controller: TextEditingController(text: noticePeriod),
+                          controller: noticePeriodController,
+                          onChanged: (value) {
+                            noticePeriod = value; // ✅ keep variable updated
+                            print("$noticePeriod");
+                          },
                         ),
                       const SizedBox(height: 15),
 

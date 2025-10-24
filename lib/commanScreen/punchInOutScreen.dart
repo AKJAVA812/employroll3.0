@@ -802,39 +802,27 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
       },
       child: Scaffold(
         appBar: AppBar(
-          elevation: 4,
-          backgroundColor: Colors.transparent,
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF5D9CDF), Color(0xFF2575FC)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
+          elevation: 3,
           title: FittedBox(
             fit: BoxFit.scaleDown,
             child: RichText(
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: '$title  ',
-                    style: const TextStyle(
-                      fontSize: 20,
+                    text: '$title - ',
+                    style: TextStyle(
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
+                      color: Colors.black,
                     ),
                   ),
                   WidgetSpan(
                     alignment: PlaceholderAlignment.middle,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                        color: Mythemes.successColor,
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: ValueListenableBuilder<String>(
                         valueListenable: selectedProfileNameNotifier,
@@ -846,10 +834,9 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
                           return Text(
                             displayText,
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.4,
+                              color: Mythemes.whitish,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
                             ),
                           );
                         },
@@ -860,25 +847,12 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
               ),
             ),
           ),
-          centerTitle: true,
           actions: <Widget>[
-            // 🧭 User Manual Icon
-            /*IconButton(
-              tooltip: "User Manual / Help",
-              icon: const Icon(Icons.info_outline_rounded, color: Colors.white),
-              onPressed: () {
-                // 👉 Navigate to your User Manual Page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => UserManualPage()),
-                );
-              },
-            ),*/
-            // 🔌 Logout Icon
             IconButton(
-              tooltip: "Logout",
-              icon: const Icon(Icons.power_settings_new_rounded, color: Colors.white),
-              onPressed: () => logoutApp(context),
+              icon: Icon(Icons.power_settings_new_outlined),
+              onPressed: () {
+                logoutApp(context);
+              },
             ),
           ],
         ),
