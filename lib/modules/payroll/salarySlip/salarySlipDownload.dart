@@ -326,7 +326,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
 
 
   Future<SalarySlipDownloadModal> getSalarySlip(String SessionId) async {
-    String conn = ApiDetails.serverTwo;
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.salarySlipDownload;
     print('employeeList11: ${SessionId}');
     SalarySlipDownloadModal salarySlipDownloadModal;

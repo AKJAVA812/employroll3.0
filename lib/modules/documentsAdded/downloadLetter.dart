@@ -83,7 +83,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
   }
 
   Future<DocumentDataModal> getDocument(String SessionId) async {
-    String conn = ApiDetails.serverTwo;
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.documentDetApi;
     print('employeeList11: ${SessionId}');
     DocumentDataModal documentDataModal;

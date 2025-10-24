@@ -127,7 +127,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
 
   Future<DepartmentListModal> getDepartmentList(String sessionId) async {
     deptList=[];
-    String conn = ApiDetails.serverTwo;
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.departmentListApi;
 
     //print('employeeList11: ${SessionId}');
@@ -157,7 +157,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
 
   Future<QueryTypeListModal> getQueryTypeList(String sessionId) async {
     queryTypeList=[];
-    String conn = ApiDetails.serverTwo;
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.queryTypeListApi;
 
     //print('employeeList11: ${SessionId}');
@@ -188,7 +188,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
 
   Future<SubQueryTypeListModal> getSubQueryTypeList(String sessionId) async {
     subQueryTypeList=[];
-    String conn = ApiDetails.serverTwo;
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.subQueryTypeListApi;
 
     //print('employeeList11: ${SessionId}');
@@ -219,7 +219,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
   }
 
   Future<RaisedQueryListModal> getRaisedList(String SessionId) async {
-    String conn = ApiDetails.serverTwo;
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.queryRaisedList;
     print('employeeList11: ${SessionId}');
     RaisedQueryListModal raisedQueryListModal;
@@ -1566,7 +1566,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
       int subqueryObj
       )
   async {
-    String conn = ApiDetails.serverTwo;
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.querySendApi;
     CommonNotificationPage.showLoaderDialog(this.context);
 

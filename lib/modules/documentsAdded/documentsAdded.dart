@@ -60,7 +60,7 @@ class _DocumentsAddedState extends State<DocumentsAdded> {
   var titleName = 'My Documents';
 
   Future<DocumentListModal> getDocuments(String SessionId) async {
-    String conn = ApiDetails.serverTwo;
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.documentListApi;
     print('employeeList11: ${SessionId}');
     DocumentListModal documentListModal;
