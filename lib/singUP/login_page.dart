@@ -822,7 +822,7 @@ class _LoginPageState extends State<LoginPage> {
           shared.setDefaultProfileName(profileNameNew);
           shared.setDefaultProfileId(profileIdNew);
 
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD")) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD")) {
             print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
             levelOne = "true";
             shared.setLevelOne(levelOne);
@@ -832,7 +832,7 @@ class _LoginPageState extends State<LoginPage> {
             shared.setLevelOne(levelOne);
           }
 
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD")) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD")) {
             print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
             levelTwo = "true";
             shared.setLevelTwo(levelTwo);
@@ -957,15 +957,15 @@ class _LoginPageState extends State<LoginPage> {
               ? "1"
               : "0";
           // 🟢 Check if the selected profile has the Leave Request permission
-          String leaveReqMSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+          String leaveReqMSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_APP_MYTEAM_ADD") ?? false)
               ? "1"
               : "0";
           // 🟢 Check if the selected profile has the Leave Request L1 permission
-          String leaveReqL1MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
+          String leaveReqL1MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
               ? "1"
               : "0";
           // 🟢 Check if the selected profile has the Leave Request L2 permission
-          String leaveReqL2MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
+          String leaveReqL2MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
               ? "1"
               : "0";
           // 🟢 Check if the selected profile has the Leave Request L2 permission
@@ -1257,7 +1257,7 @@ class _LoginPageState extends State<LoginPage> {
           shared.setDefaultProfileName(profileNameNew);
           shared.setDefaultProfileId(profileIdNew);
 
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD")) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD")) {
             print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
             levelOne = "true";
             shared.setLevelOne(levelOne);
@@ -1267,7 +1267,7 @@ class _LoginPageState extends State<LoginPage> {
             shared.setLevelOne(levelOne);
           }
 
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD")) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD")  || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD")) {
             print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
             levelTwo = "true";
             shared.setLevelTwo(levelTwo);
@@ -1276,7 +1276,7 @@ class _LoginPageState extends State<LoginPage> {
             levelTwo = "false";
             shared.setLevelTwo(levelTwo);
           }
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD")) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_APP_MYTEAM_ADD")) {
             print("resopnse LEAVE_REQ_APPROVAL_ADD");
             pendingLeaveRequisitions = "true";
             shared.setPendingLeaveReq(pendingLeaveRequisitions);
@@ -1396,11 +1396,11 @@ class _LoginPageState extends State<LoginPage> {
               ? "1"
               : "0";
           // 🟢 Check if the selected profile has the Leave Request L1 permission
-          String leaveReqL1MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
+          String leaveReqL1MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
               ? "1"
               : "0";
           // 🟢 Check if the selected profile has the Leave Request L2 permission
-          String leaveReqL2MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
+          String leaveReqL2MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
               ? "1"
               : "0";
           // 🟢 Check if the selected profile has the Leave Request L2 permission
