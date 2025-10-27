@@ -3641,15 +3641,21 @@ class _DrawerFileState extends State<DrawerFile> {
                                   ? "1"
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request permission
-                              String leaveReqMSSPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false || selected.profilePermission!.contains("LEAVE_APP_MYTEAM_ADD") ?? false)
+                              String leaveReqMSSPermValue =
+                              ((selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false) ||
+                                  (selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request L1 permission
-                              String leaveReqL1MSSPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false || selected.profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
+                              String leaveReqL1MSSPermValue =
+                              ((selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false) ||
+                                  (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              String leaveReqL2MSSPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false || selected.profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false )
+                              String leaveReqL2MSSPermValue =
+                              ((selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false) ||
+                                  (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
@@ -3720,7 +3726,7 @@ class _DrawerFileState extends State<DrawerFile> {
                                   ? "1"
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request permission
-                              String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+                              /* String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
                                   ? "1"
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request L1 permission
@@ -3729,6 +3735,23 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
                               String leaveReqL2UISPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";*/
+                              String leaveReqUISPermValue =
+                              ((selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false) ||
+                                  (selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") ?? false))
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L1 permission
+                              String leaveReqL1UISPermValue =
+                              ((selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false) ||
+                                  (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
+                                  ? "1"
+                                  : "0";
+                              // 🟢 Check if the selected profile has the Leave Request L2 permission
+                              String leaveReqL2UISPermValue =
+                              ((selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false) ||
+                                  (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request L2 permission

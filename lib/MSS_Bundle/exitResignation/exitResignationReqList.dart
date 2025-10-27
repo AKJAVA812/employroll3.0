@@ -7,7 +7,6 @@ import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
 import '../../commanScreen/routes.dart';
 import '../../ess/EssDashboarrddModel.dart';
-import '../../ess/Model/myManagersModalList.dart';
 import '../../ess/essDashboardNavigate.dart';
 import '../../main.dart';
 import '../../profiles/profilePageWithHead.dart';
@@ -15,6 +14,8 @@ import '../../sharedPrefancePage/ShardPre.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../themes/empThemes.dart';
+import 'exitModalClasses/exitResignationRequisitionListModal.dart';
+import 'exitResignationReqL1AppovalPage.dart';
 class ExitResignationRequestPage extends StatefulWidget {
   @override
   _ExitResignationRequestPageState createState() => _ExitResignationRequestPageState();
@@ -25,20 +26,16 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+String? statusChange = "LEVEL_ONE_PENDING";
+dynamic getOrgId;
+dynamic userPermissions;
+dynamic getDefaultProfileId;
 List<ListData>? allUsernew=[];
 List<ListData>? foundDataNew=[];
-List<DottedEmpList>? allUsernewDotted=[];
 List pendingData =[];
-List<SharedEmpList>? allUsernewShared=[];
-List<DirectEmpList>? allUsernewDirect=[];
-List<DesignatedEmpList>? allUsernewDesignated=[];
-List<DottedEmpList>? foundDataNewDotted=[];
-List<SharedEmpList>? foundDataNewShared=[];
-List<DirectEmpList>? foundDataNewDirect=[];
-List<DesignatedEmpList>? foundDataNewDesignated=[];
 
-MyManagersModalList? myManagersModalListLabel;
-MyManagersModalList? myManagersModalListLabeled;
+ExitResignationRquisitionListModal? exitResignationRequisitionListLabel;
+ExitResignationRquisitionListModal? exitResignationRequisitionListLabeled;
 int valueChange = 0;
 class _ExitResignationRequestPageState extends State<ExitResignationRequestPage> with RouteAware{
   String selectedFilter = "L1";
@@ -84,8 +81,11 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    getOrgId = await shared!.getOrgId();
+    userPermissions = await shared!.getUserPanel();
+    getDefaultProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<MyManagersModalList> getEmployeeList11 = getMyReportingOfficersList(sessionId!);
+    Future<ExitResignationRquisitionListModal> getEmployeeList11 = getResignationRequisitionList(sessionId!);
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -96,26 +96,25 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
 
     getEmployeeList11.then((value) {
       setState(() {
+        foundDataNew = allUsernew;
         if(selectedFilter == "All") {
-          foundDataNew = allUsernew;
-        } if(selectedFilter == "L1") {
-          foundDataNewDotted = allUsernewDotted;
-        } if(selectedFilter == "L2") {
-          foundDataNewShared = allUsernewShared;
-        } if(selectedFilter == "Approved") {
-          foundDataNewDirect = allUsernewDirect;
-        }if(selectedFilter == "Disapproved") {
-          foundDataNewDesignated = allUsernewDesignated;
+          statusChange = "0";
+        }
+        if (selectedFilter == "L1") {
+          statusChange = "LEVEL_ONE_PENDING";
+        }
+        if (selectedFilter == "L2") {
+          statusChange = "LEVEL_TWO_PENDING";
         }
 
-        myManagersModalListLabel=value;
-        myManagersModalListLabeled=myManagersModalListLabel;
+        exitResignationRequisitionListLabel=value;
+        exitResignationRequisitionListLabeled=exitResignationRequisitionListLabel;
       });
-      print('All LIST - ${myManagersModalListLabel!.listData!.length}');
-      print('L1 LIST - ${myManagersModalListLabel!.dottedEmpList!.length}');
-      print('L2 LIST - ${myManagersModalListLabel!.sharedEmpList!.length}');
-      print('Approved LIST - ${myManagersModalListLabel!.directEmpList!.length}');
-      print('Disapproved LIST - ${myManagersModalListLabel!.designatedEmpList!.length}');
+      print('All LIST - ${exitResignationRequisitionListLabel!.data!.length}');
+     /* print('L1 LIST - ${exitResignationRequisitionListLabel!.dottedEmpList!.length}');
+      print('L2 LIST - ${exitResignationRequisitionListLabel!.sharedEmpList!.length}');
+      print('Approved LIST - ${exitResignationRequisitionListLabel!.directEmpList!.length}');
+      print('Disapproved LIST - ${exitResignationRequisitionListLabel!.designatedEmpList!.length}');*/
     });
 
 
@@ -161,18 +160,31 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
   bool isLoading = false;
   bool isLoadingCount = true;
 
-  Future<MyManagersModalList> getMyReportingOfficersList(String sessionId) async {
+  Future<ExitResignationRquisitionListModal> getResignationRequisitionList(String sessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.myManagersApi;
+    String apiUrl = ApiDetails.employeeResignationMSSList;
 
     print('employeeList11: $sessionId');
-
+    if (selectedFilter == "All") {
+      statusChange = "0";
+    }
+    if (selectedFilter == "L1") {
+      statusChange = "LEVEL_ONE_PENDING";
+    }
+    if (selectedFilter == "L2") {
+      statusChange = "LEVEL_TWO_PENDING";
+    }
     setState(() {
       isLoadingCount = true; // ✅ Start loader before API
     });
 
     try {
-      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+      var urlapi = Uri.parse("$conn$apiUrl?"
+          "sessionId=$sessionId&"
+          "status=$statusChange&"
+          "orgId=$getOrgId&"
+          "profId=$getDefaultProfileId&"
+          "permission=$userPermissions");
       final response = await http.post(urlapi);
 
       print('responseemployeeList ${response.body}');
@@ -187,22 +199,16 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         showNodata(context, "Oops", "There is no any requisition.");
       }
 
-      MyManagersModalList myManagersModalList = MyManagersModalList.fromJson(mapResponse);
-      print("mymanger ${myManagersModalList.listData}");
+      ExitResignationRquisitionListModal exitResignationRequisitionList = ExitResignationRquisitionListModal.fromJson(mapResponse);
+      print("mymanger ${exitResignationRequisitionList.data}");
       // Assign data based on selected filter
-      if (selectedFilter == "All") {
-        allUsernew = myManagersModalList.listData!;
-      } else if (selectedFilter == "Dotted") {
-        allUsernewDotted = myManagersModalList.dottedEmpList!;
-      } else if (selectedFilter == "Shared") {
-        allUsernewShared = myManagersModalList.sharedEmpList!;
-      } else if (selectedFilter == "Direct") {
-        allUsernewDirect = myManagersModalList.directEmpList!;
-      } else if (selectedFilter == "Designated") {
-        allUsernewDesignated = myManagersModalList.designatedEmpList!;
-      }
+      allUsernew = exitResignationRequisitionList.data!;
 
-      return myManagersModalList;
+
+      setState(() {
+
+      });
+      return exitResignationRequisitionList;
     } catch (e) {
       print("Error fetching reporting officers: $e");
       rethrow;
@@ -599,16 +605,16 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
           Expanded(
             child: isLoadingCount
                 ? Center(child: CircularProgressIndicator()) // Show loader
-                : myManagersModalListLabeled == null
+                : exitResignationRequisitionListLabeled == null
                 ? Center(child: Text("No Data Available"))
-                : getMyReportings(myManagersModalListLabeled!),
+                : getMyReportings(exitResignationRequisitionListLabeled!),
           ),
         ],
       ),
     );
   }
 
-  getMyReportings(MyManagersModalList myManagersModalList) {
+  getMyReportings(ExitResignationRquisitionListModal myManagersModalList) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
@@ -633,8 +639,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
                   filterChip("All"),
                   filterChip("L1"),
                   filterChip("L2"),
-                  filterChip("Approved"),
-                  filterChip("Disapproved"),
                 ],
               ),
             ),
@@ -642,276 +646,91 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
           Divider(thickness: 1),
 
           // List
-
-          Visibility(
-            visible: selectedFilter == "All",
-            child: Expanded(
-              child: ListView.builder(
-                itemCount: foundDataNew!.length,
-                itemBuilder: (context, index) {
-                  var officer = foundDataNew![index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
-                    child: ListTile(
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      title: Text(
-                        "${foundDataNew![index].reportingOfficerName.toString()} (EMPCODE)",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
+          Expanded(
+            child: ListView.builder(
+              itemCount: foundDataNew!.length,
+              itemBuilder: (context, index) {
+                var officer = foundDataNew![index];
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  elevation: 4,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border(
+                        left: BorderSide(
+                          color: Mythemes.lightBluishColor,
+                          width: 6, // Left colored curved border
                         ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Department: Sales",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.deepPurple),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            "DOJ: 04-04-2025",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.deepPurple),
-                          ),
-                          Text(
-                            "Raised On: 2025-10-24",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.deepPurple),
-                          ),
-                          Text(
-                            "Requisition Date: 2025-10-24",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.deepPurple),
-                          ),
-                        ],
-                      ),
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.deepPurple.shade100,
-                        child: Icon(Icons.person, color: Colors.deepPurple),
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          Visibility(
-            visible: selectedFilter == "L1",
-            child: Expanded(
-              child: ListView.builder(
-                itemCount: foundDataNewDirect!.length,
-                itemBuilder: (context, index) {
-                  var officer = foundDataNewDirect![index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
                     child: ListTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ExitResignationL1ApprovalPage()),
+                        );
+                      },
                       contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      title: Text(
-                        foundDataNewDirect![index].reportingOfficerName.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      title:
+                      Row(
                         children: [
-                          Text(
-                            "Type: ${ foundDataNewDirect![index].reportieeType.toString()}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.deepPurple),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            foundDataNewDirect![index].profileName.toString(),
-                            style: TextStyle(
+                          Expanded(
+                            child: Text(
+                              "${foundDataNew![index].empName.toString()} (${foundDataNew![index].empCode.toString()})",
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.grey[700]),
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
                           ),
+                          foundDataNew![index].statusShow.toString().text.fontWeight(FontWeight.w900).size(14).color(Mythemes.lightBluishColor).make()
                         ],
                       ),
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.deepPurple.shade100,
-                        child: Icon(Icons.person, color: Colors.deepPurple),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
 
-          Visibility(
-            visible: selectedFilter == "L2",
-            child: Expanded(
-              child: ListView.builder(
-                itemCount: foundDataNewDesignated!.length,
-                itemBuilder: (context, index) {
-                  var officer = foundDataNewDesignated![index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
-                    child: ListTile(
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      title: Text(
-                        foundDataNewDesignated![index].reportingOfficerName.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Type: ${ foundDataNewDesignated![index].reportieeType.toString()}",
+                            "Department: ${foundDataNew![index].department.toString()}",
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: Colors.deepPurple),
+                                color: Mythemes.blackish),
                           ),
                           SizedBox(height: 4),
                           Text(
-                            foundDataNewDesignated![index].profileName.toString(),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[700]),
-                          ),
-                        ],
-                      ),
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.deepPurple.shade100,
-                        child: Icon(Icons.person, color: Colors.deepPurple),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          Visibility(
-            visible: selectedFilter == "Approved",
-            child: Expanded(
-              child: ListView.builder(
-                itemCount: foundDataNewShared!.length,
-                itemBuilder: (context, index) {
-                  var officer = foundDataNewShared![index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
-                    child: ListTile(
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      title: Text(
-                        foundDataNewShared![index].reportingOfficerName.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Type: ${ foundDataNewShared![index].reportieeType.toString()}",
+                            "DOJ: ${foundDataNew![index].doj.toString()}",
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: Colors.deepPurple),
+                                color: Mythemes.blackish),
                           ),
-                          SizedBox(height: 4),
                           Text(
-                            foundDataNewShared![index].profileName.toString(),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[700]),
-                          ),
-                        ],
-                      ),
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.deepPurple.shade100,
-                        child: Icon(Icons.person, color: Colors.deepPurple),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-
-          Visibility(
-            visible: selectedFilter == "Disapproved",
-            child: Expanded(
-              child: ListView.builder(
-                itemCount: foundDataNewDotted!.length,
-                itemBuilder: (context, index) {
-                  var officer = foundDataNewDotted![index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
-                    child: ListTile(
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      title: Text(
-                        foundDataNewDotted![index].reportingOfficerName.toString(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Type: ${ foundDataNewDotted![index].reportieeType.toString()}",
+                            "Raised On: ${foundDataNew![index].requestDate.toString()}",
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
-                                color: Colors.deepPurple),
+                                color: Mythemes.blackish),
                           ),
-                          SizedBox(height: 4),
                           Text(
-                            foundDataNewDotted![index].profileName.toString(),
+                            "Requisition Date: ${foundDataNew![index].requestDate.toString()}",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey[700]),
+                                fontWeight: FontWeight.w600,
+                                color: Mythemes.blackish),
                           ),
                         ],
                       ),
-                      leading: CircleAvatar(
+                      //trailing: foundDataNew![index].statusShow.toString().text.bold.size(14).color(Mythemes.lightBluishColor).make(),
+                     /* leading: CircleAvatar(
                         backgroundColor: Colors.deepPurple.shade100,
                         child: Icon(Icons.person, color: Colors.deepPurple),
-                      ),
+                      ),*/
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -934,8 +753,19 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         onSelected: (val) {
           setState(() {
             selectedFilter = label;
+
+            // set statusChange immediately BEFORE making API call
+            if (selectedFilter == "All") {
+              statusChange = "0";
+            } else if (selectedFilter == "L1") {
+              statusChange = "LEVEL_ONE_PENDING";
+            } else if (selectedFilter == "L2") {
+              statusChange = "LEVEL_TWO_PENDING";
+            }
+
+            // now fetch list with correct statusChange value
             getSharedPrfanceList();
-            print("Selected Filter - $selectedFilter");
+            print("Selected Filter - $selectedFilter, statusChange - $statusChange");
           });
         },
       ),
