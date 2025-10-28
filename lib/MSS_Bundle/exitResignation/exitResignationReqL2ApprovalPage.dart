@@ -316,6 +316,9 @@ class _ExitResignationL2ApprovalPageState
                 ),*/
                 formLabel("Reason for Leaving"),
                 TextFormField(
+                  style: TextStyle(
+                    color: Mythemes.blackish
+                  ),
                   controller: reasonForLeavingController,
                   enabled: false,
                   decoration: const InputDecoration(
@@ -325,7 +328,11 @@ class _ExitResignationL2ApprovalPageState
                 ),
                 const SizedBox(height: 15),
 
+                formLabel("Resignation Date"),
                 TextFormField(
+                  style: TextStyle(
+                      color: Mythemes.black
+                  ),
                   onTap: () async {
                     DateTime? fromDate = DateTime.now();
                     FocusScope.of(context).requestFocus(FocusNode());
@@ -358,7 +365,7 @@ class _ExitResignationL2ApprovalPageState
                         Icon(Icons.calendar_month, size: 18),
                       ],
                     ),
-                    labelText: "Resignation Date",
+                    hintText: "Resignation Date",
                     contentPadding: EdgeInsets.all(5),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(width: 1, color: Mythemes.blackishade),
@@ -374,6 +381,9 @@ class _ExitResignationL2ApprovalPageState
 
                 formLabel("Notice Period (Official)"),
                 TextFormField(
+                  style: TextStyle(
+                      color: Mythemes.black
+                  ),
                   controller: noticePeriodController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
@@ -383,7 +393,11 @@ class _ExitResignationL2ApprovalPageState
                 ),
                 const SizedBox(height: 15),
 
+                formLabel("Last Working Date"),
                 TextFormField(
+                  style: TextStyle(
+                      color: Mythemes.black
+                  ),
                   onTap: () async {
                     FocusScope.of(context).requestFocus(FocusNode()); // to prevent keyboard
                     DateTime? fromDate = await showDatePicker(
@@ -417,7 +431,7 @@ class _ExitResignationL2ApprovalPageState
                         Icon(Icons.calendar_month, size: 18),
                       ],
                     ),
-                    labelText: "Last Working Date",
+                    hintText: "Last Working Date",
                     contentPadding: EdgeInsets.all(5),
                     enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(width: 1, color: Mythemes.blackishade),
@@ -433,6 +447,9 @@ class _ExitResignationL2ApprovalPageState
 
                 formLabel("Reason for Leaving"),
                 TextFormField(
+                  style: TextStyle(
+                      color: Mythemes.black
+                  ),
                   controller: empRemarksController,
                   readOnly: true,
                   maxLines: 2,
@@ -444,6 +461,9 @@ class _ExitResignationL2ApprovalPageState
 
                 formLabel("L1 Remarks"),
                 TextFormField(
+                  style: TextStyle(
+                      color: Mythemes.black
+                  ),
                   controller: l1remarksController,
                   maxLines: 2,
                   readOnly: true,
