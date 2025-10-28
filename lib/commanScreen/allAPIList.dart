@@ -243,5 +243,9 @@ class ApiDetails{
    static var reasonForLeavingListApi = "restful/service/ess/reason/for/leaving/list";
    static var resignationRequisitionSaveApi = "restful/service/save/self/ess/employee";
    static var employeeResignationList = "restful/service/get/self/resignation/list";
+   //MSS Resignation Requisition List API
+   static var employeeResignationMSSList = "restful/service/get/org/ess/resignation/list/for/mss";
+   static var fetchSingleEmployeeExitData = "restful/service/get/fetch/ess/exit/details";
+
 
 }
