@@ -16,6 +16,7 @@ import 'package:velocity_x/velocity_x.dart';
 import '../../themes/empThemes.dart';
 import 'exitModalClasses/exitResignationRequisitionListModal.dart';
 import 'exitResignationReqL1AppovalPage.dart';
+import 'exitResignationReqL2ApprovalPage.dart';
 class ExitResignationRequestPage extends StatefulWidget {
   @override
   _ExitResignationRequestPageState createState() => _ExitResignationRequestPageState();
@@ -24,7 +25,7 @@ class ExitResignationRequestPage extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
-
+dynamic requestIdSend;
 String? sessionId;
 String? statusChange = "LEVEL_ONE_PENDING";
 dynamic getOrgId;
@@ -39,6 +40,7 @@ ExitResignationRquisitionListModal? exitResignationRequisitionListLabeled;
 int valueChange = 0;
 class _ExitResignationRequestPageState extends State<ExitResignationRequestPage> with RouteAware{
   String selectedFilter = "L1";
+
 
   @override
   void didChangeDependencies() {
@@ -668,10 +670,41 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
                     ),
                     child: ListTile(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ExitResignationL1ApprovalPage()),
-                        );
+                        requestIdSend = foundDataNew![index].requestId;
+                        if (selectedFilter == "All") {
+                          if(foundDataNew![index].statusShow == "LEVEL_1_PENDING") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ExitResignationL1ApprovalPage(
+                                  requestId:requestIdSend
+                              )),
+                            );
+                          } else if(foundDataNew![index].statusShow == "LEVEL_2_PENDING") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ExitResignationL2ApprovalPage(
+                                  requestId:requestIdSend
+                              )),
+                            );
+                          }
+                        }
+                        if (selectedFilter == "L1") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ExitResignationL1ApprovalPage(
+                                requestId:requestIdSend
+                            )),
+                          );
+                        }
+                        if (selectedFilter == "L2") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ExitResignationL2ApprovalPage(
+                                requestId:requestIdSend
+                            )),
+                          );
+                        }
+
                       },
                       contentPadding:
                       EdgeInsets.symmetric(horizontal: 16, vertical: 12),
