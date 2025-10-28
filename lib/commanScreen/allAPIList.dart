@@ -246,6 +246,10 @@ class ApiDetails{
    //MSS Resignation Requisition List API
    static var employeeResignationMSSList = "restful/service/get/org/ess/resignation/list/for/mss";
    static var fetchSingleEmployeeExitData = "restful/service/get/fetch/ess/exit/details";
+   static var approveResignationRequestL1 = "restful/service/org/ess/approval/level/one";
+   static var disApproveResignationRequestL1 = "restful/service/org/ess/disapproval/level/one";
+   static var approveResignationRequestL2 = "restful/service/org/ess/approval/level/two";
+   static var disApproveResignationRequestL2 = "restful/service/org/ess/disapproval/level/two";
 
 
 }
