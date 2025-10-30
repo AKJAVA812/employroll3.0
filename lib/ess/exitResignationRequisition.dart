@@ -667,6 +667,7 @@ String valuenew="listText";
 
                       if (noticeServing)
                         TextFormField(
+                          keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                             labelText: "Notice Period (To be served in Days)",
                           ),

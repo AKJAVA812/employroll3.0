@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../commanScreen/allAPIList.dart';
@@ -85,7 +86,7 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
     super.didUpdateWidget(oldWidget);
   }
 
-  Future getSharedPrfanceList() async {
+  /*Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     getOrgId = await shared!.getOrgId();
     userPermissions = await shared!.getUserPanel();
@@ -129,13 +130,58 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         exitResignationRequisitionListLabeled=exitResignationRequisitionListLabel;
       });
       print('All LIST - ${exitResignationRequisitionListLabel!.data!.length}');
-     /* print('L1 LIST - ${exitResignationRequisitionListLabel!.dottedEmpList!.length}');
+     *//* print('L1 LIST - ${exitResignationRequisitionListLabel!.dottedEmpList!.length}');
       print('L2 LIST - ${exitResignationRequisitionListLabel!.sharedEmpList!.length}');
       print('Approved LIST - ${exitResignationRequisitionListLabel!.directEmpList!.length}');
-      print('Disapproved LIST - ${exitResignationRequisitionListLabel!.designatedEmpList!.length}');*/
+      print('Disapproved LIST - ${exitResignationRequisitionListLabel!.designatedEmpList!.length}');*//*
     });
 
 
+  }*/
+
+  Future getSharedPrfanceList({bool fromUser = false}) async {
+    sessionId = await shared!.getSessionId();
+    getOrgId = await shared!.getOrgId();
+    userPermissions = await shared!.getUserPanel();
+    getDefaultProfileId = await shared!.getDefaultProfileId();
+    exitResignationL1ApprovalShow = await shared!.getExitResignationApproveL1Show();
+    exitResignationL1ApprovalView = await shared!.getExitResignationApproveL1View();
+    exitResignationL2ApprovalShow = await shared!.getExitResignationApproveL2Show();
+    exitResignationL2ApprovalView = await shared!.getExitResignationApproveL2View();
+
+    // 👇 Skip resetting selectedFilter if triggered from user selection
+    if (!fromUser) {
+      if (exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1") {
+        selectedFilter = "L1";
+      }
+      if (exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1") {
+        selectedFilter = "L2";
+      }
+      if ((exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1") &&
+          (exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1")) {
+        selectedFilter = "All";
+      }
+    }
+
+    Future<ExitResignationRquisitionListModal> getEmployeeList11 =
+    getResignationRequisitionList(sessionId!);
+
+    getEmployeeList11.then((value) {
+      setState(() {
+        foundDataNew = allUsernew;
+        if (selectedFilter == "All") {
+          statusChange = "0";
+        } else if (selectedFilter == "L1") {
+          statusChange = "LEVEL_ONE_PENDING";
+        } else if (selectedFilter == "L2") {
+          statusChange = "LEVEL_TWO_PENDING";
+        }
+
+        exitResignationRequisitionListLabel = value;
+        exitResignationRequisitionListLabeled = exitResignationRequisitionListLabel;
+      });
+      print('All LIST - ${exitResignationRequisitionListLabel!.data!.length}');
+    });
   }
 
   showNodata(BuildContext buildContext, result,reason) {
@@ -237,6 +283,38 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
     }
   }
 
+  void _runFilter(String enteredKeyword) {
+    print('value$enteredKeyword');
+    List<ListData>?  resultsAll = [];
+
+    if (enteredKeyword.isEmpty) {
+      // if the search field is empty or only contains white-space, we'll display all users
+      //results = _allUsers;
+      setState(() {
+        //results = allUsernew;
+        resultsAll = allUsernew;
+      });
+    } else {
+      /*results = allUsernew.where((user) =>
+        user!.data!.contains(enteredKeyword.toLowerCase()))
+          .toList();*/
+
+      resultsAll = allUsernew?.where((element) =>
+          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+
+      /*for(int i=0; i<inductionListLabel!.data!.length;i++){
+        if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
+          // Refresh the UI
+          setState(() {
+            inductionListLabeldd=inductionResult;
+          });
+        }*/
+    }
+    // we use the toLowerCase() method to make it case-insensitive
+    setState(() {
+      foundDataNew = resultsAll;
+    });
+  }
 
   final List<Map<String, String>> officers = [
     {
@@ -265,17 +343,46 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
     if (selectedFilter == "All") return officers;
     return officers.where((o) => o["type"] == selectedFilter).toList();
   }
+  TextEditingController searchType = TextEditingController();
   int currentIndex = 2;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Resignation Request List",
-          style: TextStyle(fontWeight: FontWeight.bold),
+      appBar: PreferredSize(
+        preferredSize: Size(double.infinity, 100),
+        child: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(color: Colors.white, border: Border(
+                top: BorderSide.none
+            ), boxShadow: [
+              BoxShadow(
+                  color: Colors.grey,
+                  blurRadius: 0.5,
+                  spreadRadius: 0,
+                  offset: Offset(0, 0.2))
+            ]),
+            child: AnimationSearchBar(
+                searchFieldDecoration: BoxDecoration(
+                  color: Mythemes.greyishade,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                backIcon: Icons.arrow_back_ios,
+                backIconColor: Mythemes.black,
+                textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                onChanged: (value) {
+                  _runFilter(value);
+                },
+                horizontalPadding: 8,
+                searchIconColor: Mythemes.black,
+                centerTitle: "Resignation Request List - ${foundDataNew!.length}",
+                verticalPadding: 3,
+                centerTitleStyle: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                    color: Mythemes.black),
+                searchTextEditingController: searchType),
+          ),
         ),
-        //backgroundColor: Colors.deepPurple,
-        elevation: 3,
       ),
       /*body: Column(
         children: [
@@ -813,7 +920,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
           setState(() {
             selectedFilter = label;
 
-            // set statusChange immediately BEFORE making API call
             if (selectedFilter == "All") {
               statusChange = "0";
             } else if (selectedFilter == "L1") {
@@ -822,8 +928,8 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
               statusChange = "LEVEL_TWO_PENDING";
             }
 
-            // now fetch list with correct statusChange value
-            getSharedPrfanceList();
+            // ✅ Prevent auto-reset
+            getSharedPrfanceList(fromUser: true);
             print("Selected Filter - $selectedFilter, statusChange - $statusChange");
           });
         },
