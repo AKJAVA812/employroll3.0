@@ -1,9 +1,9 @@
 
 class ApiDetails{
    //Base Server Address
-   //static var server="http://www.employroll.com/";
-
-   static var server="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
+   static var server="http://www.employroll.com/";
+   
+   //static var server="https://sutton-optometrical-dishonourably.ngrok-free.dev/";
    //Attendance Punch in and Punch out
    static String login="restful/service/login";
    static String punchIn="restful/service/attendance/via/mobile";
