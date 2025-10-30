@@ -77,7 +77,12 @@ int currentIndex = 0;
 var orgId;
 var setGeofenceActive;
 dynamic empIdGet;
-var myTeamShow = "false";
+var myTeamShow = "0";
+var exitResignationListView = "0";
+var exitResignationApproveL1View = "0";
+var exitResignationApproveL2View = "0";
+var exitResignationDisApproveL1View = "0";
+var exitResignationDisApproveL2View = "0";
 Position? positionCheck = Position(
     longitude: 0.0,
     latitude: 0.0,
@@ -3059,180 +3064,448 @@ class _DrawerFileState extends State<DrawerFile> {
 
                               //MSS MO
                               // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                              String pendingAttReqMOPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") ?? false)
+                              /*String pendingAttReqMOPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") == true) {
+                                shared.setPendingAttendanceReqMSSMOPermission("1");
+                              } else {
+                                shared.setPendingAttendanceReqMSSMOPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request permission
-                              String leaveReqMOPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
+                              /*String leaveReqMOPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") == true) {
+                                shared.setPendingLeaveReqMSSMOPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqMSSMOPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L1 permission
-                              String leaveReqL1MOPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
+                              /*String leaveReqL1MOPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") == true) {
+                                shared.setPendingLeaveReqL1MSSMOPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqL1MSSMOPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
+                              /* String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true) {
+                                shared.setPendingLeaveReqL2MSSMOPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqL2MSSMOPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              String othersLeaveReqMOPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") ?? false)
+                              /* String othersLeaveReqMOPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") == true) {
+                                shared.setOthersLeaveReqMSSMOPermission("1");
+                              } else {
+                                shared.setOthersLeaveReqMSSMOPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L1 permission
-                              String pendingClaimL1MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                              /*String pendingClaimL1MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
+                                shared.setClaimLevelOneMO("1");
+                                permissionNotifier.updatePermission("1");
+                              } else {
+                                shared.setClaimLevelOneMO("0");
+                                permissionNotifier.updatePermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L2 permission
-                              String pendingClaimL2MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                              /*String pendingClaimL2MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
+                                shared.setClaimLevelTwoMO("1");
+                                permissionNotifier.updatePermission("1");
+                              } else {
+                                shared.setClaimLevelTwoMO("0");
+                                permissionNotifier.updatePermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L3 permission
-                              String pendingClaimL3MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                              /*String pendingClaimL3MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
+                                shared.setClaimLevelThreeMO("1");
+                                permissionNotifier.updatePermission("1");
+                              } else {
+                                shared.setClaimLevelThreeMO("0");
+                                permissionNotifier.updatePermission("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Pending List permission
-                              String pendingODListMOPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                              /* String pendingODListMOPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
+                                shared.setODPendingListMO("1");
+                              } else {
+                                shared.setODPendingListMO("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Activate permission
-                              String odActivateMOPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                              /*String odActivateMOPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
+                                shared.setODActivateMO("1");
+                              } else {
+                                shared.setODActivateMO("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Activate permission
-                              String loanActivateMOPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                              /*String loanActivateMOPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
+                                shared.setLoanPendingListMO("1");
+                              } else {
+                                shared.setLoanPendingListMO("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L1 permission
-                              String loanApprovalL1Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                              /*String loanApprovalL1Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
+                                shared.setLoanApprovalL1MO("LOAN_APPROVAL_LEVEL_ONE_ADD");
+                              } else {
+                                shared.setLoanApprovalL1MO("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L2 permission
-                              String loanApprovalL2Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                              /*String loanApprovalL2Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") == true) {
+                                shared.setLoanApprovalL2MO("LOAN_APPROVAL_LEVEL_TWO_ADD");
+                              } else {
+                                shared.setLoanApprovalL2MO("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L3 permission
-                              String loanApprovalL3Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                              /*String loanApprovalL3Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") == true) {
+                                shared.setLoanApprovalL3MO("LOAN_APPROVAL_LEVEL_THREE_ADD");
+                              } else {
+                                shared.setLoanApprovalL3MO("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
-                              String loanApprovalL1DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                              /*String loanApprovalL1DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL1MO("LOAN_APPROVAL_LEVEL_ONE_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL1MO("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
-                              String loanApprovalL2DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                              /*String loanApprovalL2DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL2MO("LOAN_APPROVAL_LEVEL_TWO_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL2MO("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
-                              String loanApprovalL3DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                              /*String loanApprovalL3DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL3MO("LOAN_APPROVAL_LEVEL_THREE_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL3MO("0");
+                              }
 
                               // 🟢 Check if the selected profile has the OD Pending List permission
-                              String pendingAttendanceRequestMOL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                              /*String pendingAttendanceRequestMOL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATT_APP_ONE_ADD") == true) {
+                                shared.setPendingAttendanceReqL1MO("1");
+                              } else {
+                                shared.setPendingAttendanceReqL1MO("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Activate permission
-                              String pendingAttendanceRequestMOL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                              /*String pendingAttendanceRequestMOL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATT_APP_TWO_ADD") == true) {
+                                shared.setPendingAttendanceReqL2MO("1");
+                              } else {
+                                shared.setPendingAttendanceReqL2MO("0");
+                              }
                               // 🟢 Check if the selected profile has the MY Team Activate permission
-                              myTeamShow = (selected.profilePermission?.contains("HRIS_EMP_LIST_VIEW") ?? false)
+                              /* myTeamShow = (selected.profilePermission?.contains("HRIS_EMP_LIST_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("HRIS_EMP_LIST_VIEW") == true){
+                                shared.setMyTeamShow("true");
+                                shared.setMyTeamPageShow("1");
+                              } else {
+                                shared.setMyTeamShow("false");
+                                shared.setMyTeamPageShow("0");
+                              }
+
+                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
+                              // exitResignationListView = (selected.profilePermission?.contains("EXIT_RESIGN_REQUEST_LIST_VIEW") ?? false)
+                              //     ? "1"
+                              //     : "0";
+                              if(selected.profilePermission?.contains("EXIT_RESIGN_REQUEST_LIST_VIEW") == true) {
+                                print("true");
+                                shared.setExitResignationListShow("true");
+                                shared.setExitResignationListView("1");
+                              }
+                              else {
+                                print("false");
+                                shared.setExitResignationListShow("false");
+                                shared.setExitResignationListView("0");
+                              }
+                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
+                              /*exitResignationApproveL1View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                  ? "1"
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD") == true) {
+                                shared.setExitResignationApproveL1View("1");
+                              } else {
+                                shared.setExitResignationApproveL1View("0");
+                              }
+                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
+                              /*exitResignationApproveL2View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                  ? "1"
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD") == true) {
+                                shared.setExitResignationApproveL2View("1");
+                              } else {
+                                shared.setExitResignationApproveL2View("0");
+                              }
+
+                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
+                              /* exitResignationDisApproveL1View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                  ? "1"
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE") == true) {
+                                shared.setExitResignationDisApproveL1View("1");
+                              } else {
+                                shared.setExitResignationDisApproveL1View("0");
+                              }
+                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
+                              /*exitResignationDisApproveL2View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                  ? "1"
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE") == true) {
+                                shared.setExitResignationDisApproveL2View("1");
+                              } else {
+                                shared.setExitResignationDisApproveL2View("0");
+                              }
 
 
                               //MSS
                               // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                              String pendingAttReqMSSPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+                              /*String pendingAttReqMSSPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") == true) {
+                                shared.setPendingAttendanceReqMSSPermission("1");
+                              } else {
+                                shared.setPendingAttendanceReqMSSPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request permission
-                              String leaveReqMSSPermValue =
+                              /*String leaveReqMSSPermValue =
                               ((selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") ?? false))
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+
+                              if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") == true || selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") == true) {
+                                shared.setPendingLeaveReqMSSPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqMSSPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L1 permission
-                              String leaveReqL1MSSPermValue =
+                              /* String leaveReqL1MSSPermValue =
                               ((selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+
+                              if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+                                shared.setPendingLeaveReqL1MSSPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqL1MSSPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              String leaveReqL2MSSPermValue =
+                              /* String leaveReqL2MSSPermValue =
                               ((selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+                                shared.setPendingLeaveReqL2MSSPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqL2MSSPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              String othersLeaveReqMSSPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+                              /*String othersLeaveReqMSSPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") == true) {
+                                shared.setOthersLeaveReqMSSPermission("1");
+                              } else {
+                                shared.setOthersLeaveReqMSSPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L1 permission
-                              String pendingClaimL1Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                              /*String pendingClaimL1Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
+                                shared.setClaimLevelOne("1");
+                                permissionNotifier.updatePermission("1");
+                              } else {
+                                shared.setClaimLevelOne("0");
+                                permissionNotifier.updatePermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L2 permission
-                              String pendingClaimL2Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                              /*String pendingClaimL2Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
+                                shared.setClaimLevelTwo("1");
+                                permissionNotifier.updatePermission("1");
+                              } else {
+                                shared.setClaimLevelTwo("0");
+                                permissionNotifier.updatePermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L3 permission
-                              String pendingClaimL3Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                              /* String pendingClaimL3Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
+                                shared.setClaimLevelThree("1");
+                                permissionNotifier.updatePermission("1");
+                              } else {
+                                shared.setClaimLevelThree("0");
+                                permissionNotifier.updatePermission("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Pending List permission
-                              String pendingODListPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                              /*String pendingODListPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
+                                shared.setODPendingList("1");
+                              } else {
+                                shared.setODPendingList("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Activate permission
-                              String odActivatePermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                              /*String odActivatePermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
+                                shared.setODActivate("1");
+                              } else {
+                                shared.setODActivate("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Activate permission
-                              String loanActivatePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                              /* String loanActivatePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
+                                shared.setLoanPendingList("1");
+                              } else {
+                                shared.setLoanPendingList("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L1 permission
-                              String loanApprovalL1MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                              /*String loanApprovalL1MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
+                                shared.setLoanApprovalL1MSS("LOAN_APPROVAL_LEVEL_ONE_ADD");
+                              } else {
+                                shared.setLoanApprovalL1MSS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L2 permission
-                              String loanApprovalL2MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                              /*String loanApprovalL2MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") == true) {
+                                shared.setLoanApprovalL2MSS("LOAN_APPROVAL_LEVEL_TWO_ADD");
+                              } else {
+                                shared.setLoanApprovalL2MSS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L3 permission
-                              String loanApprovalL3MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                              /*String loanApprovalL3MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") == true) {
+                                shared.setLoanApprovalL3MSS("LOAN_APPROVAL_LEVEL_THREE_ADD");
+                              } else {
+                                shared.setLoanApprovalL3MSS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
-                              String loanApprovalL1MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                              /*String loanApprovalL1MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL1MSS("LOAN_APPROVAL_LEVEL_ONE_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL1MSS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
-                              String loanApprovalL2MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                              /*String loanApprovalL2MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL2MSS("LOAN_APPROVAL_LEVEL_TWO_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL2MSS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
-                              String loanApprovalL3MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                              /*String loanApprovalL3MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL3MSS("LOAN_APPROVAL_LEVEL_THREE_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL3MSS("0");
+                              }
 
                               // 🟢 Check if the selected profile has the OD Pending List permission
-                              String pendingAttendanceRequestMSSL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                              /* String pendingAttendanceRequestMSSL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATT_APP_ONE_ADD") == true) {
+                                shared.setPendingAttendanceReqL1MSS("1");
+                              } else {
+                                shared.setPendingAttendanceReqL1MSS("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Activate permission
-                              String pendingAttendanceRequestMSSL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                              /*String pendingAttendanceRequestMSSL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATT_APP_TWO_ADD") == true) {
+                                shared.setPendingAttendanceReqL2MSS("1");
+                              } else {
+                                shared.setPendingAttendanceReqL2MSS("0");
+                              }
 
                               //USER
                               // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                              String pendingAttReqUISPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+                              /*String pendingAttReqUISPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") == true) {
+                                shared.setPendingAttendanceReqUISPermission("1");
+                              } else {
+                                shared.setPendingAttendanceReqUISPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request permission
-                             /* String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+                              /* String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
                                   ? "1"
                                   : "0";
                               // 🟢 Check if the selected profile has the Leave Request L1 permission
@@ -3243,87 +3516,177 @@ class _DrawerFileState extends State<DrawerFile> {
                               String leaveReqL2UISPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              String leaveReqUISPermValue =
+                              /*String leaveReqUISPermValue =
                               ((selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") ?? false))
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") == true || selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") == true) {
+                                shared.setPendingLeaveReqUISPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqUISPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L1 permission
-                              String leaveReqL1UISPermValue =
+                              /* String leaveReqL1UISPermValue =
                               ((selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+                                shared.setPendingLeaveReqL1UISPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqL1UISPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              String leaveReqL2UISPermValue =
+                              /*String leaveReqL2UISPermValue =
                               ((selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+                                shared.setPendingLeaveReqL2UISPermission("1");
+                              } else {
+                                shared.setPendingLeaveReqL2UISPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              String othersLeaveReqUISPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+                              /*  String othersLeaveReqUISPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") == true) {
+                                shared.setOthersLeaveReqUISPermission("1");
+                              } else {
+                                shared.setOthersLeaveReqUISPermission("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L1 permission
-                              String pendingClaimL1UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                              /*String pendingClaimL1UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
+                                shared.setClaimLevelOneUIS("1");
+                              } else {
+                                shared.setClaimLevelOneUIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L2 permission
-                              String pendingClaimL2UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                              /*String pendingClaimL2UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
+                                shared.setClaimLevelTwoUIS("1");
+                              } else {
+                                shared.setClaimLevelTwoUIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Claim L3 permission
-                              String pendingClaimL3UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                              /*String pendingClaimL3UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
+                                shared.setClaimLevelThreeUIS("1");
+                              } else {
+                                shared.setClaimLevelThreeUIS("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Pending List permission
-                              String pendingODListUISPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                              /*String pendingODListUISPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
+                                shared.setODPendingListUIS("1");
+                              } else {
+                                shared.setODPendingListUIS("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Activate permission
-                              String odActivateUISPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                              /*String odActivateUISPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
+                                shared.setODActivateUIS("1");
+                              } else {
+                                shared.setODActivateUIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Activate permission
-                              String loanActivateUISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                              /*String loanActivateUISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
+                                shared.setLoanPendingListUIS("1");
+                              } else {
+                                shared.setLoanPendingListUIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L1 permission
-                              String loanApprovalL1UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                              /*String loanApprovalL1UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
+                                shared.setLoanApprovalL1UIS("LOAN_APPROVAL_LEVEL_ONE_ADD");
+                              } else {
+                                shared.setLoanApprovalL1UIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L2 permission
-                              String loanApprovalL2UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                              /*String loanApprovalL2UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") == true) {
+                                shared.setLoanApprovalL2UIS("LOAN_APPROVAL_LEVEL_TWO_ADD");
+                              } else {
+                                shared.setLoanApprovalL2UIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L3 permission
-                              String loanApprovalL3UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                              /*String loanApprovalL3UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") == true) {
+                                shared.setLoanApprovalL3UIS("LOAN_APPROVAL_LEVEL_THREE_ADD");
+                              } else {
+                                shared.setLoanApprovalL3UIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
-                              String loanApprovalL1UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                              /*String loanApprovalL1UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL1UIS("LOAN_APPROVAL_LEVEL_ONE_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL1UIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
-                              String loanApprovalL2UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                              /*String loanApprovalL2UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL2UIS("LOAN_APPROVAL_LEVEL_TWO_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL2UIS("0");
+                              }
                               // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
-                              String loanApprovalL3UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                              /*String loanApprovalL3UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") == true) {
+                                shared.setLoanApprovalDeleteL3UIS("LOAN_APPROVAL_LEVEL_THREE_DELETE");
+                              } else {
+                                shared.setLoanApprovalDeleteL3UIS("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Pending List permission
-                              String pendingAttendanceRequestUISL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                              /*String pendingAttendanceRequestUISL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATT_APP_ONE_ADD") == true) {
+                                shared.setPendingAttendanceReqL1UIS("1");
+                              } else {
+                                shared.setPendingAttendanceReqL1UIS("0");
+                              }
                               // 🟢 Check if the selected profile has the OD Activate permission
-                              String pendingAttendanceRequestUISL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                              /*String pendingAttendanceRequestUISL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
                                   ? "1"
-                                  : "0";
+                                  : "0";*/
+                              if(selected.profilePermission?.contains("ATT_APP_TWO_ADD") == true) {
+                                shared.setPendingAttendanceReqL2UIS("1");
+                              } else {
+                                shared.setPendingAttendanceReqL2UIS("0");
+                              }
 
 
                               // 🟢 Save the MSS MO permission to SharedPreferences
-                              await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
+                              /*await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
                               await shared.setPendingLeaveReqMSSMOPermission(leaveReqMOPermValue);
                               await shared.setPendingLeaveReqL1MSSMOPermission(leaveReqL1MOPermValue);
                               await shared.setPendingLeaveReqL2MSSMOPermission(leaveReqL2MOPermValue);
@@ -3343,6 +3706,11 @@ class _DrawerFileState extends State<DrawerFile> {
                               shared.setPendingAttendanceReqL1MO(pendingAttendanceRequestMOL1);
                               shared.setPendingAttendanceReqL2MO(pendingAttendanceRequestMOL2);
                               shared.setMyTeamPageShow(myTeamShow);
+                              shared.setExitResignationListView(exitResignationListView);
+                              shared.setExitResignationApproveL1View(exitResignationApproveL1View);
+                              shared.setExitResignationApproveL2View(exitResignationApproveL2View);
+                              shared.setExitResignationDisApproveL1View(exitResignationDisApproveL1View);
+                              shared.setExitResignationDisApproveL2View(exitResignationDisApproveL2View);
                               print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
                               print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
                               print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
@@ -3363,6 +3731,11 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ Pending Attendance L1 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL1");
                               print("✅ Pending Attendance L2 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL2");
                               print("✅ My Team MO Permission for profileId $selectedProfileId: $myTeamShow");
+                              print("✅ Exit Resignation List Permission for profileId $selectedProfileId: $exitResignationListView");
+                              print("✅ Exit Resignation Approve L1 Permission for profileId $selectedProfileId: $exitResignationApproveL1View");
+                              print("✅ Exit Resignation Approve L2 Permission for profileId $selectedProfileId: $exitResignationApproveL2View");
+                              print("✅ Exit Resignation Disapprove L1 Permission for profileId $selectedProfileId: $exitResignationDisApproveL1View");
+                              print("✅ Exit Resignation Disapprove L2 Permission for profileId $selectedProfileId: $exitResignationDisApproveL2View");
 
                               // 🟢 Save the MSS permission to SharedPreferences
                               await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
@@ -3447,7 +3820,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2UISDeletePermission");
                               print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3UISDeletePermission");
                               print("✅ Pending Attendance L1 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL1");
-                              print("✅ Pending Attendance L2 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL2");
+                              print("✅ Pending Attendance L2 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL2");*/
                               // 🟢 Save selected profile details
                               await shared.setDefaultProfileId(selectedProfileId);
                               await shared.setDefaultProfileName(selectedProfileName);

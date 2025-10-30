@@ -33,6 +33,10 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
+var approveButtonL1Show;
+var disApproveButtonL1Show;
+var approveButtonL1View;
+var disApproveButtonL1View;
 dynamic requestIdReceived;
 bool isLoading = true;
 bool isLoadingCount = true;
@@ -69,6 +73,15 @@ class _ExitResignationL1ApprovalPageState
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
+    approveButtonL1Show = await shared!.getExitResignationApproveL1Show();
+    approveButtonL1View = await shared!.getExitResignationApproveL1View();
+    disApproveButtonL1Show = await shared!.getExitResignationDisApproveL1Show();
+    disApproveButtonL1View = await shared!.getExitResignationDisApproveL1View();
+
+    print("Approve L1 Show - $approveButtonL1Show");
+    print("Approve L1 View - $approveButtonL1View");
+    print("DisApprove L1 Show - $disApproveButtonL1Show");
+    print("DisApprove L1 View - $disApproveButtonL1View");
     // await Future.delayed(Duration(seconds: 5));
     //Future<LoanDataShowApprovalModal> getEmployeeList11 = getLoanDataForApproval(sessionId!);
     isLoading = true;
@@ -506,39 +519,45 @@ class _ExitResignationL1ApprovalPageState
 
                 Row(
                   children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          disApproveResignationRequest(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          elevation: 5,
+                    Visibility(
+                      visible: disApproveButtonL1Show == "true" || disApproveButtonL1View == "1",
+                      child: Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            disApproveResignationRequest(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 5,
+                          ),
+                          child: const Text("Disapprove",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
                         ),
-                        child: const Text("Disapprove",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          approveResignationRequest(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Mythemes.successColor,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          elevation: 5,
+                    Visibility(
+                      visible: approveButtonL1Show == "true" || approveButtonL1View == "1",
+                      child: Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            approveResignationRequest(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Mythemes.successColor,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 5,
+                          ),
+                          child: const Text("Approve",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
                         ),
-                        child: const Text("Approve",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
                     ),
                   ],

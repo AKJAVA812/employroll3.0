@@ -34,6 +34,10 @@ dynamic getDefaultProfileId;
 List<ListData>? allUsernew=[];
 List<ListData>? foundDataNew=[];
 List pendingData =[];
+dynamic exitResignationL1ApprovalShow;
+dynamic exitResignationL1ApprovalView;
+dynamic exitResignationL2ApprovalShow;
+dynamic exitResignationL2ApprovalView;
 
 ExitResignationRquisitionListModal? exitResignationRequisitionListLabel;
 ExitResignationRquisitionListModal? exitResignationRequisitionListLabeled;
@@ -86,6 +90,18 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
     getOrgId = await shared!.getOrgId();
     userPermissions = await shared!.getUserPanel();
     getDefaultProfileId = await shared!.getDefaultProfileId();
+    exitResignationL1ApprovalShow = await shared!.getExitResignationApproveL1Show();
+    exitResignationL1ApprovalView = await shared!.getExitResignationApproveL1View();
+    exitResignationL2ApprovalShow = await shared!.getExitResignationApproveL2Show();
+    exitResignationL2ApprovalView = await shared!.getExitResignationApproveL2View();
+
+    if(exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1") {
+      selectedFilter = "L1";
+    } if(exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1") {
+      selectedFilter = "L2";
+    } if((exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1") && (exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1")) {
+      selectedFilter = "All";
+    }
     // await Future.delayed(Duration(seconds: 5));
     Future<ExitResignationRquisitionListModal> getEmployeeList11 = getResignationRequisitionList(sessionId!);
     final loading = Row(
@@ -638,9 +654,19 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  filterChip("All"),
-                  filterChip("L1"),
-                  filterChip("L2"),
+                  Visibility(
+                    visible: (exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1") && (exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1"),
+                      child: filterChip("All")
+                  ),
+
+                  Visibility(
+                    visible: exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1",
+                      child: filterChip("L1")
+                  ),
+                  Visibility(
+                    visible: exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1",
+                      child: filterChip("L2")
+                  ),
                 ],
               ),
             ),

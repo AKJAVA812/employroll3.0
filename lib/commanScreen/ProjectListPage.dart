@@ -44,6 +44,8 @@ String? setPreOnboardShow;
 String? setExitShow;
 String? setMyTeamShow;
 String? setMyTeamPageShow;
+String? setExitResignationListShow = "false";
+String? setExitResignationListView = "0";
 int? orgId;
 String? orgName;
 int? empRoles;
@@ -166,6 +168,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     setPreOnboardShow= await shared.getPreOnboardShow();
     setExitShow= await shared.getExitShow();
     setMyTeamShow= await shared.getMyTeamShow();
+    setExitResignationListShow= await shared.getExitResignationListShow();
+    setExitResignationListView= await shared.getExitResignationListView();
+
+    setState(() {
+
+    });
+    print("Resignation View 1 $setExitResignationListShow");
+    print("Resignation View 2 $setExitResignationListView");
     print("MY TEAM SHOW - $setMyTeamShow");
     userPanel= await shared.getUserPanel();
     print("USER PANEL - $userPanel");
@@ -189,6 +199,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     pendingLoanRequestMSSL3Permission= (await shared.getLoanApprovalL3MSS())!;
     pendingLoanRequestUISL3Permission= (await shared.getLoanApprovalL3UIS())!;
     setMyTeamPageShow= (await shared.getMyTeamPageShow())!;
+
     print("MY TEAM SHOW NEW - $setMyTeamPageShow");
     print("Pending Attendance Request MSS MO- $pendingLoanRequestMoL1Permission");
     print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
@@ -1735,7 +1746,9 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
           //Exit Resignation Approval
-          if(( orgId == 3 || orgId == 145)) {
+          if(setExitResignationListShow == "true" || setExitResignationListView == "1") {
+            print("Check Permission - $setExitResignationListShow");
+            print("Check - $setExitResignationListView");
             items.add(
               Hero(
                 tag: 'exitResignationApproval',
@@ -1785,6 +1798,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
         //My Teams
         if(setMyTeamShow == "true" || setMyTeamPageShow == "1") {
+          print("Check My Team Permission - $setMyTeamShow");
+          print("Check My Team- $setMyTeamPageShow");
             items.add(
               Hero(
                 tag: 'myTeams',
