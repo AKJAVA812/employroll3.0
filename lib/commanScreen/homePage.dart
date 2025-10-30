@@ -3114,9 +3114,11 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
                                 shared.setClaimLevelOneMO("1");
+                                shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
                                 permissionNotifier.updatePermission("1");
                               } else {
                                 shared.setClaimLevelOneMO("0");
+                                shared.setClaimLevelOne("");
                                 permissionNotifier.updatePermission("0");
                               }
                               // 🟢 Check if the selected profile has the Claim L2 permission
@@ -3125,9 +3127,11 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
                                 shared.setClaimLevelTwoMO("1");
+                                shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
                                 permissionNotifier.updatePermission("1");
                               } else {
                                 shared.setClaimLevelTwoMO("0");
+                                shared.setClaimLevelTwo("");
                                 permissionNotifier.updatePermission("0");
                               }
                               // 🟢 Check if the selected profile has the Claim L3 permission
@@ -3136,9 +3140,11 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
                                 shared.setClaimLevelThreeMO("1");
+                                shared.setClaimLevelThree("CLAIM_APPROVAL_LEVEL_THREE_VIEW");
                                 permissionNotifier.updatePermission("1");
                               } else {
                                 shared.setClaimLevelThreeMO("0");
+                                shared.setClaimLevelThree("");
                                 permissionNotifier.updatePermission("0");
                               }
                               // 🟢 Check if the selected profile has the OD Pending List permission
@@ -3273,8 +3279,10 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD") == true) {
                                 shared.setExitResignationApproveL1View("1");
+                                shared.setExitResignationApproveL1Show("true");
                               } else {
                                 shared.setExitResignationApproveL1View("0");
+                                shared.setExitResignationApproveL1Show("false");
                               }
                               // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
                               /*exitResignationApproveL2View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD") ?? false)
@@ -3282,8 +3290,11 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD") == true) {
                                 shared.setExitResignationApproveL2View("1");
+                                shared.setExitResignationApproveL2Show("true");
+
                               } else {
                                 shared.setExitResignationApproveL2View("0");
+                                shared.setExitResignationApproveL2Show("false");
                               }
 
                               // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
@@ -3292,8 +3303,10 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE") == true) {
                                 shared.setExitResignationDisApproveL1View("1");
+                                shared.setExitResignationDisApproveL1Show("true");
                               } else {
                                 shared.setExitResignationDisApproveL1View("0");
+                                shared.setExitResignationDisApproveL1Show("false");
                               }
                               // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
                               /*exitResignationDisApproveL2View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE") ?? false)
@@ -3301,8 +3314,10 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE") == true) {
                                 shared.setExitResignationDisApproveL2View("1");
+                                shared.setExitResignationDisApproveL2Show("true");
                               } else {
                                 shared.setExitResignationDisApproveL2View("0");
+                                shared.setExitResignationDisApproveL2Show("false");
                               }
 
 
@@ -3337,8 +3352,10 @@ class _DrawerFileState extends State<DrawerFile> {
 
                               if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
                                 shared.setPendingLeaveReqL1MSSPermission("1");
+                                shared.setLevelOne("true");
                               } else {
                                 shared.setPendingLeaveReqL1MSSPermission("0");
+                                shared.setLevelOne("false");
                               }
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
                               /* String leaveReqL2MSSPermValue =
@@ -3348,8 +3365,10 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
                                 shared.setPendingLeaveReqL2MSSPermission("1");
+                                shared.setLevelTwo("true");
                               } else {
                                 shared.setPendingLeaveReqL2MSSPermission("0");
+                                shared.setLevelTwo("false");
                               }
                               // 🟢 Check if the selected profile has the Leave Request L2 permission
                               /*String othersLeaveReqMSSPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
@@ -3366,9 +3385,11 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
                                 shared.setClaimLevelOne("1");
+                                shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
                                 permissionNotifier.updatePermission("1");
                               } else {
                                 shared.setClaimLevelOne("0");
+                                shared.setClaimLevelOne("");
                                 permissionNotifier.updatePermission("0");
                               }
                               // 🟢 Check if the selected profile has the Claim L2 permission
@@ -3377,9 +3398,11 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
                                 shared.setClaimLevelTwo("1");
+                                shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
                                 permissionNotifier.updatePermission("1");
                               } else {
                                 shared.setClaimLevelTwo("0");
+                                shared.setClaimLevelTwo("");
                                 permissionNotifier.updatePermission("0");
                               }
                               // 🟢 Check if the selected profile has the Claim L3 permission
@@ -3523,8 +3546,10 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") == true || selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") == true) {
                                 shared.setPendingLeaveReqUISPermission("1");
+                                shared.setPendingLeaveReq("true");
                               } else {
                                 shared.setPendingLeaveReqUISPermission("0");
+                                shared.setPendingLeaveReq("false");
                               }
                               // 🟢 Check if the selected profile has the Leave Request L1 permission
                               /* String leaveReqL1UISPermValue =
@@ -3563,8 +3588,10 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
                                 shared.setClaimLevelOneUIS("1");
+                                shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
                               } else {
                                 shared.setClaimLevelOneUIS("0");
+                                shared.setClaimLevelOne("");
                               }
                               // 🟢 Check if the selected profile has the Claim L2 permission
                               /*String pendingClaimL2UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
@@ -3572,8 +3599,10 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
                                 shared.setClaimLevelTwoUIS("1");
+                                shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
                               } else {
                                 shared.setClaimLevelTwoUIS("0");
+                                shared.setClaimLevelTwo("");
                               }
                               // 🟢 Check if the selected profile has the Claim L3 permission
                               /*String pendingClaimL3UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
@@ -3581,8 +3610,10 @@ class _DrawerFileState extends State<DrawerFile> {
                                   : "0";*/
                               if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
                                 shared.setClaimLevelThreeUIS("1");
+                                shared.setClaimLevelThree("CLAIM_APPROVAL_LEVEL_THREE_VIEW");
                               } else {
                                 shared.setClaimLevelThreeUIS("0");
+                                shared.setClaimLevelThree("");
                               }
                               // 🟢 Check if the selected profile has the OD Pending List permission
                               /*String pendingODListUISPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
