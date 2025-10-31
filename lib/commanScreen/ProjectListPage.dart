@@ -44,6 +44,8 @@ String? setPreOnboardShow;
 String? setExitShow;
 String? setMyTeamShow;
 String? setMyTeamPageShow;
+String? setExitResignationListShow = "false";
+String? setExitResignationListView = "0";
 int? orgId;
 String? orgName;
 int? empRoles;
@@ -166,6 +168,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     setPreOnboardShow= await shared.getPreOnboardShow();
     setExitShow= await shared.getExitShow();
     setMyTeamShow= await shared.getMyTeamShow();
+    setExitResignationListShow= await shared.getExitResignationListShow();
+    setExitResignationListView= await shared.getExitResignationListView();
+
+    setState(() {
+
+    });
+    print("Resignation View 1 $setExitResignationListShow");
+    print("Resignation View 2 $setExitResignationListView");
     print("MY TEAM SHOW - $setMyTeamShow");
     userPanel= await shared.getUserPanel();
     print("USER PANEL - $userPanel");
@@ -189,6 +199,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     pendingLoanRequestMSSL3Permission= (await shared.getLoanApprovalL3MSS())!;
     pendingLoanRequestUISL3Permission= (await shared.getLoanApprovalL3UIS())!;
     setMyTeamPageShow= (await shared.getMyTeamPageShow())!;
+
     print("MY TEAM SHOW NEW - $setMyTeamPageShow");
     print("Pending Attendance Request MSS MO- $pendingLoanRequestMoL1Permission");
     print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
@@ -666,59 +677,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         );
       }
 
-      //Exit Resignation Requisition
-      if(value == 0 && orgId == 145) {
-        items.add(
-          Hero(
-            tag: 'exitResigReq',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () {
-                  //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                  Navigator.pushNamed(context, MyRoutings.resignationRequisitionRoute);
-                  /*Fluttertoast.showToast(
-                      msg: "Not Activated",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.black,
-                      textColor: Colors.white,
-                      fontSize: 16.0
-                  );*/
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.golf_course,
-                        size: 50,
-                        color: Mythemes.successColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'Resignation',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
+
+
 
       if(value == 1 || userPanel == "USER") {
           //Time & Attendance
@@ -1735,7 +1695,9 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
           //Exit Resignation Approval
-          if(( orgId == 3 || orgId == 145)) {
+          if(setExitResignationListShow == "true" || setExitResignationListView == "1") {
+            print("Check Permission - $setExitResignationListShow");
+            print("Check - $setExitResignationListView");
             items.add(
               Hero(
                 tag: 'exitResignationApproval',
@@ -1754,9 +1716,9 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                       children: <Widget>[
                         Center(
                           child: Icon(
-                            Icons.do_not_disturb_off,
+                            Icons.outbond,
                             size: 50,
-                            color: Mythemes.dangerColor,
+                            color: Mythemes.purplish,
                           ),
                           /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
@@ -1785,6 +1747,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
         //My Teams
         if(setMyTeamShow == "true" || setMyTeamPageShow == "1") {
+          print("Check My Team Permission - $setMyTeamShow");
+          print("Check My Team- $setMyTeamPageShow");
             items.add(
               Hero(
                 tag: 'myTeams',

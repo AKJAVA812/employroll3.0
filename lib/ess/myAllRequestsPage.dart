@@ -493,7 +493,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
                         child: Icon(
                         CupertinoIcons.money_dollar_circle_fill,
                           size: 50,
-                          color: Mythemes.successColor,
+                          color: Mythemes.warningColor,
                         ),
                         /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
@@ -519,6 +519,62 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
             ),
           );
         }
+
+      //Exit Resignation Requisition
+      if(orgId == 3 || orgId == 145 || orgId == 190 || orgId == 191) {
+        items.add(
+          Hero(
+            tag: 'exitResigReq',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                  Navigator.pushNamed(context, MyRoutings.resignationRequisitionRoute);
+                  /*Fluttertoast.showToast(
+                      msg: "Not Activated",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );*/
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.golf_course,
+                        size: 50,
+                        color: Mythemes.successColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Resignation',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+
 
       return items;
     }

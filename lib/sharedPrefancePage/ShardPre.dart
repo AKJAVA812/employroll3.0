@@ -583,6 +583,114 @@ class SessionManager {
     final String? myTeamShow = prefs.getString('myTeamShow');
     return myTeamShow;
   }
+
+  setExitResignationListShow(exitResignationListShow) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationListShow', exitResignationListShow);
+  }
+
+  getExitResignationListShow() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationListShow = prefs.getString('exitResignationListShow');
+    return exitResignationListShow;
+  }
+  setExitResignationListView(exitResignationListViewCheck) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationListViewCheck', exitResignationListViewCheck);
+  }
+
+  getExitResignationListView() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationListViewCheck = prefs.getString('exitResignationListViewCheck');
+    return exitResignationListViewCheck;
+  }
+  setExitResignationApproveL1Show(exitResignationApproveL1Show) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationApproveL1Show', exitResignationApproveL1Show);
+  }
+
+  getExitResignationApproveL1Show() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationApproveL1Show = prefs.getString('exitResignationApproveL1Show');
+    return exitResignationApproveL1Show;
+  }
+
+  setExitResignationApproveL1View(exitResignationApproveL1View) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationApproveL1View', exitResignationApproveL1View);
+  }
+
+  getExitResignationApproveL1View() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationApproveL1View = prefs.getString('exitResignationApproveL1View');
+    return exitResignationApproveL1View;
+  }
+
+  setExitResignationApproveL2View(exitResignationApproveL2View) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationApproveL2View', exitResignationApproveL2View);
+  }
+
+  getExitResignationApproveL2View() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationApproveL2View = prefs.getString('exitResignationApproveL2View');
+    return exitResignationApproveL2View;
+  }
+
+  setExitResignationDisApproveL1View(exitResignationDisApproveL1View) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationDisApproveL1View', exitResignationDisApproveL1View);
+  }
+
+  getExitResignationDisApproveL1View() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationDisApproveL1View = prefs.getString('exitResignationDisApproveL1View');
+    return exitResignationDisApproveL1View;
+  }
+
+  setExitResignationDisApproveL2View(exitResignationDisApproveL2View) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationDisApproveL2View', exitResignationDisApproveL2View);
+  }
+
+  getExitResignationDisApproveL2View() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationDisApproveL2View = prefs.getString('exitResignationDisApproveL2View');
+    return exitResignationDisApproveL2View;
+  }
+
+  setExitResignationApproveL2Show(exitResignationApproveL2Show) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationApproveL2Show', exitResignationApproveL2Show);
+  }
+
+  getExitResignationApproveL2Show() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationApproveL2Show = prefs.getString('exitResignationApproveL2Show');
+    return exitResignationApproveL2Show;
+  }
+
+  setExitResignationDisApproveL1Show(exitResignationDisApproveL1Show) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationDisApproveL1Show', exitResignationDisApproveL1Show);
+  }
+
+  getExitResignationDisApproveL1Show() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationDisApproveL1Show = prefs.getString('exitResignationDisApproveL1Show');
+    return exitResignationDisApproveL1Show;
+  }
+
+  setExitResignationDisApproveL2Show(exitResignationDisApproveL2Show) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('exitResignationDisApproveL2Show', exitResignationDisApproveL2Show);
+  }
+
+  getExitResignationDisApproveL2Show() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? exitResignationDisApproveL2Show = prefs.getString('exitResignationDisApproveL2Show');
+    return exitResignationDisApproveL2Show;
+  }
   setLoanApprovalL1Show(loanApprovalL1Show) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loanApprovalL1Show', loanApprovalL1Show);

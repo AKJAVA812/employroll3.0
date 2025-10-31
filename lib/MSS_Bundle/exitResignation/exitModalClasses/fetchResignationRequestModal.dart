@@ -34,7 +34,7 @@ class DataNew {
   String? empNameCode;
   String? seprationName;
   int? id;
-  bool? noticeperiod;
+  dynamic noticeperiod;
   String? remarks;
   String? reasonForLeave;
 
