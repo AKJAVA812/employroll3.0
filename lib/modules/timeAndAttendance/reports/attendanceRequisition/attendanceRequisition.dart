@@ -1078,26 +1078,40 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
 
                                   }
                                   else if (outDuty == true){
-                                    print("intime $inTimeReq");
-                                    print("outtime $outTimeReq");
-                                    print("night shift  $nightShift");
-                                    print("compoff $compOff");
-                                    print("outDuty $outDuty");
-                                    if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please fill remarks !! "),
-                                      ));
+                                    if (inTimeReq!.compareTo(outTimeReq!) > 0) {
+                                      return setState(() {
+                                        CommonNotificationPage
+                                            .showWorkDoneSuccess(
+                                            context,
+                                            "Your working hours going to negative, Please select requisition time correctly."
+                                                .upperCamelCase +
+                                                " ",
+                                            "Alert Message");
+                                      });
                                     } else {
-                                      sendRequsitionToServerOutDuty(
-                                          context,
-                                          empId!,
-                                          inRemarkString,
-                                          outRemarkString,
-                                          inTimeReq!,
-                                          outTimeReq!,
-                                          logid,
-                                          dateformat);
+                                      print("intime $inTimeReq");
+                                      print("outtime $outTimeReq");
+                                      print("night shift  $nightShift");
+                                      print("compoff $compOff");
+                                      print("outDuty $outDuty");
+                                      if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(" Please fill remarks !! "),
+                                        ));
+                                      } else {
+                                        sendRequsitionToServerOutDuty(
+                                            context,
+                                            empId!,
+                                            inRemarkString,
+                                            outRemarkString,
+                                            inTimeReq!,
+                                            outTimeReq!,
+                                            logid,
+                                            dateformat);
+                                      }
                                     }
+
+
 
                                   }
                                   else if (compOff==true)
