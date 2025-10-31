@@ -1083,7 +1083,7 @@ class _LoginPageState extends State<LoginPage> {
           /*String leaveReqMSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_APP_MYTEAM_ADD") ?? false)
               ? "1"
               : "0";*/
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") == true) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_APP_MYTEAM_ADD") == true) {
             shared.setPendingLeaveReqMSSPermission("1");
           } else {
             shared.setPendingLeaveReqMSSPermission("0");
@@ -1092,7 +1092,7 @@ class _LoginPageState extends State<LoginPage> {
           /*String leaveReqL1MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
               ? "1"
               : "0";*/
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
             shared.setPendingLeaveReqL1MSSPermission("1");
           } else {
             shared.setPendingLeaveReqL1MSSPermission("0");
@@ -1101,7 +1101,7 @@ class _LoginPageState extends State<LoginPage> {
           /*String leaveReqL2MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
               ? "1"
               : "0";*/
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
             shared.setPendingLeaveReqL2MSSPermission("1");
           } else {
             shared.setPendingLeaveReqL2MSSPermission("0");
@@ -1451,15 +1451,563 @@ class _LoginPageState extends State<LoginPage> {
 
     adminRoleChcker = loginModelglobal!.data!.adminrole!.length;
     print('adminRolesCheckss $adminRoleChcker');
-    for(int i=0; i<loginModelglobal!.data!.mobAction!.length;i++){
-      geofenceActive = shared.setGeofenceActive(loginModelglobal!.data!.mobAction![i].geofenceActive);
-      attAction = shared.setAttAction(loginModelglobal!.data!.mobAction![i].attAction);
-      mobileActions = shared.setMobAttAction(loginModelglobal!.data!.mobAction![i].mobAction);
-      mobileTrackTime = shared.setMobTrackTime(loginModelglobal!.data!.mobAction![i].time);
-      print('attActionSet $attAction');
-      print('MobActionSet $mobileActions');
-      print('MobTrackTime $mobileTrackTime');
-      print('Geofence Active $geofenceActive');
+    for (int i = 0; i < loginModelglobal!.data!.profileList!.length; i++) {
+      profileName = loginModelglobal!.data!.profileList![i].profileName;
+      profileId = loginModelglobal!.data!.profileList![i].profileId;
+      defaultProfile = loginModelglobal!.data!.profileList![i].defaultProfile;
+
+      if (defaultProfile == true || loginModelglobal!.data!.profileList![i].isDefaultProfile == true) {
+        String profileNameNew = loginModelglobal!.data!.profileList![i].profileName ?? '';
+        dynamic profileIdNew = loginModelglobal!.data!.profileList![i].profileId;
+        shared.setDefaultProfileName(profileNameNew);
+        shared.setDefaultProfileId(profileIdNew);
+
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD")) {
+          print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
+          //levelOne = "true";
+          shared.setLevelOne("true");
+        } else {
+          print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
+          //levelOne = "false";
+          shared.setLevelOne("false");
+        }
+
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD")) {
+          print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
+          //levelTwo = "true";
+          shared.setLevelTwo("true");
+        } else {
+          print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
+          //levelTwo = "false";
+          shared.setLevelTwo("false");
+        }
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD")) {
+          print("resopnse LEAVE_REQ_APPROVAL_ADD");
+          //pendingLeaveRequisitions = "true";
+          shared.setPendingLeaveReq("true");
+        }
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW")) {
+          print("resopnse CLAIM_APPROVAL_LEVEL_ONE_VIEW");
+          //claimLevelOne = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
+          shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
+        } else {
+          print("claimLevelOne else");
+          //claimLevelOne = "";
+          shared.setClaimLevelOne("");
+        }
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW")) {
+          print("resopnse CLAIM_APPROVAL_LEVEL_TWO_VIEW");
+          //claimLevelTwo = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
+          shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
+        } else {
+          print("claimLevelTwo else");
+          //claimLevelTwo = "";
+          shared.setClaimLevelTwo("");
+        }
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW")) {
+          print("Response: CLAIM_APPROVAL_LEVEL_THREE_VIEW");
+          //claimLevelThree = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
+          shared.setClaimLevelThree("CLAIM_APPROVAL_LEVEL_THREE_VIEW");
+        } else {
+          print("claimLevelThree else");
+          //claimLevelThree = "";
+          shared.setClaimLevelThree("");
+        }
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("PRE_INDUCTION_ONBOARDING_ADD")) {
+          print("Response: PRE_INDUCTION_ONBOARDING_ADD");
+          //preOnboardShow = "true";
+          shared.setPreOnboardShow("true");
+        } else {
+          print("preOnboardShow else");
+          //preOnboardShow = "false";
+          shared.setPreOnboardShow("false");
+        }
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("EXIT_EMP_LIST_ADD")) {
+          print("Response: EXIT_EMP_LIST_ADD");
+          //exitShow = "true";
+          shared.setExitShow("true");
+        } else {
+          print("exitShow else");
+          //exitShow = "false";
+          shared.setExitShow("false");
+        }
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("HRIS_EMP_LIST_VIEW")) {
+          print("Response: HRIS_EMP_LIST_VIEW");
+          //myTeamShow = "true";
+          shared.setMyTeamShow("true");
+          shared.setMyTeamPageShow("1");
+        } else {
+          print("My Team else");
+          //myTeamShow = "false";
+          shared.setMyTeamShow("false");
+          shared.setMyTeamPageShow("0");
+        }
+
+        //Exit Permission setter
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("EXIT_RESIGN_REQUEST_LIST_VIEW")) {
+          print("Response: EXIT_RESIGN_REQUEST_LIST_VIEW");
+          //exitResignationListShow = "true";
+          //exitResignationListView = "1";
+          shared.setExitResignationListShow("true");
+          shared.setExitResignationListView("1");
+        } else {
+          print("EXIT_RESIGN_REQUEST_LIST_VIEW else");
+          //exitResignationListShow = "false";
+          //exitResignationListView = "0";
+          shared.setExitResignationListShow("false");
+          shared.setExitResignationListView("0");
+        }
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD")) {
+          print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD");
+          //exitResignationApproveL1Show = "true";
+          shared.setExitResignationApproveL1Show("true");
+        } else {
+          print("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD else");
+          //exitResignationApproveL1Show = "false";
+          shared.setExitResignationApproveL1Show("false");
+        }
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD")) {
+          print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD");
+          //exitResignationApproveL2Show = "true";
+          shared.setExitResignationApproveL2Show("true");
+        } else {
+          print("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD else");
+          //exitResignationApproveL2Show = "false";
+          shared.setExitResignationApproveL2Show("false");
+        }
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE")) {
+          print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE");
+          //exitResignationDisApproveL1Show = "true";
+          shared.setExitResignationDisApproveL1Show("true");
+        } else {
+          print("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE else");
+          //exitResignationDisApproveL1Show = "false";
+          shared.setExitResignationDisApproveL1Show("false");
+        }
+        if (loginModelglobal!.data!.profileList![i].profilePermission!.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE")) {
+          print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE");
+          //exitResignationDisApproveL2Show = "true";
+          shared.setExitResignationDisApproveL2Show("true");
+        } else {
+          print("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE else");
+          //exitResignationDisApproveL2Show = "false";
+          shared.setExitResignationDisApproveL2Show("false");
+        }
+
+        //MSS MO
+        // 🟢 Check if the selected profile has the Pending Attendance Request permission
+        /*String pendingAttReqMOPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") == true) {
+          shared.setPendingAttendanceReqMSSMOPermission("1");
+        } else {
+          shared.setPendingAttendanceReqMSSMOPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request permission
+        /*String leaveReqMOPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_MO_ADD") == true) {
+          shared.setPendingLeaveReqMSSMOPermission("1");
+        } else {
+          shared.setPendingLeaveReqMSSMOPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L1 permission
+        /*String leaveReqL1MOPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") == true) {
+          shared.setPendingLeaveReqL1MSSMOPermission("1");
+        } else {
+          shared.setPendingLeaveReqL1MSSMOPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L2 permission
+        /*String leaveReqL2MOPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true) {
+          shared.setPendingLeaveReqL2MSSMOPermission("1");
+        } else {
+          shared.setPendingLeaveReqL2MSSMOPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L2 permission
+        /*String othersLeaveReqMOPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("OTHERS_LEAVE_REQUEST_MO_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("OTHERS_LEAVE_REQUEST_MO_ADD") == true) {
+          shared.setOthersLeaveReqMSSMOPermission("1");
+        } else {
+          shared.setOthersLeaveReqMSSMOPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L1 permission
+        /*String pendingClaimL1MOPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
+          shared.setClaimLevelOneMO("1");
+        } else {
+          shared.setClaimLevelOneMO("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L2 permission
+        /*String pendingClaimL2MOPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
+          shared.setClaimLevelTwoMO("1");
+        } else {
+          shared.setClaimLevelTwoMO("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L3 permission
+        /*String pendingClaimL3MOPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
+          shared.setClaimLevelThreeMO("1");
+        } else {
+          shared.setClaimLevelThreeMO("0");
+        }
+        // 🟢 Check if the selected profile has the OD Pending List permission
+        /* String pendingODListMOPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
+          shared.setODPendingListMO("1");
+        } else {
+          shared.setODPendingListMO("0");
+        }
+        // 🟢 Check if the selected profile has the OD Activate permission
+        /*String odActivateMOPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
+          shared.setODActivateMO("1");
+        } else {
+          shared.setODActivateMO("0");
+        }
+        // 🟢 Check if the selected profile has the OD Pending List permission
+        /*String pendingAttendanceRequestMOL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") == true) {
+          shared.setPendingAttendanceReqL1MO("1");
+        } else {
+          shared.setPendingAttendanceReqL1MO("0");
+        }
+        // 🟢 Check if the selected profile has the OD Activate permission
+        /* String pendingAttendanceRequestMOL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") == true) {
+          shared.setPendingAttendanceReqL2MO("1");
+        } else {
+          shared.setPendingAttendanceReqL2MO("0");
+        }
+
+        //MSS
+        // 🟢 Check if the selected profile has the Pending Attendance Request permission
+        /*String pendingAttReqMSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") == true) {
+          shared.setPendingAttendanceReqMSSPermission("1");
+        } else {
+          shared.setPendingAttendanceReqMSSPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request permission
+        /*String leaveReqMSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_APP_MYTEAM_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_APP_MYTEAM_ADD") == true) {
+          shared.setPendingLeaveReqMSSPermission("1");
+        } else {
+          shared.setPendingLeaveReqMSSPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L1 permission
+        /*String leaveReqL1MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+          shared.setPendingLeaveReqL1MSSPermission("1");
+        } else {
+          shared.setPendingLeaveReqL1MSSPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L2 permission
+        /*String leaveReqL2MSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+          shared.setPendingLeaveReqL2MSSPermission("1");
+        } else {
+          shared.setPendingLeaveReqL2MSSPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L2 permission
+        /* String othersLeaveReqMSSPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("OTHERS_LEAVE_REQUEST_ADD") == true) {
+          shared.setOthersLeaveReqMSSPermission("1");
+        } else {
+          shared.setOthersLeaveReqMSSPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L1 permission
+        /* String pendingClaimL1Permission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
+          shared.setClaimLevelOne("1");
+        } else {
+          shared.setClaimLevelOne("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L2 permission
+        /*String pendingClaimL2Permission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
+          shared.setClaimLevelTwo("1");
+        } else {
+          shared.setClaimLevelTwo("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L3 permission
+        /*String pendingClaimL3Permission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
+          shared.setClaimLevelThree("1");
+        } else {
+          shared.setClaimLevelThree("0");
+        }
+        // 🟢 Check if the selected profile has the OD Pending List permission
+        /*String pendingODListPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
+          shared.setODPendingList("1");
+        } else {
+          shared.setODPendingList("0");
+        }
+        // 🟢 Check if the selected profile has the OD Activate permission
+        /*String odActivatePermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
+          shared.setODActivate("1");
+        } else {
+          shared.setODActivate("0");
+        }
+        // 🟢 Check if the selected profile has the OD Pending List permission
+        /*String pendingAttendanceRequestMSSL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") == true) {
+          shared.setPendingAttendanceReqL1MSS("1");
+        } else {
+          shared.setPendingAttendanceReqL1MSS("0");
+        }
+        // 🟢 Check if the selected profile has the OD Activate permission
+        /*String pendingAttendanceRequestMSSL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") == true) {
+          shared.setPendingAttendanceReqL2MSS("1");
+        } else {
+          shared.setPendingAttendanceReqL2MSS("0");
+        }
+
+        //USER
+        // 🟢 Check if the selected profile has the Pending Attendance Request permission
+        /*String pendingAttReqUISPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") == true) {
+          shared.setPendingAttendanceReqUISPermission("1");
+        } else {
+          shared.setPendingAttendanceReqUISPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request permission
+        /*String leaveReqUISPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD") == true) {
+          shared.setPendingLeaveReqUISPermission("1");
+        } else {
+          shared.setPendingLeaveReqUISPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L1 permission
+        /*String leaveReqL1UISPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true) {
+          shared.setPendingLeaveReqL1UISPermission("1");
+        } else {
+          shared.setPendingLeaveReqL1UISPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L2 permission
+        /*String leaveReqL2UISPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true) {
+          shared.setPendingLeaveReqL2UISPermission("1");
+        } else {
+          shared.setPendingLeaveReqL2UISPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Leave Request L2 permission
+        /*String othersLeaveReqUISPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("OTHERS_LEAVE_REQUEST_ADD") == true) {
+          shared.setOthersLeaveReqUISPermission("1");
+        } else {
+          shared.setOthersLeaveReqUISPermission("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L1 permission
+        /*String pendingClaimL1UISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
+          shared.setClaimLevelOneUIS("1");
+        } else {
+          shared.setClaimLevelOneUIS("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L2 permission
+        /*String pendingClaimL2UISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
+          shared.setClaimLevelTwoUIS("1");
+        } else {
+          shared.setClaimLevelTwoUIS("0");
+        }
+        // 🟢 Check if the selected profile has the Claim L3 permission
+        /*String pendingClaimL3UISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
+          shared.setClaimLevelThreeUIS("1");
+        } else {
+          shared.setClaimLevelThreeUIS("0");
+        }
+        // 🟢 Check if the selected profile has the OD Pending List permission
+        /*String pendingODListUISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
+          shared.setODPendingListUIS("1");
+        } else {
+          shared.setODPendingListUIS("0");
+        }
+        // 🟢 Check if the selected profile has the OD Activate permission
+        /*String odActivateUISPermission = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
+          shared.setODActivateUIS("1");
+        } else {
+          shared.setODActivateUIS("0");
+        }
+        // 🟢 Check if the selected profile has the OD Pending List permission
+        /*String pendingAttendanceRequestUISL1 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_ONE_ADD") == true) {
+          shared.setPendingAttendanceReqL1UIS("1");
+        } else {
+          shared.setPendingAttendanceReqL1UIS("0");
+        }
+        // 🟢 Check if the selected profile has the OD Activate permission
+        /*String pendingAttendanceRequestUISL2 = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") ?? false)
+              ? "1"
+              : "0";*/
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("ATT_APP_TWO_ADD") == true) {
+          shared.setPendingAttendanceReqL2UIS("1");
+        } else {
+          shared.setPendingAttendanceReqL2UIS("0");
+        }
+
+
+
+        // 🟢 Save the MSS MO permission to SharedPreferences
+        /*shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
+          shared.setPendingLeaveReqMSSMOPermission(leaveReqMOPermValue);
+          shared.setPendingLeaveReqL1MSSMOPermission(leaveReqL1MOPermValue);
+          shared.setPendingLeaveReqL2MSSMOPermission(leaveReqL2MOPermValue);
+          shared.setOthersLeaveReqMSSMOPermission(othersLeaveReqMOPermValue);
+          shared.setClaimLevelOneMO(pendingClaimL1MOPermission);
+          shared.setClaimLevelTwoMO(pendingClaimL2MOPermission);
+          shared.setClaimLevelThreeMO(pendingClaimL3MOPermission);
+          shared.setODActivateMO(odActivateMOPermission);
+          shared.setODPendingListMO(pendingODListMOPermission);
+          shared.setPendingAttendanceReqL1MO(pendingAttendanceRequestMOL1);
+          shared.setPendingAttendanceReqL2MO(pendingAttendanceRequestMOL2);
+          print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqMOPermValue");
+          print("✅ Leave Permission for profileId $profileIdNew: $leaveReqMOPermValue");
+          print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1MOPermValue");
+          print("✅ Leave L2 Permission for profileId $profileIdNew: $leaveReqL2MOPermValue");
+          print("✅ Others Leave Permission for profileId $profileIdNew: $othersLeaveReqMOPermValue");
+          print("✅ Claim L1 Permission for profileId $profileIdNew: $pendingClaimL1MOPermission");
+          print("✅ Claim L2 Permission for profileId $profileIdNew: $pendingClaimL2MOPermission");
+          print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3MOPermission");
+          print("✅ OD Activate Permission for profileId $profileIdNew: $odActivateMOPermission");
+          print("✅ Pending OD Permission for profileId $profileIdNew: $pendingODListMOPermission");
+          print("✅ Pending Attendance L1 MO Permission for profileId $profileIdNew: $pendingAttendanceRequestMOL1");
+          print("✅ Pending Attendance L2 MO Permission for profileId $profileIdNew: $pendingAttendanceRequestMOL2");
+
+          // 🟢 Save the MSS permission to SharedPreferences
+          shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
+          shared.setPendingLeaveReqMSSPermission(leaveReqMSSPermValue);
+          shared.setPendingLeaveReqL1MSSPermission(leaveReqL1MSSPermValue);
+          shared.setPendingLeaveReqL2MSSPermission(leaveReqL2MSSPermValue);
+          shared.setOthersLeaveReqMSSPermission(othersLeaveReqMSSPermValue);
+          shared.setClaimLevelOne(pendingClaimL1Permission);
+          shared.setClaimLevelTwo(pendingClaimL2Permission);
+          shared.setClaimLevelThree(pendingClaimL3Permission);
+          shared.setODActivate(odActivatePermission);
+          shared.setODPendingList(pendingODListPermission);
+          shared.setPendingAttendanceReqL1MSS(pendingAttendanceRequestMSSL1);
+          shared.setPendingAttendanceReqL2MSS(pendingAttendanceRequestMSSL2);
+          print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqMSSPermValue");
+          print("✅ Leave Permission for profileId $profileIdNew: $leaveReqMSSPermValue");
+          print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1MSSPermValue");
+          print("✅ Leave L2 Permission for profileId $profileIdNew: $leaveReqL2MSSPermValue");
+          print("✅ Others Leave Permission for profileId $profileIdNew: $othersLeaveReqMSSPermValue");
+          print("✅ Claim L1 Permission for profileId $profileIdNew: $pendingClaimL1Permission");
+          print("✅ Claim L2 Permission for profileId $profileIdNew: $pendingClaimL2Permission");
+          print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3Permission");
+          print("✅ OD Activate Permission for profileId $profileIdNew: $odActivatePermission");
+          print("✅ Pending OD List Permission for profileId $profileIdNew: $pendingODListPermission");
+          print("✅ Pending Attendance L1 MSS Permission for profileId $profileIdNew: $pendingAttendanceRequestMSSL1");
+          print("✅ Pending Attendance L2 MSS Permission for profileId $profileIdNew: $pendingAttendanceRequestMSSL2");
+
+          // 🟢 Save the UIS permission to SharedPreferences
+          shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
+          shared.setPendingLeaveReqUISPermission(leaveReqUISPermValue);
+          shared.setPendingLeaveReqL1UISPermission(leaveReqL1UISPermValue);
+          shared.setPendingLeaveReqL2UISPermission(leaveReqL2UISPermValue);
+          shared.setOthersLeaveReqUISPermission(othersLeaveReqUISPermValue);
+          shared.setClaimLevelOneUIS(pendingClaimL1UISPermission);
+          shared.setClaimLevelTwoUIS(pendingClaimL2UISPermission);
+          shared.setClaimLevelThreeUIS(pendingClaimL3UISPermission);
+          shared.setODActivateUIS(odActivateUISPermission);
+          shared.setODPendingListUIS(pendingODListUISPermission);
+          shared.setPendingAttendanceReqL1UIS(pendingAttendanceRequestUISL1);
+          shared.setPendingAttendanceReqL2UIS(pendingAttendanceRequestUISL2);
+          print("✅ Attendance Permission for profileId $profileIdNew: $pendingAttReqUISPermValue");
+          print("✅ Leave Permission for profileId $profileIdNew: $leaveReqUISPermValue");
+          print("✅ Leave L1 Permission for profileId $profileIdNew: $leaveReqL1UISPermValue");
+          print("✅ Leave L2 Permission for profileId $profileIdNew: $leaveReqL2UISPermValue");
+          print("✅ Others Leave Permission for profileId $profileIdNew: $othersLeaveReqUISPermValue");
+          print("✅ Claim L1 Permission for profileId $profileIdNew: $pendingClaimL1UISPermission");
+          print("✅ Claim L2 Permission for profileId $profileIdNew: $pendingClaimL2UISPermission");
+          print("✅ Claim L3 Permission for profileId $profileIdNew: $pendingClaimL3UISPermission");
+          print("✅ OD Activate Permission for profileId $profileIdNew: $odActivateUISPermission");
+          print("✅ Pending OD List Permission for profileId $profileIdNew: $pendingODListUISPermission");
+          print("✅ Pending Attendance L1 UIS Permission for profileId $profileIdNew: $pendingAttendanceRequestUISL1");
+          print("✅ Pending Attendance L2 UIS Permission for profileId $profileIdNew: $pendingAttendanceRequestUISL2");*/
+      }
+
+      print('Profile Name $profileName');
+      print('Profile Id $profileId');
+      print('Default Profile $defaultProfile');
     }
 
     /*for(int i=0; i<loginModelglobal!.data!.profileList!.length;i++){

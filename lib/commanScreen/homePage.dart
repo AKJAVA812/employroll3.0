@@ -2745,8 +2745,9 @@ class _DrawerFileState extends State<DrawerFile> {
     selectedProfileId = await shared.getDefaultProfileId();
     selectedProfileName = await shared.getDefaultProfileName();
 
+    print("$selectedProfileId");
     // Optional: update the ValueNotifiers if needed globally
-    selectedProfileIdNotifier.value = selectedProfileId!;
+    selectedProfileIdNotifier.value = selectedProfileId;
     selectedProfileNameNotifier.value = selectedProfileName!;
 
     setState(() {});
