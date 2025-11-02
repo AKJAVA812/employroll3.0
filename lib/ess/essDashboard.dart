@@ -139,21 +139,21 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     print('roRole $roRole');
     print('adminRole $adminRole');
 
-    Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
+    //Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
     getRealTimeAttButtonShow = true;
     getRealTimeAttShow = false;
-    getEmployeeList11.then((value) {
+    /*getEmployeeList11.then((value) {
       setState(() {
         essDashboardModelGlobal = value;
         isLoading = false;
       });
 
-    });
+    });*/
     //Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
     /*Future<EssEventsListModal?> getEmployeeList14 = getEventData(sessionId!);
     Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
     Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);*/
-    Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+    /*Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
 
 
     getCalendar.then((value) {
@@ -162,7 +162,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         isLoading = false;
       });
 
-    });
+    });*/
     checkAndRunApi();
     /*getEmployeeList14.then((value) {
       setState(() {
@@ -264,6 +264,9 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
     mapResponse = json.decode(response.body);
     dashboardModel = EssDashboarrdModel.fromJson(mapResponse);
+    // ✅ Save to SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('dashboardData', jsonEncode(mapResponse));
     return dashboardModel;
   }
 
@@ -364,7 +367,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     return calendarModalClass;
   }*/
 
-  Future<CalendarModalClass> getCalendarData(String sessionId) async {
+  /*Future<CalendarModalClass> getCalendarData(String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.calendarApi;
     print("Current Month - $_currentMonth");
@@ -428,6 +431,117 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
     calendarModalClass = CalendarModalClass.fromJson(mapResponse);
     return calendarModalClass;
+  }*/
+  Future<CalendarModalClass> getCalendarData(String sessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.calendarApi;
+    print("Current Month - $_currentMonth");
+
+    CalendarModalClass calendarModalClass;
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "month=$_currentMonth");
+
+    setState(() {
+      isLoading = true;
+    });
+
+    Map<String, dynamic> mapResponse = {};
+
+    final prefs = await SharedPreferences.getInstance();
+
+    // ✅ STEP 1: Try loading from SharedPreferences first
+    final cachedData = prefs.getString('calendarData');
+    final cachedMonth = prefs.getString('calendarMonth');
+
+    print("Calendar Data - $cachedData");
+    print("Calendar Month - $cachedMonth");
+
+    if (cachedData != null) {
+      print("Cachded Month $cachedMonth");
+      try {
+        print("Loaded calendar data from cache ✅");
+        mapResponse = json.decode(cachedData);
+        _buildCalendarFromMap(mapResponse);
+      } catch (e) {
+        print("Error loading cached calendar: $e");
+      }
+    }
+
+    // ✅ STEP 2: Now call API (refresh data and overwrite cache)
+    try {
+      final response = await http.post(urlapi);
+      if (response.statusCode == 200) {
+        print('Calendar URL - ${response.request}');
+        print('Response body - ${response.body}');
+        mapResponse = json.decode(response.body);
+
+        print("Calendar Data - $cachedData");
+        print("Calendar Month - $cachedMonth");
+
+          print("My month - $cachedMonth");
+          // Save to SharedPreferences
+          await prefs.setString('calendarData', json.encode(mapResponse));
+          await prefs.setString('calendarMonth', _currentMonth);
+
+
+
+        // ✅ Rebuild UI from fresh API data
+        _buildCalendarFromMap(mapResponse);
+      } else {
+        print('Failed to load calendar data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error calling calendar API: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+
+    calendarModalClass = CalendarModalClass.fromJson(mapResponse);
+    return calendarModalClass;
+  }
+
+// 🔧 Helper method to rebuild UI from any map data (API or cache)
+  void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+    try {
+      List<dynamic> data = mapResponse['data'] ?? [];
+      List<dynamic> legends = mapResponse['legends'] ?? [];
+
+      // Build legends
+      _legends = legends.map((legend) {
+        return {
+          "mobColor": legend["mobColor"].toString(),
+          "status": legend["status"].toString(),
+        };
+      }).toList();
+
+      // Build marked dates
+      _markedDateMap.clear();
+      //print("Calendar Mark Date - $_markedDateMap");
+
+      for (var event in data) {
+        DateTime eventDate = DateTime.parse(event['logDate']);
+        String title = event['status'] ?? "Event";
+        String logDate = event['logDate'];
+        String mobColor = event['mobColor'] ?? "0xff2196F3";
+        //print("Calendar event data - $eventDate");
+
+        _markedDateMap.add(
+          eventDate,
+          Event(
+            date: eventDate,
+            title: title,
+            icon: _buildEventIcon(mobColor, logDate),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error parsing calendar data: $e");
+    }
+
+    setState(() {}); // Refresh UI
   }
 
   // Helper function to build event icon
@@ -530,6 +644,23 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       getTodayEventData(sessionId!);
 
       Future<HolidayESSModal?> getHolidayList = getHolidayData(sessionId!);
+      Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+      Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
+      getEmployeeList11.then((value) {
+        setState(() {
+          essDashboardModelGlobal = value;
+          isLoading = false;
+        });
+
+      });
+
+      getCalendar.then((value) {
+        setState(() {
+          calendarModalGlobal = value;
+          isLoading = false;
+        });
+
+      });
 
       getHolidayList.then((value) {
         setState(() {
@@ -722,14 +853,18 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   // ===============================================================
   Future<void> loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
-
     final eventsJson = prefs.getString('eventsListModalData');
     final todayEventsJson = prefs.getString('todayEventModalData');
     final holidayJson = prefs.getString('holidayData');
+    final calendarJson = prefs.getString('calendarData');
+    final calendarMonth = prefs.getString('calendarMonth');
+    final dashboardData = prefs.getString('dashboardData');
 
     if (eventsJson != null) {
       final mapResponse = jsonDecode(eventsJson);
+
       eventsListModalGlobal = EssEventsListModal.fromJson(mapResponse);
+      _buildCalendarFromMap(mapResponse);
       isLoadingEvent = false;
       isLoading = false;
       isLoadingTodayEvent = false;
@@ -742,6 +877,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       isLoading = false;
       isLoadingTodayEvent = false;
     }
+
+
     if (holidayJson != null) {
       final mapResponse = jsonDecode(holidayJson);
       final holidayESSModal = HolidayESSModal.fromJson(mapResponse);
@@ -755,6 +892,35 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       print("📦 Loaded Holiday data from SharedPreferences");
     } else {
       print("⚠️ No saved holiday data found in SharedPreferences");
+    }
+
+    print("Calendar Data Loaded - $calendarJson");
+
+    /*if (calendarMonth != null) {
+      final mapResponse = jsonDecode(calendarMonth);
+      calendarModalGlobal = CalendarModalClass.fromJson(mapResponse);
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }*/
+    if (calendarJson != null && calendarMonth == _currentMonth) {
+      final mapResponse = jsonDecode(calendarJson);
+      print("Loaded calendar data from cache ✅");
+      calendarModalGlobal = CalendarModalClass.fromJson(mapResponse);
+      _buildCalendarFromMap(mapResponse);
+      isLoadingEvent = false;
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }
+    if (dashboardData != null) {
+      final mapResponse = jsonDecode(dashboardData);
+      print("Loaded Dashboard Data data from cache ✅");
+      essDashboardModelGlobal = EssDashboarrdModel.fromJson(mapResponse);
+      isLoadingEvent = false;
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
     }
 
     setState(() {

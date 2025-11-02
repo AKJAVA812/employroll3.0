@@ -10,6 +10,9 @@ class SharedPrefHelper {
     await prefs.remove('eventsListModalData');
     await prefs.remove('todayEventModalData');
     await prefs.remove('holidayData');
+    await prefs.remove('calendarData');
+    await prefs.remove('calendarMonth');
+    await prefs.remove('dashboardData');
 
     print("🧹 Cleared cached API data on login");
   }
