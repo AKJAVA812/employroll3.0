@@ -16,6 +16,7 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../modalClass/leaveBalModal.dart';
 import '../modalClass/leaveBalanceModel.dart';
 import 'package:http/http.dart' as http;
 
@@ -29,6 +30,8 @@ SessionManager sessionManager=SessionManager();
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+var doj;
+LeaveBalModal? leaveBalLabel;
 LeaveBalanceModel? leaveBalanceLabel;
 String valuenew="listText";
 List<String> leavereqIdGlobel=[];
@@ -68,6 +71,10 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
+    Future<LeaveBalModal> getAppReq11 = getLeaveBalance(sessionId!);
+
+    fetchLeaveBalance(sessionId!);
+    doj= await shared.getDoj();
     Future<LeaveBalanceModel?> getLeaveType12 = getLeaveTypeList(sessionId!);
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -83,6 +90,82 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         //print('object$leaveTypeId');
       });
     });
+    getAppReq11.then((value) {
+      setState(() {
+        leaveBalLabel=value;
+      });
+
+    });
+  }
+  showNodata(BuildContext buildContext, result,reason) {
+    var alertDialog = AlertDialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0),
+          )
+      ),
+      title: Row(
+        children: [
+          //Icon(Icons.warning),
+          Text(result),
+        ],
+      ),
+      content: Text(reason),
+      titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+            Navigator.pop(buildContext);
+          },
+          child: Text("Ok"),
+        )
+      ],
+      elevation: 24.0,
+    );
+    showDialog(
+        context:buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        });
+  }
+
+  Future<LeaveBalModal> getLeaveBalance(String SessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.leaveBal;
+    print('employeeList11: ${SessionId}');
+    LeaveBalModal leaveBalModal;
+    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
+    final response = await http.post(urlapi);
+    print('URL ${response.request}');
+    //print('responseemployeeList ${response.body}');
+
+    mapResponse = json.decode(response.body);
+    var getData = mapResponse['data'];
+
+    var emptyjson = mapResponse['leaveData']['leaveTypeList'];
+    //var emptyjson = respons;
+
+    var notEmptyjson = mapResponse.isNotEmpty;
+    var containsEmptyjson = mapResponse.length;
+
+    print('responseemployeeList $emptyjson');
+    print('responseemployeeList $notEmptyjson');
+    print('responseemployeeList $containsEmptyjson');
+
+    /* if (containsEmptyjson==1)  {
+      //print("getData111 $getData");
+      showNodata(context, "Oops", "There is no any requisition.");
+    }*/
+    print('responseemployeeList $mapResponse');
+    leaveBalModal=LeaveBalModal.fromJson(mapResponse);
+
+    //print("typename:-${mapResponse['leaveData']['CO-578']['leavesTaken']}");
+    if(emptyjson==null){
+      showNodata(context, "Oops!!", "You are not mapped with any leave policy.");
+    }
+    return leaveBalModal;
   }
 
   Future<LeaveBalanceModel?> getLeaveTypeList(String sessionId) async {
@@ -120,6 +203,97 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
 
     return leaveBalanceLabel;
   }
+
+  Map<String, dynamic>? leaveBalances;
+  List<String> leaveTypes = [];
+  Future<void> fetchLeaveBalance(String sessionId) async {
+    try {
+      LeaveBalModal leaveBalModal = await getLeaveBalance(sessionId);
+
+      setState(() {
+        leaveBalances = {};
+        leaveTypes = [];
+
+        // === Convert leaveData to Map<String, dynamic> safely ===
+        dynamic rawLeaveData = leaveBalModal.leaveData;
+
+        // If it's already a Map, use it directly; otherwise convert via json encode/decode
+        Map<String, dynamic> leaveDataMap;
+        if (rawLeaveData is Map<String, dynamic>) {
+          leaveDataMap = rawLeaveData;
+        } else {
+          // Converts typed object -> JSON string -> Map
+          leaveDataMap = json.decode(json.encode(rawLeaveData)) as Map<String, dynamic>;
+        }
+
+        // === Read leaveTypeList -> leaveTypelist safely ===
+        final rawTypeList = (leaveDataMap['leaveTypeList']?['leaveTypelist']) ?? [];
+
+
+        // Ensure it's a List
+        final List<dynamic> typelist =
+        (rawTypeList is List) ? rawTypeList : (rawTypeList is String ? [rawTypeList] : []);
+
+        // Extract codes like "Casual Leave-CL-789" -> "CL"
+        for (var item in typelist) {
+          final parts = item.toString().split('-');
+          if (parts.length >= 2) {
+            leaveTypes.add(parts[1].trim());
+          }
+        }
+
+        // Deduplicate if any
+        leaveTypes = leaveTypes.toSet().toList();
+
+        // === Map each leave type to its data (find the matching key like "CL-789" or "CL-789" present keys) ===
+        // The API keys look like "CL-789" or "EL-790" etc. We search for keys that contain the code (e.g. "-CL")
+        for (final type in leaveTypes) {
+          // find key where key ends with type or contains '-$type' or starts with '$type-'
+          final matchedKey = leaveDataMap.keys.firstWhere(
+                (k) {
+              final lower = k.toString().toLowerCase();
+              final t = type.toLowerCase();
+              return lower.contains('-$t') || lower.startsWith('$t-') || lower == t;
+            },
+            orElse: () => '',
+          );
+
+          if (matchedKey.isNotEmpty) {
+            // ensure the value is a map (holds leavesTaken, totalLeavesPending etc.)
+            final val = leaveDataMap[matchedKey];
+            if (val is Map<String, dynamic>) {
+              leaveBalances![type] = val;
+            } else {
+              // if it's not map, try to convert typed to map
+              leaveBalances![type] = (val != null) ? json.decode(json.encode(val)) : {};
+            }
+          } else {
+            // If no matching key, create default empty object for this type
+            leaveBalances![type] = {
+              'lwp': 0,
+              'leavesTaken': 0,
+              'totalLeavesPending': 0,
+              'currentYearLeaves': 0,
+              'lastYearLeaves': 0,
+            };
+          }
+        }
+
+        // debug prints
+        print("✅ leaveTypes: $leaveTypes");
+        print("✅ leaveBalances: $leaveBalances");
+      });
+    } catch (e, st) {
+      print("❌ Error in fetchLeaveBalance: $e");
+      print(st);
+      // optional: setState to clear loader or show fallback UI
+      setState(() {
+        leaveBalances = {};
+        leaveTypes = [];
+      });
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -130,6 +304,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     getEmpId();
     getOrgId();
     getSharedPrfanceList();
+
   }
 
   Future getUserName() async {
@@ -413,18 +588,30 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     ),
                   ),
                 ),*/
-              /*Column(
+
+                leaveBalances == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //Text("Leave Ledger", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  //SizedBox(height: 10),
-                  _buildLeaveCard("Last Year Leave Balance 2024", "0", "0", "0", "1", "0", Colors.green, isBold: true),
-                  _buildLeaveCard("Leaves for 2025", "7", "7", "15", "0", "1", Colors.blue, isBold: true),
-                  _buildLeaveCard("Leave taken till date", "0", "0", "0", "0", "1", Colors.red, isBold: true),
-                  _buildLeaveCard("LWP (Leave Without Pay)", "0", "0", "0", "0", "1", Colors.red, isBold: true),
-                  _buildLeaveCard("Total Leaves Pending", "7", "7", "15", "0", "1", Colors.green, isBold: true),
+                  _buildLeaveCardDynamic(
+                    "Leave Taken (Current Ledger)",
+                    leaveTypes,
+                    leaveBalances!, (type) => leaveBalances?[type]?['leavesTaken']?.toString() ?? "0",
+                    Colors.red,
+                    isBold: true,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildLeaveCardDynamic(
+                    "Total Balance",
+                    leaveTypes,
+                    leaveBalances!,
+                        (type) => leaveBalances?[type]?['totalLeavesPending']?.toString() ?? "0",
+                    Colors.green,
+                    isBold: true,
+                  ),
                 ],
-              ).py8(),*/
+              ).py8(),
                 /*Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -1090,6 +1277,59 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     );
   }
 
+  Widget _buildLeaveCardDynamic(
+      String title,
+      List<String> types,
+      Map<String, dynamic> data,
+      String Function(String) valueGetter,
+      Color titleColor, {
+        bool isBold = false,
+      }) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                    color: titleColor)),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 25,
+              runSpacing: 20,
+              children: types.map((type) {
+                final value = valueGetter(type);
+                return _buildLeaveType(type, value, _getColorForType(type));
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Color _getColorForType(String type) {
+    switch (type.toUpperCase()) {
+      case "CL":
+        return Colors.orange;
+      case "SL":
+        return Colors.blue;
+      case "EL":
+        return Colors.green;
+      case "PL":
+        return Colors.red;
+      case "CO":
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
+  }
 
   Widget _buildLeaveCard(String title, String cl, String sl, String el, String pl, String WO, Color titleColor, {bool isBold = false}) {
     return Card(
@@ -1128,7 +1368,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     );
   }
 
-  Widget _buildLeaveType(String type, String count, Color color) {
+/*  Widget _buildLeaveType(String type, String count, Color color) {
     return Column(
       children: [
         Text(type, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
@@ -1137,6 +1377,25 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
           child: Text(count, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+        ),
+      ],
+    );
+  }*/
+  Widget _buildLeaveType(String label, String value, Color color) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
         ),
       ],
     );

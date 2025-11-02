@@ -3077,7 +3077,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               /*String leaveReqMOPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") == true) {
+                              if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") == true || selected.profilePermission?.contains("LEAVE_REQ_MYTEAM_ADD") == true) {
                                 shared.setPendingLeaveReqMSSMOPermission("1");
                               } else {
                                 shared.setPendingLeaveReqMSSMOPermission("0");
@@ -3086,7 +3086,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               /*String leaveReqL1MOPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") == true) {
+                              if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") == true || selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
                                 shared.setPendingLeaveReqL1MSSMOPermission("1");
                               } else {
                                 shared.setPendingLeaveReqL1MSSMOPermission("0");
@@ -3095,7 +3095,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               /* String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true) {
+                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
                                 shared.setPendingLeaveReqL2MSSMOPermission("1");
                               } else {
                                 shared.setPendingLeaveReqL2MSSMOPermission("0");

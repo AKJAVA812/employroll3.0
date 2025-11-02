@@ -25,6 +25,7 @@ import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 import '../../commanScreen/allAPIList.dart';
@@ -59,6 +60,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 dynamic orgId;
+dynamic currentDateCheck;
+dynamic lastSavedDateCheck;
 String? userPanel;
 EssDashboarrdModel? essDashboardModelGlobal;
 CalendarModalClass? calendarModalGlobal;
@@ -137,7 +140,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     getRealTimeAttShow = false;
 
     //Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
-    Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
+    Future<EssEventsListModal?> getEmployeeList14 = getEventData(sessionId!);
     Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
     Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);
     Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
@@ -403,7 +406,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   }
 
 
-  Future<EssEventsListModal> getEventData(String sessionId) async {
+
+  /*Future<EssEventsListModal> getEventData(String sessionId) async {
     setState(() {
       isLoadingEvent = true; // Show loader before fetching
     });
@@ -438,6 +442,63 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     });
 
     return eventsListModal;
+  }*/
+
+  Future<EssEventsListModal?> getEventData(String sessionId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final lastApiCallDate = prefs.getString('lastApiCallDate');
+    print("Last API Call Date - $lastApiCallDate");
+    print("Current Date - $currentDate");
+    // ✅ Check if today's date matches last call date
+    if (lastApiCallDate == currentDate) {
+      print("⏩ Skipping API call. Already fetched today ($currentDate).");
+      isLoadingEvent = false;
+      return eventsListModalGlobal; // Return previously fetched data if available
+    }
+
+    // ✅ If date doesn’t match, make the API call
+    setState(() {
+      isLoadingEvent = true;
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.eventListModalESSApi;
+
+      print('Fetching event data for session: $sessionId');
+
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&"
+            "shift=$shift&"
+            "date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE",
+      );
+
+      final response = await http.post(urlapi);
+
+      print('API Request: ${response.request}');
+      print('Response Body: ${response.body}');
+
+      final mapResponse = json.decode(response.body);
+      final eventsListModal = EssEventsListModal.fromJson(mapResponse);
+
+      // ✅ Save global reference
+      eventsListModalGlobal = eventsListModal;
+
+      // ✅ Save current date as last API call date
+      await prefs.setString('lastApiCallDate', currentDate);
+
+      return eventsListModal;
+    } catch (e) {
+      print("❌ Error fetching event data: $e");
+      return null;
+    } finally {
+      setState(() {
+        isLoadingEvent = false;
+      });
+    }
   }
 
   Future<TodayEventListModal> getTodayEventData(String sessionId) async {
