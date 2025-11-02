@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 #ios
 //version: 3.1.49
 #android
-version: 4.0.55+76
+version: 4.0.56+77
 environment:
   sdk: ^3.7.2
 
