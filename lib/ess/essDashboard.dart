@@ -131,6 +131,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     roRole= await shared.getRoRole();
     userPanelPermission= await shared.getUserPanel();
     adminRole= await shared.getAdminRole();
+
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
@@ -138,44 +139,36 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
     getRealTimeAttButtonShow = true;
     getRealTimeAttShow = false;
-
-    //Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
-    Future<EssEventsListModal?> getEmployeeList14 = getEventData(sessionId!);
-    Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
-    Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);
-    Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
-
     getEmployeeList11.then((value) {
       setState(() {
         essDashboardModelGlobal = value;
         isLoading = false;
       });
-      //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
-    });
-    /*getTodayPunch.then((value) {
-      setState(() {
-        todayPunchesModalGlobal = value;
-        isLoading = false;
-      });
 
-    });*/
+    });
+    //Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+    /*Future<EssEventsListModal?> getEmployeeList14 = getEventData(sessionId!);
+    Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
+    Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);*/
+    Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+
 
     getCalendar.then((value) {
       setState(() {
         calendarModalGlobal = value;
         isLoading = false;
       });
-      //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
-    });
 
-    getEmployeeList14.then((value) {
+    });
+    checkAndRunApi();
+    /*getEmployeeList14.then((value) {
       setState(() {
         eventsListModalGlobal = value;
         setState(() {
           isLoading = false; // End loading
         });
       });
-      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
+
     });
     getHolidayList.then((value) {
       setState(() {
@@ -184,7 +177,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
           isLoading = false; // End loading
         });
       });
-      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
+
     });
     getTodayEventList.then((value) {
       setState(() {
@@ -193,8 +186,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
           isLoading = false; // End loading
         });
       });
-      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
-    });
+
+    });*/
     setState(() {
       if(empRole==1){
         showHide=true;
@@ -271,7 +264,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     return dashboardModel;
   }
 
-  Future<HolidayESSModal> getHolidayData(String sessionId) async {
+  /*Future<HolidayESSModal> getHolidayData(String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.holidayListEss;
 
@@ -293,7 +286,57 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       showNoData = true;
     }
     holidayESSModal = HolidayESSModal.fromJson(mapResponse);
+
     return holidayESSModal;
+  }*/
+
+  Future<HolidayESSModal?> getHolidayData(String sessionId) async {
+    setState(() {
+      isLoading = true; // Start loading
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.holidayListEss;
+
+      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+
+      final response = await http.post(urlapi);
+
+      print('Holiday URL: ${response.request}');
+      print('Response body: ${response.body}');
+      developer.log("Response :- ", name: response.body);
+
+      final mapResponse = json.decode(response.body);
+
+      // ✅ Handle empty data
+      if (mapResponse == null || mapResponse.isEmpty) {
+        print("No holiday data found");
+        showNoData = true;
+        setState(() {
+          isLoading = false;
+        });
+        return null;
+      }
+
+      // ✅ Convert response to model
+      final holidayESSModal = HolidayESSModal.fromJson(mapResponse);
+
+      // ✅ Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('holidayData', jsonEncode(mapResponse));
+
+      print("✅ Holiday data saved to SharedPreferences");
+
+      return holidayESSModal;
+    } catch (e) {
+      print("❌ Error fetching holiday data: $e");
+      return null;
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   /*Future<CalendarModalClass> getCalendarData(String sessionId) async {
@@ -444,8 +487,102 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     return eventsListModal;
   }*/
 
-  Future<EssEventsListModal?> getEventData(String sessionId) async {
+  static const String _lastApiCallKey = 'lastApiCallDate';
+
+  /// Call this before executing your daily API
+/*  static Future<bool> shouldRunApi() async {
     final prefs = await SharedPreferences.getInstance();
+    final String? lastCallDate = prefs.getString(_lastApiCallKey);
+    //prefs.remove(_lastApiCallKey);
+    // Get current date in yyyy-MM-dd format
+    final String currentDate = DateTime.now().toIso8601String().split('T')[0];
+
+    if (lastCallDate == currentDate) {
+      // ✅ API already called today
+      print('API already called today ($currentDate). Skipping call.');
+      isLoading =false;
+      return false;
+    } else {
+      // 🆕 Update date and allow API call
+      await prefs.setString(_lastApiCallKey, currentDate);
+      print('Running API for new date: $currentDate');
+      return true;
+    }
+  }*/
+
+  // ===============================================================
+  // ✅ MAIN METHOD - Check and Run API only once per day
+  // ===============================================================
+  void checkAndRunApi() async {
+    bool runApi = await shouldRunApi();
+
+    if (runApi) {
+      // ✅ Run API only if needed
+      print("🔄 Running API for today...");
+
+      Future<EssEventsListModal?> getEmployeeList14 =
+      getEventData(sessionId!);
+
+      Future<TodayEventListModal> getTodayEventList =
+      getTodayEventData(sessionId!);
+
+      Future<HolidayESSModal?> getHolidayList = getHolidayData(sessionId!);
+
+      getHolidayList.then((value) {
+        setState(() {
+          holidayListModalGlobal = value;
+          setState(() {
+            isLoading = false; // End loading
+            isLoadingTodayEvent = false;
+          });
+        });
+
+      });
+
+      getEmployeeList14.then((value) {
+        if (value != null) {
+          setState(() {
+            eventsListModalGlobal = value;
+            isLoading = false;
+            isLoadingTodayEvent = false;
+          });
+        }
+      });
+
+      getTodayEventList.then((value) {
+        setState(() {
+          todayEventModalGlobal = value;
+          isLoading = false;
+          isLoadingTodayEvent = false;
+        });
+      });
+    } else {
+      print("⏸ Skipping API. Loading from cache...");
+      await loadSavedData(); // 🔹 Load saved modal data
+    }
+  }
+
+
+  // ===============================================================
+  // ✅ Helper - Check if API should run today
+  // ===============================================================
+  Future<bool> shouldRunApi() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? lastCallDate = prefs.getString('lastApiCallDate');
+    final String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    if (lastCallDate == currentDate) {
+      return false; // Same date, skip API
+    } else {
+      // Update date
+      await prefs.setString('lastApiCallDate', currentDate);
+      return true;
+    }
+  }
+
+
+  /*Future<EssEventsListModal?> getEventData(String sessionId) async {
+    *//*final prefs = await SharedPreferences.getInstance();
     final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final lastApiCallDate = prefs.getString('lastApiCallDate');
     print("Last API Call Date - $lastApiCallDate");
@@ -455,7 +592,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       print("⏩ Skipping API call. Already fetched today ($currentDate).");
       isLoadingEvent = false;
       return eventsListModalGlobal; // Return previously fetched data if available
-    }
+    }*//*
 
     // ✅ If date doesn’t match, make the API call
     setState(() {
@@ -488,7 +625,44 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       eventsListModalGlobal = eventsListModal;
 
       // ✅ Save current date as last API call date
-      await prefs.setString('lastApiCallDate', currentDate);
+      //await prefs.setString('lastApiCallDate', currentDate);
+
+      return eventsListModal;
+    } catch (e) {
+      print("❌ Error fetching event data: $e");
+      return null;
+    } finally {
+      setState(() {
+        isLoadingEvent = false;
+      });
+    }
+  }*/
+  // ✅ Get Event Data and Save to SharedPreferences
+  // ===============================================================
+  Future<EssEventsListModal?> getEventData(String sessionId) async {
+    setState(() {
+      isLoadingEvent = true;
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.eventListModalESSApi;
+
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&shift=$shift&date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE",
+      );
+
+      final response = await http.post(urlapi);
+      final mapResponse = json.decode(response.body);
+
+      final eventsListModal = EssEventsListModal.fromJson(mapResponse);
+      eventsListModalGlobal = eventsListModal;
+
+      // ✅ Save modal data to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('eventsListModalData', jsonEncode(mapResponse));
 
       return eventsListModal;
     } catch (e) {
@@ -501,7 +675,91 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     }
   }
 
+  // ===============================================================
+  // ✅ Get Today's Event Data and Save to SharedPreferences
+  // ===============================================================
   Future<TodayEventListModal> getTodayEventData(String sessionId) async {
+    setState(() {
+      isLoadingTodayEvent = true;
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.todayEventApi;
+
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&shift=$shift&date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE",
+      );
+
+      final response = await http.post(urlapi);
+      final mapResponse = json.decode(response.body);
+
+      final todayEventListModal = TodayEventListModal.fromJson(mapResponse);
+      todayEventModalGlobal = todayEventListModal;
+
+      // ✅ Save modal data to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('todayEventModalData', jsonEncode(mapResponse));
+
+      return todayEventListModal;
+    } catch (e) {
+      print("❌ Error fetching today’s event data: $e");
+      rethrow;
+    } finally {
+      setState(() {
+        isLoadingTodayEvent = false;
+      });
+    }
+  }
+
+  // ===============================================================
+  // ✅ Load saved data from SharedPreferences
+  // ===============================================================
+  Future<void> loadSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final eventsJson = prefs.getString('eventsListModalData');
+    final todayEventsJson = prefs.getString('todayEventModalData');
+    final holidayJson = prefs.getString('holidayData');
+
+    if (eventsJson != null) {
+      final mapResponse = jsonDecode(eventsJson);
+      eventsListModalGlobal = EssEventsListModal.fromJson(mapResponse);
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }
+
+    if (todayEventsJson != null) {
+      final mapResponse = jsonDecode(todayEventsJson);
+      todayEventModalGlobal = TodayEventListModal.fromJson(mapResponse);
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }
+    if (holidayJson != null) {
+      final mapResponse = jsonDecode(holidayJson);
+      final holidayESSModal = HolidayESSModal.fromJson(mapResponse);
+
+      setState(() {
+        holidayListModalGlobal = holidayESSModal;
+        isLoadingEvent = false;
+        isLoadingTodayEvent = false;
+      });
+
+      print("📦 Loaded Holiday data from SharedPreferences");
+    } else {
+      print("⚠️ No saved holiday data found in SharedPreferences");
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  /*Future<TodayEventListModal> getTodayEventData(String sessionId) async {
     setState(() {
       isLoadingTodayEvent = true; // Show loader before fetching
     });
@@ -536,7 +794,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     });
 
     return todayEventListModal;
-  }
+  }*/
 
   Future<TodayPunchesModal> getTodayPunchData(String sessionId) async {
     setState(() {
@@ -861,7 +1119,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       print("joblist is null");
     }
 
-    if (holidayListModalGlobal?.result == "success") {
+    /*if (holidayListModalGlobal?.result == "success") {
       for (int i = 0; i < holidayListModalGlobal!.viewHolidayList!.length; i++) {
         holidayDate = holidayListModalGlobal!.viewHolidayList![i].dateOfHoliday;
         holidayLength = holidayListModalGlobal!.viewHolidayList!.length;
@@ -869,7 +1127,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       }
     } else {
       print("holiday list is null");
-    }
+    }*/
 
     final double cardWidth = MediaQuery.of(context).size.width * 0.3;
 
