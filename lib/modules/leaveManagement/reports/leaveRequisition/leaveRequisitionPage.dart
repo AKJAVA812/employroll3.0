@@ -1309,29 +1309,35 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       Color titleColor, {
         bool isBold = false,
       }) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    return SizedBox(
+      width: double.infinity,
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-                    color: titleColor)),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 25,
-              runSpacing: 20,
-              children: types.map((type) {
-                final value = valueGetter(type);
-                return _buildLeaveType(type, value, _getColorForType(type));
-              }).toList(),
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Card(
+          elevation: 3,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                        color: titleColor)),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 35,
+                  runSpacing: 20,
+                  children: types.map((type) {
+                    final value = valueGetter(type);
+                    return _buildLeaveType(type, value, _getColorForType(type));
+                  }).toList(),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

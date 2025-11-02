@@ -55,6 +55,9 @@ class EssAdminDashboard extends StatefulWidget {
   @override
   State<EssAdminDashboard> createState() => _EssAdminDashboardState(dashboardModel1N);
 }
+final DateTime _today = DateTime.now();
+final DateTime _minDateAllowed = DateTime(_today.year, _today.month - 2); // 2 months before
+final DateTime _maxDateAllowed = DateTime(_today.year, _today.month + 1); // 1 month ahead
 
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
@@ -2617,6 +2620,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     );
   }
 
+
 CalendarShow() {
   /// Example with custom icon
   final _calendarCarousel = Container(
@@ -2655,7 +2659,7 @@ CalendarShow() {
   /// Example Calendar Carousel without header and custom prev & next button
   final _calendarCarouselNoHeader = CalendarCarousel<Event>(
     todayBorderColor: Mythemes.lightBluishColor,
-    onDayPressed: (date, events) {
+    /*onDayPressed: (date, events) {
 
       this.setState(() => _currentDate = date);
       this.setState(() => _currentDate2 = date);
@@ -2669,6 +2673,45 @@ CalendarShow() {
           AttendanceRequisitionCalendar(new AttendanceReportModel(), OnDateAttModel(),0, "$formattedDate")));
       //Nevigate Next Page
 
+    },*/
+    onDayPressed: (date, events) {
+      // Prevent selecting dates older than current month view
+      if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
+        print("⛔ Date tap disabled for past months");
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            title: const Text(
+              "Notice",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: const Text(
+              "Requisitions for the past pay-cycle has been closed.",
+              style: TextStyle(fontSize: 15),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK", style: TextStyle(color: Colors.blue)),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      this.setState(() => _currentDate = date);
+      this.setState(() => _currentDate2 = date);
+      events.forEach((event) => print(event.title));
+      print(date);
+      setState(() {
+        formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
+        print("Formatted Date - $formattedDate");
+      });
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => AttendanceRequisitionCalendar(
+              new AttendanceReportModel(), OnDateAttModel(), 0, "$formattedDate")));
     },
     daysHaveCircularBorder: true,
     showOnlyCurrentMonthDate: false,
@@ -2714,7 +2757,7 @@ CalendarShow() {
       color: Colors.tealAccent,
       fontSize: 20,
     ),
-    onCalendarChanged: (DateTime date) {
+    /*onCalendarChanged: (DateTime date) {
       _targetDateTime = date;
       _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
       //_currentMonth = DateFormat.yMMM().format(_targetDateTime);
@@ -2731,6 +2774,29 @@ CalendarShow() {
           //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
         });
         //API month change call
+      });
+    },*/
+    onCalendarChanged: (DateTime date) {
+      // Prevent sliding beyond allowed range
+      if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
+        print("⛔ Calendar slide limit reached");
+        return;
+      }
+
+      _targetDateTime = date;
+      _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+      print('change date $date.month$_targetDateTime');
+      singleDateString = DateFormat('dd-MM-yyyy').format(date);
+      print("Updated Date Change - $singleDateString");
+
+      getSharedPrfanceList();
+      setState(() {
+        Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+        getCalendar.then((value) {
+          setState(() {
+            calendarModalGlobal = value;
+          });
+        });
       });
     },
     onDayLongPressed: (DateTime date) {
@@ -2766,7 +2832,7 @@ CalendarShow() {
                         fontSize: 24.0,
                       ),
                     )),
-                TextButton(
+                /*TextButton(
                   child: Text('PREV'),
                   onPressed: () {
                     setState(() {
@@ -2776,8 +2842,31 @@ CalendarShow() {
                           DateFormat.yMMM().format(_targetDateTime);
                     });
                   },
-                ),
+                ),*/
                 TextButton(
+                  child: Text('PREV'),
+                  onPressed: () {
+                    final previousMonth = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
+                    if (previousMonth.isBefore(_minDateAllowed)) {
+                      print("⛔ You can’t go beyond last 2 months");
+                      Fluttertoast.showToast(
+                          msg: "Can't go before this month !!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _targetDateTime = previousMonth;
+                      _currentMonth = DateFormat.yMMM().format(_targetDateTime);
+                    });
+                  },
+                ),
+                /*TextButton(
                   child: Text('NEXT'),
                   onPressed: () {
                     setState(() {
@@ -2787,7 +2876,30 @@ CalendarShow() {
                           DateFormat.yMMM().format(_targetDateTime);
                     });
                   },
-                )
+                )*/
+                TextButton(
+                  child: Text('NEXT'),
+                  onPressed: () {
+                    final nextMonth = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
+                    if (nextMonth.isAfter(_maxDateAllowed)) {
+                      print("⛔ You can’t go beyond next month");
+                      Fluttertoast.showToast(
+                      msg: "Can't go beyond this month !!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                      return;
+                    }
+                    setState(() {
+                      _targetDateTime = nextMonth;
+                      _currentMonth = DateFormat.yMMM().format(_targetDateTime);
+                    });
+                  },
+                ),
               ],
             ),
           ),
