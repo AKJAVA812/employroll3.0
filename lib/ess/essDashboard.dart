@@ -2271,6 +2271,53 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                 height: 0,
               ),
 
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+                child: SizedBox(
+                  height: 50,
+                  width: double.infinity, // 👈 full width
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
+                      getEmployeeList11.then((value) {
+                        setState(() {
+                          essDashboardModelGlobal = value;
+                          isLoading = false;
+                        });
+
+                      });
+
+                      Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+                      getCalendar.then((value) {
+                        setState(() {
+                          calendarModalGlobal = value;
+                          isLoading = false;
+                        });
+
+                      });
+                      // 👇 Your action here
+                      print("Update your dashboard clicked");
+                    },
+                    icon: const Icon(Icons.dashboard_customize, color: Colors.white, size: 22,),
+                    label: const Text(
+                      "Update Your Dashboard",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Mythemes.successColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12,), // height
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
+                    ),
+                  ),
+                ),
+              ),
               CalendarShow(),
 
               empRole == 1 || roRole == 1 ?

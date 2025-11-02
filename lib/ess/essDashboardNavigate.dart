@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -24,6 +25,7 @@ import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 import '../../commanScreen/allAPIList.dart';
@@ -53,12 +55,17 @@ class EssAdminDashboardHead extends StatefulWidget {
   @override
   State<EssAdminDashboardHead> createState() => _EssAdminDashboardHeadState(dashboardModel1N);
 }
+final DateTime _today = DateTime.now();
+final DateTime _minDateAllowed = DateTime(_today.year, _today.month - 2); // 2 months before
+final DateTime _maxDateAllowed = DateTime(_today.year, _today.month + 1); // 1 month ahead
 
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 dynamic orgId;
-String? userPanelPermission;
+dynamic currentDateCheck;
+dynamic lastSavedDateCheck;
+String? userPanel;
 EssDashboarrdModel? essDashboardModelGlobal;
 CalendarModalClass? calendarModalGlobal;
 EssEventsListModal? eventsListModalGlobal;
@@ -69,6 +76,7 @@ DateTime date = DateTime.now();
 var branchId = 0;
 var shift = 0;
 var singleDateString;
+var todayDateFetch;
 var eventSingleDateString;
 var day = new DateTime.now();
 var single = new DateFormat('dd');
@@ -79,7 +87,6 @@ bool isLoadingTodayEvent = true;
 bool isLoadingTodayPunch = true;
 String valuenew = "listText";
 String shiftValue = "listText";
-
 
 class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
@@ -92,6 +99,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   bool showHide = false;
   bool showAdmin = false;
   bool showRo = false;
+  String userPanelPermission = "COMPANY_EMPLOYEE";
   dynamic formattedDate;
   DateTime _currentDate = DateTime.now();
   DateTime _currentDate2 = DateTime.now();
@@ -103,7 +111,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   List<Map<String, String>> _legends = [];
 
-  var todayDate = "dd/mm/yyyy";
+  var todayDate = "dd-mm-yyyy";
   int? totalAttendance;
   int? presentCount;
   int? paidDaysCount;
@@ -121,65 +129,50 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
     orgId = await shared.getOrgId();
+    userPanel = await shared.getUserPanel();
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
-    adminRole= await shared.getAdminRole();
     userPanelPermission= await shared.getUserPanel();
+    adminRole= await shared.getAdminRole();
+
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
-    Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
-    //Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+
+    //Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
     getRealTimeAttButtonShow = true;
     getRealTimeAttShow = false;
-    Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
-    Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);
-    Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
-    Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
-    getEmployeeList11.then((value) {
+    /*getEmployeeList11.then((value) {
       setState(() {
         essDashboardModelGlobal = value;
         isLoading = false;
       });
-      //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
-    });
 
-    /*getTodayPunch.then((value) {
-      setState(() {
-        todayPunchesModalGlobal = value;
-        isLoading = false;
-      });
-      //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
     });*/
+    //Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+    /*Future<EssEventsListModal?> getEmployeeList14 = getEventData(sessionId!);
+    Future<HolidayESSModal> getHolidayList = getHolidayData(sessionId!);
+    Future<TodayEventListModal> getTodayEventList = getTodayEventData(sessionId!);*/
+    /*Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+
 
     getCalendar.then((value) {
       setState(() {
         calendarModalGlobal = value;
         isLoading = false;
       });
-      //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
-    });
 
-    getEmployeeList14.then((value) {
+    });*/
+    checkAndRunApi();
+    /*getEmployeeList14.then((value) {
       setState(() {
         eventsListModalGlobal = value;
         setState(() {
           isLoading = false; // End loading
         });
       });
-      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
-    });
 
-    getTodayEventList.then((value) {
-      setState(() {
-        todayEventModalGlobal = value;
-        setState(() {
-          isLoading = false; // End loading
-        });
-      });
-      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
     });
-
     getHolidayList.then((value) {
       setState(() {
         holidayListModalGlobal = value;
@@ -187,10 +180,17 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           isLoading = false; // End loading
         });
       });
-      //print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
+
     });
-    empRole= await shared.getEmpRoll();
-    roRole= await shared.getRoRole();
+    getTodayEventList.then((value) {
+      setState(() {
+        todayEventModalGlobal = value;
+        setState(() {
+          isLoading = false; // End loading
+        });
+      });
+
+    });*/
     setState(() {
       if(empRole==1){
         showHide=true;
@@ -229,11 +229,14 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   }
 
+  var showNoData;
   dynamic cardLoader = false;
 
   Future getTodayDate() async {
     singleDateString = DateTime.now();
+    todayDateFetch = DateTime.now();
     singleDateString = DateFormat('dd-MM-yyyy').format(date);
+    todayDateFetch = DateFormat('dd-MM-yyyy').format(date);
     //print("SingleDate $singleDateString");
     //dateController.text = DateFormat("dd-MM-yyyy").format(date);
     //  DateFormat.yMd().format(date!).toString();
@@ -261,7 +264,85 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     mapResponse = json.decode(response.body);
     dashboardModel = EssDashboarrdModel.fromJson(mapResponse);
+    // ✅ Save to SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('dashboardData', jsonEncode(mapResponse));
     return dashboardModel;
+  }
+
+  /*Future<HolidayESSModal> getHolidayData(String sessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.holidayListEss;
+
+    //print('employeeList11: ${SessionId}');
+    HolidayESSModal holidayESSModal;
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId");
+    final response = await http.post(urlapi);
+    setState(() {
+      isLoading = true; // Start loading
+    });
+    print('Holiday URL ${response.request}');
+    print('response body ${response.body}');
+    developer.log("response:- " ,name: response.body);
+    mapResponse = json.decode(response.body);
+    var getData = mapResponse.length;
+    if (getData == 0 )  {
+      print("getData111 $getData");
+      showNoData = true;
+    }
+    holidayESSModal = HolidayESSModal.fromJson(mapResponse);
+
+    return holidayESSModal;
+  }*/
+
+  Future<HolidayESSModal?> getHolidayData(String sessionId) async {
+    setState(() {
+      isLoading = true; // Start loading
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.holidayListEss;
+
+      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+
+      final response = await http.post(urlapi);
+
+      print('Holiday URL: ${response.request}');
+      print('Response body: ${response.body}');
+      developer.log("Response :- ", name: response.body);
+
+      final mapResponse = json.decode(response.body);
+
+      // ✅ Handle empty data
+      if (mapResponse == null || mapResponse.isEmpty) {
+        print("No holiday data found");
+        showNoData = true;
+        setState(() {
+          isLoading = false;
+        });
+        return null;
+      }
+
+      // ✅ Convert response to model
+      final holidayESSModal = HolidayESSModal.fromJson(mapResponse);
+
+      // ✅ Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('holidayData', jsonEncode(mapResponse));
+
+      print("✅ Holiday data saved to SharedPreferences");
+
+      return holidayESSModal;
+    } catch (e) {
+      print("❌ Error fetching holiday data: $e");
+      return null;
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   /*Future<CalendarModalClass> getCalendarData(String sessionId) async {
@@ -285,33 +366,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     calendarModalClass = CalendarModalClass.fromJson(mapResponse);
     return calendarModalClass;
   }*/
-  var showNoData;
-  Future<HolidayESSModal> getHolidayData(String sessionId) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.holidayListEss;
 
-    //print('employeeList11: ${SessionId}');
-    HolidayESSModal holidayESSModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
-    final response = await http.post(urlapi);
-    setState(() {
-      isLoading = true; // Start loading
-    });
-    print('Holiday URL ${response.request}');
-    print('response body ${response.body}');
-    developer.log("response:- " ,name: response.body);
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse.length;
-    if (getData == 0 )  {
-      print("getData111 $getData");
-      showNoData = true;
-    }
-    holidayESSModal = HolidayESSModal.fromJson(mapResponse);
-    return holidayESSModal;
-  }
-
-  Future<CalendarModalClass> getCalendarData(String sessionId) async {
+  /*Future<CalendarModalClass> getCalendarData(String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.calendarApi;
     print("Current Month - $_currentMonth");
@@ -342,6 +398,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             "status": legend["status"].toString(),
           };
         }).toList();
+
         _markedDateMap.clear();
 
         for (var event in data) {
@@ -350,7 +407,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           String logDate = event['logDate'];
           String mobColor = event['mobColor'] ?? "0xff2196F3"; // Default color if not provided
 
-          //print("Color - $mobColor");
+          print("Color - $mobColor");
           // Add event to _markedDateMap
           _markedDateMap.add(
             eventDate,
@@ -362,17 +419,129 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           );
         }
       } else {
-        //print('Failed to load calendar data: ${response.statusCode}');
+        print('Failed to load calendar data: ${response.statusCode}');
       }
     } catch (e) {
-      //print("Error: $e");
+      print("Error: $e");
     } finally {
       setState(() {
         isLoading = false; // Stop loading
       });
     }
+
     calendarModalClass = CalendarModalClass.fromJson(mapResponse);
     return calendarModalClass;
+  }*/
+  Future<CalendarModalClass> getCalendarData(String sessionId) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.calendarApi;
+    print("Current Month - $_currentMonth");
+
+    CalendarModalClass calendarModalClass;
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "month=$_currentMonth");
+
+    setState(() {
+      isLoading = true;
+    });
+
+    Map<String, dynamic> mapResponse = {};
+
+    final prefs = await SharedPreferences.getInstance();
+
+    // ✅ STEP 1: Try loading from SharedPreferences first
+    final cachedData = prefs.getString('calendarData');
+    final cachedMonth = prefs.getString('calendarMonth');
+
+    print("Calendar Data - $cachedData");
+    print("Calendar Month - $cachedMonth");
+
+    if (cachedData != null) {
+      print("Cachded Month $cachedMonth");
+      try {
+        print("Loaded calendar data from cache ✅");
+        mapResponse = json.decode(cachedData);
+        _buildCalendarFromMap(mapResponse);
+      } catch (e) {
+        print("Error loading cached calendar: $e");
+      }
+    }
+
+    // ✅ STEP 2: Now call API (refresh data and overwrite cache)
+    try {
+      final response = await http.post(urlapi);
+      if (response.statusCode == 200) {
+        print('Calendar URL - ${response.request}');
+        print('Response body - ${response.body}');
+        mapResponse = json.decode(response.body);
+
+        print("Calendar Data - $cachedData");
+        print("Calendar Month - $cachedMonth");
+
+        print("My month - $cachedMonth");
+        // Save to SharedPreferences
+        await prefs.setString('calendarData', json.encode(mapResponse));
+        await prefs.setString('calendarMonth', _currentMonth);
+
+
+
+        // ✅ Rebuild UI from fresh API data
+        _buildCalendarFromMap(mapResponse);
+      } else {
+        print('Failed to load calendar data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error calling calendar API: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+
+    calendarModalClass = CalendarModalClass.fromJson(mapResponse);
+    return calendarModalClass;
+  }
+
+// 🔧 Helper method to rebuild UI from any map data (API or cache)
+  void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+    try {
+      List<dynamic> data = mapResponse['data'] ?? [];
+      List<dynamic> legends = mapResponse['legends'] ?? [];
+
+      // Build legends
+      _legends = legends.map((legend) {
+        return {
+          "mobColor": legend["mobColor"].toString(),
+          "status": legend["status"].toString(),
+        };
+      }).toList();
+
+      // Build marked dates
+      _markedDateMap.clear();
+      //print("Calendar Mark Date - $_markedDateMap");
+
+      for (var event in data) {
+        DateTime eventDate = DateTime.parse(event['logDate']);
+        String title = event['status'] ?? "Event";
+        String logDate = event['logDate'];
+        String mobColor = event['mobColor'] ?? "0xff2196F3";
+        //print("Calendar event data - $eventDate");
+
+        _markedDateMap.add(
+          eventDate,
+          Event(
+            date: eventDate,
+            title: title,
+            icon: _buildEventIcon(mobColor, logDate),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error parsing calendar data: $e");
+    }
+
+    setState(() {}); // Refresh UI
   }
 
   // Helper function to build event icon
@@ -396,37 +565,370 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     );
   }
 
-  Future<EssEventsListModal> getEventData(String SessionId) async {
+
+
+  /*Future<EssEventsListModal> getEventData(String sessionId) async {
     setState(() {
-      isLoadingEvent = true; // Hide loader always
+      isLoadingEvent = true; // Show loader before fetching
     });
+
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalESSApi;
 
-    print('employeeList11: ${SessionId}');
-    EssEventsListModal eventsListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "branch=$branchId&"
-        "shift=$shift&"
-        "date=$singleDateString&"
-        "userPermission=COMPANY_EMPLOYEE");
-    final response = await http.post(urlapi);
+    print('employeeList11: $sessionId');
 
+    EssEventsListModal eventsListModal;
+
+    var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&"
+            "shift=$shift&"
+            "date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE");
+
+    final response = await http.post(urlapi);
     print('responseemployeeList ${response.request}');
-    //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
-    //var getData = mapResponse;
-    //print('Body Data $getData');
+    print('Body Data $mapResponse');
+
     eventsListModal = EssEventsListModal.fromJson(mapResponse);
+
+    // assign to global
+    eventsListModalGlobal = eventsListModal;
+
     setState(() {
-      isLoadingEvent = false; // Hide loader always
+      isLoadingEvent = false; // Hide loader AFTER everything is ready
     });
+
     return eventsListModal;
+  }*/
+
+  static const String _lastApiCallKey = 'lastApiCallDate';
+
+  /// Call this before executing your daily API
+/*  static Future<bool> shouldRunApi() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? lastCallDate = prefs.getString(_lastApiCallKey);
+    //prefs.remove(_lastApiCallKey);
+    // Get current date in yyyy-MM-dd format
+    final String currentDate = DateTime.now().toIso8601String().split('T')[0];
+
+    if (lastCallDate == currentDate) {
+      // ✅ API already called today
+      print('API already called today ($currentDate). Skipping call.');
+      isLoading =false;
+      return false;
+    } else {
+      // 🆕 Update date and allow API call
+      await prefs.setString(_lastApiCallKey, currentDate);
+      print('Running API for new date: $currentDate');
+      return true;
+    }
+  }*/
+
+  // ===============================================================
+  // ✅ MAIN METHOD - Check and Run API only once per day
+  // ===============================================================
+  void checkAndRunApi() async {
+    bool runApi = await shouldRunApi();
+
+    if (runApi) {
+      // ✅ Run API only if needed
+      print("🔄 Running API for today...");
+
+      Future<EssEventsListModal?> getEmployeeList14 =
+      getEventData(sessionId!);
+
+      Future<TodayEventListModal> getTodayEventList =
+      getTodayEventData(sessionId!);
+
+      Future<HolidayESSModal?> getHolidayList = getHolidayData(sessionId!);
+      Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+      Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
+      getEmployeeList11.then((value) {
+        setState(() {
+          essDashboardModelGlobal = value;
+          isLoading = false;
+        });
+
+      });
+
+      getCalendar.then((value) {
+        setState(() {
+          calendarModalGlobal = value;
+          isLoading = false;
+        });
+
+      });
+
+      getHolidayList.then((value) {
+        setState(() {
+          holidayListModalGlobal = value;
+          setState(() {
+            isLoading = false; // End loading
+            isLoadingTodayEvent = false;
+          });
+        });
+
+      });
+
+      getEmployeeList14.then((value) {
+        if (value != null) {
+          setState(() {
+            eventsListModalGlobal = value;
+            isLoading = false;
+            isLoadingTodayEvent = false;
+          });
+        }
+      });
+
+      getTodayEventList.then((value) {
+        setState(() {
+          todayEventModalGlobal = value;
+          isLoading = false;
+          isLoadingTodayEvent = false;
+        });
+      });
+    } else {
+      print("⏸ Skipping API. Loading from cache...");
+      await loadSavedData(); // 🔹 Load saved modal data
+    }
   }
 
+
+  // ===============================================================
+  // ✅ Helper - Check if API should run today
+  // ===============================================================
+  Future<bool> shouldRunApi() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? lastCallDate = prefs.getString('lastApiCallDate');
+    final String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    if (lastCallDate == currentDate) {
+      return false; // Same date, skip API
+    } else {
+      // Update date
+      await prefs.setString('lastApiCallDate', currentDate);
+      return true;
+    }
+  }
+
+
+  /*Future<EssEventsListModal?> getEventData(String sessionId) async {
+    *//*final prefs = await SharedPreferences.getInstance();
+    final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final lastApiCallDate = prefs.getString('lastApiCallDate');
+    print("Last API Call Date - $lastApiCallDate");
+    print("Current Date - $currentDate");
+    // ✅ Check if today's date matches last call date
+    if (lastApiCallDate == currentDate) {
+      print("⏩ Skipping API call. Already fetched today ($currentDate).");
+      isLoadingEvent = false;
+      return eventsListModalGlobal; // Return previously fetched data if available
+    }*//*
+
+    // ✅ If date doesn’t match, make the API call
+    setState(() {
+      isLoadingEvent = true;
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.eventListModalESSApi;
+
+      print('Fetching event data for session: $sessionId');
+
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&"
+            "shift=$shift&"
+            "date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE",
+      );
+
+      final response = await http.post(urlapi);
+
+      print('API Request: ${response.request}');
+      print('Response Body: ${response.body}');
+
+      final mapResponse = json.decode(response.body);
+      final eventsListModal = EssEventsListModal.fromJson(mapResponse);
+
+      // ✅ Save global reference
+      eventsListModalGlobal = eventsListModal;
+
+      // ✅ Save current date as last API call date
+      //await prefs.setString('lastApiCallDate', currentDate);
+
+      return eventsListModal;
+    } catch (e) {
+      print("❌ Error fetching event data: $e");
+      return null;
+    } finally {
+      setState(() {
+        isLoadingEvent = false;
+      });
+    }
+  }*/
+  // ✅ Get Event Data and Save to SharedPreferences
+  // ===============================================================
+  Future<EssEventsListModal?> getEventData(String sessionId) async {
+    setState(() {
+      isLoadingEvent = true;
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.eventListModalESSApi;
+
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&shift=$shift&date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE",
+      );
+
+      final response = await http.post(urlapi);
+      final mapResponse = json.decode(response.body);
+
+      final eventsListModal = EssEventsListModal.fromJson(mapResponse);
+      eventsListModalGlobal = eventsListModal;
+
+      // ✅ Save modal data to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('eventsListModalData', jsonEncode(mapResponse));
+
+      return eventsListModal;
+    } catch (e) {
+      print("❌ Error fetching event data: $e");
+      return null;
+    } finally {
+      setState(() {
+        isLoadingEvent = false;
+      });
+    }
+  }
+
+  // ===============================================================
+  // ✅ Get Today's Event Data and Save to SharedPreferences
+  // ===============================================================
   Future<TodayEventListModal> getTodayEventData(String sessionId) async {
+    setState(() {
+      isLoadingTodayEvent = true;
+    });
+
+    try {
+      String conn = ApiDetails.server;
+      String apiUrl = ApiDetails.todayEventApi;
+
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&"
+            "branch=$branchId&shift=$shift&date=$singleDateString&"
+            "userPermission=COMPANY_EMPLOYEE",
+      );
+
+      final response = await http.post(urlapi);
+      final mapResponse = json.decode(response.body);
+
+      final todayEventListModal = TodayEventListModal.fromJson(mapResponse);
+      todayEventModalGlobal = todayEventListModal;
+
+      // ✅ Save modal data to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('todayEventModalData', jsonEncode(mapResponse));
+
+      return todayEventListModal;
+    } catch (e) {
+      print("❌ Error fetching today’s event data: $e");
+      rethrow;
+    } finally {
+      setState(() {
+        isLoadingTodayEvent = false;
+      });
+    }
+  }
+
+  // ===============================================================
+  // ✅ Load saved data from SharedPreferences
+  // ===============================================================
+  Future<void> loadSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final eventsJson = prefs.getString('eventsListModalData');
+    final todayEventsJson = prefs.getString('todayEventModalData');
+    final holidayJson = prefs.getString('holidayData');
+    final calendarJson = prefs.getString('calendarData');
+    final calendarMonth = prefs.getString('calendarMonth');
+    final dashboardData = prefs.getString('dashboardData');
+
+    if (eventsJson != null) {
+      final mapResponse = jsonDecode(eventsJson);
+
+      eventsListModalGlobal = EssEventsListModal.fromJson(mapResponse);
+      _buildCalendarFromMap(mapResponse);
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }
+
+    if (todayEventsJson != null) {
+      final mapResponse = jsonDecode(todayEventsJson);
+      todayEventModalGlobal = TodayEventListModal.fromJson(mapResponse);
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }
+
+
+    if (holidayJson != null) {
+      final mapResponse = jsonDecode(holidayJson);
+      final holidayESSModal = HolidayESSModal.fromJson(mapResponse);
+
+      setState(() {
+        holidayListModalGlobal = holidayESSModal;
+        isLoadingEvent = false;
+        isLoadingTodayEvent = false;
+      });
+
+      print("📦 Loaded Holiday data from SharedPreferences");
+    } else {
+      print("⚠️ No saved holiday data found in SharedPreferences");
+    }
+
+    print("Calendar Data Loaded - $calendarJson");
+
+    /*if (calendarMonth != null) {
+      final mapResponse = jsonDecode(calendarMonth);
+      calendarModalGlobal = CalendarModalClass.fromJson(mapResponse);
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }*/
+    if (calendarJson != null && calendarMonth == _currentMonth) {
+      final mapResponse = jsonDecode(calendarJson);
+      print("Loaded calendar data from cache ✅");
+      calendarModalGlobal = CalendarModalClass.fromJson(mapResponse);
+      _buildCalendarFromMap(mapResponse);
+      isLoadingEvent = false;
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }
+    if (dashboardData != null) {
+      final mapResponse = jsonDecode(dashboardData);
+      print("Loaded Dashboard Data data from cache ✅");
+      essDashboardModelGlobal = EssDashboarrdModel.fromJson(mapResponse);
+      isLoadingEvent = false;
+      isLoadingEvent = false;
+      isLoading = false;
+      isLoadingTodayEvent = false;
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  /*Future<TodayEventListModal> getTodayEventData(String sessionId) async {
     setState(() {
       isLoadingTodayEvent = true; // Show loader before fetching
     });
@@ -457,11 +959,11 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     todayEventModalGlobal = todayEventListModal;
 
     setState(() {
-      isLoadingEvent = false; // Hide loader AFTER everything is ready
+      isLoadingTodayEvent = false; // Hide loader AFTER everything is ready
     });
 
     return todayEventListModal;
-  }
+  }*/
 
   Future<TodayPunchesModal> getTodayPunchData(String sessionId) async {
     setState(() {
@@ -477,13 +979,14 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     var urlapi = Uri.parse(
         "$conn$apiUrl?sessionId=$sessionId&"
-            "date=$singleDateString");
+            "date=$todayDateFetch");
 
     final response = await http.post(urlapi);
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     print('Body Data $mapResponse');
+
 
     todayPunchesModal = TodayPunchesModal.fromJson(mapResponse);
 
@@ -598,8 +1101,44 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     var now = DateTime.now();
     var formatter = DateFormat('dd/MM/yyyy');
     todayDate = formatter.format(now);
+    _scrollController = ScrollController();
+    // Delay scroll start slightly to ensure build completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startAutoScroll();
+    });
     getSharedPrfanceList();
 
+    setState(() {
+      if(empRole==1){
+        showHide=true;
+        print('Show Emp $showHide');
+        setState(() {
+        });
+      }
+      if(empRole==0){
+        showHide=false;
+        print('Show Emp $showHide');
+        setState(() {
+        });
+      }
+      if (adminRole == 0) {
+        showAdmin = false;
+        print("Show Admin $showAdmin");
+      }
+      if (adminRole == 1) {
+        showAdmin = true;
+        print("Show Admin $showAdmin");
+      }
+      if (roRole == 0) {
+        showRo = false;
+
+        print("Show Ro $showRo");
+      }
+      if (roRole == 1) {
+        showRo = true;
+        print("Show Ro $showRo");
+      }
+    });
     setState(() {});
 
     getTodayDate();
@@ -607,43 +1146,83 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     // TODO: implement initState
   }
   int pageIndex = 0;
-  int currentIndex = 3;
+  int currentIndex = 2;
   var titleName = "My Dashboard";
+
+  var holidayDate;
+  var holidayLength;
+
+
+  final Map<String, Color> punchColors = {
+    "In": Colors.green,
+    "Out": Colors.redAccent,
+  };
+
+  final List<Map<String, String>> punches = [
+    {"type": "In", "time": "09:15 AM"},
+    {"type": "Out", "time": "01:00 PM"},
+    {"type": "In", "time": "02:00 PM"},
+    {"type": "Out", "time": "06:30 PM"},
+    {"type": "In", "time": "07:00 PM"},
+    {"type": "Out", "time": "10:00 PM"},
+  ];
+
+  late final ScrollController _scrollController;
+  late Timer _scrollTimer;
+  final double scrollStep = 1.0; // how many pixels to scroll each tick
+  final Duration scrollDuration = Duration(milliseconds: 30); // speed
+
+  void _startAutoScroll() {
+    _scrollTimer = Timer.periodic(scrollDuration, (_) {
+      if (!_scrollController.hasClients) return;
+
+      /* final maxScroll = _scrollController.position.maxScrollExtent;
+      final currentScroll = _scrollController.offset;
+
+      print("Max - $maxScroll");
+      print("Current - $currentScroll");
+      if (currentScroll >= maxScroll) {
+        _scrollController.jumpTo(0); // Reset back to start
+      } else {
+        _scrollController.jumpTo(currentScroll + scrollStep);
+      }*/
+      /* for(double i=0 ;i>=10;i++){
+        _scrollController.jumpTo(i);
+      }*/
+
+    });
+  }
+
+  void scrollToFirstPunch() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0.0,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollTimer.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+
+
   var getRealTimeAttButtonShow = true;
   var getRealTimeAttShow = false;
 
   @override
   Widget build(BuildContext context) {
 
-
     return Scaffold(
-
       appBar: AppBar(
-        title: titleName.text.make(),
+        title: "My Dashboard".text.bold.center.make(),
       ),
-      /*floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          date = (await showDatePicker(
-              context: context,
-              initialDate: date,
-              firstDate: DateTime(1947),
-              lastDate: DateTime.now().add(Duration(days: 0))))!;
 
-          setState(() {
-            loader();
-            getSharedPrfanceList();
-            singleDateString = DateFormat('dd-MM-yyyy').format(date);
-            singleDay = DateFormat('dd').format(date);
-            print("SingleDateNew $singleDateString");
-            print("singleDay $singleDay");
-            //dateController.text = DateFormat("dd").format(date!);
-
-            //  DateFormat.yMd().format(date!).toString();
-          });
-        },
-        backgroundColor: Mythemes.lightBluishColor,
-        child: singleDay.toString().text.color(Mythemes.whitish).make(),
-      ),*/
       body: essDashboardModelGlobal == null
           ? loader()
           : RefreshIndicator(
@@ -652,71 +1231,12 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           },
           child: DashboardWidgets(essDashboardModelGlobal!)),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
-        type: BottomNavigationBarType.fixed,
-        currentIndex: currentIndex,
-        iconSize: 25,
-        selectedFontSize: 12,
-        unselectedFontSize: 10,
-        onTap: (index) {
-
-          if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
-            //Navigator.pop(context);
-            print('home tab');
-          }
-          if(index==1){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
-          }
-          if(index==2){
-            Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-            print('Reports');
-          }
-          if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
-          }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
-            print('Profile');
-          }
-
-          setState(() => currentIndex = index);
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.doc_chart),
-            label: 'Reports',
-            //backgroundColor: Colors.blue,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
-            //backgroundColor: Colors.blue,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
-            //backgroundColor: Colors.blue,
-          ),
-        ],
-      ),
     );
   }
+
+  late Future<List<Map<String, dynamic>>> punchesFuture;
+
+
 
   DashboardWidgets(EssDashboarrdModel dashboardModel) {
     paidDaysCount = essDashboardModelGlobal!.countData!.paidDaysCount;
@@ -730,8 +1250,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     shortLeaveCount = essDashboardModelGlobal!.countData!.shortlev;
 
     presentCount = (totalDays ?? 0) - (totalAbsentEmp ?? 0);
-    var holidayDate;
-    var holidayLength;
     print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
@@ -743,43 +1261,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     var oldJobLength;
     var oldJobEvent;
 
-    /*for(int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
-      oldEvent = eventsListModalGlobal!.bdayList![i].dob;
-      oldEventLength = eventsListModalGlobal!.bdayList!.length;
-      print("oldEvent $oldEvent");
-    }
-
-    for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
-      oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
-      oldJobLength = eventsListModalGlobal!.joblist!.length;
-      print("oldJobEvent $oldJobEvent");
-    }*/
-
     if (eventsListModalGlobal?.bdayList != null) {
-      setState(() {
-        isLoading = true;
-      });
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
         print("oldEvent $oldEvent");
       }
-      setState(() {
-        isLoading = false;
-      });
     } else {
       print("bdayList is null");
     }
 
-    if (todayEventModalGlobal?.todayEventList != null) {
-      for (int i = 0; i < todayEventModalGlobal!.todayEventList!.length; i++) {
-        oldJobEvent = todayEventModalGlobal!.todayEventList![i].dob;
-        oldJobLength = todayEventModalGlobal!.todayEventList!.length;
-        print("oldJobEvent $oldJobEvent");
-      }
-    } else {
-      print("joblist is null");
-    }
 
     if (eventsListModalGlobal?.joblist != null) {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
@@ -790,8 +1281,17 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     } else {
       print("joblist is null");
     }
+    if (todayEventModalGlobal?.todayEventList != null) {
+      for (int i = 0; i < todayEventModalGlobal!.todayEventList!.length; i++) {
+        oldJobEvent = todayEventModalGlobal!.todayEventList![i].dob;
+        oldJobLength = todayEventModalGlobal!.todayEventList!.length;
+        print("oldJobEvent $oldJobEvent");
+      }
+    } else {
+      print("joblist is null");
+    }
 
-    if (holidayListModalGlobal?.result == "success") {
+    /*if (holidayListModalGlobal?.result == "success") {
       for (int i = 0; i < holidayListModalGlobal!.viewHolidayList!.length; i++) {
         holidayDate = holidayListModalGlobal!.viewHolidayList![i].dateOfHoliday;
         holidayLength = holidayListModalGlobal!.viewHolidayList!.length;
@@ -799,223 +1299,1020 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       }
     } else {
       print("holiday list is null");
-    }
+    }*/
+
+    final double cardWidth = MediaQuery.of(context).size.width * 0.3;
 
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
+// Repeat data enough times to scroll indefinitely
+    final repeatedPunches = List.generate(
+      1000,
+          (index) => punches[index % punches.length],
+    );
+
 
     return DismissKeyboard(
       child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Visibility(
-              visible: userPanelPermission == "MSS",
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedToggleSwitch<int>.size(
-                    height: 30,
-                    current: min(value, 2),
-                    style: ToggleStyle(
-                      backgroundColor: Mythemes.greyishade,
-                      indicatorColor: Mythemes.lightBluishColor,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20.0),
-                      indicatorBorderRadius: BorderRadius.zero,
-                    ),
-                    values: const [0, 1],
-                    iconOpacity: 1.0,
-                    selectedIconScale: 1.0,
-                    indicatorSize: const Size.fromWidth(150),
-                    iconAnimationType: AnimationType.onHover,
-                    styleAnimationType: AnimationType.onHover,
-                    spacing: 2.0,
-                    customSeparatorBuilder: (context, local, global) {
-                      final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
-                      return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
-                    },
-                    customIconBuilder: (context, local, global) {
-                      final text = const ['ESS', 'MSS'][local.index];
-                      return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
-                    },
-                    borderWidth: 0.0,
-                    onChanged: (i) {
-                      setState(() {
-                        value = i;
-                        print(i);
+        child: Padding(
+          padding: const EdgeInsets.all(0.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Visibility(
+                visible: userPanelPermission == "MSS",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 2),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(150),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 2.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['ESS', 'MSS'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
 
-                      });
-                      if(value == 1) {
-                        Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
-                      }
-                      if(value == 0) {
-                        Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-                      }
-                    },
-                  )
+                        });
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
+                        }
+                        if(value == 0) {
+                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
+              Visibility(
+                visible: userPanelPermission == "MSS_MO_ADMIN",
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 2),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(150),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 2.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['ESS', 'MSS MO'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
+
+                        });
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                        }
+                        if(value == 0) {
+                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
+
+              Visibility(
+                visible: getRealTimeAttButtonShow,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+                  child: SizedBox(
+                    width: double.infinity, // 👈 full width
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        getRealTimeAttButtonShow = false;
+                        getRealTimeAttShow = true;
+                        Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+                        getTodayPunch.then((value) {
+                          setState(() {
+                            todayPunchesModalGlobal = value;
+                            isLoadingTodayPunch = false;
+                          });
+
+                        });
+                        // 👇 Your action here
+                        print("Get Real-Time Attendance clicked");
+                      },
+                      icon: const Icon(Icons.access_time, color: Colors.white, size: 22,),
+                      label: const Text(
+                        "Get Real-Time Attendance",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.lightBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14), // height
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              Visibility(
+                visible: getRealTimeAttShow,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Today's Punches",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+
+                      // 👇 Loader or punches
+                      isLoadingTodayPunch
+                          ? SizedBox(
+                        height: 60, // match approx. punch card height
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.green,
+                          ),
+                        ),
+                      )
+                          : todayPunches.isEmpty
+                          ? const Text(
+                        "No punches found",
+                        style: TextStyle(color: Colors.grey),
+                      )
+                          : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Arrow always at the start
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 8.0, bottom: 10,top: 5.0),
+                              child: Icon(
+                                Icons.arrow_back,
+                                size: 30,
+                                color: Colors.black,
+                              ),
+                            ),
+                            // Punch cards
+                            ...todayPunches.map((punch) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 12, bottom: 5),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    border: Border.all(color: Mythemes.greyishade),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                        offset: Offset(2, 2),
+                                      )
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        punch["punchType"] == "DEVICE"
+                                            ? Icons.touch_app
+                                            : Icons.smartphone,
+                                        color: punch["color"],
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        punch["time"],
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: punch["color"],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Card(
+                      elevation: 4,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Mythemes.whitish,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        //margin: EdgeInsets.only(left: 10.0),
+                        //height: 38,
+                        width: MediaQuery.of(context).size.width / 2,
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            Visibility(
-              visible: userPanelPermission == "MSS_MO_ADMIN",
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  AnimatedToggleSwitch<int>.size(
-                    height: 30,
-                    current: min(value, 2),
-                    style: ToggleStyle(
-                      backgroundColor: Mythemes.greyishade,
-                      indicatorColor: Mythemes.lightBluishColor,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20.0),
-                      indicatorBorderRadius: BorderRadius.zero,
-                    ),
-                    values: const [0, 1],
-                    iconOpacity: 1.0,
-                    selectedIconScale: 1.0,
-                    indicatorSize: const Size.fromWidth(150),
-                    iconAnimationType: AnimationType.onHover,
-                    styleAnimationType: AnimationType.onHover,
-                    spacing: 2.0,
-                    customSeparatorBuilder: (context, local, global) {
-                      final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
-                      return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
-                    },
-                    customIconBuilder: (context, local, global) {
-                      final text = const ['ESS', 'MSS MO'][local.index];
-                      return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
-                    },
-                    borderWidth: 0.0,
-                    onChanged: (i) {
-                      setState(() {
-                        value = i;
-                        print(i);
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (presentCount == 0 || presentCount == null) {
+                          Fluttertoast.showToast(
+                              msg: "There is no data available for this month.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                        else{
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  PresentEmpList(essDashboardModelGlobal!)));
+                        }
 
-                      });
-                      if(value == 1) {
-                        Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
-                      }
-                      if(value == 0) {
-                        Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-                      }
-                    },
-                  )
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Mythemes.whitish,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          //margin: EdgeInsets.only(right: 10.0),
+                          height: 88,
+                          width: MediaQuery.of(context).size.width / 2,
+                          //color: Mythemes.purplish,
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      isLoading
+                                          ? CircularProgressIndicator()
+                                          .centered()
+                                          .py8()
+                                          .px8()
+                                          : "$presentCount / $totalDays"
+                                          .text
+                                          .xl2
+                                          .bold
+                                          .color(Mythemes.lightBluishColor)
+                                          .make()
+                                          .py8()
+                                          .px8(),
+                                      Container(
+                                          child: Icon(
+                                            Icons.groups,
+                                            size: 58,
+                                            color: Mythemes.lightBluishColor,
+                                          )).px8()
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      "Attendance"
+                                          .text
+                                          .xl
+                                          .color(Mythemes.lightBluishColor)
+                                          .make()
+                                          .px8(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (totalAbsentEmp == 0 || totalAbsentEmp == null) {
+                          Fluttertoast.showToast(
+                              msg: "There is no data available for this month.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                        else{
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  AbsentEmpList(essDashboardModelGlobal!)));
+                        }
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Mythemes.whitish,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          //margin: EdgeInsets.only(left: 10.0),
+                          height: 88,
+                          width: MediaQuery.of(context).size.width / 2,
+                          //color: Mythemes.greenColor,
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      isLoading
+                                          ? CircularProgressIndicator()
+                                          .centered()
+                                          .py8()
+                                          .px8()
+                                          :
+                                      "$totalAbsentEmp"
+                                          .text
+                                          .xl2
+                                          .bold
+                                          .color(Mythemes.dangerColor)
+                                          .make()
+                                          .py8()
+                                          .px8(),
+                                      Container(
+                                        child: Icon(
+                                          Icons.not_interested,
+                                          size: 55,
+                                          color: Mythemes.dangerColor,
+                                        ),
+                                      ).px8()
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      "Absent"
+                                          .text
+                                          .xl
+                                          .color(Mythemes.dangerColor)
+                                          .make()
+                                          .px8(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-
-           /* Visibility(
-              visible: showRo  || showAdmin,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  AnimatedToggleSwitch<int>.size(
-                    height: 30,
-                    current: min(value, 2),
-                    style: ToggleStyle(
-                      backgroundColor: Mythemes.greyishade,
-                      indicatorColor: Mythemes.lightBluishColor,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20.0),
-                      indicatorBorderRadius: BorderRadius.zero,
-                    ),
-                    values: const [0, 1],
-                    iconOpacity: 1.0,
-                    selectedIconScale: 1.0,
-                    indicatorSize: const Size.fromWidth(150),
-                    iconAnimationType: AnimationType.onHover,
-                    styleAnimationType: AnimationType.onHover,
-                    spacing: 2.0,
-                    customSeparatorBuilder: (context, local, global) {
-                      final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
-                      return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
-                    },
-                    customIconBuilder: (context, local, global) {
-                      final text = const ['ESS', 'MSS'][local.index];
-                      return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
-                    },
-                    borderWidth: 0.0,
-                    onChanged: (i) {
-                      setState(() {
-                        value = i;
-                        print(i);
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (misPunchEmp == 0 || misPunchEmp == null) {
+                          Fluttertoast.showToast(
+                              msg: "There is no data available for this month.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                        else{
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  MissPunchEmpList(essDashboardModelGlobal!)));
+                        }
 
-                      });
-                      if(value == 1) {
-                        Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                      }
-                    },
-                  )
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Mythemes.whitish,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          //margin: EdgeInsets.only(right: 10.0),
+                          height: 88,
+                          width: MediaQuery.of(context).size.width / 2,
+                          //color: Mythemes.redish,
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      isLoading
+                                          ? CircularProgressIndicator()
+                                          .centered()
+                                          .py8()
+                                          .px8()
+                                          :
+                                      "$misPunchEmp"
+                                          .text
+                                          .xl2
+                                          .bold
+                                          .color(Mythemes.warningColor)
+                                          .make()
+                                          .py8()
+                                          .px8(),
+                                      Container(
+                                          child: Icon(
+                                            Icons.touch_app,
+                                            size: 58,
+                                            color: Mythemes.warningColor,
+                                          )).px8()
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      "Mispunch"
+                                          .text
+                                          .xl
+                                          .color(Mythemes.warningColor)
+                                          .make()
+                                          .px8(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (totalAttendance == 0 || totalAttendance == null) {
+                          Fluttertoast.showToast(
+                              msg: "There is no data available for this month.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                        else{
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  OnDutyEmpList(essDashboardModelGlobal!)));
+                        }
+
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Mythemes.whitish,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          //margin: EdgeInsets.only(left: 10.0),
+                          height: 88,
+                          width: MediaQuery.of(context).size.width / 2,
+                          // color: Mythemes.lightBluishColor,
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      isLoading
+                                          ? CircularProgressIndicator()
+                                          .centered()
+                                          .py8()
+                                          .px8()
+                                          :
+                                      "$totalAttendance"
+                                          .text
+                                          .xl2
+                                          .bold
+                                          .color(Mythemes.successColor)
+                                          .make()
+                                          .py8()
+                                          .px8(),
+                                      Container(
+                                        child: Icon(
+                                          Icons.business_center,
+                                          size: 55,
+                                          color: Mythemes.successColor,
+                                        ),
+                                      ).px8()
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      "Working Days"
+                                          .text
+                                          .xl
+                                          .color(Mythemes.successColor)
+                                          .make()
+                                          .px8(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),*/
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (earlyOutEmp == 0 || earlyOutEmp == null) {
+                          Fluttertoast.showToast(
+                              msg: "There is no data available for this month.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                        else{
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  EarlyGoEmpList(essDashboardModelGlobal!)));
+                        }
 
-            Visibility(
-              visible: getRealTimeAttButtonShow,
-              child: Padding(
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Mythemes.whitish,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          //margin: EdgeInsets.only(left: 10.0),
+                          height: 88,
+                          width: MediaQuery.of(context).size.width / 2,
+                          //color: Mythemes.VoiletColor,
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      isLoading
+                                          ? CircularProgressIndicator()
+                                          .centered()
+                                          .py8()
+                                          .px8()
+                                          :
+                                      "$earlyOutEmp"
+                                          .text
+                                          .xl2
+                                          .bold
+                                          .color(Mythemes.lightBluishColor)
+                                          .make()
+                                          .py8()
+                                          .px8(),
+                                      Container(
+                                        child: Icon(
+                                          Icons.directions_run,
+                                          size: 55,
+                                          color: Mythemes.lightBluishColor,
+                                        ),
+                                      ).px8()
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      "Early Go"
+                                          .text
+                                          .xl
+                                          .color(Mythemes.lightBluishColor)
+                                          .make()
+                                          .px8(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (lateIn == 0 || lateIn == null) {
+                          Fluttertoast.showToast(
+                              msg: "There is no data available for this month.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                        else{
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  LateInEmpList(essDashboardModelGlobal!)));
+                        }
+
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Mythemes.whitish,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          //margin: EdgeInsets.only(right: 10.0),
+                          height: 88,
+                          width: MediaQuery.of(context).size.width / 2,
+                          // color: Mythemes.BluishColor,
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      isLoading
+                                          ? CircularProgressIndicator()
+                                          .centered()
+                                          .py8()
+                                          .px8()
+                                          :
+                                      "$lateIn"
+                                          .text
+                                          .xl2
+                                          .bold
+                                          .color(Mythemes.alertColor)
+                                          .make()
+                                          .py8()
+                                          .px8(),
+                                      Container(
+                                          child: Icon(
+                                            Icons.assignment_late,
+                                            size: 58,
+                                            color: Mythemes.alertColor,
+                                          )).px8()
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      "Late In"
+                                          .text
+                                          .xl
+                                          .color(Mythemes.alertColor)
+                                          .make()
+                                          .px8(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (overTime == 0 || overTime == null) {
+                          Fluttertoast.showToast(
+                              msg: "There is no data available for this month.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                        else{
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  OverTimeEmpList(essDashboardModelGlobal!)));
+                        }
+
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Mythemes.whitish,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          //margin: EdgeInsets.only(left: 10.0),
+                          height: 88,
+                          width: MediaQuery.of(context).size.width / 2,
+                          //color: Mythemes.redAccent,
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      isLoading
+                                          ? CircularProgressIndicator()
+                                          .centered()
+                                          .py8()
+                                          .px8()
+                                          :
+                                      overTime == null ? "0".text.xl2
+                                          .bold
+                                          .color(Mythemes.dangerColor)
+                                          .make()
+                                          .py8()
+                                          .px8() :
+                                      "$overTime"
+                                          .text
+                                          .xl2
+                                          .bold
+                                          .color(Mythemes.dangerColor)
+                                          .make()
+                                          .py8()
+                                          .px8(),
+                                      Container(
+                                        child: Icon(
+                                          Icons.timelapse,
+                                          size: 55,
+                                          color: Mythemes.dangerColor,
+                                        ),
+                                      ).px8()
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      "Short Leave"
+                                          .text
+                                          .xl
+                                          .color(Mythemes.dangerColor)
+                                          .make()
+                                          .px8(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        if (halfEmp == 0 || halfEmp == null) {
+                          Fluttertoast.showToast(
+                              msg: "There is no data available for this month.",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black,
+                              textColor: Colors.white,
+                              fontSize: 16.0
+                          );
+                        }
+                        else{
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  HalfDayEmpList(essDashboardModelGlobal!)));
+                        }
+
+                      },
+                      child: Card(
+                        elevation: 4,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Mythemes.whitish,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          //margin: EdgeInsets.only(right: 10.0),
+                          height: 88,
+                          width: MediaQuery.of(context).size.width / 2,
+                          //color: Mythemes.greenColor,
+                          child: Column(
+                            children: [
+                              Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      isLoading
+                                          ? CircularProgressIndicator()
+                                          .centered()
+                                          .py8()
+                                          .px8()
+                                          :
+                                      "$halfEmp"
+                                          .text
+                                          .xl2
+                                          .bold
+                                          .color(Mythemes.warningColor)
+                                          .make()
+                                          .py8()
+                                          .px8(),
+                                      Container(
+                                          child: Icon(
+                                            Icons.calendar_month,
+                                            size: 58,
+                                            color: Mythemes.warningColor,
+                                          )).px8()
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      "Half Day"
+                                          .text
+                                          .xl
+                                          .color(Mythemes.warningColor)
+                                          .make()
+                                          .px8(),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 0,
+              ),
+
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
                 child: SizedBox(
+                  height: 50,
                   width: double.infinity, // 👈 full width
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      getRealTimeAttButtonShow = false;
-                      getRealTimeAttShow = true;
-                      Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
-                      getTodayPunch.then((value) {
+                      Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
+                      getEmployeeList11.then((value) {
                         setState(() {
-                          todayPunchesModalGlobal = value;
-                          isLoadingTodayPunch = false;
+                          essDashboardModelGlobal = value;
+                          isLoading = false;
+                        });
+
+                      });
+
+                      Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+                      getCalendar.then((value) {
+                        setState(() {
+                          calendarModalGlobal = value;
+                          isLoading = false;
                         });
 
                       });
                       // 👇 Your action here
-                      print("Get Real-Time Attendance clicked");
+                      print("Update your dashboard clicked");
                     },
-                    icon: const Icon(Icons.access_time, color: Colors.white, size: 22,),
+                    icon: const Icon(Icons.dashboard_customize, color: Colors.white, size: 22,),
                     label: const Text(
-                      "Get Real-Time Attendance",
+                      "Update Your Dashboard",
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue,
+                      backgroundColor: Mythemes.successColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14), // height
+                      padding: const EdgeInsets.symmetric(vertical: 12,), // height
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -1024,1176 +2321,333 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                   ),
                 ),
               ),
-            ),
+              CalendarShow(),
 
-            Visibility(
-              visible: getRealTimeAttShow,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
+              empRole == 1 || roRole == 1 ?
+              /*DefaultTabController(
+                length: 4,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Today's Punches",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-
-                    // 👇 Loader or punches
-                    isLoadingTodayPunch
-                        ? SizedBox(
-                      height: 60, // match approx. punch card height
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.green,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      constraints: const BoxConstraints(maxHeight: 150.0),
+                      child: Material(
+                        color: Mythemes.whitish,
+                        child: TabBar(
+                          tabs: [
+                            Tab(
+                              icon: Icon(
+                                Icons.celebration,
+                                color: Mythemes.blackishade,
+                              ),
+                              text: "Birthday",
+                            ),
+                            Tab(
+                              icon: Icon(
+                                Icons.workspace_premium_rounded,
+                                color: Mythemes.blackishade,
+                              ),
+                              text: "Work Anniversary",
+                            ),
+                            Tab(
+                              icon: Icon(
+                                Icons.today,
+                                color: Mythemes.blackishade,
+                              ),
+                              text: "Today events",
+                            ),
+                            Tab(
+                              icon: Icon(
+                                Icons.holiday_village,
+                                color: Mythemes.blackishade,
+                              ),
+                              text: "Holidays",
+                            ),
+                          ],
                         ),
                       ),
-                    )
-                        : todayPunches.isEmpty
-                        ? const Text(
-                      "No punches found",
-                      style: TextStyle(color: Colors.grey),
-                    )
-                        : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // Arrow always at the start
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                right: 8.0, bottom: 10,top: 5.0),
-                            child: Icon(
-                              Icons.arrow_back,
-                              size: 30,
-                              color: Colors.black,
-                            ),
-                          ),
-                          // Punch cards
-                          ...todayPunches.map((punch) {
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 12, bottom: 5),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  border: Border.all(color: Mythemes.greyishade),
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 4,
-                                      offset: Offset(2, 2),
-                                    )
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      punch["punchType"] == "DEVICE"
-                                          ? Icons.touch_app
-                                          : Icons.smartphone,
-                                      color: punch["color"],
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      punch["time"],
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: punch["color"],
+                    ),
+                    SizedBox(
+                      height: 400,
+                      child: TabBarView(children: [
+
+                        //Birthday
+                        Container(
+                          // height: 1,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child:
+                            isLoading
+                                ? CircularProgressIndicator()
+                                .centered()
+                                .py8()
+                                .px8():
+                            oldEventLength == null ? "There is no data available.".text.center.make().py16() :
+                            ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: eventsListModalGlobal!.bdayList!.length,
+                                itemBuilder: (context, itemCount) {
+                                  return Card(
+                                    child: ListTile(
+                                      //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
+                                      title: Text(eventsListModalGlobal!
+                                          .bdayList![itemCount].fullName
+                                          .toString()),
+                                      subtitle: Text(eventsListModalGlobal!
+                                          .bdayList![itemCount].department
+                                          .toString()),
+                                      trailing: Text(eventsListModalGlobal!
+                                          .bdayList![itemCount].dob
+                                          .toString()),
+                                      leading: Container(
+                                        width: 40,
+                                        height: 40,
+                                        child: CircleAvatar(
+                                          radius: 30,
+                                          backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount].image
+                                                  .toString()),
+                                          backgroundColor: Colors.grey,
+                                          // child: Image.network(imageString!),
+                                        ),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  );
+                                }),
+                          ),
+                        ),
+                        //Work Anievarsary
+                        Container(
+                          // height: 1,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child:
+                            isLoading
+                                ? CircularProgressIndicator()
+                                .centered()
+                                .py8():
+                            oldJobLength == null ? "There is no data available.".text.center.make().py16() :
+                            ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: eventsListModalGlobal!.joblist!.length,
+                                itemBuilder: (context, itemCount) {
+                                  return Card(
+                                    child: ListTile(
+                                      title: Text(eventsListModalGlobal!
+                                          .joblist![itemCount].fullName
+                                          .toString()),
+                                      subtitle: Text(eventsListModalGlobal!
+                                          .joblist![itemCount].department
+                                          .toString()),
+                                      trailing: Text(eventsListModalGlobal!
+                                          .joblist![itemCount].doj
+                                          .toString()),
+                                      leading: Container(
+                                        width: 40,
+                                        height: 40,
+                                        child: CircleAvatar(
+                                          radius: 30,
+                                          backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .joblist![itemCount].image
+                                                  .toString()),
+                                          backgroundColor: Colors.grey,
+                                          // child: Image.network(imageString!),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ),
+                        ),
+                        //Today Events
+                        Container(
+                          // height: 1,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child:
+                                isLoading
+                                    ? CircularProgressIndicator()
+                                    .centered()
+                                    .py8():
+                                oldEvent != todayEvent ? "There is no data available.".text.make().py16() :
+
+                                ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemCount: eventsListModalGlobal!.bdayList!.length,
+                                    itemBuilder: (context, itemCount) {
+
+                                      return Card(
+                                        child: ListTile(
+                                          title: Text(eventsListModalGlobal!
+                                              .bdayList![itemCount].fullName
+                                              .toString()),
+                                          subtitle: Text(eventsListModalGlobal!
+                                              .bdayList![itemCount].department
+                                              .toString()),
+                                          trailing: Text(eventsListModalGlobal!
+                                              .bdayList![itemCount].dob
+                                              .toString()),
+                                          leading: Container(
+                                            width: 40,
+                                            height: 40,
+                                            child: CircleAvatar(
+                                              radius: 30,
+                                              backgroundImage: NetworkImage(
+                                                  eventsListModalGlobal!
+                                                      .bdayList![itemCount].image
+                                                      .toString()),
+                                              backgroundColor: Colors.grey,
+                                              // child: Image.network(imageString!),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
                               ),
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    ),
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child:
+                                isLoading
+                                    ? CircularProgressIndicator()
+                                    .centered()
+                                    .py8():
+                                oldJobEvent != todayEvent ? "".text.make() :
+                                ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemCount: eventsListModalGlobal!.joblist!.length,
+                                    itemBuilder: (context, itemCount) {
+                                      return Card(
+                                        child: ListTile(
+                                          title: Text(eventsListModalGlobal!
+                                              .joblist![itemCount].fullName
+                                              .toString()),
+                                          subtitle: Text(eventsListModalGlobal!
+                                              .joblist![itemCount].department
+                                              .toString()),
+                                          trailing: Text(eventsListModalGlobal!
+                                              .joblist![itemCount].doj
+                                              .toString()),
+                                          leading: Container(
+                                            width: 40,
+                                            height: 40,
+                                            child: CircleAvatar(
+                                              radius: 30,
+                                              backgroundImage: NetworkImage(
+                                                  eventsListModalGlobal!
+                                                      .bdayList![itemCount].image
+                                                      .toString()),
+                                              backgroundColor: Colors.grey,
+                                              // child: Image.network(imageString!),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                              ),
+                            ],
+                          ),
+                        ),
+                        //Holiday
+                        Container(
+                          // height: 1,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child:
+                            isLoading
+                                ? CircularProgressIndicator()
+                                .centered()
+                                .py8():
+                            holidayLength == null ? "There is no data available.".text.make().py16() :
+
+                            ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: holidayLength,
+                                itemBuilder: (context, itemCount) {
+
+                                  return Card(
+                                    child: ListTile(
+                                      title: Text(holidayListModalGlobal!
+                                          .viewHolidayList![itemCount].holidayName
+                                          .toString()),
+                                      subtitle: Text(holidayListModalGlobal!
+                                          .viewHolidayList![itemCount].dateOfHoliday
+                                          .toString()),
+                                      trailing: Text(holidayListModalGlobal!
+                                          .viewHolidayList![itemCount].holidayType
+                                          .toString()),
+                                    ),
+                                  );
+                                }),
+                          ),
+                        ),
+                      ]),
+                    )
                   ],
                 ),
-              ),
-            ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Card(
-                    elevation: 4,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Mythemes.whitish,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      //margin: EdgeInsets.only(left: 10.0),
-                      //height: 38,
-                      width: MediaQuery.of(context).size.width / 2,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      if (totalAttendance == 0 || totalAttendance == null) {
-                        Fluttertoast.showToast(
-                            msg: "There is no data available for this month.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                      else{
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                PresentEmpList(essDashboardModelGlobal!)));
-                      }
-
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Mythemes.whitish,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        //margin: EdgeInsets.only(right: 10.0),
-                        height: 88,
-                        width: MediaQuery.of(context).size.width / 2,
-                        //color: Mythemes.purplish,
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    isLoading
-                                        ? CircularProgressIndicator()
-                                        .centered()
-                                        .py8()
-                                        .px8()
-                                        : "$presentCount / $totalDays"
-                                        .text
-                                        .xl2
-                                        .bold
-                                        .color(Mythemes.lightBluishColor)
-                                        .make()
-                                        .py8()
-                                        .px8(),
-                                    Container(
-                                        child: Icon(
-                                          Icons.groups,
-                                          size: 58,
-                                          color: Mythemes.lightBluishColor,
-                                        )).px8()
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    "Attendance"
-                                        .text
-                                        .xl
-                                        .color(Mythemes.lightBluishColor)
-                                        .make()
-                                        .px8(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      if (totalAbsentEmp == 0 || totalAbsentEmp == null) {
-                        Fluttertoast.showToast(
-                            msg: "There is no data available for this month.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                      else{
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                AbsentEmpList(essDashboardModelGlobal!)));
-                      }
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Mythemes.whitish,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        //margin: EdgeInsets.only(left: 10.0),
-                        height: 88,
-                        width: MediaQuery.of(context).size.width / 2,
-                        //color: Mythemes.greenColor,
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    isLoading
-                                        ? CircularProgressIndicator()
-                                        .centered()
-                                        .py8()
-                                        .px8()
-                                        :
-                                    "$totalAbsentEmp"
-                                        .text
-                                        .xl2
-                                        .bold
-                                        .color(Mythemes.dangerColor)
-                                        .make()
-                                        .py8()
-                                        .px8(),
-                                    Container(
-                                      child: Icon(
-                                        Icons.not_interested,
-                                        size: 55,
-                                        color: Mythemes.dangerColor,
-                                      ),
-                                    ).px8()
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    "Absent"
-                                        .text
-                                        .xl
-                                        .color(Mythemes.dangerColor)
-                                        .make()
-                                        .px8(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      if (misPunchEmp == 0 || misPunchEmp == null) {
-                        Fluttertoast.showToast(
-                            msg: "There is no data available for this month.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                      else{
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                MissPunchEmpList(essDashboardModelGlobal!)));
-                      }
-
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Mythemes.whitish,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        //margin: EdgeInsets.only(right: 10.0),
-                        height: 88,
-                        width: MediaQuery.of(context).size.width / 2,
-                        //color: Mythemes.redish,
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    isLoading
-                                        ? CircularProgressIndicator()
-                                        .centered()
-                                        .py8()
-                                        .px8()
-                                        :
-                                    "$misPunchEmp"
-                                        .text
-                                        .xl2
-                                        .bold
-                                        .color(Mythemes.warningColor)
-                                        .make()
-                                        .py8()
-                                        .px8(),
-                                    Container(
-                                        child: Icon(
-                                          Icons.touch_app,
-                                          size: 58,
-                                          color: Mythemes.warningColor,
-                                        )).px8()
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    "Mispunch"
-                                        .text
-                                        .xl
-                                        .color(Mythemes.warningColor)
-                                        .make()
-                                        .px8(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      if (totalAttendance == 0 || totalAttendance == null) {
-                        Fluttertoast.showToast(
-                            msg: "There is no data available for this month.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                      else{
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                OnDutyEmpList(essDashboardModelGlobal!)));
-                      }
-
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Mythemes.whitish,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        //margin: EdgeInsets.only(left: 10.0),
-                        height: 88,
-                        width: MediaQuery.of(context).size.width / 2,
-                        // color: Mythemes.lightBluishColor,
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    isLoading
-                                        ? CircularProgressIndicator()
-                                        .centered()
-                                        .py8()
-                                        .px8()
-                                        :
-                                    "$totalAttendance"
-                                        .text
-                                        .xl2
-                                        .bold
-                                        .color(Mythemes.successColor)
-                                        .make()
-                                        .py8()
-                                        .px8(),
-                                    Container(
-                                      child: Icon(
-                                        Icons.business_center,
-                                        size: 55,
-                                        color: Mythemes.successColor,
-                                      ),
-                                    ).px8()
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    "Working Days"
-                                        .text
-                                        .xl
-                                        .color(Mythemes.successColor)
-                                        .make()
-                                        .px8(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      if (earlyOutEmp == 0 || earlyOutEmp == null) {
-                        Fluttertoast.showToast(
-                            msg: "There is no data available for this month.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                      else{
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                EarlyGoEmpList(essDashboardModelGlobal!)));
-                      }
-
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Mythemes.whitish,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        //margin: EdgeInsets.only(left: 10.0),
-                        height: 88,
-                        width: MediaQuery.of(context).size.width / 2,
-                        //color: Mythemes.VoiletColor,
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    isLoading
-                                        ? CircularProgressIndicator()
-                                        .centered()
-                                        .py8()
-                                        .px8()
-                                        :
-                                    "$earlyOutEmp"
-                                        .text
-                                        .xl2
-                                        .bold
-                                        .color(Mythemes.lightBluishColor)
-                                        .make()
-                                        .py8()
-                                        .px8(),
-                                    Container(
-                                      child: Icon(
-                                        Icons.directions_run,
-                                        size: 55,
-                                        color: Mythemes.lightBluishColor,
-                                      ),
-                                    ).px8()
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    "Early Go"
-                                        .text
-                                        .xl
-                                        .color(Mythemes.lightBluishColor)
-                                        .make()
-                                        .px8(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      if (lateIn == 0 || lateIn == null) {
-                        Fluttertoast.showToast(
-                            msg: "There is no data available for this month.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                      else{
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                LateInEmpList(essDashboardModelGlobal!)));
-                      }
-
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Mythemes.whitish,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        //margin: EdgeInsets.only(right: 10.0),
-                        height: 88,
-                        width: MediaQuery.of(context).size.width / 2,
-                        // color: Mythemes.BluishColor,
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    isLoading
-                                        ? CircularProgressIndicator()
-                                        .centered()
-                                        .py8()
-                                        .px8()
-                                        :
-                                    "$lateIn"
-                                        .text
-                                        .xl2
-                                        .bold
-                                        .color(Mythemes.alertColor)
-                                        .make()
-                                        .py8()
-                                        .px8(),
-                                    Container(
-                                        child: Icon(
-                                          Icons.assignment_late,
-                                          size: 58,
-                                          color: Mythemes.alertColor,
-                                        )).px8()
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    "Late In"
-                                        .text
-                                        .xl
-                                        .color(Mythemes.alertColor)
-                                        .make()
-                                        .px8(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      if (overTime == 0 || overTime == null) {
-                        Fluttertoast.showToast(
-                            msg: "There is no data available for this month.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                      else{
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                OverTimeEmpList(essDashboardModelGlobal!)));
-                      }
-
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Mythemes.whitish,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        //margin: EdgeInsets.only(left: 10.0),
-                        height: 88,
-                        width: MediaQuery.of(context).size.width / 2,
-                        //color: Mythemes.redAccent,
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    isLoading
-                                        ? CircularProgressIndicator()
-                                        .centered()
-                                        .py8()
-                                        .px8()
-                                        :
-                                    overTime == null ? "0".text.xl2
-                                        .bold
-                                        .color(Mythemes.dangerColor)
-                                        .make()
-                                        .py8()
-                                        .px8() :
-                                    "$overTime"
-                                        .text
-                                        .xl2
-                                        .bold
-                                        .color(Mythemes.dangerColor)
-                                        .make()
-                                        .py8()
-                                        .px8(),
-                                    Container(
-                                      child: Icon(
-                                        Icons.timelapse,
-                                        size: 55,
-                                        color: Mythemes.dangerColor,
-                                      ),
-                                    ).px8()
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    "Short Leave"
-                                        .text
-                                        .xl
-                                        .color(Mythemes.dangerColor)
-                                        .make()
-                                        .px8(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      if (halfEmp == 0 || halfEmp == null) {
-                        Fluttertoast.showToast(
-                            msg: "There is no data available for this month.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                      else{
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                HalfDayEmpList(essDashboardModelGlobal!)));
-                      }
-
-                    },
-                    child: Card(
-                      elevation: 4,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Mythemes.whitish,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        //margin: EdgeInsets.only(right: 10.0),
-                        height: 88,
-                        width: MediaQuery.of(context).size.width / 2,
-                        //color: Mythemes.greenColor,
-                        child: Column(
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    isLoading
-                                        ? CircularProgressIndicator()
-                                        .centered()
-                                        .py8()
-                                        .px8()
-                                        :
-                                    "$halfEmp"
-                                        .text
-                                        .xl2
-                                        .bold
-                                        .color(Mythemes.warningColor)
-                                        .make()
-                                        .py8()
-                                        .px8(),
-                                    Container(
-                                        child: Icon(
-                                          Icons.calendar_month,
-                                          size: 58,
-                                          color: Mythemes.warningColor,
-                                        )).px8()
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    "Half Day"
-                                        .text
-                                        .xl
-                                        .color(Mythemes.warningColor)
-                                        .make()
-                                        .px8(),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ).pLTRB(0, 0, 0, 10.0),
-            SizedBox(
-              height: 0,
-            ),
-
-            CalendarShow(),
-
-            empRole == 1 || roRole == 1 ?
-            /*DefaultTabController(
-              length: 4,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    constraints: const BoxConstraints(maxHeight: 150.0),
-                    child: Material(
+              )*/
+              DefaultTabController(
+                length: 4,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    // TabBar
+                    Material(
                       color: Mythemes.whitish,
                       child: TabBar(
-                        tabs: [
-                          Tab(
-                            icon: Icon(
-                              Icons.cake,
-                              color: Mythemes.blackishade,
-                            ),
-                            text: "Birthday",
-                          ),
-                          Tab(
-                            icon: Icon(
-                              Icons.cake,
-                              color: Mythemes.blackishade,
-                            ),
-                            text: "Anniversary",
-                          ),
-                          Tab(
-                            icon: Icon(
-                              Icons.calendar_month,
-                              color: Mythemes.blackishade,
-                            ),
-                            text: "Today events",
-                          ),
-                          Tab(
-                            icon: Icon(
-                              Icons.holiday_village,
-                              color: Mythemes.blackishade,
-                            ),
-                            text: "Holidays",
-                          ),
+                        indicatorColor: Colors.deepPurple,
+                        indicatorWeight: 4,
+                        labelColor: Colors.deepPurple,
+                        unselectedLabelColor: Mythemes.blackishade,
+                        tabs: const [
+                          Tab(icon: Icon(Icons.celebration), text: "Birthday"),
+                          Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
+                          Tab(icon: Icon(Icons.today), text: "Today Events"),
+                          Tab(icon: Icon(Icons.holiday_village), text: "Holidays"),
                         ],
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 400,
-                    child: TabBarView(children: [
 
-                      Container(
-                        // height: 1,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child:
-                          isLoading
-                              ? CircularProgressIndicator()
-                              .centered()
-                              .py8()
-                              .px8():
-                          oldEventLength == null ? "There is no data available.".text.center.make().py16() :
-                          ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              itemCount: eventsListModalGlobal!.bdayList!.length,
-                              itemBuilder: (context, itemCount) {
-                                return Card(
-                                  child: ListTile(
-                                    //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
-                                    title: Text(eventsListModalGlobal!
-                                        .bdayList![itemCount].fullName
-                                        .toString()),
-                                    subtitle: Text(eventsListModalGlobal!
-                                        .bdayList![itemCount].department
-                                        .toString()),
-                                    trailing: Text(eventsListModalGlobal!
-                                        .bdayList![itemCount].dob
-                                        .toString()),
-                                    leading: Container(
-                                      width: 40,
-                                      height: 40,
-                                      child: CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: NetworkImage(
-                                            eventsListModalGlobal!
-                                                .bdayList![itemCount].image
-                                                .toString()),
-                                        backgroundColor: Colors.grey,
-                                        // child: Image.network(imageString!),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                        ),
-                      ),
-                      Container(
-                        // height: 1,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child:
-                          isLoading
-                              ? CircularProgressIndicator()
-                              .centered()
-                              .py8():
-                          oldJobLength == null ? "There is no data available.".text.center.make().py16() :
-                          ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              itemCount: eventsListModalGlobal!.joblist!.length,
-                              itemBuilder: (context, itemCount) {
-                                return Card(
-                                  child: ListTile(
-                                    title: Text(eventsListModalGlobal!
-                                        .joblist![itemCount].fullName
-                                        .toString()),
-                                    subtitle: Text(eventsListModalGlobal!
-                                        .joblist![itemCount].department
-                                        .toString()),
-                                    trailing: Text(eventsListModalGlobal!
-                                        .joblist![itemCount].doj
-                                        .toString()),
-                                    leading: Container(
-                                      width: 40,
-                                      height: 40,
-                                      child: CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: NetworkImage(
-                                            eventsListModalGlobal!
-                                                .joblist![itemCount].image
-                                                .toString()),
-                                        backgroundColor: Colors.grey,
-                                        // child: Image.network(imageString!),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                        ),
-                      ),
-                      Container(
-                        // height: 1,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child:
-                              isLoading
-                                  ? CircularProgressIndicator()
-                                  .centered()
-                                  .py8():
-                              oldEvent != todayEvent ? "There is no data available.".text.make().py16() :
+                    // Tab Views
+                    SizedBox(
+                      height: 400,
+                      child: TabBarView(
+                        children: [
+                          // 🎂 Birthday Tab
+                          buildEventList(
+                            isLoading: isLoadingEvent,
+                            items: eventsListModalGlobal?.bdayList ?? [],
+                            emptyText: "No birthdays today 🎉",
+                            titleBuilder: (item) => item.fullName,
+                            subtitleBuilder: (item) => item.department,
+                            trailingBuilder: (item) => item.dob,
+                            imageBuilder: (item) => item.image,
+                          ),
 
-                              ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemCount: eventsListModalGlobal!.bdayList!.length,
-                                  itemBuilder: (context, itemCount) {
-
-                                    return Card(
-                                      child: ListTile(
-                                        title: Text(eventsListModalGlobal!
-                                            .bdayList![itemCount].fullName
-                                            .toString()),
-                                        subtitle: Text(eventsListModalGlobal!
-                                            .bdayList![itemCount].department
-                                            .toString()),
-                                        trailing: Text(eventsListModalGlobal!
-                                            .bdayList![itemCount].dob
-                                            .toString()),
-                                        leading: Container(
-                                          width: 40,
-                                          height: 40,
-                                          child: CircleAvatar(
-                                            radius: 30,
-                                            backgroundImage: NetworkImage(
-                                                eventsListModalGlobal!
-                                                    .bdayList![itemCount].image
-                                                    .toString()),
-                                            backgroundColor: Colors.grey,
-                                            // child: Image.network(imageString!),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child:
-                              isLoading
-                                  ? CircularProgressIndicator()
-                                  .centered()
-                                  .py8():
-                              oldJobEvent != todayEvent ? "".text.make() :
-                              ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemCount: eventsListModalGlobal!.joblist!.length,
-                                  itemBuilder: (context, itemCount) {
-                                    return Card(
-                                      child: ListTile(
-                                        title: Text(eventsListModalGlobal!
-                                            .joblist![itemCount].fullName
-                                            .toString()),
-                                        subtitle: Text(eventsListModalGlobal!
-                                            .joblist![itemCount].department
-                                            .toString()),
-                                        trailing: Text(eventsListModalGlobal!
-                                            .joblist![itemCount].doj
-                                            .toString()),
-                                        leading: Container(
-                                          width: 40,
-                                          height: 40,
-                                          child: CircleAvatar(
-                                            radius: 30,
-                                            backgroundImage: NetworkImage(
-                                                eventsListModalGlobal!
-                                                    .bdayList![itemCount].image
-                                                    .toString()),
-                                            backgroundColor: Colors.grey,
-                                            // child: Image.network(imageString!),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        // height: 1,
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child:
-                              oldEvent != todayEvent ? "There is no data available.".text.make().py16() :
-
-                              ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemCount: eventsListModalGlobal!.bdayList!.length,
-                                  itemBuilder: (context, itemCount) {
-
-                                    return Card(
-                                      child: ListTile(
-                                        title: Text(eventsListModalGlobal!
-                                            .bdayList![itemCount].fullName
-                                            .toString()),
-                                        subtitle: Text(eventsListModalGlobal!
-                                            .bdayList![itemCount].department
-                                            .toString()),
-                                        trailing: Text(eventsListModalGlobal!
-                                            .bdayList![itemCount].dob
-                                            .toString()),
-                                        leading: Container(
-                                          width: 40,
-                                          height: 40,
-                                          child: CircleAvatar(
-                                            radius: 30,
-                                            backgroundImage: NetworkImage(
-                                                eventsListModalGlobal!
-                                                    .bdayList![itemCount].image
-                                                    .toString()),
-                                            backgroundColor: Colors.grey,
-                                            // child: Image.network(imageString!),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child:
-                              oldJobEvent != todayEvent ? "".text.make() :
-                              ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemCount: eventsListModalGlobal!.joblist!.length,
-                                  itemBuilder: (context, itemCount) {
-                                    return Card(
-                                      child: ListTile(
-                                        title: Text(eventsListModalGlobal!
-                                            .joblist![itemCount].fullName
-                                            .toString()),
-                                        subtitle: Text(eventsListModalGlobal!
-                                            .joblist![itemCount].department
-                                            .toString()),
-                                        trailing: Text(eventsListModalGlobal!
-                                            .joblist![itemCount].doj
-                                            .toString()),
-                                        leading: Container(
-                                          width: 40,
-                                          height: 40,
-                                          child: CircleAvatar(
-                                            radius: 30,
-                                            backgroundImage: NetworkImage(
-                                                eventsListModalGlobal!
-                                                    .bdayList![itemCount].image
-                                                    .toString()),
-                                            backgroundColor: Colors.grey,
-                                            // child: Image.network(imageString!),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ]),
-                  )
-                ],
-              ),
-            )*/
-            DefaultTabController(
-              length: 4,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  // TabBar
-                  Material(
-                    color: Mythemes.whitish,
-                    child: TabBar(
-                      indicatorColor: Colors.deepPurple,
-                      indicatorWeight: 4,
-                      labelColor: Colors.deepPurple,
-                      unselectedLabelColor: Mythemes.blackishade,
-                      tabs: const [
-                        Tab(icon: Icon(Icons.celebration), text: "Birthday"),
-                        Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
-                        Tab(icon: Icon(Icons.today), text: "Today Events"),
-                        Tab(icon: Icon(Icons.holiday_village), text: "Holidays"),
-                      ],
-                    ),
-                  ),
-
-                  // Tab Views
-                  SizedBox(
-                    height: 400,
-                    child: TabBarView(
-                      children: [
-                        // 🎂 Birthday Tab
-                        buildEventList(
-                          isLoading: isLoadingEvent,
-                          items: eventsListModalGlobal?.bdayList ?? [],
-                          emptyText: "No birthdays today 🎉",
-                          titleBuilder: (item) => item.fullName,
-                          subtitleBuilder: (item) => item.department,
-                          trailingBuilder: (item) => item.dob,
-                          imageBuilder: (item) => item.image,
-                        ),
-
-                        // 🏅 Anniversary Tab
-                        buildEventList(
-                          isLoading: isLoadingEvent,
-                          items: eventsListModalGlobal?.joblist ?? [],
-                          emptyText: "No anniversaries today 🎊",
-                          titleBuilder: (item) => item.fullName,
-                          subtitleBuilder: (item) => item.department,
-                          trailingBuilder: (item) => item.doj,
-                          imageBuilder: (item) => item.image,
-                        ),
+                          // 🏅 Anniversary Tab
+                          buildEventList(
+                            isLoading: isLoadingEvent,
+                            items: eventsListModalGlobal?.joblist ?? [],
+                            emptyText: "No anniversaries today 🎊",
+                            titleBuilder: (item) => item.fullName,
+                            subtitleBuilder: (item) => item.department,
+                            trailingBuilder: (item) => item.doj,
+                            imageBuilder: (item) => item.image,
+                          ),
 
 
 
-                        // 📅 Today Events Tab (combine lists)
+                          // 📅 Today Events Tab (combine lists)
 
-                        /*  buildEventList(
+                          /*  buildEventList(
                                 isLoading: isLoadingEvent,
                                 items: eventsListModalGlobal?.bdayList ?? [],
                                 emptyText: "No events today 🎂",
@@ -2203,39 +2657,39 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 imageBuilder: (item) => item.image,
                               ),*/
 
-                        buildEventList(
-                          isLoading: isLoadingTodayEvent,
-                          items: todayEventModalGlobal?.todayEventList ?? [],
-                          emptyText: "No events today 🎂",
-                          titleBuilder: (item) => item.fullName,
-                          subtitleBuilder: (item) => item.department,
-                          trailingBuilder: (item) => item.dob,
-                          imageBuilder: (item) => item.image,
-                        ),
+                          buildEventList(
+                            isLoading: isLoadingTodayEvent,
+                            items: todayEventModalGlobal?.todayEventList ?? [],
+                            emptyText: "No events today 🎂",
+                            titleBuilder: (item) => item.fullName,
+                            subtitleBuilder: (item) => item.department,
+                            trailingBuilder: (item) => item.dob,
+                            imageBuilder: (item) => item.image,
+                          ),
 
-                        buildHolidayList(
-                          isLoading: isLoadingEvent,
-                          items: holidayListModalGlobal!
-                              .viewHolidayList ?? [],
-                          emptyText: "No Holidays",
-                          holidayName: (item) => item.holidayName,
-                          holidayDate: (item) => item.dateOfHoliday,
-                          holidayType: (item) => item.holidayType,
-                        ),
+                          buildHolidayList(
+                            isLoading: isLoadingEvent,
+                            items: holidayListModalGlobal!
+                                .viewHolidayList ?? [],
+                            emptyText: "No Holidays",
+                            holidayName: (item) => item.holidayName,
+                            holidayDate: (item) => item.dateOfHoliday,
+                            holidayType: (item) => item.holidayType,
+                          ),
 
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            )
-                 :
-            //TabSection(EventsListModal()!) :
-            SizedBox(
-              height: 0,
-            )
-            ,
-          ],
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ) :
+              //TabSection(EventsListModal()!) :
+              SizedBox(
+                height: 0,
+              )
+              ,
+            ],
+          ),
         ),
       ),
     );
@@ -2382,6 +2836,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     );
   }
 
+
   CalendarShow() {
     /// Example with custom icon
     final _calendarCarousel = Container(
@@ -2394,7 +2849,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           events.forEach((event) => print(event.title));
         },
         weekendTextStyle: TextStyle(
-          color: Colors.red,
+          color: Colors.black,
         ),
         thisMonthDayBorderColor: Colors.grey,
         headerText: 'Custom Header',
@@ -2420,7 +2875,47 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     /// Example Calendar Carousel without header and custom prev & next button
     final _calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Mythemes.lightBluishColor,
+      /*onDayPressed: (date, events) {
+
+      this.setState(() => _currentDate = date);
+      this.setState(() => _currentDate2 = date);
+      events.forEach((event) => print(event.title));
+      print(date);
+      setState(() {
+        formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
+        print("Formatted Date - $formattedDate");
+      });
+      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+          AttendanceRequisitionCalendar(new AttendanceReportModel(), OnDateAttModel(),0, "$formattedDate")));
+      //Nevigate Next Page
+
+    },*/
       onDayPressed: (date, events) {
+        // Prevent selecting dates older than current month view
+        if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
+          print("⛔ Date tap disabled for past months");
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              title: const Text(
+                "Notice",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: const Text(
+                "Requisitions for the past pay-cycle has been closed.",
+                style: TextStyle(fontSize: 15),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK", style: TextStyle(color: Colors.blue)),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
 
         this.setState(() => _currentDate = date);
         this.setState(() => _currentDate2 = date);
@@ -2430,15 +2925,15 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
           print("Formatted Date - $formattedDate");
         });
-        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-            AttendanceRequisitionCalendar(new AttendanceReportModel(), OnDateAttModel(),0, "$formattedDate")));
-        //Nevigate Next Page
-
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => AttendanceRequisitionCalendar(
+                new AttendanceReportModel(), OnDateAttModel(), 0, "$formattedDate")));
       },
       daysHaveCircularBorder: true,
       showOnlyCurrentMonthDate: false,
       weekendTextStyle: TextStyle(
-        color: Colors.red,
+        fontSize: 12,
+        color: Colors.black,
       ),
       thisMonthDayBorderColor: Colors.grey,
       weekFormat: false,
@@ -2478,13 +2973,38 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         color: Colors.tealAccent,
         fontSize: 20,
       ),
+      /*onCalendarChanged: (DateTime date) {
+      _targetDateTime = date;
+      _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+      //_currentMonth = DateFormat.yMMM().format(_targetDateTime);
+      print('change date $date.month$_targetDateTime');
+      singleDateString = DateFormat('dd-MM-yyyy').format(date);
+      print("Updated Date Change - $singleDateString");
+      getSharedPrfanceList();
+      setState(() {
+        Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+        getCalendar.then((value) {
+          setState(() {
+            calendarModalGlobal = value;
+          });
+          //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
+        });
+        //API month change call
+      });
+    },*/
       onCalendarChanged: (DateTime date) {
+        // Prevent sliding beyond allowed range
+        if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
+          print("⛔ Calendar slide limit reached");
+          return;
+        }
+
         _targetDateTime = date;
         _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
-        //_currentMonth = DateFormat.yMMM().format(_targetDateTime);
         print('change date $date.month$_targetDateTime');
         singleDateString = DateFormat('dd-MM-yyyy').format(date);
         print("Updated Date Change - $singleDateString");
+
         getSharedPrfanceList();
         setState(() {
           Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
@@ -2492,9 +3012,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             setState(() {
               calendarModalGlobal = value;
             });
-            //print('Dashboard length ${essDashboardModelGlobal!.result!.length}');
           });
-          //API month change call
         });
       },
       onDayLongPressed: (DateTime date) {
@@ -2503,7 +3021,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     );
 
     return Card(
-      elevation: 3.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -2531,7 +3048,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                         fontSize: 24.0,
                       ),
                     )),
-                TextButton(
+                /*TextButton(
                   child: Text('PREV'),
                   onPressed: () {
                     setState(() {
@@ -2541,8 +3058,31 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                           DateFormat.yMMM().format(_targetDateTime);
                     });
                   },
-                ),
+                ),*/
                 TextButton(
+                  child: Text('PREV'),
+                  onPressed: () {
+                    final previousMonth = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
+                    if (previousMonth.isBefore(_minDateAllowed)) {
+                      print("⛔ You can’t go beyond last 2 months");
+                      Fluttertoast.showToast(
+                          msg: "Can't go before this month !!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _targetDateTime = previousMonth;
+                      _currentMonth = DateFormat.yMMM().format(_targetDateTime);
+                    });
+                  },
+                ),
+                /*TextButton(
                   child: Text('NEXT'),
                   onPressed: () {
                     setState(() {
@@ -2552,7 +3092,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                           DateFormat.yMMM().format(_targetDateTime);
                     });
                   },
-                )
+                )*/
+                TextButton(
+                  child: Text('NEXT'),
+                  onPressed: () {
+                    final nextMonth = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
+                    if (nextMonth.isAfter(_maxDateAllowed)) {
+                      print("⛔ You can’t go beyond next month");
+                      Fluttertoast.showToast(
+                          msg: "Can't go beyond this month !!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _targetDateTime = nextMonth;
+                      _currentMonth = DateFormat.yMMM().format(_targetDateTime);
+                    });
+                  },
+                ),
               ],
             ),
           ),
@@ -2607,17 +3170,17 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                 tabs: [
                   Tab(
                     icon: Icon(
-                      Icons.cake,
+                      Icons.celebration,
                       color: Mythemes.blackishade,
                     ),
                     text: "Birthday",
                   ),
                   Tab(
                     icon: Icon(
-                      Icons.cake,
+                      Icons.workspace_premium_rounded,
                       color: Mythemes.blackishade,
                     ),
-                    text: "Anniversary",
+                    text: "Work Anniversary",
                   ),
                   Tab(
                     icon: Icon(
