@@ -150,14 +150,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     var notEmptyjson = mapResponse.isNotEmpty;
     var containsEmptyjson = mapResponse.length;
 
-    print('responseemployeeList $emptyjson');
-    print('responseemployeeList $notEmptyjson');
-    print('responseemployeeList $containsEmptyjson');
-
-    /* if (containsEmptyjson==1)  {
-      //print("getData111 $getData");
-      showNodata(context, "Oops", "There is no any requisition.");
-    }*/
     print('responseemployeeList $mapResponse');
     leaveBalModal=LeaveBalModal.fromJson(mapResponse);
 
@@ -186,12 +178,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     int? length = leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
 
     print('totalleaveLength $length ');
-    /*for(int i=0; i<leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;i++){
-      String? leaveTypeName = leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i];
-        leaveTypeList.add(leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i]);
 
-      print('dataLeaveTypeName $leaveTypeName');
-    }*/
     for(int i=0; i<mapResponse['leaveTypeList'].length;i++){
       var halfDayRadioShow =  mapResponse['leaveTypeList'][i]['isHalfday'];
       String? leaveTypeName = mapResponse['leaveTypeList'][i]['leavetype'];
@@ -206,7 +193,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
 
   Map<String, dynamic>? leaveBalances;
   List<String> leaveTypes = [];
-  Future<void> fetchLeaveBalance(String sessionId) async {
+  /*Future<void> fetchLeaveBalance(String sessionId) async {
     try {
       LeaveBalModal leaveBalModal = await getLeaveBalance(sessionId);
 
@@ -229,7 +216,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         // === Read leaveTypeList -> leaveTypelist safely ===
         final rawTypeList = (leaveDataMap['leaveTypeList']?['leaveTypelist']) ?? [];
 
-
         // Ensure it's a List
         final List<dynamic> typelist =
         (rawTypeList is List) ? rawTypeList : (rawTypeList is String ? [rawTypeList] : []);
@@ -248,28 +234,32 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         // === Map each leave type to its data (find the matching key like "CL-789" or "CL-789" present keys) ===
         // The API keys look like "CL-789" or "EL-790" etc. We search for keys that contain the code (e.g. "-CL")
         for (final type in leaveTypes) {
-          // find key where key ends with type or contains '-$type' or starts with '$type-'
+          //print("value1111 $type");
+
           final matchedKey = leaveDataMap.keys.firstWhere(
                 (k) {
               final lower = k.toString().toLowerCase();
+              print("value1111L $k");
               final t = type.toLowerCase();
-              return lower.contains('-$t') || lower.startsWith('$t-') || lower == t;
+              //print("value1111T $t");
+              return lower.startsWith('$t-');
+              // ✅ fixed
             },
             orElse: () => '',
           );
+          print("🔍 Matching type=$type with keys=${leaveDataMap.keys}");
+          print("✅ matchedKey=$matchedKey -> ${leaveDataMap[matchedKey]}");
 
           if (matchedKey.isNotEmpty) {
-            // ensure the value is a map (holds leavesTaken, totalLeavesPending etc.)
             final val = leaveDataMap[matchedKey];
             if (val is Map<String, dynamic>) {
               leaveBalances![type] = val;
             } else {
-              // if it's not map, try to convert typed to map
-              leaveBalances![type] = (val != null) ? json.decode(json.encode(val)) : {};
+              leaveBalances![type] =
+              (val != null) ? json.decode(json.encode(val)) : {};
             }
           } else {
-            // If no matching key, create default empty object for this type
-            leaveBalances![type] = {
+            leaveBalances![''] = {
               'lwp': 0,
               'leavesTaken': 0,
               'totalLeavesPending': 0,
@@ -287,6 +277,40 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       print("❌ Error in fetchLeaveBalance: $e");
       print(st);
       // optional: setState to clear loader or show fallback UI
+      setState(() {
+        leaveBalances = {};
+        leaveTypes = [];
+      });
+    }
+  }*/
+  Future<void> fetchLeaveBalance(String sessionId) async {
+    try {
+      LeaveBalModal leaveBalModal = await getLeaveBalance(sessionId);
+
+      setState(() {
+        leaveBalances = {};
+        leaveTypes = [];
+
+        // ✅ Step 1: Ensure we have valid data
+        if (leaveBalModal.leaveData == null) {
+          print("❌ No leaveData found in API response");
+          return;
+        }
+
+        // ✅ Step 2: Extract the parsed balances directly from model
+        final parsedBalances = leaveBalModal.leaveData!.getParsedBalances();
+
+        // ✅ Step 3: Set the data for UI
+        leaveBalances = parsedBalances;
+        leaveTypes = parsedBalances.keys.toList();
+
+        // ✅ Debug info
+        print("✅ leaveTypes: $leaveTypes");
+        print("✅ leaveBalances: $leaveBalances");
+      });
+    } catch (e, st) {
+      print("❌ Error in fetchLeaveBalance: $e");
+      print(st);
       setState(() {
         leaveBalances = {};
         leaveTypes = [];

@@ -3,86 +3,90 @@ class LeaveBalModal {
 
   LeaveBalModal({this.leaveData});
 
-  LeaveBalModal.fromJson(Map<String, dynamic> json) {
-    leaveData = json['leaveData'] != null
-        ? new LeaveData.fromJson(json['leaveData'])
-        : null;
+  factory LeaveBalModal.fromJson(Map<String, dynamic> json) {
+    return LeaveBalModal(
+      leaveData: json['leaveData'] != null
+          ? LeaveData.fromJson(json['leaveData'])
+          : null,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.leaveData != null) {
-      data['leaveData'] = this.leaveData!.toJson();
+    final Map<String, dynamic> data = {};
+    if (leaveData != null) {
+      data['leaveData'] = leaveData!.toJson();
     }
     return data;
   }
 }
+
 
 class LeaveData {
-  CL607? cL607;
+  Map<String, LeaveDetail>? leaveDetails;
   LeaveTypeList? leaveTypeList;
-  CL607? eL608;
-  CL607? sL606;
 
-  LeaveData({this.cL607, this.leaveTypeList, this.eL608, this.sL606});
+  LeaveData({this.leaveDetails, this.leaveTypeList});
 
-  LeaveData.fromJson(Map<String, dynamic> json) {
-    cL607 = json['CL-607'] != null ? new CL607.fromJson(json['CL-607']) : null;
-    leaveTypeList = json['leaveTypeList'] != null
-        ? new LeaveTypeList.fromJson(json['leaveTypeList'])
-        : null;
-    eL608 = json['EL-608'] != null ? new CL607.fromJson(json['EL-608']) : null;
-    sL606 = json['SL-606'] != null ? new CL607.fromJson(json['SL-606']) : null;
+  factory LeaveData.fromJson(Map<String, dynamic> json) {
+    final leaveDetails = <String, LeaveDetail>{};
+    LeaveTypeList? leaveTypeList;
+
+    json.forEach((key, value) {
+      if (key == 'leaveTypeList') {
+        leaveTypeList = LeaveTypeList.fromJson(value);
+      } else if (value is Map<String, dynamic>) {
+        leaveDetails[key] = LeaveDetail.fromJson(value);
+      }
+    });
+
+    return LeaveData(
+      leaveDetails: leaveDetails,
+      leaveTypeList: leaveTypeList,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.cL607 != null) {
-      data['CL-607'] = this.cL607!.toJson();
+    final Map<String, dynamic> data = {};
+    if (leaveDetails != null) {
+      data.addAll(leaveDetails!.map((key, value) => MapEntry(key, value.toJson())));
     }
-    if (this.leaveTypeList != null) {
-      data['leaveTypeList'] = this.leaveTypeList!.toJson();
-    }
-    if (this.eL608 != null) {
-      data['EL-608'] = this.eL608!.toJson();
-    }
-    if (this.sL606 != null) {
-      data['SL-606'] = this.sL606!.toJson();
+    if (leaveTypeList != null) {
+      data['leaveTypeList'] = leaveTypeList!.toJson();
     }
     return data;
   }
-}
 
-class CL607 {
-  dynamic lwp;
-  dynamic leavesTaken;
-  dynamic totalLeavesPending;
-  dynamic currentYearLeaves;
-  dynamic lastYearLeaves;
+  /// ✅ Function to parse & return clean leave balances map
+  Map<String, dynamic> getParsedBalances() {
+    final leaveBalances = <String, dynamic>{};
 
-  CL607(
-      {this.lwp,
-        this.leavesTaken,
-        this.totalLeavesPending,
-        this.currentYearLeaves,
-        this.lastYearLeaves});
+    final leaveTypeItems = leaveTypeList?.leaveTypelist ?? [];
+    print("🧩 Final leaveDataMap keys: ${leaveDetails?.keys.toList()}");
 
-  CL607.fromJson(Map<String, dynamic> json) {
-    lwp = json['lwp'];
-    leavesTaken = json['leavesTaken'];
-    totalLeavesPending = json['totalLeavesPending'];
-    currentYearLeaves = json['currentYearLeaves'];
-    lastYearLeaves = json['lastYearLeaves'];
-  }
+    for (var typeItem in leaveTypeItems) {
+      // Example: "Casual Leave-CL-789"
+      final parts = typeItem.split('-');
+      if (parts.length >= 3) {
+        final typeCode = parts[1]; // e.g. "CL"
+        final typeId = parts[2];   // e.g. "789"
+        final matchedKey = "$typeCode-$typeId";
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['lwp'] = this.lwp;
-    data['leavesTaken'] = this.leavesTaken;
-    data['totalLeavesPending'] = this.totalLeavesPending;
-    data['currentYearLeaves'] = this.currentYearLeaves;
-    data['lastYearLeaves'] = this.lastYearLeaves;
-    return data;
+        print("🔍 Matching type=$typeCode -> matchedKey=$matchedKey");
+
+        final data = leaveDetails?[matchedKey];
+
+        leaveBalances[typeCode] = {
+          "lwp": data?.lwp ?? 0.0,
+          "leavesTaken": data?.leavesTaken ?? 0.0,
+          "totalLeavesPending": data?.totalLeavesPending ?? 0.0,
+          "currentYearLeaves": data?.currentYearLeaves ?? 0.0,
+          "lastYearLeaves": data?.lastYearLeaves ?? 0.0,
+        };
+      }
+    }
+
+    print("✅ Final leaveBalances: $leaveBalances");
+    return leaveBalances;
   }
 }
 
@@ -91,13 +95,51 @@ class LeaveTypeList {
 
   LeaveTypeList({this.leaveTypelist});
 
-  LeaveTypeList.fromJson(Map<String, dynamic> json) {
-    leaveTypelist = json['leaveTypelist'].cast<String>();
+  factory LeaveTypeList.fromJson(Map<String, dynamic> json) {
+    return LeaveTypeList(
+      leaveTypelist: List<String>.from(json['leaveTypelist'] ?? []),
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['leaveTypelist'] = this.leaveTypelist;
-    return data;
+    return {
+      'leaveTypelist': leaveTypelist,
+    };
+  }
+}
+
+class LeaveDetail {
+  double? lwp;
+  double? leavesTaken;
+  double? totalLeavesPending;
+  double? currentYearLeaves;
+  double? lastYearLeaves;
+
+  LeaveDetail({
+    this.lwp,
+    this.leavesTaken,
+    this.totalLeavesPending,
+    this.currentYearLeaves,
+    this.lastYearLeaves,
+  });
+
+  factory LeaveDetail.fromJson(Map<String, dynamic> json) {
+    return LeaveDetail(
+      lwp: (json['lwp'] ?? 0).toDouble(),
+      leavesTaken: (json['leavesTaken'] ?? 0).toDouble(),
+      totalLeavesPending: (json['totalLeavesPending'] ?? 0).toDouble(),
+      currentYearLeaves: (json['currentYearLeaves'] ?? 0).toDouble(),
+      lastYearLeaves: (json['lastYearLeaves'] ?? 0).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'lwp': lwp,
+      'leavesTaken': leavesTaken,
+      'totalLeavesPending': totalLeavesPending,
+      'currentYearLeaves': currentYearLeaves,
+      'lastYearLeaves': lastYearLeaves,
+    };
   }
 }

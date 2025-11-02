@@ -342,7 +342,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             "status": legend["status"].toString(),
           };
         }).toList();
-
         _markedDateMap.clear();
 
         for (var event in data) {
@@ -492,7 +491,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     todayPunchesModalGlobal = todayPunchesModal;
     // 👇 after parsing response
     setPunchData(todayPunchesModal.data);
-
 
     setState(() {
       isLoadingTodayPunch = false; // Hide loader AFTER everything is ready
