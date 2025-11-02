@@ -433,9 +433,10 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     return calendarModalClass;
   }*/
   Future<CalendarModalClass> getCalendarData(String sessionId) async {
+    String _currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.calendarApi;
-    print("Current Month - $_currentMonth");
+    print("Current Month - $_currentMonth $_currentMonthc");
 
     CalendarModalClass calendarModalClass;
     var urlapi = Uri.parse("$conn$apiUrl?"
@@ -451,8 +452,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     final prefs = await SharedPreferences.getInstance();
 
     // ✅ STEP 1: Try loading from SharedPreferences first
-    final cachedData = prefs.getString('calendarData');
-    final cachedMonth = prefs.getString('calendarMonth');
+    if(_currentMonthc==_currentMonth){
+
+      final cachedData = prefs.getString('calendarData');
+      final cachedMonth = prefs.getString('calendarMonth');
+
 
     print("Calendar Data - $cachedData");
     print("Calendar Month - $cachedMonth");
@@ -467,6 +471,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         print("Error loading cached calendar: $e");
       }
     }
+    }
 
     // ✅ STEP 2: Now call API (refresh data and overwrite cache)
     try {
@@ -476,15 +481,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         print('Response body - ${response.body}');
         mapResponse = json.decode(response.body);
 
-        print("Calendar Data - $cachedData");
-        print("Calendar Month - $cachedMonth");
-
-          print("My month - $cachedMonth");
           // Save to SharedPreferences
+        if(_currentMonthc==_currentMonth){
           await prefs.setString('calendarData', json.encode(mapResponse));
           await prefs.setString('calendarMonth', _currentMonth);
-
-
+        }
 
         // ✅ Rebuild UI from fresh API data
         _buildCalendarFromMap(mapResponse);
