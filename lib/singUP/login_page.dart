@@ -26,6 +26,7 @@ import '../commanScreen/routes.dart';
 import '../firebasePushNotification/firebase_api.dart';
 import '../main.dart';
 import '../sharedPrefancePage/ShardPre.dart';
+import '../sharedPrefancePage/shared_preference_helper.dart';
 import '../themes/empThemes.dart';
 import 'model/adminLoginModal.dart';
 import 'model/loginModel.dart';
@@ -202,6 +203,7 @@ class _LoginPageState extends State<LoginPage> {
           } else {
             // call shared prefs loader AFTER login
             getSharedPrfanceList();
+            SharedPrefHelper.clearApiCacheOnLogin();
 
             if (empLength == 1 || roLength == 1) {
               Navigator.push(context,
