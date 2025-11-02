@@ -1223,11 +1223,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
       body: essDashboardModelGlobal == null
           ? loader()
-          : RefreshIndicator(
-          onRefresh: () {
-            return getSharedPrfanceList();
-          },
-          child: DashboardWidgets(essDashboardModelGlobal!)),
+          : DashboardWidgets(essDashboardModelGlobal!),
 
     );
   }
@@ -2279,6 +2275,15 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                   width: double.infinity, // 👈 full width
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      _currentMonth = DateFormat('MM-yyyy').format(DateTime.now());
+
+                      // 👇 Reset calendar to current month
+                      setState(() {
+                        _targetDateTime = DateTime.now();
+                        _currentDate = DateTime.now();
+                        _currentDate2 = DateTime.now();
+                        _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+                      });
                       Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
                       getEmployeeList11.then((value) {
                         setState(() {
@@ -2287,7 +2292,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                         });
 
                       });
-
                       Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
                       getCalendar.then((value) {
                         setState(() {
@@ -3031,7 +3035,7 @@ CalendarShow() {
           //custom icon without header
           Container(
             margin: EdgeInsets.only(
-              top: 30.0,
+              top: 0.0,
               bottom: 16.0,
               left: 16.0,
               right: 16.0,

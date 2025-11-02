@@ -433,9 +433,10 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     return calendarModalClass;
   }*/
   Future<CalendarModalClass> getCalendarData(String sessionId) async {
+    String _currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.calendarApi;
-    print("Current Month - $_currentMonth");
+    print("Current Month - $_currentMonth $_currentMonthc");
 
     CalendarModalClass calendarModalClass;
     var urlapi = Uri.parse("$conn$apiUrl?"
@@ -451,20 +452,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     final prefs = await SharedPreferences.getInstance();
 
     // ✅ STEP 1: Try loading from SharedPreferences first
-    final cachedData = prefs.getString('calendarData');
-    final cachedMonth = prefs.getString('calendarMonth');
+    if(_currentMonthc==_currentMonth){
 
-    print("Calendar Data - $cachedData");
-    print("Calendar Month - $cachedMonth");
+      final cachedData = prefs.getString('calendarData');
+      final cachedMonth = prefs.getString('calendarMonth');
 
-    if (cachedData != null) {
-      print("Cachded Month $cachedMonth");
-      try {
-        print("Loaded calendar data from cache ✅");
-        mapResponse = json.decode(cachedData);
-        _buildCalendarFromMap(mapResponse);
-      } catch (e) {
-        print("Error loading cached calendar: $e");
+
+      print("Calendar Data - $cachedData");
+      print("Calendar Month - $cachedMonth");
+
+      if (cachedData != null) {
+        print("Cachded Month $cachedMonth");
+        try {
+          print("Loaded calendar data from cache ✅");
+          mapResponse = json.decode(cachedData);
+          _buildCalendarFromMap(mapResponse);
+        } catch (e) {
+          print("Error loading cached calendar: $e");
+        }
       }
     }
 
@@ -476,15 +481,11 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         print('Response body - ${response.body}');
         mapResponse = json.decode(response.body);
 
-        print("Calendar Data - $cachedData");
-        print("Calendar Month - $cachedMonth");
-
-        print("My month - $cachedMonth");
         // Save to SharedPreferences
-        await prefs.setString('calendarData', json.encode(mapResponse));
-        await prefs.setString('calendarMonth', _currentMonth);
-
-
+        if(_currentMonthc==_currentMonth){
+          await prefs.setString('calendarData', json.encode(mapResponse));
+          await prefs.setString('calendarMonth', _currentMonth);
+        }
 
         // ✅ Rebuild UI from fresh API data
         _buildCalendarFromMap(mapResponse);
@@ -1220,17 +1221,76 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     return Scaffold(
       appBar: AppBar(
-        title: "My Dashboard".text.bold.center.make(),
+        title: titleName.text.bold.center.make(),
       ),
 
       body: essDashboardModelGlobal == null
           ? loader()
-          : RefreshIndicator(
-          onRefresh: () {
-            return getSharedPrfanceList();
-          },
-          child: DashboardWidgets(essDashboardModelGlobal!)),
+          : DashboardWidgets(essDashboardModelGlobal!),
 
+      bottomNavigationBar:
+      BottomNavigationBar (
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
+
+          if(index==0){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => HomePage()));
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if(index==1){
+            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Attendance');
+          }
+          if(index==2){
+            Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+            print('Reports');
+          }
+          if(index==3){
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('Dashboard');
+          }
+          if(index==4){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew())
+            );
+            print('Profile');
+          }
+
+          setState(() => currentIndex = index);
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pending_actions),
+            label: 'Attendance',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'Reports',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_customize),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+            //backgroundColor: Colors.blue,
+          ),
+        ],
+      ),
     );
   }
 
@@ -2281,6 +2341,15 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                   width: double.infinity, // 👈 full width
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      _currentMonth = DateFormat('MM-yyyy').format(DateTime.now());
+
+                      // 👇 Reset calendar to current month
+                      setState(() {
+                        _targetDateTime = DateTime.now();
+                        _currentDate = DateTime.now();
+                        _currentDate2 = DateTime.now();
+                        _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+                      });
                       Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
                       getEmployeeList11.then((value) {
                         setState(() {
@@ -2289,7 +2358,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                         });
 
                       });
-
                       Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
                       getCalendar.then((value) {
                         setState(() {
@@ -3033,7 +3101,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           //custom icon without header
           Container(
             margin: EdgeInsets.only(
-              top: 30.0,
+              top: 0.0,
               bottom: 16.0,
               left: 16.0,
               right: 16.0,
