@@ -311,10 +311,10 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
                   childrenPadding: EdgeInsets.all(16).copyWith(top: 0),
 
                   title: nameOnly.toString()
-                      .text
+                      .text.bold
                       .make(),
-                  subtitle: "DOJ - $doj"
-                      .text
+                  subtitle: "Balance - ${mapResponse['leaveData']['$newString']['totalLeavesPending'].toString()}"
+                      .text.bold.color(Mythemes.successColor)
                       .make(),
                   children: [
                     /*Row(
@@ -401,7 +401,7 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
                     ).pLTRB(0, 0, 0, 8.0),*/
                     Row(
                         children: [
-                          "Total Leave Pending".text.bold.color(Mythemes.successColor).make(),
+                          "Total Balance".text.bold.color(Mythemes.successColor).make(),
                           Expanded(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,

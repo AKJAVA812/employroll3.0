@@ -2971,7 +2971,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               content: const Text(
-                "Requisitions for the past pay-cycle has been closed.",
+                "Requisitions for the last pay-cycle has been closed.",
                 style: TextStyle(fontSize: 15),
               ),
               actions: [

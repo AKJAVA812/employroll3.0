@@ -307,6 +307,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         // ✅ Debug info
         print("✅ leaveTypes: $leaveTypes");
         print("✅ leaveBalances: $leaveBalances");
+
       });
     } catch (e, st) {
       print("❌ Error in fetchLeaveBalance: $e");

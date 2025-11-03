@@ -792,6 +792,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       final response = await http.post(urlapi);
       final mapResponse = json.decode(response.body);
 
+      print("Event API -${response.request}");
       final eventsListModal = EssEventsListModal.fromJson(mapResponse);
       eventsListModalGlobal = eventsListModal;
 
@@ -831,6 +832,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       final response = await http.post(urlapi);
       final mapResponse = json.decode(response.body);
 
+      print("Today Event - ${response.request}");
+
       final todayEventListModal = TodayEventListModal.fromJson(mapResponse);
       todayEventModalGlobal = todayEventListModal;
 
@@ -862,10 +865,9 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     final dashboardData = prefs.getString('dashboardData');
 
     if (eventsJson != null) {
+      print("Event JSON - $eventsJson");
       final mapResponse = jsonDecode(eventsJson);
-
       eventsListModalGlobal = EssEventsListModal.fromJson(mapResponse);
-      _buildCalendarFromMap(mapResponse);
       isLoadingEvent = false;
       isLoading = false;
       isLoadingTodayEvent = false;
@@ -2905,7 +2907,7 @@ CalendarShow() {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             content: const Text(
-              "Requisitions for the past pay-cycle has been closed.",
+              "Requisitions for the last pay-cycle has been closed.",
               style: TextStyle(fontSize: 15),
             ),
             actions: [
