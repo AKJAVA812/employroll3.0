@@ -483,9 +483,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
     request.fields['battery'] = sessionId!;
 
 
-    //print("stream.length");
-    //print(stream.length.toString());
-
     var multipart = new http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
     request.files.add(multipart);
@@ -497,6 +494,8 @@ class _ImageUploadedState extends State<ImageUploaded> {
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 20));
+
       http.Response response = await http.Response.fromStream(await request.send().timeout(const Duration(seconds: 30)));
       // Process the response here
 
@@ -510,23 +509,8 @@ class _ImageUploadedState extends State<ImageUploaded> {
       result= json.decode(response.body.toString());
       String resultSuccess=result['result'];
       String reasonSuccess=result['reason'];
-      print('URL ${response.request}');
-      print('result${result}');
-      print("Reason: ${result['reason']}, Type: ${result['reason'].runtimeType}");
-      print("Result: ${result['result']}, Type: ${result['result'].runtimeType}");
-
-
-      print('Response body: ${result}');
-
-      //var response = await request.send();
-      // listen for response
-
-      //var responseData = await response.stream.bytesToString();
-
-
 
       if(response.statusCode==200){
-        print("I am hit 2 times");
         Navigator.of(context, rootNavigator: true).pop();
         if(resultSuccess.compareToIgnoringCase("success")==0){
           showSuccessGo(context,reasonSuccess.upperCamelCase+" "+formattedDate,"Successfully Punch $clockingType");
@@ -543,12 +527,8 @@ class _ImageUploadedState extends State<ImageUploaded> {
         showDialgError(context, result,"Your Punch Not Submitted, Please Try Again");
       }
     } on TimeoutException catch (_) {
-      // Show retry popup if the request times out
-      //showDialgError(context, "Alert", "Please Try again !");
+      showDialgError(context, result,"Your Punch Submitted offline");
     }
-
-
-
   }
 
   Future<void> uploadImageWithGeofence(BuildContext context, dynamic selectedGeofenceId) async {
