@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
@@ -28,6 +31,7 @@ class LeaveRequisitionPage extends StatefulWidget {
 }
 SessionManager sessionManager=SessionManager();
 Map<String, dynamic> mapResponse = {};
+Map<String, dynamic> mapResponseLBalance = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 var doj;
@@ -141,17 +145,17 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     print('URL ${response.request}');
     //print('responseemployeeList ${response.body}');
 
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse['data'];
+    mapResponseLBalance = json.decode(response.body);
+    var getData = mapResponseLBalance['data'];
 
-    var emptyjson = mapResponse['leaveData']['leaveTypeList'];
+    var emptyjson = mapResponseLBalance['leaveData']['leaveTypeList'];
     //var emptyjson = respons;
 
-    var notEmptyjson = mapResponse.isNotEmpty;
-    var containsEmptyjson = mapResponse.length;
+    var notEmptyjson = mapResponseLBalance.isNotEmpty;
+    var containsEmptyjson = mapResponseLBalance.length;
 
-    print('responseemployeeList $mapResponse');
-    leaveBalModal=LeaveBalModal.fromJson(mapResponse);
+    print('responseemployeeList $mapResponseLBalance');
+    leaveBalModal=LeaveBalModal.fromJson(mapResponseLBalance);
 
     //print("typename:-${mapResponse['leaveData']['CO-578']['leavesTaken']}");
     if(emptyjson==null){
@@ -183,6 +187,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       var halfDayRadioShow =  mapResponse['leaveTypeList'][i]['isHalfday'];
       String? leaveTypeName = mapResponse['leaveTypeList'][i]['leavetype'];
       leaveTypeList.add(mapResponse['leaveTypeList'][i]['leavetype']);
+
 
       //print('dataLeaveTypeName $leaveTypeName');
       //print("HalfDayShow $halfDayRadioShow");
@@ -362,7 +367,61 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     {"count": "0", "type": "MATERNITY", "subtext": "90 Leaves"},
   ];
 
-
+  File? uploadedFile;
+  var sickLeaveMedicalShow = false;
+  void openUploadDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Wrap(
+          children: [
+            Center(
+              child: Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            const SizedBox(height: 15),
+            const Center(
+                child: Text("Upload Medical",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+            const SizedBox(height: 10),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: Colors.blue),
+              title: const Text("Use Camera"),
+              onTap: () async {
+                Navigator.pop(context);
+                final ImagePicker picker = ImagePicker();
+                final XFile? image =
+                await picker.pickImage(source: ImageSource.camera);
+                if (image != null) {
+                  setState(() => uploadedFile = File(image.path));
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.insert_drive_file, color: Colors.teal),
+              title: const Text("Upload from Files"),
+              onTap: () async {
+                Navigator.pop(context);
+                FilePickerResult? result = await FilePicker.platform.pickFiles();
+                if (result != null && result.files.single.path != null) {
+                  setState(() => uploadedFile = File(result.files.single.path!));
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   int pageIndex = 0;
   int currentIndex = 2;
@@ -709,8 +768,11 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     onChanged: (newVal) {
                       valuenew = newVal.toString();
                       int i =leaveTypeList.indexOf(valuenew);
+                      print("Leave Type Data List - ${mapResponse['leaveTypeList']}");
                       leaveTypeId = mapResponse['leaveTypeList'][i]['leaveId'];
                       var leaveHalfDay = mapResponse['leaveTypeList'][i]['isHalfday'];
+                      sickLeaveMedicalShow = mapResponse['leaveTypeList'][i]['medCerti'];
+                      print("$sickLeaveMedicalShow");
                       print('Leave Half Day $leaveHalfDay');
                       var policyidnew= leaveTypeList.elementAt(i);
                       leavereqIdGlobel = newVal.toString().split('-');
@@ -747,6 +809,31 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
 
                   ),
                 ),
+                // Upload
+                Visibility(
+                  visible: sickLeaveMedicalShow,
+                  child: Center(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                      icon: const Icon(Icons.upload_file),
+                      label: const Text("Upload Medical",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: openUploadDialog,
+                    ),
+                  ),
+                ),
+
+                if (uploadedFile != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text("📎 Selected: ${uploadedFile!.path.split('/').last}",
+                        style: const TextStyle(color: Colors.green)),
+                  ),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1095,6 +1182,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                   ),
                 ),
 
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -1440,7 +1528,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
+   /* var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "leaveTypeId=$leaveTypeId&"
         "fromDate=$fromDate&"
@@ -1449,14 +1537,52 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         "empid=$empNewId&"
         "nominee=$nominee&"
         "confirmyes=$confirmYes"
-    );
-    final response = await http.post(urlapi);
-    print('URL ${response.request}');
-    if (response.statusCode == 200) {
-      var responseResult = response.body;
+    );*/
+    var urlapi = Uri.parse("$conn$apiUrl");
+    var request = http.MultipartRequest("POST", urlapi);
+
+    // Add static fields
+    request.fields['sessionId'] = sessionId!;
+    request.fields['leaveTypeId'] = leaveTypeId.toString();
+    request.fields['fromDate'] = fromDate;
+    request.fields['summary'] = getRemark;
+    request.fields['radio'] = dayRadio;
+    request.fields['empid'] = empNewId.toString();
+    request.fields['nominee'] = nominee;
+    request.fields['confirmyes'] = confirmYes;
+
+    // ✅ Attach file if available
+  /*  if (uploadedFile != null && uploadedFile!.existsSync()) {
+      String fileName = uploadedFile!.path.split('/').last;
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'document',               // key name for backend
+          uploadedFile!.path,       // local file path
+          filename: fileName,
+        ),
+      );
+    } else {
+      // If no file uploaded, send empty field
+      request.fields['document'] = "";
+    }*/
+
+    String apiWithParams = urlapi.toString() +
+        '?' +
+        request.fields.entries
+            .map((e) =>
+        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .join('&');
+    print('API URL with Parameters: $apiWithParams');
+
+    //final response = await http.post(urlapi);
+    http.StreamedResponse response = await request.send();
+    http.Response httpResponse = await http.Response.fromStream(response);
+    print('URL ${httpResponse.request}');
+    if (httpResponse.statusCode == 200) {
+      var responseResult = httpResponse.body;
       print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
-      mapResponse = json.decode(response.body);
+      mapResponse = json.decode(httpResponse.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
       bool isValidate = true;
@@ -1472,20 +1598,20 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       print("IsValidate - $isValidate");
       if(isValidate == false) {
         if(result.compareToIgnoringCase("success")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
+          showDialgSucess(context,reason.upperCamelCase+" ","Success");
         }else if(result.compareToIgnoringCase("error")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+          showDialgSucess(context,reason.upperCamelCase, " Error ");
         }else if(result.compareToIgnoringCase("warning")==0){
           showValidatePop(context,reason.upperCamelCase, " Warning ");
         }
 
       } else {
         if(result.compareToIgnoringCase("success")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
+          showDialgSucess(context,reason.upperCamelCase+" ","Success");
         }else if(result.compareToIgnoringCase("error")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+          showDialgSucess(context,reason.upperCamelCase, " Error ");
         }else if(result.compareToIgnoringCase("warning")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Warning ");
+          showDialgSucess(context,reason.upperCamelCase, " Warning ");
         }
       }
 
@@ -1498,7 +1624,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
+   /* var urlapi = Uri.parse("$conn$apiUrl?"
         "tilldate=$toDate&"
         "sessionId=$sessionId&"
         "leaveTypeId=$leaveTypeId&"
@@ -1508,14 +1634,50 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         "empid=$empNewId&"
         "nominee=$nominee&"
         "confirmyes=$confirmyes"
-    );
-    final response = await http.post(urlapi);
-    print('URL ${response.request}');
-    if (response.statusCode == 200) {
-      var responseResult = response.body;
+    );*/
+    var urlapi = Uri.parse("$conn$apiUrl");
+    var request = http.MultipartRequest("POST", urlapi);
+    // Add static fields
+    request.fields['sessionId'] = sessionId!;
+    request.fields['tilldate'] = toDate;
+    request.fields['leaveTypeId'] = leaveTypeId.toString();
+    request.fields['fromDate'] = fromDate;
+    request.fields['summary'] = getRemark;
+    request.fields['radio'] = dayRadio;
+    request.fields['empid'] = empNewId.toString();
+    request.fields['confirmyes'] = confirmyes;
+
+    // ✅ Attach file if available
+    /*if (uploadedFile != null && uploadedFile!.existsSync()) {
+      String fileName = uploadedFile!.path.split('/').last;
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'document',               // key name for backend
+          uploadedFile!.path,       // local file path
+          filename: fileName,
+        ),
+      );
+    } else {
+      // If no file uploaded, send empty field
+      request.fields['document'] = "";
+    }*/
+    String apiWithParams = urlapi.toString() +
+        '?' +
+        request.fields.entries
+            .map((e) =>
+        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .join('&');
+    print('API URL with Parameters: $apiWithParams');
+
+    //final response = await http.post(urlapi);
+    http.StreamedResponse response = await request.send();
+    http.Response httpResponse = await http.Response.fromStream(response);
+    print('URL ${httpResponse.request}');
+    if (httpResponse.statusCode == 200) {
+      var responseResult = httpResponse.body;
       print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
-      mapResponse = json.decode(response.body);
+      mapResponse = json.decode(httpResponse.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
       bool isValidate = true;
@@ -1531,33 +1693,32 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       print("IsValidate - $isValidate");
       if(isValidate == false) {
         if(result.compareToIgnoringCase("success")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
+          showDialgSucess(context,reason.upperCamelCase+" ","Success");
         }else if(result.compareToIgnoringCase("error")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+          showDialgSucess(context,reason.upperCamelCase, " Error ");
         }else if(result.compareToIgnoringCase("warning")==0){
           showValidatePop(context,reason.upperCamelCase, " Warning ");
         }
 
       } else {
         if(result.compareToIgnoringCase("success")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
+          showDialgSucess(context,reason.upperCamelCase+" ","Success");
         }else if(result.compareToIgnoringCase("error")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+          showDialgSucess(context,reason.upperCamelCase, " Error ");
         }else if(result.compareToIgnoringCase("warning")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Warning ");
+          showDialgSucess(context,reason.upperCamelCase, " Warning ");
         }
       }
 
     }
   }
-
   Future<void> halfDayRequisition(startTime, endTime, String getRemark,  int? idn, fromDate, empNewId,nominee, String confirmyes) async {
     String idn=leavereqIdGlobel.last;
     String dayRadio = "3";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
+    /*var urlapi = Uri.parse("$conn$apiUrl?"
         "starttime=$startTime&"
         "endtime=$endTime&"
         "sessionId=$sessionId&"
@@ -1568,14 +1729,51 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         "empid=$empNewId&"
         "nominee=$nominee&"
         "confirmyes=$confirmyes"
-    );
-    final response = await http.post(urlapi);
-    print('URL ${response.request}');
-    if (response.statusCode == 200) {
-      var responseResult = response.body;
+    );*/
+    var urlapi = Uri.parse("$conn$apiUrl");
+    var request = http.MultipartRequest("POST", urlapi);
+    // Add static fields
+    request.fields['starttime'] = startTime!;
+    request.fields['endtime'] = endTime;
+    request.fields['sessionId'] = sessionId!;
+    request.fields['leaveTypeId'] = leaveTypeId.toString();
+    request.fields['fromDate'] = fromDate;
+    request.fields['summary'] = getRemark;
+    request.fields['radio'] = dayRadio;
+    request.fields['empid'] = empNewId;
+    request.fields['nominee'] = nominee;
+    request.fields['confirmyes'] = confirmyes;
+
+    // ✅ Attach file if available
+   /* if (uploadedFile != null && uploadedFile!.existsSync()) {
+      String fileName = uploadedFile!.path.split('/').last;
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'document',               // key name for backend
+          uploadedFile!.path,       // local file path
+          filename: fileName,
+        ),
+      );
+    } else {
+      // If no file uploaded, send empty field
+      request.fields['document'] = "";
+    }*/
+    String apiWithParams = urlapi.toString() +
+        '?' +
+        request.fields.entries
+            .map((e) =>
+        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .join('&');
+    print('API URL with Parameters: $apiWithParams');
+    //final response = await http.post(urlapi);
+    http.StreamedResponse response = await request.send();
+    http.Response httpResponse = await http.Response.fromStream(response);
+    print('URL ${httpResponse.request}');
+    if (httpResponse.statusCode == 200) {
+      var responseResult = httpResponse.body;
       print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
-      mapResponse = json.decode(response.body);
+      mapResponse = json.decode(httpResponse.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
       bool isValidate = true;
@@ -1591,24 +1789,63 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       print("IsValidate - $isValidate");
       if(isValidate == false) {
         if(result.compareToIgnoringCase("success")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
+          showDialgSucess(context,reason.upperCamelCase+" ","Success");
         }else if(result.compareToIgnoringCase("error")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+          showDialgSucess(context,reason.upperCamelCase, " Error ");
         }else if(result.compareToIgnoringCase("warning")==0){
           showValidatePop(context,reason.upperCamelCase, " Warning ");
         }
 
       } else {
         if(result.compareToIgnoringCase("success")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
+          showDialgSucess(context,reason.upperCamelCase+" ","Success");
         }else if(result.compareToIgnoringCase("error")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+          showDialgSucess(context,reason.upperCamelCase, " Error ");
         }else if(result.compareToIgnoringCase("warning")==0){
-          CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Warning ");
+          showDialgSucess(context,reason.upperCamelCase, " Warning ");
         }
       }
 
     }
+  }
+
+  static showDialgSucess(BuildContext buildContext, String result, String alert) {
+    if (buildContext == null) {
+      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      return;
+    }
+
+    showDialog(
+      context: buildContext,
+      barrierDismissible: false, // Prevents accidental dismiss
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+          title: Row(
+            children: [
+              Expanded(child: Text(alert)),
+            ],
+          ),
+          content: Text(result),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
+                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                  Navigator.of(buildContext).maybePop();
+                } else {
+                  print("⚠️ Warning: No route to close.");
+                }
+              },
+              child: Text("Ok"),
+            ),
+          ],
+          elevation: 24.0,
+        );
+      },
+    );
   }
 }
 
