@@ -265,7 +265,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
               padding: const EdgeInsets.only(top: 10.0),
               child: Column(
                 children: [
-                  orgId == null
+                  /*orgId == null
                       ? const SizedBox.shrink() // hides everything until orgId is fetched
                       : Column(
                     children: [
@@ -385,6 +385,61 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                             ),
                           ],
                         ),
+                      ),
+                    ],
+                  ),*/
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedToggleSwitch<int>.size(
+                        height: 30,
+                        current: min(value, 3),
+                        style: ToggleStyle(
+                          backgroundColor: Mythemes.greyishade,
+                          indicatorColor: Mythemes.lightBluishColor,
+                          borderColor: Colors.transparent,
+                          borderRadius: BorderRadius.circular(10.0),
+                          indicatorBorderRadius: BorderRadius.zero,
+                        ),
+                        values: const [0, 1, 2],
+                        iconOpacity: 1.0,
+                        selectedIconScale: 1.0,
+                        indicatorSize: const Size.fromWidth(85),
+                        iconAnimationType: AnimationType.onHover,
+                        styleAnimationType: AnimationType.onHover,
+                        spacing: 3.0,
+                        customSeparatorBuilder: (context, local, global) {
+                          final opacity = ((global.position - local.position).abs() - 0.5)
+                              .clamp(0.0, 1.0);
+                          return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity),
+                          );
+                        },
+                        customIconBuilder: (context, local, global) {
+                          final text = const ['Attendance', 'Leave', 'OD'][local.index];
+                          return Center(
+                            child: Text(
+                              text,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color.lerp(
+                                    Colors.black, Colors.white, local.animationValue),
+                              ),
+                            ),
+                          );
+                        },
+                        borderWidth: 0.0,
+                        onChanged: (i) {
+                          setState(() => value = i);
+                          if (value == 1) {
+                            Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                          } else if (value == 2) {
+                            Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                          }
+                        },
                       ),
                     ],
                   ),

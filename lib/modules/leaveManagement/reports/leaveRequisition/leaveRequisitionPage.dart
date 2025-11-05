@@ -3,11 +3,13 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
@@ -368,7 +370,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
   ];
 
   File? uploadedFile;
+  var sickLeaveMedicalTypeShow = false;
   var sickLeaveMedicalShow = false;
+  var sickLeaveMedicalShowValue = 0;
   void openUploadDialog() {
     showModalBottomSheet(
       context: context,
@@ -422,6 +426,73 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       ),
     );
   }
+
+  void showAttachmentBottomSheet(BuildContext context, String attachmentUrl) {
+    final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
+    final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
+        attachmentUrl.toLowerCase().endsWith('.jpeg') ||
+        attachmentUrl.toLowerCase().endsWith('.png');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SizedBox(
+
+        height: MediaQuery.of(context).size.height * 0.85,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("View Attachment",
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  )
+                ],
+              ),
+            ),
+            // File content viewer
+            Expanded(
+              child: isPdf
+                  ? SfPdfViewer.network(
+                attachmentUrl,
+                canShowScrollStatus: true,
+                canShowPaginationDialog: true,
+              )
+                  : isImage
+                  ? CachedNetworkImage(
+                imageUrl: attachmentUrl,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) =>
+                const Center(child: Text("❌ Failed to load image")),
+              )
+                  : const Center(
+                child: Text(
+                  "⚠️ Unsupported file format",
+                  style: TextStyle(fontSize: 16, color: Colors.redAccent),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 
   int pageIndex = 0;
   int currentIndex = 2;
@@ -511,7 +582,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
             key: _formKey,
             child: Column(
               children: [
-                Visibility(
+                /*Visibility(
                   visible: orgNewId != 190 && orgNewId != 191 && orgNewId != 198,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -571,9 +642,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                           if(value == 2) {
                             Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
                           }
-                          /* if(value == 3) {
+                          *//* if(value == 3) {
                               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                            }*/
+                            }*//*
                         },
                       )
                     ],
@@ -636,16 +707,81 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                             Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
-                          /* if(value == 2) {
+                          *//* if(value == 2) {
                               Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                            }*/
-                          /* if(value == 3) {
+                            }*//*
+                          *//* if(value == 3) {
                               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                            }*/
+                            }*//*
                         },
                       )
                     ],
                   ),
+                ),*/
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedToggleSwitch<int>.size(
+                      height: 30,
+                      current: min(value, 3),
+                      style: ToggleStyle(
+                        backgroundColor: Mythemes.greyishade,
+                        indicatorColor: Mythemes.lightBluishColor,
+                        borderColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(10.0),
+                        indicatorBorderRadius: BorderRadius.zero,
+                      ),
+                      values: const [0, 1, 2],
+                      iconOpacity: 1.0,
+                      selectedIconScale: 1.0,
+                      indicatorSize: const Size.fromWidth(85),
+                      iconAnimationType: AnimationType.onHover,
+                      styleAnimationType: AnimationType.onHover,
+                      spacing: 3.0,
+                      customSeparatorBuilder: (context, local, global) {
+                        final opacity =
+                        ((global.position - local.position).abs() - 0.5)
+                            .clamp(0.0, 1.0);
+                        return VerticalDivider(
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity));
+                      },
+                      customIconBuilder: (context, local, global) {
+                        final text = const ['Attendance', 'Leave', 'OD'][local.index];
+                        return Center(
+                            child: Text(text,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color.lerp(Colors.black, Colors.white,
+                                        local.animationValue))));
+                      },
+                      borderWidth: 0.0,
+                      onChanged: (i) {
+                        setState(() {
+                          value = i;
+                          print(i);
+
+                        });
+                        if(value == 0){
+                          Navigator.pushNamed(context, MyRoutings.attendanceReqCalendar);
+                          //Navigator.of(context, rootNavigator: true).pop();
+
+                        }
+                        if(value == 1) {
+                          Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                          //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                        }
+                        if(value == 2) {
+                          Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                        }
+                        /* if(value == 3) {
+                              Navigator.pushNamed(context, MyRoutings.onDutyTypes);
+                            }*/
+                      },
+                    )
+                  ],
                 ),
                 /*Padding(
                   padding: EdgeInsets.all(8.0),
@@ -771,7 +907,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                       print("Leave Type Data List - ${mapResponse['leaveTypeList']}");
                       leaveTypeId = mapResponse['leaveTypeList'][i]['leaveId'];
                       var leaveHalfDay = mapResponse['leaveTypeList'][i]['isHalfday'];
-                      sickLeaveMedicalShow = mapResponse['leaveTypeList'][i]['medCerti'];
+                      sickLeaveMedicalTypeShow = mapResponse['leaveTypeList'][i]['medCerti'];
+                      sickLeaveMedicalShowValue = mapResponse['leaveTypeList'][i]['medValue'];
                       print("$sickLeaveMedicalShow");
                       print('Leave Half Day $leaveHalfDay');
                       var policyidnew= leaveTypeList.elementAt(i);
@@ -809,31 +946,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
 
                   ),
                 ),
-                // Upload
-                Visibility(
-                  visible: sickLeaveMedicalShow,
-                  child: Center(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      ),
-                      icon: const Icon(Icons.upload_file),
-                      label: const Text("Upload Medical",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      onPressed: openUploadDialog,
-                    ),
-                  ),
-                ),
 
-                if (uploadedFile != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text("📎 Selected: ${uploadedFile!.path.split('/').last}",
-                        style: const TextStyle(color: Colors.green)),
-                  ),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -995,9 +1108,29 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                                 firstDate:DateTime(1947),
                                 lastDate: DateTime(2040)
                             );
-                            setState(() {
+                            /*setState(() {
                               //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
                               _toDateController.text = DateFormat("dd-MM-yyyy").format(toDate!);
+                            });*/
+                            setState(() {
+                              _toDateController.text = DateFormat("dd-MM-yyyy").format(toDate!);
+
+                              // 🧩 Calculate day difference between from and to date
+                              if (_fromDateController.text.isNotEmpty) {
+                                DateTime fromDateParsed =
+                                DateFormat("dd-MM-yyyy").parse(_fromDateController.text);
+                                int dayDifference = toDate.difference(fromDateParsed).inDays + 1;
+
+                                // 🧠 Show medical section if dayDifference > medValue
+                                if (sickLeaveMedicalShowValue != null &&
+                                    dayDifference > sickLeaveMedicalShowValue) {
+                                  sickLeaveMedicalShow = true;
+                                } else {
+                                  sickLeaveMedicalShow = false;
+                                }
+                              } else {
+                                sickLeaveMedicalShow = false;
+                              }
                             });
 
                             print(toDate);
@@ -1166,6 +1299,63 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     ),
                   ),
                 ),
+
+                // Upload
+                Visibility(
+                  visible: sickLeaveMedicalTypeShow && sickLeaveMedicalShow,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.teal,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          ),
+                          icon: const Icon(Icons.upload_file),
+                          label: const Text("Upload Medical",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          onPressed: openUploadDialog,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                /*if (uploadedFile != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text("📎 Selected: ${uploadedFile!.path.split('/').last}",
+                        style: const TextStyle(color: Colors.green)),
+                  ),*/
+                if (uploadedFile != null)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    "View Attachment".text.bold.color(Mythemes.lightBluishColor).make().px12(),
+                    IconButton(
+                      onPressed: () {
+                        if (uploadedFile != null &&
+                            uploadedFile.toString().isNotEmpty) {
+                          showAttachmentBottomSheet(context, uploadedFile.toString());
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("No attachment available")),
+                          );
+                        }
+                      },
+                      icon: Icon(Icons.remove_red_eye,
+                          color: Mythemes.lightBluishColor, size: 24),
+                      tooltip: "View Attachment",
+                    ),
+                  ],
+                ),
+
+
 
                 Padding(
                   padding: EdgeInsets.all(8.0),
