@@ -909,8 +909,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                       var leaveHalfDay = mapResponse['leaveTypeList'][i]['isHalfday'];
                       sickLeaveMedicalTypeShow = mapResponse['leaveTypeList'][i]['medCerti'];
                       sickLeaveMedicalShowValue = mapResponse['leaveTypeList'][i]['medValue'];
-                      print("$sickLeaveMedicalShow");
-                      print('Leave Half Day $leaveHalfDay');
+                      //print("MED CERTI - $sickLeaveMedicalShow");
+                      //print("MED VALUE - $sickLeaveMedicalShowValue");
+                      //print('Leave Half Day $leaveHalfDay');
                       var policyidnew= leaveTypeList.elementAt(i);
                       leavereqIdGlobel = newVal.toString().split('-');
                       String idn=leavereqIdGlobel.last;
@@ -1121,15 +1122,24 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                                 DateFormat("dd-MM-yyyy").parse(_fromDateController.text);
                                 int dayDifference = toDate.difference(fromDateParsed).inDays + 1;
 
+                                print("Sick Leave Value - $sickLeaveMedicalShowValue");
+                                print("Day Difference - $dayDifference");
                                 // 🧠 Show medical section if dayDifference > medValue
                                 if (sickLeaveMedicalShowValue != null &&
                                     dayDifference > sickLeaveMedicalShowValue) {
                                   sickLeaveMedicalShow = true;
+                                  //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
+                                  //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
+
                                 } else {
                                   sickLeaveMedicalShow = false;
+                                  //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
+                                  //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
                                 }
                               } else {
                                 sickLeaveMedicalShow = false;
+                                //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
+                                //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
                               }
                             });
 
