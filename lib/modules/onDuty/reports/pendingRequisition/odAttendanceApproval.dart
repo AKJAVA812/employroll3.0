@@ -519,15 +519,12 @@ class _RadioGroupsState extends State<RadioGroups> {
       actions: [
         TextButton(
           onPressed: () {
-            /*Navigator.pop(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (a, b, c) =>
-                      PendingOdRequisition(PendingOdReqList()),
-                  transitionDuration: Duration(seconds: 1),
-                  maintainState: true,
-                ));*/
-            Navigator.of(buildContext, rootNavigator: true).pop();
+            if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
+              Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+              Navigator.of(buildContext).maybePop();
+            } else {
+              print("⚠️ Warning: No route to close.");
+            }
           },
           child: Text("Ok"),
         ),

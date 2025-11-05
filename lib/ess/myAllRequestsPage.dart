@@ -275,7 +275,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
       }
 
       //OD Punch ESS
-      if(orgId != 190 && orgId != 191 && (userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN")) {
+      if((userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN")) {
 
           items.add(
             Hero(
@@ -339,7 +339,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
 
       }
       //My OD Requests ESS
-      if(orgId != 190 && orgId != 191 && (userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN")) {
+      if((userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN")) {
         items.add(
           Hero(
             tag: 'myOdRequest',

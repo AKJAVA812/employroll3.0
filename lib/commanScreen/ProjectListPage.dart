@@ -72,6 +72,7 @@ String pendingLoanRequestMSSL3Permission = "0";
 String pendingLoanRequestUISL1Permission = "0";
 String pendingLoanRequestUISL2Permission = "0";
 String pendingLoanRequestUISL3Permission = "0";
+String odPendingPermissionMSS = "0";
 dynamic mobOdCount;
 dynamic odReqCount;
 dynamic tourReqCount;
@@ -170,7 +171,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     setMyTeamShow= await shared.getMyTeamShow();
     setExitResignationListShow= await shared.getExitResignationListShow();
     setExitResignationListView= await shared.getExitResignationListView();
-
+    odPendingPermissionMSS= (await shared.getODPendingList())!;
     setState(() {
 
     });
@@ -832,7 +833,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
           );
 
           //OUT DUTY
-          if(orgId != 190 && orgId != 191){
+          if(odPendingPermissionMSS == "1") {
             items.add(
               Hero(
                 tag: 'odReport',
@@ -914,6 +915,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
               ),
             );
           }
+
+
 
 
         //TRAVEL & EXPENSE

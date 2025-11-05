@@ -292,6 +292,9 @@ class _ODImageUploadState extends State<ODImageUpload> {
         child: Scaffold(
           backgroundColor: Mythemes.whitish,
           appBar: AppBar(
+            leading: IconButton(onPressed: () {
+              Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+            }, icon: Icon(Icons.arrow_back_ios)),
             elevation: 0.5,
             title: Text('OD Attendance Punch'),
           ),

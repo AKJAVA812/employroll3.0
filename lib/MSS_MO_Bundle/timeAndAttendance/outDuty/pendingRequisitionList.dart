@@ -77,21 +77,20 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
       _isFirstBuild = false;
       routeObserver.subscribe(this, ModalRoute.of(context)!);
 
-      // Defer execution until after current build frame
+      // Defer execution until after build frame
       WidgetsBinding.instance.addPostFrameCallback((_) {
         getSharedPrfanceList(); // Safe to call here
         DateTime now = DateTime.now();
         odStatus = "Pending";
         startDate = "2015-01-01";
+
         DateFormat currentDateFormat = DateFormat("yyyy-MM-dd");
         String currentDateFormatString = currentDateFormat.format(now);
         print("current date $currentDateFormatString");
         endDate = currentDateFormatString;
-        // TODO: implement initState
-        super.initState();
+
         setState(() {
-          var listLength;
-          listLength = foundDataNewMO!.length;
+          int listLength = foundDataNewMO?.length ?? 0;
           print('listLength $listLength');
         });
       });
@@ -526,7 +525,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                       isLoading = true;
                       titleName = "OD Pending List";
                       odStatus = "Pending";
-                      Navigator.pushNamed(context, MyRoutings.pendingRequisitionListRoute);
+                      //Navigator.pushNamed(context, MyRoutings.mssMoPendingOdRequisitionRoute);
                       getSharedPrfanceList();
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
@@ -686,123 +685,186 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
               }
             },
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          foundDataNewMO![itemCount].name
-                              .toString()
-                              .text
-                              .make()
-                              .px8()
-                              .py4(),
-                          Expanded(
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              foundDataNewMO![itemCount].approvalstatus
-                                  .toString()
-                                  .text.bold
-                                  .color(statusColor)
-                                  .sm
-                                  .make()
-                                  .px8(),
-                            ],
-                          ))
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(child: foundDataNewMO![itemCount].odaddress
-                              .toString()
-                              .text
-                              .textStyle(context.captionStyle)
-                              .make()
-                              .px8(),)
+              elevation: 4,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top row: Avatar | Name + address | Status
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Avatar
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: (foundDataNewMO![itemCount].image != null &&
+                              foundDataNewMO![itemCount].image.toString().isNotEmpty)
+                              ? NetworkImage(foundDataNewMO![itemCount].image.toString())
+                          as ImageProvider
+                              : AssetImage('assets/images/avtar7.png'),
+                        ),
 
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          foundDataNewMO![itemCount].remark
-                              .toString()
-                              .text
-                              .textStyle(context.captionStyle)
-                              .make()
-                              .px8(),
-                        ],
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.touch_app,
-                                  size: 35,
-                                  color: Mythemes.lightBluishColor,
+                        const SizedBox(width: 12),
+
+                        // Name + address (left, expandable)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Name
+                              Text(
+                                foundDataNewMO![itemCount].name.toString(),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black87,
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Address row with icon. The Expanded text prevents overflow and ellipsizes.
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.location_on, size: 16, color: Colors.redAccent),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      foundDataNewMO![itemCount].odaddress.toString(),
+                                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.redAccent),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      foundDataNewMO![itemCount].remark.toString(),
+                                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                foundDataNewMO![itemCount].odtype
-                                    .toString()
-                                    .text
-                                    .sm
-                                    .make(),
-                                foundDataNewMO![itemCount].odtime
-                                    .toString()
-                                    .text
-                                    .sm
-                                    .make()
-                              ],
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        // Status (right aligned, stays vertically at the top)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              foundDataNewMO![itemCount].approvalstatus.toString(),
+                              style: TextStyle(
+                                color: statusColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Remark row
+                    /*Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.teal),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            foundDataNewMO![itemCount].remark.toString(),
+                            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.date_range,
-                                  size: 35,
-                                  color: Mythemes.lightBluishColor,
-                                ),
-                              ],
-                            ),
+                        )
+                      ],
+                    ),*/
+
+                    const SizedBox(height: 12),
+                    const Divider(height: 1),
+
+                    const SizedBox(height: 10),
+
+                    // Bottom icons row (In/Out + Date)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Left block - In/Out and time
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.touch_app, size: 32, color: Mythemes.lightBluishColor),
+                              const SizedBox(width: 6),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    foundDataNewMO![itemCount].odtype.toString(),
+                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    foundDataNewMO![itemCount].odtime.toString(),
+                                    style: const TextStyle(color: Colors.black87, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Date".text.sm.make(),
-                                DateFormat("dd-MM-yyyy")
-                                    .format(DateTime.parse(foundDataNewMO![itemCount].date
-                                        .toString()))
-                                    .text
-                                    .sm
-                                    .make()
-                              ],
-                            ),
+                        ),
+
+                        // Right block - Date
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.date_range, size: 32, color: Mythemes.lightBluishColor),
+                              const SizedBox(width: 6),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Date',
+                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    DateFormat("dd-MM-yyyy")
+                                        .format(DateTime.parse(foundDataNewMO![itemCount].date.toString())),
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                )),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),

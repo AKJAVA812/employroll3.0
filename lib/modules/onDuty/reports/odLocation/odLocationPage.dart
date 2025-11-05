@@ -52,6 +52,9 @@ class _ODLocationViewState extends State<ODLocationView> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(onPressed: () {
+          Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+        }, icon: Icon(Icons.arrow_back_ios)),
         title: titleName.text.make(),
       ),
 
