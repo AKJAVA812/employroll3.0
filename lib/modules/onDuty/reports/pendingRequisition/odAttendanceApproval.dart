@@ -191,7 +191,7 @@ class _RadioGroupsState extends State<RadioGroups> {
         odRemark = foundDataNewMSS![indexCont].remark;
         odId = foundDataNewMSS![indexCont].id;
       }
-      if(userPanel == "MSS_MO") {
+      if(userPanel == "MSS_MO_ADMIN") {
         empName = foundDataNewMO![indexCont].name;
         image = foundDataNewMO![indexCont].image;
         odDate = foundDataNewMO![indexCont].date;
