@@ -605,7 +605,8 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
 
                     /// Attachment Row
                     Visibility(
-                      visible: item.document != null,
+                      visible: item.document != null &&
+                          item.document.toString().isNotEmpty,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -617,7 +618,8 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
                               color: Colors.blueAccent,
                             ),
                             onPressed: () {
-                              print("Attachment tapped for ${item.employeeName}");
+                              print("Attachment tpppppp for ${item.employeeName}");
+                              print("Attachment tpppppp for ${item.document}");
                               if (item.document != null &&
                                   item.document.toString().isNotEmpty) {
                                 showAttachmentBottomSheet(

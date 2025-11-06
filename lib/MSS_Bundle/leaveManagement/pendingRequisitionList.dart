@@ -613,7 +613,8 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                     /// Attachment Row
 
                     Visibility(
-                      visible: item.document != null,
+                      visible: item.document != null &&
+                          item.document.toString().isNotEmpty,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [

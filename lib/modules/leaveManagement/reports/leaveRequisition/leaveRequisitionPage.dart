@@ -829,7 +829,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                   ),
                   const SizedBox(height: 12),
                   _buildLeaveCardDynamic(
-                    "Total Balance",
+                    "Net Balance",
                     leaveTypes,
                     leaveBalances!,
                         (type) => leaveBalances?[type]?['totalLeavesPending']?.toString() ?? "0",

@@ -605,7 +605,8 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
 
                     /// Attachment Row
                     Visibility(
-                      visible: item.document != null,
+                      visible: item.document != null &&
+                          item.document.toString().isNotEmpty,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
