@@ -601,7 +601,8 @@ class _UIS_LevelOnePendingLeaveState extends State<UIS_LevelOnePendingLeave> wit
 
                     /// Attachment Row
                     Visibility(
-                      visible: item.document != null,
+                      visible: item.document != null &&
+                          item.document.toString().isNotEmpty,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
