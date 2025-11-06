@@ -736,9 +736,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
               Navigator.of(context, rootNavigator: true).pop();
               getSharedPrfanceList();
             }
-
-
-
           },
           child: Text("Ok"),
         ),
