@@ -72,7 +72,11 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
+
     Future<SelfLeaveRequisitionListModal> getAppReq11 = getSelfLeaveReqList(sessionId!);
+    setState(() {
+
+    });
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -369,133 +373,168 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
         return Future.value(false);
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(8.0),
         itemCount: selfLeaveRequisitionListModal!.data!.length,
-        itemBuilder: (context, itemCount) {
-          return InkWell(
-              onTap: (){
-                leaveId = selfLeaveRequisitionListModal.data![itemCount].leavereqId;
-                print("leaveId $leaveId");
-                var statusCheck = selfLeaveRequisitionListModal.data![itemCount].status.toString();
-                if (statusCheck == 'Level_One_Pending') {
-                  showDialgCancel(context, context, context);
-                }
-                else if (statusCheck == 'Level_Two_Pending') {
-                  showDialgCancel(context, context, context);
-                }
-                else if (statusCheck == 'PENDING') {
-                  showDialgCancel(context, context, context);
-                }
-                else if (statusCheck == 'APPROVED') {
-                  Fluttertoast.showToast(
-                      msg: "Your Requisition has already Approved",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 3,
-                      backgroundColor: Colors.black,
-                      textColor: Colors.white,
-                      fontSize: 16.0
-                  );
-                }
-                else {
-                  Fluttertoast.showToast(
-                      msg: "Your Requisition has already Disapproved",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 3,
-                      backgroundColor: Colors.black,
-                      textColor: Colors.white,
-                      fontSize: 16.0
-                  );
-                }
+        itemBuilder: (context, index) {
+          final leaveData = selfLeaveRequisitionListModal!.data![index];
+          final statusCheck = leaveData.status.toString();
 
-                //print("hi bharat");
-                //CommonNotificationPage.showDeleteMessage(context, context, context);
-              },
-              child: Card(
-                  elevation: 2,
-                  child: Container(
-                    child: Column(
+          return InkWell(
+            onTap: () {
+              leaveId = leaveData.leavereqId;
+              print("leaveId $leaveId");
+
+              if (statusCheck == 'Level_One_Pending' ||
+                  statusCheck == 'Level_Two_Pending' ||
+                  statusCheck == 'PENDING') {
+                showDialgCancel(context, context, context);
+              } else if (statusCheck == 'APPROVED') {
+                Fluttertoast.showToast(
+                  msg: "Your Requisition has already Approved",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              } else {
+                Fluttertoast.showToast(
+                  msg: "Your Requisition has already Disapproved",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }
+            },
+            child: Card(
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// ===== Header Row: Name + Status + Attachment Icon =====
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: leaveData.empName
+                              .toString()
+                              .text
+                              .bold
+                              .lg
+                              .make(),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: statusCheck == 'APPROVED'
+                                    ? Colors.green.withOpacity(0.15)
+                                    : statusCheck.contains('PENDING')
+                                    ? Colors.orange.withOpacity(0.15)
+                                    : Colors.red.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                statusCheck,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: statusCheck == 'APPROVED'
+                                      ? Colors.green
+                                      : statusCheck.contains('PENDING')
+                                      ? Colors.orange
+                                      : Colors.red,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+
+                    /// ===== Leave Type + Leave Length =====
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            selfLeaveRequisitionListModal.data![itemCount].empName.toString().text.make().px8().py4(),
-                            Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    selfLeaveRequisitionListModal.data![itemCount].status.toString().text.make().px8(),
-                                  ],
-                                )
-                            )
+                            const SizedBox(width: 6),
+                            leaveData.leavetype
+                                .toString()
+                                .text
+                                .semiBold
+                                .make(),
+                          ],
+                        ),
+                        leaveData.leaveLength
+                            .toString()
+                            .text
+                            .color(Colors.black87)
+                            .bold
+                            .make(),
+                      ],
+                    ).pSymmetric(v: 4),
 
-                          ],
+                    const SizedBox(height: 4),
+
+                    /// ===== Dates and Time Row =====
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: _buildInfoColumn("Start Date", leaveData.startDate.toString()),
                         ),
-                        Row(
-                          children: [
-                            selfLeaveRequisitionListModal.data![itemCount].leavetype.toString().text.textStyle(context.captionStyle).make().px8(),
-                          ],
+                        Expanded(
+                          child: _buildInfoColumn("End Date", leaveData.endDate.toString()),
                         ),
-                        Row(
-                          children: [
-                            selfLeaveRequisitionListModal.data![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
-                          ],
+                        Expanded(
+                          child: _buildInfoColumn("In Time", leaveData.startTime.toString()),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              children: [
-                                "Start Date".text.sm.make(),
-                                selfLeaveRequisitionListModal.data![itemCount].startDate.toString().text.sm.make()
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                              child: Column(
-                                children: [
-                                  "End Date".text.sm.make(),
-                                  selfLeaveRequisitionListModal.data![itemCount].endDate.toString().text.sm.make()
-                                ],
-                              ),
-                            ),
-                            Column(
-                              children: [
-                                "In Time".text.sm.make(),
-                                selfLeaveRequisitionListModal.data![itemCount].startTime.toString().text.sm.make()
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                              child: Column(
-                                children: [
-                                  "Out Time".text.sm.make(),
-                                  selfLeaveRequisitionListModal.data![itemCount].endTime.toString().text.sm.make()
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
+                        Expanded(
+                          child: _buildInfoColumn("Out Time", leaveData.endTime.toString()),
+                        ),
                       ],
                     ),
-                  )
-              )
 
-            /*  .badge(
-                color: Mythemes.lightBluishColor ,
-                size: 25 ,
-                count: 8,
-                position: VxBadgePosition.rightTop,
-                textStyle: TextStyle(
-                    fontSize: 14,
-                    color: Mythemes.whitish)
-
-            ),*/
+                    const SizedBox(height: 6),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
     );
+  }
+
+  /// Helper Widget to build column pairs (Label + Value)
+  Widget _buildInfoColumn(String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        title.text
+            .color(Colors.grey[600]!)
+            .size(12)
+            .make(),
+        value.text
+            .bold
+            .color(Colors.black)
+            .make(),
+      ],
+    ).pSymmetric(h: 6);
   }
 
   showDialgCancel(BuildContext buildContext, result,alert) {
@@ -532,7 +571,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
         TextButton(
             onPressed: () {
               Navigator.of(context, rootNavigator: true).pop();
-              getSelfLeaveReqList(sessionId!);
+              //getSelfLeaveReqList(sessionId!);
               /*Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
@@ -542,6 +581,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                     maintainState: true,
                   ));*/
               cancelReqRequisitionList(leaveId.toString());
+              getSharedPrfanceList();
             },
             child: Container(
               child: Text("Yes", style: TextStyle(color: Mythemes.warningColor),),
@@ -694,6 +734,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                 ));*/
             if(mounted) {
               Navigator.of(context, rootNavigator: true).pop();
+              getSharedPrfanceList();
             }
 
 

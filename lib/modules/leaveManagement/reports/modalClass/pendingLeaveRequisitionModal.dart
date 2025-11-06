@@ -45,6 +45,7 @@ class Data {
   String? employeeName;
   int? empId;
   String? endDate;
+  dynamic document;
   double? count;
   String? branchName;
   String? leaveLength;
@@ -66,6 +67,7 @@ class Data {
         this.employeeName,
         this.empId,
         this.endDate,
+        this.document,
         this.count,
         this.branchName,
         this.leaveLength,
@@ -86,6 +88,7 @@ class Data {
     employeeName = json['employeeName'];
     empId = json['empId'];
     endDate = json['endDate'];
+    document = json['document'];
     count = json['count'];
     branchName = json['branchName'];
     leaveLength = json['leaveLength'];
@@ -108,6 +111,7 @@ class Data {
     data['employeeName'] = this.employeeName;
     data['empId'] = this.empId;
     data['endDate'] = this.endDate;
+    data['document'] = this.document;
     data['count'] = this.count;
     data['branchName'] = this.branchName;
     data['leaveLength'] = this.leaveLength;

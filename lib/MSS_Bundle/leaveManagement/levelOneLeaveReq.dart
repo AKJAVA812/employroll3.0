@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/modules/leaveManagement/reports/pendingRequisition/pendingLeaveApprovalDis.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
@@ -212,6 +215,78 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
     });
   }
 
+  void showAttachmentBottomSheet(BuildContext context, String attachmentUrl) {
+    // Clean up any "File:" prefix accidentally passed
+    attachmentUrl = attachmentUrl.replaceAll("File: '", "").replaceAll("'", "");
+
+    final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
+    final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
+        attachmentUrl.toLowerCase().endsWith('.jpeg') ||
+        attachmentUrl.toLowerCase().endsWith('.png');
+
+    final isLocalFile = attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.85,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("View Attachment",
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  )
+                ],
+              ),
+            ),
+
+            Expanded(
+              child: isPdf
+                  ? SfPdfViewer.network(attachmentUrl)
+                  : isImage
+                  ? (isLocalFile
+                  ? Image.file(
+                File(attachmentUrl),
+                fit: BoxFit.contain,
+              )
+                  : CachedNetworkImage(
+                imageUrl: attachmentUrl,
+                fit: BoxFit.contain,
+                placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Center(
+                    child: Text("❌ Failed to load image")),
+              ))
+                  : const Center(
+                child: Text(
+                  "⚠️ Unsupported file format",
+                  style:
+                  TextStyle(fontSize: 16, color: Colors.redAccent),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 1;
@@ -417,89 +492,180 @@ class _MSS_LevelOnePendingLeaveState extends State<MSS_LevelOnePendingLeave> wit
         return Future.value(false);
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(8.0),
         itemCount: foundDataNewMSSL1!.length,
-        itemBuilder: (context, itemCount) {
+        itemBuilder: (context, index) {
+          final item = foundDataNewMSSL1![index];
           return InkWell(
-              onTap: (){
-                print(foundDataNewMSSL1!.length);
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => LevelOnePendingApproval(
-                    pendingLeaveRequisitionModal, itemCount)));
-                //Navigator.pushNamed(context, MyRoutings.pendingLeaveAppDisRoute);
-                //CommonNotificationPage.showDeleteMessage(context, context, context);
-              },
-              child: Card(
-                  elevation: 2,
-                  child: Container(
-                    child: Column(
+            onTap: () {
+              print(foundDataNewMSSL1!.length);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => LevelOnePendingApproval(
+                    pendingLeaveRequisitionModal,
+                    index,
+                  ),
+                ),
+              );
+            },
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// Employee Name + Status Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            foundDataNewMSSL1![itemCount].employeeName.toString().text.make().px8().py4(),
-                            Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    foundDataNewMSSL1![itemCount].status.toString().text.make().px8(),
-                                  ],
-                                )
-                            )
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            foundDataNewMSSL1![itemCount].leaveType.toString().text.textStyle(context.captionStyle).make().px8(),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            foundDataNewMSSL1![itemCount].leaveLength.toString().text.textStyle(context.captionStyle).make().px8(),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              children: [
-                                "Start Date".text.sm.make(),
-                                foundDataNewMSSL1![itemCount].startDate.toString().text.sm.make()
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                              child: Column(
-                                children: [
-                                  "End Date".text.sm.make(),
-                                  foundDataNewMSSL1![itemCount].endDate.toString().text.sm.make()
-                                ],
-                              ),
-                            ),
-                            Column(
-                              children: [
-                                "In Time".text.sm.make(),
-                                "00:00".toString().text.sm.make()
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                              child: Column(
-                                children: [
-                                  "Out Time".text.sm.make(),
-                                  "00:00".text.sm.make()
-                                ],
+                            const Icon(Icons.person, color: Colors.blueAccent, size: 20),
+                            const SizedBox(width: 6),
+                            Text(
+                              item.employeeName.toString(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.black87,
                               ),
                             ),
                           ],
-                        )
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: item.status.toString().toLowerCase() == 'pending'
+                                ? Colors.orange.withOpacity(0.2)
+                                : Colors.green.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          padding:
+                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          child: Text(
+                            item.status.toString(),
+                            style: TextStyle(
+                              color: item.status.toString().toLowerCase() == 'pending'
+                                  ? Colors.orange
+                                  : Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                  )
-              )
+
+                    const SizedBox(height: 8),
+
+                    /// Leave Type + Length
+                    Row(
+                      children: [
+                        const Icon(Icons.work_outline,
+                            color: Colors.indigoAccent, size: 18),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            "${item.leaveType} (${item.leaveLength})",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    /// Dates row (Start - End - In - Out)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildDateColumn("Start Date", item.startDate.toString()),
+                          _buildDateColumn("End Date", item.endDate.toString()),
+                          //_buildDateColumn("In Time", "00:00"),
+                          //_buildDateColumn("Out Time", "00:00"),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    /// Attachment Row
+                    Visibility(
+                      visible: item.document != null,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          "View Attachment".text.bold.color(Mythemes.lightBluishColor).make(),
+                          IconButton(
+                            tooltip: "View Attachment",
+                            icon: const Icon(
+                              Icons.attach_file,
+                              color: Colors.blueAccent,
+                            ),
+                            onPressed: () {
+                              print("Attachment tapped for ${item.employeeName}");
+                              if (item.document != null &&
+                                  item.document.toString().isNotEmpty) {
+                                showAttachmentBottomSheet(
+                                    context, item.document.toString());
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("No attachment available")),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
+    );
+  }
+
+  /// 🔹 Helper method for date columns
+  Widget _buildDateColumn(String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 }
