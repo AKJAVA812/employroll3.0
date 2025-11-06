@@ -428,10 +428,16 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
   }
 
   void showAttachmentBottomSheet(BuildContext context, String attachmentUrl) {
+    // Clean up any "File:" prefix accidentally passed
+    attachmentUrl = attachmentUrl.replaceAll("File: '", "").replaceAll("'", "");
+
     final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
     final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
         attachmentUrl.toLowerCase().endsWith('.jpeg') ||
         attachmentUrl.toLowerCase().endsWith('.png');
+
+    final isLocalFile = attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -440,7 +446,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => SizedBox(
-
         height: MediaQuery.of(context).size.height * 0.85,
         child: Column(
           children: [
@@ -462,28 +467,29 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                 ],
               ),
             ),
-            // File content viewer
+
             Expanded(
               child: isPdf
-                  ? SfPdfViewer.network(
-                attachmentUrl,
-                canShowScrollStatus: true,
-                canShowPaginationDialog: true,
-              )
+                  ? SfPdfViewer.network(attachmentUrl)
                   : isImage
-                  ? CachedNetworkImage(
+                  ? (isLocalFile
+                  ? Image.file(
+                File(attachmentUrl),
+                fit: BoxFit.contain,
+              )
+                  : CachedNetworkImage(
                 imageUrl: attachmentUrl,
                 fit: BoxFit.contain,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                errorWidget: (context, url, error) =>
-                const Center(child: Text("❌ Failed to load image")),
-              )
+                placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Center(
+                    child: Text("❌ Failed to load image")),
+              ))
                   : const Center(
                 child: Text(
                   "⚠️ Unsupported file format",
-                  style: TextStyle(fontSize: 16, color: Colors.redAccent),
+                  style:
+                  TextStyle(fontSize: 16, color: Colors.redAccent),
                 ),
               ),
             ),
@@ -1349,9 +1355,10 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     "View Attachment".text.bold.color(Mythemes.lightBluishColor).make().px12(),
                     IconButton(
                       onPressed: () {
+                        print("My File - $uploadedFile");
                         if (uploadedFile != null &&
                             uploadedFile.toString().isNotEmpty) {
-                          showAttachmentBottomSheet(context, uploadedFile.toString());
+                          showAttachmentBottomSheet(context, uploadedFile!.path);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text("No attachment available")),
@@ -1844,6 +1851,58 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         request.fields['radio'] = dayRadio;
         request.fields['empid'] = empNewId.toString();
         request.fields['confirmyes'] = confirmyes;
+
+
+        String apiWithParams = urlapi.toString() +
+            '?' +
+            request.fields.entries
+                .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                .join('&');
+        print('API URL with Parameters: $apiWithParams');
+
+        //final response = await http.post(urlapi);
+        http.StreamedResponse response = await request.send();
+        http.Response httpResponse = await http.Response.fromStream(response);
+        print('URL ${httpResponse.request}');
+        if (httpResponse.statusCode == 200) {
+          var responseResult = httpResponse.body;
+          print('success $responseResult');
+          Navigator.of(context, rootNavigator: true).pop();
+          mapResponse = json.decode(httpResponse.body);
+          String result = mapResponse['result']['result'];
+          String reason = mapResponse['result']['reason'];
+          bool isValidate = true;
+          try{
+            isValidate = mapResponse['result']['isValidation'];
+          } catch (e) {
+            //Navigator.of(context, rootNavigator: true).pop();
+            isValidate = true;
+          }
+
+          print('result both $result $reason');
+          print('result${result}');
+          print("IsValidate - $isValidate");
+          if(isValidate == false) {
+            if(result.compareToIgnoringCase("success")==0){
+              showDialgSucess(context,reason.upperCamelCase+" ","Success");
+            }else if(result.compareToIgnoringCase("error")==0){
+              showDialgSucess(context,reason.upperCamelCase, " Error ");
+            }else if(result.compareToIgnoringCase("warning")==0){
+              showValidatePop(context,reason.upperCamelCase, " Warning ");
+            }
+
+          } else {
+            if(result.compareToIgnoringCase("success")==0){
+              showDialgSucess(context,reason.upperCamelCase+" ","Success");
+            }else if(result.compareToIgnoringCase("error")==0){
+              showDialgSucess(context,reason.upperCamelCase, " Error ");
+            }else if(result.compareToIgnoringCase("warning")==0){
+              showDialgSucess(context,reason.upperCamelCase, " Warning ");
+            }
+          }
+
+        }
       }
       else {
         Navigator.of(context, rootNavigator: true).pop();
