@@ -1836,6 +1836,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
             filename: fileName,
           ),
         );
+        print("multipart call");
         request.fields['sessionId'] = sessionId!;
         request.fields['tilldate'] = toDate;
         request.fields['leaveTypeId'] = leaveTypeId.toString();
@@ -1844,6 +1845,54 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         request.fields['radio'] = dayRadio;
         request.fields['empid'] = empNewId.toString();
         request.fields['confirmyes'] = confirmyes;
+        String apiWithParams = urlapi.toString() +
+            '?' +
+            request.fields.entries
+                .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                .join('&');
+        print('API URL with Parameters: $apiWithParams');
+
+        //final response = await http.post(urlapi);
+        http.StreamedResponse response = await request.send();
+        http.Response httpResponse = await http.Response.fromStream(response);
+        print('URL ${httpResponse.request}');
+        if (httpResponse.statusCode == 200) {
+          var responseResult = httpResponse.body;
+          print('success $responseResult');
+          Navigator.of(context, rootNavigator: true).pop();
+          mapResponse = json.decode(httpResponse.body);
+          String result = mapResponse['result']['result'];
+          String reason = mapResponse['result']['reason'];
+          bool isValidate = true;
+          try {
+            isValidate = mapResponse['result']['isValidation'];
+          } catch (e) {
+            //Navigator.of(context, rootNavigator: true).pop();
+            isValidate = true;
+          }
+
+          print('result both $result $reason');
+          print('result${result}');
+          print("IsValidate - $isValidate");
+          if (isValidate == false) {
+            if (result.compareToIgnoringCase("success") == 0) {
+              showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+            } else if (result.compareToIgnoringCase("error") == 0) {
+              showDialgSucess(context, reason.upperCamelCase, " Error ");
+            } else if (result.compareToIgnoringCase("warning") == 0) {
+              showValidatePop(context, reason.upperCamelCase, " Warning ");
+            }
+          } else {
+            if (result.compareToIgnoringCase("success") == 0) {
+              showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+            } else if (result.compareToIgnoringCase("error") == 0) {
+              showDialgSucess(context, reason.upperCamelCase, " Error ");
+            } else if (result.compareToIgnoringCase("warning") == 0) {
+              showDialgSucess(context, reason.upperCamelCase, " Warning ");
+            }
+          }
+        }
       }
       else {
         Navigator.of(context, rootNavigator: true).pop();
@@ -1932,7 +1981,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
             showDialgSucess(context,reason.upperCamelCase, " Warning ");
           }
         }
-
       }
     }
 
