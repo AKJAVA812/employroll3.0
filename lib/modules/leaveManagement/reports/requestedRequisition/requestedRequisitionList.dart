@@ -72,7 +72,11 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
+
     Future<SelfLeaveRequisitionListModal> getAppReq11 = getSelfLeaveReqList(sessionId!);
+    setState(() {
+
+    });
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -730,6 +734,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                 ));*/
             if(mounted) {
               Navigator.of(context, rootNavigator: true).pop();
+              getSharedPrfanceList();
             }
 
 
