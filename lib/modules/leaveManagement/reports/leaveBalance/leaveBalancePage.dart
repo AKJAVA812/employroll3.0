@@ -401,7 +401,7 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
                     ).pLTRB(0, 0, 0, 8.0),*/
                     Row(
                         children: [
-                          "Total Balance".text.bold.color(Mythemes.successColor).make(),
+                          "Net Balance".text.bold.color(Mythemes.successColor).make(),
                           Expanded(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
