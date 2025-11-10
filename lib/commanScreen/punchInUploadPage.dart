@@ -494,40 +494,45 @@ class _ImageUploadedState extends State<ImageUploaded> {
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
-      final streamedResponse = await request.send().timeout(const Duration(seconds: 20));
+      // Send request once
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
 
-      http.Response response = await http.Response.fromStream(await request.send().timeout(const Duration(seconds: 30)));
-      // Process the response here
+      // Convert to Response
+      final response = await http.Response.fromStream(streamedResponse);
 
       print('Response received: ${response.body}');
-      //print('URL ${response.request}');
 
-      if(response.statusCode==500){
+      if (response.statusCode == 500) {
         Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(context,"Slow Internet Connection !"+"","Your Punch in not submitted, Please try again.");
+        slowInternetPop(context, "Slow Internet Connection !", "Your Punch in not submitted, Please try again.");
+        return;
       }
-      result= json.decode(response.body.toString());
-      String resultSuccess=result['result'];
-      String reasonSuccess=result['reason'];
 
-      if(response.statusCode==200){
+      result = json.decode(response.body.toString());
+      String resultSuccess = result['result'];
+      String reasonSuccess = result['reason'];
+
+      print('URL ${response.request}');
+      print('result: $result');
+      print("Reason: $reasonSuccess");
+      print("Result: $resultSuccess");
+
+      if (response.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
-        if(resultSuccess.compareToIgnoringCase("success")==0){
-          showSuccessGo(context,reasonSuccess.upperCamelCase+" "+formattedDate,"Successfully Punch $clockingType");
-        }else if(resultSuccess.compareToIgnoringCase("failed")==0){
+        if (resultSuccess.compareToIgnoringCase("success") == 0) {
+          showSuccessGo(context, reasonSuccess.upperCamelCase + " " + formattedDate, "Successfully Punch $clockingType");
+        } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
           if (reasonSuccess == "non-geofence area") {
-            showSuccessGo(context, reasonSuccess.upperCamelCase+" "+formattedDate, " Non Geofence Area ");
+            showSuccessGo(context, reasonSuccess.upperCamelCase + " " + formattedDate, " Non Geofence Area ");
           } else {
-            showSuccessGo(context,reasonSuccess.upperCamelCase, "Failed");
+            showSuccessGo(context, reasonSuccess.upperCamelCase, "Failed");
           }
-
         }
-      }else {
-        //Navigator.pop(context);
-        showDialgError(context, result,"Your Punch Not Submitted, Please Try Again");
+      } else {
+        showDialgError(context, result, "Your Punch Not Submitted, Please Try Again");
       }
     } on TimeoutException catch (_) {
-      showDialgError(context, result,"Your Punch Submitted offline");
+      showDialgError(context, result, "Your Punch Submitted offline");
     }
   }
 
