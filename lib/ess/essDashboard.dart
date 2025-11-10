@@ -505,7 +505,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   }
 
 // 🔧 Helper method to rebuild UI from any map data (API or cache)
-  void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+  /*void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
       List<dynamic> data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
@@ -528,6 +528,47 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         String logDate = event['logDate'];
         String mobColor = event['mobColor'] ?? "0xff2196F3";
         //print("Calendar event data - $eventDate");
+
+        _markedDateMap.add(
+          eventDate,
+          Event(
+            date: eventDate,
+            title: title,
+            icon: _buildEventIcon(mobColor, logDate),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error parsing calendar data: $e");
+    }
+
+    setState(() {}); // Refresh UI
+  }*/
+  void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+    try {
+      List<dynamic> data = mapResponse['data'] ?? [];
+      List<dynamic> legends = mapResponse['legends'] ?? [];
+
+      // Build legends (✅ limit status length to 8 chars + add "...")
+      _legends = legends.map((legend) {
+        String status = legend["status"]?.toString() ?? "";
+        if (status.length > 8) {
+          status = "${status.substring(0, 8)}..."; // add ellipsis
+        }
+        return {
+          "mobColor": legend["mobColor"].toString(),
+          "status": status,
+        };
+      }).toList();
+
+      // Build marked dates
+      _markedDateMap.clear();
+
+      for (var event in data) {
+        DateTime eventDate = DateTime.parse(event['logDate']);
+        String title = event['status'] ?? "Event";
+        String logDate = event['logDate'];
+        String mobColor = event['mobColor'] ?? "0xff2196F3";
 
         _markedDateMap.add(
           eventDate,
