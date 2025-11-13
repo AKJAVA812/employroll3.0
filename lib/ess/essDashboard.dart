@@ -505,7 +505,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   }
 
 // 🔧 Helper method to rebuild UI from any map data (API or cache)
-  /*void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+  void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
       List<dynamic> data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
@@ -543,8 +543,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     }
 
     setState(() {}); // Refresh UI
-  }*/
-  void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+  }
+  /*void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
       List<dynamic> data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
@@ -584,7 +584,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     }
 
     setState(() {}); // Refresh UI
-  }
+  }*/
 
   // Helper function to build event icon
   Widget _buildEventIcon(String colorHex, String logDate) {
@@ -921,7 +921,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       isLoading = false;
       isLoadingTodayEvent = false;
     }
-
 
     if (holidayJson != null) {
       final mapResponse = jsonDecode(holidayJson);
@@ -2920,6 +2919,7 @@ CalendarShow() {
   /// Example Calendar Carousel without header and custom prev & next button
   final _calendarCarouselNoHeader = CalendarCarousel<Event>(
     todayBorderColor: Mythemes.lightBluishColor,
+    
     /*onDayPressed: (date, events) {
 
       this.setState(() => _currentDate = date);
@@ -2978,8 +2978,22 @@ CalendarShow() {
     showOnlyCurrentMonthDate: false,
     weekendTextStyle: TextStyle(
       fontSize: 12,
-      color: Colors.black,
+      color: Colors.red, // weekend date color
     ),
+
+    prevDaysTextStyle: TextStyle(
+      fontSize: 16,
+      color: Colors.grey, // previous month date color
+    ),
+
+    inactiveDaysTextStyle: TextStyle(
+      color: Colors.grey.shade400, // inactive days color
+      fontSize: 14,
+    ),
+   /* weekendTextStyle: TextStyle(
+      fontSize: 12,
+      color: Colors.black,
+    ),*/
     thisMonthDayBorderColor: Colors.grey,
     weekFormat: false,
     //firstDayOfWeek: 4,
@@ -3006,18 +3020,18 @@ CalendarShow() {
     markedDateMoreShowTotal: true,
     todayButtonColor: Mythemes.lightBluishColor,
     selectedDayTextStyle: TextStyle(
-      color: Mythemes.whitish,
+      color: Mythemes.black,
     ),
     //minSelectedDate: _currentDate.subtract(Duration(days: 360)),
     //maxSelectedDate: _currentDate.add(Duration(days: 360)),
-    prevDaysTextStyle: TextStyle(
+    /*prevDaysTextStyle: TextStyle(
       fontSize: 16,
       color: Colors.pinkAccent,
     ),
     inactiveDaysTextStyle: TextStyle(
       color: Colors.tealAccent,
       fontSize: 20,
-    ),
+    ),*/
     /*onCalendarChanged: (DateTime date) {
       _targetDateTime = date;
       _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
