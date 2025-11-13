@@ -401,8 +401,6 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
   final TextEditingController _dateController = TextEditingController();
   String? selectedDate;
 
-
-
   /* String Progress = "0";
   //Final Dio dio = Dio();
     Future requestPermission() async {

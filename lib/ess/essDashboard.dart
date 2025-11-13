@@ -457,20 +457,19 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       final cachedData = prefs.getString('calendarData');
       final cachedMonth = prefs.getString('calendarMonth');
 
+      print("Calendar Data - $cachedData");
+      print("Calendar Month - $cachedMonth");
 
-    print("Calendar Data - $cachedData");
-    print("Calendar Month - $cachedMonth");
-
-    if (cachedData != null) {
-      print("Cachded Month $cachedMonth");
-      try {
-        print("Loaded calendar data from cache ✅");
-        mapResponse = json.decode(cachedData);
-        _buildCalendarFromMap(mapResponse);
-      } catch (e) {
-        print("Error loading cached calendar: $e");
+      if (cachedData != null) {
+        print("Cachded Month $cachedMonth");
+        try {
+          print("Loaded calendar data from cache ✅");
+          mapResponse = json.decode(cachedData);
+          _buildCalendarFromMap(mapResponse);
+        } catch (e) {
+          print("Error loading cached calendar: $e");
+        }
       }
-    }
     }
 
     // ✅ STEP 2: Now call API (refresh data and overwrite cache)
@@ -481,12 +480,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         print('Response body - ${response.body}');
         mapResponse = json.decode(response.body);
 
-          // Save to SharedPreferences
+        // Save to SharedPreferences
         if(_currentMonthc==_currentMonth){
           await prefs.setString('calendarData', json.encode(mapResponse));
           await prefs.setString('calendarMonth', _currentMonth);
         }
-
         // ✅ Rebuild UI from fresh API data
         _buildCalendarFromMap(mapResponse);
       } else {
@@ -505,7 +503,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   }
 
 // 🔧 Helper method to rebuild UI from any map data (API or cache)
-  /*void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+  void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
       List<dynamic> data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
@@ -543,8 +541,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     }
 
     setState(() {}); // Refresh UI
-  }*/
-  void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+  }
+  /*void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
       List<dynamic> data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
@@ -584,10 +582,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     }
 
     setState(() {}); // Refresh UI
-  }
+  }*/
 
   // Helper function to build event icon
   Widget _buildEventIcon(String colorHex, String logDate) {
+    print('_buildEventIcon $colorHex');
     return Container(
       width: 36, // Adjust size to fit the text
       height: 36,
@@ -599,7 +598,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       child: Text(
         logDate.split('-').last, // Extract the day from 'logDate' (e.g., "01" from "2024-12-01")
         style: TextStyle(
-          color: Colors.white,
+          color: int.parse(colorHex) == 0xFFFFFF00 ? Colors.black : Colors.white,
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
@@ -922,7 +921,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       isLoadingTodayEvent = false;
     }
 
-
     if (holidayJson != null) {
       final mapResponse = jsonDecode(holidayJson);
       final holidayESSModal = HolidayESSModal.fromJson(mapResponse);
@@ -1220,7 +1218,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     _scrollTimer = Timer.periodic(scrollDuration, (_) {
       if (!_scrollController.hasClients) return;
 
-     /* final maxScroll = _scrollController.position.maxScrollExtent;
+      /* final maxScroll = _scrollController.position.maxScrollExtent;
       final currentScroll = _scrollController.offset;
 
       print("Max - $maxScroll");
@@ -1230,7 +1228,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       } else {
         _scrollController.jumpTo(currentScroll + scrollStep);
       }*/
-     /* for(double i=0 ;i>=10;i++){
+      /* for(double i=0 ;i>=10;i++){
         _scrollController.jumpTo(i);
       }*/
 
@@ -1520,99 +1518,99 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
               Visibility(
                 visible: getRealTimeAttShow,
                 child: Padding(
-                            padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
-                            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Today's Punches",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-
-                  // 👇 Loader or punches
-                  isLoadingTodayPunch
-                      ? SizedBox(
-                    height: 60, // match approx. punch card height
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.green,
+                  padding: EdgeInsets.only(bottom: 0, left: 15, top: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Today's Punches",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
-                    ),
-                  )
-                      : todayPunches.isEmpty
-                      ? const Text(
-                    "No punches found",
-                    style: TextStyle(color: Colors.grey),
-                  )
-                      : SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        // Arrow always at the start
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              right: 8.0, bottom: 10,top: 5.0),
-                          child: Icon(
-                            Icons.arrow_back,
-                            size: 30,
-                            color: Colors.black,
+                      const SizedBox(height: 5),
+
+                      // 👇 Loader or punches
+                      isLoadingTodayPunch
+                          ? SizedBox(
+                        height: 60, // match approx. punch card height
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.green,
                           ),
                         ),
-                        // Punch cards
-                        ...todayPunches.map((punch) {
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                                right: 12, bottom: 5),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                border: Border.all(color: Mythemes.greyishade),
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 4,
-                                    offset: Offset(2, 2),
-                                  )
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    punch["punchType"] == "DEVICE"
-                                        ? Icons.touch_app
-                                        : Icons.smartphone,
-                                    color: punch["color"],
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    punch["time"],
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: punch["color"],
-                                    ),
-                                  ),
-                                ],
+                      )
+                          : todayPunches.isEmpty
+                          ? const Text(
+                        "No punches found",
+                        style: TextStyle(color: Colors.grey),
+                      )
+                          : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Arrow always at the start
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 8.0, bottom: 10,top: 5.0),
+                              child: Icon(
+                                Icons.arrow_back,
+                                size: 30,
+                                color: Colors.black,
                               ),
                             ),
-                          );
-                        }).toList(),
-                      ],
-                    ),
+                            // Punch cards
+                            ...todayPunches.map((punch) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 12, bottom: 5),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    border: Border.all(color: Mythemes.greyishade),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                        offset: Offset(2, 2),
+                                      )
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        punch["punchType"] == "DEVICE"
+                                            ? Icons.touch_app
+                                            : Icons.smartphone,
+                                        color: punch["color"],
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        punch["time"],
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: punch["color"],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-                            ),
-                          ),
+                ),
               ),
 
               Row(
@@ -2692,7 +2690,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
                           // 📅 Today Events Tab (combine lists)
 
-                            /*  buildEventList(
+                          /*  buildEventList(
                                 isLoading: isLoadingEvent,
                                 items: eventsListModalGlobal?.bdayList ?? [],
                                 emptyText: "No events today 🎂",
@@ -2702,15 +2700,15 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                                 imageBuilder: (item) => item.image,
                               ),*/
 
-                              buildEventList(
-                                isLoading: isLoadingTodayEvent,
-                                items: todayEventModalGlobal?.todayEventList ?? [],
-                                emptyText: "No events today 🎂",
-                                titleBuilder: (item) => item.fullName,
-                                subtitleBuilder: (item) => item.department,
-                                trailingBuilder: (item) => item.dob,
-                                imageBuilder: (item) => item.image,
-                              ),
+                          buildEventList(
+                            isLoading: isLoadingTodayEvent,
+                            items: todayEventModalGlobal?.todayEventList ?? [],
+                            emptyText: "No events today 🎂",
+                            titleBuilder: (item) => item.fullName,
+                            subtitleBuilder: (item) => item.department,
+                            trailingBuilder: (item) => item.dob,
+                            imageBuilder: (item) => item.image,
+                          ),
 
                           buildHolidayList(
                             isLoading: isLoadingEvent,
@@ -2882,45 +2880,46 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   }
 
 
-CalendarShow() {
-  /// Example with custom icon
-  final _calendarCarousel = Container(
-    constraints: BoxConstraints(
-      maxHeight: 300.0, // Set a valid maximum height
-    ),
-    child: CalendarCarousel<Event>(
-      onDayPressed: (date, events) {
-        setState(() => _currentDate = date);
-        events.forEach((event) => print(event.title));
-      },
-      weekendTextStyle: TextStyle(
-        color: Colors.black,
+  CalendarShow() {
+    /// Example with custom icon
+    final _calendarCarousel = Container(
+      constraints: BoxConstraints(
+        maxHeight: 300.0, // Set a valid maximum height
       ),
-      thisMonthDayBorderColor: Colors.grey,
-      headerText: 'Custom Header',
-      weekFormat: true,
-      markedDatesMap: _markedDateMap,
-      height: 300.0, // Provide a valid height
-      selectedDateTime: _currentDate2,
-      showIconBehindDayText: true,
-      markedDateShowIcon: true,
-      markedDateIconMaxShown: 2,
-      selectedDayTextStyle: TextStyle(
-        color: Mythemes.lightBluishColor,
+      child: CalendarCarousel<Event>(
+        onDayPressed: (date, events) {
+          setState(() => _currentDate = date);
+          events.forEach((event) => print(event.title));
+        },
+        weekendTextStyle: TextStyle(
+          color: Colors.black,
+        ),
+        thisMonthDayBorderColor: Colors.grey,
+        headerText: 'Custom Header',
+        weekFormat: true,
+        markedDatesMap: _markedDateMap,
+        height: 300.0, // Provide a valid height
+        selectedDateTime: _currentDate2,
+        showIconBehindDayText: true,
+        markedDateShowIcon: true,
+        markedDateIconMaxShown: 2,
+        selectedDayTextStyle: TextStyle(
+          color: Mythemes.lightBluishColor,
+        ),
+        todayTextStyle: TextStyle(
+          color: Colors.blue,
+        ),
+        todayButtonColor: Colors.transparent,
+        todayBorderColor: Colors.transparent,
+        markedDateMoreShowTotal: true,
       ),
-      todayTextStyle: TextStyle(
-        color: Colors.blue,
-      ),
-      todayButtonColor: Colors.transparent,
-      todayBorderColor: Colors.transparent,
-      markedDateMoreShowTotal: true,
-    ),
-  );
+    );
 
-  /// Example Calendar Carousel without header and custom prev & next button
-  final _calendarCarouselNoHeader = CalendarCarousel<Event>(
-    todayBorderColor: Mythemes.lightBluishColor,
-    /*onDayPressed: (date, events) {
+    /// Example Calendar Carousel without header and custom prev & next button
+    final _calendarCarouselNoHeader = CalendarCarousel<Event>(
+      todayBorderColor: Mythemes.lightBluishColor,
+
+      /*onDayPressed: (date, events) {
 
       this.setState(() => _currentDate = date);
       this.setState(() => _currentDate2 = date);
@@ -2935,90 +2934,104 @@ CalendarShow() {
       //Nevigate Next Page
 
     },*/
-    onDayPressed: (date, events) {
-      // Prevent selecting dates older than current month view
-      if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
-        print("⛔ Date tap disabled for past months");
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            title: const Text(
-              "Notice",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            content: const Text(
-              "Requisitions for the last pay-cycle has been closed.",
-              style: TextStyle(fontSize: 15),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("OK", style: TextStyle(color: Colors.blue)),
+      onDayPressed: (date, events) {
+        // Prevent selecting dates older than current month view
+        if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
+          print("⛔ Date tap disabled for past months");
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              title: const Text(
+                "Notice",
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-            ],
-          ),
-        );
-        return;
-      }
+              content: const Text(
+                "Requisitions for the last pay-cycle has been closed.",
+                style: TextStyle(fontSize: 15),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK", style: TextStyle(color: Colors.blue)),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
 
-      this.setState(() => _currentDate = date);
-      this.setState(() => _currentDate2 = date);
-      events.forEach((event) => print(event.title));
-      print(date);
-      setState(() {
-        formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
-        print("Formatted Date - $formattedDate");
-      });
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => AttendanceRequisitionCalendar(
-              new AttendanceReportModel(), OnDateAttModel(), 0, "$formattedDate")));
-    },
-    daysHaveCircularBorder: true,
-    showOnlyCurrentMonthDate: false,
-    weekendTextStyle: TextStyle(
+        this.setState(() => _currentDate = date);
+        this.setState(() => _currentDate2 = date);
+        events.forEach((event) => print(event.title));
+        print(date);
+        setState(() {
+          formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
+          print("Formatted Date - $formattedDate");
+        });
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => AttendanceRequisitionCalendar(
+                new AttendanceReportModel(), OnDateAttModel(), 0, "$formattedDate")));
+      },
+      daysHaveCircularBorder: true,
+      showOnlyCurrentMonthDate: false,
+      weekendTextStyle: TextStyle(
+        fontSize: 12,
+        color: Colors.red, // weekend date color
+      ),
+
+      prevDaysTextStyle: TextStyle(
+        fontSize: 16,
+        color: Colors.grey, // previous month date color
+      ),
+
+      inactiveDaysTextStyle: TextStyle(
+        color: Colors.grey.shade400, // inactive days color
+        fontSize: 14,
+      ),
+      /* weekendTextStyle: TextStyle(
       fontSize: 12,
       color: Colors.black,
-    ),
-    thisMonthDayBorderColor: Colors.grey,
-    weekFormat: false,
-    //firstDayOfWeek: 4,
-    markedDatesMap: _markedDateMap,
-    height: 300.0,
-    selectedDateTime: _currentDate2,
-    targetDateTime: _targetDateTime,
-    customGridViewPhysics: NeverScrollableScrollPhysics(),
+    ),*/
+      thisMonthDayBorderColor: Colors.grey,
+      weekFormat: false,
+      //firstDayOfWeek: 4,
+      markedDatesMap: _markedDateMap,
+      height: 300.0,
+      selectedDateTime: _currentDate2,
+      targetDateTime: _targetDateTime,
+      customGridViewPhysics: NeverScrollableScrollPhysics(),
 
-    markedDateCustomShapeBorder: CircleBorder(side: BorderSide(color: Colors.grey)),
-    markedDateCustomTextStyle: TextStyle(
-      fontSize: 18,
-      color: Colors.amberAccent,
-    ),
-    showHeader: false,
-    todayTextStyle: TextStyle(
-      color: Colors.white,
-    ),
-    markedDateShowIcon: true,
-    markedDateIconMaxShown: 2,
-    markedDateIconBuilder: (event) {
-      return event.icon;
-    },
-    markedDateMoreShowTotal: true,
-    todayButtonColor: Mythemes.lightBluishColor,
-    selectedDayTextStyle: TextStyle(
-      color: Mythemes.whitish,
-    ),
-    //minSelectedDate: _currentDate.subtract(Duration(days: 360)),
-    //maxSelectedDate: _currentDate.add(Duration(days: 360)),
-    prevDaysTextStyle: TextStyle(
+      markedDateCustomShapeBorder: CircleBorder(side: BorderSide(color: Colors.grey)),
+      markedDateCustomTextStyle: TextStyle(
+        fontSize: 18,
+        color: Colors.amberAccent,
+      ),
+      showHeader: false,
+      todayTextStyle: TextStyle(
+        color: Colors.white,
+      ),
+      markedDateShowIcon: true,
+      markedDateIconMaxShown: 2,
+      markedDateIconBuilder: (event) {
+        return event.icon;
+      },
+      markedDateMoreShowTotal: true,
+      todayButtonColor: Mythemes.lightBluishColor,
+      selectedDayTextStyle: TextStyle(
+        color: Mythemes.black,
+      ),
+      //minSelectedDate: _currentDate.subtract(Duration(days: 360)),
+      //maxSelectedDate: _currentDate.add(Duration(days: 360)),
+      /*prevDaysTextStyle: TextStyle(
       fontSize: 16,
       color: Colors.pinkAccent,
     ),
     inactiveDaysTextStyle: TextStyle(
       color: Colors.tealAccent,
       fontSize: 20,
-    ),
-    /*onCalendarChanged: (DateTime date) {
+    ),*/
+      /*onCalendarChanged: (DateTime date) {
       _targetDateTime = date;
       _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
       //_currentMonth = DateFormat.yMMM().format(_targetDateTime);
@@ -3037,33 +3050,33 @@ CalendarShow() {
         //API month change call
       });
     },*/
-    onCalendarChanged: (DateTime date) {
-      // Prevent sliding beyond allowed range
-      if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
-        print("⛔ Calendar slide limit reached");
-        return;
-      }
+      onCalendarChanged: (DateTime date) {
+        // Prevent sliding beyond allowed range
+        if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
+          print("⛔ Calendar slide limit reached");
+          return;
+        }
 
-      _targetDateTime = date;
-      _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
-      print('change date $date.month$_targetDateTime');
-      singleDateString = DateFormat('dd-MM-yyyy').format(date);
-      print("Updated Date Change - $singleDateString");
+        _targetDateTime = date;
+        _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+        print('change date $date.month$_targetDateTime');
+        singleDateString = DateFormat('dd-MM-yyyy').format(date);
+        print("Updated Date Change - $singleDateString");
 
-      getSharedPrfanceList();
-      setState(() {
-        Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
-        getCalendar.then((value) {
-          setState(() {
-            calendarModalGlobal = value;
+        getSharedPrfanceList();
+        setState(() {
+          Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+          getCalendar.then((value) {
+            setState(() {
+              calendarModalGlobal = value;
+            });
           });
         });
-      });
-    },
-    onDayLongPressed: (DateTime date) {
-      print('long pressed date $date');
-    },
-  );
+      },
+      onDayLongPressed: (DateTime date) {
+        print('long pressed date $date');
+      },
+    );
 
     return Card(
       child: Column(
@@ -3071,7 +3084,7 @@ CalendarShow() {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           //custom icon
-         /* Container(
+          /* Container(
             margin: EdgeInsets.symmetric(horizontal: 16.0),
             child: _calendarCarousel,
           ),*/ // This trailing comma makes auto-formatting nicer for build methods.
@@ -3145,14 +3158,14 @@ CalendarShow() {
                     if (nextMonth.isAfter(_maxDateAllowed)) {
                       print("⛔ You can’t go beyond next month");
                       Fluttertoast.showToast(
-                      msg: "Can't go beyond this month !!",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.black,
-                      textColor: Colors.white,
-                      fontSize: 16.0
-                  );
+                          msg: "Can't go beyond this month !!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
                       return;
                     }
                     setState(() {
@@ -3175,7 +3188,7 @@ CalendarShow() {
         ],
       ),
     );
-}
+  }
 
 
 
