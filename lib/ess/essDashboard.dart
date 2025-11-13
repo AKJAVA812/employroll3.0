@@ -586,7 +586,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
   // Helper function to build event icon
   Widget _buildEventIcon(String colorHex, String logDate) {
-    print('_buildEventIcon $colorHex');
+    //print('_buildEventIcon $colorHex');
     return Container(
       width: 36, // Adjust size to fit the text
       height: 36,
