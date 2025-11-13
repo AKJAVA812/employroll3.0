@@ -29,7 +29,6 @@ class ImageUploaded extends StatefulWidget {
   final String address;
   final String? punchType;
 
-
   ImageUploaded({required this.value, required this.time, required this.address, required this.punchType});
 
   @override
@@ -483,9 +482,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
     request.fields['battery'] = sessionId!;
 
 
-    //print("stream.length");
-    //print(stream.length.toString());
-
     var multipart = new http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
     request.files.add(multipart);
@@ -497,57 +493,46 @@ class _ImageUploadedState extends State<ImageUploaded> {
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
-      final streamedResponse = await request.send().timeout(const Duration(seconds: 10));
-      http.Response response = await http.Response.fromStream(streamedResponse);
-      // Process the response here
+      // Send request once
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
+
+      // Convert to Response
+      final response = await http.Response.fromStream(streamedResponse);
 
       print('Response received: ${response.body}');
-      print('Response received: ${response.statusCode}');
-      //print('URL ${response.request}');
 
-      if(response.statusCode==500){
+      if (response.statusCode == 500) {
         Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(context,"Slow Internet Connection !"+"","Your Punch in not submitted, Please try again.");
+        slowInternetPop(context, "Slow Internet Connection !", "Your Punch in not submitted, Please try again.");
+        return;
       }
-      result= json.decode(response.body.toString());
-      String resultSuccess=result['result'];
-      String reasonSuccess=result['reason'];
+
+      result = json.decode(response.body.toString());
+      String resultSuccess = result['result'];
+      String reasonSuccess = result['reason'];
+
       print('URL ${response.request}');
-      print('result${result}');
-      print("Reason: ${result['reason']}, Type: ${result['reason'].runtimeType}");
-      print("Result: ${result['result']}, Type: ${result['result'].runtimeType}");
+      print('result: $result');
+      print("Reason: $reasonSuccess");
+      print("Result: $resultSuccess");
 
-
-      print('Response body: ${result}');
-
-      //var response = await request.send();
-      // listen for response
-
-      //var responseData = await response.stream.bytesToString();
-
-      if(response.statusCode==200){
-        print("I am hit 2 times");
+      if (response.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
-        if(resultSuccess.compareToIgnoringCase("success")==0){
-          showSuccessGo(context,reasonSuccess.upperCamelCase+" "+formattedDate,"Successfully Punch $clockingType");
-        }else if(resultSuccess.compareToIgnoringCase("failed")==0){
+        if (resultSuccess.compareToIgnoringCase("success") == 0) {
+          showSuccessGo(context, reasonSuccess.upperCamelCase + " " + formattedDate, "Successfully Punch $clockingType");
+        } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
           if (reasonSuccess == "non-geofence area") {
-            showSuccessGo(context, reasonSuccess.upperCamelCase+" "+formattedDate, " Non Geofence Area ");
+            showSuccessGo(context, reasonSuccess.upperCamelCase + " " + formattedDate, " Non Geofence Area ");
           } else {
-            showSuccessGo(context,reasonSuccess.upperCamelCase, "Failed");
+            showSuccessGo(context, reasonSuccess.upperCamelCase, "Failed");
           }
-
         }
-      }else {
-        //Navigator.pop(context);
-        showDialgError(context, result,"Your Punch Not Submitted, Please Try Again");
+      } else {
+        showDialgError(context, result, "Your Punch Not Submitted, Please Try Again");
       }
     } on TimeoutException catch (_) {
-      // Show retry popup if the request times out
-      showDialgError(context, "Alert", "Please Try again !");
+      showDialgError(context, result, "Your Punch Submitted offline");
     }
-
-
   }
 
   Future<void> uploadImageWithGeofence(BuildContext context, dynamic selectedGeofenceId) async {
@@ -611,7 +596,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
-
       http.Response response = await http.Response.fromStream(await request.send().timeout(const Duration(seconds: 30)));
       // Process the response here
 
@@ -638,6 +622,8 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
       //var responseData = await response.stream.bytesToString();
 
+
+
       if(response.statusCode==200){
         print("I am hit 2 times");
         // ✅ Always pop loader safely
@@ -660,7 +646,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
       }
     } on TimeoutException catch (_) {
       // Show retry popup if the request times out
-      showDialgError(rootContext, result,"Your Punch Not Submitted, Please Try Again");
       //showDialgError(context, "Alert", "Please Try again !");
     }
 
