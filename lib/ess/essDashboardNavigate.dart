@@ -510,24 +510,26 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       List<dynamic> data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
 
-      // Build legends
+      // Build legends (✅ limit status length to 8 chars + add "...")
       _legends = legends.map((legend) {
+        String status = legend["status"]?.toString() ?? "";
+        if (status.length > 8) {
+          status = "${status.substring(0, 8)}..."; // add ellipsis
+        }
         return {
           "mobColor": legend["mobColor"].toString(),
-          "status": legend["status"].toString(),
+          "status": status,
         };
       }).toList();
 
       // Build marked dates
       _markedDateMap.clear();
-      //print("Calendar Mark Date - $_markedDateMap");
 
       for (var event in data) {
         DateTime eventDate = DateTime.parse(event['logDate']);
         String title = event['status'] ?? "Event";
         String logDate = event['logDate'];
         String mobColor = event['mobColor'] ?? "0xff2196F3";
-        //print("Calendar event data - $eventDate");
 
         _markedDateMap.add(
           eventDate,

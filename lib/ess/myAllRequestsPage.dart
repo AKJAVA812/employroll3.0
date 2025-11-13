@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:math';
+import 'package:er_flutter_project/ess/myAllReports.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -321,7 +322,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'OD Punch',
+                              'OD (Out Duty)',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style:
@@ -338,71 +339,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
 
 
       }
-      //My OD Requests ESS
-      if((userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN")) {
-        items.add(
-          Hero(
-            tag: 'myOdRequest',
-            child: Card(
-              color: Mythemes.whitish,
-              child: InkWell(
-                onTap: () async{
-                  bool internetCheck =
-                  await InternetConnectionChecker().hasConnection;
-                  if (internetCheck == false) {
-                    setState(() {
-                      AlertDialog(
-                        content: "Please check your internet connection"
-                            .text
-                            .make(),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(
-                            "Please check your Internet connection."),
-                      ));
-                    });
-                  } else {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SelfODRequisitionList(
-                          startDate: "",
-                          endDate: "",
-                        )));
-                    /*  Navigator.pushNamed(
-                        context, MyRoutings.odSelfReqDateSelectRoute);*/
-                  }
-                },
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(
-                        Icons.work_history,
-                        size: 50,
-                        color: Mythemes.successColor,
-                      ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                    ),
-                    Center(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 75, left: 10),
-                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                        child: Text(
-                            'OD Requests',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
+
 
       //My Claim Requests
       if(orgId == 3 || orgId == 145 || orgId == 171 || orgId == 179 || orgId == 186) {
@@ -633,6 +570,8 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
                   MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
             }
             if(index==2){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MyAllReportsPage()));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Claim');
             }
