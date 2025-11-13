@@ -549,6 +549,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   // Helper function to build event icon
   Widget _buildEventIcon(String colorHex, String logDate) {
+    //print('_buildEventIcon $colorHex');
     return Container(
       width: 36, // Adjust size to fit the text
       height: 36,
@@ -560,7 +561,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       child: Text(
         logDate.split('-').last, // Extract the day from 'logDate' (e.g., "01" from "2024-12-01")
         style: TextStyle(
-          color: Colors.white,
+          color: int.parse(colorHex) == 0xFFFFFF00 ? Colors.black : Colors.white,
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
