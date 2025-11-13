@@ -29,7 +29,6 @@ class ImageUploaded extends StatefulWidget {
   final String address;
   final String? punchType;
 
-
   ImageUploaded({required this.value, required this.time, required this.address, required this.punchType});
 
   @override
