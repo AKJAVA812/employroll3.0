@@ -98,6 +98,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       mapResponse = json.decode(response.body);
       var getData = mapResponse;
       //print("My Data - $getData");
+      print("My Data - ${response.request}");
 
       // Assign values to variables
       branchNameset = getData['branch'] ?? '';

@@ -85,6 +85,7 @@ bool isLoadingTodayEvent = true;
 bool isLoadingTodayPunch = true;
 String valuenew = "listText";
 String shiftValue = "listText";
+List<dynamic> data=[];
 
 class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
@@ -502,7 +503,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 // 🔧 Helper method to rebuild UI from any map data (API or cache)
   void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
-      List<dynamic> data = mapResponse['data'] ?? [];
+      data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
 
       // Build legends
@@ -2935,6 +2936,29 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     },*/
       onDayPressed: (date, events) {
         // Prevent selecting dates older than current month view
+        if (date.month < _targetDateTime.month && date.year == _targetDateTime.year) {
+          print("⛔ Last month dates are not selectable");
+          Fluttertoast.showToast(
+            msg: "You cannot select last month's dates.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          return;
+        }
+        if (date.month > _targetDateTime.month && date.year == _targetDateTime.year) {
+          Fluttertoast.showToast(
+            msg: "You cannot select next month's dates.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          return;
+        }
         if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
           print("⛔ Date tap disabled for past months");
           showDialog(
@@ -2966,7 +2990,10 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         //print(date);
         setState(() {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
+          int dayOnly = int.parse(DateFormat('dd').format(_currentDate));
           print("Formatted Date - $formattedDate");
+          print(data[dayOnly-1]);
+          //print("Formatted Date - $date");
         });
 
         Navigator.of(context).push(MaterialPageRoute(
