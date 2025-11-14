@@ -21,20 +21,21 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../ess/essDashboard.dart';
 import '../reports/attendanceRequisition/model/onDateReportModel.dart';
 
 class AttendanceRequisitionCalendar extends StatefulWidget {
   AttendanceReportModel? attendanceModelGlobel;
-  OnDateAttModel? onDateAttModel;
+  final dynamic calendarSendData;
   int indexCont;
   final String singleDateString;
 
   AttendanceRequisitionCalendar(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont, this.singleDateString);
+      this.attendanceModelGlobel, this.calendarSendData, this.indexCont, this.singleDateString);
 
   @override
   State<AttendanceRequisitionCalendar> createState() => _AttendanceRequisitionCalendarState(
-      attendanceModelGlobel, onDateAttModel, indexCont, singleDateString);
+      attendanceModelGlobel, calendarSendData, indexCont, singleDateString);
 }
 
 OnDateAttModel? onDateAttModelGlobel;
@@ -42,6 +43,7 @@ int? empId;
 
 class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCalendar> {
   AttendanceReportModel? attendanceModelGlobel;
+  var calendarSendData;
   OnDateAttModel? onDateAttModel;
   int indexCont;
   dynamic singleDateString;
@@ -65,7 +67,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   var onDate;
 
   _AttendanceRequisitionCalendarState(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont, this.singleDateString);
+      this.attendanceModelGlobel, this.calendarSendData, this.indexCont, this.singleDateString);
 
   @override
   void initState() {
@@ -148,13 +150,13 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
 
     empId=await shared.getEmpId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<OnDateAttModel> getEmployeeList11 = getSingleAttList(sessionId!,singleDateString);
+    /*Future<OnDateAttModel> getEmployeeList11 = getSingleAttList(sessionId!,singleDateString);
     getEmployeeList11.then((value) {
       setState(() {
         onDateAttModelGlobel=value;
       });
       // print('employeeList00${onDateAttModelGlobel!.data!.length}');
-    });
+    });*/
 
     /*if(attendanceModelGlobel!=null){
       print('attendanceModelGlobel');
@@ -170,7 +172,19 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
 
     }*/
     //print('onModelrun');
-    branchNameset= onDateAttModel!.branch;
+    branchNameset= calendarSendData['branch'];
+    print("Branch name from calendar - $branchNameset");
+    updatedWorkHourSet = calendarSendData['updatedWorkingHour'];
+    relaxationHourSet = calendarSendData['relaxationHour'];
+    workingHrsSet = calendarSendData['workingHrs'];
+    shiftWorkingHourSet = calendarSendData['shiftWorkingHour'];
+    departmentset= calendarSendData['dept'];
+    employeeNameset= calendarSendData['empName'];
+    onDateset= calendarSendData['logDate'];
+    actualTimeset= calendarSendData['inTime'];
+    actualOutTimeset= calendarSendData['outTime'];
+    //empId= calendarSendData['empId'];
+    /*branchNameset= onDateAttModel!.branch;
     updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
     relaxationHourSet = onDateAttModel!.relaxationHour;
     workingHrsSet = onDateAttModel!.workingHrs;
@@ -180,7 +194,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
     onDateset= onDateAttModel!.date;
     actualTimeset= onDateAttModel!.inTime;
     actualOutTimeset= onDateAttModel!.outTime;
-    empId= onDateAttModel!.empId;
+    empId= onDateAttModel!.empId;*/
 
 
     //print(branchNameset);

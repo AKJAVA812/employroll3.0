@@ -86,6 +86,7 @@ bool isLoadingTodayPunch = true;
 String valuenew = "listText";
 String shiftValue = "listText";
 List<dynamic> data=[];
+var calendarSendData;
 
 class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
@@ -2993,12 +2994,14 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
           int dayOnly = int.parse(DateFormat('dd').format(_currentDate));
           print("Formatted Date - $formattedDate");
           print(data[dayOnly-1]);
+          calendarSendData = data[dayOnly-1];
+
           //print("Formatted Date - $date");
         });
 
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => AttendanceRequisitionCalendar(
-                new AttendanceReportModel(), OnDateAttModel(), 0, "$formattedDate")));
+                new AttendanceReportModel(), calendarSendData, 0, "$formattedDate")));
       },
       daysHaveCircularBorder: true,
       showOnlyCurrentMonthDate: false,
