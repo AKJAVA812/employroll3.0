@@ -89,7 +89,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   Future<OnDateAttModel> getSingleAttList(String SessionId , String singleDate) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getAttDetails;
-    print('employeeList11: ${SessionId}');
+    //print('employeeList11: ${SessionId}');
     OnDateAttModel onDateAttModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&date=$singleDate");
     final response = await http.post(urlapi);
@@ -97,7 +97,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
     try {
       mapResponse = json.decode(response.body);
       var getData = mapResponse;
-      print("My Data - $getData");
+      //print("My Data - $getData");
 
       // Assign values to variables
       branchNameset = getData['branch'] ?? '';
@@ -116,17 +116,17 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
       isCompOff = getData['isNormalCoff'] ?? isCompOff;
 
       // Log for debugging
-      print('Branch: $branchNameset');
-      print('Department: $departmentset');
-      print('Employee Name: $employeeNameset');
-      print('Date: $onDateset');
-      print('In Time: $actualTimeset');
-      print('Out Time: $actualOutTimeset');
-      print('Employee ID: $empId');
+      //print('Branch: $branchNameset');
+      //print('Department: $departmentset');
+      //print('Employee Name: $employeeNameset');
+      //print('Date: $onDateset');
+      //print('In Time: $actualTimeset');
+      //print('Out Time: $actualOutTimeset');
+      //print('Employee ID: $empId');
     } catch (e) {
-      print("Error parsing API response: $e");
+      //print("Error parsing API response: $e");
     }
-    print('responseemployeeList ${response.request}');
+    //print('responseemployeeList ${response.request}');
 
 
 
@@ -142,10 +142,10 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     //orgId = await shared!.getOrgId();
 
-    empId=await shared!.getEmpId();
+    empId=await shared.getEmpId();
     // await Future.delayed(Duration(seconds: 5));
     Future<OnDateAttModel> getEmployeeList11 = getSingleAttList(sessionId!,singleDateString);
     getEmployeeList11.then((value) {
@@ -168,7 +168,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
     }else{
 
     }*/
-    print('onModelrun');
+    //print('onModelrun');
     branchNameset= onDateAttModel!.branch;
     updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
     relaxationHourSet = onDateAttModel!.relaxationHour;
@@ -182,9 +182,9 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
     empId= onDateAttModel!.empId;
 
 
-    print(branchNameset);
-    print(departmentset);
-    print(employeeNameset);
+    //print(branchNameset);
+    //print(departmentset);
+    //print(employeeNameset);
   }
 
 
@@ -456,9 +456,11 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                 value: "onDate",
                                 groupValue: radios,
                                 onChanged: (value) {
-                                  *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  */
+                  /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("On Date Click"),
-                              ));*//*
+                              ));*/
+                  /*
                                   setState(() {
                                     onDateRadio = "1";
                                     nextDayRadio = "0";
@@ -480,9 +482,11 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                 value: "nextDay",
                                 groupValue: radios,
                                 onChanged: (value) {
-                                  *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  */
+                  /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Next Day Click"),
-                              ));*//*
+                              ));*/
+                  /*
                                   setState(() {
                                     onDateRadio = "0";
                                     nextDayRadio = "1";
@@ -504,9 +508,11 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                 value: "compOff",
                                 groupValue: radios,
                                 onChanged: (value) {
-                                  *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  */
+                  /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Comp Off Click"),
-                              ));*//*
+                              ));*/
+                  /*
                                   setState(() {
                                     onDateRadio = "0";
                                     nextDayRadio = "0";

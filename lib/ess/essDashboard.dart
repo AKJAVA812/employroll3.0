@@ -45,8 +45,6 @@ import '../profiles/profilePageWithHead.dart';
 import 'Model/calendarModalClass.dart';
 import 'Model/holidaylistEssModal.dart';
 
-
-
 class EssAdminDashboard extends StatefulWidget {
   final EssDashboarrdModel dashboardModel1N;
 
@@ -135,9 +133,9 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     userPanelPermission= await shared.getUserPanel();
     adminRole= await shared.getAdminRole();
 
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
+    //print('empRole $empRole');
+    //print('roRole $roRole');
+    //print('adminRole $adminRole');
 
     //Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
     getRealTimeAttButtonShow = true;
@@ -442,7 +440,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "month=$_currentMonth");
-
     setState(() {
       isLoading = true;
     });
@@ -463,11 +460,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       if (cachedData != null) {
         print("Cachded Month $cachedMonth");
         try {
-          print("Loaded calendar data from cache ✅");
+          //print("Loaded calendar data from cache ✅");
           mapResponse = json.decode(cachedData);
           _buildCalendarFromMap(mapResponse);
         } catch (e) {
-          print("Error loading cached calendar: $e");
+          //print("Error loading cached calendar: $e");
         }
       }
     }
@@ -757,7 +754,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
 
   /*Future<EssEventsListModal?> getEventData(String sessionId) async {
-    *//*final prefs = await SharedPreferences.getInstance();
+    */
+  /*final prefs = await SharedPreferences.getInstance();
     final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final lastApiCallDate = prefs.getString('lastApiCallDate');
     print("Last API Call Date - $lastApiCallDate");
@@ -767,7 +765,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       print("⏩ Skipping API call. Already fetched today ($currentDate).");
       isLoadingEvent = false;
       return eventsListModalGlobal; // Return previously fetched data if available
-    }*//*
+    }*/
+  /*
 
     // ✅ If date doesn’t match, make the API call
     setState(() {
@@ -2963,12 +2962,13 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
         this.setState(() => _currentDate = date);
         this.setState(() => _currentDate2 = date);
-        events.forEach((event) => print(event.title));
-        print(date);
+        events.forEach((event) => print('event list ${event.getDescription()}'));
+        //print(date);
         setState(() {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
           print("Formatted Date - $formattedDate");
         });
+
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => AttendanceRequisitionCalendar(
                 new AttendanceReportModel(), OnDateAttModel(), 0, "$formattedDate")));
@@ -3074,7 +3074,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         });
       },
       onDayLongPressed: (DateTime date) {
-        print('long pressed date $date');
+        //print('long pressed date $date');
       },
     );
 

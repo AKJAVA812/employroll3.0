@@ -119,11 +119,11 @@ class _PendingLeaveRequisitionListState extends State<PendingLeaveRequisitionLis
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
-    getProfileId = await shared!.getDefaultProfileId();
-    levelOne = await shared!.getLevelOne();
-    levelTwo = await shared!.getLevelTwo();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
+    levelOne = await shared.getLevelOne();
+    levelTwo = await shared.getLevelTwo();
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));
@@ -158,7 +158,7 @@ class _PendingLeaveRequisitionListState extends State<PendingLeaveRequisitionLis
   Future<PendingLeaveRequisitionModal> getPendingLeaveReq(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingLeaveReqList;
-    print('employeeList11: ${SessionId}');
+    //print('employeeList11: ${SessionId}');
     PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$SessionId&"
@@ -167,8 +167,8 @@ class _PendingLeaveRequisitionListState extends State<PendingLeaveRequisitionLis
         "orgId=0"
     );
     final response = await http.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
+    //print('URL ${response.request}');
+    //print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
@@ -190,7 +190,7 @@ class _PendingLeaveRequisitionListState extends State<PendingLeaveRequisitionLis
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
+    //print('value$enteredKeyword');
     List<Data>?  results = [];
 
     if (enteredKeyword.isEmpty) {

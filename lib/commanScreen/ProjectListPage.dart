@@ -116,17 +116,13 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       "password": password
     });*/
     final response = await http.get(urlapi);
-    print('Response status: ${response.request}');
-    print('Response status: ${response.statusCode}');
+    //print('Response status: ${response.request}');
+    //print('Response status: ${response.statusCode}');
     //print('Response body: ${response.body}');
     mapResponse = json.decode(response.body);
     loginModel = LoginModel.fromJson(mapResponse);
     return loginModel;
-    if (response.statusCode == 200) {
-      setState(() {
-        //stringResponse= response.body;
-      });
-    }
+
   }
 
   /*Future monthAttendancePost(String sessionId) async{
@@ -150,19 +146,19 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
   Future getSharedPrfanceList() async {
 
-    sessionId = await shared!.getSessionId();
-    userType = await shared!.getUserType();
+    sessionId = await shared.getSessionId();
+    userType = await shared.getUserType();
 
 
     setState(() {
 
     });
-    print("User Type - $userType");
-    setShowPayroll = await shared!.getShowPayroll();
-    orgId = await shared!.getOrgId();
-    emailId = await shared!.getEmailId();
-    empIdNew = await shared!.getEmpId();
-    orgName = await shared!.getOrgName();
+    //print("User Type - $userType");
+    setShowPayroll = await shared.getShowPayroll();
+    orgId = await shared.getOrgId();
+    emailId = await shared.getEmailId();
+    empIdNew = await shared.getEmpId();
+    orgName = await shared.getOrgName();
     empRoles= await shared.getEmpRoll();
     roRoles= await shared.getRoRole();
     adminRoles= await shared.getAdminRole();
@@ -175,21 +171,21 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     setState(() {
 
     });
-    print("Resignation View 1 $setExitResignationListShow");
-    print("Resignation View 2 $setExitResignationListView");
-    print("MY TEAM SHOW - $setMyTeamShow");
+    //print("Resignation View 1 $setExitResignationListShow");
+    //print("Resignation View 2 $setExitResignationListView");
+    //print("MY TEAM SHOW - $setMyTeamShow");
     userPanel= await shared.getUserPanel();
-    print("USER PANEL - $userPanel");
-    claimLevelOneMSS = await shared!.getClaimLevelOne();
-    print("CLAIM APPROVAL L1 - $claimLevelOneMSS");
-    claimLevelTwoMSS = await shared!.getClaimLevelTwo();
-    claimLevelThreeMSS = await shared!.getClaimLevelThree();
-    claimLevelOneMO = await shared!.getClaimLevelOneMO();
-    claimLevelTwoMO = await shared!.getClaimLevelTwoMO();
-    claimLevelThreeMO = await shared!.getClaimLevelThreeMO();
-    claimLevelOneUIS = await shared!.getClaimLevelOneUIS();
-    claimLevelTwoUIS = await shared!.getClaimLevelTwoUIS();
-    claimLevelThreeUIS = await shared!.getClaimLevelThreeUIS();
+    //print("USER PANEL - $userPanel");
+    claimLevelOneMSS = await shared.getClaimLevelOne();
+    //print("CLAIM APPROVAL L1 - $claimLevelOneMSS");
+    claimLevelTwoMSS = await shared.getClaimLevelTwo();
+    claimLevelThreeMSS = await shared.getClaimLevelThree();
+    claimLevelOneMO = await shared.getClaimLevelOneMO();
+    claimLevelTwoMO = await shared.getClaimLevelTwoMO();
+    claimLevelThreeMO = await shared.getClaimLevelThreeMO();
+    claimLevelOneUIS = await shared.getClaimLevelOneUIS();
+    claimLevelTwoUIS = await shared.getClaimLevelTwoUIS();
+    claimLevelThreeUIS = await shared.getClaimLevelThreeUIS();
     pendingLoanRequestMoL1Permission = (await shared.getLoanApprovalL1MO())!;
     pendingLoanRequestMSSL1Permission= (await shared.getLoanApprovalL1MSS())!;
     pendingLoanRequestUISL1Permission= (await shared.getLoanApprovalL1UIS())!;
@@ -201,10 +197,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     pendingLoanRequestUISL3Permission= (await shared.getLoanApprovalL3UIS())!;
     setMyTeamPageShow= (await shared.getMyTeamPageShow())!;
 
-    print("MY TEAM SHOW NEW - $setMyTeamPageShow");
-    print("Pending Attendance Request MSS MO- $pendingLoanRequestMoL1Permission");
-    print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
-    print("Pending Attendance Request UIS- $pendingLoanRequestUISL1Permission");
+    //print("MY TEAM SHOW NEW - $setMyTeamPageShow");
+    //print("Pending Attendance Request MSS MO- $pendingLoanRequestMoL1Permission");
+    //print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
+    //print("Pending Attendance Request UIS- $pendingLoanRequestUISL1Permission");
 
     if(userPanel == "COMPANY_EMPLOYEE") {
       value = 0;
@@ -214,50 +210,50 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     profileName= await shared.getDefaultProfileName();
     profileId= await shared.getDefaultProfileId();
     getRequisitionCounts(sessionId!);
-    print("Default Profile Name - $profileName");
-    print("Default Profile Id - $profileId");
-    print("User Panel - $userPanel");
-    print('Pre-Onboard $setPreOnboardShow');
-    print('Exit Show $setExitShow');
-    print('empRole $empRoles');
-    print('roRole $roRoles');
-    print('adminRole $adminRoles');
-    print('Response snapshot: ${sessionId}');
-    print('Show Payroll: ${setShowPayroll}');
-    print('OrgId -  ${orgId}');
-    print('OrgName - : ${orgName}');
+    //print("Default Profile Name - $profileName");
+    //print("Default Profile Id - $profileId");
+    //print("User Panel - $userPanel");
+    //print('Pre-Onboard $setPreOnboardShow');
+    //print('Exit Show $setExitShow');
+    //print('empRole $empRoles');
+    //print('roRole $roRoles');
+    //print('adminRole $adminRoles');
+    //print('Response snapshot: ${sessionId}');
+    //print('Show Payroll: ${setShowPayroll}');
+    //print('OrgId -  ${orgId}');
+    //print('OrgName - : ${orgName}');
     setState(() {
 
     });
     setState(() {
       if(empRoles==1){
         showHide=true;
-        print('Show Emp $showHide');
+        //print('Show Emp $showHide');
         setState(() {
         });
       }
       if(empRoles==0){
         showHide=false;
-        print('Show Emp $showHide');
+        //print('Show Emp $showHide');
         setState(() {
         });
       }
       if (adminRoles == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
+        //print("Show Admin $showAdmin");
       }
       if (adminRoles == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
+        //print("Show Admin $showAdmin");
       }
       if (roRoles == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
+        //print("Show Ro $showRo");
       }
       if (roRoles == 1) {
         showRo = true;
-        print("Show Ro $showRo");
+        //print("Show Ro $showRo");
       }
     });
   }
@@ -270,7 +266,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       uploadImage();
       setState(() {});
     } else {
-      print('no image selected');
+      //print('no image selected');
     }
 
     //_uploadFile(photo);
@@ -285,9 +281,9 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     stream.cast();
 
     var length = await image!.length();
-    print('Response status: ${length}');
-    print('Response body: ${stream}');
-    print('Response body: ${image}');
+    //print('Response status: ${length}');
+    //print('Response body: ${stream}');
+    //print('Response body: ${image}');
     //var uri = Uri.parse("https://c264-2401-4900-1c68-cb6f-f5aa-6720-cdf2-749.ngrok.io/restful/service/attendance/via/mobile");
     var uri = Uri.parse(
         "http://www.employroll.com//restful/service/attendance/via/mobile");
@@ -311,10 +307,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     var response = await request.send();
 
     var responseData = await response.stream.bytesToString();
-    print('Response body: ${request}');
-    print('Response body: ${response.toString()}');
-    print('Response body: ${responseData.toString()}');
-    print('Response body: ${response.statusCode}');
+    //print('Response body: ${request}');
+    //print('Response body: ${response.toString()}');
+    //print('Response body: ${responseData.toString()}');
+    //print('Response body: ${response.statusCode}');
   }
 
   //============================== Image from gallery
@@ -324,7 +320,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
   void _uploadFile(filePath) async {
     String filename = basename(filePath.path);
-    print("File base name $filename");
+    //print("File base name $filename");
     try {
       FormData fromData = new FormData.fromMap({
         'sessionId': "1116a07f94bbd789c25280a8a480ced5d87a8811714",
@@ -340,11 +336,11 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
           "http://www.employroll.com/restful/service/attendance/via/mobile",
           data: fromData);
 
-      print('Response status: ${response.statusMessage}');
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response}');
+      //print('Response status: ${response.statusMessage}');
+      //print('Response status: ${response.statusCode}');
+      //print('Response body: ${response}');
     } catch (e) {
-      print('Response statuserror: ${e.toString()}');
+      //print('Response statuserror: ${e.toString()}');
     }
   }
 
@@ -374,13 +370,13 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     await request.send().then((response) async {
       // listen for response
       response.stream.transform(utf8.decoder).listen((value) {
-        print(value);
-        print('Response status: ${response.stream}');
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response}');
+        //print(value);
+        //print('Response status: ${response.stream}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response}');
       });
     }).catchError((e) {
-      print(e);
+      //print(e);
     });
   }
 
@@ -396,8 +392,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
       final response = await http.post(urlapi);
 
-      print("Requisition Count API - ${response.request}");
-      print("Response Body - ${response.body}");
+      //print("Requisition Count API - ${response.request}");
+      //print("Response Body - ${response.body}");
 
       Map<String, dynamic> mapResponse = json.decode(response.body);
 
@@ -433,10 +429,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       await prefs.setInt("tourReqCount", tourReqCount);
       await prefs.setInt("attReqCount", attReqCount);
 
-      print("Saved Requisition Counts to SharedPreferences ✅");
+      //print("Saved Requisition Counts to SharedPreferences ✅");
 
     } catch (e) {
-      print("Error fetching requisition counts: $e");
+      //print("Error fetching requisition counts: $e");
     } finally {
       setState(() {
         //isLoading = false; // hide loader always
@@ -495,7 +491,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     double widgetHeight = screenHeight * 0.5; // 50% of the screen height
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
-      print("CheckOrg - $orgId");
+      //print("CheckOrg - $orgId");
       List<Widget> items = [];
 
       //ESS Cards
@@ -677,9 +673,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
           ),
         );
       }
-
-
-
 
       if(value == 1 || userPanel == "USER") {
           //Time & Attendance

@@ -408,7 +408,6 @@ class SessionManager {
     return doj;
   }
 
-
   setUserRoles(userRoles) async{
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('userRoles',userRoles);
