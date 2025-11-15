@@ -46,6 +46,8 @@ final DateTime _minDateAllowed = DateTime(_today.year, _today.month - 2); // 2 m
 final DateTime _maxDateAllowed = DateTime(_today.year, _today.month + 1); // 1 month ahead
 String singleDateString="";
 CalendarModalClass? calendarModalGlobal;
+List<dynamic> data=[];
+var calendarSendData;
 class _GetAttendanceDetState extends State<GetAttendanceDet> {
   dynamic formattedDate;
   DateTime _currentDate = DateTime.now();
@@ -54,6 +56,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
   DateTime _targetDateTime = DateTime.now();
   List<Map<String, String>> _legends = [];
   var todayDate = "dd-mm-yyyy";
+
  @override
   void initState() {
    getSharedPrfanceList();
@@ -182,7 +185,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 // 🔧 Helper method to rebuild UI from any map data (API or cache)
   void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
-      List<dynamic> data = mapResponse['data'] ?? [];
+      data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
 
       // Build legends
@@ -559,6 +562,54 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                   ]),
             ).py(80),*/
 
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+              child: SizedBox(
+                height: 50,
+                width: double.infinity, // 👈 full width
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _currentMonth = DateFormat('MM-yyyy').format(DateTime.now());
+
+                    // 👇 Reset calendar to current month
+                    setState(() {
+                      _targetDateTime = DateTime.now();
+                      _currentDate = DateTime.now();
+                      _currentDate2 = DateTime.now();
+                      _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+                    });
+
+                    Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+                    getCalendar.then((value) {
+                      setState(() {
+                        calendarModalGlobal = value;
+                        isLoading = false;
+                      });
+
+                    });
+                    // 👇 Your action here
+                    print("Update your dashboard clicked");
+                  },
+                  icon: const Icon(Icons.dashboard_customize, color: Colors.white, size: 22,),
+                  label: const Text(
+                    "Update Your Calendar",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Mythemes.successColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12,), // height
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                  ),
+                ),
+              ),
+            ),
             CalendarShow(),
 
           ],
@@ -568,45 +619,45 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
   }
 
   CalendarShow() {
-   /// Example with custom icon
-   final _calendarCarousel = Container(
-     constraints: BoxConstraints(
-       maxHeight: 300.0, // Set a valid maximum height
-     ),
-     child: CalendarCarousel<Event>(
-       onDayPressed: (date, events) {
-         setState(() => _currentDate = date);
-         events.forEach((event) => print(event.title));
-       },
-       weekendTextStyle: TextStyle(
-         color: Colors.black,
-       ),
-       thisMonthDayBorderColor: Colors.grey,
-       headerText: 'Custom Header',
-       weekFormat: true,
-       markedDatesMap: _markedDateMap,
-       height: 300.0, // Provide a valid height
-       selectedDateTime: _currentDate2,
-       showIconBehindDayText: true,
-       markedDateShowIcon: true,
-       markedDateIconMaxShown: 2,
-       selectedDayTextStyle: TextStyle(
-         color: Mythemes.lightBluishColor,
-       ),
-       todayTextStyle: TextStyle(
-         color: Colors.blue,
-       ),
-       todayButtonColor: Colors.transparent,
-       todayBorderColor: Colors.transparent,
-       markedDateMoreShowTotal: true,
-     ),
-   );
+    /// Example with custom icon
+    final _calendarCarousel = Container(
+      constraints: BoxConstraints(
+        maxHeight: 300.0, // Set a valid maximum height
+      ),
+      child: CalendarCarousel<Event>(
+        onDayPressed: (date, events) {
+          setState(() => _currentDate = date);
+          events.forEach((event) => print(event.title));
+        },
+        weekendTextStyle: TextStyle(
+          color: Colors.black,
+        ),
+        thisMonthDayBorderColor: Colors.grey,
+        headerText: 'Custom Header',
+        weekFormat: true,
+        markedDatesMap: _markedDateMap,
+        height: 300.0, // Provide a valid height
+        selectedDateTime: _currentDate2,
+        showIconBehindDayText: true,
+        markedDateShowIcon: true,
+        markedDateIconMaxShown: 2,
+        selectedDayTextStyle: TextStyle(
+          color: Mythemes.lightBluishColor,
+        ),
+        todayTextStyle: TextStyle(
+          color: Colors.blue,
+        ),
+        todayButtonColor: Colors.transparent,
+        todayBorderColor: Colors.transparent,
+        markedDateMoreShowTotal: true,
+      ),
+    );
 
-   /// Example Calendar Carousel without header and custom prev & next button
-   final _calendarCarouselNoHeader = CalendarCarousel<Event>(
-     todayBorderColor: Mythemes.lightBluishColor,
+    /// Example Calendar Carousel without header and custom prev & next button
+    final _calendarCarouselNoHeader = CalendarCarousel<Event>(
+      todayBorderColor: Mythemes.lightBluishColor,
 
-     /*onDayPressed: (date, events) {
+      /*onDayPressed: (date, events) {
 
       this.setState(() => _currentDate = date);
       this.setState(() => _currentDate2 = date);
@@ -621,96 +672,125 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       //Nevigate Next Page
 
     },*/
-     onDayPressed: (date, events) {
-       // Prevent selecting dates older than current month view
-       if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
-         print("⛔ Date tap disabled for past months");
-         showDialog(
-           context: context,
-           builder: (context) => AlertDialog(
-             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-             title: const Text(
-               "Notice",
-               style: TextStyle(fontWeight: FontWeight.bold),
-             ),
-             content: const Text(
-               "Requisitions for the last pay-cycle has been closed.",
-               style: TextStyle(fontSize: 15),
-             ),
-             actions: [
-               TextButton(
-                 onPressed: () => Navigator.pop(context),
-                 child: const Text("OK", style: TextStyle(color: Colors.blue)),
-               ),
-             ],
-           ),
-         );
-         return;
-       }
+      onDayPressed: (date, events) {
+        // Prevent selecting dates older than current month view
+        if (date.month < _targetDateTime.month && date.year == _targetDateTime.year) {
+          print("⛔ Last month dates are not selectable");
+          Fluttertoast.showToast(
+            msg: "You cannot select last month's dates.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          return;
+        }
+        if (date.month > _targetDateTime.month && date.year == _targetDateTime.year) {
+          Fluttertoast.showToast(
+            msg: "You cannot select next month's dates.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          return;
+        }
+        if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
+          print("⛔ Date tap disabled for past months");
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              title: const Text(
+                "Notice",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: const Text(
+                "Requisitions for the last pay-cycle has been closed.",
+                style: TextStyle(fontSize: 15),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK", style: TextStyle(color: Colors.blue)),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
 
-       this.setState(() => _currentDate = date);
-       this.setState(() => _currentDate2 = date);
-       events.forEach((event) => print(event.title));
-       print(date);
-       setState(() {
-         formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
-         print("Formatted Date - $formattedDate");
-       });
-       Navigator.of(context).push(MaterialPageRoute(
-           builder: (context) => AttendanceRequisitionCalendar(
-               new AttendanceReportModel(), OnDateAttModel(), 0, "$formattedDate")));
-     },
-     daysHaveCircularBorder: true,
-     showOnlyCurrentMonthDate: false,
-     weekendTextStyle: TextStyle(
-       fontSize: 12,
-       color: Colors.red, // weekend date color
-     ),
+        this.setState(() => _currentDate = date);
+        this.setState(() => _currentDate2 = date);
+        events.forEach((event) => print('event list ${event.getDescription()}'));
+        //print(date);
+        setState(() {
+          formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
+          int dayOnly = int.parse(DateFormat('dd').format(_currentDate));
+          print("Formatted Date - $formattedDate");
+          print(data[dayOnly-1]);
+          calendarSendData = data[dayOnly-1];
 
-     prevDaysTextStyle: TextStyle(
-       fontSize: 16,
-       color: Colors.grey, // previous month date color
-     ),
+          //print("Formatted Date - $date");
+        });
 
-     inactiveDaysTextStyle: TextStyle(
-       color: Colors.grey.shade400, // inactive days color
-       fontSize: 14,
-     ),
-     /* weekendTextStyle: TextStyle(
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => AttendanceRequisitionCalendar(
+                new AttendanceReportModel(), calendarSendData, 0, "$formattedDate")));
+      },
+      daysHaveCircularBorder: true,
+      showOnlyCurrentMonthDate: false,
+      weekendTextStyle: TextStyle(
+        fontSize: 12,
+        color: Colors.red, // weekend date color
+      ),
+
+      prevDaysTextStyle: TextStyle(
+        fontSize: 16,
+        color: Colors.grey, // previous month date color
+      ),
+
+      inactiveDaysTextStyle: TextStyle(
+        color: Colors.grey.shade400, // inactive days color
+        fontSize: 14,
+      ),
+      /* weekendTextStyle: TextStyle(
       fontSize: 12,
       color: Colors.black,
     ),*/
-     thisMonthDayBorderColor: Colors.grey,
-     weekFormat: false,
-     //firstDayOfWeek: 4,
-     markedDatesMap: _markedDateMap,
-     height: 300.0,
-     selectedDateTime: _currentDate2,
-     targetDateTime: _targetDateTime,
-     customGridViewPhysics: NeverScrollableScrollPhysics(),
+      thisMonthDayBorderColor: Colors.grey,
+      weekFormat: false,
+      //firstDayOfWeek: 4,
+      markedDatesMap: _markedDateMap,
+      height: 300.0,
+      selectedDateTime: _currentDate2,
+      targetDateTime: _targetDateTime,
+      customGridViewPhysics: NeverScrollableScrollPhysics(),
 
-     markedDateCustomShapeBorder: CircleBorder(side: BorderSide(color: Colors.grey)),
-     markedDateCustomTextStyle: TextStyle(
-       fontSize: 18,
-       color: Colors.amberAccent,
-     ),
-     showHeader: false,
-     todayTextStyle: TextStyle(
-       color: Colors.white,
-     ),
-     markedDateShowIcon: true,
-     markedDateIconMaxShown: 2,
-     markedDateIconBuilder: (event) {
-       return event.icon;
-     },
-     markedDateMoreShowTotal: true,
-     todayButtonColor: Mythemes.lightBluishColor,
-     selectedDayTextStyle: TextStyle(
-       color: Mythemes.black,
-     ),
-     //minSelectedDate: _currentDate.subtract(Duration(days: 360)),
-     //maxSelectedDate: _currentDate.add(Duration(days: 360)),
-     /*prevDaysTextStyle: TextStyle(
+      markedDateCustomShapeBorder: CircleBorder(side: BorderSide(color: Colors.grey)),
+      markedDateCustomTextStyle: TextStyle(
+        fontSize: 18,
+        color: Colors.amberAccent,
+      ),
+      showHeader: false,
+      todayTextStyle: TextStyle(
+        color: Colors.white,
+      ),
+      markedDateShowIcon: true,
+      markedDateIconMaxShown: 2,
+      markedDateIconBuilder: (event) {
+        return event.icon;
+      },
+      markedDateMoreShowTotal: true,
+      todayButtonColor: Mythemes.lightBluishColor,
+      selectedDayTextStyle: TextStyle(
+        color: Mythemes.black,
+      ),
+      //minSelectedDate: _currentDate.subtract(Duration(days: 360)),
+      //maxSelectedDate: _currentDate.add(Duration(days: 360)),
+      /*prevDaysTextStyle: TextStyle(
       fontSize: 16,
       color: Colors.pinkAccent,
     ),
@@ -718,7 +798,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       color: Colors.tealAccent,
       fontSize: 20,
     ),*/
-     /*onCalendarChanged: (DateTime date) {
+      /*onCalendarChanged: (DateTime date) {
       _targetDateTime = date;
       _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
       //_currentMonth = DateFormat.yMMM().format(_targetDateTime);
@@ -737,63 +817,63 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         //API month change call
       });
     },*/
-     onCalendarChanged: (DateTime date) {
-       // Prevent sliding beyond allowed range
-       if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
-         print("⛔ Calendar slide limit reached");
-         return;
-       }
+      onCalendarChanged: (DateTime date) {
+        // Prevent sliding beyond allowed range
+        if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
+          print("⛔ Calendar slide limit reached");
+          return;
+        }
 
-       _targetDateTime = date;
-       _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
-       print('change date $date.month$_targetDateTime');
-       singleDateString = DateFormat('dd-MM-yyyy').format(date);
-       print("Updated Date Change - $singleDateString");
+        _targetDateTime = date;
+        _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+        print('change date $date.month$_targetDateTime');
+        singleDateString = DateFormat('dd-MM-yyyy').format(date);
+        print("Updated Date Change - $singleDateString");
 
-       getSharedPrfanceList();
-       setState(() {
-         Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
-         getCalendar.then((value) {
-           setState(() {
-             calendarModalGlobal = value;
-           });
-         });
-       });
-     },
-     onDayLongPressed: (DateTime date) {
-       print('long pressed date $date');
-     },
-   );
+        getSharedPrfanceList();
+        setState(() {
+          Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+          getCalendar.then((value) {
+            setState(() {
+              calendarModalGlobal = value;
+            });
+          });
+        });
+      },
+      onDayLongPressed: (DateTime date) {
+        //print('long pressed date $date');
+      },
+    );
 
-   return Card(
-     child: Column(
-       crossAxisAlignment: CrossAxisAlignment.start,
-       mainAxisAlignment: MainAxisAlignment.start,
-       children: <Widget>[
-         //custom icon
-         /* Container(
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          //custom icon
+          /* Container(
             margin: EdgeInsets.symmetric(horizontal: 16.0),
             child: _calendarCarousel,
           ),*/ // This trailing comma makes auto-formatting nicer for build methods.
-         //custom icon without header
-         Container(
-           margin: EdgeInsets.only(
-             top: 0.0,
-             bottom: 16.0,
-             left: 16.0,
-             right: 16.0,
-           ),
-           child: new Row(
-             children: <Widget>[
-               Expanded(
-                   child: Text(
-                     _currentMonth,
-                     style: TextStyle(
-                       fontWeight: FontWeight.w100,
-                       fontSize: 24.0,
-                     ),
-                   )),
-               /*TextButton(
+          //custom icon without header
+          Container(
+            margin: EdgeInsets.only(
+              top: 0.0,
+              bottom: 16.0,
+              left: 16.0,
+              right: 16.0,
+            ),
+            child: new Row(
+              children: <Widget>[
+                Expanded(
+                    child: Text(
+                      _currentMonth,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w100,
+                        fontSize: 24.0,
+                      ),
+                    )),
+                /*TextButton(
                   child: Text('PREV'),
                   onPressed: () {
                     setState(() {
@@ -804,30 +884,30 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                     });
                   },
                 ),*/
-               TextButton(
-                 child: Text('PREV'),
-                 onPressed: () {
-                   final previousMonth = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
-                   if (previousMonth.isBefore(_minDateAllowed)) {
-                     print("⛔ You can’t go beyond last 2 months");
-                     Fluttertoast.showToast(
-                         msg: "Can't go before this month !!",
-                         toastLength: Toast.LENGTH_SHORT,
-                         gravity: ToastGravity.BOTTOM,
-                         timeInSecForIosWeb: 1,
-                         backgroundColor: Colors.black,
-                         textColor: Colors.white,
-                         fontSize: 16.0
-                     );
-                     return;
-                   }
-                   setState(() {
-                     _targetDateTime = previousMonth;
-                     _currentMonth = DateFormat.yMMM().format(_targetDateTime);
-                   });
-                 },
-               ),
-               /*TextButton(
+                TextButton(
+                  child: Text('PREV'),
+                  onPressed: () {
+                    final previousMonth = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
+                    if (previousMonth.isBefore(_minDateAllowed)) {
+                      print("⛔ You can’t go beyond last 2 months");
+                      Fluttertoast.showToast(
+                          msg: "Can't go before this month !!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _targetDateTime = previousMonth;
+                      _currentMonth = DateFormat.yMMM().format(_targetDateTime);
+                    });
+                  },
+                ),
+                /*TextButton(
                   child: Text('NEXT'),
                   onPressed: () {
                     setState(() {
@@ -838,44 +918,44 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                     });
                   },
                 )*/
-               TextButton(
-                 child: Text('NEXT'),
-                 onPressed: () {
-                   final nextMonth = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
-                   if (nextMonth.isAfter(_maxDateAllowed)) {
-                     print("⛔ You can’t go beyond next month");
-                     Fluttertoast.showToast(
-                         msg: "Can't go beyond this month !!",
-                         toastLength: Toast.LENGTH_SHORT,
-                         gravity: ToastGravity.BOTTOM,
-                         timeInSecForIosWeb: 1,
-                         backgroundColor: Colors.black,
-                         textColor: Colors.white,
-                         fontSize: 16.0
-                     );
-                     return;
-                   }
-                   setState(() {
-                     _targetDateTime = nextMonth;
-                     _currentMonth = DateFormat.yMMM().format(_targetDateTime);
-                   });
-                 },
-               ),
-             ],
-           ),
-         ),
-         Container(
-           margin: EdgeInsets.symmetric(horizontal: 22.0),
-           child: _calendarCarouselNoHeader,
-         ), //
-         if (_legends.isNotEmpty)
-           LegendWidget(legends: _legends), // Dynamically show legends
-         if (isLoading)
-           CircularProgressIndicator(),
-       ],
-     ),
-   );
- }
+                TextButton(
+                  child: Text('NEXT'),
+                  onPressed: () {
+                    final nextMonth = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
+                    if (nextMonth.isAfter(_maxDateAllowed)) {
+                      print("⛔ You can’t go beyond next month");
+                      Fluttertoast.showToast(
+                          msg: "Can't go beyond this month !!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.black,
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
+                      return;
+                    }
+                    setState(() {
+                      _targetDateTime = nextMonth;
+                      _currentMonth = DateFormat.yMMM().format(_targetDateTime);
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 22.0),
+            child: _calendarCarouselNoHeader,
+          ), //
+          if (_legends.isNotEmpty)
+            LegendWidget(legends: _legends), // Dynamically show legends
+          if (isLoading)
+            CircularProgressIndicator(),
+        ],
+      ),
+    );
+  }
 
 
 }

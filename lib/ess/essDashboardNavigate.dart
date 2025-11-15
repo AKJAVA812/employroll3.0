@@ -104,6 +104,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   DateTime _currentDate = DateTime.now();
   DateTime _currentDate2 = DateTime.now();
 
+  List<dynamic> data=[];
+  var calendarSendData;
   //String _currentMonth = DateFormat.yMMM().format(DateTime.now());
   //String _currentMonth = DateFormat.yMMM().format(DateTime.now());
   String _currentMonth = DateFormat('MM-yyyy').format(DateTime.now());
@@ -505,31 +507,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
 // 🔧 Helper method to rebuild UI from any map data (API or cache)
+  // 🔧 Helper method to rebuild UI from any map data (API or cache)
   void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
-      List<dynamic> data = mapResponse['data'] ?? [];
+      data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
 
-      // Build legends (✅ limit status length to 8 chars + add "...")
+      // Build legends
       _legends = legends.map((legend) {
-        String status = legend["status"]?.toString() ?? "";
-        if (status.length > 8) {
-          status = "${status.substring(0, 8)}..."; // add ellipsis
-        }
         return {
           "mobColor": legend["mobColor"].toString(),
-          "status": status,
+          "status": legend["status"].toString(),
         };
       }).toList();
 
       // Build marked dates
       _markedDateMap.clear();
+      //print("Calendar Mark Date - $_markedDateMap");
 
       for (var event in data) {
         DateTime eventDate = DateTime.parse(event['logDate']);
         String title = event['status'] ?? "Event";
         String logDate = event['logDate'];
         String mobColor = event['mobColor'] ?? "0xff2196F3";
+        //print("Calendar event data - $eventDate");
 
         _markedDateMap.add(
           eventDate,
@@ -2946,6 +2947,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     /// Example Calendar Carousel without header and custom prev & next button
     final _calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Mythemes.lightBluishColor,
+
       /*onDayPressed: (date, events) {
 
       this.setState(() => _currentDate = date);
@@ -2963,6 +2965,29 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     },*/
       onDayPressed: (date, events) {
         // Prevent selecting dates older than current month view
+        if (date.month < _targetDateTime.month && date.year == _targetDateTime.year) {
+          print("⛔ Last month dates are not selectable");
+          Fluttertoast.showToast(
+            msg: "You cannot select last month's dates.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          return;
+        }
+        if (date.month > _targetDateTime.month && date.year == _targetDateTime.year) {
+          Fluttertoast.showToast(
+            msg: "You cannot select next month's dates.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          return;
+        }
         if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
           print("⛔ Date tap disabled for past months");
           showDialog(
@@ -2990,22 +3015,42 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
         this.setState(() => _currentDate = date);
         this.setState(() => _currentDate2 = date);
-        events.forEach((event) => print(event.title));
-        print(date);
+        events.forEach((event) => print('event list ${event.getDescription()}'));
+        //print(date);
         setState(() {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
+          int dayOnly = int.parse(DateFormat('dd').format(_currentDate));
           print("Formatted Date - $formattedDate");
+          print(data[dayOnly-1]);
+          calendarSendData = data[dayOnly-1];
+
+          //print("Formatted Date - $date");
         });
+
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => AttendanceRequisitionCalendar(
-                new AttendanceReportModel(), OnDateAttModel(), 0, "$formattedDate")));
+                new AttendanceReportModel(), calendarSendData, 0, "$formattedDate")));
       },
       daysHaveCircularBorder: true,
       showOnlyCurrentMonthDate: false,
       weekendTextStyle: TextStyle(
         fontSize: 12,
-        color: Colors.black,
+        color: Colors.red, // weekend date color
       ),
+
+      prevDaysTextStyle: TextStyle(
+        fontSize: 16,
+        color: Colors.grey, // previous month date color
+      ),
+
+      inactiveDaysTextStyle: TextStyle(
+        color: Colors.grey.shade400, // inactive days color
+        fontSize: 14,
+      ),
+      /* weekendTextStyle: TextStyle(
+      fontSize: 12,
+      color: Colors.black,
+    ),*/
       thisMonthDayBorderColor: Colors.grey,
       weekFormat: false,
       //firstDayOfWeek: 4,
@@ -3032,18 +3077,18 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       markedDateMoreShowTotal: true,
       todayButtonColor: Mythemes.lightBluishColor,
       selectedDayTextStyle: TextStyle(
-        color: Mythemes.whitish,
+        color: Mythemes.black,
       ),
       //minSelectedDate: _currentDate.subtract(Duration(days: 360)),
       //maxSelectedDate: _currentDate.add(Duration(days: 360)),
-      prevDaysTextStyle: TextStyle(
-        fontSize: 16,
-        color: Colors.pinkAccent,
-      ),
-      inactiveDaysTextStyle: TextStyle(
-        color: Colors.tealAccent,
-        fontSize: 20,
-      ),
+      /*prevDaysTextStyle: TextStyle(
+      fontSize: 16,
+      color: Colors.pinkAccent,
+    ),
+    inactiveDaysTextStyle: TextStyle(
+      color: Colors.tealAccent,
+      fontSize: 20,
+    ),*/
       /*onCalendarChanged: (DateTime date) {
       _targetDateTime = date;
       _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
@@ -3087,7 +3132,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         });
       },
       onDayLongPressed: (DateTime date) {
-        print('long pressed date $date');
+        //print('long pressed date $date');
       },
     );
 

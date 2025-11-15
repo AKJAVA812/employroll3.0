@@ -172,7 +172,26 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
 
     }*/
     //print('onModelrun');
-    branchNameset= calendarSendData['branch'];
+    branchNameset = calendarSendData['branch'] ?? '';
+    updatedWorkHourSet = calendarSendData['updatedWorkingHour'] ?? '';
+    relaxationHourSet = calendarSendData['relaxationHour'] ?? '';
+    workingHrsSet = calendarSendData['workingHrs'] ?? '';
+    shiftWorkingHourSet = calendarSendData['shiftWorkingHour'] ?? '';
+    departmentset = calendarSendData['dept'] ?? '';
+    employeeNameset = calendarSendData['empName'] ?? '';
+    onDateset = calendarSendData['logDate'] ?? '';
+    actualTimeset = calendarSendData['inTime'] ?? '';
+    actualOutTimeset = calendarSendData['outTime'] ?? '';
+    //empId = calendarSendData['empId'] ?? 0;
+    isShortLeave = calendarSendData['isShortLeave'] ?? isShortLeave;
+    isOutDuty = calendarSendData['isOdReq'] ?? isOutDuty;
+    isCompOff = calendarSendData['isNormalCoff'] ?? isCompOff;
+
+    setState(() {
+
+    });
+
+    /*branchNameset= calendarSendData['branch'];
     print("Branch name from calendar - $branchNameset");
     updatedWorkHourSet = calendarSendData['updatedWorkingHour'];
     relaxationHourSet = calendarSendData['relaxationHour'];
@@ -182,7 +201,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
     employeeNameset= calendarSendData['empName'];
     onDateset= calendarSendData['logDate'];
     actualTimeset= calendarSendData['inTime'];
-    actualOutTimeset= calendarSendData['outTime'];
+    actualOutTimeset= calendarSendData['outTime'];*/
     //empId= calendarSendData['empId'];
     /*branchNameset= onDateAttModel!.branch;
     updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
