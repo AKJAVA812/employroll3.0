@@ -909,17 +909,23 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       print("Event JSON - $eventsJson");
       final mapResponse = jsonDecode(eventsJson);
       eventsListModalGlobal = EssEventsListModal.fromJson(mapResponse);
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded eventsJson data from SharedPreferences");
+    }else{
+      print("📦 Loaded eventsJson data not save from SharedPreferences");
     }
 
     if (todayEventsJson != null) {
       final mapResponse = jsonDecode(todayEventsJson);
       todayEventModalGlobal = TodayEventListModal.fromJson(mapResponse);
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded todayEventsJson data from SharedPreferences");
+    }else{
+      print("📦 Loaded todayEventsJson data not save from SharedPreferences");
     }
 
     if (holidayJson != null) {
@@ -928,8 +934,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
       setState(() {
         holidayListModalGlobal = holidayESSModal;
-        isLoadingEvent = false;
-        isLoadingTodayEvent = false;
+        //isLoadingEvent = false;
+        //isLoadingTodayEvent = false;
       });
 
       print("📦 Loaded Holiday data from SharedPreferences");
@@ -955,15 +961,21 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       isLoadingEvent = false;
       isLoading = false;
       isLoadingTodayEvent = false;
+      print("📦 Loaded calender data from SharedPreferences");
+    }else{
+      print("📦 Loaded calender data from SharedPreferences");
     }
     if (dashboardData != null) {
       final mapResponse = jsonDecode(dashboardData);
       print("Loaded Dashboard Data data from cache ✅");
       essDashboardModelGlobal = EssDashboarrdModel.fromJson(mapResponse);
-      isLoadingEvent = false;
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded Dashboard data from SharedPreferences");
+    }else{
+      print("📦 Loaded Dashboard data Not Saved from SharedPreferences");
     }
 
     setState(() {
