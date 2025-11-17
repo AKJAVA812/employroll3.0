@@ -23,6 +23,7 @@ import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../ess/essDashboard.dart';
+import '../../../ess/myAllReports.dart';
 import '../reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../reports/attendanceRequisition/model/onDateReportModel.dart';
 
@@ -1388,7 +1389,8 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
               print('My requests');
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('my reports');
             }

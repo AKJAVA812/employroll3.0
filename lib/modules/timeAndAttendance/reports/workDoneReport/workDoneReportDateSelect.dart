@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneReport/workDoneReport.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
@@ -13,8 +14,10 @@ import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
+import '../../../../ess/myAllReports.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
+import '../attendanceRequisition/getAttendanceDetails.dart';
 
 class WorkDoneReportDateSelect extends StatefulWidget {
   const WorkDoneReportDateSelect({Key? key}) : super(key: key);
@@ -137,7 +140,7 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
     }
   }
   int pageIndex = 0;
-  int currentIndex = 2;
+  int currentIndex = 3;
   int value = 0;
   @override
   Widget build(BuildContext context) {
@@ -161,30 +164,35 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
         onTap: (index) {
 
           if(index==0){
+
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            print('My Requests');
           }
           if(index==3){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-            );
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
+            print('My Reports');
           }
           if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
-            print('Profile');
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+
+            //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
+            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -201,17 +209,17 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.data_exploration_outlined),
-            label: 'Reports',
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

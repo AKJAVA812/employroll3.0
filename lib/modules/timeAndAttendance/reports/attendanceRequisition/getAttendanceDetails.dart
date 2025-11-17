@@ -19,6 +19,7 @@ import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../ess/Model/calendarModalClass.dart';
+import '../../../../ess/myAllReports.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
@@ -408,7 +409,8 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
               print('Attendance');*/
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }

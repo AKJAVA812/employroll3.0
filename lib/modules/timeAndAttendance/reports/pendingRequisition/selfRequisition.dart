@@ -19,6 +19,7 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
+import '../../../../ess/myAllReports.dart';
 import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
@@ -390,7 +391,8 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
             print('My Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');

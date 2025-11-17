@@ -5,10 +5,12 @@ import 'package:velocity_x/velocity_x.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
 import '../../commanScreen/routes.dart';
+import '../../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../themes/empThemes.dart';
 import '../EssDashboarrddModel.dart';
 import '../essDashboardNavigate.dart';
+import '../myAllReports.dart';
 
 class MyLoanLedgerPage extends StatefulWidget {
   const MyLoanLedgerPage({super.key});
@@ -56,7 +58,7 @@ class _MyLoanLedgerPageState extends State<MyLoanLedgerPage> {
         ? Icon(CupertinoIcons.arrow_up_right, color: Colors.white, size: 26)
         : Icon(CupertinoIcons.arrow_down_left, color: Colors.white, size: 26);
   }
-  int currentIndex = 2;
+  int currentIndex = 3;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,35 +124,37 @@ class _MyLoanLedgerPageState extends State<MyLoanLedgerPage> {
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
+
           if(index==0){
+
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
-            //Navigator.of(context, rootNavigator: true).pop();
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+            //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
-            print('My Reports');
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            print('My Requests');
           }
           if(index==3){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
-            );
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
+            print('My Reports');
           }
           if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
+            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -167,17 +171,17 @@ class _MyLoanLedgerPageState extends State<MyLoanLedgerPage> {
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.data_exploration_outlined),
-            label: 'My Reports',
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

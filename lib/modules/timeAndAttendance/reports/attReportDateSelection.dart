@@ -1,5 +1,7 @@
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceReport.dart';
+import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +12,7 @@ import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
+import '../../../ess/myAllReports.dart';
 import '../../../profiles/profilePageWithHead.dart';
 
 class AttReport extends StatefulWidget {
@@ -80,7 +83,7 @@ class _AttReportState extends State<AttReport> {
     }
   }
   int pageIndex = 0;
-  int currentIndex = 2;
+  int currentIndex = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -336,31 +339,33 @@ class _AttReportState extends State<AttReport> {
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
-            print('Reports');
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            print('My Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
+            print('My Reports');
           }
           if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
+            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -377,17 +382,17 @@ class _AttReportState extends State<AttReport> {
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.data_exploration_outlined),
-            label: 'Reports',
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],
