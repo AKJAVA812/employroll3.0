@@ -52,6 +52,8 @@ String singleDateString="";
 CalendarModalClass? calendarModalGlobal;
 List<dynamic> data=[];
 var calendarSendData;
+var startPayCycle;
+var endPayCycle;
 class _GetAttendanceDetState extends State<GetAttendanceDet> {
   dynamic formattedDate;
   DateTime _currentDate = DateTime.now();
@@ -81,6 +83,11 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     deptName = await shared!.getDept()??"N/A";
     empName = await shared!.getempName()??"N/A";
 
+    startPayCycle = await shared!.getPayCycleStart() ?? "N/A";
+    endPayCycle = await shared!.getPayCycleEnd() ?? "N/A";
+
+    print("Start Pay $startPayCycle");
+    print("End Pay $endPayCycle");
     checkAndRunApi();
     setState(() {
       print('ResponseAttendance: ${sessionId}' );

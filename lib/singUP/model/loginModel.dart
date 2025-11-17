@@ -53,6 +53,8 @@ class Data {
   int? needUpdation;
   String? doj;
   String? enrollId;
+  String? startDate;
+  String? endDate;
 
   Data(
       {this.empId,
@@ -90,6 +92,8 @@ class Data {
         this.needUpdation,
         this.doj,
         this.enrollId,
+        this.startDate,
+        this.endDate,
       });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -141,6 +145,8 @@ class Data {
     needUpdation = json['need_updation'];
     doj = json['doj'];
     enrollId = json['enrollId'];
+    startDate = json['startDate'];
+    endDate = json['endDate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -184,6 +190,8 @@ class Data {
     data['need_updation'] = this.needUpdation;
     data['doj'] = this.doj;
     data['enrollId'] = this.enrollId;
+    data['startDate'] = this.startDate;
+    data['endDate'] = this.endDate;
     return data;
   }
 }
