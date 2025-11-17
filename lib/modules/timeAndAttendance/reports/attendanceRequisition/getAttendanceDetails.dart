@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
@@ -29,7 +30,9 @@ import 'model/onDateReportModel.dart';
 
 
 class GetAttendanceDet extends StatefulWidget {
-   GetAttendanceDet({Key? key}) : super(key: key);
+  final bool showAppBar;
+  GetAttendanceDet({this.showAppBar = true});
+   //GetAttendanceDet({Key? key}) : super(key: key);
 
   @override
   State<GetAttendanceDet> createState() => _GetAttendanceDetState();
@@ -326,10 +329,12 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Mythemes.whitish,
-      appBar: AppBar(
-        title: "Requisitions".text.make(),
-        elevation: 0.5,
-      ),
+        appBar: widget.showAppBar
+            ? AppBar(
+          title: "Select Date for Requisition".text.make(),
+          elevation: 0.5,
+        )
+            : null,
 
      /* floatingActionButton: FloatingActionButton(
         onPressed: (){
@@ -375,7 +380,8 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
             ]),
       ),*/
 
-        bottomNavigationBar:
+        bottomNavigationBar: widget.showAppBar
+            ?
         BottomNavigationBar (
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
@@ -387,29 +393,30 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
             if(index==0){
 
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
+              /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Attendance');*/
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
             if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
+              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => ProfilePageNew())
+              // );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
             }
@@ -428,21 +435,21 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              icon: Icon(CupertinoIcons.app_badge_fill),
+              label: 'My Requests',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
+              //backgroundColor: Colors.blue,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard),
               label: 'Dashboard',
               //backgroundColor: Colors.blue,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
-              //backgroundColor: Colors.blue,
-            ),
           ],
-        ),
+        ) : null,
 
       body: SingleChildScrollView(
         child: Column(
@@ -764,7 +771,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       weekFormat: false,
       //firstDayOfWeek: 4,
       markedDatesMap: _markedDateMap,
-      height: 300.0,
+      height: 370.0,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
       customGridViewPhysics: NeverScrollableScrollPhysics(),

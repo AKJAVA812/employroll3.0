@@ -5,6 +5,7 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:er_flutter_project/ess/myAllRequestsPage.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_app/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:http/http.dart' as http;
@@ -355,7 +356,7 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
         ),
         mini: false,
         onPressed: () async {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetAttendanceDet()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
         },
         backgroundColor: Mythemes.lightBluishColor,
         child: Icon(Icons.add, color: Mythemes.whitish,),
@@ -373,29 +374,32 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
             print('My Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
           if(index==4){
-            Navigator.push(context,
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+           /* Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
+            );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
           }
@@ -414,17 +418,17 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_tree_outlined),
+            icon: Icon(CupertinoIcons.app_badge_fill),
             label: 'My Requests',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

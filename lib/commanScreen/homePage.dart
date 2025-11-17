@@ -46,6 +46,9 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import '../adminPage/modelClass/dashboardModel.dart';
+import '../ess/myAllRequestsPage.dart';
+import '../ess/myAllRequestsPageNoHead.dart';
+import '../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../mss_profiles/global_profile.dart';
 import '../mss_profiles/organisationListModal.dart';
 import '../mss_profiles/profileListModal.dart';
@@ -159,9 +162,10 @@ String name = "Employee Name ";
 final screens = [
   const DefaultPage(),
   const Workflow(),
+  const MyRequests(),
   const Report(),
   Dashboard(),
-  ProfileCheck(),
+  //ProfileCheck(),
 ];
 
 class _HomePageState extends State<HomePage> {
@@ -558,13 +562,13 @@ class _HomePageState extends State<HomePage> {
                 newTitle = "Workflow";
                 break;
               case 2:
-                newTitle = "Reports";
+                newTitle = "My Requests";
                 break;
               case 3:
-                newTitle = "Dashboard";
+                newTitle = "My Reports";
                 break;
               case 4:
-                newTitle = "Profile";
+                newTitle = "My Dashboard";
                 break;
             }
 
@@ -583,17 +587,17 @@ class _HomePageState extends State<HomePage> {
               label: 'Workflow',
             ),
             const BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
-              label: 'Reports',
+              icon: Icon(CupertinoIcons.app_badge_fill),
+              label: 'My Requests',
             ),
             const BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard),
-              label: 'Dashboard',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
             ),
             if (userType != 'COMPANY_ADMIN')
               const BottomNavigationBarItem(
-                icon: Icon(Icons.account_circle),
-                label: 'Profile',
+                icon: Icon(Icons.dashboard),
+                label: 'Dashboard',
               ),
           ],
         ),
@@ -2651,6 +2655,15 @@ class Workflow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const ProjectList();
+  }
+}
+
+class MyRequests extends StatelessWidget {
+  const MyRequests({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return  GetAttendanceDet(showAppBar: false);
   }
 }
 

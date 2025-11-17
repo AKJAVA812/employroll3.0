@@ -540,7 +540,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       }
 
       //My Reports
-      if(value == 0) {
+      /*if(value == 0) {
         items.add(
           Hero(
             tag: 'myAllReports',
@@ -558,9 +558,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                         size: 50,
                         color: Mythemes.lightBluishColor,
                       ),
-                      /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
                     ),
                     Center(
                       child: Container(
@@ -581,7 +578,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
             ),
           ),
         );
-      }
+      }*/
 
       if(value == 0) {
         items.add(

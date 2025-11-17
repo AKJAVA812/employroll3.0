@@ -21,7 +21,6 @@ import '../commanScreen/homePage.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../main.dart';
 import '../modules/onDuty/reports/selfRequisition/selfOdRequisitionList.dart';
-import '../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../profiles/profilePageWithHead.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../singUP/model/loginModel.dart';
@@ -29,14 +28,11 @@ import '../widgets/drawer_file.dart';
 import 'dart:io';
 import 'package:path/path.dart';
 
-import 'EssDashboarrddModel.dart';
-import 'essDashboardNavigate.dart';
-
-class MyAllRequestPage extends StatefulWidget {
-  const MyAllRequestPage({Key? key}) : super(key: key);
+class MyAllRequestPageNoHead extends StatefulWidget {
+  const MyAllRequestPageNoHead({Key? key}) : super(key: key);
 
   @override
-  State<MyAllRequestPage> createState() => _MyAllRequestPageState();
+  State<MyAllRequestPageNoHead> createState() => _MyAllRequestPageNoHeadState();
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -60,8 +56,8 @@ bool showHide = false;
 bool showAdmin = false;
 bool showRo = false;
 
-class _MyAllRequestPageState extends State<MyAllRequestPage> {
-  int currentIndex = 2;
+class _MyAllRequestPageNoHeadState extends State<MyAllRequestPageNoHead> {
+  int currentIndex = 1;
   final ImagePicker _picker = ImagePicker();
   File? image;
 
@@ -282,64 +278,64 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
       //OD Punch ESS
       if((userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN")) {
 
-          items.add(
-            Hero(
-              tag: 'odPunch',
-              child: Card(
-                color: Mythemes.whitish,
-                child: InkWell(
-                  onTap: () async{
-                    bool internetCheck =
-                    await InternetConnectionChecker().hasConnection;
-                    if (internetCheck == false) {
-                      setState(() {
-                        AlertDialog(
-                          content: "Please check your internet connection"
-                              .text
-                              .make(),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              "Please check your Internet connection."),
-                        ));
-                      });
-                    } else {
-                      Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                      /*  Navigator.pushNamed(
+        items.add(
+          Hero(
+            tag: 'odPunch',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async{
+                  bool internetCheck =
+                  await InternetConnectionChecker().hasConnection;
+                  if (internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection"
+                            .text
+                            .make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            "Please check your Internet connection."),
+                      ));
+                    });
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                    /*  Navigator.pushNamed(
                         context, MyRoutings.odSelfReqDateSelectRoute);*/
-                    }
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
-                          Icons.location_on,
-                          size: 50,
-                          color: Mythemes.lightBluishColor,
-                        ),
-                        /*Image(
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.location_on,
+                        size: 50,
+                        color: Mythemes.lightBluishColor,
+                      ),
+                      /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 75, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                              'OD (Out Duty)',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'OD (Out Duty)',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          );
+          ),
+        );
 
 
       }
@@ -406,60 +402,60 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
 
       //My Loan Requests
       if(orgId == 3 || orgId == 145 || orgId == 179 || orgId == 186) {
-          items.add(
-            Hero(
-              tag: 'raiseLoan',
-              child: Card(
-                color: Mythemes.whitish,
-                child: InkWell(
-                  onTap: () async{
-                    bool internetCheck = await InternetConnectionChecker().hasConnection;
-                    if(internetCheck == false) {
-                      setState(() {
-                        AlertDialog(
-                          content: "Please check your internet connection".text.make(),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text("Please check your Internet connection."),
-                        ));
-                      });
+        items.add(
+          Hero(
+            tag: 'raiseLoan',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async{
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
 
-                    } else {
-                      Navigator.pushNamed(context, MyRoutings.myLoanRequestListRoute);
-                    }
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.myLoanRequestListRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
                         CupertinoIcons.money_dollar_circle_fill,
-                          size: 50,
-                          color: Mythemes.warningColor,
-                        ),
-                        /*Image(
+                        size: 50,
+                        color: Mythemes.warningColor,
+                      ),
+                      /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                      ),
-                      Center(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 75, left: 10),
-                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                          child: Text(
-                              'My Loans',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
-                          ),
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'My Loans',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          );
-        }
+          ),
+        );
+      }
 
       //Exit Resignation Requisition
       if(orgId == 3 || orgId == 145 || orgId == 190 || orgId == 191) {
@@ -523,7 +519,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
     timeDilation = 0.5;
     return Material(
       child: Scaffold(
-        appBar: AppBar(
+        /*appBar: AppBar(
           title: RichText(
             text: TextSpan(
               children: [
@@ -544,7 +540,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
                     MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 1,)));
               },
               icon: Icon(Icons.arrow_back_ios)),
-        ),
+        ),*/
         body: Column(
             children: [
               Expanded(
@@ -555,7 +551,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
               ),
             ]
         ),
-        bottomNavigationBar: BottomNavigationBar(
+        /*bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
@@ -565,40 +561,36 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
             String newTitle = "";
             if(index==0){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
             }
             if(index==2){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+                  MaterialPageRoute(builder: (context) => MyAllReportsPage()));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Claim');
             }
             if(index==3){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyAllReportsPage()));
-
-
+                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+              );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
             if(index==4){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
-              );
-             /* Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );*/
+              );
               print('Profile');
             }
-            /*if(index==3){
+            *//*if(index==3){
                 title="Notifications";
-              }*/
+              }*//*
             setState(() => currentIndex = index);
             // Adjust index mapping if Profile is hidden
             int adjustedIndex = index;
@@ -614,13 +606,13 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
                 newTitle = "Workflow";
                 break;
               case 2:
-                newTitle = "My Requests";
+                newTitle = "Reports";
                 break;
               case 3:
-                newTitle = "My Reports";
+                newTitle = "Dashboard";
                 break;
               case 4:
-                newTitle = "Dashboard";
+                newTitle = "Profile";
                 break;
             }
 
@@ -638,20 +630,20 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
               label: 'Workflow',
             ),
             const BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.app_badge_fill),
-              label: 'My Requests',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'Reports',
             ),
             const BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
-              label: 'My Reports',
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
             ),
-            //if (userType != 'COMPANY_ADMIN')
+            if (userType != 'COMPANY_ADMIN')
               const BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard),
-                label: 'Dashboard',
+                icon: Icon(Icons.account_circle),
+                label: 'Profile',
               ),
           ],
-        ),
+        ),*/
       ),
       //debugShowCheckedModeBanner: false,
     );

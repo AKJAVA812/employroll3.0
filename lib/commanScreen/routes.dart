@@ -309,6 +309,7 @@ class MyRoutings {
   //ESS
   //My Requests
   static String myAllRequestRoute= "/myAllRequestRoute";
+  static String myAllRequestNoHeadRoute= "/myAllRequestNoHeadRoute";
   static String myAllReportsRoute= "/myAllReportsRoute";
 
 

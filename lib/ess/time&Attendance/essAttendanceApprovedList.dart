@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
@@ -210,7 +211,7 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
         ),
         mini: false,
         onPressed: () async {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetAttendanceDet()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
         },
         backgroundColor: Mythemes.lightBluishColor,
         child: Icon(Icons.add, color: Mythemes.whitish,),
@@ -228,31 +229,30 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            //Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             print('My Requests');
           }
           if(index==3){
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            print('My Reports');
+          }
+          if(index==4){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
-          }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
-            //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -269,17 +269,17 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_tree_outlined),
+            icon: Icon(CupertinoIcons.app_badge_fill),
             label: 'My Requests',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

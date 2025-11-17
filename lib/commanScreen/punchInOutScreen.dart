@@ -48,7 +48,10 @@ import '../adminPage/modelClass/dashboardModel.dart';
 import '../ess/EssDashboarrddModel.dart';
 //import '../ess/essDashboard.dart';
 import '../ess/essDashboard.dart' as ess;
+import '../ess/myAllRequestsPage.dart';
+import '../ess/myAllRequestsPageNoHead.dart';
 import '../main.dart';
+import '../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../mss_profiles/global_profile.dart';
 import '../mss_profiles/organisationListModal.dart';
 import '../mss_profiles/profileListModal.dart';
@@ -176,9 +179,10 @@ String name = "Employee Name ";
 final screensNew = [
   const DefaultPage(),
   const Workflow(),
+  const MyRequests(),
   const Report(),
   Dashboard(),
-  ProfileCheck(),
+  //ProfileCheck(),
 ];
 
 late List<String?> organisationList = [];
@@ -885,13 +889,13 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
                 newTitle = "Workflow";
                 break;
               case 2:
-                newTitle = "Reports";
+                newTitle = "My Requests";
                 break;
               case 3:
-                newTitle = "Dashboard";
+                newTitle = "My Reports";
                 break;
               case 4:
-                newTitle = "Profile";
+                newTitle = "My Dashboard";
                 break;
             }
 
@@ -910,17 +914,17 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
               label: 'Workflow',
             ),
             const BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
-              label: 'Reports',
+              icon: Icon(CupertinoIcons.app_badge_fill),
+              label: 'My Requests',
             ),
             const BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard),
-              label: 'Dashboard',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
             ),
             if (userType != 'COMPANY_ADMIN')
               const BottomNavigationBarItem(
-                icon: Icon(Icons.account_circle),
-                label: 'Profile',
+                icon: Icon(Icons.dashboard),
+                label: 'Dashboard',
               ),
           ],
         ),
@@ -3143,6 +3147,15 @@ class Workflow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const ProjectList();
+  }
+}
+
+class MyRequests extends StatelessWidget {
+  const MyRequests({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return  GetAttendanceDet(showAppBar: false);
   }
 }
 

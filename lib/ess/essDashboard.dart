@@ -3027,7 +3027,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       weekFormat: false,
       //firstDayOfWeek: 4,
       markedDatesMap: _markedDateMap,
-      height: 300.0,
+      height: 370.0,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
       customGridViewPhysics: NeverScrollableScrollPhysics(),
