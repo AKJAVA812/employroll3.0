@@ -2119,7 +2119,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     request.fields['fromDate'] = fromDate;
     request.fields['summary'] = getRemark;
     request.fields['radio'] = dayRadio;
-    request.fields['empid'] = empNewId;
+    request.fields['empid'] = empNewId.toString();
     request.fields['nominee'] = nominee;
     request.fields['confirmyes'] = confirmyes;
 
