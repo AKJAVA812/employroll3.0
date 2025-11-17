@@ -2960,7 +2960,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
           );
           return;
         }
-        if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
+        /*if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
           print("⛔ Date tap disabled for past months");
           showDialog(
             context: context,
@@ -2983,6 +2983,58 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
             ),
           );
           return;
+        }
+*/
+
+              // PAYCYCLE RANGE
+        //DateTime cycleStart = DateTime(2025, 10, 20);
+        //DateTime cycleEnd = DateTime(2025, 11, 19);
+        DateTime cycleStart;
+        DateTime cycleEnd;
+
+        // CURRENT DATE
+        DateTime today = DateTime.now();
+
+        int startDay = 20;
+        int endDay = 19;
+
+        if (today.day < startDay) {
+          // Current month cycle is last month → this month
+          cycleStart = DateTime(today.year, today.month - 1, startDay);
+          cycleEnd = DateTime(today.year, today.month, endDay);
+        } else {
+          // Current month cycle is this month → next month
+          cycleStart = DateTime(today.year, today.month, startDay);
+          cycleEnd = DateTime(today.year, today.month + 1, endDay);
+        }
+
+        print("Cycle Start: $cycleStart");
+        print("Cycle End:   $cycleEnd");
+
+// CHECK: If current date is outside paycycle → BLOCK
+        if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
+          developer.log('date for all true');
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              title: const Text(
+                "Notice",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: const Text(
+                "You are out of the paycycle. Attendance requisition not allowed.",
+                style: TextStyle(fontSize: 15),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+          );
+          return; // STOP further action
         }
 
         this.setState(() => _currentDate = date);
