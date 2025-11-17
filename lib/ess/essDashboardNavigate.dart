@@ -1151,7 +1151,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     // TODO: implement initState
   }
   int pageIndex = 0;
-  int currentIndex = 2;
+  int currentIndex = 4;
   var titleName = "My Dashboard";
 
   var holidayDate;
@@ -1243,28 +1243,33 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
           if(index==0){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-            print('Reports');
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+            print('My Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
+            print('My Reports');
           }
           if(index==4){
-            Navigator.push(context,
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+           /* Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
-            print('Profile');
+            );*/
+            print('Dashboard');
           }
 
           setState(() => currentIndex = index);
@@ -1275,22 +1280,22 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
+            //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.doc_chart),
-            label: 'Reports',
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
+            icon: Icon(Icons.dashboard),
             label: 'Dashboard',
-            //backgroundColor: Colors.blue,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
             //backgroundColor: Colors.blue,
           ),
         ],
@@ -3055,7 +3060,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       weekFormat: false,
       //firstDayOfWeek: 4,
       markedDatesMap: _markedDateMap,
-      height: 300.0,
+      height: 370.0,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
       customGridViewPhysics: NeverScrollableScrollPhysics(),

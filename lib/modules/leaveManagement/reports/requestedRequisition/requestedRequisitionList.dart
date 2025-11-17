@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -18,6 +19,8 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:badges/badges.dart';
 import 'package:http/http.dart' as http;
+import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
+import '../leaveRequisition/leaveRequisitionPage.dart';
 import '../modalClass/selfLeaveRequisitionModal.dart';
 
 class RequestedRequisitionList extends StatefulWidget {
@@ -198,7 +201,9 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
             });
 
           } else {
-            Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => LeaveRequisitionPage(showShortcuts: false,)));
+            //Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
           }
         },
         backgroundColor: Mythemes.lightBluishColor,
@@ -300,29 +305,32 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
             print('My All Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
           if(index==4){
-            Navigator.push(context,
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+           /* Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
+            );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
           }
@@ -341,17 +349,17 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_tree_outlined),
+            icon: Icon(CupertinoIcons.app_badge_fill),
             label: 'My Requests',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

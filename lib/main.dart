@@ -125,6 +125,7 @@ import 'ess/loan&Advance/myLoanRequestRaisePage.dart';
 import 'ess/loan&Advance/myLoanSummary.dart';
 import 'ess/myAllReports.dart';
 import 'ess/myAllRequestsPage.dart';
+import 'ess/myAllRequestsPageNoHead.dart';
 import 'ess/realtimeESSDashboard.dart';
 import 'ess/time&Attendance/essAttendanceApprovedList.dart';
 import 'faceRecognizationAttendance/FaceRecognitionHome.dart';
@@ -860,6 +861,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //ESS
           MyRoutings.myAllRequestRoute: (context) => MyAllRequestPage(),
+          MyRoutings.myAllRequestNoHeadRoute: (context) => MyAllRequestPageNoHead(),
           MyRoutings.myAllReportsRoute: (context) => MyAllReportsPage(),
 
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/singleDateAttendance.dart';
@@ -22,6 +23,7 @@ import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../ess/essDashboard.dart';
+import '../reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../reports/attendanceRequisition/model/onDateReportModel.dart';
 
 class AttendanceRequisitionCalendar extends StatefulWidget {
@@ -1370,31 +1372,33 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
             if(index==0){
 
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+              print('My requests');
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
+              print('my reports');
             }
             if(index==4){
-              Navigator.push(context,
+              /*Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
+              );*/
+              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
+              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";
@@ -1411,17 +1415,17 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              icon: Icon(CupertinoIcons.app_badge_fill),
+              label: 'My Requests',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
               //backgroundColor: Colors.blue,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
               //backgroundColor: Colors.blue,
             ),
           ],

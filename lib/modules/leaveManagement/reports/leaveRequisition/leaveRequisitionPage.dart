@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,12 +22,14 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../modalClass/leaveBalModal.dart';
 import '../modalClass/leaveBalanceModel.dart';
 import 'package:http/http.dart' as http;
 
 class LeaveRequisitionPage extends StatefulWidget {
-  const LeaveRequisitionPage({Key? key}) : super(key: key);
+  final bool showShortcuts;
+  LeaveRequisitionPage({this.showShortcuts = true});
 
   @override
   State<LeaveRequisitionPage> createState() => _LeaveRequisitionPageState();
@@ -523,31 +526,31 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
             if(index==0){
 
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
               print('Leave');
             }
             if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
+              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
             if(index==4){
-              Navigator.push(context,
+              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              /*Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
+              );*/
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
             }
@@ -566,17 +569,17 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.group_off),
-              label: 'Leave',
+              icon: Icon(CupertinoIcons.app_badge_fill),
+              label: 'My Requests',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
               //backgroundColor: Colors.blue,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
               //backgroundColor: Colors.blue,
             ),
           ],
@@ -724,70 +727,73 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     ],
                   ),
                 ),*/
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedToggleSwitch<int>.size(
-                      height: 30,
-                      current: min(value, 3),
-                      style: ToggleStyle(
-                        backgroundColor: Mythemes.greyishade,
-                        indicatorColor: Mythemes.lightBluishColor,
-                        borderColor: Colors.transparent,
-                        borderRadius: BorderRadius.circular(10.0),
-                        indicatorBorderRadius: BorderRadius.zero,
-                      ),
-                      values: const [0, 1, 2],
-                      iconOpacity: 1.0,
-                      selectedIconScale: 1.0,
-                      indicatorSize: const Size.fromWidth(85),
-                      iconAnimationType: AnimationType.onHover,
-                      styleAnimationType: AnimationType.onHover,
-                      spacing: 3.0,
-                      customSeparatorBuilder: (context, local, global) {
-                        final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
-                        return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
-                      },
-                      customIconBuilder: (context, local, global) {
-                        final text = const ['Attendance', 'Leave', 'OD'][local.index];
-                        return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
-                      },
-                      borderWidth: 0.0,
-                      onChanged: (i) {
-                        setState(() {
-                          value = i;
-                          print(i);
+                Visibility(
+                  visible: widget.showShortcuts,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedToggleSwitch<int>.size(
+                        height: 30,
+                        current: min(value, 3),
+                        style: ToggleStyle(
+                          backgroundColor: Mythemes.greyishade,
+                          indicatorColor: Mythemes.lightBluishColor,
+                          borderColor: Colors.transparent,
+                          borderRadius: BorderRadius.circular(10.0),
+                          indicatorBorderRadius: BorderRadius.zero,
+                        ),
+                        values: const [0, 1, 2],
+                        iconOpacity: 1.0,
+                        selectedIconScale: 1.0,
+                        indicatorSize: const Size.fromWidth(85),
+                        iconAnimationType: AnimationType.onHover,
+                        styleAnimationType: AnimationType.onHover,
+                        spacing: 3.0,
+                        customSeparatorBuilder: (context, local, global) {
+                          final opacity =
+                          ((global.position - local.position).abs() - 0.5)
+                              .clamp(0.0, 1.0);
+                          return VerticalDivider(
+                              indent: 10.0,
+                              endIndent: 10.0,
+                              color: Colors.white38.withOpacity(opacity));
+                        },
+                        customIconBuilder: (context, local, global) {
+                          final text = const ['Attendance', 'Leave', 'OD'][local.index];
+                          return Center(
+                              child: Text(text,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color.lerp(Colors.black, Colors.white,
+                                          local.animationValue))));
+                        },
+                        borderWidth: 0.0,
+                        onChanged: (i) {
+                          setState(() {
+                            value = i;
+                            print(i);
 
-                        });
-                        if(value == 0){
-                          Navigator.pushNamed(context, MyRoutings.attendanceReqCalendar);
-                          //Navigator.of(context, rootNavigator: true).pop();
+                          });
+                          if(value == 0){
+                            Navigator.pushNamed(context, MyRoutings.attendanceReqCalendar);
+                            //Navigator.of(context, rootNavigator: true).pop();
 
-                        }
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
-                          //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                        }
-                        if(value == 2) {
-                          Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                        }
-                        /* if(value == 3) {
-                              Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                            }*/
-                      },
-                    )
-                  ],
+                          }
+                          if(value == 1) {
+                            Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                          }
+                          if(value == 2) {
+                            Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                          }
+                          /* if(value == 3) {
+                                Navigator.pushNamed(context, MyRoutings.onDutyTypes);
+                              }*/
+                        },
+                      )
+                    ],
+                  ),
                 ),
                 /*Padding(
                   padding: EdgeInsets.all(8.0),
