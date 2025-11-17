@@ -28,6 +28,7 @@ import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
+import '../../../../ess/myAllReports.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
@@ -90,7 +91,8 @@ class _ODLocationViewState extends State<ODLocationView> {
             print('My All Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');

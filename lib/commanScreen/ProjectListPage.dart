@@ -548,7 +548,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
               color: Mythemes.whitish,
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+                  Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
                 },
                 child: Stack(
                   children: <Widget>[

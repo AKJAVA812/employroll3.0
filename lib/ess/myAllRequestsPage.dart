@@ -28,7 +28,7 @@ import '../singUP/model/loginModel.dart';
 import '../widgets/drawer_file.dart';
 import 'dart:io';
 import 'package:path/path.dart';
-
+import 'myAllReports.dart';
 import 'EssDashboarrddModel.dart';
 import 'essDashboardNavigate.dart';
 
@@ -581,7 +581,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
             }
             if(index==3){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyAllReportsPage()));
+                  MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
 
 
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);

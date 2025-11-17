@@ -862,7 +862,7 @@ class _MyHomePageState extends State<MyHomePage> {
           //ESS
           MyRoutings.myAllRequestRoute: (context) => MyAllRequestPage(),
           MyRoutings.myAllRequestNoHeadRoute: (context) => MyAllRequestPageNoHead(),
-          MyRoutings.myAllReportsRoute: (context) => MyAllReportsPage(),
+          MyRoutings.myAllReportsRoute: (context) => MyAllReportsPage(showAppBar: true,),
 
 
           //Incident Reporting

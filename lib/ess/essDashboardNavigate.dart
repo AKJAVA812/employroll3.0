@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-
+import 'myAllReports.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:er_flutter_project/adminPage/modelClass/eventListModal.dart';
 import 'package:er_flutter_project/commanScreen/homePage.dart';
@@ -1260,7 +1260,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             print('My Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('My Reports');
           }

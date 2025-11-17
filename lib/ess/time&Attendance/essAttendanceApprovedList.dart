@@ -19,6 +19,7 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import '../../modules/timeAndAttendance/reports/approvedRequisition/approvedRequisitionModel.dart';
 import '../../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
+import '../myAllReports.dart';
 
 class ESSAttApprovedRequisiton extends StatefulWidget {
   final ApprovedRequisitionModel approvedRequisitionModel;
@@ -246,7 +247,8 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
             print('My Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
             print('My Reports');
           }
           if(index==4){

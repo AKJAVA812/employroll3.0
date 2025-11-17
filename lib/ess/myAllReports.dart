@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:er_flutter_project/commanScreen/punchInOutScreen.dart';
+import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -23,7 +25,8 @@ import 'package:path/path.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class MyAllReportsPage extends StatefulWidget {
-  const MyAllReportsPage({Key? key}) : super(key: key);
+  final bool showAppBar;
+  MyAllReportsPage({this.showAppBar = true});
 
   @override
   State<MyAllReportsPage> createState() => _MyAllReportsPageState();
@@ -517,10 +520,11 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
 
     var titleName = "My Reports";
     timeDilation = 0.5;
-    int currentIndex = 2;
+    int currentIndex = 3;
     return Material(
       child: Scaffold(
-        appBar: AppBar(
+        appBar: widget.showAppBar
+            ? AppBar(
           title: RichText(
             text: TextSpan(
               children: [
@@ -535,14 +539,15 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
               ],
             ),
           ),
-        ),
+        ) : null,
         body: GridView.count(
           crossAxisCount: 3,
           children: generateGridViewItems(),
         ),
 
 
-        bottomNavigationBar:
+        bottomNavigationBar: widget.showAppBar
+            ?
         BottomNavigationBar (
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
@@ -553,35 +558,37 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
 
             if(index==0){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             }
             if(index==2){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
               //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-              print('Reports');
+              print('My Requests');
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
+              print('My Reports');
             }
             if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
-              print('Profile');
+              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";
               }*/
             setState(() => currentIndex = index);
           },
-          items: const [
+          items:  [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
@@ -591,21 +598,21 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.data_exploration_outlined),
-              label: 'Reports',
+              icon: Icon(CupertinoIcons.app_badge_fill),
+              label: 'My Requests',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
+              //backgroundColor: Colors.blue,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard),
               label: 'Dashboard',
               //backgroundColor: Colors.blue,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
-              //backgroundColor: Colors.blue,
-            ),
           ],
-        ),
+        ) : null,
 
         //IndexedStack(
         //index:currentIndex,

@@ -571,7 +571,7 @@ class _MyAllRequestPageNoHeadState extends State<MyAllRequestPageNoHead> {
             }
             if(index==2){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyAllReportsPage()));
+                  MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,);));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Claim');
             }

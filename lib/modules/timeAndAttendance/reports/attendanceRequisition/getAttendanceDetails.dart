@@ -19,6 +19,7 @@ import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../ess/Model/calendarModalClass.dart';
+import '../../../../ess/myAllReports.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
@@ -51,6 +52,8 @@ String singleDateString="";
 CalendarModalClass? calendarModalGlobal;
 List<dynamic> data=[];
 var calendarSendData;
+var startPayCycle;
+var endPayCycle;
 class _GetAttendanceDetState extends State<GetAttendanceDet> {
   dynamic formattedDate;
   DateTime _currentDate = DateTime.now();
@@ -80,6 +83,11 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     deptName = await shared!.getDept()??"N/A";
     empName = await shared!.getempName()??"N/A";
 
+    startPayCycle = await shared!.getPayCycleStart() ?? "N/A";
+    endPayCycle = await shared!.getPayCycleEnd() ?? "N/A";
+
+    print("Start Pay $startPayCycle");
+    print("End Pay $endPayCycle");
     checkAndRunApi();
     setState(() {
       print('ResponseAttendance: ${sessionId}' );
@@ -408,7 +416,8 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
               print('Attendance');*/
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }

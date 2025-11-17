@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import '../../commanScreen/punchInOutScreen.dart';
+import '../../ess/myAllReports.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,7 @@ import '../../../sharedPrefancePage/ShardPre.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
 import '../../themes/empThemes.dart';
+import '../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'downloadLetter.dart';
 import 'modalClass/documentListModal.dart';
 
@@ -252,27 +254,39 @@ class _DocumentsAddedState extends State<DocumentsAdded> {
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
 
           if(index==0){
+
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
-            //Navigator.pushNamed(context, MyRoutings.projectListRoute);
-            //Navigator.of(context, rootNavigator: true).pop();
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+            //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-            print('Dashboard');
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
-            print('Reports');
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            print('My Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.documentsAddedRoute);
-            print('e-Doc');
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('My Reports');
+          }
+          if(index==4){
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+
+            //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
+            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -285,17 +299,21 @@ class _DocumentsAddedState extends State<DocumentsAdded> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.data_exploration_outlined),
-            label: 'Reports',
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.doc_text_search),
-            label: 'e-Doc',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

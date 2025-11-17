@@ -129,6 +129,8 @@ class _LoginPageState extends State<LoginPage> {
   var userPanel;
   var profileId;
   var defaultProfile;
+  var startPayCycle;
+  var endPayCycle;
   Future<LoginModel> monthAttendance(String emailId, String password) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.login;
@@ -753,6 +755,27 @@ class _LoginPageState extends State<LoginPage> {
       shared.setUserPanel(loginModelglobal!.data!.userPanel);
       userPanel = loginModelglobal!.data!.userPanel;
       shared.setEnrollId(loginModelglobal!.data!.enrollId);
+
+      if(loginModelglobal!.data!.startDate == null) {
+        startPayCycle = "0";
+        shared.setPayCycleStart(startPayCycle);
+        print("If Null Show 0 - $startPayCycle");
+      } else {
+        startPayCycle = loginModelglobal!.data!.startDate;
+        shared.setPayCycleStart(startPayCycle);
+        print("Else Show value - $startPayCycle");
+      }
+      if(loginModelglobal!.data!.endDate == null) {
+        endPayCycle = "0";
+        shared.setPayCycleEnd(endPayCycle);
+        print("If Null Show 0 - $endPayCycle");
+      } else {
+        endPayCycle = loginModelglobal!.data!.endDate;
+        shared.setPayCycleEnd(endPayCycle);
+        print("Else Show value - $startPayCycle");
+      }
+
+
     });
 
     print("Check User Panel - $userPanel");
@@ -1423,6 +1446,25 @@ class _LoginPageState extends State<LoginPage> {
       shared.setUserPanel(loginModelglobal!.data!.userPanel);
       userPanel = loginModelglobal!.data!.userPanel;
       shared.setEnrollId(loginModelglobal!.data!.enrollId);
+
+      if(loginModelglobal!.data!.startDate == null) {
+        startPayCycle = "0";
+        shared.setPayCycleStart(startPayCycle);
+        print("If Null Show 0 - $startPayCycle");
+      } else {
+        startPayCycle = loginModelglobal!.data!.startDate;
+        shared.setPayCycleStart(startPayCycle);
+        print("Else Show value - $startPayCycle");
+      }
+      if(loginModelglobal!.data!.endDate == null) {
+        endPayCycle = "0";
+        shared.setPayCycleEnd(endPayCycle);
+        print("If Null Show 0 - $endPayCycle");
+      } else {
+        endPayCycle = loginModelglobal!.data!.endDate;
+        shared.setPayCycleEnd(endPayCycle);
+        print("Else Show value - $startPayCycle");
+      }
     });
 
     print("Check User Panel - $userPanel");

@@ -46,6 +46,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import '../adminPage/modelClass/dashboardModel.dart';
+import '../ess/myAllReports.dart';
 import '../ess/myAllRequestsPage.dart';
 import '../ess/myAllRequestsPageNoHead.dart';
 import '../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
@@ -2672,7 +2673,7 @@ class Report extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReportPage();
+    return MyAllReportsPage(showAppBar: false,);
   }
 }
 

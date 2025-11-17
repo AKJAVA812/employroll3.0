@@ -202,6 +202,27 @@ class SessionManager {
     final String? enrollId=prefs.getString('enrollId');
     return enrollId;
   }
+
+  setPayCycleStart(startDate) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('startDate', startDate);
+  }
+
+  getPayCycleStart() async{
+    final prefs = await SharedPreferences.getInstance();
+    final String? startDate=prefs.getString('startDate');
+    return startDate;
+  }
+  setPayCycleEnd(endDate) async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('endDate', endDate);
+  }
+
+  getPayCycleEnd() async{
+    final prefs = await SharedPreferences.getInstance();
+    final String? endDate=prefs.getString('endDate');
+    return endDate;
+  }
   setMobileNo(mobileNo) async{
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('mobileNO', mobileNo);

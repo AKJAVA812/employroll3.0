@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:er_flutter_project/modules/claimAndReimbursement/mss/claimMssApprovalPage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/ess/loan&Advance/modalClass/loanWiseSkipModal.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/commanNotificationPage.dart';
+import '../../commanScreen/punchInOutScreen.dart';
+import '../../commanScreen/routes.dart';
+import '../../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import '../../themes/empThemes.dart';
+import '../myAllReports.dart';
 import 'modalClass/loanLedgerModal.dart';
 import 'modalClass/loanSummaryModal.dart';
 
@@ -943,7 +948,7 @@ var skipMonth;
   ];
 
   var isFirstExpended;
-
+  int currentIndex = 3;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1095,6 +1100,77 @@ var skipMonth;
               );
             },
           ),
+          ),
+        ],
+      ),
+
+      bottomNavigationBar:
+      BottomNavigationBar (
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
+
+          if(index==0){
+
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if(index==1){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Workflow');
+          }
+          if(index==2){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            print('My Requests');
+          }
+          if(index==3){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('My Reports');
+          }
+          if(index==4){
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+
+            //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
+            print('Dashboard');
+          }
+          /*if(index==3){
+                title="Notifications";
+              }*/
+          setState(() => currentIndex = index);
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
           ),
         ],
       ),

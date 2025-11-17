@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../commanScreen/allAPIList.dart';
@@ -14,6 +16,8 @@ import 'EssDashboarrddModel.dart';
 import 'Model/myManagersModalList.dart';
 import 'essDashboardNavigate.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+import 'myAllReports.dart';
 class ReportingOfficersPage extends StatefulWidget {
   @override
   _ReportingOfficersPageState createState() => _ReportingOfficersPageState();
@@ -240,7 +244,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage> with Rout
     if (selectedFilter == "All") return officers;
     return officers.where((o) => o["type"] == selectedFilter).toList();
   }
-  int currentIndex = 2;
+  int currentIndex = 1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -336,7 +340,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage> with Rout
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
@@ -347,22 +351,27 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage> with Rout
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+
             print('My Requests');
           }
           if(index==3){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
-            );
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
+            print('My reports');
           }
           if(index==4){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+                MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
             );
+           /* Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew())
+            );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
+            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -379,17 +388,17 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage> with Rout
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_tree_outlined),
+            icon: Icon(CupertinoIcons.app_badge_fill),
             label: 'My Requests',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

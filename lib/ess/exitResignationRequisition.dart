@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,6 +23,7 @@ import '../themes/empThemes.dart';
 import 'Model/employeeResignationListModal.dart';
 import 'Model/reasonForLeavingModal.dart';
 import 'dart:developer' as developer;
+import 'myAllReports.dart';
 class ResignationRequisitionPage extends StatefulWidget {
   const ResignationRequisitionPage({super.key});
 
@@ -988,31 +991,33 @@ String valuenew="listText";
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+
+            print('My Requests');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
+            print('My Reports');
           }
           if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
+            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -1029,17 +1034,17 @@ String valuenew="listText";
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

@@ -48,6 +48,7 @@ import '../adminPage/modelClass/dashboardModel.dart';
 import '../ess/EssDashboarrddModel.dart';
 //import '../ess/essDashboard.dart';
 import '../ess/essDashboard.dart' as ess;
+import '../ess/myAllReports.dart';
 import '../ess/myAllRequestsPage.dart';
 import '../ess/myAllRequestsPageNoHead.dart';
 import '../main.dart';
@@ -3164,7 +3165,7 @@ class Report extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReportPage();
+    return MyAllReportsPage(showAppBar: false,);
   }
 }
 

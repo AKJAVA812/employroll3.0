@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -18,6 +20,9 @@ import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
 import '../../commanScreen/routes.dart';
 import '../../commanScreen/ujalaCreditWorkdone.dart';
+import '../../ess/EssDashboarrddModel.dart';
+import '../../ess/essDashboardNavigate.dart';
+import '../../ess/myAllReports.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
@@ -900,30 +905,31 @@ class _HRISDetailsState extends State<HRISDetails> {
             if(index==0){
 
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-           /* if(index==2){
-              Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-              print('Leave');
-            }*/
             if(index==2){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
+                  MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+              print('My Requests');
+            }
+            if(index==3){
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
             if(index==4){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+                  MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -942,18 +948,18 @@ class _HRISDetailsState extends State<HRISDetails> {
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
             ),
-           /* BottomNavigationBarItem(
-              icon: Icon(Icons.group_off),
-              label: 'Leave',
-            ),*/
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
+              icon: Icon(CupertinoIcons.app_badge_fill),
+              label: 'My Requests',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
               //backgroundColor: Colors.blue,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
               //backgroundColor: Colors.blue,
             ),
           ],
