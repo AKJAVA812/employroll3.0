@@ -2986,17 +2986,33 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         }
 */
 
-              // PAYCYCLE RANGE
+        // PAYCYCLE RANGE
         //DateTime cycleStart = DateTime(2025, 10, 20);
         //DateTime cycleEnd = DateTime(2025, 11, 19);
         DateTime cycleStart;
         DateTime cycleEnd;
+        int startDay = 0;
+        int endDay = 0;
+
 
         // CURRENT DATE
         DateTime today = DateTime.now();
+        DateTime monthStart = DateTime(today.year, today.month, 1);
+        DateTime monthEnd = DateTime(today.year, today.month + 1, 0);
+        // Convert to only "dd"
+        int startDayInt = monthStart.day;
+        int endDayInt = monthEnd.day;
 
-        int startDay = 20;
-        int endDay = 19;
+        print("Start: $startDayInt");
+        print("End:   $endDayInt");
+        //deadlineStartDate - Data get form Login API deadlineEndDate = Data get from Login
+        /*if (deadlineStartDate == 0 || deadlineEndDate == 0){
+          startDay = startDayInt;
+          endDay = endDayInt;
+        }else{
+          startDay = 20;
+          endDay = 19;
+        }*/
 
         if (today.day < startDay) {
           // Current month cycle is last month → this month
