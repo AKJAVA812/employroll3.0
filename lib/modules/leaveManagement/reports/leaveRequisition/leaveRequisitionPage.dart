@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:er_flutter_project/ess/Model/LeaveCombinedResponse.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -77,9 +78,10 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
 
 
 
-  Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+ /* Future getSharedPrfanceList() async {
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
+    //Future<LeaveBalModal> getAppReq11 = getLeaveBalance(sessionId!);
     Future<LeaveBalModal> getAppReq11 = getLeaveBalance(sessionId!);
 
     fetchLeaveBalance(sessionId!);
@@ -105,7 +107,22 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       });
 
     });
+  }*/
+
+  Future getSharedPrfanceList() async {
+    sessionId = await shared.getSessionId();
+    doj = await shared.getDoj();
+
+    getLeaveTypeList(sessionId!).then((data) {
+      if (data != null) {
+        setState(() {
+          leaveBalanceLabel = data.leaveBalanceModel;  // full model
+          leaveBalLabel = data.leaveBalModal;          // only leaveData part
+        });
+      }
+    });
   }
+
   showNodata(BuildContext buildContext, result,reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
@@ -140,11 +157,11 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         });
   }
 
-  Future<LeaveBalModal> getLeaveBalance(String SessionId) async {
+ /* Future<LeaveBalModal> getLeaveBalance(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBal;
     print('employeeList11: ${SessionId}');
-    LeaveBalModal leaveBalModal;
+    LeaveBalModal leaveBalModal = new LeaveBalModal();
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await http.post(urlapi);
     print('URL ${response.request}');
@@ -168,11 +185,13 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     }
     return leaveBalModal;
   }
+*/
 
-  Future<LeaveBalanceModel?> getLeaveTypeList(String sessionId) async {
+  /*Future<LeaveBalanceModel?> getLeaveTypeList(String sessionId) async {
     leaveTypeList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBalanceApi;
+    LeaveBalModal leaveBalModal;
     print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await http.post(urlapi);
@@ -180,10 +199,12 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['leaveTypeList'];
+    var leaveGetData = mapResponse['leaveData'];
     print("GETDATA $getData");
 
     print('responseLeaveTypeList $getData');
     leaveBalanceLabel=LeaveBalanceModel.fromJson(mapResponse);
+    leaveBalModal=LeaveBalModal.fromJson(leaveGetData);
     int? length = leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
 
     print('totalleaveLength $length ');
@@ -199,6 +220,42 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     }
 
     return leaveBalanceLabel;
+  }*/
+
+  Future<LeaveCombinedResponse?> getLeaveTypeList(String sessionId) async {
+    leaveTypeList = [];
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.leaveBalanceApi;
+
+    print('employeeList11: $sessionId');
+    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
+    final response = await http.post(urlapi);
+
+    print('URL ${response.request}');
+    print('responseLeaveTypeList ${response.body}');
+
+    mapResponse = json.decode(response.body);
+
+    // Main model
+    LeaveBalanceModel? modelFull = LeaveBalanceModel.fromJson(mapResponse);
+
+    // Leave Data -> used for LeaveBalModal
+    var leaveGetData = mapResponse['leaveData'];
+    print('Data leave  $leaveGetData');
+    LeaveBalModal? modelLeaveData = LeaveBalModal.fromJson(mapResponse);
+    //print('Data leave  ${modelLeaveData.leaveData.leaveDetails.length}');
+
+    // Populate dropdown list
+    if (mapResponse['leaveTypeList'] != null) {
+      for (var item in mapResponse['leaveTypeList']) {
+        leaveTypeList.add(item['leavetype']);
+      }
+    }
+
+    return LeaveCombinedResponse(
+      leaveBalanceModel: modelFull,
+      leaveBalModal: modelLeaveData,
+    );
   }
 
   Map<String, dynamic>? leaveBalances;
@@ -293,22 +350,23 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       });
     }
   }*/
+
   Future<void> fetchLeaveBalance(String sessionId) async {
     try {
-      LeaveBalModal leaveBalModal = await getLeaveBalance(sessionId);
+     // LeaveBalModal leaveBalModal = await getLeaveBalance(sessionId);
 
       setState(() {
         leaveBalances = {};
         leaveTypes = [];
 
         // ✅ Step 1: Ensure we have valid data
-        if (leaveBalModal.leaveData == null) {
+        if (leaveBalLabel!.leaveData == null) {
           print("❌ No leaveData found in API response");
           return;
         }
 
         // ✅ Step 2: Extract the parsed balances directly from model
-        final parsedBalances = leaveBalModal.leaveData!.getParsedBalances();
+        final parsedBalances = leaveBalLabel!.leaveData!.getParsedBalances();
 
         // ✅ Step 3: Set the data for UI
         leaveBalances = parsedBalances;
@@ -343,24 +401,24 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
   }
 
   Future getUserName() async {
-    empName = await shared!.getempName();
+    empName = await shared.getempName();
     print('Response snapshot: ${empName}');
   }
   Future getDept() async {
-  deptName = await shared!.getDept();
+  deptName = await shared.getDept();
     print('Response snapshot: ${deptName}');
   }
   Future getBranch() async {
-    branchName = await shared!.getBranch();
+    branchName = await shared.getBranch();
     print('Response snapshot: ${branchName}');
   }
   Future getEmpId() async {
-    empNewId = await shared!.getEmpId();
+    empNewId = await shared.getEmpId();
     print('Response snapshot: ${empNewId}');
   }
 
   Future getOrgId() async {
-    orgNewId = await shared!.getOrgId();
+    orgNewId = await shared.getOrgId();
     print('ORGID: ${orgNewId}');
   }
 
@@ -651,9 +709,11 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                           if(value == 2) {
                             Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
                           }
-                          *//* if(value == 3) {
+                          */
+                /* if(value == 3) {
                               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                            }*//*
+                            }*/
+                /*
                         },
                       )
                     ],
@@ -716,12 +776,16 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                             Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
-                          *//* if(value == 2) {
+                          */
+                /* if(value == 2) {
                               Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
-                            }*//*
-                          *//* if(value == 3) {
+                            }*/
+                /*
+                          */
+                /* if(value == 3) {
                               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                            }*//*
+                            }*/
+                /*
                         },
                       )
                     ],
@@ -866,7 +930,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     ],
                   ),
                 ),*/
-
 
                 Padding(
                   padding: EdgeInsets.all(12.0),
@@ -1448,8 +1511,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                             }
                           }
                         }
-
-
                         //key = "APPROVED";
                         //approveLeaveRequisition(_commentController.text, leaveReqId);
                       },

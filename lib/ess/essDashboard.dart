@@ -2991,9 +2991,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         //DateTime cycleEnd = DateTime(2025, 11, 19);
         DateTime cycleStart;
         DateTime cycleEnd;
+        /*int startDay = deadlineStartDate;
+        int endDay = deadlineEndDate;
+*/
         int startDay = 0;
         int endDay = 0;
-
 
         // CURRENT DATE
         DateTime today = DateTime.now();
