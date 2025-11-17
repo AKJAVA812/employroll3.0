@@ -909,17 +909,23 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       print("Event JSON - $eventsJson");
       final mapResponse = jsonDecode(eventsJson);
       eventsListModalGlobal = EssEventsListModal.fromJson(mapResponse);
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded eventsJson data from SharedPreferences");
+    }else{
+      print("📦 Loaded eventsJson data not save from SharedPreferences");
     }
 
     if (todayEventsJson != null) {
       final mapResponse = jsonDecode(todayEventsJson);
       todayEventModalGlobal = TodayEventListModal.fromJson(mapResponse);
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded todayEventsJson data from SharedPreferences");
+    }else{
+      print("📦 Loaded todayEventsJson data not save from SharedPreferences");
     }
 
     if (holidayJson != null) {
@@ -928,8 +934,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
       setState(() {
         holidayListModalGlobal = holidayESSModal;
-        isLoadingEvent = false;
-        isLoadingTodayEvent = false;
+        //isLoadingEvent = false;
+        //isLoadingTodayEvent = false;
       });
 
       print("📦 Loaded Holiday data from SharedPreferences");
@@ -955,15 +961,21 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       isLoadingEvent = false;
       isLoading = false;
       isLoadingTodayEvent = false;
+      print("📦 Loaded calender data from SharedPreferences");
+    }else{
+      print("📦 Loaded calender data from SharedPreferences");
     }
     if (dashboardData != null) {
       final mapResponse = jsonDecode(dashboardData);
       print("Loaded Dashboard Data data from cache ✅");
       essDashboardModelGlobal = EssDashboarrdModel.fromJson(mapResponse);
-      isLoadingEvent = false;
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded Dashboard data from SharedPreferences");
+    }else{
+      print("📦 Loaded Dashboard data Not Saved from SharedPreferences");
     }
 
     setState(() {
@@ -2986,17 +2998,35 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         }
 */
 
-              // PAYCYCLE RANGE
+        // PAYCYCLE RANGE
         //DateTime cycleStart = DateTime(2025, 10, 20);
         //DateTime cycleEnd = DateTime(2025, 11, 19);
         DateTime cycleStart;
         DateTime cycleEnd;
+        /*int startDay = deadlineStartDate;
+        int endDay = deadlineEndDate;
+*/
+        int startDay = 0;
+        int endDay = 0;
 
         // CURRENT DATE
         DateTime today = DateTime.now();
+        DateTime monthStart = DateTime(today.year, today.month, 1);
+        DateTime monthEnd = DateTime(today.year, today.month + 1, 0);
+        // Convert to only "dd"
+        int startDayInt = monthStart.day;
+        int endDayInt = monthEnd.day;
 
-        int startDay = 20;
-        int endDay = 19;
+        print("Start: $startDayInt");
+        print("End:   $endDayInt");
+        //deadlineStartDate - Data get form Login API deadlineEndDate = Data get from Login
+        /*if (deadlineStartDate == 0 || deadlineEndDate == 0){
+          startDay = startDayInt;
+          endDay = endDayInt;
+        }else{
+          startDay = 20;
+          endDay = 19;
+        }*/
 
         if (today.day < startDay) {
           // Current month cycle is last month → this month
