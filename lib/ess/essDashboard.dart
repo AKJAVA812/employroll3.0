@@ -670,7 +670,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   // ===============================================================
   // ✅ MAIN METHOD - Check and Run API only once per day
   // ===============================================================
-  void checkAndRunApi() async {
+  /*void checkAndRunApi() async {
     bool runApi = await shouldRunApi();
 
     if (runApi) {
@@ -735,7 +735,59 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       await loadSavedData(); // 🔹 Load saved modal data
     }
   }
+*/
+  void checkAndRunApi() async {
+    bool runApi = await shouldRunApi();
 
+    if (!runApi) {
+      print("⏸ Skipping API. Loading from cache...");
+      await loadSavedData();
+      return;
+    }
+
+    print("🔄 Running API for today...");
+
+    try {
+      // Parallel API calls
+      final results = await Future.wait([
+        getDashboardData(sessionId!),       // 0
+        getCalendarData(sessionId!),        // 1
+        getHolidayData(sessionId!),         // 2
+        getEventData(sessionId!),           // 3
+        getTodayEventData(sessionId!),      // 4
+      ]);
+
+      // Assign results
+      final dashboardData   = results[0] as EssDashboarrdModel;
+      final calendarData    = results[1] as CalendarModalClass;
+      final holidayData     = results[2] as HolidayESSModal?;
+      final eventList       = results[3] as EssEventsListModal?;
+      final todayEventList  = results[4] as TodayEventListModal;
+
+      // Update UI state only once
+      setState(() {
+        essDashboardModelGlobal = dashboardData;
+        calendarModalGlobal = calendarData;
+        holidayListModalGlobal = holidayData;
+        eventsListModalGlobal = eventList;
+        todayEventModalGlobal = todayEventList;
+
+        isLoading = false;
+        isLoadingTodayEvent = false;
+      });
+
+      print("✅ All APIs loaded successfully.");
+
+    } catch (e, st) {
+      print("❌ Error loading APIs: $e");
+      print(st);
+
+      setState(() {
+        isLoading = false;
+        isLoadingTodayEvent = false;
+      });
+    }
+  }
 
   // ===============================================================
   // ✅ Helper - Check if API should run today
@@ -977,7 +1029,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     }else{
       print("📦 Loaded Dashboard data Not Saved from SharedPreferences");
     }
-
     setState(() {
       isLoading = false;
     });
