@@ -121,6 +121,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         });
       }
     });
+   // fetchLeaveBalance(sessionId!);
   }
 
   showNodata(BuildContext buildContext, result,reason) {
@@ -221,6 +222,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
 
     return leaveBalanceLabel;
   }*/
+  Map<String, dynamic>? leaveBalances;
+  List<String> leaveTypes = [];
 
   Future<LeaveCombinedResponse?> getLeaveTypeList(String sessionId) async {
     leaveTypeList = [];
@@ -240,11 +243,35 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     LeaveBalanceModel? modelFull = LeaveBalanceModel.fromJson(mapResponse);
 
     // Leave Data -> used for LeaveBalModal
-    var leaveGetData = mapResponse['leaveData'];
-    print('Data leave  $leaveGetData');
-    LeaveBalModal? modelLeaveData = LeaveBalModal.fromJson(mapResponse);
-    //print('Data leave  ${modelLeaveData.leaveData.leaveDetails.length}');
+    // Extract only leaveData for LeaveBalModal
+    var leaveGetData = mapResponse["leaveData"];
+    LeaveBalModal? modelLeaveData =
+    leaveGetData != null ? LeaveBalModal.fromJson({"leaveData": leaveGetData}) : null;
 
+    print("Parsed LeaveBalModal leaveData: ${modelLeaveData?.leaveData}");
+    print("Parsed LeaveBalModal leaveData: ${modelLeaveData?.leaveData?.leaveDetails}");
+    setState(() {
+      leaveBalances = {};
+      leaveTypes = [];
+
+      // ✅ Step 1: Ensure we have valid data
+      if (modelLeaveData!.leaveData == null) {
+        print("❌ No leaveData found in API response");
+        return;
+      }
+
+      // ✅ Step 2: Extract the parsed balances directly from model
+      final parsedBalances = modelLeaveData.leaveData!.getParsedBalances();
+
+      // ✅ Step 3: Set the data for UI
+      leaveBalances = parsedBalances;
+      leaveTypes = parsedBalances.keys.toList();
+
+      // ✅ Debug info
+      print("✅ leaveTypes: $leaveTypes");
+      print("✅ leaveBalances: $leaveBalances");
+
+    });
     // Populate dropdown list
     if (mapResponse['leaveTypeList'] != null) {
       for (var item in mapResponse['leaveTypeList']) {
@@ -258,8 +285,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     );
   }
 
-  Map<String, dynamic>? leaveBalances;
-  List<String> leaveTypes = [];
   /*Future<void> fetchLeaveBalance(String sessionId) async {
     try {
       LeaveBalModal leaveBalModal = await getLeaveBalance(sessionId);
