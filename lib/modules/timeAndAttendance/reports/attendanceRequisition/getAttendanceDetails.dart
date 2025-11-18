@@ -14,11 +14,12 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
+import '../../../../ess/EssDashboarrddModel.dart';
 import '../../../../ess/Model/calendarModalClass.dart';
+import '../../../../ess/essDashboardNavigate.dart';
 import '../../../../ess/myAllReports.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
@@ -117,8 +118,8 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
    // ✅ STEP 1: Try loading from SharedPreferences first
    if(_currentMonthc==_currentMonth){
 
-     final cachedData = prefs.getString('calendarData');
-     final cachedMonth = prefs.getString('calendarMonth');
+     final cachedData = prefs.getString('calendarDataMyRequest');
+     final cachedMonth = prefs.getString('calendarMonthMyRequest');
 
      print("Calendar Data - $cachedData");
      print("Calendar Month - $cachedMonth");
@@ -145,8 +146,8 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
        // Save to SharedPreferences
        if(_currentMonthc==_currentMonth){
-         await prefs.setString('calendarData', json.encode(mapResponse));
-         await prefs.setString('calendarMonth', _currentMonth);
+         await prefs.setString('calendarDataMyRequest', json.encode(mapResponse));
+         await prefs.setString('calendarMonthMyRequest', _currentMonth);
        }
        // ✅ Rebuild UI from fresh API data
        _buildCalendarFromMap(mapResponse);
@@ -279,22 +280,22 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
   Future<bool> shouldRunApi() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? lastCallDate = prefs.getString('lastApiCallDate');
+    final String? lastCallDate = prefs.getString('lastApiCallDateMyRequest');
     final String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     if (lastCallDate == currentDate) {
       return false; // Same date, skip API
     } else {
       // Update date
-      await prefs.setString('lastApiCallDate', currentDate);
+      await prefs.setString('lastApiCallDateMyRequest', currentDate);
       return true;
     }
   }
 
   Future<void> loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
-    final calendarJson = prefs.getString('calendarData');
-    final calendarMonth = prefs.getString('calendarMonth');
+    final calendarJson = prefs.getString('calendarDataMyRequest');
+    final calendarMonth = prefs.getString('calendarMonthMyRequest');
 
 
     print("Calendar Data Loaded - $calendarJson");
@@ -422,7 +423,9 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
               print('Dashboard');
             }
             if(index==4){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel())));
+              //Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
               // Navigator.push(context,
               //     MaterialPageRoute(builder: (context) => ProfilePageNew())
               // );
