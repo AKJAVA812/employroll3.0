@@ -413,10 +413,13 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('mobAction', mobAction);
   }
-  getMobAction() async{
+  getMobAction() async {
     final prefs = await SharedPreferences.getInstance();
-    final int? mobAction=prefs.getInt('mobAction');
-    return mobAction;
+    final String? mob = prefs.getString('mobAction');
+
+    if (mob == null) return null;
+
+    return int.tryParse(mob);   // convert String → int
   }
 
   setDoj(doj) async{
