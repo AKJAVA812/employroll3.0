@@ -58,6 +58,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
   var empNewId;
   var orgNewId;
   String dayRadio = "1";
+  String halfDayNewRadios = "";
   String confirmYes = "";
   bool singleDayShow = true;
   bool multipleDayShow = false;
@@ -1275,8 +1276,93 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     ),
                   ],
                 ).pLTRB(0, 0, 0, 8),
+
+
                 Visibility(
                   visible: halfDayShow,
+                  child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                        child:  Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Radio(
+                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  value: "firstHalf",
+                                  groupValue: halfDayNewRadios,
+                                  onChanged: (value) {
+                                    setState(() {
+
+                                      /*  _singleDayShow == _singleDayShow;
+                                           _multipleDayShow == _multipleDayShow;*/
+                                    });
+                                    setState(() {
+                                      halfDayNewRadios = value.toString();
+                                    });
+                                  },
+                                ),
+                                "First Half".text.make(),
+                              ],
+                            ).px1(),
+                            Row(
+                              /*mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,*/
+                              children: [
+                                Radio(
+                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  value: "secondHalf",
+                                  groupValue: halfDayNewRadios,
+                                  onChanged: (value) {
+                                    setState(() {
+
+                                      /*  _singleDayShow =_singleDayShow;
+                                          _multipleDayShow =! _multipleDayShow;*/
+                                    });
+                                    setState(() {
+                                      halfDayNewRadios = value.toString();
+                                    });
+                                  },
+                                ),
+                                "Second Half".text.make(),
+                              ],
+                            ).px1(),
+                            Row(
+                              /*mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,*/
+                              children: [
+                                Radio(
+                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  value: "byTime",
+                                  groupValue: halfDayNewRadios,
+                                  onChanged: (value) {
+                                    setState(() {
+
+                                      /*  _singleDayShow =_singleDayShow;
+                                          _multipleDayShow =! _multipleDayShow;*/
+                                    });
+                                    setState(() {
+                                      halfDayNewRadios = value.toString();
+                                    });
+                                  },
+                                ),
+                                "By Time".text.make(),
+                              ],
+                            ).px1(),
+                          ],
+                        ).pLTRB(0, 0, 5, 5)
+
+                    ),
+                  ],
+                ),
+                ),
+
+                Visibility(
+                  visible: halfDayNewRadios == 'byTime',
                   child: Row(
                     children: [
                       Expanded(
