@@ -114,7 +114,7 @@ Position? position = Position(
     speed: 0.0,
     speedAccuracy: 0.0);
 
-LatLng? currentPostion = const LatLng(0.0, 0.0);
+LatLng? currentPostion;
 GoogleMapController? _mapController;
 late GoogleMapController googleMapController;
 var currentAddress = "Address Not Found";
@@ -1731,7 +1731,6 @@ class _DefaultPageState extends State<DefaultPage> {
           ),
         );
       }
-
       shared.setLatitude(position!.latitude);
       shared.setLongitude(position!.longitude);
       getAddress(position!);
@@ -1740,11 +1739,9 @@ class _DefaultPageState extends State<DefaultPage> {
     }
   }
 
-
-
-  Future<void> getAddress(Position position) async {
+  /*Future<void> getAddress(Position position) async {
     List<Placemark> pleaceMark =
-        await placemarkFromCoordinates(position!.latitude, position.longitude);
+        await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark placemarkee = pleaceMark[0];
     print('currentPosition $currentAddress');
     var contryName = placemarkee.country;
@@ -1763,7 +1760,51 @@ class _DefaultPageState extends State<DefaultPage> {
           '$contryName ' +
           '$postalCode ';
     });
+  }*/
+
+  Future<void> getAddress(Position position) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isEmpty) {
+        print("❌ No placemark found");
+        return;
+      }
+
+      final p = placemarks.first;
+
+      // Build address safely (ignores null values)
+      final List<String> addressParts = [
+        p.street ?? '',
+        p.name ?? '',
+        p.subLocality ?? '',
+        p.locality ?? '',
+        p.administrativeArea ?? '',
+        p.country ?? '',
+        p.postalCode ?? '',
+      ];
+
+      // Join non-null, non-empty values
+      // Filter empty strings and join
+      final formattedAddress = addressParts
+          .where((part) => part.trim().isNotEmpty)
+          .join(", ");
+
+      setState(() {
+        currentAddress = formattedAddress;
+      });
+
+      print('📍 Current Address: $currentAddress');
+
+    } catch (e) {
+      print("❌ Error getting address: $e");
+      currentAddress = "Address Not Find";
+    }
   }
+
 
   void _getTime() {
     final DateTime now = DateTime.now();
@@ -1794,21 +1835,20 @@ class _DefaultPageState extends State<DefaultPage> {
     userPanelPermissions = await shared.getUserPanel();
     //getGeofenceList(sessionId!);
     print("$userPanelPermissions");
-    lat = await shared.getLatitude();
+
     //position= Position(longitude: shared.getLongitude(), latitude: shared.getLatitude(), timestamp: date, accuracy: 1, altitude: 1, altitudeAccuracy: 1, heading: 1, headingAccuracy: 1, speed: 1, speedAccuracy: 1);
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
     timeString = _formatDateTime(DateTime.now());
     Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
-
+    lat = await shared.getLatitude();
     lng = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
     attAction = await shared.getAttAction();
     print("LatLong - ${LatLng(position!.latitude, position!.longitude)}");
     //print("Long - $lng");
     currentPostion = LatLng(position!.latitude, position!.longitude);
-
 
     mobAction = await shared.getMobAction();
     print('mobActions $mobAction');
@@ -1894,9 +1934,11 @@ class _DefaultPageState extends State<DefaultPage> {
             //Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
           } else {
             setState(() {
-             *//*File image = File(value.path);
+             */
+    /*File image = File(value.path);
              final bytearray = image.readAsBytesSync().lengthInBytes;
-             print("workdone image:- $bytearray");*//*
+             print("workdone image:- $bytearray");*/
+    /*
               if (orgnizationID == 108) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => UjalaCreditWorkdone(
@@ -1922,12 +1964,16 @@ class _DefaultPageState extends State<DefaultPage> {
           }
         });
 
-        *//*final File image = File(imageValue!.path);
+        */
+    /*final File image = File(imageValue!.path);
         final bytearray = image.readAsBytesSync().lengthInBytes;
-        print("workdone image$bytearray");*//*
-       *//* if(imageValue==null) return;
+        print("workdone image$bytearray");*/
+    /*
+       */
+    /* if(imageValue==null) return;
         final imagePath= File(imageValue.path);
-        print("workdone image$imagePath");*//*
+        print("workdone image$imagePath");*/
+    /*
       } on PlatformException catch (e) {
         //print('failed to upload: $e');
       }
