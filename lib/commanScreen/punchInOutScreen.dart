@@ -115,6 +115,7 @@ Position? position = Position(
     speedAccuracy: 0.0);
 
 LatLng? currentPostion = const LatLng(0.0, 0.0);
+GoogleMapController? _mapController;
 late GoogleMapController googleMapController;
 var currentAddress = "Address Not Found";
 var todayDate = "dd/mm/yyyy";
@@ -124,7 +125,7 @@ String timeString = "";
 String? sessionId;
 dynamic empIdGet;
 String? userType;
-String? getMobActions;
+dynamic getMobActions;
 dynamic getMobTrackTime;
 int? orgnizationID = 0;
 late String UserName = "Employee Name";
@@ -399,16 +400,16 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    orgId = await shared!.getOrgId();
-    setGeofenceActive = await shared!.getGeofenceActive();
+    sessionId = await shared.getSessionId();
+    orgId = await shared.getOrgId();
+    setGeofenceActive = await shared.getGeofenceActive();
     print("Geofence Permission - $setGeofenceActive");
-    userType = await shared!.getUserType();
-    defaultProfileName = await shared!.getDefaultProfileName();
-    defaultProfileId = await shared!.getDefaultProfileId();
+    userType = await shared.getUserType();
+    defaultProfileName = await shared.getDefaultProfileName();
+    defaultProfileId = await shared.getDefaultProfileId();
     print("Default Profile Name - $defaultProfileName");
     print("Default Profile Id - $defaultProfileId");
-    userPanelPermissions = await shared!.getUserPanel();
+    userPanelPermissions = await shared.getUserPanel();
     print("User Type - $userType");
 
     Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
@@ -427,7 +428,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     employeeCode = await shared.getEmpCode();
     lat= await shared.getLatitude();
     lng = await shared.getLongitude();
-    getMobActions = await shared.getMobAttAction();
+    getMobActions = await shared.getMobAction();
     getMobTrackTime = await shared.getMobTrackTime();
     print("GetMobAction - $getMobActions");
     print("GetMobTrackTime - $getMobTrackTime");
@@ -554,7 +555,6 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     final latlngIdSave = databaseLatlngSave.insertlatlng(rowData);
 
   }
-
 
   dynamic allLatlng;
   void getLatlngAll() async {
@@ -1086,7 +1086,7 @@ class _DefaultPageState extends State<DefaultPage> {
   File? _workDoneImage;
 
   int? orgnizationID = 0;
-  int? mobAction;
+  dynamic mobAction;
   String? mockLat;
   String? mockLong;
   bool? isMock = false;
@@ -1694,7 +1694,7 @@ class _DefaultPageState extends State<DefaultPage> {
     return await Geolocator.getCurrentPosition();
   }
 
-  _getUserLocation() async {
+  /*_getUserLocation() async {
     print('Setcurrent ');
     position = await GeolocatorPlatform.instance.getCurrentPosition();
     //position = await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
@@ -1712,7 +1712,35 @@ class _DefaultPageState extends State<DefaultPage> {
     } else {
       showAboutDialog(context: this.context);
     }
+  }*/
+
+  _getUserLocation() async {
+    //print('Setcurrent');
+    position = await Geolocator.getCurrentPosition();
+
+    if (position != null) {
+      setState(() {
+        currentPostion = LatLng(position!.latitude, position!.longitude);
+      });
+
+      // 🔥 IMPORTANT: Update Google Map Camera
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(position!.latitude, position!.longitude),
+          ),
+        );
+      }
+
+      shared.setLatitude(position!.latitude);
+      shared.setLongitude(position!.longitude);
+      getAddress(position!);
+    } else {
+      showAboutDialog(context: this.context);
+    }
   }
+
+
 
   Future<void> getAddress(Position position) async {
     List<Placemark> pleaceMark =
@@ -2006,10 +2034,17 @@ class _DefaultPageState extends State<DefaultPage> {
           Container(
             height: MediaQuery.of(context).size.height * 0.4,
             child: Card(
-              child: GoogleMap(
+              child: currentPostion == null
+                  ? Center(child: CircularProgressIndicator())
+                  : GoogleMap(
+                onMapCreated: (controller) {
+                  _mapController = controller;
+                },
                 initialCameraPosition: CameraPosition(
                   target: LatLng(
-                      currentPostion!.latitude, currentPostion!.longitude),
+                    currentPostion!.latitude,
+                    currentPostion!.longitude,
+                  ),
                   zoom: 14,
                 ),
                 myLocationButtonEnabled: true,

@@ -2738,7 +2738,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                             trailingBuilder: (item) => item.dob,
                             imageBuilder: (item) => item.image,
                           ),
-
                           // 🏅 Anniversary Tab
                           buildEventList(
                             isLoading: isLoadingEvent,
@@ -2749,8 +2748,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                             trailingBuilder: (item) => item.doj,
                             imageBuilder: (item) => item.image,
                           ),
-
-
 
                           // 📅 Today Events Tab (combine lists)
 
@@ -2982,9 +2979,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     /// Example Calendar Carousel without header and custom prev & next button
     final _calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Mythemes.lightBluishColor,
-
+      pageScrollPhysics: NeverScrollableScrollPhysics(),
       /*onDayPressed: (date, events) {
-
       this.setState(() => _currentDate = date);
       this.setState(() => _currentDate2 = date);
       events.forEach((event) => print(event.title));
@@ -3163,7 +3159,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       height: 370.0,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
-      customGridViewPhysics: NeverScrollableScrollPhysics(),
+      //customGridViewPhysics: NeverScrollableScrollPhysics(),
 
       markedDateCustomShapeBorder: CircleBorder(side: BorderSide(color: Colors.grey)),
       markedDateCustomTextStyle: TextStyle(
@@ -3214,6 +3210,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       });
     },*/
       onCalendarChanged: (DateTime date) {
+
         // Prevent sliding beyond allowed range
         if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
           print("⛔ Calendar slide limit reached");
