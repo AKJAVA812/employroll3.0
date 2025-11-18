@@ -1427,43 +1427,44 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       shared.setSessionId(loginModelglobal!.data!.sessionId!);
       print("MY NEW SESSION - ${shared.getSessionId}");
-      shared.setDept(loginModelglobal!.data!.department);
-      shared.setName(loginModelglobal!.data!.userLoginned!.name);
-      shared.setProfileImage(loginModelglobal!.data!.userImage);
-      shared.setOrgId(loginModelglobal!.data!.orgId);
-      shared.setEmailid(loginModelglobal!.data!.userLoginned!.userId);
-      shared.setDob(loginModelglobal!.data!.dob);
-      shared.setMobileNo(loginModelglobal!.data!.contact);
-      shared.setDesignation(loginModelglobal!.data!.designation);
-      shared.setBranch(loginModelglobal!.data!.branch);
-      shared.setAadhar(loginModelglobal!.data!.aadharNo);
-      shared.setPfNo(loginModelglobal!.data!.pfNo);
-      shared.setEsicNo(loginModelglobal!.data!.esicNo);
-      shared.setBankName(loginModelglobal!.data!.bankName);
-      shared.setBankAcc(loginModelglobal!.data!.bankAccNo);
-      shared.setIfscCode(loginModelglobal!.data!.ifscCode);
-      shared.setEmpId(loginModelglobal!.data!.empId);
-      shared.setUserType(loginModelglobal!.data!.userLoginned!.userType);
+      shared.setDept(loginModelglobal.data!.department);
+      shared.setName(loginModelglobal.data!.userLoginned!.name);
+      shared.setProfileImage(loginModelglobal.data!.userImage);
+      shared.setOrgId(loginModelglobal.data!.orgId);
+      shared.setEmailid(loginModelglobal.data!.userLoginned!.userId);
+      shared.setDob(loginModelglobal.data!.dob);
+      shared.setMobileNo(loginModelglobal.data!.contact);
+      shared.setDesignation(loginModelglobal.data!.designation);
+      shared.setBranch(loginModelglobal.data!.branch);
+      shared.setAadhar(loginModelglobal.data!.aadharNo);
+      shared.setPfNo(loginModelglobal.data!.pfNo);
+      shared.setEsicNo(loginModelglobal.data!.esicNo);
+      shared.setBankName(loginModelglobal.data!.bankName);
+      shared.setBankAcc(loginModelglobal.data!.bankAccNo);
+      shared.setIfscCode(loginModelglobal.data!.ifscCode);
+      shared.setEmpId(loginModelglobal.data!.empId);
+      shared.setUserType(loginModelglobal.data!.userLoginned!.userType);
 
-      shared.setUserPanel(loginModelglobal!.data!.userPanel);
-      userPanel = loginModelglobal!.data!.userPanel;
-      shared.setEnrollId(loginModelglobal!.data!.enrollId);
+      shared.setUserPanel(loginModelglobal.data!.userPanel);
+      userPanel = loginModelglobal.data!.userPanel;
+      shared.setEnrollId(loginModelglobal.data!.enrollId);
 
-      if(loginModelglobal!.data!.startDate == null) {
+      if(loginModelglobal.data!.startDate == null) {
         startPayCycle = "0";
         shared.setPayCycleStart(startPayCycle);
         print("If Null Show 0 - $startPayCycle");
       } else {
-        startPayCycle = loginModelglobal!.data!.startDate;
+        startPayCycle = loginModelglobal.data!.startDate;
         shared.setPayCycleStart(startPayCycle);
         print("Else Show value - $startPayCycle");
       }
-      if(loginModelglobal!.data!.endDate == null) {
+
+      if(loginModelglobal.data!.endDate == null) {
         endPayCycle = "0";
         shared.setPayCycleEnd(endPayCycle);
         print("If Null Show 0 - $endPayCycle");
       } else {
-        endPayCycle = loginModelglobal!.data!.endDate;
+        endPayCycle = loginModelglobal.data!.endDate;
         shared.setPayCycleEnd(endPayCycle);
         print("Else Show value - $startPayCycle");
       }
@@ -1471,15 +1472,14 @@ class _LoginPageState extends State<LoginPage> {
 
     print("Check User Panel - $userPanel");
 
-
     shared.setEmpRoll(loginModelglobal!.data!.empRole!.length);
-    shared.setMobAction(loginModelglobal!.data!.mobAction!.length);
-    shared.setDoj(loginModelglobal!.data!.doj);
-    shared.setShowPayroll(loginModelglobal!.data!.userLoginned!.showPayroll);
-    shared.setEmpCode(loginModelglobal!.data!.empCode);
-    shared.setEmpCode(loginModelglobal!.data!.empCode);
+    shared.setMobAction(loginModelglobal.data!.mobAction!.length);
+    shared.setDoj(loginModelglobal.data!.doj);
+    shared.setShowPayroll(loginModelglobal.data!.userLoginned!.showPayroll);
+    shared.setEmpCode(loginModelglobal.data!.empCode);
+    shared.setEmpCode(loginModelglobal.data!.empCode);
 
-    var mobAction = loginModelglobal!.data!.mobAction!.length;
+    var mobAction = loginModelglobal.data!.mobAction!.length;
     /*shared.setUserRoles(loginModelglobal!.data!.userRoles![0]);
     print(loginModelglobal!.data!.userRoles![0]);*/
 

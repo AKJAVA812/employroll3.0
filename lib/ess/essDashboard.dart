@@ -125,6 +125,9 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   int? shortLeaveCount;
   int? overTime;
 
+  var deadlineStartDate;
+  var deadlineEndDate;
+
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
@@ -134,6 +137,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     roRole= await shared.getRoRole();
     userPanelPermission= await shared.getUserPanel();
     adminRole= await shared.getAdminRole();
+    deadlineStartDate = await shared.getPayCycleStart() ?? "0";
+    deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
+
+    print("Start Pay $startPayCycle");
+    print("End Pay $endPayCycle");
 
     //print('empRole $empRole');
     //print('roRole $roRole');
@@ -3050,11 +3058,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         //DateTime cycleEnd = DateTime(2025, 11, 19);
         DateTime cycleStart;
         DateTime cycleEnd;
-        /*int startDay = deadlineStartDate;
-        int endDay = deadlineEndDate;
-*/
-        int startDay = 0;
-        int endDay = 0;
+        int startDay = int.parse(deadlineStartDate);
+        int endDay = int.parse(deadlineEndDate);
+        print('date start and End $startDay $endDay');
+       /* int startDay = 0;
+        int endDay = 0;*/
 
         // CURRENT DATE
         DateTime today = DateTime.now();
@@ -3067,14 +3075,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         print("Start: $startDayInt");
         print("End:   $endDayInt");
         //deadlineStartDate - Data get form Login API deadlineEndDate = Data get from Login
-        /*if (deadlineStartDate == 0 || deadlineEndDate == 0){
+        if (startDay == 0 || endDay == 0){
           startDay = startDayInt;
           endDay = endDayInt;
-        }else{
-          startDay = 20;
-          endDay = 19;
-        }*/
-
+        }
+        print('date start and End $startDay $endDay');
         if (today.day < startDay) {
           // Current month cycle is last month → this month
           cycleStart = DateTime(today.year, today.month - 1, startDay);
