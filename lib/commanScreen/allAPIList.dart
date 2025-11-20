@@ -2,9 +2,9 @@
 class ApiDetails{
    //Base Server Address
    //static var server="http://www.employroll.com/";
-   static var server="http://mobile.employroll.com/";
+   //static var server="http://mobile.employroll.com/";
 
-   //static var server="https://3fef0809fdd4.ngrok-free.app/";
+   static var server="https://elma-unrestrainable-leda.ngrok-free.dev/";
    //Attendance Punch in and Punch out
    static String login="restful/service/login";
    static String punchIn="restful/service/attendance/via/mobile";
@@ -124,7 +124,8 @@ class ApiDetails{
    static var savedOfflineAtt = "restful/service/attendance/via/mobile/offline";
 
    //ESS Calendar API
-   static var calendarApi = "restful/service/get/emp/calendar/ess";
+   //static var calendarApi = "restful/service/get/emp/calendar/ess";
+   static var calendarApi = "restful/service/get/emp/calendar/new";
 
    //Travel & Expense
    static var selfClaimRequestListApi = "restful/service/get/employee/self/claim/policy/list";
