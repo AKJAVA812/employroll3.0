@@ -1,8 +1,8 @@
 
 class ApiDetails{
    //Base Server Address
-   //static var server="http://www.employroll.com/";
-   static var server="http://mobile.employroll.com/";
+   static var server="http://www.employroll.com/";
+   //static var server="http://mobile.employroll.com/";
 
    //static var server="https://3fef0809fdd4.ngrok-free.app/";
    //Attendance Punch in and Punch out
