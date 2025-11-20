@@ -1359,11 +1359,14 @@ class _DefaultPageState extends State<DefaultPage> {
   }
 
   _getUserLocation() async {
+    double lat=shared.getLatitude();
+    double lng =shared.getLongitude();
+    currentPostion = LatLng(lat,lng);
     print('Setcurrent ');
     positionCheck = await GeolocatorPlatform.instance.getCurrentPosition();
     //position = await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
     //print('SetcurrentCL  $position');
-    var lastPosition = await Geolocator.getLastKnownPosition();
+    //var lastPosition = await Geolocator.getLastKnownPosition();
     //print('SetcurrentLast  $lastPosition');
     // bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (positionCheck != null) {
@@ -2737,12 +2740,12 @@ class _DrawerFileState extends State<DrawerFile> {
 
 
   Future<void> getSharedPreferences() async {
-    orgId = await shared!.getOrgId();
+    orgId = await shared.getOrgId();
     print("Org Id Check - $orgId");
     final prefs = await SharedPreferences.getInstance();
     selectedProfileId = prefs.getInt('defaultProfileId');
     selectedProfileName = prefs.getString('defaultProfileName');
-    userPanelPermission = await shared!.getUserPanel();
+    userPanelPermission = await shared.getUserPanel();
     print("Loaded ID: $selectedProfileId, Name: $selectedProfileName");
 
     getProfileList(sessionId!).then((value) {
@@ -2843,7 +2846,6 @@ class _DrawerFileState extends State<DrawerFile> {
           othersLeaveReqMOPermission = "1";
         }*/
 
-
         print("Attendance Permission - $pendingAttendanceReqMOPermission");
       }
 
@@ -2880,7 +2882,6 @@ class _DrawerFileState extends State<DrawerFile> {
 
     print("Loaded counts → attReqCount: $attReqCount, leaveReqCount: $leaveReqCount");
   }
-
 
   Future<void> getRequisitionCounts(String sessionId) async {
     try {

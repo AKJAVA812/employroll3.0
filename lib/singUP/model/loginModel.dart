@@ -55,6 +55,8 @@ class Data {
   String? enrollId;
   String? startDate;
   String? endDate;
+  String? raisedDate;
+  String? approvedDate;
 
   Data(
       {this.empId,
@@ -94,6 +96,8 @@ class Data {
         this.enrollId,
         this.startDate,
         this.endDate,
+        this.raisedDate,
+        this.approvedDate,
       });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -147,6 +151,8 @@ class Data {
     enrollId = json['enrollId'];
     startDate = json['startDate'];
     endDate = json['endDate'];
+    raisedDate = json['raisedDeadlineDate'];
+    approvedDate = json['approvelDeadlineDate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -184,29 +190,31 @@ class Data {
    /* data['userRoles'] = this.userRoles;*/
     data['empCode'] = this.empCode;
     data['dob'] = this.dob;
-    data['esicNo'] = this.esicNo;
-    data['empRole'] = this.empRole;
-    data['designation'] = this.designation;
-    data['need_updation'] = this.needUpdation;
-    data['doj'] = this.doj;
-    data['enrollId'] = this.enrollId;
-    data['startDate'] = this.startDate;
-    data['endDate'] = this.endDate;
+    data['esicNo'] = esicNo;
+    data['empRole'] = empRole;
+    data['designation'] = designation;
+    data['need_updation'] = needUpdation;
+    data['doj'] = doj;
+    data['enrollId'] = enrollId;
+    data['startDate'] = startDate;
+    data['endDate'] = endDate;
+    data['raisedDeadlineDate']=raisedDate;
+    data['approvelDeadlineDate']=approvedDate;
     return data;
   }
 }
 
 class UserLoginned {
   String? name;
-  Null? password;
+  Null password;
   String? userId;
   String? status;
   String? userType;
-  Null? salt;
-  Null? otp;
+  Null salt;
+  Null otp;
   bool? accountSuspended;
-  Null? userProfileImage;
-  Null? otpExpiryDateTime;
+  Null userProfileImage;
+  Null otpExpiryDateTime;
   String? firstLoginDate;
   bool? loggedIn;
   bool? showPayroll;

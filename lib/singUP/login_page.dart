@@ -736,43 +736,45 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       shared.setSessionId(loginModelglobal!.data!.sessionId!);
       print("MY NEW SESSION - ${shared.getSessionId}");
-      shared.setDept(loginModelglobal!.data!.department);
-      shared.setName(loginModelglobal!.data!.userLoginned!.name);
-      shared.setProfileImage(loginModelglobal!.data!.userImage);
-      shared.setOrgId(loginModelglobal!.data!.orgId);
-      shared.setEmailid(loginModelglobal!.data!.userLoginned!.userId);
-      shared.setDob(loginModelglobal!.data!.dob);
-      shared.setMobileNo(loginModelglobal!.data!.contact);
-      shared.setDesignation(loginModelglobal!.data!.designation);
-      shared.setBranch(loginModelglobal!.data!.branch);
-      shared.setAadhar(loginModelglobal!.data!.aadharNo);
-      shared.setPfNo(loginModelglobal!.data!.pfNo);
-      shared.setEsicNo(loginModelglobal!.data!.esicNo);
-      shared.setBankName(loginModelglobal!.data!.bankName);
-      shared.setBankAcc(loginModelglobal!.data!.bankAccNo);
-      shared.setIfscCode(loginModelglobal!.data!.ifscCode);
-      shared.setEmpId(loginModelglobal!.data!.empId);
-      shared.setUserType(loginModelglobal!.data!.userLoginned!.userType);
+      shared.setDept(loginModelglobal.data!.department);
+      shared.setName(loginModelglobal.data!.userLoginned!.name);
+      shared.setProfileImage(loginModelglobal.data!.userImage);
+      shared.setOrgId(loginModelglobal.data!.orgId);
+      shared.setEmailid(loginModelglobal.data!.userLoginned!.userId);
+      shared.setDob(loginModelglobal.data!.dob);
+      shared.setMobileNo(loginModelglobal.data!.contact);
+      shared.setDesignation(loginModelglobal.data!.designation);
+      shared.setBranch(loginModelglobal.data!.branch);
+      shared.setAadhar(loginModelglobal.data!.aadharNo);
+      shared.setPfNo(loginModelglobal.data!.pfNo);
+      shared.setEsicNo(loginModelglobal.data!.esicNo);
+      shared.setBankName(loginModelglobal.data!.bankName);
+      shared.setBankAcc(loginModelglobal.data!.bankAccNo);
+      shared.setIfscCode(loginModelglobal.data!.ifscCode);
+      shared.setEmpId(loginModelglobal.data!.empId);
+      shared.setRaiseRequisition(loginModelglobal.data!.raisedDate);
+      shared.setApprovalRequisition(loginModelglobal.data!.approvedDate);
+      shared.setUserType(loginModelglobal.data!.userLoginned!.userType);
 
-      shared.setUserPanel(loginModelglobal!.data!.userPanel);
-      userPanel = loginModelglobal!.data!.userPanel;
-      shared.setEnrollId(loginModelglobal!.data!.enrollId);
+      shared.setUserPanel(loginModelglobal.data!.userPanel);
+      userPanel = loginModelglobal.data!.userPanel;
+      shared.setEnrollId(loginModelglobal.data!.enrollId);
 
-      if(loginModelglobal!.data!.startDate == null) {
+      if(loginModelglobal.data!.startDate == null) {
         startPayCycle = "0";
         shared.setPayCycleStart(startPayCycle);
         print("If Null Show 0 - $startPayCycle");
       } else {
-        startPayCycle = loginModelglobal!.data!.startDate;
+        startPayCycle = loginModelglobal.data!.startDate;
         shared.setPayCycleStart(startPayCycle);
         print("Else Show value - $startPayCycle");
       }
-      if(loginModelglobal!.data!.endDate == null) {
+      if(loginModelglobal.data!.endDate == null) {
         endPayCycle = "0";
         shared.setPayCycleEnd(endPayCycle);
         print("If Null Show 0 - $endPayCycle");
       } else {
-        endPayCycle = loginModelglobal!.data!.endDate;
+        endPayCycle = loginModelglobal.data!.endDate;
         shared.setPayCycleEnd(endPayCycle);
         print("Else Show value - $startPayCycle");
       }
@@ -1444,7 +1446,8 @@ class _LoginPageState extends State<LoginPage> {
       shared.setIfscCode(loginModelglobal.data!.ifscCode);
       shared.setEmpId(loginModelglobal.data!.empId);
       shared.setUserType(loginModelglobal.data!.userLoginned!.userType);
-
+      shared.setRaiseRequisition(loginModelglobal.data!.raisedDate);
+      shared.setApprovalRequisition(loginModelglobal.data!.approvedDate);
       shared.setUserPanel(loginModelglobal.data!.userPanel);
       userPanel = loginModelglobal.data!.userPanel;
       shared.setEnrollId(loginModelglobal.data!.enrollId);
@@ -1469,9 +1472,6 @@ class _LoginPageState extends State<LoginPage> {
         print("Else Show value - $startPayCycle");
       }
     });
-
-    print("Check User Panel - $userPanel");
-
     shared.setEmpRoll(loginModelglobal!.data!.empRole!.length);
     shared.setMobAction(loginModelglobal.data!.mobAction!.length);
     shared.setDoj(loginModelglobal.data!.doj);
@@ -1483,32 +1483,29 @@ class _LoginPageState extends State<LoginPage> {
     /*shared.setUserRoles(loginModelglobal!.data!.userRoles![0]);
     print(loginModelglobal!.data!.userRoles![0]);*/
 
-
-
     print('mobActionCheck $mobAction');
     var empRole;
-    empRole = loginModelglobal!.data!.empRole!.length;
+    empRole = loginModelglobal.data!.empRole!.length;
     print('empRoleChecker $empRole');
-    shared.setRoRoll(loginModelglobal!.data!.roRole!.length);
+    shared.setRoRoll(loginModelglobal.data!.roRole!.length);
     var roRole;
-    roRole = loginModelglobal!.data!.roRole!.length;
-    print('roRole $roRole');
-    shared.setAdminRole(loginModelglobal!.data!.adminrole!.length);
+    roRole = loginModelglobal.data!.roRole!.length;
+    shared.setAdminRole(loginModelglobal.data!.adminrole!.length);
 
-    adminRoleChcker = loginModelglobal!.data!.adminrole!.length;
+    adminRoleChcker = loginModelglobal.data!.adminrole!.length;
     print('adminRolesCheckss $adminRoleChcker');
-    for (int i = 0; i < loginModelglobal!.data!.profileList!.length; i++) {
-      profileName = loginModelglobal!.data!.profileList![i].profileName;
-      profileId = loginModelglobal!.data!.profileList![i].profileId;
-      defaultProfile = loginModelglobal!.data!.profileList![i].defaultProfile;
+    for (int i = 0; i < loginModelglobal.data!.profileList!.length; i++) {
+      profileName = loginModelglobal.data!.profileList![i].profileName;
+      profileId = loginModelglobal.data!.profileList![i].profileId;
+      defaultProfile = loginModelglobal.data!.profileList![i].defaultProfile;
 
-      if (defaultProfile == true || loginModelglobal!.data!.profileList![i].isDefaultProfile == true) {
-        String profileNameNew = loginModelglobal!.data!.profileList![i].profileName ?? '';
-        dynamic profileIdNew = loginModelglobal!.data!.profileList![i].profileId;
+      if (defaultProfile == true || loginModelglobal.data!.profileList![i].isDefaultProfile == true) {
+        String profileNameNew = loginModelglobal.data!.profileList![i].profileName ?? '';
+        dynamic profileIdNew = loginModelglobal.data!.profileList![i].profileId;
         shared.setDefaultProfileName(profileNameNew);
         shared.setDefaultProfileId(profileIdNew);
 
-        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD")) {
+        if(loginModelglobal.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") || loginModelglobal.data!.profileList![i].profilePermission!.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD")) {
           print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
           //levelOne = "true";
           shared.setLevelOne("true");
@@ -1518,7 +1515,7 @@ class _LoginPageState extends State<LoginPage> {
           shared.setLevelOne("false");
         }
 
-        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD")) {
+        if(loginModelglobal.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") || loginModelglobal.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD")) {
           print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
           //levelTwo = "true";
           shared.setLevelTwo("true");
@@ -1527,7 +1524,7 @@ class _LoginPageState extends State<LoginPage> {
           //levelTwo = "false";
           shared.setLevelTwo("false");
         }
-        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD")) {
+        if(loginModelglobal.data!.profileList![i].profilePermission!.contains("LEAVE_REQ_APPROVAL_ADD")) {
           print("resopnse LEAVE_REQ_APPROVAL_ADD");
           //pendingLeaveRequisitions = "true";
           shared.setPendingLeaveReq("true");

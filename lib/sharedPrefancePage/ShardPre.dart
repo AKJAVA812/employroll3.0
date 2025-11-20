@@ -464,6 +464,26 @@ class SessionManager {
     final String? levelTwo = prefs.getString('levelTwo');
     return levelTwo;
   }
+  setRaiseRequisition(raiseDate) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('raisedDeadlineDate', raiseDate);
+  }
+
+  getRaiseRequisition() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? raiseDate = prefs.getString('approvelDeadlineDate');
+    return raiseDate;
+  }
+  setApprovalRequisition(approvalDate) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('approvelDeadlineDate', approvalDate);
+  }
+
+  getApprovalRequisition() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? approvalDate = prefs.getString('raisedDeadlineDate');
+    return approvalDate;
+  }
 
   setClaimLevelOne(claimLevelOne) async {
     final prefs = await SharedPreferences.getInstance();

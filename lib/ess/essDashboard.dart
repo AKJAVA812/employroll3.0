@@ -127,6 +127,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
   var deadlineStartDate;
   var deadlineEndDate;
+  String lockDateStr="";
 
 
   Future getSharedPrfanceList() async {
@@ -139,6 +140,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     adminRole= await shared.getAdminRole();
     deadlineStartDate = await shared.getPayCycleStart() ?? "0";
     deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
+    lockDateStr = await shared.getRaiseRequisition();
 
     print("Start Pay $startPayCycle");
     print("End Pay $endPayCycle");
@@ -2948,7 +2950,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     );
   }
 
-
+  DateTime? _lastApiCallMonth;
   CalendarShow() {
     /// Example with custom icon
     final _calendarCarousel = Container(
@@ -3066,6 +3068,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
         // CURRENT DATE
         DateTime today = DateTime.now();
+         // e.g. "23-11-2024 11:59 AM"
+
+        // Convert String → DateTime
+        DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm a").parse(lockDateStr);
+        print('raise date  $lockDateTime');
         DateTime monthStart = DateTime(today.year, today.month, 1);
         DateTime monthEnd = DateTime(today.year, today.month + 1, 0);
         // Convert to only "dd"
@@ -3093,35 +3100,40 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         print("Cycle Start: $cycleStart");
         print("Cycle End:   $cycleEnd");
 
-// CHECK: If current date is outside paycycle → BLOCK
-        if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
-          developer.log('date for all true');
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              title: const Text(
-                "Notice",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: const Text(
-                "You are out of the paycycle. Attendance requisition not allowed.",
-                style: TextStyle(fontSize: 15),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("OK"),
+        // Step 1 → Execute only if now >= lock date+time
+        if (today.isAfter(lockDateTime) || today.isAtSameMomentAs(lockDateTime)) {
+          // CHECK: If current date is outside paycycle → BLOCK
+          if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
+            developer.log('date for all true');
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                title: const Text(
+                  "Notice",
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-              ],
-            ),
-          );
-          return; // STOP further action
+                content: const Text(
+                  "You are out of the pay-cycle. Attendance requisition not allowed.",
+                  style: TextStyle(fontSize: 15),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
+            );
+            return; // STOP further action
+          }
+
         }
 
-        this.setState(() => _currentDate = date);
-        this.setState(() => _currentDate2 = date);
-        events.forEach((event) => print('event list ${event.getDescription()}'));
+
+        setState(() => _currentDate = date);
+        setState(() => _currentDate2 = date);
+        //events.forEach((event) => print('event list ${event.getDescription()}'));
         //print(date);
         setState(() {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
@@ -3214,30 +3226,45 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         //API month change call
       });
     },*/
-      onCalendarChanged: (DateTime date) {
 
-        // Prevent sliding beyond allowed range
-        if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
-          print("⛔ Calendar slide limit reached");
-          return;
-        }
+        onCalendarChanged: (DateTime date) async {
 
-        _targetDateTime = date;
-        _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
-        print('change date $date.month$_targetDateTime');
-        singleDateString = DateFormat('dd-MM-yyyy').format(date);
-        print("Updated Date Change - $singleDateString");
+          // 1. Prevent sliding beyond allowed range
+          if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
+            print("⛔ Calendar slide limit reached");
+            return;
+          }
 
-        getSharedPrfanceList();
-        setState(() {
-          Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
-          getCalendar.then((value) {
-            setState(() {
-              calendarModalGlobal = value;
-            });
+          // 2. Stop duplicate API calls
+          // Compare only month & year — day changes should NOT trigger new API
+          if (_lastApiCallMonth != null &&
+              _lastApiCallMonth!.month == date.month &&
+              _lastApiCallMonth!.year == date.year) {
+            print("⛔ Duplicate onCalendarChanged — API blocked");
+            return;
+          }
+
+          // 3. Save month so next duplicate call is blocked
+          _lastApiCallMonth = DateTime(date.year, date.month);
+
+          // 4. Update month, UI & selected date
+          _targetDateTime = date;
+          _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+
+          singleDateString = DateFormat('dd-MM-yyyy').format(date);
+          print("Updated Date Change - $singleDateString");
+
+          print("✅ Calling Calendar API for: $_currentMonth");
+
+          // 5. Call API — only ONE time now
+          CalendarModalClass result = await getCalendarData(sessionId!);
+
+          setState(() {
+            calendarModalGlobal = result;
           });
-        });
-      },
+
+          print("✔ Calendar API Updated");
+        },
       onDayLongPressed: (DateTime date) {
         //print('long pressed date $date');
       },
