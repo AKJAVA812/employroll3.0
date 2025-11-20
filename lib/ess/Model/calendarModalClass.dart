@@ -34,18 +34,21 @@ class CalendarModalClass {
 class Legends {
   String? mobColor;
   String? status;
+  String? statusName;
 
   Legends({this.mobColor, this.status});
 
   Legends.fromJson(Map<String, dynamic> json) {
     mobColor = json['mobColor'];
     status = json['status'];
+    statusName = json['statusName'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['mobColor'] = this.mobColor;
     data['status'] = this.status;
+    data['statusName'] = this.statusName;
     return data;
   }
 }

@@ -25,7 +25,7 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
+import 'dart:developer' as developer;
 import '../../calendarPage/attendanceRequetCalendar.dart';
 import '../modelClass/attendanceReportModel.dart';
 import 'model/onDateReportModel.dart';
@@ -53,8 +53,6 @@ String singleDateString="";
 CalendarModalClass? calendarModalGlobal;
 List<dynamic> data=[];
 var calendarSendData;
-var startPayCycle;
-var endPayCycle;
 class _GetAttendanceDetState extends State<GetAttendanceDet> {
   dynamic formattedDate;
   DateTime _currentDate = DateTime.now();
@@ -76,6 +74,9 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     // TODO: implement initState
     super.initState();
   }
+  var deadlineStartDate;
+  var deadlineEndDate;
+  String lockDateStr="";
   Future getSharedPrfanceList() async {
     //await Future.delayed(Duration(seconds: 1));
 
@@ -84,11 +85,10 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     deptName = await shared!.getDept()??"N/A";
     empName = await shared!.getempName()??"N/A";
 
-    startPayCycle = await shared!.getPayCycleStart() ?? "N/A";
-    endPayCycle = await shared!.getPayCycleEnd() ?? "N/A";
+    deadlineStartDate = await shared.getPayCycleStart() ?? "0";
+    deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
+    lockDateStr = await shared.getRaiseRequisition() ?? "0";
 
-    print("Start Pay $startPayCycle");
-    print("End Pay $endPayCycle");
     checkAndRunApi();
     setState(() {
       print('ResponseAttendance: ${sessionId}' );
@@ -205,6 +205,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         return {
           "mobColor": legend["mobColor"].toString(),
           "status": legend["status"].toString(),
+          "statusName": legend["statusName"].toString(),
         };
       }).toList();
 
@@ -637,6 +638,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     );
   }
 
+  DateTime? _lastApiCallMonth;
   CalendarShow() {
     /// Example with custom icon
     final _calendarCarousel = Container(
@@ -675,9 +677,8 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     /// Example Calendar Carousel without header and custom prev & next button
     final _calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Mythemes.lightBluishColor,
-
+      pageScrollPhysics: NeverScrollableScrollPhysics(),
       /*onDayPressed: (date, events) {
-
       this.setState(() => _currentDate = date);
       this.setState(() => _currentDate2 = date);
       events.forEach((event) => print(event.title));
@@ -716,7 +717,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           );
           return;
         }
-        if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
+        /*if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
           print("⛔ Date tap disabled for past months");
           showDialog(
             context: context,
@@ -740,10 +741,87 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           );
           return;
         }
+*/
 
-        this.setState(() => _currentDate = date);
-        this.setState(() => _currentDate2 = date);
-        events.forEach((event) => print('event list ${event.getDescription()}'));
+        // PAYCYCLE RANGE
+        //DateTime cycleStart = DateTime(2025, 10, 20);
+        //DateTime cycleEnd = DateTime(2025, 11, 19);
+        DateTime cycleStart;
+        DateTime cycleEnd;
+        int startDay = int.parse(deadlineStartDate);
+        int endDay = int.parse(deadlineEndDate);
+        print('date start and End $startDay $endDay');
+        /* int startDay = 0;
+        int endDay = 0;*/
+
+        // CURRENT DATE
+        DateTime today = DateTime.now();
+        // e.g. "23-11-2024 11:59 AM"
+
+        // Convert String → DateTime
+        DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm a").parse(lockDateStr);
+        print('raise date  $lockDateTime');
+        DateTime monthStart = DateTime(today.year, today.month, 1);
+        DateTime monthEnd = DateTime(today.year, today.month + 1, 0);
+        // Convert to only "dd"
+        int startDayInt = monthStart.day;
+        int endDayInt = monthEnd.day;
+
+        print("Start: $startDayInt");
+        print("End:   $endDayInt");
+        //deadlineStartDate - Data get form Login API deadlineEndDate = Data get from Login
+        if (startDay == 0 || endDay == 0){
+          startDay = startDayInt;
+          endDay = endDayInt;
+        }
+        print('date start and End $startDay $endDay');
+        if (today.day < startDay) {
+          // Current month cycle is last month → this month
+          cycleStart = DateTime(today.year, today.month - 1, startDay);
+          cycleEnd = DateTime(today.year, today.month, endDay);
+        } else {
+          // Current month cycle is this month → next month
+          cycleStart = DateTime(today.year, today.month, startDay);
+          cycleEnd = DateTime(today.year, today.month + 1, endDay);
+        }
+
+        print("Cycle Start: $cycleStart");
+        print("Cycle End:   $cycleEnd");
+
+        // Step 1 → Execute only if now >= lock date+time
+        if (today.isAfter(lockDateTime) || today.isAtSameMomentAs(lockDateTime)) {
+          // CHECK: If current date is outside paycycle → BLOCK
+          if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
+            developer.log('date for all true');
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                title: const Text(
+                  "Notice",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                content: const Text(
+                  "You are out of the pay-cycle. Attendance requisition not allowed.",
+                  style: TextStyle(fontSize: 15),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
+            );
+            return; // STOP further action
+          }
+
+        }
+
+
+        setState(() => _currentDate = date);
+        setState(() => _currentDate2 = date);
+        //events.forEach((event) => print('event list ${event.getDescription()}'));
         //print(date);
         setState(() {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
@@ -786,7 +864,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       height: 370.0,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
-      customGridViewPhysics: NeverScrollableScrollPhysics(),
+      //customGridViewPhysics: NeverScrollableScrollPhysics(),
 
       markedDateCustomShapeBorder: CircleBorder(side: BorderSide(color: Colors.grey)),
       markedDateCustomTextStyle: TextStyle(
@@ -836,28 +914,44 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         //API month change call
       });
     },*/
-      onCalendarChanged: (DateTime date) {
-        // Prevent sliding beyond allowed range
+
+      onCalendarChanged: (DateTime date) async {
+
+        // 1. Prevent sliding beyond allowed range
         if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
           print("⛔ Calendar slide limit reached");
           return;
         }
 
+        // 2. Stop duplicate API calls
+        // Compare only month & year — day changes should NOT trigger new API
+        if (_lastApiCallMonth != null &&
+            _lastApiCallMonth!.month == date.month &&
+            _lastApiCallMonth!.year == date.year) {
+          print("⛔ Duplicate onCalendarChanged — API blocked");
+          return;
+        }
+
+        // 3. Save month so next duplicate call is blocked
+        _lastApiCallMonth = DateTime(date.year, date.month);
+
+        // 4. Update month, UI & selected date
         _targetDateTime = date;
         _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
-        print('change date $date.month$_targetDateTime');
+
         singleDateString = DateFormat('dd-MM-yyyy').format(date);
         print("Updated Date Change - $singleDateString");
 
-        getSharedPrfanceList();
+        print("✅ Calling Calendar API for: $_currentMonth");
+
+        // 5. Call API — only ONE time now
+        CalendarModalClass result = await getCalendarData(sessionId!);
+
         setState(() {
-          Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
-          getCalendar.then((value) {
-            setState(() {
-              calendarModalGlobal = value;
-            });
-          });
+          calendarModalGlobal = result;
         });
+
+        print("✔ Calendar API Updated");
       },
       onDayLongPressed: (DateTime date) {
         //print('long pressed date $date');
@@ -988,29 +1082,95 @@ class LegendWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      child: Wrap(
-        spacing: 16, // Space between items
-        runSpacing: 8, // Space between rows
-        children: legends.map((legend) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 16,
-                height: 16,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(int.parse(legend['mobColor']!)), // Parse color
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // LEFT SIDE — current legend wrap
+          Expanded(
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 8,
+              children: legends.map((legend) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(int.parse(legend['mobColor']!)),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      legend['status']!,
+                      style: TextStyle(fontSize: 14, color: Colors.black),
+                    ),
+                  ],
+                ).py1();
+              }).toList(),
+            ),
+          ),
+
+          // RIGHT SIDE — ellipsis icon
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
-              ),
-              SizedBox(width: 8), // Space between circle and text
-              Text(
-                legend['status']!,
-                style: TextStyle(fontSize: 14, color: Colors.black),
-              ),
-            ],
-          ).py1();
-        }).toList(),
+                builder: (context) {
+                  return Container(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("Legend Details",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 12),
+
+                        // FULL LIST WITH COLORS
+                        ...legends.map((legend) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(
+                                        int.parse(legend['mobColor']!)),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    legend['statusName']!,
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12.0, top: 4),
+              child: Icon(Icons.more_vert, size: 24, color: Colors.black),
+            ),
+          ),
+        ],
       ),
     );
   }

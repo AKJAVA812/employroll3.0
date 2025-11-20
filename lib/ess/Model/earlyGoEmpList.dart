@@ -5,8 +5,11 @@ import 'package:er_flutter_project/adminPage/modelClass/dashboardModel.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../../themes/empThemes.dart';
 import '../../commanScreen/homePage.dart';
+import '../../commanScreen/punchInOutScreen.dart';
 import '../../commanScreen/routes.dart';
 import '../../profiles/profilePageWithHead.dart';
+import '../essDashboardNavigate.dart';
+import '../myAllReports.dart';
 
 
 class EarlyGoEmpList extends StatefulWidget {
@@ -32,7 +35,7 @@ class _EarlyGoEmpListState extends State<EarlyGoEmpList> {
     super.initState();
   }
   int pageIndex = 0;
-  int currentIndex = 3;
+  int currentIndex = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -65,28 +68,36 @@ class _EarlyGoEmpListState extends State<EarlyGoEmpList> {
         onTap: (index) {
 
           if(index==0){
+
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
             print('home tab');
           }
           if(index==1){
-            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-            print('Reports');
+            /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Attendance');*/
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
+                MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel())));
+            //Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            // Navigator.push(context,
+            //     MaterialPageRoute(builder: (context) => ProfilePageNew())
+            // );
+            //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
           }
           /*if(index==3){
@@ -100,21 +111,21 @@ class _EarlyGoEmpListState extends State<EarlyGoEmpList> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.pending_actions),
-            label: 'Attendance',
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.doc_chart),
-            label: 'Reports',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

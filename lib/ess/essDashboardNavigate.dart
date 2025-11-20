@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-import 'myAllReports.dart';
+
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:er_flutter_project/adminPage/modelClass/eventListModal.dart';
 import 'package:er_flutter_project/commanScreen/homePage.dart';
@@ -44,8 +44,7 @@ import '../modules/timeAndAttendance/reports/modelClass/attendanceReportModel.da
 import '../profiles/profilePageWithHead.dart';
 import 'Model/calendarModalClass.dart';
 import 'Model/holidaylistEssModal.dart';
-
-
+import 'myAllReports.dart';
 
 class EssAdminDashboardHead extends StatefulWidget {
   final EssDashboarrdModel dashboardModel1N;
@@ -87,6 +86,8 @@ bool isLoadingTodayEvent = true;
 bool isLoadingTodayPunch = true;
 String valuenew = "listText";
 String shiftValue = "listText";
+List<dynamic> data=[];
+var calendarSendData;
 
 class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
@@ -104,8 +105,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   DateTime _currentDate = DateTime.now();
   DateTime _currentDate2 = DateTime.now();
 
-  List<dynamic> data=[];
-  var calendarSendData;
   //String _currentMonth = DateFormat.yMMM().format(DateTime.now());
   //String _currentMonth = DateFormat.yMMM().format(DateTime.now());
   String _currentMonth = DateFormat('MM-yyyy').format(DateTime.now());
@@ -127,6 +126,10 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   int? shortLeaveCount;
   int? overTime;
 
+  var deadlineStartDate;
+  var deadlineEndDate;
+  String lockDateStr="";
+
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
@@ -136,10 +139,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     roRole= await shared.getRoRole();
     userPanelPermission= await shared.getUserPanel();
     adminRole= await shared.getAdminRole();
+    deadlineStartDate = await shared.getPayCycleStart() ?? "0";
+    deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
+    lockDateStr = await shared.getRaiseRequisition() ?? "0";
 
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
+    print("Start Pay $deadlineStartDate");
+    print("End Pay $deadlineEndDate");
+
+    //print('empRole $empRole');
+    //print('roRole $roRole');
+    //print('adminRole $adminRole');
 
     //Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
     getRealTimeAttButtonShow = true;
@@ -444,7 +453,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "month=$_currentMonth");
-
     setState(() {
       isLoading = true;
     });
@@ -459,18 +467,17 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       final cachedData = prefs.getString('calendarData');
       final cachedMonth = prefs.getString('calendarMonth');
 
-
       print("Calendar Data - $cachedData");
       print("Calendar Month - $cachedMonth");
 
       if (cachedData != null) {
         print("Cachded Month $cachedMonth");
         try {
-          print("Loaded calendar data from cache ✅");
+          //print("Loaded calendar data from cache ✅");
           mapResponse = json.decode(cachedData);
           _buildCalendarFromMap(mapResponse);
         } catch (e) {
-          print("Error loading cached calendar: $e");
+          //print("Error loading cached calendar: $e");
         }
       }
     }
@@ -488,7 +495,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           await prefs.setString('calendarData', json.encode(mapResponse));
           await prefs.setString('calendarMonth', _currentMonth);
         }
-
         // ✅ Rebuild UI from fresh API data
         _buildCalendarFromMap(mapResponse);
       } else {
@@ -507,7 +513,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
 // 🔧 Helper method to rebuild UI from any map data (API or cache)
-  // 🔧 Helper method to rebuild UI from any map data (API or cache)
   void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
       data = mapResponse['data'] ?? [];
@@ -518,6 +523,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         return {
           "mobColor": legend["mobColor"].toString(),
           "status": legend["status"].toString(),
+          "statusName": legend["statusName"].toString(),
         };
       }).toList();
 
@@ -547,6 +553,47 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     setState(() {}); // Refresh UI
   }
+  /*void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
+    try {
+      List<dynamic> data = mapResponse['data'] ?? [];
+      List<dynamic> legends = mapResponse['legends'] ?? [];
+
+      // Build legends (✅ limit status length to 8 chars + add "...")
+      _legends = legends.map((legend) {
+        String status = legend["status"]?.toString() ?? "";
+        if (status.length > 8) {
+          status = "${status.substring(0, 8)}..."; // add ellipsis
+        }
+        return {
+          "mobColor": legend["mobColor"].toString(),
+          "status": status,
+        };
+      }).toList();
+
+      // Build marked dates
+      _markedDateMap.clear();
+
+      for (var event in data) {
+        DateTime eventDate = DateTime.parse(event['logDate']);
+        String title = event['status'] ?? "Event";
+        String logDate = event['logDate'];
+        String mobColor = event['mobColor'] ?? "0xff2196F3";
+
+        _markedDateMap.add(
+          eventDate,
+          Event(
+            date: eventDate,
+            title: title,
+            icon: _buildEventIcon(mobColor, logDate),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error parsing calendar data: $e");
+    }
+
+    setState(() {}); // Refresh UI
+  }*/
 
   // Helper function to build event icon
   Widget _buildEventIcon(String colorHex, String logDate) {
@@ -635,7 +682,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   // ===============================================================
   // ✅ MAIN METHOD - Check and Run API only once per day
   // ===============================================================
-  void checkAndRunApi() async {
+  /*void checkAndRunApi() async {
     bool runApi = await shouldRunApi();
 
     if (runApi) {
@@ -700,7 +747,59 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       await loadSavedData(); // 🔹 Load saved modal data
     }
   }
+*/
+  void checkAndRunApi() async {
+    bool runApi = await shouldRunApi();
 
+    if (!runApi) {
+      print("⏸ Skipping API. Loading from cache...");
+      await loadSavedData();
+      return;
+    }
+
+    print("🔄 Running API for today...");
+
+    try {
+      // Parallel API calls
+      final results = await Future.wait([
+        getDashboardData(sessionId!),       // 0
+        getCalendarData(sessionId!),        // 1
+        getHolidayData(sessionId!),         // 2
+        getEventData(sessionId!),           // 3
+        getTodayEventData(sessionId!),      // 4
+      ]);
+
+      // Assign results
+      final dashboardData   = results[0] as EssDashboarrdModel;
+      final calendarData    = results[1] as CalendarModalClass;
+      final holidayData     = results[2] as HolidayESSModal?;
+      final eventList       = results[3] as EssEventsListModal?;
+      final todayEventList  = results[4] as TodayEventListModal;
+
+      // Update UI state only once
+      setState(() {
+        essDashboardModelGlobal = dashboardData;
+        calendarModalGlobal = calendarData;
+        holidayListModalGlobal = holidayData;
+        eventsListModalGlobal = eventList;
+        todayEventModalGlobal = todayEventList;
+
+        isLoading = false;
+        isLoadingTodayEvent = false;
+      });
+
+      print("✅ All APIs loaded successfully.");
+
+    } catch (e, st) {
+      print("❌ Error loading APIs: $e");
+      print(st);
+
+      setState(() {
+        isLoading = false;
+        isLoadingTodayEvent = false;
+      });
+    }
+  }
 
   // ===============================================================
   // ✅ Helper - Check if API should run today
@@ -721,7 +820,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
 
   /*Future<EssEventsListModal?> getEventData(String sessionId) async {
-    *//*final prefs = await SharedPreferences.getInstance();
+    */
+  /*final prefs = await SharedPreferences.getInstance();
     final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final lastApiCallDate = prefs.getString('lastApiCallDate');
     print("Last API Call Date - $lastApiCallDate");
@@ -731,7 +831,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       print("⏩ Skipping API call. Already fetched today ($currentDate).");
       isLoadingEvent = false;
       return eventsListModalGlobal; // Return previously fetched data if available
-    }*//*
+    }*/
+  /*
 
     // ✅ If date doesn’t match, make the API call
     setState(() {
@@ -796,6 +897,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       final response = await http.post(urlapi);
       final mapResponse = json.decode(response.body);
 
+      print("Event API -${response.request}");
       final eventsListModal = EssEventsListModal.fromJson(mapResponse);
       eventsListModalGlobal = eventsListModal;
 
@@ -835,6 +937,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       final response = await http.post(urlapi);
       final mapResponse = json.decode(response.body);
 
+      print("Today Event - ${response.request}");
+
       final todayEventListModal = TodayEventListModal.fromJson(mapResponse);
       todayEventModalGlobal = todayEventListModal;
 
@@ -866,23 +970,27 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     final dashboardData = prefs.getString('dashboardData');
 
     if (eventsJson != null) {
+      print("Event JSON - $eventsJson");
       final mapResponse = jsonDecode(eventsJson);
-
       eventsListModalGlobal = EssEventsListModal.fromJson(mapResponse);
-      _buildCalendarFromMap(mapResponse);
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded eventsJson data from SharedPreferences");
+    }else{
+      print("📦 Loaded eventsJson data not save from SharedPreferences");
     }
 
     if (todayEventsJson != null) {
       final mapResponse = jsonDecode(todayEventsJson);
       todayEventModalGlobal = TodayEventListModal.fromJson(mapResponse);
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded todayEventsJson data from SharedPreferences");
+    }else{
+      print("📦 Loaded todayEventsJson data not save from SharedPreferences");
     }
-
 
     if (holidayJson != null) {
       final mapResponse = jsonDecode(holidayJson);
@@ -890,8 +998,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       setState(() {
         holidayListModalGlobal = holidayESSModal;
-        isLoadingEvent = false;
-        isLoadingTodayEvent = false;
+        //isLoadingEvent = false;
+        //isLoadingTodayEvent = false;
       });
 
       print("📦 Loaded Holiday data from SharedPreferences");
@@ -917,17 +1025,22 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       isLoadingEvent = false;
       isLoading = false;
       isLoadingTodayEvent = false;
+      print("📦 Loaded calender data from SharedPreferences");
+    }else{
+      print("📦 Loaded calender data from SharedPreferences");
     }
     if (dashboardData != null) {
       final mapResponse = jsonDecode(dashboardData);
       print("Loaded Dashboard Data data from cache ✅");
       essDashboardModelGlobal = EssDashboarrdModel.fromJson(mapResponse);
-      isLoadingEvent = false;
-      isLoadingEvent = false;
-      isLoading = false;
-      isLoadingTodayEvent = false;
+      //isLoadingEvent = false;
+      //isLoadingEvent = false;
+      //isLoading = false;
+      //isLoadingTodayEvent = false;
+      print("📦 Loaded Dashboard data from SharedPreferences");
+    }else{
+      print("📦 Loaded Dashboard data Not Saved from SharedPreferences");
     }
-
     setState(() {
       isLoading = false;
     });
@@ -1232,75 +1345,78 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           ? loader()
           : DashboardWidgets(essDashboardModelGlobal!),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
-        type: BottomNavigationBarType.fixed,
-        currentIndex: currentIndex,
-        iconSize: 25,
-        selectedFontSize: 12,
-        unselectedFontSize: 10,
-        onTap: (index) {
+        bottomNavigationBar:
+        BottomNavigationBar (
+          type: BottomNavigationBarType.fixed,
+          currentIndex: currentIndex,
+          iconSize: 25,
+          selectedFontSize: 12,
+          unselectedFontSize: 10,
+          onTap: (index) {
 
-          if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
-            //Navigator.pop(context);
-            print('home tab');
-          }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
-            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
-          }
-          if(index==2){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
-            //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-            print('My Requests');
-          }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
-            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
-          }
-          if(index==4){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-           /* Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );*/
-            print('Dashboard');
-          }
+            if(index==0){
 
-          setState(() => currentIndex = index);
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.manage_accounts_outlined),
-            label: 'Workflow',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.app_badge_fill),
-            label: 'My Requests',
-            //backgroundColor: Colors.blue,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.doc_chart),
-            label: 'My Reports',
-            //backgroundColor: Colors.blue,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-            //backgroundColor: Colors.blue,
-          ),
-        ],
-      ),
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+              //Navigator.pop(context);
+              print('home tab');
+            }
+            if(index==1){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Workflow');
+            }
+            if(index==2){
+              /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Attendance');*/
+            }
+            if(index==3){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+              print('Dashboard');
+            }
+            if(index==4){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel())));
+              //Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => ProfilePageNew())
+              // );
+              //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
+              print('Profile');
+            }
+            /*if(index==3){
+                title="Notifications";
+              }*/
+            setState(() => currentIndex = index);
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.manage_accounts_outlined),
+              label: 'Workflow',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.app_badge_fill),
+              label: 'My Requests',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
+              //backgroundColor: Colors.blue,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+              //backgroundColor: Colors.blue,
+            ),
+          ],
+        ),
     );
   }
 
@@ -2709,7 +2825,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                             trailingBuilder: (item) => item.dob,
                             imageBuilder: (item) => item.image,
                           ),
-
                           // 🏅 Anniversary Tab
                           buildEventList(
                             isLoading: isLoadingEvent,
@@ -2720,8 +2835,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                             trailingBuilder: (item) => item.doj,
                             imageBuilder: (item) => item.image,
                           ),
-
-
 
                           // 📅 Today Events Tab (combine lists)
 
@@ -2914,7 +3027,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     );
   }
 
-
+  DateTime? _lastApiCallMonth;
   CalendarShow() {
     /// Example with custom icon
     final _calendarCarousel = Container(
@@ -2953,9 +3066,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     /// Example Calendar Carousel without header and custom prev & next button
     final _calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Mythemes.lightBluishColor,
-
+      pageScrollPhysics: NeverScrollableScrollPhysics(),
       /*onDayPressed: (date, events) {
-
       this.setState(() => _currentDate = date);
       this.setState(() => _currentDate2 = date);
       events.forEach((event) => print(event.title));
@@ -2994,7 +3106,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           );
           return;
         }
-        if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
+        /*if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
           print("⛔ Date tap disabled for past months");
           showDialog(
             context: context,
@@ -3018,10 +3130,87 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           );
           return;
         }
+*/
 
-        this.setState(() => _currentDate = date);
-        this.setState(() => _currentDate2 = date);
-        events.forEach((event) => print('event list ${event.getDescription()}'));
+        // PAYCYCLE RANGE
+        //DateTime cycleStart = DateTime(2025, 10, 20);
+        //DateTime cycleEnd = DateTime(2025, 11, 19);
+        DateTime cycleStart;
+        DateTime cycleEnd;
+        int startDay = int.parse(deadlineStartDate);
+        int endDay = int.parse(deadlineEndDate);
+        print('date start and End $startDay $endDay');
+        /* int startDay = 0;
+        int endDay = 0;*/
+
+        // CURRENT DATE
+        DateTime today = DateTime.now();
+        // e.g. "23-11-2024 11:59 AM"
+
+        // Convert String → DateTime
+        DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm a").parse(lockDateStr);
+        print('raise date  $lockDateTime');
+        DateTime monthStart = DateTime(today.year, today.month, 1);
+        DateTime monthEnd = DateTime(today.year, today.month + 1, 0);
+        // Convert to only "dd"
+        int startDayInt = monthStart.day;
+        int endDayInt = monthEnd.day;
+
+        print("Start: $startDayInt");
+        print("End:   $endDayInt");
+        //deadlineStartDate - Data get form Login API deadlineEndDate = Data get from Login
+        if (startDay == 0 || endDay == 0){
+          startDay = startDayInt;
+          endDay = endDayInt;
+        }
+        print('date start and End $startDay $endDay');
+        if (today.day < startDay) {
+          // Current month cycle is last month → this month
+          cycleStart = DateTime(today.year, today.month - 1, startDay);
+          cycleEnd = DateTime(today.year, today.month, endDay);
+        } else {
+          // Current month cycle is this month → next month
+          cycleStart = DateTime(today.year, today.month, startDay);
+          cycleEnd = DateTime(today.year, today.month + 1, endDay);
+        }
+
+        print("Cycle Start: $cycleStart");
+        print("Cycle End:   $cycleEnd");
+
+        // Step 1 → Execute only if now >= lock date+time
+        if (today.isAfter(lockDateTime) || today.isAtSameMomentAs(lockDateTime)) {
+          // CHECK: If current date is outside paycycle → BLOCK
+          if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
+            developer.log('date for all true');
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                title: const Text(
+                  "Notice",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                content: const Text(
+                  "You are out of the pay-cycle. Attendance requisition not allowed.",
+                  style: TextStyle(fontSize: 15),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
+            );
+            return; // STOP further action
+          }
+
+        }
+
+
+        setState(() => _currentDate = date);
+        setState(() => _currentDate2 = date);
+        //events.forEach((event) => print('event list ${event.getDescription()}'));
         //print(date);
         setState(() {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
@@ -3064,7 +3253,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       height: 370.0,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
-      customGridViewPhysics: NeverScrollableScrollPhysics(),
+      //customGridViewPhysics: NeverScrollableScrollPhysics(),
 
       markedDateCustomShapeBorder: CircleBorder(side: BorderSide(color: Colors.grey)),
       markedDateCustomTextStyle: TextStyle(
@@ -3114,28 +3303,44 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         //API month change call
       });
     },*/
-      onCalendarChanged: (DateTime date) {
-        // Prevent sliding beyond allowed range
+
+      onCalendarChanged: (DateTime date) async {
+
+        // 1. Prevent sliding beyond allowed range
         if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
           print("⛔ Calendar slide limit reached");
           return;
         }
 
+        // 2. Stop duplicate API calls
+        // Compare only month & year — day changes should NOT trigger new API
+        if (_lastApiCallMonth != null &&
+            _lastApiCallMonth!.month == date.month &&
+            _lastApiCallMonth!.year == date.year) {
+          print("⛔ Duplicate onCalendarChanged — API blocked");
+          return;
+        }
+
+        // 3. Save month so next duplicate call is blocked
+        _lastApiCallMonth = DateTime(date.year, date.month);
+
+        // 4. Update month, UI & selected date
         _targetDateTime = date;
         _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
-        print('change date $date.month$_targetDateTime');
+
         singleDateString = DateFormat('dd-MM-yyyy').format(date);
         print("Updated Date Change - $singleDateString");
 
-        getSharedPrfanceList();
+        print("✅ Calling Calendar API for: $_currentMonth");
+
+        // 5. Call API — only ONE time now
+        CalendarModalClass result = await getCalendarData(sessionId!);
+
         setState(() {
-          Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
-          getCalendar.then((value) {
-            setState(() {
-              calendarModalGlobal = value;
-            });
-          });
+          calendarModalGlobal = result;
         });
+
+        print("✔ Calendar API Updated");
       },
       onDayLongPressed: (DateTime date) {
         //print('long pressed date $date');
@@ -3582,7 +3787,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 }
 
-class LegendWidget extends StatelessWidget {
+/*class LegendWidget extends StatelessWidget {
   final List<Map<String, String>> legends;
 
   LegendWidget({required this.legends});
@@ -3614,6 +3819,109 @@ class LegendWidget extends StatelessWidget {
             ],
           ).py1();
         }).toList(),
+      ),
+    );
+  }
+}*/
+
+class LegendWidget extends StatelessWidget {
+  final List<Map<String, String>> legends;
+
+  LegendWidget({required this.legends});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // LEFT SIDE — current legend wrap
+          Expanded(
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 8,
+              children: legends.map((legend) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(int.parse(legend['mobColor']!)),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      legend['status']!,
+                      style: TextStyle(fontSize: 14, color: Colors.black),
+                    ),
+                  ],
+                ).py1();
+              }).toList(),
+            ),
+          ),
+
+          // RIGHT SIDE — ellipsis icon
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (context) {
+                  return Container(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("Legend Details",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 12),
+
+                        // FULL LIST WITH COLORS
+                        ...legends.map((legend) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(
+                                        int.parse(legend['mobColor']!)),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    legend['statusName']!,
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12.0, top: 4),
+              child: Icon(Icons.more_vert, size: 24, color: Colors.black),
+            ),
+          ),
+        ],
       ),
     );
   }
