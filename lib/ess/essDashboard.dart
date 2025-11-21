@@ -141,6 +141,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     deadlineStartDate = await shared.getPayCycleStart() ?? "0";
     deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
     lockDateStr = await shared.getRaiseRequisition() ?? "0";
+    //lockDateStr = "20-11-2025 11:59 PM";
 
     print("Start Pay $deadlineStartDate");
     print("End Pay $deadlineEndDate");
@@ -3072,7 +3073,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
          // e.g. "23-11-2024 11:59 AM"
 
         // Convert String → DateTime
-        DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm a").parse(lockDateStr);
+        DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm").parse(lockDateStr);
+        print('raise date New  $lockDateStr');
         print('raise date  $lockDateTime');
         DateTime monthStart = DateTime(today.year, today.month, 1);
         DateTime monthEnd = DateTime(today.year, today.month + 1, 0);

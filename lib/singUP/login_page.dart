@@ -753,6 +753,8 @@ class _LoginPageState extends State<LoginPage> {
       shared.setIfscCode(loginModelglobal.data!.ifscCode);
       shared.setEmpId(loginModelglobal.data!.empId);
       shared.setRaiseRequisition(loginModelglobal.data!.raisedDate);
+      var raisedDate = loginModelglobal.data!.raisedDate;
+      print("Raised Date - ${raisedDate}");
       shared.setApprovalRequisition(loginModelglobal.data!.approvedDate);
       shared.setUserType(loginModelglobal.data!.userLoginned!.userType);
 

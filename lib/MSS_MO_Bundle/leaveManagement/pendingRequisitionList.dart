@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/modules/leaveManagement/reports/modalClass/pendingLeaveRequisitionModal.dart';
@@ -622,7 +623,7 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
@@ -633,20 +634,20 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
             print('Workflow');
           }
           if(index==2){
-            Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+            //Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+            Navigator.pop(context);
             print('Leave');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
+            print('My Reports');
           }
           if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
+            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
+            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -663,17 +664,17 @@ class _MSS_MO_PendingLeaveRequisitionListState extends State<MSS_MO_PendingLeave
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.group_off),
+            icon: Icon(Icons.new_label_sharp),
             label: 'Leave',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],
