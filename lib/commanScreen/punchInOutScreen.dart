@@ -1721,6 +1721,8 @@ class _DefaultPageState extends State<DefaultPage> {
     if (position != null) {
       setState(() {
         currentPostion = LatLng(position!.latitude, position!.longitude);
+        print('latlng map $currentPostion');
+        getAddress(position!);
       });
 
       // 🔥 IMPORTANT: Update Google Map Camera
@@ -1733,7 +1735,7 @@ class _DefaultPageState extends State<DefaultPage> {
       }
       shared.setLatitude(position!.latitude);
       shared.setLongitude(position!.longitude);
-      getAddress(position!);
+      //getAddress(position!);
     } else {
       showAboutDialog(context: this.context);
     }
@@ -2091,7 +2093,7 @@ class _DefaultPageState extends State<DefaultPage> {
                     currentPostion!.latitude,
                     currentPostion!.longitude,
                   ),
-                  zoom: 14,
+                  zoom: 16,
                 ),
                 myLocationButtonEnabled: true,
                 zoomControlsEnabled: false,

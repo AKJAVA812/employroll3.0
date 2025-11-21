@@ -143,7 +143,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     lockDateStr = await shared.getRaiseRequisition() ?? "0";
     //lockDateStr = "20-11-2025 11:59 PM";
 
-    print("Start Pay $deadlineStartDate");
+    print("Start Pay ${lockDateStr.isEmpty}");
     print("End Pay $deadlineEndDate");
 
     //print('empRole $empRole');
@@ -616,8 +616,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       ),
     );
   }
-
-
 
   /*Future<EssEventsListModal> getEventData(String sessionId) async {
     setState(() {
@@ -3072,18 +3070,17 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         DateTime today = DateTime.now();
          // e.g. "23-11-2024 11:59 AM"
 
-        // Convert String → DateTime
-        DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm").parse(lockDateStr);
-        print('raise date New  $lockDateStr');
-        print('raise date  $lockDateTime');
+
+        //print('raise date New  $lockDateStr');
+        //print('raise date  $lockDateTime');
         DateTime monthStart = DateTime(today.year, today.month, 1);
         DateTime monthEnd = DateTime(today.year, today.month + 1, 0);
         // Convert to only "dd"
         int startDayInt = monthStart.day;
         int endDayInt = monthEnd.day;
 
-        print("Start: $startDayInt");
-        print("End:   $endDayInt");
+        //print("Start: $startDayInt");
+        //print("End:   $endDayInt");
         //deadlineStartDate - Data get form Login API deadlineEndDate = Data get from Login
         if (startDay == 0 || endDay == 0){
           startDay = startDayInt;
@@ -3102,10 +3099,38 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
         print("Cycle Start: $cycleStart");
         print("Cycle End:   $cycleEnd");
-
-        // Step 1 → Execute only if now >= lock date+time
-        if (today.isAfter(lockDateTime) || today.isAtSameMomentAs(lockDateTime)) {
-          // CHECK: If current date is outside paycycle → BLOCK
+        if (lockDateStr != null && lockDateStr.trim().isNotEmpty) {
+          // Convert String → DateTime
+          DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm").parse(lockDateStr);
+          // Step 1 → Execute only if now >= lock date+time
+          if (today.isAfter(lockDateTime) || today.isAtSameMomentAs(lockDateTime)) {
+            // CHECK: If current date is outside paycycle → BLOCK
+            if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
+              developer.log('date for all true');
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  title: const Text(
+                    "Notice",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  content: const Text(
+                    "You are out of the pay-cycle. Attendance requisition not allowed.",
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+              return; // STOP further action
+            }
+          }
+        }else{
           if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
             developer.log('date for all true');
             showDialog(
@@ -3130,8 +3155,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
             );
             return; // STOP further action
           }
-
         }
+
 
 
         setState(() => _currentDate = date);
