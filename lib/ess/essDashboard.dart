@@ -140,10 +140,10 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     adminRole= await shared.getAdminRole();
     deadlineStartDate = await shared.getPayCycleStart() ?? "0";
     deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
-    lockDateStr = await shared.getRaiseRequisition();
+    lockDateStr = await shared.getRaiseRequisition() ?? "0";
 
-    print("lockDateStr Pay $lockDateStr");
-    //print("End Pay $endPayCycle");
+    print("Start Pay $deadlineStartDate");
+    print("End Pay $deadlineEndDate");
 
     //print('empRole $empRole');
     //print('roRole $roRole');
@@ -522,6 +522,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         return {
           "mobColor": legend["mobColor"].toString(),
           "status": legend["status"].toString(),
+          "statusName": legend["statusName"].toString(),
         };
       }).toList();
 
@@ -3710,7 +3711,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   }
 }
 
-class LegendWidget extends StatelessWidget {
+/*class LegendWidget extends StatelessWidget {
   final List<Map<String, String>> legends;
 
   LegendWidget({required this.legends});
@@ -3742,6 +3743,109 @@ class LegendWidget extends StatelessWidget {
             ],
           ).py1();
         }).toList(),
+      ),
+    );
+  }
+}*/
+
+class LegendWidget extends StatelessWidget {
+  final List<Map<String, String>> legends;
+
+  LegendWidget({required this.legends});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // LEFT SIDE — current legend wrap
+          Expanded(
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 8,
+              children: legends.map((legend) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(int.parse(legend['mobColor']!)),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      legend['status']!,
+                      style: TextStyle(fontSize: 14, color: Colors.black),
+                    ),
+                  ],
+                ).py1();
+              }).toList(),
+            ),
+          ),
+
+          // RIGHT SIDE — ellipsis icon
+          GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (context) {
+                  return Container(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("Legend Details",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 12),
+
+                        // FULL LIST WITH COLORS
+                        ...legends.map((legend) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(
+                                        int.parse(legend['mobColor']!)),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    legend['statusName']!,
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12.0, top: 4),
+              child: Icon(Icons.more_vert, size: 24, color: Colors.black),
+            ),
+          ),
+        ],
       ),
     );
   }
