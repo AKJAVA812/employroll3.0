@@ -1097,23 +1097,14 @@ class _DefaultPageState extends State<DefaultPage> {
     //print('initState');
     // TODO: implement initState
     _determinePosition();
-    _getUserLocation();
+    //_getUserLocation();
+    _startLocationTracking();
     timeString = _formatDateTime(DateTime.now());
     getSharedPrfanceList();
     _getTime();
     initPlatformState();
     super.initState();
   }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    //TrustLocation.stop();
-    super.dispose();
-  }
-
-
-
 
 // ✅ Main method to get Geofence list
   Future<GeofenceListModal> getGeofenceList(String sessionId) async {
@@ -1713,8 +1704,9 @@ class _DefaultPageState extends State<DefaultPage> {
       showAboutDialog(context: this.context);
     }
   }*/
+  StreamSubscription<Position>? positionStream;
 
-  _getUserLocation() async {
+  /*_getUserLocation() async {
     //print('Setcurrent');
     position = await Geolocator.getCurrentPosition();
 
@@ -1739,6 +1731,44 @@ class _DefaultPageState extends State<DefaultPage> {
     } else {
       showAboutDialog(context: this.context);
     }
+  }*/
+
+  void _startLocationTracking() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 5, // update every 5 meter movement
+    );
+
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position pos) {
+      setState(() {
+        currentPostion = LatLng(pos.latitude, pos.longitude);
+      });
+
+      // Save position
+      shared.setLatitude(pos.latitude);
+      shared.setLongitude(pos.longitude);
+
+      // Update address dynamically
+      getAddress(pos);
+
+      // Update map center dynamically
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(pos.latitude, pos.longitude),
+          ),
+        );
+      }
+
+      print('🏃‍♂️ Position Updated: $currentPostion');
+    });
+  }
+
+  @override
+  void dispose() {
+    positionStream?.cancel();
+    super.dispose();
   }
 
   /*Future<void> getAddress(Position position) async {
