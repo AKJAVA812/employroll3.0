@@ -471,7 +471,7 @@ class SessionManager {
 
   getRaiseRequisition() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? raiseDate = prefs.getString('approvelDeadlineDate');
+    final String? raiseDate = prefs.getString('raisedDeadlineDate');
     return raiseDate;
   }
   setApprovalRequisition(approvalDate) async {

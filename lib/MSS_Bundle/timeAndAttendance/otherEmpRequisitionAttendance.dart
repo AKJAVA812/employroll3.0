@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -432,7 +433,7 @@ class _MSS_OthersAttendanceRequisitionPageState extends State<MSS_OthersAttendan
             if(index==0){
 
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
@@ -448,23 +449,24 @@ class _MSS_OthersAttendanceRequisitionPageState extends State<MSS_OthersAttendan
               print('Attendance');
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
+              print('My Reports');
             }
             if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
+              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              /*Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew())
+            );*/
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
+              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";
               }*/
             setState(() => currentIndex = index);
           },
-          items: const [
+          items:  [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
@@ -474,17 +476,17 @@ class _MSS_OthersAttendanceRequisitionPageState extends State<MSS_OthersAttendan
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              icon: Icon(Icons.approval_sharp),
+              label: 'Att. Approval',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
               //backgroundColor: Colors.blue,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
               //backgroundColor: Colors.blue,
             ),
           ],

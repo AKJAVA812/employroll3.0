@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/singleDateAttendance.dart';
@@ -484,40 +485,40 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
             if(index==0){
 
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.pop(context);
               print('home tab');
             }
             if(index==1){
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
             if(index==2){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              Navigator.pop(context);
               print('Attendance');
             }
             if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
+              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
+              print('My Reports');
             }
             if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
+              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              /*Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew())
+            );*/
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
+              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";
               }*/
             setState(() => currentIndex = index);
           },
-          items: const [
+          items:  [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
@@ -527,17 +528,17 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage> with Ro
               label: 'Workflow',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
+              icon: Icon(Icons.approval_sharp),
+              label: 'Att. Approval',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
               //backgroundColor: Colors.blue,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
               //backgroundColor: Colors.blue,
             ),
           ],

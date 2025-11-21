@@ -21,6 +21,8 @@ import '../../employeePage/employeeListModel.dart';
 import '../../employeePage/liveMapView.dart';
 import '../../employeePage/mapView.dart';
 import '../../employeePage/myTeamListModal.dart';
+import '../../ess/EssDashboarrddModel.dart';
+import '../../ess/essDashboardNavigate.dart';
 import '../../main.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../themes/empThemes.dart';
@@ -552,73 +554,77 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware{
             ),
           ),
         ),
-        bottomNavigationBar:
-        BottomNavigationBar (
-          type: BottomNavigationBarType.fixed,
-          currentIndex: currentIndex,
-          iconSize: 25,
-          selectedFontSize: 12,
-          unselectedFontSize: 10,
-          onTap: (index) {
+      bottomNavigationBar:
+      BottomNavigationBar (
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
 
-            if(index==0){
+          if(index==0){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if(index==1){
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Workflow');
+          }
+          if(index==2){
+            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Attendance');
+          }
+          if(index==3){
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('My Reports');
+          }
+          if(index==4){
+            if(userPanelPermission != "USER") {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
-              //Navigator.pop(context);
-              print('home tab');
+                  MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel())));
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
-            }
-            if(index==2){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
-              print('Reports');
-            }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
-              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
-            }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
-              print('Profile');
-            }
-            /*if(index==3){
+            /*Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew())
+            );*/
+            //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
+            print('Profile');
+          }
+          /*if(index==3){
                 title="Notifications";
               }*/
-            setState(() => currentIndex = index);
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.manage_accounts_outlined),
-              label: 'Workflow',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
-              label: 'Reports',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
-              //backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
-              //backgroundColor: Colors.blue,
-            ),
-          ],
-        ),
+          setState(() => currentIndex = index);
+        },
+        items:  [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.approval_sharp),
+            label: 'Att. Approval',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
+          ),
+        ],
+      ),
         //floatingActionButton: getFAB(),
         /*floatingActionButton: FloatingActionButton(
           onPressed: (){

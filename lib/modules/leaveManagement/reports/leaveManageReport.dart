@@ -9,6 +9,8 @@ import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
+import '../../../ess/EssDashboarrddModel.dart';
+import '../../../ess/essDashboardNavigate.dart';
 import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 
@@ -1059,7 +1061,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
           if(index==0){
 
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
@@ -1074,23 +1076,28 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
             print('Leave');
           }
           if(index==3){
-            Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
+            //Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
+            print('My Reports');
           }
           if(index==4){
-            Navigator.push(context,
+            if(userPanelPermission != "USER") {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel())));
+            }
+            /*Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
-            );
+            );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
+            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
               }*/
           setState(() => currentIndex = index);
         },
-        items: const [
+        items:  [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -1100,17 +1107,17 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
             label: 'Workflow',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.group_off),
-            label: 'Leave',
+            icon: Icon(Icons.new_label_sharp),
+            label: 'Leave Approval',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_customize),
-            label: 'Dashboard',
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
             //backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
             //backgroundColor: Colors.blue,
           ),
         ],

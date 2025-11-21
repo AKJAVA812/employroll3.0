@@ -456,7 +456,7 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
             if(index==0){
 
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
+                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
@@ -471,7 +471,7 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
               print('OD');
             }
             if(index==3){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
              /* Navigator.push(context,
                   MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
               );*/
@@ -479,9 +479,10 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
               print('Dashboard');
             }
             if(index==4){
-              Navigator.push(context,
+              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+              /*Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
+              );*/
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
             }
@@ -490,7 +491,7 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
               }*/
             setState(() => currentIndex = index);
           },
-          items: const [
+          items:  [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',
@@ -504,13 +505,13 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
               label: 'OD',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
+              icon: Icon(CupertinoIcons.doc_chart),
+              label: 'My Reports',
               //backgroundColor: Colors.blue,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),
-              label: 'Profile',
+              label: 'Dashboard',
               //backgroundColor: Colors.blue,
             ),
           ],
