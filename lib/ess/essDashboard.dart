@@ -142,8 +142,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
     lockDateStr = await shared.getRaiseRequisition();
 
-    print("Start Pay $startPayCycle");
-    print("End Pay $endPayCycle");
+    print("lockDateStr Pay $lockDateStr");
+    //print("End Pay $endPayCycle");
 
     //print('empRole $empRole');
     //print('roRole $roRole');
