@@ -511,11 +511,15 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                           child: _buildInfoColumn("End Date", leaveData.endDate.toString()),
                         ),
                         Expanded(
+                          child: _buildInfoColumn("Leave Count", leaveData.noOfDay.toString()),
+                        ),
+                        /*Expanded(
                           child: _buildInfoColumn("In Time", leaveData.startTime.toString()),
                         ),
                         Expanded(
                           child: _buildInfoColumn("Out Time", leaveData.endTime.toString()),
-                        ),
+                        ),*/
+
                       ],
                     ),
 
@@ -540,7 +544,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
             .size(12)
             .make(),
         value.text
-            .bold
+            .bold.center
             .color(Colors.black)
             .make(),
       ],
