@@ -523,7 +523,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
       // Build legends
       _legends = legends.map((legend) {
-        String mobColor = (legend["mobColor"]?.toString().trim().isNotEmpty ?? false)
+        String mobColor = (legend["mobColor"] != null &&
+            legend["mobColor"].toString().trim().isNotEmpty)
             ? legend["mobColor"].toString()
             : "0xff2196F3";
         return {
@@ -541,7 +542,10 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         DateTime eventDate = DateTime.parse(event['logDate']);
         String title = event['status'] ?? "Event";
         String logDate = event['logDate'];
-        String mobColor = event['mobColor'] ?? "0xff2196F3";
+        String mobColor = (event["mobColor"] != null &&
+            event["mobColor"].toString().trim().isNotEmpty)
+            ? event["mobColor"].toString()
+            : "0xff2196F3";
         //print("Calendar event data - $eventDate");
 
         _markedDateMap.add(
@@ -3191,8 +3195,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
           }
         }
 
-
-
         setState(() => _currentDate = date);
         setState(() => _currentDate2 = date);
         //events.forEach((event) => print('event list ${event.getDescription()}'));
@@ -3443,8 +3445,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       ),
     );
   }
-
-
 
   TabSection(EventsListModal eventsListModal) {
     var todayEvent;

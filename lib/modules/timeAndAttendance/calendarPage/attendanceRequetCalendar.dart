@@ -1051,134 +1051,136 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                           children: [
                             ElevatedButton(
                               onPressed: () {
-
+                                DateTime now = DateTime.now();
                                 String? inTimeReq;
                                 String? outTimeReq;
                                 String logid ="0";
                                 String inRemarkString = inRemarkController.text;
                                 String outRemarkString = outRemarkController.text;
                                 String onDate = DateFormat("dd-MM-yyyy").format(DateTime.parse(onDateset!));
+                                //print('object onDate $onDate');
                                 var dateformat = onDate;
+                                // Convert String to DateTime
+                                DateTime parsedDate = DateFormat("dd-MM-yyyy").parse(onDate);
+                                print('object onDate $parsedDate $now');
+                               // 🔥 Check: block if future date
+                                if (parsedDate.isAfter(now)) {
+                                  print("Future date — function call stopped!");
 
-                                if(shortLeave == true){
-                                  inTimeReq= actualTimeset;
-                                  outTimeReq= actualOutTimeset;
-                                  inRemarkString= shortLeaveRemarkController.text;
-                                  outRemarkString="";
-                                  if(inRemarkString == ""){
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                      content: Text(" Please fill remarks !! "),
-                                    ));
-                                  } else {
-                                    sendRequsitionToServerShortLeave(
-                                        context,
-                                        empId!,
-                                        inRemarkString,
-                                        outRemarkString,
-                                        inTimeReq!,
-                                        outTimeReq!,
-                                        logid,
-                                        dateformat);
-                                  }
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      title: const Text(
+                                        "Notice",
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      content: const Text(
+                                        "Oops! Attendance requisition in advance is not allowed.",
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text("OK"),
+                                        ),
+                                      ],
+                                    ),
+                                  );
 
-                                }
-                                else
-                                {
-                                  if(_inTimePicker.compareToIgnoringCase("00:00")==0){
-                                    if(actualTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0){
+                                  return; // ❌ Stop further execution
+                                }else{
+                                  if(shortLeave == true){
+                                    inTimeReq= actualTimeset;
+                                    outTimeReq= actualOutTimeset;
+                                    inRemarkString= shortLeaveRemarkController.text;
+                                    outRemarkString="";
+                                    if(inRemarkString == ""){
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select In Time "),
+                                        content: Text(" Please fill remarks !! "),
                                       ));
-                                    }else{
-                                      inTimeReq=actualTimeset;
+                                    } else {
+                                      sendRequsitionToServerShortLeave(
+                                          context,
+                                          empId!,
+                                          inRemarkString,
+                                          outRemarkString,
+                                          inTimeReq!,
+                                          outTimeReq!,
+                                          logid,
+                                          dateformat);
                                     }
-                                  }else{
-                                    inTimeReq=_inTimePicker;
-                                  }
-                                  if(actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualOutTimeset!.compareToIgnoringCase("--:--")==0)
-                                  {
-                                    if(_outTimePicker!.compareToIgnoringCase("00:00")==0)
-                                    {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select Out Time "),
-                                      ));
-                                    }
-                                    else
-                                    {
-                                      outTimeReq = _outTimePicker;
-                                      print("outtime $outTimeReq");
-                                    }
+
                                   }
                                   else
                                   {
-                                    if(_outTimePicker!.compareToIgnoringCase("00:00")!=0)
-                                    {
-                                      outTimeReq=_outTimePicker;
-                                    }else{
-                                      outTimeReq=actualOutTimeset;
-                                    }
-
-                                  }
-
-                                  if(actualTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0){
-                                    if(_inTimePicker!.compareToIgnoringCase("00:00")==0){
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select In Time "),
-                                      ));
+                                    if(_inTimePicker.compareToIgnoringCase("00:00")==0){
+                                      if(actualTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0){
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(" Please Select In Time "),
+                                        ));
+                                      }else{
+                                        inTimeReq=actualTimeset;
+                                      }
                                     }else{
                                       inTimeReq=_inTimePicker;
                                     }
-                                    if(_outTimePicker!.compareToIgnoringCase("00:00")==0){
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select Out Time "),
-                                      ));
-                                    }else{
-                                      outTimeReq=_outTimePicker;
+                                    if(actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualOutTimeset!.compareToIgnoringCase("--:--")==0)
+                                    {
+                                      if(_outTimePicker.compareToIgnoringCase("00:00")==0)
+                                      {
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(" Please Select Out Time "),
+                                        ));
+                                      }
+                                      else
+                                      {
+                                        outTimeReq = _outTimePicker;
+                                        print("outtime $outTimeReq");
+                                      }
                                     }
-                                  }
-                                 if(nightShift==false && compOff == false && outDuty == false)
-                                 {
-                                   print("intime $inTimeReq");
-                                   print("outtime $outTimeReq");
-                                   print("night shift  $nightShift");
-                                   print("compoff $compOff");
-                                   print("compoff $outDuty");
+                                    else
+                                    {
+                                      if(_outTimePicker.compareToIgnoringCase("00:00")!=0)
+                                      {
+                                        outTimeReq=_outTimePicker;
+                                      }else{
+                                        outTimeReq=actualOutTimeset;
+                                      }
 
-                                   if (inTimeReq!.compareTo(outTimeReq!) > 0) {
-                                     return setState(() {
-                                       CommonNotificationPage
-                                           .showWorkDoneSuccess(
-                                           context,
-                                           "Your working hours going to negative, Please select requisition time correctly."
-                                               .upperCamelCase +
-                                               " ",
-                                           "Alert Message");
-                                     });
-                                   }
-                                   else{
-                                     print("intime $inTimeReq");
-                                     print("outtime $outTimeReq");
-                                     print("night shift  $nightShift");
-                                     print("compoff $compOff");
-                                     if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
-                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                         content: Text(" Please fill remarks !! "),
-                                       ));
-                                     } else {
-                                       sendRequsitionToServer(
-                                           context,
-                                           empId!,
-                                           inRemarkString,
-                                           outRemarkString,
-                                           inTimeReq,
-                                           outTimeReq,
-                                           logid,
-                                           dateformat);
-                                     }
+                                    }
 
-                                   }
-                                 }
-                                   else if (nightShift == true){
+                                    if(actualTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0){
+                                      if(_inTimePicker!.compareToIgnoringCase("00:00")==0){
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(" Please Select In Time "),
+                                        ));
+                                      }else{
+                                        inTimeReq=_inTimePicker;
+                                      }
+                                      if(_outTimePicker.compareToIgnoringCase("00:00")==0){
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(" Please Select Out Time "),
+                                        ));
+                                      }else{
+                                        outTimeReq=_outTimePicker;
+                                      }
+                                    }
+                                    if(nightShift==false && compOff == false && outDuty == false)
+                                    {
+
+                                      if (inTimeReq!.compareTo(outTimeReq!) > 0) {
+                                        return setState(() {
+                                          CommonNotificationPage
+                                              .showWorkDoneSuccess(
+                                              context,
+                                              "Your working hours going to negative, Please select requisition time correctly."
+                                                  .upperCamelCase +
+                                                  " ",
+                                              "Alert Message");
+                                        });
+                                      }
+                                      else{
                                         print("intime $inTimeReq");
                                         print("outtime $outTimeReq");
                                         print("night shift  $nightShift");
@@ -1187,8 +1189,100 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                             content: Text(" Please fill remarks !! "),
                                           ));
-                                        }else {
-                                          sendRequsitionToServernextDay(
+                                        } else {
+                                          print('object  $dateformat');
+                                          sendRequsitionToServer(
+                                              context,
+                                              empId!,
+                                              inRemarkString,
+                                              outRemarkString,
+                                              inTimeReq,
+                                              outTimeReq,
+                                              logid,
+                                              dateformat);
+                                        }
+
+                                      }
+                                    }
+                                    else if (nightShift == true){
+                                      print("intime $inTimeReq");
+                                      print("outtime $outTimeReq");
+                                      print("night shift  $nightShift");
+                                      print("compoff $compOff");
+                                      if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(" Please fill remarks !! "),
+                                        ));
+                                      }else {
+                                        sendRequsitionToServernextDay(
+                                            context,
+                                            empId!,
+                                            inRemarkString,
+                                            outRemarkString,
+                                            inTimeReq!,
+                                            outTimeReq!,
+                                            logid,
+                                            dateformat);
+                                      }
+
+                                    }
+                                    else if (outDuty == true){
+                                      if (inTimeReq!.compareTo(outTimeReq!) > 0) {
+                                        return setState(() {
+                                          CommonNotificationPage
+                                              .showWorkDoneSuccess(
+                                              context,
+                                              "Your working hours going to negative, Please select requisition time correctly."
+                                                  .upperCamelCase +
+                                                  " ",
+                                              "Alert Message");
+                                        });
+                                      } else {
+                                        print("intime $inTimeReq");
+                                        print("outtime $outTimeReq");
+                                        print("night shift  $nightShift");
+                                        print("compoff $compOff");
+                                        print("outDuty $outDuty");
+                                        if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                            content: Text(" Please fill remarks !! "),
+                                          ));
+                                        } else {
+                                          sendRequsitionToServerOutDuty(
+                                              context,
+                                              empId!,
+                                              inRemarkString,
+                                              outRemarkString,
+                                              inTimeReq!,
+                                              outTimeReq!,
+                                              logid,
+                                              dateformat);
+                                        }
+                                      }
+
+
+                                    }
+                                    else if (compOff==true)
+                                    {
+                                      print("intime $inTimeReq");
+                                      print("outtime $outTimeReq");
+                                      print("night shift  $nightShift");
+                                      print("compoff $compOff");
+                                      print("outDuty $outDuty");
+                                      if(actualTimeset!.compareToIgnoringCase("N/A")==0||
+                                          actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0||
+                                          actualOutTimeset!.compareToIgnoringCase("--:--")==0){
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                          content: Text(" Please Handle Attendance Requisition "),
+                                        ));
+                                      }
+                                      else{
+                                        if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                            content: Text(" Please fill remarks !! "),
+                                          ));
+                                        } else {
+                                          sendRequsitionToServerCompOff(
                                               context,
                                               empId!,
                                               inRemarkString,
@@ -1200,85 +1294,17 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                         }
 
                                       }
-                                   else if (outDuty == true){
-                                   if (inTimeReq!.compareTo(outTimeReq!) > 0) {
-                                     return setState(() {
-                                       CommonNotificationPage
-                                           .showWorkDoneSuccess(
-                                           context,
-                                           "Your working hours going to negative, Please select requisition time correctly."
-                                               .upperCamelCase +
-                                               " ",
-                                           "Alert Message");
-                                     });
-                                   } else {
-                                     print("intime $inTimeReq");
-                                     print("outtime $outTimeReq");
-                                     print("night shift  $nightShift");
-                                     print("compoff $compOff");
-                                     print("outDuty $outDuty");
-                                     if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
-                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                         content: Text(" Please fill remarks !! "),
-                                       ));
-                                     } else {
-                                       sendRequsitionToServerOutDuty(
-                                           context,
-                                           empId!,
-                                           inRemarkString,
-                                           outRemarkString,
-                                           inTimeReq!,
-                                           outTimeReq!,
-                                           logid,
-                                           dateformat);
-                                     }
-                                   }
-
-
-                                      }
-                                   else if (compOff==true)
-                                      {
-                                        print("intime $inTimeReq");
-                                        print("outtime $outTimeReq");
-                                        print("night shift  $nightShift");
-                                        print("compoff $compOff");
-                                        print("outDuty $outDuty");
-                                        if(actualTimeset!.compareToIgnoringCase("N/A")==0||
-                                            actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0||
-                                            actualOutTimeset!.compareToIgnoringCase("--:--")==0){
-                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                            content: Text(" Please Handle Attendance Requisition "),
-                                          ));
-                                        }
-                                        else{
-                                          if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
-                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                              content: Text(" Please fill remarks !! "),
-                                            ));
-                                          } else {
-                                            sendRequsitionToServerCompOff(
-                                                context,
-                                                empId!,
-                                                inRemarkString,
-                                                outRemarkString,
-                                                inTimeReq!,
-                                                outTimeReq!,
-                                                logid,
-                                                dateformat);
-                                          }
-
-                                        }
-                                      }
+                                    }
 
 
 
-                                  /*if (_outTimePicker!.compareToIgnoringCase("00:00") == 0)
+                                    /*if (_outTimePicker!.compareToIgnoringCase("00:00") == 0)
                                   {
                                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                       content: Text(" Please Select Out Time "),
                                     ));
                                   }*/
-                                  /*else {
+                                    /*else {
                                     //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
                                     if(onDateset!.compareToIgnoringCase("--:--")==0){
                                       inTimeReq = onDateset.toString().compareToIgnoringCase("--:--") == 0 ? _inTimePicker :_inTimePicker;
@@ -1341,8 +1367,8 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                       }
                                     }
                                   }*/
+                                  }
                                 }
-
                               },
                               style: ButtonStyle(
                                 backgroundColor:
