@@ -641,6 +641,25 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     );
   }
 
+  int getCalendarRowCount(DateTime month) {
+    // 1st day of month
+    DateTime firstDay = DateTime(month.year, month.month, 1);
+
+    // last day of month
+    DateTime lastDay = DateTime(month.year, month.month + 1, 0);
+
+    // weekday of first day (Mon=1, Sun=7)
+    int firstWeekday = firstDay.weekday;
+
+    // total days in this month
+    int totalDays = lastDay.day;
+
+    // (days + offset) / 7 → number of rows
+    int rows = ((totalDays + (firstWeekday - 1)) / 7).ceil();
+
+    return rows;
+  }
+
   DateTime? _lastApiCallMonth;
   CalendarShow() {
     /// Example with custom icon
@@ -676,6 +695,17 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         markedDateMoreShowTotal: true,
       ),
     );
+
+    int rowCount = getCalendarRowCount(_targetDateTime);
+
+// Height per row in your calendar UI
+    double rowHeight = 60; // perfect for your design
+
+// Header + padding
+    double topPadding = 55;
+
+// Final height
+    double dynamicHeight = (rowCount * rowHeight) + topPadding;
 
     /// Example Calendar Carousel without header and custom prev & next button
     final _calendarCarouselNoHeader = CalendarCarousel<Event>(
@@ -892,7 +922,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       weekFormat: false,
       //firstDayOfWeek: 4,
       markedDatesMap: _markedDateMap,
-      height: 370.0,
+      height: dynamicHeight,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
       //customGridViewPhysics: NeverScrollableScrollPhysics(),
@@ -988,6 +1018,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         //print('long pressed date $date');
       },
     );
+
 
     return Card(
       child: Column(
@@ -1155,42 +1186,43 @@ class LegendWidget extends StatelessWidget {
                 builder: (context) {
                   return Container(
                     padding: EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text("Legend Details",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 12),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Legend Details",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 12),
 
-                        // FULL LIST WITH COLORS
-                        ...legends.map((legend) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(
-                                        int.parse(legend['mobColor']!)),
+                          ...legends.map((legend) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6.0),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(int.parse(legend['mobColor']!)),
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    legend['statusName']!,
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      legend['statusName']!,
+                                      style:
+                                      TextStyle(fontSize: 16, color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ],
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
                     ),
                   );
                 },

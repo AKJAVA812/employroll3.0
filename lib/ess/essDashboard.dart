@@ -523,8 +523,11 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
       // Build legends
       _legends = legends.map((legend) {
+        String mobColor = (legend["mobColor"]?.toString().trim().isNotEmpty ?? false)
+            ? legend["mobColor"].toString()
+            : "0xff2196F3";
         return {
-          "mobColor": legend["mobColor"].toString(),
+          "mobColor": mobColor,
           "status": legend["status"].toString(),
           "statusName": legend["statusName"].toString(),
         };
@@ -2952,7 +2955,24 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       },
     );
   }
+  int getCalendarRowCount(DateTime month) {
+    // 1st day of month
+    DateTime firstDay = DateTime(month.year, month.month, 1);
 
+    // last day of month
+    DateTime lastDay = DateTime(month.year, month.month + 1, 0);
+
+    // weekday of first day (Mon=1, Sun=7)
+    int firstWeekday = firstDay.weekday;
+
+    // total days in this month
+    int totalDays = lastDay.day;
+
+    // (days + offset) / 7 → number of rows
+    int rows = ((totalDays + (firstWeekday - 1)) / 7).ceil();
+
+    return rows;
+  }
   DateTime? _lastApiCallMonth;
   CalendarShow() {
     /// Example with custom icon
@@ -2988,6 +3008,17 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         markedDateMoreShowTotal: true,
       ),
     );
+
+    int rowCount = getCalendarRowCount(_targetDateTime);
+
+// Height per row in your calendar UI
+    double rowHeight = 60; // perfect for your design
+
+// Header + padding
+    double topPadding = 55;
+
+// Final height
+    double dynamicHeight = (rowCount * rowHeight) + topPadding;
 
     /// Example Calendar Carousel without header and custom prev & next button
     final _calendarCarouselNoHeader = CalendarCarousel<Event>(
@@ -3204,7 +3235,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       weekFormat: false,
       //firstDayOfWeek: 4,
       markedDatesMap: _markedDateMap,
-      height: 370.0,
+      height: dynamicHeight,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
       //customGridViewPhysics: NeverScrollableScrollPhysics(),
