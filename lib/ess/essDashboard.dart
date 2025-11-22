@@ -494,9 +494,10 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
           await prefs.setString('calendarData', json.encode(mapResponse));
           await prefs.setString('calendarMonth', _currentMonth);
         }
-        String raiseDate = mapResponse['raisedDeadlineDate'];
+        //Need to un comment this for deadline requisition restriction
+        /*String raiseDate = mapResponse['raisedDeadlineDate'];
         shared.setRaiseRequisition(raiseDate);
-        print('object raised $raiseDate');
+        print('object raised $raiseDate');*/
         // ✅ Rebuild UI from fresh API data
         _buildCalendarFromMap(mapResponse);
       } else {
@@ -3828,42 +3829,43 @@ class LegendWidget extends StatelessWidget {
                 builder: (context) {
                   return Container(
                     padding: EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text("Legend Details",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 12),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Legend Details",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 12),
 
-                        // FULL LIST WITH COLORS
-                        ...legends.map((legend) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(
-                                        int.parse(legend['mobColor']!)),
+                          ...legends.map((legend) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6.0),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(int.parse(legend['mobColor']!)),
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    legend['statusName']!,
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      legend['statusName']!,
+                                      style:
+                                      TextStyle(fontSize: 16, color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ],
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
                     ),
                   );
                 },

@@ -96,75 +96,78 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
   }
 
- Future<CalendarModalClass> getCalendarData(String sessionId) async {
-   String _currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
-   String conn = ApiDetails.server;
-   String apiUrl = ApiDetails.calendarApi;
-   print("Current Month - $_currentMonth $_currentMonthc");
+  Future<CalendarModalClass> getCalendarData(String sessionId) async {
+    String _currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.calendarApi;
+    print("Current Month - $_currentMonth $_currentMonthc");
 
-   CalendarModalClass calendarModalClass;
-   var urlapi = Uri.parse("$conn$apiUrl?"
-       "sessionId=$sessionId&"
-       "month=$_currentMonth");
+    CalendarModalClass calendarModalClass;
+    var urlapi = Uri.parse("$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "month=$_currentMonth");
+    setState(() {
+      isLoading = true;
+    });
 
-   setState(() {
-     isLoading = true;
-   });
+    Map<String, dynamic> mapResponse = {};
 
-   Map<String, dynamic> mapResponse = {};
+    final prefs = await SharedPreferences.getInstance();
 
-   final prefs = await SharedPreferences.getInstance();
+    // ✅ STEP 1: Try loading from SharedPreferences first
+    if(_currentMonthc==_currentMonth){
 
-   // ✅ STEP 1: Try loading from SharedPreferences first
-   if(_currentMonthc==_currentMonth){
+      final cachedData = prefs.getString('calendarDataMyRequest');
+      final cachedMonth = prefs.getString('calendarMonthMyRequest');
 
-     final cachedData = prefs.getString('calendarDataMyRequest');
-     final cachedMonth = prefs.getString('calendarMonthMyRequest');
+      print("Calendar Data - $cachedData");
+      print("Calendar Month - $cachedMonth");
 
-     print("Calendar Data - $cachedData");
-     print("Calendar Month - $cachedMonth");
+      if (cachedData != null) {
+        print("Cachded Month $cachedMonth");
+        try {
+          //print("Loaded calendar data from cache ✅");
+          mapResponse = json.decode(cachedData);
+          _buildCalendarFromMap(mapResponse);
+        } catch (e) {
+          //print("Error loading cached calendar: $e");
+        }
+      }
+    }
 
-     if (cachedData != null) {
-       print("Cachded Month $cachedMonth");
-       try {
-         print("Loaded calendar data from cache ✅");
-         mapResponse = json.decode(cachedData);
-         _buildCalendarFromMap(mapResponse);
-       } catch (e) {
-         print("Error loading cached calendar: $e");
-       }
-     }
-   }
+    // ✅ STEP 2: Now call API (refresh data and overwrite cache)
+    try {
+      final response = await http.post(urlapi);
+      if (response.statusCode == 200) {
 
-   // ✅ STEP 2: Now call API (refresh data and overwrite cache)
-   try {
-     final response = await http.post(urlapi);
-     if (response.statusCode == 200) {
-       print('Calendar URL - ${response.request}');
-       print('Response body - ${response.body}');
-       mapResponse = json.decode(response.body);
+        print("Calendar URL - ${response.request}");
+        mapResponse = json.decode(response.body);
 
-       // Save to SharedPreferences
-       if(_currentMonthc==_currentMonth){
-         await prefs.setString('calendarDataMyRequest', json.encode(mapResponse));
-         await prefs.setString('calendarMonthMyRequest', _currentMonth);
-       }
-       // ✅ Rebuild UI from fresh API data
-       _buildCalendarFromMap(mapResponse);
-     } else {
-       print('Failed to load calendar data: ${response.statusCode}');
-     }
-   } catch (e) {
-     print("Error calling calendar API: $e");
-   } finally {
-     setState(() {
-       isLoading = false;
-     });
-   }
+        // Save to SharedPreferences
+        if(_currentMonthc==_currentMonth){
+          await prefs.setString('calendarDataMyRequest', json.encode(mapResponse));
+          await prefs.setString('calendarMonthMyRequest', _currentMonth);
+        }
+        //Need to un comment this for deadline requisition restriction
+        /*String raiseDate = mapResponse['raisedDeadlineDate'];
+        shared.setRaiseRequisition(raiseDate);
+        print('object raised $raiseDate');*/
+        // ✅ Rebuild UI from fresh API data
+        _buildCalendarFromMap(mapResponse);
+      } else {
+        print('Failed to load calendar data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error calling calendar API: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
 
-   calendarModalClass = CalendarModalClass.fromJson(mapResponse);
-   return calendarModalClass;
- }
+    calendarModalClass = CalendarModalClass.fromJson(mapResponse);
+    return calendarModalClass;
+  }
 
   EventList<Event> _markedDateMap = new EventList<Event>(
     events: {
@@ -758,17 +761,17 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         DateTime today = DateTime.now();
         // e.g. "23-11-2024 11:59 AM"
 
-        // Convert String → DateTime
-        DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm a").parse(lockDateStr);
-        print('raise date  $lockDateTime');
+
+        //print('raise date New  $lockDateStr');
+        //print('raise date  $lockDateTime');
         DateTime monthStart = DateTime(today.year, today.month, 1);
         DateTime monthEnd = DateTime(today.year, today.month + 1, 0);
         // Convert to only "dd"
         int startDayInt = monthStart.day;
         int endDayInt = monthEnd.day;
 
-        print("Start: $startDayInt");
-        print("End:   $endDayInt");
+        //print("Start: $startDayInt");
+        //print("End:   $endDayInt");
         //deadlineStartDate - Data get form Login API deadlineEndDate = Data get from Login
         if (startDay == 0 || endDay == 0){
           startDay = startDayInt;
@@ -787,10 +790,38 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
         print("Cycle Start: $cycleStart");
         print("Cycle End:   $cycleEnd");
-
-        // Step 1 → Execute only if now >= lock date+time
-        if (today.isAfter(lockDateTime) || today.isAtSameMomentAs(lockDateTime)) {
-          // CHECK: If current date is outside paycycle → BLOCK
+        if (lockDateStr != null && lockDateStr.trim().isNotEmpty) {
+          // Convert String → DateTime
+          DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm").parse(lockDateStr);
+          // Step 1 → Execute only if now >= lock date+time
+          if (today.isAfter(lockDateTime) || today.isAtSameMomentAs(lockDateTime)) {
+            // CHECK: If current date is outside paycycle → BLOCK
+            if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
+              developer.log('date for all true');
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  title: const Text(
+                    "Notice",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  content: const Text(
+                    "You are out of the pay-cycle. Attendance requisition not allowed.",
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+              return; // STOP further action
+            }
+          }
+        }else{
           if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
             developer.log('date for all true');
             showDialog(
@@ -815,8 +846,8 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
             );
             return; // STOP further action
           }
-
         }
+
 
 
         setState(() => _currentDate = date);

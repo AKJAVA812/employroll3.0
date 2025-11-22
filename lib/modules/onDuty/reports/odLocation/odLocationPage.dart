@@ -44,6 +44,7 @@ class ODLocationView extends StatefulWidget {
   @override
   State<ODLocationView> createState() => _ODLocationViewState();
 }
+StreamSubscription<Position>? positionStream;
 
 class _ODLocationViewState extends State<ODLocationView> {
   int pageIndex = 0;
@@ -150,17 +151,98 @@ String? clockingType=" ";
 class _ODPageViewState extends State<ODPageView> {
   String UserName = "Employee Name";
   File? _workDoneImage;
+  LatLng? currentPostion;
+  GoogleMapController? _mapController;
+  late GoogleMapController googleMapController;
   void initState() {
     // TODO: implement initState
     getUserName();
     timeString = _formatDateTime(DateTime.now());
     Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    _startLocationTracking();
     super.initState();
   }
   Future getUserName() async {
     UserName = await shared!.getempName();
     print('Response snapshot: ${UserName}');
   }
+
+
+  void _startLocationTracking() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 5, // update every 5 meter movement
+    );
+
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position pos) {
+      setState(() {
+        currentPostion = LatLng(pos.latitude, pos.longitude);
+      });
+
+      // Save position
+      shared.setLatitude(pos.latitude);
+      shared.setLongitude(pos.longitude);
+
+      // Update address dynamically
+      getAddress(pos);
+
+      // Update map center dynamically
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(pos.latitude, pos.longitude),
+          ),
+        );
+      }
+
+      print('🏃‍♂️ Position Updated: $currentPostion');
+    });
+  }
+
+  Future<void> getAddress(Position position) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isEmpty) {
+        print("❌ No placemark found");
+        return;
+      }
+
+      final p = placemarks.first;
+
+      // Build address safely (ignores null values)
+      final List<String> addressParts = [
+        p.street ?? '',
+        p.name ?? '',
+        p.subLocality ?? '',
+        p.locality ?? '',
+        p.administrativeArea ?? '',
+        p.country ?? '',
+        p.postalCode ?? '',
+      ];
+
+      // Join non-null, non-empty values
+      // Filter empty strings and join
+      final formattedAddress = addressParts
+          .where((part) => part.trim().isNotEmpty)
+          .join(", ");
+
+      setState(() {
+        currentAddress = formattedAddress;
+      });
+
+      print('📍 Current Address: $currentAddress');
+
+    } catch (e) {
+      print("❌ Error getting address: $e");
+      currentAddress = "Address Not Find";
+    }
+  }
+
 
   void _getTime() {
     final DateTime now = DateTime.now();
@@ -291,18 +373,23 @@ class _ODPageViewState extends State<ODPageView> {
         Expanded(
             child: Container(
               child: Card(
-                child: GoogleMap(
+                child: currentPostion == null
+                    ? Center(child: CircularProgressIndicator())
+                    : GoogleMap(
+                  onMapCreated: (controller) {
+                    _mapController = controller;
+                  },
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(
+                      currentPostion!.latitude,
+                      currentPostion!.longitude,
+                    ),
+                    zoom: 16,
+                  ),
                   myLocationButtonEnabled: true,
                   zoomControlsEnabled: false,
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(position!.latitude, position!.longitude),
-                    zoom: 14,
-                  ),
                   myLocationEnabled: true,
                   mapToolbarEnabled: false,
-                  onMapCreated: (GoogleMapController controler) {
-                    googleMapController = controler;
-                  },
                 ),
               ),
             )),
