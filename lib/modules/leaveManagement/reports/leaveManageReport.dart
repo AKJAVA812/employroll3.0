@@ -62,7 +62,9 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
     userPanelPermission= await shared.getUserPanel();
     pendingLeaveRequestMOPermission= (await shared.getPendingLeaveReqMSSMOPermission())!;
     pendingLeaveL1RequestMOPermission= (await shared.getPendingLeaveReqL1MSSMOPermission())!;
+    print("MO L1 - $pendingLeaveL1RequestMOPermission");
     pendingLeaveL2RequestMOPermission= (await shared.getPendingLeaveReqL2MSSMOPermission())!;
+    print("MO L2 - $pendingLeaveL2RequestMOPermission");
     pendingLeaveRequestMSSPermission= (await shared.getPendingLeaveReqMSSPermission())!;
     pendingLeaveL1RequestMSSPermission= (await shared.getPendingLeaveReqL1MSSPermission())!;
     pendingLeaveL2RequestMSSPermission= (await shared.getPendingLeaveReqL2MSSPermission())!;
@@ -234,6 +236,90 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
           ),
         );
       }*/
+      // L1 Pending
+      if(userPanelPermission == "MSS" && pendingLeaveL1RequestMSSPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'myTeamLeavePendingReqL1',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.mssLevelOnePendingReqRoute);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        "L1",style: TextStyle(fontSize: 50, color: Mythemes.warningColor),
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending L1',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      // L2 Pending
+      if(userPanelPermission == "MSS" && pendingLeaveL2RequestMSSPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'myTeamLeavePendingReqL1',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, MyRoutings.mssLevelTwoPendingReqRoute);
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        "L1",style: TextStyle(fontSize: 50, color: Mythemes.warningColor),
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending L1',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
 
       //MSS Pending Leaves
       if(userPanelPermission == "MSS" && pendingLeaveRequestMSSPermission == "1") {
@@ -349,6 +435,121 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
       }
 
       //MSS MO Pending Leaves
+      //Pending MO l1
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingLeaveL1RequestMOPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'pendingLeaveL1MO',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
+
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.mssMoLevelOnePendingReqRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.pending_actions_rounded,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending L2',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      //Pending MO l2
+      if(userPanelPermission == "MSS_MO_ADMIN" && pendingLeaveL2RequestMOPermission == "1") {
+        items.add(
+          Hero(
+            tag: 'pendingLeaveL2MO',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () async {
+                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  if(internetCheck == false) {
+                    setState(() {
+                      AlertDialog(
+                        content: "Please check your internet connection".text.make(),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ));
+                    });
+
+                  } else {
+                    Navigator.pushNamed(context, MyRoutings.mssMoLevelTwoPendingReqRoute);
+                  }
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.pending_actions_rounded,
+                        size: 50,
+                        color: Mythemes.alertColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                            'Pending L2',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style:
+                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+
       if(userPanelPermission == "MSS_MO_ADMIN" && pendingLeaveRequestMOPermission == "1") {
         items.add(
           Hero(
@@ -404,6 +605,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
           ),
         );
       }
+
       //MSS MO Others Leave
       if(userPanelPermission == "MSS_MO_ADMIN" && pendingLeaveRequestMOPermission == "1") {
         items.add(
