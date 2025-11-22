@@ -184,16 +184,11 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     _loginModel = new LoginModel();
     getSharedPrfanceList();
-    //loadProfileFromPrefs();
     loadRequisitionCountsFromPrefs();
     currentIndex = widget.selectedIndex;
     var now = new DateTime.now();
-    //var now =  ntpTime.toUtc();
-
-    print("NTP TIME -  $todayDate");
     var newFormat = new DateFormat('dd-MM-yyyy');
     todayDateShowNew = newFormat.format(now);
-    print("todaydate  $todayDateShowNew");
     getUserNameImage();
     super.initState();
   }
@@ -249,13 +244,13 @@ class _HomePageState extends State<HomePage> {
               getLogout(this.context);
               final service = FlutterBackgroundService();
               var isRunning = await service.isRunning();
-              print(isRunning);
+
               if (isRunning) {
                 service.invoke("stopService");
-                print("Background Stop");
+
               } else {
                 service.startService();
-                print("New service Started");
+
               }
               if (!isRunning) {
                 text = 'Stop Service';
@@ -289,25 +284,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future getLogout(BuildContext buildContext) async {
-    //var cameraStatus = await Permission.camera.status;
-    //if(cameraStatus.isGranted) {
-    //String? qrData = await scanner.scan();
+
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.logoutAPi;
-    /*var stream = http.ByteStream(value!.openRead());
-    stream.cast();*/
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "type=$type");
-    var request = new http.MultipartRequest("Post", urlapi);
+    var request =  http.MultipartRequest("Post", urlapi);
     http.Response response =
     await http.Response.fromStream(await request.send());
     mapResponse = json.decode(response.body);
-    String reason = mapResponse['reason'];
-    //String status = mapResponse['status'];
+
     String result = mapResponse['result'];
-    print('reason $reason');
-    print('reason${reason}');
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -362,16 +350,14 @@ class _HomePageState extends State<HomePage> {
 
     sessionId = await shared.getSessionId();
     orgId = await shared.getOrgId();
-    setGeofenceActive = await shared!.getGeofenceActive();
+    setGeofenceActive = await shared.getGeofenceActive();
     print("Geofence Permission - $setGeofenceActive");
-    empIdGet = await shared!.getEmpId();
+    empIdGet = await shared.getEmpId();
     userType = await shared.getUserType();
     defaultProfileName = await shared.getDefaultProfileName();
     defaultProfileId = await shared.getDefaultProfileId();
-    print("Default Profile Name - $defaultProfileName");
-    print("Default Profile Id - $defaultProfileId");
     userPanelPermission = await shared.getUserPanel();
-    print("Default userPanelPermission - $userPanelPermission");
+
     Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
     getOrgList.then((value) {
       setState(() {
@@ -382,14 +368,13 @@ class _HomePageState extends State<HomePage> {
     setState(() {
 
     });
-    print("User Type - $userType");
+
     imageStringNew = await shared.getProfileImage();
     UserName = await shared.getempName();
     employeeCode = await shared.getEmpCode();
     lat= await shared.getLatitude();
     lng = await shared.getLongitude();
-    //currentPostion = LatLng(lat, lng);
-    //print('Response snapshot: ${sessionId}');
+
   }
 
   Future<OrganisationListModal> getOrganisationList(String sessionId) async {
@@ -759,25 +744,59 @@ class _DefaultPageState extends State<DefaultPage> {
   String? mockLat;
   String? mockLong;
   bool? isMock = false;
+  GoogleMapController? _mapController;
 
   @override
   void initState() {
     //print('initState');
     // TODO: implement initState
     _determinePosition();
-    _getUserLocation();
+    //_getUserLocation();
+    _startLocationTracking();
     timeStringNew = _formatDateTime(DateTime.now());
     getSharedPrfanceList();
     _getTime();
     initPlatformState();
     super.initState();
   }
-
+  StreamSubscription<Position>? positionStream;
   @override
   void dispose() {
     // TODO: implement dispose
     //TrustLocation.stop();
+    positionStream?.cancel();
     super.dispose();
+  }
+  void _startLocationTracking() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 5, // update every 5 meter movement
+    );
+
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position pos) {
+      setState(() {
+        currentPostion = LatLng(pos.latitude, pos.longitude);
+      });
+
+      // Save position
+      shared.setLatitude(pos.latitude);
+      shared.setLongitude(pos.longitude);
+
+      // Update address dynamically
+      getAddress(pos);
+
+      // Update map center dynamically
+      if (_mapController != null) {
+        _mapController!.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(pos.latitude, pos.longitude),
+          ),
+        );
+      }
+
+      print('🏃‍♂️ Position Updated: $currentPostion');
+    });
   }
 
 
@@ -807,234 +826,6 @@ class _DefaultPageState extends State<DefaultPage> {
       return GeofenceListModal(userdata: []);
     }
   }
-
-
-
-// ✅ Widget Method to show Geofence Dialog
-/*  Future<void> showGeofenceDialog(
-      BuildContext context, {
-        required dynamic sessionId,
-        required dynamic empId,
-        required dynamic orgId,
-      }) async {
-    GeofenceListModal? geofenceList;
-    int? selectedGeofenceId; // ✅ Store ID instead of name
-    bool isLoading = true;
-
-    // ✅ Fetch geofences
-    geofenceList = await getGeofenceList(sessionId);
-    isLoading = false;
-
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: const Text(
-                "Select Your Location",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : (geofenceList?.userdata == null ||
-                    geofenceList!.userdata!.isEmpty)
-                    ? const Center(
-                  child: Text(
-                    "No geofence data available",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                )
-                    : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DropdownButtonFormField<int>(
-                      value: selectedGeofenceId,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Select Geofence",
-                      ),
-                      items: geofenceList!.userdata!
-                          .map(
-                            (geo) => DropdownMenuItem<int>(
-                          value: geo.id, // ✅ ID as value
-                          child: Text(
-                            "${geo.name ?? "Unnamed"}",
-                          ),
-                        ),
-                      )
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedGeofenceId = value;
-                          print("🆔 Selected Geofence ID: $selectedGeofenceId");
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel"),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    print("✅ SELECTED GEOFENCE ID - $selectedGeofenceId");
-                    if (selectedGeofenceId != null) {
-                      Navigator.pop(context, selectedGeofenceId);
-                      getPunchInWithGeofence(context, selectedGeofenceId); // ✅ Pass selected ID to your method
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please select a geofence"),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text("Submit"),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    }
-  }*/
-
-  // ✅ Widget Method to show Geofence Dialog
-/*  Future<void> showGeofenceDialogPunchOut(
-      BuildContext context, {
-        required dynamic sessionId,
-        required dynamic empId,
-        required dynamic orgId,
-      }) async {
-    GeofenceListModal? geofenceList;
-    int? selectedGeofenceId; // ✅ Store ID instead of name
-    bool isLoading = true;
-
-    // ✅ Fetch geofences
-    geofenceList = await getGeofenceList(sessionId);
-    isLoading = false;
-
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: const Text(
-                "Select Your Location",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : (geofenceList?.userdata == null ||
-                    geofenceList!.userdata!.isEmpty)
-                    ? const Center(
-                  child: Text(
-                    "No geofence data available",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                )
-                    : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DropdownButtonFormField<int>(
-                      value: selectedGeofenceId,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Select Geofence",
-                      ),
-                      items: geofenceList!.userdata!
-                          .map(
-                            (geo) => DropdownMenuItem<int>(
-                          value: geo.id, // ✅ ID as value
-                          child: Text(
-                            "${geo.name ?? "Unnamed"}",
-                          ),
-                        ),
-                      )
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedGeofenceId = value;
-                          print("🆔 Selected Geofence ID: $selectedGeofenceId");
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancel"),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    print("✅ SELECTED GEOFENCE ID - $selectedGeofenceId");
-                    if (selectedGeofenceId != null) {
-                      Navigator.pop(context, selectedGeofenceId);
-                      getPunchOutWithGeofence(context, selectedGeofenceId); // ✅ Pass selected ID to your method
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please select a geofence"),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text("Submit"),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    }
-  }*/
 
   static const String _kSavedGeofenceKey = 'savedGeofenceId';
   // Helper to get saved geofence id (nullable)
@@ -1424,8 +1215,8 @@ class _DefaultPageState extends State<DefaultPage> {
   var attAction;
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    lat = await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    lat = await shared.getLatitude();
     //position= Position(longitude: shared.getLongitude(), latitude: shared.getLatitude(), timestamp: date, accuracy: 1, altitude: 1, altitudeAccuracy: 1, heading: 1, headingAccuracy: 1, speed: 1, speedAccuracy: 1);
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
@@ -1562,13 +1353,7 @@ class _DefaultPageState extends State<DefaultPage> {
             .then((value) {
           this._workDoneImage = File(value!.path);
         });
-        /* if(imageValue==null) return;
 
-        final imagePath= File(imageValue.path);
-        setState(() {
-          this._workDoneImage=imagePath;
-          print('object$imagePath');
-        });*/
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => ImageUploaded(
                 value: _workDoneImage,
@@ -1586,12 +1371,18 @@ class _DefaultPageState extends State<DefaultPage> {
           Container(
             height: MediaQuery.of(context).size.height * 0.4,
             child: Card(
-              child: GoogleMap(
+              child: currentPostion == null
+                  ? Center(child: CircularProgressIndicator())
+                  : GoogleMap(
+                onMapCreated: (controller) {
+                  _mapController = controller;
+                },
                 initialCameraPosition: CameraPosition(
                   target: LatLng(
-                      currentPostion!.latitude, currentPostion!.longitude
+                    currentPostion!.latitude,
+                    currentPostion!.longitude,
                   ),
-                  zoom: 14,
+                  zoom: 16,
                 ),
                 myLocationButtonEnabled: true,
                 zoomControlsEnabled: false,
@@ -2745,8 +2536,8 @@ class _DrawerFileState extends State<DrawerFile> {
     final prefs = await SharedPreferences.getInstance();
     selectedProfileId = prefs.getInt('defaultProfileId');
     selectedProfileName = prefs.getString('defaultProfileName');
+
     userPanelPermission = await shared.getUserPanel();
-    print("Loaded ID: $selectedProfileId, Name: $selectedProfileName");
 
     getProfileList(sessionId!).then((value) {
       setState(() {

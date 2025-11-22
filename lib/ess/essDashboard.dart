@@ -486,8 +486,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     try {
       final response = await http.post(urlapi);
       if (response.statusCode == 200) {
-        print('Calendar URL - ${response.request}');
-        print('Response body - ${response.body}');
+
         mapResponse = json.decode(response.body);
 
         // Save to SharedPreferences
@@ -495,6 +494,9 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
           await prefs.setString('calendarData', json.encode(mapResponse));
           await prefs.setString('calendarMonth', _currentMonth);
         }
+        String raiseDate = mapResponse['raisedDeadlineDate'];
+        shared.setRaiseRequisition(raiseDate);
+        print('object raised $raiseDate');
         // ✅ Rebuild UI from fresh API data
         _buildCalendarFromMap(mapResponse);
       } else {
