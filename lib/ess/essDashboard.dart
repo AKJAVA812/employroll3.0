@@ -456,7 +456,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     setState(() {
       isLoading = true;
     });
-
+    print("Calendar Data - $urlapi");
     Map<String, dynamic> mapResponse = {};
 
     final prefs = await SharedPreferences.getInstance();
@@ -467,7 +467,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       final cachedData = prefs.getString('calendarData');
       final cachedMonth = prefs.getString('calendarMonth');
 
-      print("Calendar Data - $cachedData");
+
       print("Calendar Month - $cachedMonth");
 
       if (cachedData != null) {
