@@ -293,7 +293,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
                   children: <Widget>[
                     Center(
                       child: Text(
-                        "L1",style: TextStyle(fontSize: 50, color: Mythemes.warningColor),
+                        "L2",style: TextStyle(fontSize: 50, color: Mythemes.warningColor),
                       ),
                       /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
@@ -304,7 +304,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'Pending L1',
+                            'Pending L2',
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style:
@@ -377,6 +377,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
           ),
         );
       }
+
       //MSS Others Leave
       if(userPanelPermission == "MSS" && pendingLeaveRequestMSSPermission == "1") {
         items.add(
@@ -462,10 +463,8 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
                 child: Stack(
                   children: <Widget>[
                     Center(
-                      child: Icon(
-                        Icons.pending_actions_rounded,
-                        size: 50,
-                        color: Mythemes.alertColor,
+                      child: Text(
+                        "L1",style: TextStyle(fontSize: 50, color: Mythemes.warningColor),
                       ),
                       /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
@@ -476,7 +475,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'Pending L2',
+                            'Pending L1',
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style:
@@ -519,10 +518,8 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
                 child: Stack(
                   children: <Widget>[
                     Center(
-                      child: Icon(
-                        Icons.pending_actions_rounded,
-                        size: 50,
-                        color: Mythemes.alertColor,
+                      child: Text(
+                        "L2",style: TextStyle(fontSize: 50, color: Mythemes.warningColor),
                       ),
                       /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,

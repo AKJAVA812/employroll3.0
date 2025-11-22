@@ -312,7 +312,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
 
   Future<LevelTwoPendingLeaveModal> getPendingLeaveReq(String SessionId) async {
     String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.levelTwoLeaveList;
+    String apiUrl = ApiDetails.pendingLeaveReqList;
     print('employeeList11: ${SessionId}');
     LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
@@ -478,7 +478,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                 },
                 horizontalPadding: 8,
                 searchIconColor: Mythemes.black,
-                centerTitle: titleName,
+              centerTitle: "$titleName - ${foundDataNewMOL2!.length}",
                 verticalPadding: 3,
                 centerTitleStyle: TextStyle(
                     fontSize: 19,
@@ -495,67 +495,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
         child:
             Column(
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedToggleSwitch<int>.size(
-                      height: 30,
-                      current: min(value, 3),
-                      style: ToggleStyle(
-                        backgroundColor: Mythemes.greyishade,
-                        indicatorColor: Mythemes.lightBluishColor,
-                        borderColor: Colors.transparent,
-                        borderRadius: BorderRadius.circular(10.0),
-                        indicatorBorderRadius: BorderRadius.zero,
-                      ),
-                      values: const [0, 1, 2],
-                      iconOpacity: 1.0,
-                      selectedIconScale: 1.0,
-                      indicatorSize: const Size.fromWidth(90),
-                      iconAnimationType: AnimationType.onHover,
-                      styleAnimationType: AnimationType.onHover,
-                      spacing: 10.0,
-                      customSeparatorBuilder: (context, local, global) {
-                        final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
-                        return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
-                      },
-                      customIconBuilder: (context, local, global) {
-                        final text = const ['Pending', 'Level One', 'Level Two'][local.index];
-                        return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
-                      },
-                      borderWidth: 0.0,
-                      onChanged: (i) {
-                        setState(() {
-                          value = i;
-                          print(i);
 
-                        });
-
-                        if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.pendingLeaveReqListRoute);
-                          //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                        }
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.levelOnePendingRoute);
-                        }
-                        if(value == 2) {
-                          Navigator.pushNamed(context, MyRoutings.levelTwoPendingRoute);
-                        }
-                      },
-                    )
-                  ],
-                ).py(6),
                 Expanded(child:
                 pendingLeaveReqLabeled == null ?
                 Center(

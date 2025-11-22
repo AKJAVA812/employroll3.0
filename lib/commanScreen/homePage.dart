@@ -2579,6 +2579,7 @@ class _DrawerFileState extends State<DrawerFile> {
       profileListGetter.clear();
       profileListGetter.addAll(profileListModal?.data ?? []);
 
+      print("${response.request}");
       for (int i = 0; i < profileListGetter.length; i++) {
         List<String>? userPermission = profileListGetter[i].profilePermission;
 
