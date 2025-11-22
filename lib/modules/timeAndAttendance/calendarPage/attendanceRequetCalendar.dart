@@ -1076,7 +1076,7 @@ class _AttendanceRequisitionCalendarState extends State<AttendanceRequisitionCal
                                         style: TextStyle(fontWeight: FontWeight.bold),
                                       ),
                                       content: const Text(
-                                        "OOpps!! Attendance requisition in advance is not allowed.",
+                                        "Oops! Attendance requisition in advance is not allowed.",
                                         style: TextStyle(fontSize: 15),
                                       ),
                                       actions: [
