@@ -3903,42 +3903,43 @@ class LegendWidget extends StatelessWidget {
                 builder: (context) {
                   return Container(
                     padding: EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text("Legend Details",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 12),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Legend Details",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 12),
 
-                        // FULL LIST WITH COLORS
-                        ...legends.map((legend) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(
-                                        int.parse(legend['mobColor']!)),
+                          ...legends.map((legend) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6.0),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(int.parse(legend['mobColor']!)),
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    legend['statusName']!,
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      legend['statusName']!,
+                                      style:
+                                      TextStyle(fontSize: 16, color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ],
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                      ),
                     ),
                   );
                 },
