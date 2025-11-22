@@ -2901,7 +2901,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               /* String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true || selected.profilePermission?.contains("FINAL_LEVEL_LEAVE_APPROVE_MO_ADD") == true) {
                                 shared.setPendingLeaveReqL2MSSMOPermission("1");
                               } else {
                                 shared.setPendingLeaveReqL2MSSMOPermission("0");

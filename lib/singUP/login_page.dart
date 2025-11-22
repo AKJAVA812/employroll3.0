@@ -990,7 +990,7 @@ class _LoginPageState extends State<LoginPage> {
           /*String leaveReqL2MOPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
               ? "1"
               : "0";*/
-          if(loginModelglobal.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+          if(loginModelglobal.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MO_ADD") == true) {
             shared.setPendingLeaveReqL2MSSMOPermission("1");
           } else {
             shared.setPendingLeaveReqL2MSSMOPermission("0");
@@ -1560,7 +1560,7 @@ class _LoginPageState extends State<LoginPage> {
         /*String leaveReqL2MOPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
               ? "1"
               : "0";*/
-        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
+        if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MO_ADD") == true) {
           shared.setPendingLeaveReqL2MSSMOPermission("1");
         } else {
           shared.setPendingLeaveReqL2MSSMOPermission("0");
@@ -2141,7 +2141,7 @@ class _LoginPageState extends State<LoginPage> {
           /*String leaveReqL2MOPermValue = (loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
               ? "1"
               : "0";*/
-          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true) {
+          if(loginModelglobal!.data!.profileList![i].profilePermission!.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || loginModelglobal!.data!.profileList![i].profilePermission!.contains("FINAL_LEVEL_LEAVE_APPROVE_MO_ADD") == true) {
             shared.setPendingLeaveReqL2MSSMOPermission("1");
           } else {
             shared.setPendingLeaveReqL2MSSMOPermission("0");
