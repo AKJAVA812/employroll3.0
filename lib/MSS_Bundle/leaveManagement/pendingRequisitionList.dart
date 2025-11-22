@@ -326,7 +326,7 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                 },
                 horizontalPadding: 8,
                 searchIconColor: Mythemes.black,
-                centerTitle: titleName,
+                centerTitle: "$titleName - ${foundDataNewMSS!.length}",
                 verticalPadding: 3,
                 centerTitleStyle: TextStyle(
                     fontSize: 19,
