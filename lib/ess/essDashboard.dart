@@ -526,7 +526,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         String mobColor = (legend["mobColor"] != null &&
             legend["mobColor"].toString().trim().isNotEmpty)
             ? legend["mobColor"].toString()
-            : "0xff2196F3";
+            : "0xffff000a";
         return {
           "mobColor": mobColor,
           "status": legend["status"].toString(),
@@ -545,7 +545,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         String mobColor = (event["mobColor"] != null &&
             event["mobColor"].toString().trim().isNotEmpty)
             ? event["mobColor"].toString()
-            : "0xff2196F3";
+            : "0xffff000a";
         //print("Calendar event data - $eventDate");
 
         _markedDateMap.add(

@@ -523,8 +523,12 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       // Build legends
       _legends = legends.map((legend) {
+        String mobColor = (legend["mobColor"] != null &&
+            legend["mobColor"].toString().trim().isNotEmpty)
+            ? legend["mobColor"].toString()
+            : "0xffff000a";
         return {
-          "mobColor": legend["mobColor"].toString(),
+          "mobColor": mobColor,
           "status": legend["status"].toString(),
           "statusName": legend["statusName"].toString(),
         };
@@ -538,7 +542,10 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         DateTime eventDate = DateTime.parse(event['logDate']);
         String title = event['status'] ?? "Event";
         String logDate = event['logDate'];
-        String mobColor = event['mobColor'] ?? "0xff2196F3";
+        String mobColor = (event["mobColor"] != null &&
+            event["mobColor"].toString().trim().isNotEmpty)
+            ? event["mobColor"].toString()
+            : "0xffff000a";
         //print("Calendar event data - $eventDate");
 
         _markedDateMap.add(
