@@ -3096,10 +3096,10 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     int rowCount = getCalendarRowCount(_targetDateTime);
 
 // Height per row in your calendar UI
-    double rowHeight = 60; // perfect for your design
+    double rowHeight = 52; // perfect for your design
 
 // Header + padding
-    double topPadding = 55;
+    double topPadding = 60;
 
 // Final height
     double dynamicHeight = (rowCount * rowHeight) + topPadding;
