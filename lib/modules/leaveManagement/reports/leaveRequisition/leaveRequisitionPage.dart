@@ -1293,7 +1293,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                               children: [
                                 Radio(
                                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  value: "firstHalf",
+                                  value: "1",
                                   groupValue: halfDayNewRadios,
                                   onChanged: (value) {
                                     setState(() {
@@ -1303,6 +1303,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                                     });
                                     setState(() {
                                       halfDayNewRadios = value.toString();
+                                      print("$halfDayNewRadios");
                                     });
                                   },
                                 ),
@@ -1315,7 +1316,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                               children: [
                                 Radio(
                                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  value: "secondHalf",
+                                  value: "2",
                                   groupValue: halfDayNewRadios,
                                   onChanged: (value) {
                                     setState(() {
@@ -1325,34 +1326,14 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                                     });
                                     setState(() {
                                       halfDayNewRadios = value.toString();
+                                      print("$halfDayNewRadios");
                                     });
                                   },
                                 ),
                                 "Second Half".text.make(),
                               ],
                             ).px1(),
-                            Row(
-                              /*mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,*/
-                              children: [
-                                Radio(
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  value: "byTime",
-                                  groupValue: halfDayNewRadios,
-                                  onChanged: (value) {
-                                    setState(() {
 
-                                      /*  _singleDayShow =_singleDayShow;
-                                          _multipleDayShow =! _multipleDayShow;*/
-                                    });
-                                    setState(() {
-                                      halfDayNewRadios = value.toString();
-                                    });
-                                  },
-                                ),
-                                "By Time".text.make(),
-                              ],
-                            ).px1(),
                           ],
                         ).pLTRB(0, 0, 5, 5)
 
@@ -1361,125 +1342,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                 ),
                 ),
 
-                Visibility(
-                  visible: halfDayNewRadios == 'byTime',
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child:  TextFormField(
-                          onTap: () async {
-                            FocusScope.of(context).requestFocus(new FocusNode());
-                            //_openInTimepicker(context);
-                            final TimeOfDay? n = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                                builder: (BuildContext context, Widget? child) {
-                                  return MediaQuery(
-                                    data: MediaQuery.of(context)
-                                        .copyWith(alwaysUse24HourFormat: true),
-                                    child: child!,
-                                  );
-                                });
-                            print('timenewOut $n');
-                            setState(() {
-                              var now = DateTime.now();
-                              DateTime newt = DateTime(now.year, now.month,
-                                  now.day, n!.hour, n!.minute);
-                              var nT = DateFormat('HH:mm').format(newt);
-                              print(DateFormat('HH:mm').format(newt));
-                              _fromTimePicker = nT;
-                              fromTimePickerController.text = _fromTimePicker;
-                            });
-                          },
-                          controller: fromTimePickerController,
-                          readOnly: true,
-                          enabled: true,
-                          // initialValue: "Head Office",
-                          // maxLines: 3,
-                          decoration: InputDecoration(
-                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                              borderSide: BorderSide(
-                                  width: 1, color: Mythemes.blackishade),
-                            ),
-                            suffixIcon: Icon(
-                              Icons.timer, size: 18,
-                            ),
-                            contentPadding: EdgeInsets.all(5),
-                            labelText: "From Time",
-                            //hintText: _fromTimePicker,
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                            ),
-                            /*border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))),*/
-                            // labelText: "Location",
-                            labelStyle: TextStyle(
-                                fontWeight: FontWeight.w500,fontSize: 13,
-                                color: Mythemes.blackish),
-                          ),
-                        ).p8(),
 
-                      ),
-                      Expanded(
-                        child:  TextFormField(
-                          onTap: () async {
-                            FocusScope.of(context).requestFocus(new FocusNode());
-                            //_openInTimepicker(context);
-                            final TimeOfDay? o = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                                builder: (BuildContext context, Widget? child) {
-                                  return MediaQuery(
-                                    data: MediaQuery.of(context)
-                                        .copyWith(alwaysUse24HourFormat: true),
-                                    child: child!,
-                                  );
-                                });
-                            print('timenewOut $o');
-                            setState(() {
-                              var now = DateTime.now();
-                              DateTime newt = DateTime(now.year, now.month,
-                                  now.day, o!.hour, o!.minute);
-                              var ot = DateFormat('HH:mm').format(newt);
-                              print(DateFormat('HH:mm').format(newt));
-                              _toTimePicker = ot;
-                              toTimePickerController.text = _toTimePicker;
-                            });
-                          },
-                          controller: toTimePickerController,
-                          enabled: true,
-                          readOnly: true,
-                          // initialValue: "Head Office",
-                          // maxLines: 3,
-                          decoration: InputDecoration(
-                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                              borderSide: BorderSide(
-                                  width: 1, color: Mythemes.blackishade),
-                            ),
-                            suffixIcon: Icon(
-                              Icons.timer, size: 18,
-                            ),
-                            contentPadding: EdgeInsets.all(5),
-                            labelText: "To Time",
-                            //hintText: _fromTimePicker,
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                            ),
-                            /*border: OutlineInputBorder(
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(8))),*/
-                            // labelText: "Location",
-                            labelStyle: TextStyle(
-                                fontWeight: FontWeight.w500,fontSize: 13,
-                                color: Mythemes.blackish),
-                          ),
-                        ).p8(),
-
-                      ),
-                    ],
-                  ),
-                ),
 
                 Visibility(
                   visible: orgNewId == 115 || orgNewId == 145 || orgNewId == 3,
@@ -1935,6 +1798,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     request.fields['summary'] = getRemark;
     request.fields['radio'] = dayRadio;
     request.fields['empid'] = empNewId.toString();
+    request.fields['halfDayType'] = "0";
     request.fields['nominee'] = nominee;
     request.fields['confirmyes'] = confirmYes;
 
@@ -2030,6 +1894,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         request.fields['summary'] = getRemark;
         request.fields['radio'] = dayRadio;
         request.fields['empid'] = empNewId.toString();
+        request.fields['halfDayType'] = "0";
         request.fields['confirmyes'] = confirmyes;
 
 
@@ -2121,6 +1986,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       request.fields['summary'] = getRemark;
       request.fields['radio'] = dayRadio;
       request.fields['empid'] = empNewId.toString();
+      request.fields['halfDayType'] = "0";
       request.fields['confirmyes'] = confirmyes;
 
       String apiWithParams = urlapi.toString() +
@@ -2200,14 +2066,15 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     var urlapi = Uri.parse("$conn$apiUrl");
     var request = http.MultipartRequest("POST", urlapi);
     // Add static fields
-    request.fields['starttime'] = startTime!;
-    request.fields['endtime'] = endTime;
+    //request.fields['starttime'] = startTime!;
+    //request.fields['endtime'] = endTime;
     request.fields['sessionId'] = sessionId!;
     request.fields['leaveTypeId'] = leaveTypeId.toString();
     request.fields['fromDate'] = fromDate;
     request.fields['summary'] = getRemark;
     request.fields['radio'] = dayRadio;
     request.fields['empid'] = empNewId.toString();
+    request.fields['halfDayType'] = halfDayNewRadios.toString();
     request.fields['nominee'] = nominee;
     request.fields['confirmyes'] = confirmyes;
 
