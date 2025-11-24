@@ -408,7 +408,7 @@ class SessionManager {
     final int? adminrole=prefs.getInt('adminrole');
     return adminrole;
   }
-
+/*
   setMobAction(mobAction) async{
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('mobAction', mobAction);
@@ -420,6 +420,26 @@ class SessionManager {
     if (mob == null) return null;
 
     return int.tryParse(mob);   // convert String → int
+  }*/
+
+  Future<void> setMobAction(int mobAction) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('mobAction', mobAction);
+  }
+
+  Future<int?> getMobAction() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Use get() to fetch value without forcing a type
+    final dynamic value = prefs.get('mobAction');
+
+    if (value == null) return null;
+
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value);
+
+    // unexpected type
+    return null;
   }
 
   setDoj(doj) async{
