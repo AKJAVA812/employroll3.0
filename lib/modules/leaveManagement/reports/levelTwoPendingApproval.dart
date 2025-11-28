@@ -9,6 +9,7 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
 import '../../../MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
+import '../../../MSS_MO_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
@@ -170,17 +171,17 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
   var getComment;
   @override
   void initState() {
-      leaveType = foundDataNewMSSL2![itemCount].leaveType;
-      branchName = foundDataNewMSSL2![itemCount].branchName;
-      lBalance = foundDataNewMSSL2![itemCount].totalLeave;
-      department = foundDataNewMSSL2![itemCount].department;
-      empName = foundDataNewMSSL2![itemCount].employeeName;
-      applicationDate = foundDataNewMSSL2![itemCount].applicationDate;
-      fromDate = foundDataNewMSSL2![itemCount].startDate;
-      toDate = foundDataNewMSSL2![itemCount].endDate;
-      reqRemarks = foundDataNewMSSL2![itemCount].summary;
-      leaveReqId = foundDataNewMSSL2![itemCount].reqId;
-      status = foundDataNewMSSL2![itemCount].status;
+      leaveType = foundDataNewMOL2![itemCount].leaveType;
+      branchName = foundDataNewMOL2![itemCount].branchName;
+      lBalance = foundDataNewMOL2![itemCount].totalLeave;
+      department = foundDataNewMOL2![itemCount].department;
+      empName = foundDataNewMOL2![itemCount].employeeName;
+      applicationDate = foundDataNewMOL2![itemCount].applicationDate;
+      fromDate = foundDataNewMOL2![itemCount].startDate;
+      toDate = foundDataNewMOL2![itemCount].endDate;
+      reqRemarks = foundDataNewMOL2![itemCount].summary;
+      leaveReqId = foundDataNewMOL2![itemCount].reqId;
+      status = foundDataNewMOL2![itemCount].status;
       getSharedPrfanceList();
     //getComment = _commentController;
     super.initState();

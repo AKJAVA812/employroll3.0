@@ -503,6 +503,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         // ✅ Rebuild UI from fresh API data
         _buildCalendarFromMap(mapResponse);
       } else {
+        print("Calendar URL - ${response.request}");
         print('Failed to load calendar data: ${response.statusCode}');
       }
     } catch (e) {
