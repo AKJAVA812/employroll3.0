@@ -112,6 +112,7 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 1;
+  var reqType = "Attendance Requisition";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -306,77 +307,123 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
         padding: const EdgeInsets.all(4.0),
         itemCount: approvedRequisitionModel!.data!.length,
         itemBuilder: (context, i) {
-          return Card(
-              elevation: 2,
-              child: Container(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        approvedRequisitionModel.data![i].empName.toString().text.make().px8().py4(),
-                        Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                "Approved".text.bold.color(Mythemes.successColor).sm.make().px8(),
-                              ],
-                            )
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        approvedRequisitionModel.data![i].onDate.toString().text.textStyle(context.captionStyle).make().px8(),
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.touch_app, size: 35, color: Mythemes.lightBluishColor,
-                              ),
-                            ],
-                          ),
+          return
+          Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  // ================= EMPLOYEE NAME + STATUS =================
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      approvedRequisitionModel.data![i].empName
+                          .toString()
+                          .text
+                          .xl
+                          .semiBold
+                          .make(),
+
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Mythemes.lightBluishColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              "In Time".text.sm.make(),
-                              approvedRequisitionModel.data![i].inTime.toString().text.sm.make()
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.touch_app, size: 35, color: Mythemes.lightBluishColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              "Out Time".text.sm.make(),
-                              approvedRequisitionModel.data![i].outTime.toString().text.sm.make()
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              )
+                        child: "Approved"
+                            .toString()
+                            .text
+                            .color(Mythemes.successColor)
+                            .bold
+                            .make(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // ================= DATE =================
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month, size: 18, color: Colors.grey.shade600),
+                      const SizedBox(width: 6),
+                      approvedRequisitionModel.data![i].onDate
+                          .toString()
+                          .text
+                          .textStyle(context.captionStyle)
+                          .color(Colors.grey.shade700)
+                          .make(),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // ================= REQUEST TYPE =================
+                  Row(
+                    children: [
+                      Icon(Icons.assignment, size: 18, color: Colors.grey.shade600),
+                      const SizedBox(width: 6),
+                      "Request Type: $reqType"
+                          .text
+                          .bold
+                          .color(Colors.black87)
+                          .sm
+                          .make(),
+                    ],
+                  ),
+
+                  //const SizedBox(height: 16),
+                  const Divider(thickness: .8),
+                  // const SizedBox(height: 12),
+
+                  // ================= IN/OUT TIME =================
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+
+                      // ---------------- IN TIME ----------------
+                      Column(
+                        children: [
+                          Icon(Icons.touch_app,
+                              size: 32, color: Mythemes.lightBluishColor),
+                          const SizedBox(height: 4),
+                          "In Time".text.sm.make(),
+                          approvedRequisitionModel.data![i].inTime.toString().text.semiBold.make(),
+                        ],
+                      ),
+
+                      // ---------------- OUT TIME ----------------
+                      Column(
+                        children: [
+                          Icon(Icons.touch_app,
+                              size: 32, color: Mythemes.dangerColor),
+                          const SizedBox(height: 4),
+                          "Out Time".text.sm.make(),
+                          approvedRequisitionModel.data![i].outTime.toString().text.semiBold.make(),
+                        ],
+                      ),
+
+                      // If you want working hours, uncomment easily
+                      /*
+            Column(
+              children: [
+                Icon(Icons.timer_outlined,
+                    size: 32, color: Mythemes.lightBluishColor),
+                const SizedBox(height: 4),
+                "Working Hours".text.sm.make(),
+                "09:30".text.semiBold.make()
+              ],
+            ),
+            */
+                    ],
+                  ),
+                ],
+              ),
+            ),
           );
         },
 

@@ -480,135 +480,123 @@ class _PendingRequisitionState extends State<PendingRequisition> with RouteAware
               //CommonNotificationPage.showDeleteMessage(context, context, context);
             },
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          foundDataNew![i].employeeName
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    // ================= EMPLOYEE NAME + STATUS =================
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        foundDataNew![i].employeeName
+                            .toString()
+                            .text
+                            .xl
+                            .semiBold
+                            .make(),
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Mythemes.lightBluishColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: foundDataNew![i].status
                               .toString()
                               .text
-                              .make()
-                              .px8()
-                              .py4(),
-                          Expanded(
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              foundDataNew![i].status.toString()
-                                  .text.bold
-                                  .color(Mythemes.lightBluishColor)
-                                  .sm
-                                  .make()
-                                  .px8(),
-                            ],
-                          ))
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          selfRequisitionModel
-                                  .data![i].reqDate
-                                  .toString()
-                              .text
-                              .textStyle(context.captionStyle)
-                              .make()
-                              .px8(),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          "Request Type: $reqType"
-                              .text.bold
-                              .textStyle(context.captionStyle)
-                              .make()
-                              .px8(),
-                        ],
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.touch_app,
-                                  size: 35,
-                                  color: Mythemes.lightBluishColor,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "In Time".text.sm.make(),
-                                foundDataNew![i].inTime
-                                    .toString()
-                                    .text
-                                    .sm
-                                    .make()
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.touch_app,
-                                  size: 35,
-                                  color: Mythemes.dangerColor,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Out Time".text.sm.make(),
-                                foundDataNew![i].outTime
-                                    .toString()
-                                    .text
-                                    .sm
-                                    .make()
-                              ],
-                            ),
-                          ),
-                          /*Padding(
-                            padding: const EdgeInsets.only(top:15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.update, size: 35, color: Mythemes.lightBluishColor,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Working Hours".text.sm.make(),
-                                "09:30".text.sm.make()
-                              ],
-                            ),
-                          ),*/
-                        ],
-                      )
-                    ],
-                  ),
-                )),
+                              .color(Mythemes.lightBluishColor)
+                              .bold
+                              .sm
+                              .make(),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // ================= DATE =================
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_month, size: 18, color: Colors.grey.shade600),
+                        const SizedBox(width: 6),
+                        selfRequisitionModel.data![i].reqDate
+                            .toString()
+                            .text
+                            .textStyle(context.captionStyle)
+                            .color(Colors.grey.shade700)
+                            .make(),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // ================= REQUEST TYPE =================
+                    Row(
+                      children: [
+                        Icon(Icons.assignment, size: 18, color: Colors.grey.shade600),
+                        const SizedBox(width: 6),
+                        "Request Type: $reqType"
+                            .text
+                            .bold
+                            .color(Colors.black87)
+                            .sm
+                            .make(),
+                      ],
+                    ),
+
+                    //const SizedBox(height: 16),
+                    const Divider(thickness: .8),
+                   // const SizedBox(height: 12),
+
+                    // ================= IN/OUT TIME =================
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+
+                        // ---------------- IN TIME ----------------
+                        Column(
+                          children: [
+                            Icon(Icons.touch_app,
+                                size: 32, color: Mythemes.lightBluishColor),
+                            const SizedBox(height: 4),
+                            "In Time".text.sm.make(),
+                            foundDataNew![i].inTime.toString().text.semiBold.make(),
+                          ],
+                        ),
+
+                        // ---------------- OUT TIME ----------------
+                        Column(
+                          children: [
+                            Icon(Icons.touch_app,
+                                size: 32, color: Mythemes.dangerColor),
+                            const SizedBox(height: 4),
+                            "Out Time".text.sm.make(),
+                            foundDataNew![i].outTime.toString().text.semiBold.make(),
+                          ],
+                        ),
+
+                        // If you want working hours, uncomment easily
+                        /*
+            Column(
+              children: [
+                Icon(Icons.timer_outlined,
+                    size: 32, color: Mythemes.lightBluishColor),
+                const SizedBox(height: 4),
+                "Working Hours".text.sm.make(),
+                "09:30".text.semiBold.make()
+              ],
+            ),
+            */
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
