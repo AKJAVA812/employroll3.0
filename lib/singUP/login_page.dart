@@ -631,8 +631,7 @@ class _LoginPageState extends State<LoginPage> {
                                       });
                                       changeButton =true;
                                       moveToHome();
-                                      if (_username != null &&
-                                          _password != null) {
+                                      if (_username != null && _password != null) {
                                         saveLoginCredentials();
 
                                         setState(() {
