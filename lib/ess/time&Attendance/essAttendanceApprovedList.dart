@@ -363,7 +363,7 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
                   const SizedBox(height: 8),
 
                   // ================= REQUEST TYPE =================
-                  Row(
+                  /*Row(
                     children: [
                       Icon(Icons.assignment, size: 18, color: Colors.grey.shade600),
                       const SizedBox(width: 6),
@@ -374,7 +374,7 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
                           .sm
                           .make(),
                     ],
-                  ),
+                  ),*/
 
                   //const SizedBox(height: 16),
                   const Divider(thickness: .8),
