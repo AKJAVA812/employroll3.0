@@ -17,16 +17,19 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/MSS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
 import 'package:er_flutter_project/MSS_MO_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
 import 'package:er_flutter_project/UIS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
+
 class OdApproveDisapproveReq extends StatefulWidget {
   PendingOdReqList? pendingOdReqList;
   int indexCont;
   OdApproveDisapproveReq(this.pendingOdReqList, this.indexCont);
 
   @override
-  State<OdApproveDisapproveReq> createState() => _OdApproveDisapproveReqState(pendingOdReqList, indexCont);
+  State<OdApproveDisapproveReq> createState() =>
+      _OdApproveDisapproveReqState(pendingOdReqList, indexCont);
 }
 
 dynamic userPanel;
@@ -46,54 +49,56 @@ class _OdApproveDisapproveReqState extends State<OdApproveDisapproveReq> {
     double height = MediaQuery.of(context).size.height;
     return DismissKeyboard(
       child: Scaffold(
-        appBar: AppBar(
-          title: titleName.text.make(),
-          elevation: 0.5,
-        ),
+        appBar: AppBar(title: titleName.text.make(), elevation: 0.5),
         body: Container(
           height: height,
           color: Mythemes.whitish,
           child: SingleChildScrollView(
-              child: RadioGroups(pendingOdReqList! , indexCont)
+            child: RadioGroups(pendingOdReqList!, indexCont),
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
               print('OD');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -104,10 +109,7 @@ class _OdApproveDisapproveReqState extends State<OdApproveDisapproveReq> {
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -140,7 +142,8 @@ class RadioGroups extends StatefulWidget {
   RadioGroups(this.pendingOdReqList, this.indexCont);
 
   @override
-  State<RadioGroups> createState() => _RadioGroupsState(pendingOdReqList, indexCont);
+  State<RadioGroups> createState() =>
+      _RadioGroupsState(pendingOdReqList, indexCont);
 }
 
 class _RadioGroupsState extends State<RadioGroups> {
@@ -157,14 +160,13 @@ class _RadioGroupsState extends State<RadioGroups> {
   var odRemark;
   var type;
   var odId;
-  SessionManager sessionManager=SessionManager();
+  SessionManager sessionManager = SessionManager();
   Map<String, dynamic> mapResponse = {};
   SessionManager shared = SessionManager();
   String? sessionId;
   String? commentRo;
   int? attReqId;
   final TextEditingController _commentController = TextEditingController();
-
 
   @override
   void initState() {
@@ -175,13 +177,12 @@ class _RadioGroupsState extends State<RadioGroups> {
 
   Future getSharedPrfanceList() async {
     //await Future.delayed(Duration(seconds: 1));
-    sessionId = await shared!.getSessionId()??"N/A";
-    userPanel = await shared!.getUserPanel()??"N/A";
-    getProfileId = await shared!.getDefaultProfileId()??"N/A";
-
+    sessionId = await shared!.getSessionId() ?? "N/A";
+    userPanel = await shared!.getUserPanel() ?? "N/A";
+    getProfileId = await shared!.getDefaultProfileId() ?? "N/A";
 
     setState(() {
-      if(userPanel == "MSS") {
+      if (userPanel == "MSS") {
         empName = foundDataNewMSS![indexCont].name;
         image = foundDataNewMSS![indexCont].image;
         odDate = foundDataNewMSS![indexCont].date;
@@ -191,7 +192,7 @@ class _RadioGroupsState extends State<RadioGroups> {
         odRemark = foundDataNewMSS![indexCont].remark;
         odId = foundDataNewMSS![indexCont].id;
       }
-      if(userPanel == "MSS_MO_ADMIN") {
+      if (userPanel == "MSS_MO_ADMIN") {
         empName = foundDataNewMO![indexCont].name;
         image = foundDataNewMO![indexCont].image;
         odDate = foundDataNewMO![indexCont].date;
@@ -201,7 +202,7 @@ class _RadioGroupsState extends State<RadioGroups> {
         odRemark = foundDataNewMO![indexCont].remark;
         odId = foundDataNewMO![indexCont].id;
       }
-      if(userPanel == "USER") {
+      if (userPanel == "USER") {
         empName = foundDataNewUIS![indexCont].name;
         image = foundDataNewUIS![indexCont].image;
         odDate = foundDataNewUIS![indexCont].date;
@@ -212,26 +213,25 @@ class _RadioGroupsState extends State<RadioGroups> {
         odId = foundDataNewUIS![indexCont].id;
       }
     });
-
   }
+
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),
       child: Column(
         children: [
           Container(
             padding: EdgeInsets.all(10.0),
-            width: MediaQuery.of(context).size.width/3,
-            height: MediaQuery.of(context).size.width/3,
+            width: MediaQuery.of(context).size.width / 3,
+            height: MediaQuery.of(context).size.width / 3,
             decoration: BoxDecoration(
               border: Border.all(color: Mythemes.lightBluishColor, width: 3),
               shape: BoxShape.circle,
               color: Mythemes.whitish,
               image: DecorationImage(
                 fit: BoxFit.scaleDown,
-                image:  NetworkImage('$image'),
+                image: NetworkImage('$image'),
                 //FileImage(file!)
               ),
             ),
@@ -239,176 +239,177 @@ class _RadioGroupsState extends State<RadioGroups> {
           Row(
             children: [
               Expanded(
-                  child:
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: TextFormField(
-                      style:TextStyle(fontSize:14),
-                      controller: TextEditingController(text: empName),
-                      readOnly: true,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          contentPadding: EdgeInsets.only(left: 8.0),
-                          enabled: false,
-                          hintText: empName,
-                          labelText: "Name",
-                          labelStyle: TextStyle(fontSize: 15)
-                      ),
-                    ),
-                  ),
-              ),
-              Expanded(
-                  child:
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: TextFormField(
-                      style:TextStyle(fontSize:14),
-                      controller: TextEditingController(text: odDate),
-                      readOnly: true,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          contentPadding: EdgeInsets.only(left: 8.0),
-                          enabled: false,
-                          hintText: odDate,
-                          labelText: "OD Date",
-                          labelStyle: TextStyle(fontSize: 15)
-                      ),
-                    ),
-                  ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                  child:
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: TextFormField(
-                      style:TextStyle(fontSize:14),
-                      controller: TextEditingController(text: odType),
-                      readOnly: true,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          contentPadding: EdgeInsets.only(left: 8.0),
-                          enabled: false,
-                          hintText: odType,
-                          labelText: "OD Type",
-                          labelStyle: TextStyle(fontSize: 15)
-                      ),
-                    ),
-                  ),
-              ),
-              Expanded(
-                  child:
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: TextFormField(
-                      style:TextStyle(fontSize:14),
-                      controller: TextEditingController(text: odTime),
-                      readOnly: true,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          contentPadding: EdgeInsets.only(left: 8.0),
-                          enabled: false,
-                          hintText: odTime,
-                          labelText: "OD Time",
-                          labelStyle: TextStyle(fontSize: 15)
-                      ),
-                    ),
-                  ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                  child:
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: TextFormField(
-                      controller: TextEditingController(text: odAddress),
-                      maxLines: 3,
-                      style:TextStyle(fontSize:14),
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: empName),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
                       enabled: false,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                            borderSide: BorderSide(
-                                width: 1, color: Mythemes.greyishade),
-                          ),
-                          contentPadding: EdgeInsets.only(left: 8.0),
-                          hintText: odAddress,
-                          labelText: "OD Address",
-                          labelStyle: TextStyle(fontSize: 15)
-                      ),
+                      hintText: empName,
+                      labelText: "Name",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
+                ),
               ),
-            ],
-          ),
-          Row(
-            children: [
               Expanded(
-                  child:
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: TextFormField(
-                      controller: TextEditingController(text: odRemark),
-                      maxLines: 3,
-                      style:TextStyle(fontSize:14),
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: odDate),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
                       enabled: false,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                            borderSide: BorderSide(
-                                width: 1, color: Mythemes.greyishade),
-                          ),
-                          contentPadding: EdgeInsets.only(left: 8.0),
-                          hintText: odRemark,
-                          labelText: "OD Remarks",
-                          labelStyle: TextStyle(fontSize: 15)
-                      ),
+                      hintText: odDate,
+                      labelText: "OD Date",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
+                ),
               ),
             ],
           ),
           Row(
             children: [
               Expanded(
-                  child:
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: TextFormField(
-                      controller: _commentController,
-                      maxLines: 3,
-                      style:TextStyle(fontSize:14),
-                      enabled: true,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                            borderSide: BorderSide(
-                                width: 1, color: Mythemes.greyishade),
-                          ),
-                          contentPadding: EdgeInsets.only(left: 8.0),
-                          hintText: "Add Comments",
-                          labelText: "Comments",
-                          labelStyle: TextStyle(fontSize: 15)
-                      ),
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: odType),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: odType,
+                      labelText: "OD Type",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: odTime),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: odTime,
+                      labelText: "OD Time",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: ButtonBar(
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    controller: TextEditingController(text: odAddress),
+                    maxLines: 3,
+                    style: TextStyle(fontSize: 14),
+                    enabled: false,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        //<-- SEE HERE
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: Mythemes.greyishade,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      hintText: odAddress,
+                      labelText: "OD Address",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    controller: TextEditingController(text: odRemark),
+                    maxLines: 3,
+                    style: TextStyle(fontSize: 14),
+                    enabled: false,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        //<-- SEE HERE
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: Mythemes.greyishade,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      hintText: odRemark,
+                      labelText: "OD Remarks",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    controller: _commentController,
+                    maxLines: 3,
+                    style: TextStyle(fontSize: 14),
+                    enabled: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        //<-- SEE HERE
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: Mythemes.greyishade,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      hintText: "Add Comments",
+                      labelText: "Comments",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: ButtonBar(
                   alignment: MainAxisAlignment.center,
                   buttonPadding: Vx.mOnly(right: 16),
                   children: [
-
-
                     ElevatedButton(
                       onPressed: () {
                         type = "DisApproved";
@@ -416,8 +417,9 @@ class _RadioGroupsState extends State<RadioGroups> {
                         //disapprovedRequisition(_commentController.text, attReqId);
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all(Mythemes.dangerColorOne),
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.dangerColorOne,
+                        ),
                       ),
                       child: "Disapprove".text.make(),
                     ).wh(150, 40).py12(),
@@ -429,14 +431,17 @@ class _RadioGroupsState extends State<RadioGroups> {
                         //approvedRequisition(_commentController.text, attReqId);
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all(Mythemes.successColor),
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.successColor,
+                        ),
                       ),
                       child: "Approve".text.make(),
                     ).wh(150, 40).py12(),
-                  ]))
+                  ],
+                ),
+              ),
             ],
-          ).py32()
+          ).py32(),
         ],
       ),
     );
@@ -446,12 +451,14 @@ class _RadioGroupsState extends State<RadioGroups> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.odReqApproveDisAp;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "odid=$odId&"
-        "type=$type&"
-        "remark=$getComment");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "odid=$odId&"
+      "type=$type&"
+      "remark=$getComment",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -462,12 +469,11 @@ class _RadioGroupsState extends State<RadioGroups> {
       String reason = mapResponse['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        showDialgSucess1(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        showDialgSucess1(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
-
     }
   }
 
@@ -475,12 +481,14 @@ class _RadioGroupsState extends State<RadioGroups> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.odReqApproveDisAp;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "odid=$odId&"
-        "type=$type&"
-        "remark=$getComment");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "odid=$odId&"
+      "type=$type&"
+      "remark=$getComment",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -491,21 +499,19 @@ class _RadioGroupsState extends State<RadioGroups> {
       String reason = mapResponse['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        showDialgSucess1(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        showDialgSucess1(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
-
     }
   }
 
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -519,11 +525,15 @@ class _RadioGroupsState extends State<RadioGroups> {
       actions: [
         TextButton(
           onPressed: () {
-            if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-              Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+            if (Navigator.of(context).canPop()) {
+              // âœ… Using `context` inside the builder
+              Navigator.of(
+                context,
+                rootNavigator: true,
+              ).pop(); // Close the dialog
               Navigator.of(buildContext).maybePop();
             } else {
-              print("⚠️ Warning: No route to close.");
+              print("âš ï¸ Warning: No route to close.");
             }
           },
           child: Text("Ok"),
@@ -532,15 +542,13 @@ class _RadioGroupsState extends State<RadioGroups> {
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
-
-
 }
-
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;

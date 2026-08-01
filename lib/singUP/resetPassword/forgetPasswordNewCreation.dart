@@ -5,31 +5,31 @@ import 'package:flutter/material.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordOtp.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../themes/empThemes.dart';
 import '../login_page.dart';
+
 class ForgotPasswordResetPage extends StatefulWidget {
   var emailControllerNew;
 
   ForgotPasswordResetPage(this.emailControllerNew);
 
   @override
-  State<ForgotPasswordResetPage> createState() => _ForgotPasswordResetPageState(
-      emailControllerNew);
+  State<ForgotPasswordResetPage> createState() =>
+      _ForgotPasswordResetPageState(emailControllerNew);
 }
 
 class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
   bool _obscureNewPassword = true;
   bool _obscureRePassword = true;
   var emailControllersNew;
-  _ForgotPasswordResetPageState(
-      this.emailControllersNew);
+  _ForgotPasswordResetPageState(this.emailControllersNew);
 
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _rePasswordController = TextEditingController();
 
   String? _errorText;
-
 
   void _changePassword() {
     if (_newPasswordController.text != _rePasswordController.text) {
@@ -50,9 +50,11 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
   Future<void> changePassword(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.resetPasswordApi;
-    final url = Uri.parse('$conn$apiUrl?'
-        'email=${emailControllersNew.text}&'
-        'pw=${_newPasswordController.text}');
+    final url = Uri.parse(
+      '$conn$apiUrl?'
+      'email=${emailControllersNew.text}&'
+      'pw=${_newPasswordController.text}',
+    );
 
     print("Calling API: $url");
 
@@ -64,7 +66,7 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
     );
 
     try {
-      final response = await http.post(url);
+      final response = await MobileHttpClient.instance.post(url);
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
 
@@ -87,39 +89,45 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
         );*/
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Success"),
-            content: Text(data['reason'] ?? "Password changed successfully !!"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  if (Navigator.of(context).canPop()) {
-                    //Navigator.of(context, rootNavigator: true).pop();
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => LoginPage()));
-                  } else {
-                    print("⚠️ Warning: No route to close.");
-                  }
-                },
-                child: const Text("OK"),
-              )
-            ],
-          ),
+          builder:
+              (context) => AlertDialog(
+                title: const Text("Success"),
+                content: Text(
+                  data['reason'] ?? "Password changed successfully !!",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      if (Navigator.of(context).canPop()) {
+                        //Navigator.of(context, rootNavigator: true).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        );
+                      } else {
+                        print("âš ï¸ Warning: No route to close.");
+                      }
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
         );
       } else {
         // Show error dialog from response
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Error"),
-            content: Text(data['reason'] ?? "Something went wrong"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("OK"),
-              )
-            ],
-          ),
+          builder:
+              (context) => AlertDialog(
+                title: const Text("Error"),
+                content: Text(data['reason'] ?? "Something went wrong"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
         );
       }
     } catch (e) {
@@ -129,16 +137,17 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
       // Show exception error dialog
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Error"),
-          content: Text("Failed to send OTP. Error: $e"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("OK"),
-            )
-          ],
-        ),
+        builder:
+            (context) => AlertDialog(
+              title: const Text("Error"),
+              content: Text("Failed to send OTP. Error: $e"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
       );
     }
   }
@@ -173,7 +182,10 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
             children: [
               Image.asset('assets/images/new_password.png', height: 250),
               const SizedBox(height: 24),
-              const Text('Please enter a new password', style: TextStyle(fontSize: 16)),
+              const Text(
+                'Please enter a new password',
+                style: TextStyle(fontSize: 16),
+              ),
               const SizedBox(height: 24),
 
               // New Password Field
@@ -186,7 +198,9 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureNewPassword ? Icons.visibility_off : Icons.visibility,
+                      _obscureNewPassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                     ),
                     onPressed: () {
                       setState(() {
@@ -209,7 +223,9 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureRePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscureRePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                     ),
                     onPressed: () {
                       setState(() {
@@ -222,17 +238,14 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
 
               if (_errorText != null) ...[
                 const SizedBox(height: 12),
-                Text(
-                  _errorText!,
-                  style: const TextStyle(color: Colors.red),
-                ),
+                Text(_errorText!, style: const TextStyle(color: Colors.red)),
               ],
 
               const SizedBox(height: 24),
 
               ElevatedButton(
                 onPressed: () {
-                changePassword(context);
+                  changePassword(context);
                 },
                 child: const Text('Change Password'),
               ),

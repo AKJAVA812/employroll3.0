@@ -9,6 +9,7 @@ import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../adminPage/modelClass/dashboardModel.dart';
 import '../../adminPage/mssDashboard.dart';
@@ -38,8 +39,8 @@ SessionManager shared = SessionManager();
 String? sessionId;
 dynamic userPermission;
 dynamic getProfileId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNew = [];
 ExitEmpListModal? employeeListModelglobel;
 ExitEmpListModal? employeeListModelglobeled;
 var empNameExited;
@@ -47,7 +48,9 @@ var empIdExited;
 
 bool isLoading = true;
 Future<ExitEmpListModal>? futureExitEmpList;
-class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteAware{
+
+class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
+    with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -62,13 +65,13 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     setState(() {
@@ -90,15 +93,15 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        employeeListModelglobel=value;
-        employeeListModelglobeled=employeeListModelglobel;
+        employeeListModelglobel = value;
+        employeeListModelglobeled = employeeListModelglobel;
       });
       print('employeeList00${employeeListModelglobel!.data!.length}');
     });
@@ -109,12 +112,14 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
     String apiUrl = ApiDetails.exitEmpListApi;
     print('employeeList11: ${SessionId}');
     ExitEmpListModal employeeListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "userPermission=$userPermission&"
-        "profileId=$getProfileId&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "userPermission=$userPermission&"
+      "profileId=$getProfileId&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
     print('Exit API - ${response.request}');
@@ -122,10 +127,10 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    employeeListModel=ExitEmpListModal.fromJson(mapResponse);
+    employeeListModel = ExitEmpListModal.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
     setState(() {
-      isLoading = false; // ✅ Hide loader after API success
+      isLoading = false; // âœ… Hide loader after API success
     });
 
     return employeeListModel;
@@ -135,12 +140,13 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.initiateExitApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "empid=$empId&"
-        "status=true"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "empid=$empId&"
+      "status=true",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -156,14 +162,11 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
       print('result${status}');
       if (status.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(
-              context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
         } else if (status.compareToIgnoringCase("error") == 0) {
-          showDialgSucess1(
-              context, reason.upperCamelCase, " Error ");
+          showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
       }
-
     }
   }
 
@@ -171,12 +174,13 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.initiateExitApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "empid=$empId&"
-        "status=false"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "empid=$empId&"
+      "status=false",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -192,22 +196,19 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
       print('result${status}');
       if (status.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(
-              context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
         } else if (status.compareToIgnoringCase("error") == 0) {
-          showDialgSucess1(
-              context, reason.upperCamelCase, " Error ");
+          showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
       }
-
     }
   }
+
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -221,7 +222,6 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
       actions: [
         TextButton(
           onPressed: () {
-
             /*Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
@@ -230,14 +230,11 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
                   transitionDuration: Duration(seconds: 1),
                   maintainState: true,
                 ));*/
-            if(mounted) {
-              isLoading=true;
+            if (mounted) {
+              isLoading = true;
               Navigator.of(context, rootNavigator: true).pop();
               getSharedPrfanceList();
             }
-
-
-
           },
           child: Text("Ok"),
         ),
@@ -245,15 +242,16 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -266,8 +264,14 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.empName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -281,6 +285,7 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
       foundDataNew = results;
     });
   }
+
   TextEditingController searchType = TextEditingController();
   var titleName = "Exit Employees";
   int value = 1;
@@ -290,377 +295,408 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView> with RouteA
   var dropdownvalue;
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size(double.infinity, 100),
-          child: SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.white, border: Border(
-                  top: BorderSide.none
-              ), boxShadow: [
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size(double.infinity, 100),
+        child: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
                 BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 0.5,
-                    spreadRadius: 0,
-                    offset: Offset(0, 0.2))
-              ]),
-              child: AnimationSearchBar(
-                  searchFieldDecoration: BoxDecoration(
-                    color: Mythemes.greyishade,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  backIcon: Icons.arrow_back_ios,
-                  backIconColor: Mythemes.black,
-                  textStyle: TextStyle(fontSize: 14),
-                  onChanged: (value) {
-                    _runFilter(value);
-                  },
-                  horizontalPadding: 8,
-                  searchIconColor: Mythemes.black,
-                  centerTitle: "$titleName - ${foundDataNew!.length}",
-                  verticalPadding: 3,
-                  centerTitleStyle: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500,
-                      color: Mythemes.black),
-                  searchTextEditingController: searchType),
+                  color: Colors.grey,
+                  blurRadius: 0.5,
+                  spreadRadius: 0,
+                  offset: Offset(0, 0.2),
+                ),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: "$titleName - ${foundDataNew!.length}",
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
             ),
           ),
         ),
-        bottomNavigationBar:
-        BottomNavigationBar (
-          type: BottomNavigationBarType.fixed,
-          currentIndex: currentIndex,
-          iconSize: 25,
-          selectedFontSize: 12,
-          unselectedFontSize: 10,
-          onTap: (index) {
-
-            if(index==0){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
-              //Navigator.pop(context);
-              print('home tab');
-            }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
-            }
-            if(index==2){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
-            }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
-              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
-            }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
-              print('Profile');
-            }
-            /*if(index==3){
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
+          }
+          if (index == 2) {
+            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Attendance');
+          }
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MSSDashboard(DashboardModel()),
+              ),
+            );
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('Dashboard');
+          }
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
+            );
+            print('Profile');
+          }
+          /*if(index==3){
                 title="Notifications";
               }*/
-            setState(() => currentIndex = index);
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.manage_accounts_outlined),
-              label: 'Workflow',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
-              //backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
-              //backgroundColor: Colors.blue,
-            ),
-          ],
-        ),
-
-        body: FutureBuilder<ExitEmpListModal>(
-          future: futureExitEmpList,
-    builder: (context, snapshot) {
-      if (isLoading) {
-        return Center(child: CircularProgressIndicator()); // ✅ Show loader
-      } else if (snapshot.hasError) {
-        return Center(child: Text("❌ Error loading data"));
-      }
-      return  RefreshIndicator(
-        onRefresh: () {
-          Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (a, b, c) =>
-                    ExitEmployeeListView(),
-                transitionDuration: Duration(seconds: 1),
-                maintainState: true,
-              ));
-          return Future.value(false);
+          setState(() => currentIndex = index);
         },
-        child: ListView.builder(
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pending_actions),
+            label: 'Attendance',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_customize),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+            //backgroundColor: Colors.blue,
+          ),
+        ],
+      ),
 
-          padding: EdgeInsets.only(top: 4, bottom: 4,left: 4, right: 4),
-          itemCount: foundDataNew!.length,
-          itemBuilder: (context, i) {
-            int activeStep = 0;
-            int selectedStep = 2;
-            int nbSteps = 5;
-            return InkWell(
-                onTap: () {
-                  empIdExited = foundDataNew![i].empdetailsId;
-                  empNameExited = foundDataNew![i].empName;
-                  print('ID $empIdExited');
-                  print('NameCheck $empNameExited');
-                  //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
-                },
-                child: GestureDetector(
-                  onTap: () async {
+      body: FutureBuilder<ExitEmpListModal>(
+        future: futureExitEmpList,
+        builder: (context, snapshot) {
+          if (isLoading) {
+            return Center(
+              child: CircularProgressIndicator(),
+            ); // âœ… Show loader
+          } else if (snapshot.hasError) {
+            return Center(child: Text("âŒ Error loading data"));
+          }
+          return RefreshIndicator(
+            onRefresh: () {
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (a, b, c) => ExitEmployeeListView(),
+                  transitionDuration: Duration(seconds: 1),
+                  maintainState: true,
+                ),
+              );
+              return Future.value(false);
+            },
+            child: ListView.builder(
+              padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
+              itemCount: foundDataNew!.length,
+              itemBuilder: (context, i) {
+                int activeStep = 0;
+                int selectedStep = 2;
+                int nbSteps = 5;
+                return InkWell(
+                  onTap: () {
                     empIdExited = foundDataNew![i].empdetailsId;
                     empNameExited = foundDataNew![i].empName;
                     print('ID $empIdExited');
                     print('NameCheck $empNameExited');
-                    if(foundDataNew![i].initiate == true) {
-                      bool? result = await showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            title: Text("Confirm Revert"),
-                            content: Text("Do you want to revert the initiation process for this employee?"),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(false); // ❌ No pressed
-                                },
-                                child: Text("No"),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(true); // ✅ Yes pressed
-                                  empIdExited = foundDataNew![i].empdetailsId;
-                                  unInitiateExitProcess(empIdExited.toString());
-                                },
-                                child: Text("Yes"),
-                                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      if (result == true) {
-                        // ✅ YES was pressed, proceed with logic
-                        // Call your initiation API or method here
-                        // Example: await initiateExit(foundDataNew![i].empId);
-
-                        // Refresh the list or page
-                        setState(() {});
-                      }
-                    } else {
-                      bool? result = await showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            title: Text("Confirm Initiation"),
-                            content: Text("Do you want to initiate the exit process for this employee?"),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(false); // ❌ No pressed
-                                },
-                                child: Text("No"),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(true); // ✅ Yes pressed
-                                  empIdExited = foundDataNew![i].empdetailsId;
-                                  initiateExitProcess(empIdExited.toString());
-                                },
-                                child: Text("Yes"),
-                                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      if (result == true) {
-                        // ✅ YES was pressed, proceed with logic
-                        // Call your initiation API or method here
-                        // Example: await initiateExit(foundDataNew![i].empId);
-
-                        // Refresh the list or page
-                        setState(() {});
-                      }
-                    }
-
-
-
+                    //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
                   },
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8), // Space between cards
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: foundDataNew![i].initiate == true
-                              ? Mythemes.successColor
-                              : Mythemes.dangerColor,
-                          width: 5,
-                        ),
-                      ),
-                      borderRadius: BorderRadius.circular(8), // Rounded corners
-                      color: Colors.white, // Optional: to match Card background
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8), // Clip child to border radius
-                      child: Card(
-                        margin: EdgeInsets.zero,
-                        elevation: 0, // Set to 0 since we’re using BoxShadow on container
-                        color: Colors.transparent, // Let container color show
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                foundDataNew![i].initiate == true
-                                    ? "Initiated"
-                                    .text
-                                    .size(14)
-                                    .align(TextAlign.right)
-                                    .bold
-                                    .color(Mythemes.successColor)
-                                    .make()
-                                    .px8()
-                                    .py4()
-                                    : "Not Initiated"
-                                    .text
-                                    .size(14)
-                                    .align(TextAlign.right)
-                                    .bold
-                                    .color(Mythemes.dangerColor)
-                                    .make()
-                                    .px8()
-                                    .py4()
-                              ],
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  flex: 0,
-                                  child: CircleAvatar(
-                                    minRadius: 48,
-                                    backgroundColor: Mythemes.greyish,
-                                    backgroundImage:
-                                    NetworkImage(foundDataNew![i].empPhoto!),
-                                  ).px(8).py8(),
+                  child: GestureDetector(
+                    onTap: () async {
+                      empIdExited = foundDataNew![i].empdetailsId;
+                      empNameExited = foundDataNew![i].empName;
+                      print('ID $empIdExited');
+                      print('NameCheck $empNameExited');
+                      if (foundDataNew![i].initiate == true) {
+                        bool? result = await showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              title: Text("Confirm Revert"),
+                              content: Text(
+                                "Do you want to revert the initiation process for this employee?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pop(false); // âŒ No pressed
+                                  },
+                                  child: Text("No"),
                                 ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      foundDataNew![i].empName
-                                          .toString()
-                                          .text
-                                          .bold
-                                          .size(16)
-                                          .make()
-                                          .px1(),
-                                      foundDataNew![i].empDept
-                                          .toString()
-                                          .text
-                                          .size(14)
-                                          .color(Colors.grey[700])
-                                          .make()
-                                          .px1(),
-                                      "Resignation Date:"
-                                          .text
-                                          .size(13)
-                                          .bold
-                                          .make()
-                                          .px1()
-                                          .py2(),
-                                      foundDataNew![i].resignData
-                                          .toString()
-                                          .text
-                                          .size(13)
-                                          .color(Colors.black87)
-                                          .make()
-                                          .px1(),
-                                      "Last Working Date:"
-                                          .text
-                                          .size(13)
-                                          .bold
-                                          .make()
-                                          .px1()
-                                          .py2(),
-                                      foundDataNew![i].lastworkingData
-                                          .toString()
-                                          .text
-                                          .size(13)
-                                          .color(Colors.black87)
-                                          .make()
-                                          .px1(),
-                                    ],
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pop(true); // âœ… Yes pressed
+                                    empIdExited = foundDataNew![i].empdetailsId;
+                                    unInitiateExitProcess(
+                                      empIdExited.toString(),
+                                    );
+                                  },
+                                  child: Text("Yes"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
                                   ),
                                 ),
                               ],
-                            ),
-                          ],
+                            );
+                          },
+                        );
+                        if (result == true) {
+                          // âœ… YES was pressed, proceed with logic
+                          // Call your initiation API or method here
+                          // Example: await initiateExit(foundDataNew![i].empId);
+
+                          // Refresh the list or page
+                          setState(() {});
+                        }
+                      } else {
+                        bool? result = await showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              title: Text("Confirm Initiation"),
+                              content: Text(
+                                "Do you want to initiate the exit process for this employee?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pop(false); // âŒ No pressed
+                                  },
+                                  child: Text("No"),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pop(true); // âœ… Yes pressed
+                                    empIdExited = foundDataNew![i].empdetailsId;
+                                    initiateExitProcess(empIdExited.toString());
+                                  },
+                                  child: Text("Yes"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        if (result == true) {
+                          // âœ… YES was pressed, proceed with logic
+                          // Call your initiation API or method here
+                          // Example: await initiateExit(foundDataNew![i].empId);
+
+                          // Refresh the list or page
+                          setState(() {});
+                        }
+                      }
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 8,
+                      ), // Space between cards
+                      decoration: BoxDecoration(
+                        border: Border(
+                          left: BorderSide(
+                            color:
+                                foundDataNew![i].initiate == true
+                                    ? Mythemes.successColor
+                                    : Mythemes.dangerColor,
+                            width: 5,
+                          ),
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          8,
+                        ), // Rounded corners
+                        color:
+                            Colors.white, // Optional: to match Card background
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                          8,
+                        ), // Clip child to border radius
+                        child: Card(
+                          margin: EdgeInsets.zero,
+                          elevation:
+                              0, // Set to 0 since weâ€™re using BoxShadow on container
+                          color: Colors.transparent, // Let container color show
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  foundDataNew![i].initiate == true
+                                      ? "Initiated".text
+                                          .size(14)
+                                          .align(TextAlign.right)
+                                          .bold
+                                          .color(Mythemes.successColor)
+                                          .make()
+                                          .px8()
+                                          .py4()
+                                      : "Not Initiated".text
+                                          .size(14)
+                                          .align(TextAlign.right)
+                                          .bold
+                                          .color(Mythemes.dangerColor)
+                                          .make()
+                                          .px8()
+                                          .py4(),
+                                ],
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex: 0,
+                                    child:
+                                        CircleAvatar(
+                                          minRadius: 48,
+                                          backgroundColor: Mythemes.greyish,
+                                          backgroundImage: NetworkImage(
+                                            foundDataNew![i].empPhoto!,
+                                          ),
+                                        ).px(8).py8(),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        foundDataNew![i].empName
+                                            .toString()
+                                            .text
+                                            .bold
+                                            .size(16)
+                                            .make()
+                                            .px1(),
+                                        foundDataNew![i].empDept
+                                            .toString()
+                                            .text
+                                            .size(14)
+                                            .color(Colors.grey[700])
+                                            .make()
+                                            .px1(),
+                                        "Resignation Date:".text
+                                            .size(13)
+                                            .bold
+                                            .make()
+                                            .px1()
+                                            .py2(),
+                                        foundDataNew![i].resignData
+                                            .toString()
+                                            .text
+                                            .size(13)
+                                            .color(Colors.black87)
+                                            .make()
+                                            .px1(),
+                                        "Last Working Date:".text
+                                            .size(13)
+                                            .bold
+                                            .make()
+                                            .px1()
+                                            .py2(),
+                                        foundDataNew![i].lastworkingData
+                                            .toString()
+                                            .text
+                                            .size(13)
+                                            .color(Colors.black87)
+                                            .make()
+                                            .px1(),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            );
-          },
-        ),
-      );
-    }
-        )
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }
-
 
 class MyStatelessWidget extends StatefulWidget {
   final ExitEmpListModal employeeListModel;
 
   MyStatelessWidget(this.employeeListModel);
   @override
-  State<MyStatelessWidget> createState() => _MyStatelessWidgetState(employeeListModel);
+  State<MyStatelessWidget> createState() =>
+      _MyStatelessWidgetState(employeeListModel);
 }
-
 
 class _MyStatelessWidgetState extends State<MyStatelessWidget> {
   final ExitEmpListModal employeeListModel;
@@ -677,12 +713,13 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.initiateExitApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "empid=$empId&"
-        "status=true"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "empid=$empId&"
+      "status=true",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -698,14 +735,11 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       print('result${status}');
       if (status.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(
-              context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
         } else if (status.compareToIgnoringCase("error") == 0) {
-          showDialgSucess1(
-              context, reason.upperCamelCase, " Error ");
+          showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
       }
-
     }
   }
 
@@ -713,12 +747,13 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.initiateExitApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "empid=$empId&"
-        "status=false"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "empid=$empId&"
+      "status=false",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -734,22 +769,19 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       print('result${status}');
       if (status.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(
-              context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
         } else if (status.compareToIgnoringCase("error") == 0) {
-          showDialgSucess1(
-              context, reason.upperCamelCase, " Error ");
+          showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
       }
-
     }
   }
+
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -763,7 +795,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       actions: [
         TextButton(
           onPressed: () {
-
             /*Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
@@ -772,12 +803,9 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                   transitionDuration: Duration(seconds: 1),
                   maintainState: true,
                 ));*/
-            if(mounted) {
+            if (mounted) {
               Navigator.of(context, rootNavigator: true).pop();
             }
-
-
-
           },
           child: Text("Ok"),
         ),
@@ -785,38 +813,34 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    showTrackDialog(BuildContext buildContext, result,alert) {
+    showTrackDialog(BuildContext buildContext, result, alert) {
       var alertDialog = AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0),
-            )
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
         ),
         title: Row(
           children: [
             //Icon(Icons.warning),
-            Expanded(child: Text( alert, style: TextStyle(
-                fontSize: 18
-            ),)),
+            Expanded(child: Text(alert, style: TextStyle(fontSize: 18))),
           ],
         ),
-        content: Text(result , style: TextStyle(
-            fontSize: 14
-        )),
+        content: Text(result, style: TextStyle(fontSize: 14)),
         titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         actions: [
           TextButton(
-              onPressed: () {
-                /*for(int i=0; i<employeeListModel!.data!.length;i++){
+            onPressed: () {
+              /*for(int i=0; i<employeeListModel!.data!.length;i++){
                   setState(() {
                     empId;
                     empName;
@@ -826,58 +850,67 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                   });
 
                 }*/
-                //print('emPI $empId');
-                //print('emName $empName');
-                print("Emp list clicked");
-                Navigator.pop(context);
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                    HistoryMapView(empNameExited,empIdExited)));
-
-                //Navigator.pop(buildContext);
-              },
-              child: Container(
-                child: Text("History"
-                  ,style: TextStyle(color: Mythemes.dangerColor),
+              //print('emPI $empId');
+              //print('emName $empName');
+              print("Emp list clicked");
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => HistoryMapView(empNameExited, empIdExited),
                 ),
-              )
+              );
+
+              //Navigator.pop(buildContext);
+            },
+            child: Container(
+              child: Text(
+                "History",
+                style: TextStyle(color: Mythemes.dangerColor),
+              ),
+            ),
           ),
           TextButton(
-              onPressed: () {
-                Navigator.of(buildContext, rootNavigator: true).pop();
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                    LiveMapView(empNameExited,empIdExited)));
-              },
-              child: Container(
-                child: Text("Live",
-                    style: TextStyle(color: Mythemes.lightBluishColor)
+            onPressed: () {
+              Navigator.of(buildContext, rootNavigator: true).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => LiveMapView(empNameExited, empIdExited),
                 ),
-              )
+              );
+            },
+            child: Container(
+              child: Text(
+                "Live",
+                style: TextStyle(color: Mythemes.lightBluishColor),
+              ),
+            ),
           ),
-
         ],
         elevation: 24.0,
       );
       showDialog(
-          context: buildContext,
-          builder: (BuildContext context) {
-            return alertDialog;
-          });
+        context: buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        },
+      );
     }
+
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  ExitEmployeeListView(),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (a, b, c) => ExitEmployeeListView(),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
-
-        padding: EdgeInsets.only(top: 4, bottom: 4,left: 4, right: 4),
+        padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
         itemCount: foundDataNew!.length,
         itemBuilder: (context, i) {
           int activeStep = 0;
@@ -897,7 +930,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 empNameExited = foundDataNew![i].empName;
                 print('ID $empIdExited');
                 print('NameCheck $empNameExited');
-                if(foundDataNew![i].initiate == true) {
+                if (foundDataNew![i].initiate == true) {
                   bool? result = await showDialog(
                     context: context,
                     barrierDismissible: false,
@@ -907,29 +940,37 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         title: Text("Confirm Revert"),
-                        content: Text("Do you want to revert the initiation process for this employee?"),
+                        content: Text(
+                          "Do you want to revert the initiation process for this employee?",
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(false); // ❌ No pressed
+                              Navigator.of(
+                                context,
+                              ).pop(false); // âŒ No pressed
                             },
                             child: Text("No"),
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              Navigator.of(context).pop(true); // ✅ Yes pressed
+                              Navigator.of(
+                                context,
+                              ).pop(true); // âœ… Yes pressed
                               empIdExited = foundDataNew![i].empdetailsId;
                               unInitiateExitProcess(empIdExited.toString());
                             },
                             child: Text("Yes"),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
                           ),
                         ],
                       );
                     },
                   );
                   if (result == true) {
-                    // ✅ YES was pressed, proceed with logic
+                    // âœ… YES was pressed, proceed with logic
                     // Call your initiation API or method here
                     // Example: await initiateExit(foundDataNew![i].empId);
 
@@ -946,29 +987,37 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         title: Text("Confirm Initiation"),
-                        content: Text("Do you want to initiate the exit process for this employee?"),
+                        content: Text(
+                          "Do you want to initiate the exit process for this employee?",
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).pop(false); // ❌ No pressed
+                              Navigator.of(
+                                context,
+                              ).pop(false); // âŒ No pressed
                             },
                             child: Text("No"),
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              Navigator.of(context).pop(true); // ✅ Yes pressed
+                              Navigator.of(
+                                context,
+                              ).pop(true); // âœ… Yes pressed
                               empIdExited = foundDataNew![i].empdetailsId;
                               initiateExitProcess(empIdExited.toString());
                             },
                             child: Text("Yes"),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
                           ),
                         ],
                       );
                     },
                   );
                   if (result == true) {
-                    // ✅ YES was pressed, proceed with logic
+                    // âœ… YES was pressed, proceed with logic
                     // Call your initiation API or method here
                     // Example: await initiateExit(foundDataNew![i].empId);
 
@@ -976,18 +1025,18 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                     setState(() {});
                   }
                 }
-
-
-
               },
               child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 8), // Space between cards
+                margin: const EdgeInsets.symmetric(
+                  vertical: 8,
+                ), // Space between cards
                 decoration: BoxDecoration(
                   border: Border(
                     left: BorderSide(
-                      color: foundDataNew![i].initiate == true
-                          ? Mythemes.successColor
-                          : Mythemes.dangerColor,
+                      color:
+                          foundDataNew![i].initiate == true
+                              ? Mythemes.successColor
+                              : Mythemes.dangerColor,
                       width: 5,
                     ),
                   ),
@@ -1002,10 +1051,13 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8), // Clip child to border radius
+                  borderRadius: BorderRadius.circular(
+                    8,
+                  ), // Clip child to border radius
                   child: Card(
                     margin: EdgeInsets.zero,
-                    elevation: 0, // Set to 0 since we’re using BoxShadow on container
+                    elevation:
+                        0, // Set to 0 since weâ€™re using BoxShadow on container
                     color: Colors.transparent, // Let container color show
                     child: Column(
                       children: [
@@ -1014,24 +1066,22 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             foundDataNew![i].initiate == true
-                                ? "Initiated"
-                                .text
-                                .size(14)
-                                .align(TextAlign.right)
-                                .bold
-                                .color(Mythemes.successColor)
-                                .make()
-                                .px8()
-                                .py4()
-                                : "Not Initiated"
-                                .text
-                                .size(14)
-                                .align(TextAlign.right)
-                                .bold
-                                .color(Mythemes.dangerColor)
-                                .make()
-                                .px8()
-                                .py4()
+                                ? "Initiated".text
+                                    .size(14)
+                                    .align(TextAlign.right)
+                                    .bold
+                                    .color(Mythemes.successColor)
+                                    .make()
+                                    .px8()
+                                    .py4()
+                                : "Not Initiated".text
+                                    .size(14)
+                                    .align(TextAlign.right)
+                                    .bold
+                                    .color(Mythemes.dangerColor)
+                                    .make()
+                                    .px8()
+                                    .py4(),
                           ],
                         ),
                         Row(
@@ -1039,12 +1089,14 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                           children: [
                             Expanded(
                               flex: 0,
-                              child: CircleAvatar(
-                                minRadius: 48,
-                                backgroundColor: Mythemes.greyish,
-                                backgroundImage:
-                                NetworkImage(foundDataNew![i].empPhoto!),
-                              ).px(8).py8(),
+                              child:
+                                  CircleAvatar(
+                                    minRadius: 48,
+                                    backgroundColor: Mythemes.greyish,
+                                    backgroundImage: NetworkImage(
+                                      foundDataNew![i].empPhoto!,
+                                    ),
+                                  ).px(8).py8(),
                             ),
                             Expanded(
                               child: Column(
@@ -1064,8 +1116,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                       .color(Colors.grey[700])
                                       .make()
                                       .px1(),
-                                  "Resignation Date:"
-                                      .text
+                                  "Resignation Date:".text
                                       .size(13)
                                       .bold
                                       .make()
@@ -1078,8 +1129,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                       .color(Colors.black87)
                                       .make()
                                       .px1(),
-                                  "Last Working Date:"
-                                      .text
+                                  "Last Working Date:".text
                                       .size(13)
                                       .bold
                                       .make()
@@ -1102,7 +1152,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                   ),
                 ),
               ),
-            )
+            ),
 
             /* Card(
                 elevation: 2,
@@ -1152,7 +1202,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                               .make()
                               .px8(),
 
-                         *//* Expanded(
+                         */
+            /* Expanded(
                               child: Column(
                                 crossAxisAlignment:
                                 CrossAxisAlignment.end,
@@ -1165,7 +1216,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                       context.captionStyle)
                                       .make().px8(),
                                 ],
-                              ))*//*
+                              ))*/
+            /*
 
                         ],
                       ).py2(),

@@ -17,6 +17,7 @@ import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/commanNotificationPage.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
@@ -33,22 +34,21 @@ class PreInductionProcess extends StatefulWidget {
   State<PreInductionProcess> createState() => _PreInductionProcessState();
 }
 
+List<String?> onboardBranchList = [];
+List<String?> onboardDeptList = [];
+List<String?> onboardDesignationList = [];
+List<String?> onboardUserTypeList = [];
+List<String?> onboardDocTypeList = [];
+List<String?> queryTypeList = [];
+List<String?> subQueryTypeList = [];
 
-
- List<String?> onboardBranchList = [];
- List<String?> onboardDeptList = [];
- List<String?> onboardDesignationList = [];
- List<String?> onboardUserTypeList = [];
- List<String?> onboardDocTypeList = [];
- List<String?> queryTypeList = [];
- List<String?> subQueryTypeList = [];
-
-SessionManager sessionManager=SessionManager();
+SessionManager sessionManager = SessionManager();
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 late var result;
 const int STEPS = 5;
+
 class _PreInductionProcessState extends State<PreInductionProcess> {
   OnboardBranchListModal? onboardBranchListModal;
   OnboardDeptListModal? onboardDeptListModal;
@@ -56,13 +56,11 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
   OnboardUserTypeListModal? onboardUserTypeListModal;
   OnboardDocTypeListModal? onboardDocTypeListModal;
 
-
   @override
   void initState() {
     // TODO: implement initState
     getSharedPrfanceList();
-    setState(() {
-    });
+    setState(() {});
     super.initState();
   }
 
@@ -101,10 +99,10 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
   String colorVisionRadioSat = "colorVisionNoSat";
   String coronaRadios = "coronaNo";
   String hivRadios = "hivNo";
-  String valuenew="listText";
-  String valuenewSub="listText";
-  String valuenewDesignation="listText";
-  String valuenewUserType="listText";
+  String valuenew = "listText";
+  String valuenewSub = "listText";
+  String valuenewDesignation = "listText";
+  String valuenewUserType = "listText";
   TextEditingController aadharNoController = TextEditingController();
   TextEditingController aadharRegisNoController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
@@ -158,11 +156,12 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         String uploadedDocName = photo.name;
 
         setState(() {
-          uploadedDocuments[titleKey] = photo.path; // 👈 Save with key
+          uploadedDocuments[titleKey] = photo.path; // ðŸ‘ˆ Save with key
           files.add({
             'name': uploadedDocName,
             'path': photo.path,
-            'size': '${(File(photo.path).lengthSync() / 1024).toStringAsFixed(2)} Kb',
+            'size':
+                '${(File(photo.path).lengthSync() / 1024).toStringAsFixed(2)} Kb',
             'status': 'Finished',
             'type': 'image',
           });
@@ -176,11 +175,13 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         String uploadedDocName = result.files.single.name;
 
         setState(() {
-          uploadedDocuments[titleKey] = result.files.single.path!; // 👈 Save with key
+          uploadedDocuments[titleKey] =
+              result.files.single.path!; // ðŸ‘ˆ Save with key
           files.add({
             'name': uploadedDocName,
             'path': result.files.single.path!,
-            'size': '${(result.files.single.size / 1024).toStringAsFixed(2)} Kb',
+            'size':
+                '${(result.files.single.size / 1024).toStringAsFixed(2)} Kb',
             'status': 'Finished',
             'type': result.files.single.extension ?? 'file',
           });
@@ -244,64 +245,60 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
         if (result.compareToIgnoringCase("Success") == 0) {
           Fluttertoast.showToast(
-              msg: "$reason",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.TOP,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Mythemes.successColor,
-              textColor: Colors.white,
-              fontSize: 18.0
+            msg: "$reason",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Mythemes.successColor,
+            textColor: Colors.white,
+            fontSize: 18.0,
           );
           setState(() {
             aadharVerifyColor = Mythemes.successColor;
           });
-
         } else if (result.compareToIgnoringCase("Error") == 0) {
           Fluttertoast.showToast(
-              msg: "$reason",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.TOP,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Mythemes.dangerColor,
-              textColor: Colors.white,
-              fontSize: 18.0
+            msg: "$reason",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Mythemes.dangerColor,
+            textColor: Colors.white,
+            fontSize: 18.0,
           );
           setState(() {
             aadharVerifyColor = Mythemes.dangerColor;
           });
-
         }
       }
     } catch (e) {
-      print('❌ Exception during API call: $e');
+      print('âŒ Exception during API call: $e');
     }
   }
 
-
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
-    Future<OnboardBranchListModal> getEmployeeList13 = getBranchList(sessionId!);
+    Future<OnboardBranchListModal> getEmployeeList13 = getBranchList(
+      sessionId!,
+    );
     getEmployeeList13.then((value) {
       setState(() {
-        onboardBranchListModal=value;
+        onboardBranchListModal = value;
       });
-
     });
     Future<OnboardDeptListModal> getEmployeeList14 = getDeptList(sessionId!);
     getEmployeeList14.then((value) {
       setState(() {
-        onboardDeptListModal=value;
+        onboardDeptListModal = value;
       });
-
-
     });
-    Future<OnboardDesignationListModal> getEmployeeList15 = getDesignationList(sessionId!);
+    Future<OnboardDesignationListModal> getEmployeeList15 = getDesignationList(
+      sessionId!,
+    );
     getEmployeeList15.then((value) {
       setState(() {
-        onboardDesignationListModal=value;
+        onboardDesignationListModal = value;
       });
-
-
     });
     /*Future<OnboardUserTypeListModal> getEmployeeList16 = getUserTypeList(sessionId!);
     getEmployeeList16.then((value) {
@@ -321,18 +318,21 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
     });*/
   }
+
   Map<String, String> uploadedDocuments = {};
 
   Future<OnboardBranchListModal> getBranchList(String sessionId) async {
-    onboardBranchList=[];
+    onboardBranchList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.onboardBranchList;
 
     //print('employeeList11: ${SessionId}');
     OnboardBranchListModal onboardBranchListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
     print('branch List ${response.request}');
@@ -340,9 +340,9 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    onboardBranchListModal=OnboardBranchListModal.fromJson(mapResponse);
+    onboardBranchListModal = OnboardBranchListModal.fromJson(mapResponse);
 
-    for(int i=0; i<mapResponse['data'].length;i++){
+    for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardBranchList.add(mapResponse['data'][i]['name'].toString());
       branchId = mapResponse['data'][i]['id'].toString();
 
@@ -354,15 +354,17 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
   }
 
   Future<OnboardDeptListModal> getDeptList(String sessionId) async {
-    onboardDeptList=[];
+    onboardDeptList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.onboardDeptList;
 
     //print('employeeList11: ${SessionId}');
     OnboardDeptListModal onboardDeptListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
     print('LOcations ${response.request}');
@@ -370,9 +372,9 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    onboardDeptListModal=OnboardDeptListModal.fromJson(mapResponse);
+    onboardDeptListModal = OnboardDeptListModal.fromJson(mapResponse);
 
-    for(int i=0; i<mapResponse['data'].length;i++){
+    for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardDeptList.add(mapResponse['data'][i]['name'].toString());
       deptId = mapResponse['data'][i]['id'].toString();
 
@@ -383,16 +385,20 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     return onboardDeptListModal;
   }
 
-  Future<OnboardDesignationListModal> getDesignationList(String sessionId) async {
-    onboardDesignationList=[];
+  Future<OnboardDesignationListModal> getDesignationList(
+    String sessionId,
+  ) async {
+    onboardDesignationList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.onboardDesignationList;
 
     //print('employeeList11: ${SessionId}');
     OnboardDesignationListModal onboardDesignationListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
     print('LOcations ${response.request}');
@@ -400,9 +406,11 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    onboardDesignationListModal=OnboardDesignationListModal.fromJson(mapResponse);
+    onboardDesignationListModal = OnboardDesignationListModal.fromJson(
+      mapResponse,
+    );
 
-    for(int i=0; i<mapResponse['data'].length;i++){
+    for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardDesignationList.add(mapResponse['data'][i]['name'].toString());
       desigId = mapResponse['data'][i]['id'].toString();
       desigName = mapResponse['data'][i]['name'].toString();
@@ -416,15 +424,17 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
   }
 
   Future<OnboardUserTypeListModal> getUserTypeList(String sessionId) async {
-    onboardUserTypeList=[];
+    onboardUserTypeList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.onboardUserTypeList;
 
     //print('employeeList11: ${SessionId}');
     OnboardUserTypeListModal onboardUserTypeListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
     print('LOcations ${response.request}');
@@ -432,9 +442,9 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    onboardUserTypeListModal=OnboardUserTypeListModal.fromJson(mapResponse);
+    onboardUserTypeListModal = OnboardUserTypeListModal.fromJson(mapResponse);
 
-    for(int i=0; i<mapResponse['data'].length;i++){
+    for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardUserTypeList.add(mapResponse['data'][i]['name'].toString());
       userTypeId = mapResponse['data'][i]['id'].toString();
 
@@ -445,19 +455,17 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     return onboardUserTypeListModal;
   }
 
-
   var showNoData;
 
   var typeOfHiringRadio = "new";
   var accommodationRadio = "withoutAccommodation";
-  String  withoutAccommodation = "1";
-  bool  accomodationCheck = false;
+  String withoutAccommodation = "1";
+  bool accomodationCheck = false;
   String withAccommodation = "0";
   String newHire = "1";
   String replacementHiring = "0";
   String typeOfHireName = "New";
   String reHiring = "2";
-
 
   Future<OnboardDocTypeListModal> getDocTypeList(String sessionId) async {
     String conn = ApiDetails.server;
@@ -465,18 +473,20 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
     //print('employeeList11: ${SessionId}');
     OnboardDocTypeListModal onboardDocTypeListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     /*  setState(() {
       isLoading = true; // Start loading
     });*/
     print('Holiday URL ${response.request}');
     print('response body ${response.body}');
-    developer.log("response:- " ,name: response.body);
+    developer.log("response:- ", name: response.body);
     mapResponse = json.decode(response.body);
     var getData = mapResponse.length;
-    if (getData == 0 )  {
+    if (getData == 0) {
       print("getData111 $getData");
       showNoData = true;
     }
@@ -486,33 +496,34 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
   void _showUploadOptions(BuildContext context, int index) {
     showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: const EdgeInsets.all(20),
-            height: 150,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () {
-                          _handleFileUpload(index, isCamera: true);
-                          /* _openCamera(index);*/
-                        },
-                        child: "Camera".text.make())
-                        .px8(),
-                    ElevatedButton(
-                        onPressed: () {
-                          _handleFileUpload(index, isCamera: false);
-                          /*  _browseFiles(index);*/
-                        },
-                        child: "Browse".text.make()),
-                  ],
-                ),
-                /*ElevatedButton.icon(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          height: 150,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ButtonBar(
+                alignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _handleFileUpload(index, isCamera: true);
+                      /* _openCamera(index);*/
+                    },
+                    child: "Camera".text.make(),
+                  ).px8(),
+                  ElevatedButton(
+                    onPressed: () {
+                      _handleFileUpload(index, isCamera: false);
+                      /*  _browseFiles(index);*/
+                    },
+                    child: "Browse".text.make(),
+                  ),
+                ],
+              ),
+              /*ElevatedButton.icon(
                   onPressed: _openCamera,
                   icon: Icon(Icons.camera_alt),
                   label: Text("Camera"),
@@ -522,11 +533,13 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                   icon: Icon(Icons.folder),
                   label: Text("Browse"),
                 ),*/
-              ],
-            ),
-          );
-        });
+            ],
+          ),
+        );
+      },
+    );
   }
+
   var dropdownNewvalue;
   var dropdownNewvalueNew;
   var dropdownDepartmentValue;
@@ -535,24 +548,21 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
   var changeStep = "1";
   @override
   Widget build(BuildContext context) {
-
     return DismissKeyboard(
       child: Scaffold(
-        appBar: AppBar(
-          title: titleName.text.make(),
-        ),
+        appBar: AppBar(title: titleName.text.make()),
 
         bottomNavigationBar: Container(
           height: 75,
           color: context.cardColor,
           child: ButtonBar(
-              alignment: MainAxisAlignment.center,
-              //buttonPadding: Vx.mOnly(right: 16),
-              children: [
-                /* activeStep <= 0  ? SizedBox(
+            alignment: MainAxisAlignment.center,
+            //buttonPadding: Vx.mOnly(right: 16),
+            children: [
+              /* activeStep <= 0  ? SizedBox(
                   width: 0,
                 ) :*/
-                /*ElevatedButton(
+              /*ElevatedButton(
                   onPressed: () {
 
 
@@ -564,52 +574,42 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                   ),
                   child: "Draft".text.make(),
                 ).wh(150, 40).py12(),*/
-
-
-
-                ElevatedButton(
-                  onPressed: () {
-                    // Increment activeStep, when the next button is tapped. However, check for upper bound.
-                    /* if (activeStep < 13) {
+              ElevatedButton(
+                onPressed: () {
+                  // Increment activeStep, when the next button is tapped. However, check for upper bound.
+                  /* if (activeStep < 13) {
                       setState(() {
                         activeStep++;
                       });
                     }*/
 
-                    saveInductionData(context);
-
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                    MaterialStateProperty.all(Mythemes.successColor),
+                  saveInductionData(context);
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    Mythemes.successColor,
                   ),
-                  child: "Save".text.make(),
-                ).wh(150, 40).py12()
-              ]),
+                ),
+                child: "Save".text.make(),
+              ).wh(150, 40).py12(),
+            ],
+          ),
         ),
 
         body: Container(
           height: double.infinity,
           color: Mythemes.whitish,
-          child: Padding(padding: EdgeInsets.all(5.0),
+          child: Padding(
+            padding: EdgeInsets.all(5.0),
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                      height: 620,
-                      child: body()
-                  )
-
-                ],
-              ),
+              child: Column(children: [Container(height: 620, child: body())]),
             ),
           ),
         ),
-
-
       ),
     );
   }
+
   bool isLoading = true;
   Future<void> loadData() async {
     onboardDocTypeListModal = await getDocTypeList(sessionId!);
@@ -627,14 +627,16 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _dobDateController = TextEditingController();
-  final TextEditingController _familyDobDateController = TextEditingController();
+  final TextEditingController _familyDobDateController =
+      TextEditingController();
   final TextEditingController _dojDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
-  final TextEditingController _inductionDateController = TextEditingController();
+  final TextEditingController _inductionDateController =
+      TextEditingController();
   Widget body() {
     /* if(onboardDocTypeListModal!.data != 0){
       for(int i=0; i<onboardDocTypeListModal!.data!.length;i++){
-        *//* onboardUserTypeList.add(mapResponse['data'][i]['name'].toString());*//*
+        */ /* onboardUserTypeList.add(mapResponse['data'][i]['name'].toString());*/ /*
         docTypeId =onboardDocTypeListModal!.data![i].id.toString();
 
         print('ID -  $docTypeId');
@@ -642,8 +644,23 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
       }
     }*/
 
-    var filePath= "Document";
-    const List<String> list = <String>['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen'];
+    var filePath = "Document";
+    const List<String> list = <String>[
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+    ];
     String dropdownValue = list.first;
     switch (activeStep) {
       case 0:
@@ -660,11 +677,9 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                   child: Column(
                     children: [
                       Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        "Type of Hiring".text.bold.lg.make(),
-                      ],
+                        children: ["Type of Hiring".text.bold.lg.make()],
                       ).pLTRB(8, 6, 6, 0),
 
                       Row(
@@ -686,7 +701,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                         ));*/
                                     setState(() {
                                       newHire = "1";
-                                      typeOfHireName="New";
+                                      typeOfHireName = "New";
                                       replacementHiring = "0";
                                       replacementHiring = "2";
                                       typeOfHiringRadio = value.toString();
@@ -711,7 +726,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                         ));*/
                                     setState(() {
                                       newHire = "1";
-                                      typeOfHireName="Replacement";
+                                      typeOfHireName = "Replacement";
                                       replacementHiring = "0";
                                       replacementHiring = "2";
                                       typeOfHiringRadio = value.toString();
@@ -737,7 +752,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                         ));*/
                                     setState(() {
                                       newHire = "1";
-                                      typeOfHireName="Re-Hire";
+                                      typeOfHireName = "Re-Hire";
                                       replacementHiring = "0";
                                       replacementHiring = "2";
                                       typeOfHiringRadio = value.toString();
@@ -760,55 +775,64 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          "Basic Details".text.bold.lg.make(),
-                        ],
+                        children: ["Basic Details".text.bold.lg.make()],
                       ).pLTRB(8, 6, 6, 0),
                       Row(
-                          children: [
-                            Visibility(
-                              visible: true,
-                              child: Expanded(
-                                child: TextFormField(
-                                  keyboardType: TextInputType.numberWithOptions(),
-                                  controller: aadharNoController,
-                                  enabled: true,
-                                  inputFormatters: <TextInputFormatter>[
-                                    LengthLimitingTextInputFormatter(12),
-                                    FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                                  ],
-                                  // initialValue: "Head Office",
-                                  //maxLines: 3,
-                                  decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                      borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
-                                    ),
-                                    //labelText: "Select Department",
-                                    hintText: "Aadhar No.",
-                                    labelText: "Aadhar No.",
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                    contentPadding: EdgeInsets.all(5),
-                                    /*border: OutlineInputBorder(
+                        children: [
+                          Visibility(
+                            visible: true,
+                            child: Expanded(
+                              child:
+                                  TextFormField(
+                                    keyboardType:
+                                        TextInputType.numberWithOptions(),
+                                    controller: aadharNoController,
+                                    enabled: true,
+                                    inputFormatters: <TextInputFormatter>[
+                                      LengthLimitingTextInputFormatter(12),
+                                      FilteringTextInputFormatter.allow(
+                                        RegExp(r'[0-9]'),
+                                      ),
+                                    ],
+                                    // initialValue: "Head Office",
+                                    //maxLines: 3,
+                                    decoration: InputDecoration(
+                                      enabledBorder: UnderlineInputBorder(
+                                        //<-- SEE HERE
+                                        borderSide: BorderSide(
+                                          width: 1,
+                                          color: Mythemes.blackishade,
+                                        ),
+                                      ),
+                                      //labelText: "Select Department",
+                                      hintText: "Aadhar No.",
+                                      labelText: "Aadhar No.",
+                                      hintStyle: TextStyle(fontSize: 14),
+                                      contentPadding: EdgeInsets.all(5),
+                                      /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                    // labelText: "Location",
-                                    labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
-                                    suffixIcon: IconButton(
+                                      // labelText: "Location",
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                        color: Mythemes.blackish,
+                                      ),
+                                      suffixIcon: IconButton(
                                         onPressed: () {
                                           verifyAadhar(context);
                                         },
-                                        icon: Icon(Icons.check_circle, size: 22, color: aadharVerifyColor,))
-                                  ),
-                                ).p8(),
-
-                              ),
+                                        icon: Icon(
+                                          Icons.check_circle,
+                                          size: 22,
+                                          color: aadharVerifyColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ).p8(),
                             ),
-                          ],
+                          ),
+                        ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -818,33 +842,36 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                           Visibility(
                             visible: true,
                             child: Expanded(
-                              child: TextFormField(
-                                controller: fullNameController,
-                                enabled: true,
-                                // initialValue: "Head Office",
-                                //maxLines: 3,
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  //labelText: "Select Department",
-                                  hintText: "Full Name",
-                                  labelText: "Full Name",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
+                              child:
+                                  TextFormField(
+                                    controller: fullNameController,
+                                    enabled: true,
+                                    // initialValue: "Head Office",
+                                    //maxLines: 3,
+                                    decoration: InputDecoration(
+                                      enabledBorder: UnderlineInputBorder(
+                                        //<-- SEE HERE
+                                        borderSide: BorderSide(
+                                          width: 1,
+                                          color: Mythemes.blackishade,
+                                        ),
+                                      ),
+                                      //labelText: "Select Department",
+                                      hintText: "Full Name",
+                                      labelText: "Full Name",
+                                      hintStyle: TextStyle(fontSize: 14),
+                                      contentPadding: EdgeInsets.all(5),
+                                      /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-                              ).p8(),
-
+                                      // labelText: "Location",
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                        color: Mythemes.blackish,
+                                      ),
+                                    ),
+                                  ).p8(),
                             ),
                           ),
                         ],
@@ -855,94 +882,122 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                           Visibility(
                             visible: true,
                             child: Expanded(
-                              child:  TextFormField(
-                                onTap: () async{
-                                  DateTime? fromDate = DateTime.now();
-                                  FocusScope.of(context).requestFocus(new FocusNode());
+                              child:
+                                  TextFormField(
+                                    onTap: () async {
+                                      DateTime? fromDate = DateTime.now();
+                                      FocusScope.of(
+                                        context,
+                                      ).requestFocus(new FocusNode());
 
-                                  fromDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: fromDate,
-                                      firstDate:DateTime(1947),
-                                      lastDate: DateTime.now().add(Duration(days: 0)));
-                                  setState(() {
-                                    //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                                    _dobDateController.text = DateFormat("dd-MM-yyyy").format(fromDate!);
-                                  });
+                                      fromDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: fromDate,
+                                        firstDate: DateTime(1947),
+                                        lastDate: DateTime.now().add(
+                                          Duration(days: 0),
+                                        ),
+                                      );
+                                      setState(() {
+                                        //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                                        _dobDateController.text = DateFormat(
+                                          "dd-MM-yyyy",
+                                        ).format(fromDate!);
+                                      });
 
-                                  print(fromDate);
-                                },
-                                readOnly: true,
-                                enabled: true,
-                                controller: _dobDateController,
-                                // initialValue: "Head Office",
-                                decoration: InputDecoration(
-                                  suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  labelText: "Date of Birth",
-                                  hintStyle: TextStyle(
-                                    fontSize: 12,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
+                                      print(fromDate);
+                                    },
+                                    readOnly: true,
+                                    enabled: true,
+                                    controller: _dobDateController,
+                                    // initialValue: "Head Office",
+                                    decoration: InputDecoration(
+                                      suffixIcon: Icon(
+                                        Icons.calendar_month,
+                                        size: 18,
+                                      ),
+                                      enabledBorder: UnderlineInputBorder(
+                                        //<-- SEE HERE
+                                        borderSide: BorderSide(
+                                          width: 1,
+                                          color: Mythemes.blackishade,
+                                        ),
+                                      ),
+                                      labelText: "Date of Birth",
+                                      hintStyle: TextStyle(fontSize: 12),
+                                      contentPadding: EdgeInsets.all(5),
+                                      /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-                              ).p8(),
+                                      // labelText: "Location",
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                        color: Mythemes.blackish,
+                                      ),
+                                    ),
+                                  ).p8(),
                             ),
                           ),
                           //Date of Joining
                           Visibility(
                             visible: true,
                             child: Expanded(
-                              child:  TextFormField(
-                                onTap: () async{
-                                  DateTime? fromDate = DateTime.now();
-                                  FocusScope.of(context).requestFocus(new FocusNode());
+                              child:
+                                  TextFormField(
+                                    onTap: () async {
+                                      DateTime? fromDate = DateTime.now();
+                                      FocusScope.of(
+                                        context,
+                                      ).requestFocus(new FocusNode());
 
-                                  fromDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: fromDate,
-                                      firstDate:DateTime(1947),
-                                      lastDate: DateTime.now().add(Duration(days: 0)));
-                                  setState(() {
-                                    //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                                    _dojDateController.text = DateFormat("dd-MM-yyyy").format(fromDate!);
-                                  });
+                                      fromDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: fromDate,
+                                        firstDate: DateTime(1947),
+                                        lastDate: DateTime.now().add(
+                                          Duration(days: 0),
+                                        ),
+                                      );
+                                      setState(() {
+                                        //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                                        _dojDateController.text = DateFormat(
+                                          "dd-MM-yyyy",
+                                        ).format(fromDate!);
+                                      });
 
-                                  print(fromDate);
-                                },
-                                readOnly: true,
-                                enabled: true,
-                                controller: _dojDateController,
-                                // initialValue: "Head Office",
-                                decoration: InputDecoration(
-                                  suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  labelText: "Date of Joining",
-                                  hintStyle: TextStyle(
-                                    fontSize: 12,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
+                                      print(fromDate);
+                                    },
+                                    readOnly: true,
+                                    enabled: true,
+                                    controller: _dojDateController,
+                                    // initialValue: "Head Office",
+                                    decoration: InputDecoration(
+                                      suffixIcon: Icon(
+                                        Icons.calendar_month,
+                                        size: 18,
+                                      ),
+                                      enabledBorder: UnderlineInputBorder(
+                                        //<-- SEE HERE
+                                        borderSide: BorderSide(
+                                          width: 1,
+                                          color: Mythemes.blackishade,
+                                        ),
+                                      ),
+                                      labelText: "Date of Joining",
+                                      hintStyle: TextStyle(fontSize: 12),
+                                      contentPadding: EdgeInsets.all(5),
+                                      /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-                              ).p8(),
+                                      // labelText: "Location",
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                        color: Mythemes.blackish,
+                                      ),
+                                    ),
+                                  ).p8(),
                             ),
                           ),
                         ],
@@ -953,38 +1008,43 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                           Visibility(
                             visible: true,
                             child: Expanded(
-                              child: TextFormField(
-                                keyboardType: TextInputType.number,
-                                inputFormatters: <TextInputFormatter>[
-                                  LengthLimitingTextInputFormatter(10),
-                                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                                ],
-                                controller: mobNoController,
-                                enabled: true,
-                                // initialValue: "Head Office",
-                                //maxLines: 3,
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  //labelText: "Select Department",
-                                  hintText: "Mobile No.",
-                                  labelText: "Mobile No.",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
+                              child:
+                                  TextFormField(
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      LengthLimitingTextInputFormatter(10),
+                                      FilteringTextInputFormatter.allow(
+                                        RegExp(r'[0-9]'),
+                                      ),
+                                    ],
+                                    controller: mobNoController,
+                                    enabled: true,
+                                    // initialValue: "Head Office",
+                                    //maxLines: 3,
+                                    decoration: InputDecoration(
+                                      enabledBorder: UnderlineInputBorder(
+                                        //<-- SEE HERE
+                                        borderSide: BorderSide(
+                                          width: 1,
+                                          color: Mythemes.blackishade,
+                                        ),
+                                      ),
+                                      //labelText: "Select Department",
+                                      hintText: "Mobile No.",
+                                      labelText: "Mobile No.",
+                                      hintStyle: TextStyle(fontSize: 14),
+                                      contentPadding: EdgeInsets.all(5),
+                                      /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-                              ).p8(),
-
+                                      // labelText: "Location",
+                                      labelStyle: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                        color: Mythemes.blackish,
+                                      ),
+                                    ),
+                                  ).p8(),
                             ),
                           ),
                         ],
@@ -999,9 +1059,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          "Job Details".text.bold.lg.make(),
-                        ],
+                        children: ["Job Details".text.bold.lg.make()],
                       ).pLTRB(8, 6, 6, 0),
                       Row(
                         children: [
@@ -1012,39 +1070,55 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: DropdownButtonFormField<String>(
-                                  isExpanded: true, // ✅ Important for avoiding overflow
+                                  isExpanded:
+                                      true, // âœ… Important for avoiding overflow
                                   decoration: InputDecoration(
                                     enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(width: 1, color: Mythemes.blackishade),
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     hintText: "Branch",
                                     labelText: "Branch",
                                     hintStyle: TextStyle(fontSize: 14),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
                                     labelStyle: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 13,
                                       color: Mythemes.blackish,
                                     ),
                                   ),
-                                  items: onboardBranchList.map((String? value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value!,
-                                        style: TextStyle(fontSize: 13),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    );
-                                  }).toList(),
+                                  items:
+                                      onboardBranchList.map((String? value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(
+                                            value!,
+                                            style: TextStyle(fontSize: 13),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        );
+                                      }).toList(),
                                   onChanged: (newVal) {
                                     valuenew = newVal.toString();
-                                    for (int i = 0; i < onboardBranchListModal!.data!.length; i++) {
+                                    for (
+                                      int i = 0;
+                                      i < onboardBranchListModal!.data!.length;
+                                      i++
+                                    ) {
                                       if (onboardBranchListModal!.data![i].name
-                                          .toString()
-                                          .compareToIgnoringCase(newVal.toString()) ==
+                                              .toString()
+                                              .compareToIgnoringCase(
+                                                newVal.toString(),
+                                              ) ==
                                           0) {
-                                        branchId = onboardBranchListModal!.data![i].id!.toString();
+                                        branchId =
+                                            onboardBranchListModal!.data![i].id!
+                                                .toString();
                                         print("Branch Id $branchId");
                                       }
                                     }
@@ -1063,40 +1137,51 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: DropdownButtonFormField<String>(
-                                  isExpanded: true, // ✅ Make dropdown use full width
+                                  isExpanded:
+                                      true, // âœ… Make dropdown use full width
                                   decoration: InputDecoration(
                                     enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(width: 1, color: Mythemes.blackishade),
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     hintText: "Department",
                                     labelText: "Department",
                                     hintStyle: TextStyle(fontSize: 14),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
                                     labelStyle: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 13,
                                       color: Mythemes.blackish,
                                     ),
                                   ),
-                                  items: onboardDeptList.map((String? value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: FittedBox( // ✅ Fit text inside dropdown without overflow
-                                        fit: BoxFit.scaleDown,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          value!,
-                                          style: TextStyle(fontSize: 13),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
+                                  items:
+                                      onboardDeptList.map((String? value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: FittedBox(
+                                            // âœ… Fit text inside dropdown without overflow
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              value!,
+                                              style: TextStyle(fontSize: 13),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
                                   onChanged: (newVal) {
                                     valuenewSub = newVal.toString();
-                                    for (var dept in onboardDeptListModal!.data!) {
-                                      if (dept.name!.toLowerCase() == newVal!.toLowerCase()) {
+                                    for (var dept
+                                        in onboardDeptListModal!.data!) {
+                                      if (dept.name!.toLowerCase() ==
+                                          newVal!.toLowerCase()) {
                                         deptId = dept.id.toString();
                                         print("Dept Id $deptId");
                                       }
@@ -1121,169 +1206,206 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                               visible: true,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: DropdownButtonFormField<String>(
-                                  /*disabledHint: Container(
+                                child:
+                                    DropdownButtonFormField<String>(
+                                      /*disabledHint: Container(
                                     width: 110,
                                     child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                                   ),*/
+                                      decoration: InputDecoration(
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                            width: 1,
+                                            color: Mythemes.blackishade,
+                                          ),
+                                        ),
+                                        hintText: "Designation",
+                                        labelText: "Designation",
+                                        hintStyle: TextStyle(fontSize: 14),
+                                        contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 8,
+                                        ),
+                                        labelStyle: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13,
+                                          color: Mythemes.blackish,
+                                        ),
+                                      ),
+                                      items:
+                                          onboardDesignationList.map((
+                                            String? value,
+                                          ) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: FittedBox(
+                                                // âœ… Fit text inside dropdown without overflow
+                                                fit: BoxFit.scaleDown,
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  value!,
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+
+                                      onChanged: (newVal) {
+                                        valuenewDesignation = newVal.toString();
+                                        for (
+                                          int i = 0;
+                                          i <
+                                              onboardDesignationListModal!
+                                                  .data!
+                                                  .length;
+                                          i++
+                                        ) {
+                                          if (onboardDesignationListModal!
+                                                  .data![i]
+                                                  .name
+                                                  .toString()
+                                                  .compareToIgnoringCase(
+                                                    newVal.toString(),
+                                                  ) ==
+                                              0) {
+                                            desigId =
+                                                onboardDesignationListModal!
+                                                    .data![i]
+                                                    .id!
+                                                    .toString();
+                                            print("DEsi Id $desigId");
+                                          }
+                                        }
+                                        setState(() {
+                                          dropdownDesignationValue = newVal;
+                                        });
+                                      },
+                                    ).p8(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ).py8(),
+                Card(
+                  elevation: 2.0,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: ["Bank Details".text.bold.lg.make()],
+                      ).pLTRB(8, 6, 6, 0),
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                TextFormField(
+                                  controller: bankNameController,
+                                  enabled: true,
+                                  // initialValue: "Head Office",
+                                  //maxLines: 3,
                                   decoration: InputDecoration(
                                     enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(width: 1, color: Mythemes.blackishade),
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
-                                    hintText: "Designation",
-                                    labelText: "Designation",
+                                    //labelText: "Select Department",
+                                    hintText: "Bank Name",
+                                    labelText: "Bank Name",
                                     hintStyle: TextStyle(fontSize: 14),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
+                                                  borderRadius:
+                                                  BorderRadius.all(Radius.circular(8))),*/
+                                    // labelText: "Location",
                                     labelStyle: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 13,
                                       color: Mythemes.blackish,
                                     ),
                                   ),
-                                  items: onboardDesignationList.map((String? value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: FittedBox( // ✅ Fit text inside dropdown without overflow
-                                        fit: BoxFit.scaleDown,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          value!,
-                                          style: TextStyle(fontSize: 13),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-
-                                  onChanged: (newVal) {
-                                    valuenewDesignation = newVal.toString();
-                                    for(int i=0; i<onboardDesignationListModal!.data!.length;i++){
-                                      if(onboardDesignationListModal!.data![i].name.toString().compareToIgnoringCase(newVal.toString()) ==0)
-                                      {
-                                        desigId = onboardDesignationListModal!.data![i].id!.toString();
-                                        print("DEsi Id $desigId");
-                                      }
-                                    }
-                                    setState(() {
-                                      dropdownDesignationValue = newVal;
-                                    });
-
-                                  },
-
                                 ).p8(),
-                              ),
-                            ),
+                          ),
+                          Expanded(
+                            child:
+                                TextFormField(
+                                  controller: accountNoController,
+                                  enabled: true,
+                                  keyboardType:
+                                      TextInputType.numberWithOptions(),
+                                  // initialValue: "Head Office",
+                                  //maxLines: 3,
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "Account Number",
+                                    labelText: "Account Number",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
+                                                  borderRadius:
+                                                  BorderRadius.all(Radius.circular(8))),*/
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
                           ),
                         ],
-                      ),
-                    ],
-                  ),
-                ).py8(),
-                Card(
-                  elevation: 2.0,
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          "Bank Details".text.bold.lg.make(),
-                        ],
-                      ).pLTRB(8, 6, 6, 0),
-                      Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: bankNameController,
-                                enabled: true,
-                                // initialValue: "Head Office",
-                                //maxLines: 3,
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  //labelText: "Select Department",
-                                  hintText: "Bank Name",
-                                  labelText: "Bank Name",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
-                                                  borderRadius:
-                                                  BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-                              ).p8(),
-
-                            ),
-                            Expanded(
-                              child: TextFormField(
-                                controller: accountNoController,
-                                enabled: true,
-                                keyboardType: TextInputType.numberWithOptions(),
-                                // initialValue: "Head Office",
-                                //maxLines: 3,
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  //labelText: "Select Department",
-                                  hintText: "Account Number",
-                                  labelText: "Account Number",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
-                                                  borderRadius:
-                                                  BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-                              ).p8(),
-
-                            ),
-                          ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: TextFormField(
-                              controller: ifscCodeController,
-                              enabled: true,
-                              // initialValue: "Head Office",
-                              //maxLines: 3,
-                              decoration: InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.blackishade),
-                                ),
-                                //labelText: "Select Department",
-                                hintText: "IFSC Code",
-                                labelText: "IFSC Code",
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                ),
-                                contentPadding: EdgeInsets.all(5),
-                                /*border: OutlineInputBorder(
+                            child:
+                                TextFormField(
+                                  controller: ifscCodeController,
+                                  enabled: true,
+                                  // initialValue: "Head Office",
+                                  //maxLines: 3,
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "IFSC Code",
+                                    labelText: "IFSC Code",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                // labelText: "Location",
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,fontSize: 13,
-                                    color: Mythemes.blackish),
-                              ),
-                            ).p8(),
-
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
                           ),
                         ],
                       ),
@@ -1297,48 +1419,48 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          "Salary Details".text.bold.lg.make(),
-                        ],
+                        children: ["Salary Details".text.bold.lg.make()],
                       ).pLTRB(8, 6, 6, 0),
                       Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: inHandSalaryController,
-                                enabled: true,
-                                keyboardType: TextInputType.numberWithOptions(),
-                                // initialValue: "Head Office",
-                                //maxLines: 3,
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  //labelText: "Select Department",
-                                  hintText: "In Hand Salary",
-                                  labelText: "In Hand Salary",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
+                        children: [
+                          Expanded(
+                            child:
+                                TextFormField(
+                                  controller: inHandSalaryController,
+                                  enabled: true,
+                                  keyboardType:
+                                      TextInputType.numberWithOptions(),
+                                  // initialValue: "Head Office",
+                                  //maxLines: 3,
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "In Hand Salary",
+                                    labelText: "In Hand Salary",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-                              ).p8(),
-
-                            ),
-                          ],
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
+                          ),
+                        ],
                       ),
                       Row(
-                          children: [
-                            "Accommodation".text.make(),
-                          ],
+                        children: ["Accommodation".text.make()],
                       ).pLTRB(8, 6, 6, 0),
 
                       Row(
@@ -1359,7 +1481,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                           content: Text("On Date Click"),
                         ));*/
                                     setState(() {
-                                      accomodationCheck=true;
+                                      accomodationCheck = true;
                                       withoutAccommodation = "1";
                                       withAccommodation = "0";
                                       accommodationRadio = value.toString();
@@ -1383,7 +1505,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                           content: Text("Next Day Click"),
                         ));*/
                                     setState(() {
-                                      accomodationCheck=false;
+                                      accomodationCheck = false;
                                       withoutAccommodation = "1";
                                       withAccommodation = "0";
                                       accommodationRadio = value.toString();
@@ -1406,107 +1528,117 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          "Nominee Details".text.bold.lg.make(),
-                        ],
+                        children: ["Nominee Details".text.bold.lg.make()],
                       ).pLTRB(8, 6, 6, 0),
                       Row(
                         children: [
                           Expanded(
-                            child: TextFormField(
-                              controller: nomineeNameController,
-                              enabled: true,
-                              // initialValue: "Head Office",
-                              //maxLines: 3,
-                              decoration: InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.blackishade),
-                                ),
-                                //labelText: "Select Department",
-                                hintText: "Nominee Name",
-                                labelText: "Nominee Name",
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                ),
-                                contentPadding: EdgeInsets.all(5),
-                                /*border: OutlineInputBorder(
+                            child:
+                                TextFormField(
+                                  controller: nomineeNameController,
+                                  enabled: true,
+                                  // initialValue: "Head Office",
+                                  //maxLines: 3,
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "Nominee Name",
+                                    labelText: "Nominee Name",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                // labelText: "Location",
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,fontSize: 13,
-                                    color: Mythemes.blackish),
-                              ),
-                            ).p8(),
-
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
                           ),
                           Expanded(
-                            child: TextFormField(
-                              controller: familyRelationController,
-                              enabled: true,
-                              // initialValue: "Head Office",
-                              //maxLines: 3,
-                              decoration: InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.blackishade),
-                                ),
-                                //labelText: "Select Department",
-                                hintText: "Relation",
-                                labelText: "Relation",
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                ),
-                                contentPadding: EdgeInsets.all(5),
-                                /*border: OutlineInputBorder(
+                            child:
+                                TextFormField(
+                                  controller: familyRelationController,
+                                  enabled: true,
+                                  // initialValue: "Head Office",
+                                  //maxLines: 3,
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "Relation",
+                                    labelText: "Relation",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                // labelText: "Location",
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,fontSize: 13,
-                                    color: Mythemes.blackish),
-                              ),
-                            ).p8(),
-
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
                           ),
                         ],
                       ),
                       Row(
                         children: [
                           Expanded(
-                            child: TextFormField(
-                              controller: nomineeAadharController,
-                              enabled: true,
-                              keyboardType: TextInputType.numberWithOptions(),
-                              // initialValue: "Head Office",
-                              //maxLines: 3,
-                              inputFormatters: <TextInputFormatter>[
-                                LengthLimitingTextInputFormatter(12),
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                              ],
-                              decoration: InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.blackishade),
-                                ),
-                                //labelText: "Select Department",
-                                hintText: "Nominee Aadhar",
-                                labelText: "Nominee Aadhar",
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                ),
-                                contentPadding: EdgeInsets.all(5),
-                                /*border: OutlineInputBorder(
+                            child:
+                                TextFormField(
+                                  controller: nomineeAadharController,
+                                  enabled: true,
+                                  keyboardType:
+                                      TextInputType.numberWithOptions(),
+                                  // initialValue: "Head Office",
+                                  //maxLines: 3,
+                                  inputFormatters: <TextInputFormatter>[
+                                    LengthLimitingTextInputFormatter(12),
+                                    FilteringTextInputFormatter.allow(
+                                      RegExp(r'[0-9]'),
+                                    ),
+                                  ],
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "Nominee Aadhar",
+                                    labelText: "Nominee Aadhar",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                // labelText: "Location",
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,fontSize: 13,
-                                    color: Mythemes.blackish),
-                              ),
-                            ).p8(),
-
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
                           ),
                         ],
                       ),
@@ -1525,7 +1657,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                             onPressed: () => _showUploadOptions(context),
                             child: Text('Add Document'),
                           ),*/
-                          "Add Documents".text.bold.lg.make()
+                          "Add Documents".text.bold.lg.make(),
                         ],
                       ).pLTRB(8, 6, 6, 0),
                       Row(
@@ -1546,7 +1678,9 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     child: ListTile(
                                       title: Text(documentTitles[itemCount]),
                                       subtitle: Text(
-                                        uploadedDocuments.containsKey(documentTitles[itemCount])
+                                        uploadedDocuments.containsKey(
+                                              documentTitles[itemCount],
+                                            )
                                             ? uploadedDocuments[documentTitles[itemCount]]!
                                             : "No document uploaded",
                                         maxLines: 1,
@@ -1556,7 +1690,10 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                       trailing: IconButton(
                                         color: Mythemes.lightBluishColor,
                                         onPressed: () {
-                                          _showUploadOptions(context, itemCount);
+                                          _showUploadOptions(
+                                            context,
+                                            itemCount,
+                                          );
                                         },
                                         icon: Icon(Icons.upload_file),
                                       ),
@@ -1577,53 +1714,61 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         );
       case 1:
         return Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                children: [
-                  Card(
-                    child: ExpansionTile(
-                      //key: keyTile,
-                      initiallyExpanded: skillTestExpanded,
-                      childrenPadding: EdgeInsets.all(0).copyWith(top: 0),
-                      title: "Skill Testing".text.make(),
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField(
-                                /*disabledHint: Container(
+          padding: const EdgeInsets.all(5.0),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ListView(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              children: [
+                Card(
+                  child: ExpansionTile(
+                    //key: keyTile,
+                    initiallyExpanded: skillTestExpanded,
+                    childrenPadding: EdgeInsets.all(0).copyWith(top: 0),
+                    title: "Skill Testing".text.make(),
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                DropdownButtonFormField(
+                                  /*disabledHint: Container(
                                 width: 110,
                                 child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                               ),*/
                                   decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
                                       borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     //labelText: "Select Department",
                                     hintText: "Screened BY IR",
                                     labelText: "Screened BY IR",
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
+                                    hintStyle: TextStyle(fontSize: 14),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
                                   ),
                                   items: [
-
                                     DropdownMenuItem(
-                                      child:
-                                      Text('Designer',style: TextStyle(overflow: TextOverflow.ellipsis , fontSize: 13)) ,
+                                      child: Text(
+                                        'Designer',
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       value: 1,
                                     ),
                                   ],
@@ -1632,46 +1777,52 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     setState(() {
                                       value = value!;
                                     });
-                                  }
-
-                              ).p8(),
-
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField(
-                                /*disabledHint: Container(
+                                  },
+                                ).p8(),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                DropdownButtonFormField(
+                                  /*disabledHint: Container(
                                 width: 110,
                                 child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                               ),*/
                                   decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
                                       borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     //labelText: "Select Department",
                                     hintText: "Referred RO",
                                     labelText: "Referred RO",
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
+                                    hintStyle: TextStyle(fontSize: 14),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
                                   ),
                                   items: [
-
                                     DropdownMenuItem(
-                                      child:
-                                      Text('Designer',style: TextStyle(overflow: TextOverflow.ellipsis , fontSize: 13)) ,
+                                      child: Text(
+                                        'Designer',
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       value: 1,
                                     ),
                                   ],
@@ -1680,46 +1831,52 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     setState(() {
                                       value = value!;
                                     });
-                                  }
-
-                              ).p8(),
-
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField(
-                                /*disabledHint: Container(
+                                  },
+                                ).p8(),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                DropdownButtonFormField(
+                                  /*disabledHint: Container(
                                 width: 110,
                                 child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                               ),*/
                                   decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
                                       borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     //labelText: "Select Department",
                                     hintText: "For",
                                     labelText: "For",
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
+                                    hintStyle: TextStyle(fontSize: 14),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
                                   ),
                                   items: [
-
                                     DropdownMenuItem(
-                                      child:
-                                      Text('Designer',style: TextStyle(overflow: TextOverflow.ellipsis , fontSize: 13)) ,
+                                      child: Text(
+                                        'Designer',
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       value: 1,
                                     ),
                                   ],
@@ -1728,46 +1885,52 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     setState(() {
                                       value = value!;
                                     });
-                                  }
-
-                              ).p8(),
-
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField(
-                                /*disabledHint: Container(
+                                  },
+                                ).p8(),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                DropdownButtonFormField(
+                                  /*disabledHint: Container(
                                 width: 110,
                                 child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                               ),*/
                                   decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
                                       borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     //labelText: "Select Department",
                                     hintText: "Suitable For Employment As",
                                     labelText: "Suitable For Employment As",
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
+                                    hintStyle: TextStyle(fontSize: 14),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
                                   ),
                                   items: [
-
                                     DropdownMenuItem(
-                                      child:
-                                      Text('Designer',style: TextStyle(overflow: TextOverflow.ellipsis , fontSize: 13)) ,
+                                      child: Text(
+                                        'Designer',
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       value: 1,
                                     ),
                                   ],
@@ -1776,2008 +1939,2520 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     setState(() {
                                       value = value!;
                                     });
-                                  }
-
-                              ).p8(),
-
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                                  },
+                                ).p8(),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-
-                ],
-              ),
-            )
+                ),
+              ],
+            ),
+          ),
         );
 
       case 2:
         return Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                children: [
-                  Card(
-                    child: ExpansionTile(
-                      //key: keyTile,
-                      initiallyExpanded: medicalExpanded,
-                      childrenPadding: EdgeInsets.all(0).copyWith(top: 0),
-                      title: "Medical".text.make(),
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
+          padding: const EdgeInsets.all(5.0),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ListView(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              children: [
+                Card(
+                  child: ExpansionTile(
+                    //key: keyTile,
+                    initiallyExpanded: medicalExpanded,
+                    childrenPadding: EdgeInsets.all(0).copyWith(top: 0),
+                    title: "Medical".text.make(),
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
                                 "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Certificate No.",
-                                      labelText: "Medical Certificate No.",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Enter Certificate No.",
+                                  labelText: "Medical Certificate No.",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                            Expanded(
-                                child: ListTile(
-                                  /*title:
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              /*title:
                                 "Designation/Trade of the work".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    //maxLines: 3,
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Aadhar Number",
-                                      labelText: "Aadhar Number",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*  border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                //maxLines: 3,
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Enter Aadhar Number",
+                                  labelText: "Aadhar Number",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*  border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
 
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
                                 "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Weight",
-                                      labelText: "Weight",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Enter Weight",
+                                  labelText: "Weight",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                            Expanded(
-                                child: ListTile(
-                                  /*title:
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              /*title:
                                 "Designation/Trade of the work".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    //maxLines: 3,
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Height",
-                                      labelText: "Height",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*  border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                //maxLines: 3,
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Enter Height",
+                                  labelText: "Height",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*  border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                            Expanded(
-                                child: ListTile(
-                                  /*title:
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              /*title:
                                 "Designation/Trade of the work".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    //maxLines: 3,
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Blood Group",
-                                      labelText: "Blood Group",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*  border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                //maxLines: 3,
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Enter Blood Group",
+                                  labelText: "Blood Group",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*  border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
                                 "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Any Mark",
-                                      labelText: "Identification Mark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Any Mark",
+                                  labelText: "Identification Mark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                            Expanded(
-                                child: ListTile(
-                                  /*title:
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              /*title:
                                 "Designation/Trade of the work".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    //maxLines: 3,
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Any Other Mark",
-                                      labelText: "Other Identification Mark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*  border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                //maxLines: 3,
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Any Other Mark",
+                                  labelText: "Other Identification Mark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*  border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
 
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
                                 "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Vision",
-                                      labelText: "Vision",
-                                      hintStyle: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Enter Vision",
+                                  labelText: "Vision",
+                                  hintStyle: TextStyle(fontSize: 14),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                            Expanded(
-                                child: ListTile(
-                                  /*title:
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              /*title:
                                 "Designation/Trade of the work".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    //maxLines: 3,
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "DD-MM-YYYY",
-                                      labelText: "Due date for periodic medical ex",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*  border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                //maxLines: 3,
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "DD-MM-YYYY",
+                                  labelText: "Due date for periodic medical ex",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*  border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
                                 "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "Medical Fitness Remarks",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Enter Remarks",
+                                  labelText: "Medical Fitness Remarks",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Medical Fitness".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "fit",
-                                              groupValue: radios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Fit Click"),
-                                                ));
-                                                setState(() {
-                                                  radios = value.toString();
-                                                });
-                                              },
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Medical Fitness".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "fit",
+                                        groupValue: radios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("Fit Click"),
                                             ),
-                                            "Fit".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "unFit",
-                                              groupValue: radios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Un-Fit Click"),
-                                                ));
-                                                setState(() {
-                                                  radios = value.toString();
-                                                });
-                                              },
+                                          );
+                                          setState(() {
+                                            radios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Fit".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "unFit",
+                                        groupValue: radios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("Un-Fit Click"),
                                             ),
-                                            "Un Fit".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
+                                          );
+                                          setState(() {
+                                            radios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Un Fit".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
 
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Vision Deficiency Observed".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Vision Deficiency Observed".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
-                                        Expanded(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                Radio(
-                                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                  value: "yesVision",
-                                                  groupValue: visionRadios,
-                                                  onChanged: (value) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                      content: Text("Yes Vision Click"),
-                                                    ));
-                                                    setState(() {
-                                                      visionRadios = value.toString();
-                                                    });
-                                                  },
+                                        Radio(
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          value: "yesVision",
+                                          groupValue: visionRadios,
+                                          onChanged: (value) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  "Yes Vision Click",
                                                 ),
-                                                "Yes".text.make(),
-                                              ],
-                                            )).px1(),
-                                        Expanded(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                Radio(
-                                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                  value: "noVision",
-                                                  groupValue: visionRadios,
-                                                  onChanged: (value) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                      content: Text("No vision Click"),
-                                                    ));
-                                                    setState(() {
-                                                      visionRadios = value.toString();
-                                                    });
-                                                  },
+                                              ),
+                                            );
+                                            setState(() {
+                                              visionRadios = value.toString();
+                                            });
+                                          },
+                                        ),
+                                        "Yes".text.make(),
+                                      ],
+                                    ),
+                                  ).px1(),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Radio(
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                          value: "noVision",
+                                          groupValue: visionRadios,
+                                          onChanged: (value) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  "No vision Click",
                                                 ),
-                                                "No".text.make(),
-                                              ],
-                                            )).px1(),
+                                              ),
+                                            );
+                                            setState(() {
+                                              visionRadios = value.toString();
+                                            });
+                                          },
+                                        ),
+                                        "No".text.make(),
                                       ],
-                                    )
-                                )
+                                    ),
+                                  ).px1(),
+                                ],
+                              ),
                             ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Vision Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "yesVisionSat",
-                                              groupValue: visionSatRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes vision satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  visionSatRadios = value.toString();
-                                                });
-                                              },
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Vision Satisfactory".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "yesVisionSat",
+                                        groupValue: visionSatRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes vision satisfactory Click",
+                                              ),
                                             ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "noVisionSat",
-                                              groupValue: visionSatRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No vision satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  visionSatRadios = value.toString();
-                                                });
-                                              },
+                                          );
+                                          setState(() {
+                                            visionSatRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "noVisionSat",
+                                        groupValue: visionSatRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No vision satisfactory Click",
+                                              ),
                                             ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
+                                          );
+                                          setState(() {
+                                            visionSatRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
                             ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
                                 "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "Vision Remarks",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Vision Deformity/Physically Abnormally Do".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "yesVisualDef",
-                                              groupValue: visualDefRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Visual Def Click"),
-                                                ));
-                                                setState(() {
-                                                  visualDefRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "noVisualDef",
-                                              groupValue: visualDefRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No visual Def Click"),
-                                                ));
-                                                setState(() {
-                                                  visualDefRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Vision Deformity/Physically Abnormally Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "yesVisualDefSat",
-                                              groupValue: visualDefSatRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes visual Def satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  visualDefSatRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "noVisualDefSat",
-                                              groupValue: visualDefSatRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No visual Def satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  visualDefSatRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "Vision Deformity/Physically Abnormally",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "Vision Remarks",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Vision Deformity/Physically Abnormally Do"
+                                      .text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "yesVisualDef",
+                                        groupValue: visualDefRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Visual Def Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            visualDefRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "noVisualDef",
+                                        groupValue: visualDefRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No visual Def Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            visualDefRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Vision Deformity/Physically Abnormally Satisfactory"
+                                      .text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "yesVisualDefSat",
+                                        groupValue: visualDefSatRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes visual Def satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            visualDefSatRadios =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "noVisualDefSat",
+                                        groupValue: visualDefSatRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No visual Def satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            visualDefSatRadios =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Blood Pressure Do".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "BpYes",
-                                              groupValue: bPRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes BP Click"),
-                                                ));
-                                                setState(() {
-                                                  bPRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "BpNo",
-                                              groupValue: bPRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No BP Click"),
-                                                ));
-                                                setState(() {
-                                                  bPRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Blood Pressure Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "bpYesSat",
-                                              groupValue: bPRadiosSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes BP satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  bPRadiosSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "bpNoSat",
-                                              groupValue: bPRadiosSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No BP satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  bPRadiosSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "BP Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText:
+                                      "Vision Deformity/Physically Abnormally",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Blood Pressure Do".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "BpYes",
+                                        groupValue: bPRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("Yes BP Click"),
+                                            ),
+                                          );
+                                          setState(() {
+                                            bPRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "BpNo",
+                                        groupValue: bPRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("No BP Click"),
+                                            ),
+                                          );
+                                          setState(() {
+                                            bPRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Blood Pressure Satisfactory".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "bpYesSat",
+                                        groupValue: bPRadiosSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes BP satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            bPRadiosSat = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "bpNoSat",
+                                        groupValue: bPRadiosSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No BP satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            bPRadiosSat = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Hearing Do".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hearingYes",
-                                              groupValue: hearingRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Hearing Click"),
-                                                ));
-                                                setState(() {
-                                                  hearingRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hearingNo",
-                                              groupValue: hearingRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No Hearing Click"),
-                                                ));
-                                                setState(() {
-                                                  hearingRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Hearing Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hearingYesSat",
-                                              groupValue: hearingRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Hearing satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  hearingRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hearingNoSat",
-                                              groupValue: hearingRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No Hearing satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  hearingRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "Hearing Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "BP Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Hearing Do".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hearingYes",
+                                        groupValue: hearingRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Hearing Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            hearingRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hearingNo",
+                                        groupValue: hearingRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("No Hearing Click"),
+                                            ),
+                                          );
+                                          setState(() {
+                                            hearingRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Hearing Satisfactory".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hearingYesSat",
+                                        groupValue: hearingRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Hearing satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            hearingRadioSat = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hearingNoSat",
+                                        groupValue: hearingRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No Hearing satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            hearingRadioSat = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Undergone Do".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "underGoneYes",
-                                              groupValue: underGoneRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Undergone Click"),
-                                                ));
-                                                setState(() {
-                                                  underGoneRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "underGoneNo",
-                                              groupValue: underGoneRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No Undergone Click"),
-                                                ));
-                                                setState(() {
-                                                  underGoneRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Undergone Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "undergoneYesSat",
-                                              groupValue: underGoneRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Undergone satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  underGoneRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "undergoneNoSat",
-                                              groupValue: underGoneRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No Undergone satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  underGoneRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "Undergone Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "Hearing Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Undergone Do".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "underGoneYes",
+                                        groupValue: underGoneRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Undergone Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            underGoneRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "underGoneNo",
+                                        groupValue: underGoneRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No Undergone Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            underGoneRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Undergone Satisfactory".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "undergoneYesSat",
+                                        groupValue: underGoneRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Undergone satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            underGoneRadioSat =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "undergoneNoSat",
+                                        groupValue: underGoneRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No Undergone satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            underGoneRadioSat =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "CSFAI Do".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "csfaiYes",
-                                              groupValue: csfaiRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes CSFAI Click"),
-                                                ));
-                                                setState(() {
-                                                  csfaiRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "csfaiNo",
-                                              groupValue: csfaiRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No CSFAI Click"),
-                                                ));
-                                                setState(() {
-                                                  csfaiRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "CSFAI Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "csfaiYesSat",
-                                              groupValue: csfaiRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes CSFAI satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  csfaiRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "csfaiNoSat",
-                                              groupValue: csfaiRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No CSFAI satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  csfaiRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "CSFAI Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "Undergone Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "CSFAI Do".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "csfaiYes",
+                                        groupValue: csfaiRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("Yes CSFAI Click"),
+                                            ),
+                                          );
+                                          setState(() {
+                                            csfaiRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "csfaiNo",
+                                        groupValue: csfaiRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("No CSFAI Click"),
+                                            ),
+                                          );
+                                          setState(() {
+                                            csfaiRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "CSFAI Satisfactory".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "csfaiYesSat",
+                                        groupValue: csfaiRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes CSFAI satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            csfaiRadioSat = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "csfaiNoSat",
+                                        groupValue: csfaiRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No CSFAI satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            csfaiRadioSat = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "HASIILSM Do".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hasiilsmYes",
-                                              groupValue: hasiilsmRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes HASIILSM Click"),
-                                                ));
-                                                setState(() {
-                                                  hasiilsmRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hasiilsmNo",
-                                              groupValue: hasiilsmRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No CSFAI Click"),
-                                                ));
-                                                setState(() {
-                                                  hasiilsmRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "HASIILSM Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hasiilsmYesSat",
-                                              groupValue: hasiilsmRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes HASIILSM satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  hasiilsmRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hasiilsmNoSat",
-                                              groupValue: hasiilsmRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No HASIILSM satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  hasiilsmRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "HASIILSM Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "CSFAI Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "HASIILSM Do".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hasiilsmYes",
+                                        groupValue: hasiilsmRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes HASIILSM Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            hasiilsmRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hasiilsmNo",
+                                        groupValue: hasiilsmRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("No CSFAI Click"),
+                                            ),
+                                          );
+                                          setState(() {
+                                            hasiilsmRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "HASIILSM Satisfactory".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hasiilsmYesSat",
+                                        groupValue: hasiilsmRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes HASIILSM satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            hasiilsmRadioSat = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hasiilsmNoSat",
+                                        groupValue: hasiilsmRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No HASIILSM satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            hasiilsmRadioSat = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Total Visual Performance Do".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "totalVisualYes",
-                                              groupValue: totalVisualPerfRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Total Visual Performance Click"),
-                                                ));
-                                                setState(() {
-                                                  totalVisualPerfRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "totalVisualNo",
-                                              groupValue: totalVisualPerfRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No Total Visual Performance Click"),
-                                                ));
-                                                setState(() {
-                                                  totalVisualPerfRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Total Visual Performance Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "totalVisualYesSat",
-                                              groupValue: totalVisualRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Total Visual Performance satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  totalVisualRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "totalVisualNoSat",
-                                              groupValue: totalVisualRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No Total Visual Performance satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  totalVisualRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "Total Visual Performance Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "HASIILSM Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Total Visual Performance Do".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "totalVisualYes",
+                                        groupValue: totalVisualPerfRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Total Visual Performance Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            totalVisualPerfRadios =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "totalVisualNo",
+                                        groupValue: totalVisualPerfRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No Total Visual Performance Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            totalVisualPerfRadios =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Total Visual Performance Satisfactory".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "totalVisualYesSat",
+                                        groupValue: totalVisualRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Total Visual Performance satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            totalVisualRadioSat =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "totalVisualNoSat",
+                                        groupValue: totalVisualRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No Total Visual Performance satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            totalVisualRadioSat =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Colour Vision Do".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "colorVisionYes",
-                                              groupValue: colorVisionRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Colour Vision Click"),
-                                                ));
-                                                setState(() {
-                                                  colorVisionRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "colorVisionNo",
-                                              groupValue: colorVisionRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No Colour Vision Click"),
-                                                ));
-                                                setState(() {
-                                                  colorVisionRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Colour Vision Satisfactory".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "colorVisionYesSat",
-                                              groupValue: colorVisionRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Yes Colour Vision satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  colorVisionRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "colorVisionNoSat",
-                                              groupValue: colorVisionRadioSat,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("No Colour Vision satisfactory Click"),
-                                                ));
-                                                setState(() {
-                                                  colorVisionRadioSat = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "Colour Vision Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "Total Visual Performance Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Colour Vision Do".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "colorVisionYes",
+                                        groupValue: colorVisionRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Colour Vision Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            colorVisionRadios =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "colorVisionNo",
+                                        groupValue: colorVisionRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No Colour Vision Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            colorVisionRadios =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Colour Vision Satisfactory".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "colorVisionYesSat",
+                                        groupValue: colorVisionRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "Yes Colour Vision satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            colorVisionRadioSat =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "colorVisionNoSat",
+                                        groupValue: colorVisionRadioSat,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "No Colour Vision satisfactory Click",
+                                              ),
+                                            ),
+                                          );
+                                          setState(() {
+                                            colorVisionRadioSat =
+                                                value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "Corona Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "Colour Vision Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
-                            ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "Corona Deficiency Observed".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "coronaYes",
-                                              groupValue: coronaRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Corona yes Click"),
-                                                ));
-                                                setState(() {
-                                                  coronaRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "coronaNo",
-                                              groupValue: coronaRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("Corona No Click"),
-                                                ));
-                                                setState(() {
-                                                  coronaRadios = value.toString();
-                                                });
-                                              },
-                                            ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
-                            ),
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Expanded(
-                                child: ListTile(
-                                  /* title:
-                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
-                                  subtitle: TextFormField(
-                                    //controller: _locationController,
-                                    enabled: true,
-                                    // initialValue: "Head Office",
-                                    decoration: InputDecoration(
-                                      enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                        borderSide: BorderSide(
-                                            width: 1, color: Mythemes.blackishade),
-                                      ),
-                                      hintText: "Enter Remarks",
-                                      labelText: "HIV Remark",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                      ),
-                                      contentPadding: EdgeInsets.all(5),
-                                      /*border: OutlineInputBorder(
+                                  hintText: "Enter Remarks",
+                                  labelText: "Corona Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(8))),*/
-                                      // labelText: "Location",
-                                      labelStyle: TextStyle(
-                                          fontWeight: FontWeight.w500,fontSize: 13,
-                                          color: Mythemes.blackish),
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "Corona Deficiency Observed".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "coronaYes",
+                                        groupValue: coronaRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("Corona yes Click"),
+                                            ),
+                                          );
+                                          setState(() {
+                                            coronaRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "coronaNo",
+                                        groupValue: coronaRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("Corona No Click"),
+                                            ),
+                                          );
+                                          setState(() {
+                                            coronaRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              /* title:
+                                "Medical Certificate No.".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),*/
+                              subtitle: TextFormField(
+                                //controller: _locationController,
+                                enabled: true,
+                                // initialValue: "Head Office",
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    //<-- SEE HERE
+                                    borderSide: BorderSide(
+                                      width: 1,
+                                      color: Mythemes.blackishade,
                                     ),
                                   ),
-                                )
+                                  hintText: "Enter Remarks",
+                                  labelText: "HIV Remark",
+                                  hintStyle: TextStyle(fontSize: 12),
+                                  contentPadding: EdgeInsets.all(5),
+                                  /*border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.all(Radius.circular(8))),*/
+                                  // labelText: "Location",
+                                  labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                    color: Mythemes.blackish,
+                                  ),
+                                ),
+                              ),
                             ),
-                            Expanded(
-                                child: ListTile(
-                                    title:
-                                    "HIV Deficiency Observed".text.overflow(TextOverflow.ellipsis).maxLines(1).maxFontSize(12).make().px4().py2(),
-                                    subtitle: Row(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hivYes",
-                                              groupValue: hivRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("HIV yes Click"),
-                                                ));
-                                                setState(() {
-                                                  hivRadios = value.toString();
-                                                });
-                                              },
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              title:
+                                  "HIV Deficiency Observed".text
+                                      .overflow(TextOverflow.ellipsis)
+                                      .maxLines(1)
+                                      .maxFontSize(12)
+                                      .make()
+                                      .px4()
+                                      .py2(),
+                              subtitle: Row(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hivYes",
+                                        groupValue: hivRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("HIV yes Click"),
                                             ),
-                                            "Yes".text.make(),
-                                          ],
-                                        ).px1(),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Radio(
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              value: "hivNo",
-                                              groupValue: hivRadios,
-                                              onChanged: (value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Text("HIV No Click"),
-                                                ));
-                                                setState(() {
-                                                  hivRadios = value.toString();
-                                                });
-                                              },
+                                          );
+                                          setState(() {
+                                            hivRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "Yes".text.make(),
+                                    ],
+                                  ).px1(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Radio(
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        value: "hivNo",
+                                        groupValue: hivRadios,
+                                        onChanged: (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text("HIV No Click"),
                                             ),
-                                            "No".text.make(),
-                                          ],
-                                        ).px1(),
-                                      ],
-                                    )
-                                )
+                                          );
+                                          setState(() {
+                                            hivRadios = value.toString();
+                                          });
+                                        },
+                                      ),
+                                      "No".text.make(),
+                                    ],
+                                  ).px1(),
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
-
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
+                ),
+              ],
+            ),
+          ),
         );
 
       case 3:
         return Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                children: [
-                  Card(
-                    child: ExpansionTile(
-                      //key: keyTile,
-                      initiallyExpanded: safetyExpanded,
-                      childrenPadding: EdgeInsets.all(0).copyWith(top: 0),
-                      title: "Safety".text.make(),
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                /*disabledHint: Container(
-                                width: 110,
-                                child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
-                              ),*/
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  //labelText: "Select Department",
-                                  hintText: "Previous Induction Reference",
-                                  labelText: "Previous Induction Reference",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-
-                              ).p8(),
-
-                            ),
-                            Expanded(
-                              child: TextFormField(
-                                /*disabledHint: Container(
-                                width: 110,
-                                child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
-                              ),*/
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  //labelText: "Select Department",
-                                  hintText: "IR Project Site",
-                                  labelText: "IR Project Site",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-
-                              ).p8(),
-
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                /*disabledHint: Container(
-                                width: 110,
-                                child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
-                              ),*/
-                                decoration: InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  //labelText: "Select Department",
-                                  hintText: "Induction Reference",
-                                  labelText: "Induction Reference",
-                                  hintStyle: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
-                                              borderRadius:
-                                              BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-
-                              ).p8(),
-
-                            ),
-                            Expanded(
-                              child: DropdownButtonFormField(
-                                /*disabledHint: Container(
+          padding: const EdgeInsets.all(5.0),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ListView(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              children: [
+                Card(
+                  child: ExpansionTile(
+                    //key: keyTile,
+                    initiallyExpanded: safetyExpanded,
+                    childrenPadding: EdgeInsets.all(0).copyWith(top: 0),
+                    title: "Safety".text.make(),
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                TextFormField(
+                                  /*disabledHint: Container(
                                 width: 110,
                                 child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                               ),*/
                                   decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
                                       borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "Previous Induction Reference",
+                                    labelText: "Previous Induction Reference",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
+                                              borderRadius:
+                                              BorderRadius.all(Radius.circular(8))),*/
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
+                          ),
+                          Expanded(
+                            child:
+                                TextFormField(
+                                  /*disabledHint: Container(
+                                width: 110,
+                                child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
+                              ),*/
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "IR Project Site",
+                                    labelText: "IR Project Site",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
+                                              borderRadius:
+                                              BorderRadius.all(Radius.circular(8))),*/
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                TextFormField(
+                                  /*disabledHint: Container(
+                                width: 110,
+                                child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
+                              ),*/
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    //labelText: "Select Department",
+                                    hintText: "Induction Reference",
+                                    labelText: "Induction Reference",
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
+                                              borderRadius:
+                                              BorderRadius.all(Radius.circular(8))),*/
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
+                          ),
+                          Expanded(
+                            child:
+                                DropdownButtonFormField(
+                                  /*disabledHint: Container(
+                                width: 110,
+                                child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
+                              ),*/
+                                  decoration: InputDecoration(
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     //labelText: "Select Department",
                                     hintText: "Approved For Employee By",
                                     labelText: "Approved For Employee By",
-                                    hintStyle: TextStyle(
-                                      fontSize: 13,
-                                    ),
+                                    hintStyle: TextStyle(fontSize: 13),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
                                   ),
                                   items: [
-
                                     DropdownMenuItem(
-                                      child:
-                                      Text('Designer',style: TextStyle(overflow: TextOverflow.ellipsis , fontSize: 13)) ,
+                                      child: Text(
+                                        'Designer',
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       value: 1,
                                     ),
                                   ],
@@ -3786,89 +4461,110 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     setState(() {
                                       value = value!;
                                     });
-                                  }
+                                  },
+                                ).p8(),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                TextFormField(
+                                  onTap: () async {
+                                    DateTime? fromDate = DateTime.now();
+                                    FocusScope.of(
+                                      context,
+                                    ).requestFocus(new FocusNode());
 
-                              ).p8(),
-
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child:  TextFormField(
-                                onTap: () async{
-                                  DateTime? fromDate = DateTime.now();
-                                  FocusScope.of(context).requestFocus(new FocusNode());
-
-                                  fromDate = await showDatePicker(
+                                    fromDate = await showDatePicker(
                                       context: context,
                                       initialDate: fromDate,
-                                      firstDate:DateTime(1947),
-                                      lastDate: DateTime.now().add(Duration(days: 0)));
-                                  setState(() {
-                                    //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                                    _inductionDateController.text = DateFormat("dd-MM-yyyy").format(fromDate!);
-                                  });
+                                      firstDate: DateTime(1947),
+                                      lastDate: DateTime.now().add(
+                                        Duration(days: 0),
+                                      ),
+                                    );
+                                    setState(() {
+                                      //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                                      _inductionDateController
+                                          .text = DateFormat(
+                                        "dd-MM-yyyy",
+                                      ).format(fromDate!);
+                                    });
 
-                                  print(fromDate);
-                                },
-                                readOnly: true,
-                                enabled: true,
-                                controller: _inductionDateController,
-                                // initialValue: "Head Office",
-                                decoration: InputDecoration(
-                                  suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.blackishade),
-                                  ),
-                                  labelText: "Induction Date",
-                                  hintStyle: TextStyle(
-                                    fontSize: 12,
-                                  ),
-                                  contentPadding: EdgeInsets.all(5),
-                                  /*border: OutlineInputBorder(
+                                    print(fromDate);
+                                  },
+                                  readOnly: true,
+                                  enabled: true,
+                                  controller: _inductionDateController,
+                                  // initialValue: "Head Office",
+                                  decoration: InputDecoration(
+                                    suffixIcon: Icon(
+                                      Icons.calendar_month,
+                                      size: 18,
+                                    ),
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
+                                      borderSide: BorderSide(
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
+                                    ),
+                                    labelText: "Induction Date",
+                                    hintStyle: TextStyle(fontSize: 12),
+                                    contentPadding: EdgeInsets.all(5),
+                                    /*border: OutlineInputBorder(
                                             borderRadius:
                                             BorderRadius.all(Radius.circular(8))),*/
-                                  // labelText: "Location",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,fontSize: 13,
-                                      color: Mythemes.blackish),
-                                ),
-                              ).p8(),
-                            ),
-                            Expanded(
-                              child: DropdownButtonFormField(
-                                /*disabledHint: Container(
+                                    // labelText: "Location",
+                                    labelStyle: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
+                                  ),
+                                ).p8(),
+                          ),
+                          Expanded(
+                            child:
+                                DropdownButtonFormField(
+                                  /*disabledHint: Container(
                                 width: 110,
                                 child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                               ),*/
                                   decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
                                       borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     //labelText: "Select Department",
                                     hintText: "Project Site",
                                     labelText: "Project Site",
-                                    hintStyle: TextStyle(
-                                      fontSize: 13,
-                                    ),
+                                    hintStyle: TextStyle(fontSize: 13),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
                                   ),
                                   items: [
-
                                     DropdownMenuItem(
-                                      child:
-                                      Text('Designer',style: TextStyle(overflow: TextOverflow.ellipsis , fontSize: 13)) ,
+                                      child: Text(
+                                        'Designer',
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       value: 1,
                                     ),
                                   ],
@@ -3877,46 +4573,52 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     setState(() {
                                       value = value!;
                                     });
-                                  }
-
-                              ).p8(),
-
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DropdownButtonFormField(
-                                /*disabledHint: Container(
+                                  },
+                                ).p8(),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child:
+                                DropdownButtonFormField(
+                                  /*disabledHint: Container(
                                 width: 110,
                                 child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                               ),*/
                                   decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
                                       borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     //labelText: "Select Department",
                                     hintText: "Trade Recommandations",
                                     labelText: "Trade Recommandations",
-                                    hintStyle: TextStyle(
-                                      fontSize: 13,
-                                    ),
+                                    hintStyle: TextStyle(fontSize: 13),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
                                   ),
                                   items: [
-
                                     DropdownMenuItem(
-                                      child:
-                                      Text('Designer',style: TextStyle(overflow: TextOverflow.ellipsis , fontSize: 13)) ,
+                                      child: Text(
+                                        'Designer',
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       value: 1,
                                     ),
                                   ],
@@ -3925,42 +4627,48 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     setState(() {
                                       value = value!;
                                     });
-                                  }
-
-                              ).p8(),
-
-                            ),
-                            Expanded(
-                              child: DropdownButtonFormField(
-                                /*disabledHint: Container(
+                                  },
+                                ).p8(),
+                          ),
+                          Expanded(
+                            child:
+                                DropdownButtonFormField(
+                                  /*disabledHint: Container(
                                 width: 110,
                                 child: "Select".text.size(13).overflow(TextOverflow.ellipsis).make(),
                               ),*/
                                   decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
+                                    enabledBorder: UnderlineInputBorder(
+                                      //<-- SEE HERE
                                       borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
+                                        width: 1,
+                                        color: Mythemes.blackishade,
+                                      ),
                                     ),
                                     //labelText: "Select Department",
                                     hintText: "Safety Approved By",
                                     labelText: "Safety Approved By",
-                                    hintStyle: TextStyle(
-                                      fontSize: 13,
-                                    ),
+                                    hintStyle: TextStyle(fontSize: 13),
                                     contentPadding: EdgeInsets.all(5),
                                     /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
                                     // labelText: "Location",
                                     labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      color: Mythemes.blackish,
+                                    ),
                                   ),
                                   items: [
-
                                     DropdownMenuItem(
-                                      child:
-                                      Text('Designer',style: TextStyle(overflow: TextOverflow.ellipsis , fontSize: 13)) ,
+                                      child: Text(
+                                        'Designer',
+                                        style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                       value: 1,
                                     ),
                                   ],
@@ -3969,27 +4677,25 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     setState(() {
                                       value = value!;
                                     });
-                                  }
-
-                              ).p8(),
-
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                                  },
+                                ).p8(),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
+                ),
+              ],
+            ),
+          ),
         );
     }
 
     return
-      //ignore this section please
-      ButtonBar(
-        children: [
-          /*ElevatedButton(
+    //ignore this section please
+    ButtonBar(
+      children: [
+        /*ElevatedButton(
             onPressed: () {
             },
             style: ButtonStyle(
@@ -3999,7 +4705,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
             child: "Back".text.make(),
           ).wh(150, 40).py12(),*/
 
-          /* ElevatedButton(
+        /* ElevatedButton(
             onPressed: () {
 
             },
@@ -4009,12 +4715,11 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
             ),
             child: "Next".text.make(),
           ).wh(150, 40).py12()*/
-        ],
-      );
+      ],
+    );
   }
 
-
-/*  IconData _getFileIcon(String type) {
+  /*  IconData _getFileIcon(String type) {
     switch (type) {
       case 'png':
         return Icons.image;
@@ -4055,18 +4760,19 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
       uiSettings: [
         AndroidUiSettings(
-            toolbarTitle: 'Crop Image',
-            toolbarColor: Mythemes.lightBluishColor,
-            toolbarWidgetColor: Mythemes.whitish,
-            initAspectRatio: CropAspectRatioPreset.original,
-            aspectRatioPresets: [
-              CropAspectRatioPreset.square,
-              CropAspectRatioPreset.ratio3x2,
-              CropAspectRatioPreset.original,
-              CropAspectRatioPreset.ratio4x3,
-              CropAspectRatioPreset.ratio16x9
-            ],
-            lockAspectRatio: false),
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Mythemes.lightBluishColor,
+          toolbarWidgetColor: Mythemes.whitish,
+          initAspectRatio: CropAspectRatioPreset.original,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9,
+          ],
+          lockAspectRatio: false,
+        ),
         IOSUiSettings(
           title: 'Crop Image',
           aspectRatioPresets: [
@@ -4074,12 +4780,10 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
             CropAspectRatioPreset.ratio3x2,
             CropAspectRatioPreset.original,
             CropAspectRatioPreset.ratio4x3,
-            CropAspectRatioPreset.ratio16x9
+            CropAspectRatioPreset.ratio16x9,
           ],
         ),
-        WebUiSettings(
-          context: context,
-        ),
+        WebUiSettings(context: context),
       ],
     );
 
@@ -4135,29 +4839,33 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
   }*/
 
   Future<void> saveInductionData(BuildContext context) async {
-    // ✅ Step 1: Validate Aadhar Number
+    // âœ… Step 1: Validate Aadhar Number
     String? aadharNumber = aadharNoController.text.trim();
     if (aadharNumber.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter Aadhar number.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please enter Aadhar number.")));
       return;
     }
 
-    // ✅ Step 2: Validate Aadhar Documents
+    // âœ… Step 2: Validate Aadhar Documents
     String? aadharFront = uploadedDocuments["Aadhar Card Front"];
     String? aadharBack = uploadedDocuments["Aadhar Card Back"];
-    bool isAadharFrontMissing = aadharFront == null || !File(aadharFront).existsSync();
-    bool isAadharBackMissing = aadharBack == null || !File(aadharBack).existsSync();
+    bool isAadharFrontMissing =
+        aadharFront == null || !File(aadharFront).existsSync();
+    bool isAadharBackMissing =
+        aadharBack == null || !File(aadharBack).existsSync();
 
     if (isAadharFrontMissing || isAadharBackMissing) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please upload both Aadhar front and back documents.")),
+        SnackBar(
+          content: Text("Please upload both Aadhar front and back documents."),
+        ),
       );
       return;
     }
 
-    // ✅ Proceed with the API call if both checks pass
+    // âœ… Proceed with the API call if both checks pass
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.preOnboardSaveApi;
     CommonNotificationPage.showLoaderDialog(context);
@@ -4203,12 +4911,12 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         try {
           var file = await http.MultipartFile.fromPath(key, filePath);
           request.files.add(file);
-          print("✅ File added: $key -> $filePath");
+          print("âœ… File added: $key -> $filePath");
         } catch (e) {
-          print('❌ Error adding file [$title]: $e');
+          print('âŒ Error adding file [$title]: $e');
         }
       } else {
-        print('⚠️ File not found for $title');
+        print('âš ï¸ File not found for $title');
       }
     }
 
@@ -4227,19 +4935,23 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-        showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       }
     } catch (e) {
-      print('❌ Exception during API call: $e');
+      print('âŒ Exception during API call: $e');
     }
   }
 
-  static showDialgSucess(BuildContext buildContext, String result, String alert) {
+  static showDialgSucess(
+    BuildContext buildContext,
+    String result,
+    String alert,
+  ) {
     if (buildContext == null) {
-      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
       return;
     }
 
@@ -4251,20 +4963,20 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
-          title: Row(
-            children: [
-              Expanded(child: Text(alert)),
-            ],
-          ),
+          title: Row(children: [Expanded(child: Text(alert))]),
           content: Text(result),
           actions: [
             TextButton(
               onPressed: () {
-                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                if (Navigator.of(context).canPop()) {
+                  // âœ… Using `context` inside the builder
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("⚠️ Warning: No route to close.");
+                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -4276,52 +4988,102 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     );
   }
 
-
-
   Widget headerText() {
     switch (activeStep) {
       case 0:
-        return 'Basic Details'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Basic Details'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
 
       case 1:
-        return  'Document Verification'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Document Verification'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
 
       case 2:
-        return  'ID Card'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'ID Card'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
 
       case 3:
-        return 'Roles & Permissions'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Roles & Permissions'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
 
       case 4:
-        return 'Shift'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Shift'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 5:
-        return 'Leave Policy'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Leave Policy'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 6:
-        return 'Paid Days Policy'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Paid Days Policy'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 7:
-        return 'Salary Breakup'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Salary Breakup'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 8:
-        return 'Device/Mob Details'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Device/Mob Details'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 9:
-        return 'Device Details'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Device Details'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 10:
-        return 'Device Registration'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Device Registration'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 11:
-        return 'Salary Structure'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Salary Structure'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 12:
-        return 'Induction Documentation'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Induction Documentation'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
       case 13:
-        return 'Final Approval'.text.align(TextAlign.left).xl.fontWeight(FontWeight.w500).make();
+        return 'Final Approval'.text
+            .align(TextAlign.left)
+            .xl
+            .fontWeight(FontWeight.w500)
+            .make();
     }
 
-    return SizedBox(
-      height: 0,
-    );
+    return SizedBox(height: 0);
   }
 
-  void openFiles(List<PlatformFile> files) {
-
-  }
+  void openFiles(List<PlatformFile> files) {}
 
   void openFile(PlatformFile file) {
     OpenFile.open(file.path!);
@@ -4331,14 +5093,12 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     print('Path: ${file.path}');
   }
 
-
   Future<File> saveFilePermanently(PlatformFile file) async {
     final appStorage = await getApplicationDocumentsDirectory();
     final newFile = File('${appStorage.path}/${file.name}');
     return File(file.path!).copy(newFile.path);
   }
 }
-
 
 // The DismissKeybaord widget (it's reusable)
 class DismissKeyboard extends StatelessWidget {
@@ -4359,8 +5119,3 @@ class DismissKeyboard extends StatelessWidget {
     );
   }
 }
-
-
-
-
-

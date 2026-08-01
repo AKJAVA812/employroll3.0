@@ -13,6 +13,7 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'dart:convert' show utf8;
 import '../main.dart';
 import '../sharedPrefancePage/ShardPre.dart';
@@ -23,6 +24,7 @@ import 'package:path/path.dart';
 import 'package:er_flutter_project/main.dart';
 import '../mss_profiles/global_profile.dart';
 import 'allAPIList.dart';
+
 class ProjectList extends StatefulWidget {
   const ProjectList({Key? key}) : super(key: key);
 
@@ -78,7 +80,8 @@ dynamic odReqCount;
 dynamic tourReqCount;
 dynamic attReqCount;
 dynamic leaveReqCount;
-class _ProjectListState extends State<ProjectList> with RouteAware{
+
+class _ProjectListState extends State<ProjectList> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -94,10 +97,11 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   int currentIndex = 0;
   final ImagePicker _picker = ImagePicker();
   File? image;
@@ -106,29 +110,28 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
   var leaveReqCount;
   var odReqCount;
 
-
   Future<LoginModel> monthAttendance(String emailId, String password) async {
     LoginModel loginModel;
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/login?userName=$emailId&password=$password");
-    /*  final response= await http.get(urlapi,headers: {
+      "http://www.employroll.com/restful/service/login?userName=$emailId&password=$password",
+    );
+    /*  final response= await MobileHttpClient.instance.get(urlapi,headers: {
       "email": emailId,
       "password": password
     });*/
-    final response = await http.get(urlapi);
+    final response = await MobileHttpClient.instance.get(urlapi);
     //print('Response status: ${response.request}');
     //print('Response status: ${response.statusCode}');
     //print('Response body: ${response.body}');
     mapResponse = json.decode(response.body);
     loginModel = LoginModel.fromJson(mapResponse);
     return loginModel;
-
   }
 
   /*Future monthAttendancePost(String sessionId) async{
    // http://35.154.190.199/restful/service/employee/profile?sessionId=2438b3da66423f389e578692c69d333dc86b648e5df
     var urlapi=Uri.parse("http://www.employroll.com/restful/service/employee/profile");
-     final response= await http.post(urlapi,body: {
+     final response= await MobileHttpClient.instance.post(urlapi,body: {
       "sessionId": sessionId,
     });
     print('Response status: ${response.request}');
@@ -145,36 +148,30 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
   }*/
 
   Future getSharedPrfanceList() async {
-
     sessionId = await shared.getSessionId();
     userType = await shared.getUserType();
 
-
-    setState(() {
-
-    });
+    setState(() {});
     //print("User Type - $userType");
     setShowPayroll = await shared.getShowPayroll();
     orgId = await shared.getOrgId();
     emailId = await shared.getEmailId();
     empIdNew = await shared.getEmpId();
     orgName = await shared.getOrgName();
-    empRoles= await shared.getEmpRoll();
-    roRoles= await shared.getRoRole();
-    adminRoles= await shared.getAdminRole();
-    setPreOnboardShow= await shared.getPreOnboardShow();
-    setExitShow= await shared.getExitShow();
-    setMyTeamShow= await shared.getMyTeamShow();
-    setExitResignationListShow= await shared.getExitResignationListShow();
-    setExitResignationListView= await shared.getExitResignationListView();
-    odPendingPermissionMSS= (await shared.getODPendingList())!;
-    setState(() {
-
-    });
+    empRoles = await shared.getEmpRoll();
+    roRoles = await shared.getRoRole();
+    adminRoles = await shared.getAdminRole();
+    setPreOnboardShow = await shared.getPreOnboardShow();
+    setExitShow = await shared.getExitShow();
+    setMyTeamShow = await shared.getMyTeamShow();
+    setExitResignationListShow = await shared.getExitResignationListShow();
+    setExitResignationListView = await shared.getExitResignationListView();
+    odPendingPermissionMSS = (await shared.getODPendingList())!;
+    setState(() {});
     //print("Resignation View 1 $setExitResignationListShow");
     //print("Resignation View 2 $setExitResignationListView");
     //print("MY TEAM SHOW - $setMyTeamShow");
-    userPanel= await shared.getUserPanel();
+    userPanel = await shared.getUserPanel();
     //print("USER PANEL - $userPanel");
     claimLevelOneMSS = await shared.getClaimLevelOne();
     //print("CLAIM APPROVAL L1 - $claimLevelOneMSS");
@@ -187,28 +184,28 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     claimLevelTwoUIS = await shared.getClaimLevelTwoUIS();
     claimLevelThreeUIS = await shared.getClaimLevelThreeUIS();
     pendingLoanRequestMoL1Permission = (await shared.getLoanApprovalL1MO());
-    pendingLoanRequestMSSL1Permission= (await shared.getLoanApprovalL1MSS());
-    pendingLoanRequestUISL1Permission= (await shared.getLoanApprovalL1UIS());
+    pendingLoanRequestMSSL1Permission = (await shared.getLoanApprovalL1MSS());
+    pendingLoanRequestUISL1Permission = (await shared.getLoanApprovalL1UIS());
     pendingLoanRequestMoL2Permission = (await shared.getLoanApprovalL2MO());
-    pendingLoanRequestMSSL2Permission= (await shared.getLoanApprovalL2MSS());
-    pendingLoanRequestUISL2Permission= (await shared.getLoanApprovalL2UIS());
+    pendingLoanRequestMSSL2Permission = (await shared.getLoanApprovalL2MSS());
+    pendingLoanRequestUISL2Permission = (await shared.getLoanApprovalL2UIS());
     pendingLoanRequestMoL3Permission = (await shared.getLoanApprovalL3MO());
-    pendingLoanRequestMSSL3Permission= (await shared.getLoanApprovalL3MSS());
-    pendingLoanRequestUISL3Permission= (await shared.getLoanApprovalL3UIS());
-    setMyTeamPageShow= (await shared.getMyTeamPageShow())!;
+    pendingLoanRequestMSSL3Permission = (await shared.getLoanApprovalL3MSS());
+    pendingLoanRequestUISL3Permission = (await shared.getLoanApprovalL3UIS());
+    setMyTeamPageShow = (await shared.getMyTeamPageShow())!;
 
     //print("MY TEAM SHOW NEW - $setMyTeamPageShow");
     //print("Pending Attendance Request MSS MO- $pendingLoanRequestMoL1Permission");
     //print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
     //print("Pending Attendance Request UIS- $pendingLoanRequestUISL1Permission");
 
-    if(userPanel == "COMPANY_EMPLOYEE") {
+    if (userPanel == "COMPANY_EMPLOYEE") {
       value = 0;
     } else {
       value = 1;
     }
-    profileName= await shared.getDefaultProfileName();
-    profileId= await shared.getDefaultProfileId();
+    profileName = await shared.getDefaultProfileName();
+    profileId = await shared.getDefaultProfileId();
     getRequisitionCounts(sessionId!);
     //print("Default Profile Name - $profileName");
     //print("Default Profile Id - $profileId");
@@ -222,21 +219,17 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     //print('Show Payroll: ${setShowPayroll}');
     //print('OrgId -  ${orgId}');
     //print('OrgName - : ${orgName}');
+    setState(() {});
     setState(() {
-
-    });
-    setState(() {
-      if(empRoles==1){
-        showHide=true;
+      if (empRoles == 1) {
+        showHide = true;
         //print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
-      if(empRoles==0){
-        showHide=false;
+      if (empRoles == 0) {
+        showHide = false;
         //print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
       if (adminRoles == 0) {
         showAdmin = false;
@@ -259,8 +252,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
   }
 
   Future getImage() async {
-    final XFile? photo =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+    final XFile? photo = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 80,
+    );
     if (photo != null) {
       image = File(photo.path);
       uploadImage();
@@ -286,7 +281,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     //print('Response body: ${image}');
     //var uri = Uri.parse("https://c264-2401-4900-1c68-cb6f-f5aa-6720-cdf2-749.ngrok.io/restful/service/attendance/via/mobile");
     var uri = Uri.parse(
-        "http://www.employroll.com//restful/service/attendance/via/mobile");
+      "http://www.employroll.com//restful/service/attendance/via/mobile",
+    );
     var request = new http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = "53eb75da8f2f2eb7171c4dd55e343e3c405eda9d5e9";
     request.fields['currentDate'] = "2022-06-13 9:35:14";
@@ -296,10 +292,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     request.fields['lat'] = "28.5367794";
     request.fields['lng'] = "77.2714404";
 
-    var multipart = new http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
+    var multipart = new http.MultipartFile(
+      'image',
+      stream,
+      length,
+      filename: basename('image.jpg'),
+    );
 
-/*    var multipart = new http.MultipartFile.fromBytes(
+    /*    var multipart = new http.MultipartFile.fromBytes(
         'image', (await rootBundle.load('image')).buffer.asUint8List(),
         filename: 'image.jpg');*/
 
@@ -333,8 +333,9 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         //'image': new UploadFileInfo(new File('image.jpg',filename)),
       });
       Response response = await Dio().post(
-          "http://www.employroll.com/restful/service/attendance/via/mobile",
-          data: fromData);
+        "http://www.employroll.com/restful/service/attendance/via/mobile",
+        data: fromData,
+      );
 
       //print('Response status: ${response.statusMessage}');
       //print('Response status: ${response.statusCode}');
@@ -360,24 +361,31 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     request.fields["user_id"] = "text";
 
     // multipart that takes file.. here this "image_file" is a key of the API request
-    var multipartFile = new http.MultipartFile('image_file', stream, length,
-        filename: basename(_image.path));
+    var multipartFile = new http.MultipartFile(
+      'image_file',
+      stream,
+      length,
+      filename: basename(_image.path),
+    );
 
     // add file to multipart
     request.files.add(multipartFile);
 
     // send request to upload image
-    await request.send().then((response) async {
-      // listen for response
-      response.stream.transform(utf8.decoder).listen((value) {
-        //print(value);
-        //print('Response status: ${response.stream}');
-        //print('Response status: ${response.statusCode}');
-        //print('Response body: ${response}');
-      });
-    }).catchError((e) {
-      //print(e);
-    });
+    await request
+        .send()
+        .then((response) async {
+          // listen for response
+          response.stream.transform(utf8.decoder).listen((value) {
+            //print(value);
+            //print('Response status: ${response.stream}');
+            //print('Response status: ${response.statusCode}');
+            //print('Response body: ${response}');
+          });
+        })
+        .catchError((e) {
+          //print(e);
+        });
   }
 
   Future<void> getRequisitionCounts(String sessionId) async {
@@ -385,12 +393,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       String conn = ApiDetails.server;
       String apiUrl = ApiDetails.reqCountApi;
 
-      var urlapi = Uri.parse("$conn$apiUrl?"
-          "sessionId=$sessionId&"
-          "profileId=$profileId&"
-          "userPermission=$userPanel");
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "profileId=$profileId&"
+        "userPermission=$userPanel",
+      );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       //print("Requisition Count API - ${response.request}");
       //print("Response Body - ${response.body}");
@@ -402,26 +412,25 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       int leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
       int mobOdCount = mapResponse['mobOdCount'] ?? 0;
 
-// ✅ Update global notifiers
+      // âœ… Update global notifiers
       attReqCountNotifier.value = attReqCount;
       leaveReqCountNotifier.value = leaveReqCount;
       odReqCountNotifier.value = mobOdCount;
 
-// ✅ Also persist in SharedPreferences for app relaunch
+      // âœ… Also persist in SharedPreferences for app relaunch
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt("attReqCount", attReqCount);
       await prefs.setInt("leaveReqCount", leaveReqCount);
       await prefs.setInt("mobOdCount", mobOdCount);
 
-      // ✅ Assign values to variables
+      // âœ… Assign values to variables
       mobOdCount = mapResponse['mobOdCount'] ?? 0;
       leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
       odReqCount = mapResponse['odReqCount'] ?? 0;
       tourReqCount = mapResponse['tourReqCount'] ?? 0;
       attReqCount = mapResponse['attReqCount'] ?? 0;
 
-
-      // ✅ Save all data into SharedPreferences
+      // âœ… Save all data into SharedPreferences
       //final prefs = await SharedPreferences.getInstance();
       await prefs.setInt("mobOdCount", mobOdCount);
       await prefs.setInt("leaveReqCount", leaveReqCount);
@@ -429,8 +438,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       await prefs.setInt("tourReqCount", tourReqCount);
       await prefs.setInt("attReqCount", attReqCount);
 
-      //print("Saved Requisition Counts to SharedPreferences ✅");
-
+      //print("Saved Requisition Counts to SharedPreferences âœ…");
     } catch (e) {
       //print("Error fetching requisition counts: $e");
     } finally {
@@ -448,7 +456,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
     super.initState();
   }
 
-/*  final screens = [
+  /*  final screens = [
     Center(
       child: Text(
         'Home',
@@ -476,12 +484,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
   ];*/
   var hideWidget = false;
 
-
   int value = 0;
 
   @override
   Widget build(BuildContext context) {
-
     // Get the screen width and height using MediaQuery
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -496,7 +502,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
 
       //ESS Cards
       //My Requests
-      if(value == 0) {
+      if (value == 0) {
         items.add(
           Hero(
             tag: 'myAllRequests',
@@ -523,11 +529,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'My Requests',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          'My Requests',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Mythemes.black,
+                            fontSize: boxText,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -581,15 +590,18 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         );
       }*/
 
-      if(value == 0) {
+      if (value == 0) {
         items.add(
           Hero(
             tag: 'myReporting',
             child: Card(
               color: Mythemes.whitish,
               child: InkWell(
-                onTap: (){
-                  Navigator.pushNamed(context, MyRoutings.reportingOfficerPageRoute);
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    MyRoutings.reportingOfficerPageRoute,
+                  );
                 },
                 child: Stack(
                   children: <Widget>[
@@ -605,11 +617,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'My Managers',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          'My Managers',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Mythemes.black,
+                            fontSize: boxText,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -622,7 +637,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       }
 
       //HRIS Requisition
-      if(userType != 'COMPANY_ADMIN' && value == 0 && value != 1) {
+      if (userType != 'COMPANY_ADMIN' && value == 0 && value != 1) {
         items.add(
           Hero(
             tag: 'hrisReport',
@@ -658,9 +673,12 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'My Profile',
-                            style:
-                            TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                          'My Profile',
+                          style: TextStyle(
+                            color: Mythemes.black,
+                            fontSize: boxText,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -672,101 +690,25 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         );
       }
 
-      if(value == 1 || userPanel == "USER") {
-          //Time & Attendance
-          if(orgId != 144 && orgId != 138 || value == 1) {
-            items.add(
-              Hero(
-                tag: 'reportAnimate',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: Icon(
-                            Icons.more_time_rounded,
-                            size: 50,
-                            color: Mythemes.lightBluishColor,
-                          ),
-                          /*Image(
-                          image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*/
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                                'Attendance',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
-                            ),
-                          ),
-                        ),
-                        // 🔹 Badge at top-right
-                        Positioned(
-                          top: 6,
-                          right: 8,
-                          child: Container(
-                            padding: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent, // badge background color
-                              shape: BoxShape.circle,
-                            ),
-                            constraints: BoxConstraints(
-                              minWidth: 24,
-                              minHeight: 24,
-                            ),
-                            child: Center(
-                              child: ValueListenableBuilder(
-                                valueListenable: attReqCountNotifier,
-                                builder: (context, value, _) {
-                                  return Text(
-                                    "$value", // your dynamic count variable
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
-
-        //Leave Management
-
+      if (value == 1 || userPanel == "USER") {
+        //Time & Attendance
+        if (orgId != 144 && orgId != 138 || value == 1) {
           items.add(
             Hero(
-              tag: 'leaveReport',
+              tag: 'reportAnimate',
               child: Card(
                 color: Mythemes.whitish,
                 child: InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+                    Navigator.pushNamed(context, MyRoutings.timeAttRoute);
                   },
                   child: Stack(
                     children: <Widget>[
                       Center(
                         child: Icon(
-                          Icons.calendar_month_rounded,
+                          Icons.more_time_rounded,
                           size: 50,
-                          color: Mythemes.successColor,
+                          color: Mythemes.lightBluishColor,
                         ),
                         /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
@@ -777,14 +719,18 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Leave',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Attendance',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
+                      // ðŸ”¹ Badge at top-right
                       Positioned(
                         top: 6,
                         right: 8,
@@ -800,7 +746,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           ),
                           child: Center(
                             child: ValueListenableBuilder(
-                              valueListenable: leaveReqCountNotifier,
+                              valueListenable: attReqCountNotifier,
                               builder: (context, value, _) {
                                 return Text(
                                   "$value", // your dynamic count variable
@@ -822,18 +768,99 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
               ),
             ),
           );
+        }
 
-          //OUT DUTY
-          if(odPendingPermissionMSS == "1") {
-            items.add(
-              Hero(
-                tag: 'odReport',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: (){
-                      Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                      /*Fluttertoast.showToast(
+        //Leave Management
+
+        items.add(
+          Hero(
+            tag: 'leaveReport',
+            child: Card(
+              color: Mythemes.whitish,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    MyRoutings.leaveManageReportRoute,
+                  );
+                },
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: Icon(
+                        Icons.calendar_month_rounded,
+                        size: 50,
+                        color: Mythemes.successColor,
+                      ),
+                      /*Image(
+                          image: AssetImage('images/applications.png'),width: 100,height: 100,
+                        ),*/
+                    ),
+                    Center(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 75, left: 10),
+                        padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                        child: Text(
+                          'Leave',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Mythemes.black,
+                            fontSize: boxText,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 6,
+                      right: 8,
+                      child: Container(
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent, // badge background color
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 24,
+                          minHeight: 24,
+                        ),
+                        child: Center(
+                          child: ValueListenableBuilder(
+                            valueListenable: leaveReqCountNotifier,
+                            builder: (context, value, _) {
+                              return Text(
+                                "$value", // your dynamic count variable
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        //OUT DUTY
+        if (odPendingPermissionMSS == "1") {
+          items.add(
+            Hero(
+              tag: 'odReport',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.onDutyTypes);
+                    /*Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
@@ -842,76 +869,78 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                     textColor: Colors.white,
                     fontSize: 16.0
                 );*/
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: Icon(
-                            Icons.business_center,
-                            size: 50,
-                            color: Colors.orange,
-                          ),
-                          /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.business_center,
+                          size: 50,
+                          color: Colors.orange,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                                'OD',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                            'OD',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        Positioned(
-                          top: 6,
-                          right: 8,
-                          child: Container(
-                            padding: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent, // badge background color
-                              shape: BoxShape.circle,
-                            ),
-                            constraints: BoxConstraints(
-                              minWidth: 24,
-                              minHeight: 24,
-                            ),
-                            child: Center(
-                              child: ValueListenableBuilder(
-                                valueListenable: odReqCountNotifier,
-                                builder: (context, value, _) {
-                                  return Text(
-                                    "$value", // your dynamic count variable
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  );
-                                },
-                              ),
+                      ),
+                      Positioned(
+                        top: 6,
+                        right: 8,
+                        child: Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent, // badge background color
+                            shape: BoxShape.circle,
+                          ),
+                          constraints: BoxConstraints(
+                            minWidth: 24,
+                            minHeight: 24,
+                          ),
+                          child: Center(
+                            child: ValueListenableBuilder(
+                              valueListenable: odReqCountNotifier,
+                              builder: (context, value, _) {
+                                return Text(
+                                  "$value", // your dynamic count variable
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                );
+                              },
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          }
-
-
-
+            ),
+          );
+        }
 
         //TRAVEL & EXPENSE
-        if(claimLevelOneMSS == "1" || claimLevelTwoMSS == "1" || claimLevelThreeMSS == "1") {
+        if (claimLevelOneMSS == "1" ||
+            claimLevelTwoMSS == "1" ||
+            claimLevelThreeMSS == "1") {
           items.add(
             Hero(
               tag: 'claim',
@@ -919,7 +948,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 color: Mythemes.whitish,
                 child: InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, MyRoutings.claimItemsListRoute);
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.claimItemsListRoute,
+                    );
                     /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
@@ -947,11 +979,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Claim',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Claim',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -964,7 +999,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Advance
-        if(orgId == 3 || orgId == 145 || orgId == 39) {
+        if (orgId == 3 || orgId == 145 || orgId == 39) {
           items.add(
             Hero(
               tag: 'claimAdvance',
@@ -1000,11 +1035,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Advance',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Advance',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1017,24 +1055,23 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Loan
-          //MSS MO
-          if(
-              userPanel == "MSS_MO_ADMIN" &&
-                  (
-                      pendingLoanRequestMoL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
-                          pendingLoanRequestMoL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
-                          pendingLoanRequestMoL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
-                  )
-          ){
-            items.add(
-              Hero(
-                tag: 'loanAdvanceReport',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
-                      /*Fluttertoast.showToast(
+        //MSS MO
+        if (userPanel == "MSS_MO_ADMIN" &&
+            (pendingLoanRequestMoL1Permission ==
+                    "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                pendingLoanRequestMoL2Permission ==
+                    "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                pendingLoanRequestMoL3Permission ==
+                    "LOAN_APPROVAL_LEVEL_THREE_ADD")) {
+          items.add(
+            Hero(
+              tag: 'loanAdvanceReport',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1043,58 +1080,60 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: Icon(
-                            Icons.money,
-                            size: 50,
-                            color: Mythemes.lightBluishColor,
-                          ),
-                          /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.money,
+                          size: 50,
+                          color: Mythemes.lightBluishColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                                'Loan',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                            'Loan',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
+            ),
+          );
+        }
 
-          }
-
-          //MSS
-          if( userPanel == "MSS" &&
-              (
-                  pendingLoanRequestMSSL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
-                      pendingLoanRequestMSSL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
-                      pendingLoanRequestMSSL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
-              )
-          ){
-            items.add(
-              Hero(
-                tag: 'loanAdvanceReport',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
-                      /*Fluttertoast.showToast(
+        //MSS
+        if (userPanel == "MSS" &&
+            (pendingLoanRequestMSSL1Permission ==
+                    "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                pendingLoanRequestMSSL2Permission ==
+                    "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                pendingLoanRequestMSSL3Permission ==
+                    "LOAN_APPROVAL_LEVEL_THREE_ADD")) {
+          items.add(
+            Hero(
+              tag: 'loanAdvanceReport',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1103,59 +1142,60 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: Icon(
-                            Icons.money,
-                            size: 50,
-                            color: Mythemes.lightBluishColor,
-                          ),
-                          /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.money,
+                          size: 50,
+                          color: Mythemes.lightBluishColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                                'Loan',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                            'Loan',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
+            ),
+          );
+        }
 
-          }
-
-          //USER
-          if(
-          userPanel == "USER" &&
-              (
-                  pendingLoanRequestMoL1Permission == "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
-                      pendingLoanRequestMoL2Permission == "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
-                      pendingLoanRequestMoL3Permission == "LOAN_APPROVAL_LEVEL_THREE_ADD"
-              )
-          ){
-            items.add(
-              Hero(
-                tag: 'loanAdvanceReport',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
-                      /*Fluttertoast.showToast(
+        //USER
+        if (userPanel == "USER" &&
+            (pendingLoanRequestMoL1Permission ==
+                    "LOAN_APPROVAL_LEVEL_ONE_ADD" ||
+                pendingLoanRequestMoL2Permission ==
+                    "LOAN_APPROVAL_LEVEL_TWO_ADD" ||
+                pendingLoanRequestMoL3Permission ==
+                    "LOAN_APPROVAL_LEVEL_THREE_ADD")) {
+          items.add(
+            Hero(
+              tag: 'loanAdvanceReport',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, MyRoutings.loanAdvanceRoute);
+                    /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
@@ -1164,44 +1204,45 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: Icon(
-                            Icons.money,
-                            size: 50,
-                            color: Mythemes.lightBluishColor,
-                          ),
-                          /*Image(
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.money,
+                          size: 50,
+                          color: Mythemes.lightBluishColor,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                                'Loan',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                            'Loan',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-
-          }
-
+            ),
+          );
+        }
 
         //Helpdesk
-        if(orgId == 3 || orgId == 145) {
+        if (orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'helpdeskItems',
@@ -1237,11 +1278,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Helpdesk',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Helpdesk',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1252,7 +1296,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
             ),
           );
         }
-
 
         /*if(showRo  || showAdmin) {
         items.add(
@@ -1297,14 +1340,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       }*/
 
         //OCR
-        if(orgId == 3 || orgId == 145) {
+        if (orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'ocr',
               child: Card(
                 color: Mythemes.whitish,
                 child: InkWell(
-                  onTap: (){
+                  onTap: () {
                     Navigator.pushNamed(context, MyRoutings.ocrPageRoute);
                     /*Fluttertoast.showToast(
                     msg: "Not Activated",
@@ -1333,11 +1376,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'OCR',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'OCR',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1350,15 +1396,18 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Face Recognition
-        if(orgId == 3 || orgId == 145) {
+        if (orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'face_recognition',
               child: Card(
                 color: Mythemes.whitish,
                 child: InkWell(
-                  onTap: (){
-                    Navigator.pushNamed(context, MyRoutings.faceRecognitionHome);
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.faceRecognitionHome,
+                    );
                     /*Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
@@ -1386,11 +1435,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Face Recognition',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Face Recognition',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1402,9 +1454,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
           );
         }
 
-
         //Visitor Management
-        if(orgId == 3 || orgId == 145) {
+        if (orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'visitorManage',
@@ -1412,7 +1463,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 color: Mythemes.whitish,
                 child: InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, MyRoutings.visitorManageSections);
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.visitorManageSections,
+                    );
                     /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
@@ -1440,11 +1494,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Visitor ',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Visitor ',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1457,7 +1514,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //New Landing
-        if(orgId == 3 || orgId == 145) {
+        if (orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'frontPage',
@@ -1494,11 +1551,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'New',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'New',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1511,7 +1571,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Induction Onboarding
-        if(orgId == 3 || orgId == 145) {
+        if (orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'induction',
@@ -1520,7 +1580,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 child: InkWell(
                   onTap: () {
                     //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                    Navigator.pushNamed(context, MyRoutings.inductionOnboardRoute);
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.inductionOnboardRoute,
+                    );
                     /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
@@ -1548,11 +1611,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Induction',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Induction',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1565,13 +1631,12 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Pre-Onboard
-        if((
-            setPreOnboardShow == "true" ||
+        if ((setPreOnboardShow == "true" ||
                 empIdNew == 75324 ||
                 emailId == "sid@voyageofwellness.co.in" ||
                 orgId == 3 ||
-                orgId == 145
-        ) && !(orgId == 190 || orgId == 191 || orgId == 198)) {
+                orgId == 145) &&
+            !(orgId == 190 || orgId == 191 || orgId == 198)) {
           items.add(
             Hero(
               tag: 'preInduction',
@@ -1580,7 +1645,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 child: InkWell(
                   onTap: () {
                     //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                    Navigator.pushNamed(context, MyRoutings.preOnboardItemRoute);
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.preOnboardItemRoute,
+                    );
                     /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
@@ -1608,11 +1676,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Pre-Induction',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Pre-Induction',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1625,11 +1696,8 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //Exit
-        if((
-            setExitShow == "true" ||
-                orgId == 3 ||
-                orgId == 145
-        ) && !(orgId == 190 || orgId == 191 || orgId == 198)) {
+        if ((setExitShow == "true" || orgId == 3 || orgId == 145) &&
+            !(orgId == 190 || orgId == 191 || orgId == 198)) {
           items.add(
             Hero(
               tag: 'exit',
@@ -1637,10 +1705,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 color: Mythemes.whitish,
                 child: InkWell(
                   onTap: () {
-                    if(userPanel == "MSS" || userPanel == "USER") {
+                    if (userPanel == "MSS" || userPanel == "USER") {
                       Navigator.pushNamed(context, MyRoutings.exitListRoute);
                     }
-                    if(userPanel == "MSS_MO_ADMIN") {
+                    if (userPanel == "MSS_MO_ADMIN") {
                       Navigator.pushNamed(context, MyRoutings.exitListMORoute);
                     }
                     //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
@@ -1672,11 +1740,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Exit',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Exit',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1688,110 +1759,120 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
           );
         }
 
-          //Exit Resignation Approval
-          if(setExitResignationListShow == "true" || setExitResignationListView == "1") {
-            print("Check Permission - $setExitResignationListShow");
-            print("Check - $setExitResignationListView");
-            items.add(
-              Hero(
-                tag: 'exitResignationApproval',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: () {
-                      if(userPanel == "MSS" || userPanel == "USER") {
-                        Navigator.pushNamed(context, MyRoutings.exitResignationRequestListRoute);
-                      }
-                      if(userPanel == "MSS_MO_ADMIN") {
-                        Navigator.pushNamed(context, MyRoutings.exitResignationRequestListRoute);
-                      }
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: Icon(
-                            Icons.outbond,
-                            size: 50,
-                            color: Mythemes.purplish,
-                          ),
-                          /*Image(
+        //Exit Resignation Approval
+        if (setExitResignationListShow == "true" ||
+            setExitResignationListView == "1") {
+          print("Check Permission - $setExitResignationListShow");
+          print("Check - $setExitResignationListView");
+          items.add(
+            Hero(
+              tag: 'exitResignationApproval',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    if (userPanel == "MSS" || userPanel == "USER") {
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutings.exitResignationRequestListRoute,
+                      );
+                    }
+                    if (userPanel == "MSS_MO_ADMIN") {
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutings.exitResignationRequestListRoute,
+                      );
+                    }
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.outbond,
+                          size: 50,
+                          color: Mythemes.purplish,
+                        ),
+                        /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
                         ),*/
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                                'Resignation',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                            'Resignation',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          }
+            ),
+          );
+        }
 
         //My Teams
-        if(setMyTeamShow == "true" || setMyTeamPageShow == "1") {
+        if (setMyTeamShow == "true" || setMyTeamPageShow == "1") {
           print("Check My Team Permission - $setMyTeamShow");
           print("Check My Team- $setMyTeamPageShow");
-            items.add(
-              Hero(
-                tag: 'myTeams',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: () {
-                      if (userPanel == "MSS" || userPanel == "USER") {
-                        Navigator.pushNamed(context, MyRoutings.empListRoute);
-                      }
-                      if (userPanel == "MSS_MO_ADMIN") {
-                        Navigator.pushNamed(context, MyRoutings.myTeamMORoute);
-                      }
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        // Main content
-                        Center(
-                          child: Icon(
-                            Icons.supervised_user_circle_sharp,
-                            size: 50,
-                            color: Colors.purpleAccent,
-                          ),
+          items.add(
+            Hero(
+              tag: 'myTeams',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    if (userPanel == "MSS" || userPanel == "USER") {
+                      Navigator.pushNamed(context, MyRoutings.empListRoute);
+                    }
+                    if (userPanel == "MSS_MO_ADMIN") {
+                      Navigator.pushNamed(context, MyRoutings.myTeamMORoute);
+                    }
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      // Main content
+                      Center(
+                        child: Icon(
+                          Icons.supervised_user_circle_sharp,
+                          size: 50,
+                          color: Colors.purpleAccent,
                         ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                              'My Team',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                color: Mythemes.black,
-                                fontSize: boxText,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                            'My Team',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                )
+                ),
               ),
-            );
-          }
+            ),
+          );
+        }
 
-          /*if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
+        /*if(userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
             items.add(
               Hero(
                 tag: 'mySharedTeams',
@@ -1838,93 +1919,100 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
             );
           }*/
 
-
-
-          if(orgId == 3 || orgId == 145) {
-            items.add(
-              Hero(
-                tag: 'incidentReporting',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: (){
-                      Navigator.pushNamed(context, MyRoutings.incidentReportListRoute);
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: Icon(
-                            Icons.report_outlined,
-                            size: 50,
-                            color: Colors.red,
-                          ),
-
+        if (orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'incidentReporting',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.incidentReportListRoute,
+                    );
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.report_outlined,
+                          size: 50,
+                          color: Colors.red,
                         ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                                'Incident',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                            'Incident',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          }
+            ),
+          );
+        }
 
-          if(orgId == 3 || orgId == 145) {
-            items.add(
-              Hero(
-                tag: 'offlineAttendance',
-                child: Card(
-                  color: Mythemes.whitish,
-                  child: InkWell(
-                    onTap: (){
-                      Navigator.pushNamed(context, MyRoutings.offlineAttendanceRoute);
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: Icon(
-                            Icons.offline_share_sharp,
-                            size: 50,
-                            color: Colors.blueGrey,
-                          ),
-
+        if (orgId == 3 || orgId == 145) {
+          items.add(
+            Hero(
+              tag: 'offlineAttendance',
+              child: Card(
+                color: Mythemes.whitish,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.offlineAttendanceRoute,
+                    );
+                  },
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: Icon(
+                          Icons.offline_share_sharp,
+                          size: 50,
+                          color: Colors.blueGrey,
                         ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(top: 75, left: 10),
-                            padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                            child: Text(
-                                'Sync My Attendance',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style:
-                                TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                      ),
+                      Center(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 75, left: 10),
+                          padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                          child: Text(
+                            'Sync My Attendance',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          }
-
+            ),
+          );
+        }
 
         //Location
-        if(orgId == 3 || orgId == 145) {
+        if (orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'realLocation',
@@ -1936,7 +2024,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                     // Navigator.pushNamed(context, MyRoutings.realTimeLocationRoute);
                     //Navigator.pushNamed(context, MyRoutings.customCalender);
                     //Navigator.pushNamed(context, MyRoutings.locationTracking);
-                    Navigator.pushNamed(context, MyRoutings.geoLocationTracking);
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.geoLocationTracking,
+                    );
                     /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
@@ -1964,11 +2055,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Location',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Location',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -1981,7 +2075,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         }
 
         //ESS Dashboard
-        if(orgId == 3 || orgId == 145) {
+        if (orgId == 3 || orgId == 145) {
           items.add(
             Hero(
               tag: 'essDashboard',
@@ -1990,7 +2084,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 child: InkWell(
                   onTap: () {
                     //Navigator.pushNamed(context, MyRoutings.visitorManageSections);
-                    Navigator.pushNamed(context, MyRoutings.realtimeESSDashboard);
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.realtimeESSDashboard,
+                    );
                     /*Fluttertoast.showToast(
                       msg: "Not Activated",
                       toastLength: Toast.LENGTH_SHORT,
@@ -2018,11 +2115,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                           margin: EdgeInsets.only(top: 75, left: 10),
                           padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                           child: Text(
-                              'Real-Time',
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style:
-                              TextStyle(color: Mythemes.black, fontSize: boxText, fontWeight: FontWeight.bold)
+                            'Real-Time',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Mythemes.black,
+                              fontSize: boxText,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -2033,10 +2133,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
             ),
           );
         }
-
-
       }
-
 
       /*if(orgId == 3 || orgId == 145) {
         items.add(
@@ -2079,14 +2176,14 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
         );
       }*/
 
-     /* items.add(
+      /* items.add(
         Hero(
           tag: 'location',
           child: Card(
             color: Mythemes.whitish,
             child: InkWell(
               onTap: (){
-               *//* Fluttertoast.showToast(
+               */ /* Fluttertoast.showToast(
                     msg: "Not Activated",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
@@ -2094,7 +2191,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                     backgroundColor: Colors.black,
                     textColor: Colors.white,
                     fontSize: 16.0
-                );*//*
+                );*/ /*
                 Navigator.pushNamed(context, MyRoutings.getCurrentLocation);
               },
               child: Stack(
@@ -2105,9 +2202,9 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                       size: 50,
                       color: Mythemes.greyish,
                     ),
-                    *//*Image(
+                    */ /*Image(
                           image: AssetImage('images/applications.png'),width: 100,height: 100,
-                        ),*//*
+                        ),*/ /*
                   ),
                   Center(
                     child: Container(
@@ -2130,6 +2227,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
       );*/
       return items;
     }
+
     timeDilation = 0.5;
     return Material(
       child: Scaffold(
@@ -2164,34 +2262,41 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                         spacing: 2.0,
                         customSeparatorBuilder: (context, local, global) {
                           final opacity =
-                          ((global.position - local.position).abs() - 0.5)
-                              .clamp(0.0, 1.0);
+                              ((global.position - local.position).abs() - 0.5)
+                                  .clamp(0.0, 1.0);
                           return VerticalDivider(
-                              indent: 10.0,
-                              endIndent: 10.0,
-                              color: Colors.white38.withOpacity(opacity));
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity),
+                          );
                         },
                         customIconBuilder: (context, local, global) {
                           final text = const ['ESS', 'MSS'][local.index];
                           return Center(
-                              child: Text(text,
-                                  style: TextStyle(
-                                      color: Color.lerp(Colors.black, Colors.white,
-                                          local.animationValue))));
+                            child: Text(
+                              text,
+                              style: TextStyle(
+                                color: Color.lerp(
+                                  Colors.black,
+                                  Colors.white,
+                                  local.animationValue,
+                                ),
+                              ),
+                            ),
+                          );
                         },
                         borderWidth: 0.0,
                         onChanged: (i) {
                           setState(() {
-
                             value = i;
                             print(i);
                           });
-                          if(value == 1) {
+                          if (value == 1) {
                             getRequisitionCounts(sessionId!);
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -2220,34 +2325,41 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                         spacing: 2.0,
                         customSeparatorBuilder: (context, local, global) {
                           final opacity =
-                          ((global.position - local.position).abs() - 0.5)
-                              .clamp(0.0, 1.0);
+                              ((global.position - local.position).abs() - 0.5)
+                                  .clamp(0.0, 1.0);
                           return VerticalDivider(
-                              indent: 10.0,
-                              endIndent: 10.0,
-                              color: Colors.white38.withOpacity(opacity));
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity),
+                          );
                         },
                         customIconBuilder: (context, local, global) {
                           final text = const ['ESS', 'MSS MO'][local.index];
                           return Center(
-                              child: Text(text,
-                                  style: TextStyle(
-                                      color: Color.lerp(Colors.black, Colors.white,
-                                          local.animationValue))));
+                            child: Text(
+                              text,
+                              style: TextStyle(
+                                color: Color.lerp(
+                                  Colors.black,
+                                  Colors.white,
+                                  local.animationValue,
+                                ),
+                              ),
+                            ),
+                          );
                         },
                         borderWidth: 0.0,
                         onChanged: (i) {
                           setState(() {
                             value = i;
                             print(i);
-
                           });
-                          if(value == 1) {
+                          if (value == 1) {
                             getRequisitionCounts(sessionId!);
                             //Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
                           }
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -2259,7 +2371,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware{
                 children: generateGridViewItems(),
               ),
             ),
-          ]
+          ],
         ),
       ),
       //debugShowCheckedModeBanner: false,

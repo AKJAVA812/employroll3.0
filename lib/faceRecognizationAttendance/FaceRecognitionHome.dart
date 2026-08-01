@@ -18,6 +18,7 @@ import 'ML/Recognition.dart';
 import 'ML/Recognizer.dart';
 import 'package:image/image.dart' as img;
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'RecognitionScreen.dart';
 import 'RegistrationScreen.dart';
 import 'attendancMarkAi.dart';
@@ -29,6 +30,7 @@ class FaceRecognitinHome extends StatefulWidget {
   @override
   State<FaceRecognitinHome> createState() => _FaceRecognitinHomeState();
 }
+
 var titleName = "Face Recognition";
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
@@ -41,15 +43,11 @@ bool showHide = false;
 bool showAdmin = false;
 bool showRo = false;
 
-
-
 class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
-
-
   //TODO declare variables
   late ImagePicker imagePicker;
   File? _image;
-  int codeAuto =1;
+  int codeAuto = 1;
 
   //TODO declare detector
   late FaceDetector faceDetector;
@@ -63,35 +61,34 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     imagePicker = ImagePicker();
 
     //TODO initialize face detector
-    final options = FaceDetectorOptions(performanceMode: FaceDetectorMode.accurate);
+    final options = FaceDetectorOptions(
+      performanceMode: FaceDetectorMode.accurate,
+    );
     faceDetector = FaceDetector(options: options);
     getSharedPrfanceList();
     //TODO initialize face recognizer
     recognizer = Recognizer();
-
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
-    empRole= await shared.getEmpRoll();
-    roRole= await shared.getRoRole();
-    adminRole= await shared.getAdminRole();
-    empIdSelf= await shared.getEmpId();
+    empRole = await shared.getEmpRoll();
+    roRole = await shared.getRoRole();
+    adminRole = await shared.getAdminRole();
+    empIdSelf = await shared.getEmpId();
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
     setState(() {
-      if(empRole==1){
-        showHide=true;
+      if (empRole == 1) {
+        showHide = true;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
-      if(empRole==0){
-        showHide=false;
+      if (empRole == 0) {
+        showHide = false;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
@@ -111,14 +108,13 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
         print("Show Ro $showRo");
       }
     });
-
   }
 
   //TODO capture image using camera
-   _imgFromCameraRegister() async {
+  _imgFromCameraRegister() async {
     XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      setState((){
+      setState(() {
         _image = File(pickedFile.path);
         doFaceDetection();
       });
@@ -127,15 +123,17 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
 
   //TODO capture image using camera
   _imgFromCameraRecognize() async {
-    XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.camera,preferredCameraDevice: CameraDevice.front);
+    XFile? pickedFile = await imagePicker.pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: CameraDevice.front,
+    );
     if (pickedFile != null) {
-      setState((){
+      setState(() {
         _image = File(pickedFile.path);
         doFaceDetectionRecognize();
       });
     }
   }
-
 
   //TODO face detection code here
   List<Face> facesRecognized = [];
@@ -154,30 +152,41 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     for (Face face in facesRecognized) {
       final Rect boundingBox = face.boundingBox;
 
-      num left = boundingBox.left<0?0:boundingBox.left;
-      num right = boundingBox.right>imageRecognize.width?imageRecognize.width-1:boundingBox.right;
-      num top = boundingBox.top<0?0:boundingBox.top;
-      num bottom = boundingBox.bottom>imageRecognize.height?imageRecognize.height-1:boundingBox.bottom;
-      num width = right-left;
+      num left = boundingBox.left < 0 ? 0 : boundingBox.left;
+      num right =
+          boundingBox.right > imageRecognize.width
+              ? imageRecognize.width - 1
+              : boundingBox.right;
+      num top = boundingBox.top < 0 ? 0 : boundingBox.top;
+      num bottom =
+          boundingBox.bottom > imageRecognize.height
+              ? imageRecognize.height - 1
+              : boundingBox.bottom;
+      num width = right - left;
       num height = bottom - top;
 
-      print("Ract Position :- " +boundingBox.toString());
+      print("Ract Position :- " + boundingBox.toString());
 
-      final bytes= _image!.readAsBytesSync();
+      final bytes = _image!.readAsBytesSync();
       img.Image? faceImg = img.decodeImage(bytes!);
-      img.Image croppedFace = img.copyCrop(faceImg!, x: left.toInt(), y: top.toInt(), width: width.toInt(), height: height.toInt());
-      Recognition recognition=  recognizer.recognize(croppedFace, boundingBox);
+      img.Image croppedFace = img.copyCrop(
+        faceImg!,
+        x: left.toInt(),
+        y: top.toInt(),
+        width: width.toInt(),
+        height: height.toInt(),
+      );
+      Recognition recognition = recognizer.recognize(croppedFace, boundingBox);
       recognitionList.add(recognition);
       print("Face List Leng - ${recognitionList.length}");
       print("Image - ${recognition.embeddings.toString()}");
       getFaceData(context, recognition.embeddings.toString());
-      if(recognition.distance>0.6){
-        recognition.name= "Unknown Face $recognition.distance";
-
+      if (recognition.distance > 0.6) {
+        recognition.name = "Unknown Face $recognition.distance";
       }
       print("Face Matche Name " + recognition.name);
 
-     /* var snackBar = SnackBar(content: Text(" Face Name " + recognition.name));
+      /* var snackBar = SnackBar(content: Text(" Face Name " + recognition.name));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
       //showFaceRegistrationDialogue(Uint8List.fromList(img.encodeBmp(croppedFace)), recognition);
     }
@@ -188,17 +197,19 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
 
   var punchMsg = "";
 
-  getFaceData(BuildContext context,String image) async{
+  getFaceData(BuildContext context, String image) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.faceRecognizeOther;
-    Map data = {
-      'image': "$image",
-    };
+    Map data = {'image': "$image"};
     var body = json.encode(data);
     //var uri = Uri.parse("$conn$apiUrl");
     var urlapi = Uri.parse("$conn$apiUrl?");
     var request = new http.MultipartRequest("Post", urlapi);
-    var response = await http.post(urlapi,headers: {"Content-Type": "application/json"},body: body);
+    var response = await MobileHttpClient.instance.post(
+      urlapi,
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
     print('URL ${response.request}');
     print('BODY - ${response.body}');
     print("Image - $body");
@@ -207,7 +218,8 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       var responseResult = json.decode(response.body);
       print('Response: $responseResult');
 
-      String result = responseResult['result'].toLowerCase() ?? "Result not defined";
+      String result =
+          responseResult['result'].toLowerCase() ?? "Result not defined";
       String reason = responseResult['reason'] ?? "Reason not defined";
       String name = responseResult['name'] ?? "User";
 
@@ -231,32 +243,31 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
 
       // Show Success/Error/Warning Dialog
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Row(
-                children: [
-                  Icon(icon, color: iconColor),
-                  SizedBox(width: 8),
-                  Text(title),
-                ],
-              ),
-              content: Text("${reason} ${name} ${punchMsg}"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      imageRecognize = null;
-                      Navigator.of(context, rootNavigator: true).pop();
-                    });
-
-                  } ,
-                  child: Text("OK"),
-                ),
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Row(
+              children: [
+                Icon(icon, color: iconColor),
+                SizedBox(width: 8),
+                Text(title),
               ],
-            );
-          },
-        );
+            ),
+            content: Text("${reason} ${name} ${punchMsg}"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    imageRecognize = null;
+                    Navigator.of(context, rootNavigator: true).pop();
+                  });
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -275,23 +286,38 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     for (Face face in faces) {
       final Rect boundingBox = face.boundingBox;
 
-      num left = boundingBox.left<0?0:boundingBox.left;
-      num right = boundingBox.right>image.width?image.width-1:boundingBox.right;
-      num top = boundingBox.top<0?0:boundingBox.top;
-      num bottom = boundingBox.bottom>image.height?image.height-1:boundingBox.bottom;
-      num width = right-left;
+      num left = boundingBox.left < 0 ? 0 : boundingBox.left;
+      num right =
+          boundingBox.right > image.width ? image.width - 1 : boundingBox.right;
+      num top = boundingBox.top < 0 ? 0 : boundingBox.top;
+      num bottom =
+          boundingBox.bottom > image.height
+              ? image.height - 1
+              : boundingBox.bottom;
+      num width = right - left;
       num height = bottom - top;
 
-      print("Ract Position :- " +boundingBox.toString());
-      if(boundingBox!=null){
-        var snackBar = SnackBar(content: Text('Face Id :-'+boundingBox.toString()));
+      print("Ract Position :- " + boundingBox.toString());
+      if (boundingBox != null) {
+        var snackBar = SnackBar(
+          content: Text('Face Id :-' + boundingBox.toString()),
+        );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
-      final bytes= _image!.readAsBytesSync();
+      final bytes = _image!.readAsBytesSync();
       img.Image? faceImg = img.decodeImage(bytes!);
-      img.Image croppedFace = img.copyCrop(faceImg!, x: left.toInt(), y: top.toInt(), width: width.toInt(), height: height.toInt());
-      Recognition recognition=  recognizer.recognize(croppedFace, boundingBox);
-      showFaceRegistrationDialogue(Uint8List.fromList(img.encodeBmp(croppedFace)), recognition);
+      img.Image croppedFace = img.copyCrop(
+        faceImg!,
+        x: left.toInt(),
+        y: top.toInt(),
+        width: width.toInt(),
+        height: height.toInt(),
+      );
+      Recognition recognition = recognizer.recognize(croppedFace, boundingBox);
+      showFaceRegistrationDialogue(
+        Uint8List.fromList(img.encodeBmp(croppedFace)),
+        recognition,
+      );
     }
     drawRectangleAroundFaces();
     var snackBar = SnackBar(content: Text(" No Face Founded "));
@@ -302,7 +328,9 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
 
   //TODO remove rotation of camera images
   removeRotation(File inputImage) async {
-    final img.Image? capturedImage = img.decodeImage(await File(inputImage!.path).readAsBytes());
+    final img.Image? capturedImage = img.decodeImage(
+      await File(inputImage!.path).readAsBytes(),
+    );
     final img.Image orientedImage = img.bakeOrientation(capturedImage!);
     return await File(_image!.path).writeAsBytes(img.encodeJpg(orientedImage));
   }
@@ -311,52 +339,68 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
 
   //TODO Face Registration Dialogue
   TextEditingController textEditingController = TextEditingController();
-  showFaceRegistrationDialogue(Uint8List cropedFace, Recognition recognition){
+  showFaceRegistrationDialogue(Uint8List cropedFace, Recognition recognition) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Face Registration",textAlign: TextAlign.center),alignment: Alignment.center,
-        content: SizedBox(
-          height: 340,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20,),
-              Image.memory(
-                cropedFace,
-                width: 200,
-                height: 200,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text("Face Registration", textAlign: TextAlign.center),
+            alignment: Alignment.center,
+            content: SizedBox(
+              height: 340,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  Image.memory(cropedFace, width: 200, height: 200),
+                  SizedBox(
+                    width: 200,
+                    child: TextField(
+                      controller: textEditingController,
+                      decoration: const InputDecoration(
+                        fillColor: Colors.white,
+                        filled: true,
+                        hintText: "Enter Name",
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      recognizer.registerFaceInDB(
+                        textEditingController.text,
+                        recognition.embeddings,
+                      );
+                      uploadFaceRegister(
+                        context,
+                        recognition.embeddings.toString(),
+                        textEditingController.text,
+                        "0001",
+                      );
+                      textEditingController.text = "";
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Face Registered")),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      minimumSize: const Size(200, 40),
+                    ),
+                    child: const Text("Register"),
+                  ),
+                ],
               ),
-              SizedBox(
-                width: 200,
-                child: TextField(
-                    controller: textEditingController,
-                    decoration: const InputDecoration( fillColor: Colors.white, filled: true,hintText: "Enter Name")
-                ),
-              ),
-              const SizedBox(height: 10,),
-              ElevatedButton(
-                  onPressed: () {
-                    recognizer.registerFaceInDB(textEditingController.text, recognition.embeddings);
-                    uploadFaceRegister(context, recognition.embeddings.toString(),textEditingController.text,"0001");
-                    textEditingController.text = "";
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("Face Registered"),
-                    ));
-                  },style: ElevatedButton.styleFrom(backgroundColor: Colors.blue,minimumSize: const Size(200,40)),
-                  child: const Text("Register"))
-            ],
+            ),
+            contentPadding: EdgeInsets.zero,
           ),
-        ),contentPadding: EdgeInsets.zero,
-      ),
     );
   }
+
   //TODO draw rectangles
   var image;
   var imageRecognize;
   drawRectangleAroundFaces() async {
-
     //print("${image.width}   ${image.height}");
     print("${imageRecognize.width}   ${imageRecognize.height}");
     setState(() {
@@ -366,28 +410,39 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       facesRecognized;
     });
   }
-  Future<void> uploadFaceRegister(BuildContext context,String image,String name,String code) async {
+
+  Future<void> uploadFaceRegister(
+    BuildContext context,
+    String image,
+    String name,
+    String code,
+  ) async {
     codeAuto++;
     String conn = "http://www.employroll.com/";
     String apiUrl = "restful/service/face/recognize/data/save";
     Map data = {
       'image': image.toString(),
       'name': name,
-      'code': codeAuto.toString()
+      'code': codeAuto.toString(),
     };
     var body = json.encode(data);
 
     var urlapi = Uri.parse("$conn$apiUrl?");
     var request = new http.MultipartRequest("Post", urlapi);
-    var response = await http.post(urlapi,headers: {"Content-Type": "application/json"},body: body);
+    var response = await MobileHttpClient.instance.post(
+      urlapi,
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
     print('URL ${response.request}');
-    if(response.statusCode==200) {
+    if (response.statusCode == 200) {
       print("result is ok");
     }
     /* http.Response response = await http.Response.fromStream(await request.send());
 
     }*/
   }
+
   int currentIndex = 2;
   @override
   Widget build(BuildContext context) {
@@ -405,27 +460,37 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     List<Widget> generateGridViewItems() {
       List<Widget> items = [];
       //Register Face
-      if(showRo  || showAdmin) {
+      if (showRo || showAdmin) {
         items.add(
           Hero(
             tag: 'registerFace',
             child: Card(
               color: Mythemes.whitish,
               child: InkWell(
-                onTap: () async{
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
-                  if(internetCheck == false) {
+                onTap: () async {
+                  bool internetCheck =
+                      await InternetConnectionChecker().hasConnection;
+                  if (internetCheck == false) {
                     setState(() {
                       AlertDialog(
-                        content: "Please check your internet connection".text.make(),
+                        content:
+                            "Please check your internet connection".text.make(),
                       );
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Please check your Internet connection."),
-                      ));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Please check your Internet connection.",
+                          ),
+                        ),
+                      );
                     });
-
                   } else {
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>const EmpListFaceRegistered()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EmpListFaceRegistered(),
+                      ),
+                    );
                   }
                 },
                 child: Stack(
@@ -445,11 +510,14 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'Register Face',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                          'Register Face',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Mythemes.blackish,
+                            fontSize: boxText,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -462,7 +530,7 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       }
 
       //Mark AI Attendance
-      if(showHide || showAdmin) {
+      if (showHide || showAdmin) {
         items.add(
           Hero(
             tag: 'facialAttendance',
@@ -491,11 +559,14 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
                   }
                 },*/
                 onTap: () async {
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
+                  bool internetCheck =
+                      await InternetConnectionChecker().hasConnection;
 
                   if (!internetCheck) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Please check your Internet connection.")),
+                      SnackBar(
+                        content: Text("Please check your Internet connection."),
+                      ),
                     );
                     return;
                   }
@@ -511,14 +582,27 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
                   if (showHide || showAdmin) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => MarkAttendanceAI(empId: empIdSelf)),
+                      MaterialPageRoute(
+                        builder:
+                            (context) => MarkAttendanceAI(empId: empIdSelf),
+                      ),
                     ).then((_) {
                       // Ensure that when user comes back, it goes back to Navigation Page
-                      Navigator.popUntil(context, ModalRoute.withName('/faceRecognitionHome'));
+                      Navigator.popUntil(
+                        context,
+                        ModalRoute.withName('/faceRecognitionHome'),
+                      );
                     });
-                  }  if (showRo || showAdmin) {
-                    Navigator.pushNamed(context, MyRoutings.empListFaceRecognize).then((_) {
-                      Navigator.popUntil(context, ModalRoute.withName('/faceRecognitionHome'));
+                  }
+                  if (showRo || showAdmin) {
+                    Navigator.pushNamed(
+                      context,
+                      MyRoutings.empListFaceRecognize,
+                    ).then((_) {
+                      Navigator.popUntil(
+                        context,
+                        ModalRoute.withName('/faceRecognitionHome'),
+                      );
                     });
                   }
                 },
@@ -539,11 +623,14 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
                         margin: EdgeInsets.only(top: 75, left: 10),
                         padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
                         child: Text(
-                            'AI Attendance',
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style:
-                            TextStyle(color: Mythemes.blackish, fontSize: boxText, fontWeight: FontWeight.bold)
+                          'AI Attendance',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: Mythemes.blackish,
+                            fontSize: boxText,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -559,43 +646,52 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: titleName.text.make(),
-      ),
-      bottomNavigationBar:
-      BottomNavigationBar (
+      appBar: AppBar(title: titleName.text.make()),
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(selectedIndex: 0),
+              ),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>const FaceRecognitinHome()));
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const FaceRecognitinHome(),
+              ),
+            );
             print('Face');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -606,18 +702,12 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.face_3),
-            label: 'AI',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.face_3), label: 'AI'),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),
             label: 'Dashboard',
@@ -630,14 +720,14 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
           ),
         ],
       ),
-     body: Container(
-       padding: EdgeInsets.all(8.0),
-       child: GridView.count(
-         crossAxisCount: 3,
-         children: generateGridViewItems(),
-       ),
-     ),
-     /* body: Column(
+      body: Container(
+        padding: EdgeInsets.all(8.0),
+        child: GridView.count(
+          crossAxisCount: 3,
+          children: generateGridViewItems(),
+        ),
+      ),
+      /* body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           imageRecognize != null
@@ -711,9 +801,14 @@ class FacePainter extends CustomPainter {
 
     for (Recognition face in facesList) {
       canvas.drawRect(face.location, p);
-      TextSpan textSpan = TextSpan(text: face.name+ " " +face.distance.toString(),
-          style: TextStyle(color: Colors.white, fontSize: 50));
-      TextPainter tp = TextPainter(text: textSpan, textDirection: TextDirection.ltr);
+      TextSpan textSpan = TextSpan(
+        text: face.name + " " + face.distance.toString(),
+        style: TextStyle(color: Colors.white, fontSize: 50),
+      );
+      TextPainter tp = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
       tp.layout();
       tp.paint(canvas, Offset(face.location.left, face.location.top));
     }

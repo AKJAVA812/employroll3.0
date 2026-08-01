@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -18,14 +19,13 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 
-
-
 class UIS_PendingRequisitionRo extends StatefulWidget {
   final PendingRequisitionModel pendingRequisitionModel;
-  UIS_PendingRequisitionRo (this.pendingRequisitionModel);
+  UIS_PendingRequisitionRo(this.pendingRequisitionModel);
 
   @override
-  State<UIS_PendingRequisitionRo> createState() => _UIS_PendingRequisitionRoState(pendingRequisitionModel);
+  State<UIS_PendingRequisitionRo> createState() =>
+      _UIS_PendingRequisitionRoState(pendingRequisitionModel);
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -33,8 +33,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNewUIS=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNewUIS = [];
 PendingRequisitionModel? pendingRequisitionLabel;
 PendingRequisitionModel? pendingRequisitionLabeled;
 
@@ -42,7 +42,8 @@ String? userPanel;
 dynamic getProfileId;
 String? orgId;
 
-class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> with RouteAware{
+class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo>
+    with RouteAware {
   final PendingRequisitionModel pendingRequisitionModel;
   _UIS_PendingRequisitionRoState(this.pendingRequisitionModel);
 
@@ -60,7 +61,7 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
@@ -75,29 +76,29 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
       listLength = foundDataNewUIS!.length;
       print('listLength $listLength');
     });
-
   }
-
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     userPanel = await shared!.getUserPanel();
     getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<PendingRequisitionModel> getEmployeeList11 = getPendingReqList(sessionId!);
+    Future<PendingRequisitionModel> getEmployeeList11 = getPendingReqList(
+      sessionId!,
+    );
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
         foundDataNewUIS = allUsernew;
-        pendingRequisitionLabel=value;
-        pendingRequisitionLabeled=pendingRequisitionLabel;
+        pendingRequisitionLabel = value;
+        pendingRequisitionLabeled = pendingRequisitionLabel;
       });
       print('employeeList00${pendingRequisitionLabel!.data!.length}');
     });
@@ -108,25 +109,28 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
     String apiUrl = ApiDetails.pendingReqListRo;
     print('employeeList11: ${SessionId}');
     PendingRequisitionModel pendingRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "userPermission=$userPanel&"
-        "profileId=$getProfileId&"
-        "orgId=0");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "userPermission=$userPanel&"
+      "profileId=$getProfileId&"
+      "orgId=0",
+    );
 
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    pendingRequisitionModel=PendingRequisitionModel.fromJson(mapResponse);
+    pendingRequisitionModel = PendingRequisitionModel.fromJson(mapResponse);
 
     allUsernew = pendingRequisitionModel!.data;
 
     return pendingRequisitionModel;
   }
+
   var titleName = "Pending Requisition List";
 
   TextEditingController searchType = TextEditingController();
@@ -134,7 +138,7 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -147,8 +151,14 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.empName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -173,84 +183,95 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-              top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: "$titleName ${foundDataNewUIS!.length}",
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: "$titleName ${foundDataNewUIS!.length}",
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
-      body:  Container(
+      body: Container(
         padding: EdgeInsets.all(8.0),
         child: Column(
           children: [
             Expanded(
-                child: pendingRequisitionLabeled == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getPendingRequisitionRo(pendingRequisitionLabeled!)),
+              child:
+                  pendingRequisitionLabeled == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getPendingRequisitionRo(pendingRequisitionLabeled!),
+            ),
           ],
         ),
-      ) ,
+      ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             Navigator.pop(context);
             print('Attendance');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('My Reports');
           }
-          if(index==4){
+          if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.uisNewDashboardRoute);
             /*Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
@@ -263,11 +284,8 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
               }*/
           setState(() => currentIndex = index);
         },
-        items:  [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -288,59 +306,66 @@ class _UIS_PendingRequisitionRoState extends State<UIS_PendingRequisitionRo> wit
           ),
         ],
       ),
-
-
     );
   }
 
-  getPendingRequisitionRo(PendingRequisitionModel pendingRequisitionModel){
+  getPendingRequisitionRo(PendingRequisitionModel pendingRequisitionModel) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  UIS_PendingRequisitionRo(PendingRequisitionModel()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) =>
+                    UIS_PendingRequisitionRo(PendingRequisitionModel()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
-          itemCount: foundDataNewUIS!.length,
-          itemBuilder: (context, itemCount) {
-            return  Column(
-              children: [
-                // if (_isVisible)
-                Card(
-                  elevation: 3,
-                  child:
-                  ListTile(
-                    onTap: () {
-                      print(foundDataNewUIS!.length);
-                      //Navigator.pushNamed(context, MyRoutings.approveDisapproveReqRoute);
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                          ApproveDisapproveReq(pendingRequisitionModel,itemCount)));
-                    },
-                    title: foundDataNewUIS![itemCount].empName.toString().text.make(),
-                    subtitle: foundDataNewUIS![itemCount].onDate.toString().text.make(),
-                    trailing:  Icon(
-                        CupertinoIcons.chevron_forward
-                    ),
-                  ),
+        itemCount: foundDataNewUIS!.length,
+        itemBuilder: (context, itemCount) {
+          return Column(
+            children: [
+              // if (_isVisible)
+              Card(
+                elevation: 3,
+                child: ListTile(
+                  onTap: () {
+                    print(foundDataNewUIS!.length);
+                    //Navigator.pushNamed(context, MyRoutings.approveDisapproveReqRoute);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ApproveDisapproveReq(
+                              pendingRequisitionModel,
+                              itemCount,
+                            ),
+                      ),
+                    );
+                  },
+                  title:
+                      foundDataNewUIS![itemCount].empName
+                          .toString()
+                          .text
+                          .make(),
+                  subtitle:
+                      foundDataNewUIS![itemCount].onDate.toString().text.make(),
+                  trailing: Icon(CupertinoIcons.chevron_forward),
                 ),
-              ],
-            );
-          }),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
 
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -365,6 +390,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -377,12 +403,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -395,9 +420,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

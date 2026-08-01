@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:er_flutter_project/modules/visitorManagement/raiseVisitorRequisition.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,7 +16,6 @@ import '../../commanScreen/allAPIList.dart';
 import '../../employeePage/employeeListModel.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
-
 class VisitorManageSections extends StatefulWidget {
   const VisitorManageSections({super.key});
 
@@ -26,18 +26,16 @@ class VisitorManageSections extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNew = [];
 EmployeeListModel? employeeListModelglobel;
 EmployeeListModel? employeeListModelglobeled;
 var empName;
 var empId;
 
-
 class _VisitorManageSectionsState extends State<VisitorManageSections> {
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     setState(() {
@@ -47,6 +45,7 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
       print('listLength $listLength');
     });
   }
+
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
@@ -55,15 +54,15 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        employeeListModelglobel=value;
-        employeeListModelglobeled=employeeListModelglobel;
+        employeeListModelglobel = value;
+        employeeListModelglobeled = employeeListModelglobel;
       });
       print('employeeList00${employeeListModelglobel!.data!.length}');
     });
@@ -75,14 +74,14 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
     print('employeeList11: ${SessionId}');
     EmployeeListModel employeeListModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    employeeListModel=EmployeeListModel.fromJson(mapResponse);
+    employeeListModel = EmployeeListModel.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
 
     return employeeListModel;
@@ -90,7 +89,7 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -103,8 +102,14 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.empName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -118,6 +123,7 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
       foundDataNew = results;
     });
   }
+
   TextEditingController searchType = TextEditingController();
   var titleName = "Visitor Management";
   var dropdownvalue;
@@ -127,7 +133,6 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
   DateTime selectedDate = DateTime.now();
   int pageIndex = 0;
   int currentIndex = 1;
-
 
   void _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -160,60 +165,58 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
       selectedDate = selectedDate.add(Duration(days: 1));
     });
   }
+
   final ImagePicker _picker = ImagePicker();
   File? _image;
   File? _workDoneImage;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: titleName.text.make(),
-      ),
+      appBar: AppBar(title: titleName.text.make()),
       body: Column(
         children: [
-        Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: _setToday,
-            child: Text('Today'),
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(20, 30),
-              backgroundColor: Mythemes.lightBluishColor, // Button color
-              foregroundColor: Colors.white, // Text color
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: _setToday,
+                child: Text('Today'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(20, 30),
+                  backgroundColor: Mythemes.lightBluishColor, // Button color
+                  foregroundColor: Colors.white, // Text color
+                ),
+              ),
+              SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: _previousDay,
+                child: Icon(Icons.chevron_left),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(20, 30),
+                  backgroundColor: Mythemes.lightBluishColor,
+                ),
+              ),
+              TextButton(
+                onPressed: () => _selectDate(context),
+                child: Text(
+                  DateFormat('dd-MMM-yyyy').format(selectedDate),
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: _nextDay,
+                child: Icon(Icons.chevron_right),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(20, 30),
+                  backgroundColor: Mythemes.lightBluishColor,
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: _previousDay,
-            child: Icon(Icons.chevron_left),
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(20, 30),
-              backgroundColor: Mythemes.lightBluishColor,
-            ),
-          ),
-          TextButton(
-            onPressed: () => _selectDate(context),
-            child: Text(
-              DateFormat('dd-MMM-yyyy').format(selectedDate),
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _nextDay,
-            child: Icon(Icons.chevron_right),
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(20, 30),
-              backgroundColor: Mythemes.lightBluishColor,
-            ),
-          ),
-        ],
-      ),
-        Row(
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               AnimatedToggleSwitch<int>.size(
                 current: min(value, 2),
                 style: ToggleStyle(
@@ -231,79 +234,94 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
                 styleAnimationType: AnimationType.onHover,
                 spacing: 2.0,
                 customSeparatorBuilder: (context, local, global) {
-                  final opacity =
-                  ((global.position - local.position).abs() - 0.5)
+                  final opacity = ((global.position - local.position).abs() -
+                          0.5)
                       .clamp(0.0, 1.0);
                   return VerticalDivider(
-                      indent: 10.0,
-                      endIndent: 10.0,
-                      color: Colors.white38.withOpacity(opacity));
+                    indent: 10.0,
+                    endIndent: 10.0,
+                    color: Colors.white38.withOpacity(opacity),
+                  );
                 },
                 customIconBuilder: (context, local, global) {
                   final text = const ['Visitors', 'Invites'][local.index];
                   return Center(
-                      child: Text(text,
-                          style: TextStyle(
-                              color: Color.lerp(Colors.black, Colors.white,
-                                  local.animationValue))));
+                    child: Text(
+                      text,
+                      style: TextStyle(
+                        color: Color.lerp(
+                          Colors.black,
+                          Colors.white,
+                          local.animationValue,
+                        ),
+                      ),
+                    ),
+                  );
                 },
                 borderWidth: 0.0,
                 onChanged: (i) {
                   setState(() {
                     value = i;
                     print(i);
-
                   });
                 },
-              )
+              ),
             ],
           ).py16(),
-        Padding(
-        padding: const EdgeInsets.only(right: 14.0, left: 14.0, top: 1.0),
-        child: TextField(
-          onChanged: _runFilter,
-          decoration: InputDecoration(
-            hintText: 'Search...',
-            prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30.0),
-              borderSide: BorderSide.none,
+          Padding(
+            padding: const EdgeInsets.only(right: 14.0, left: 14.0, top: 1.0),
+            child: TextField(
+              onChanged: _runFilter,
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 8.0),
+              ),
             ),
-            contentPadding: EdgeInsets.symmetric(vertical: 8.0),
           ),
-        ),
-      ),
-          Expanded(child: employeeListModelglobeled == null ?
-          Center(child: CircularProgressIndicator()): MyStatelessWidget(employeeListModelglobeled!)),
+          Expanded(
+            child:
+                employeeListModelglobeled == null
+                    ? Center(child: CircularProgressIndicator())
+                    : MyStatelessWidget(employeeListModelglobeled!),
+          ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () async{
-          try{
+        onPressed: () async {
+          try {
             //ImagePicker picker = ImagePicker();
-            var  imageValue = await _picker.pickImage(source:
-            ImageSource.camera,
+            var imageValue = await _picker.pickImage(
+              source: ImageSource.camera,
               imageQuality: 20,
               preferredCameraDevice: CameraDevice.front,
-
             );
             //picker.dispose();
-            if(imageValue==null) return;
-            print("Heloo ji ""$imageValue");
+            if (imageValue == null) return;
+            print(
+              "Heloo ji "
+              "$imageValue",
+            );
             setState(() {
-              final imagePath= File(imageValue!.path);
-              this._workDoneImage=imagePath;
+              final imagePath = File(imageValue!.path);
+              this._workDoneImage = imagePath;
             });
-            imageValue=null;
+            imageValue = null;
             //imageCache.clear();
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)
-            =>RaiseVisitorRequisition(value: _workDoneImage,
-
-               )));
-          }on Exception catch (e) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder:
+                    (context) => RaiseVisitorRequisition(value: _workDoneImage),
+              ),
+            );
+          } on Exception catch (e) {
             print('failed to upload: $e');
           }
         },
@@ -329,7 +347,6 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
               });
             },
             items: const [
-
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
                 label: 'Home',
@@ -376,9 +393,11 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
 
             print('out duty');
           }
-          *//*if(index==3){
+          */
+      /*if(index==3){
                 title="Notifications";
-              }*//*
+              }*/
+      /*
           setState(() => currentIndex = index);
         },
         items: const [
@@ -411,9 +430,9 @@ class MyStatelessWidget extends StatefulWidget {
 
   MyStatelessWidget(this.employeeListModel);
   @override
-  State<MyStatelessWidget> createState() => _MyStatelessWidgetState(employeeListModel);
+  State<MyStatelessWidget> createState() =>
+      _MyStatelessWidgetState(employeeListModel);
 }
-
 
 class _MyStatelessWidgetState extends State<MyStatelessWidget> {
   final EmployeeListModel employeeListModel;
@@ -423,41 +442,37 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
   int? nullableValue;
   bool positive = false;
   bool loading = false;
-  List<bool>?positiveStates;
+  List<bool>? positiveStates;
   @override
   void initState() {
     super.initState();
-    positiveStates = List.generate(foundDataNew!.length, (index) => false); // Initialize with false or your default state
+    positiveStates = List.generate(
+      foundDataNew!.length,
+      (index) => false,
+    ); // Initialize with false or your default state
   }
+
   @override
   Widget build(BuildContext context) {
-
-
-
-    showTrackDialog(BuildContext buildContext, result,alert) {
+    showTrackDialog(BuildContext buildContext, result, alert) {
       var alertDialog = AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0),
-            )
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
         ),
         title: Row(
           children: [
             //Icon(Icons.warning),
-            Expanded(child: Text( alert, style: TextStyle(
-                fontSize: 18
-            ),)),
+            Expanded(child: Text(alert, style: TextStyle(fontSize: 18))),
           ],
         ),
-        content: Text(result , style: TextStyle(
-            fontSize: 14
-        )),
+        content: Text(result, style: TextStyle(fontSize: 14)),
         titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         actions: [
           TextButton(
-              onPressed: () {
-                /*for(int i=0; i<employeeListModel!.data!.length;i++){
+            onPressed: () {
+              /*for(int i=0; i<employeeListModel!.data!.length;i++){
                   setState(() {
                     empId;
                     empName;
@@ -467,109 +482,125 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                   });
 
                 }*/
-                //print('emPI $empId');
-                //print('emName $empName');
-                print("Emp list clicked");
+              //print('emPI $empId');
+              //print('emName $empName');
+              print("Emp list clicked");
 
-
-                //Navigator.pop(buildContext);
-              },
-              child: Container(
-                child: Text("History"
-                  ,style: TextStyle(color: Mythemes.dangerColor),
-                ),
-              )
+              //Navigator.pop(buildContext);
+            },
+            child: Container(
+              child: Text(
+                "History",
+                style: TextStyle(color: Mythemes.dangerColor),
+              ),
+            ),
           ),
           TextButton(
-              onPressed: () {
-
-              },
-              child: Container(
-                child: Text("Live",
-                    style: TextStyle(color: Mythemes.lightBluishColor)
-                ),
-              )
+            onPressed: () {},
+            child: Container(
+              child: Text(
+                "Live",
+                style: TextStyle(color: Mythemes.lightBluishColor),
+              ),
+            ),
           ),
-
         ],
         elevation: 24.0,
       );
       showDialog(
-          context: buildContext,
-          builder: (BuildContext context) {
-            return alertDialog;
-          });
+        context: buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        },
+      );
     }
+
     return ListView.builder(
-      padding: EdgeInsets.only(top: 10, bottom: 4,left: 20, right: 20),
+      padding: EdgeInsets.only(top: 10, bottom: 4, left: 20, right: 20),
       itemCount: foundDataNew!.length,
       itemBuilder: (context, i) {
         return InkWell(
-            onTap: () {
-              empId = foundDataNew![i].empdetailsId;
-              empName = foundDataNew![i].empName;
-              print('ID $empId');
-              print('NameCheck $empName');
-              //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
-            },
-            child: Card(
-              elevation: 2,
-              child: ListTile(
-                isThreeLine: true,
-                contentPadding: EdgeInsets.all(12.0),
-                leading: CircleAvatar(
-                  backgroundColor: Mythemes.greyish,
-                  radius: 35,
-                  backgroundImage: NetworkImage(foundDataNew![i].empPhoto!),
-                ),
-                title: foundDataNew![i].empName.toString().text.overflow(TextOverflow.ellipsis).maxLines(1).make().py8(),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        foundDataNew![i].empContactNo.toString()
-                            .text
-                            .make()
-                            .py4(),
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child:  Padding(
-                            padding: const EdgeInsets.only(top: 15, left: 12, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "In Time".text.size(14).bold.make(),
-                                "11:00" == null ||
-                                    "11:00" == 'Casual Leave'
-                                    ? ''.text.make() :
-                                "11:00".text.sm.make()
-                              ],
-                            ),
+          onTap: () {
+            empId = foundDataNew![i].empdetailsId;
+            empName = foundDataNew![i].empName;
+            print('ID $empId');
+            print('NameCheck $empName');
+            //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
+          },
+          child: Card(
+            elevation: 2,
+            child: ListTile(
+              isThreeLine: true,
+              contentPadding: EdgeInsets.all(12.0),
+              leading: CircleAvatar(
+                backgroundColor: Mythemes.greyish,
+                radius: 35,
+                backgroundImage: NetworkImage(foundDataNew![i].empPhoto!),
+              ),
+              title:
+                  foundDataNew![i].empName
+                      .toString()
+                      .text
+                      .overflow(TextOverflow.ellipsis)
+                      .maxLines(1)
+                      .make()
+                      .py8(),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      foundDataNew![i].empContactNo
+                          .toString()
+                          .text
+                          .make()
+                          .py4(),
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 12,
+                            right: 3,
+                            bottom: 18,
+                          ),
+                          child: Column(
+                            children: [
+                              "In Time".text.size(14).bold.make(),
+                              "11:00" == null || "11:00" == 'Casual Leave'
+                                  ? ''.text.make()
+                                  : "11:00".text.sm.make(),
+                            ],
                           ),
                         ),
-                        Expanded(
-                          child:  Padding(
-                            padding: const EdgeInsets.only(top: 15, left: 12, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Out Time".text.size(14).bold.make(),
-                                "-:-" == null ||
-                                    "-:-" == 'Casual Leave'
-                                    ? ''.text.make() :
-                                "-:-".text.sm.make()
-                              ],
-                            ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 12,
+                            right: 3,
+                            bottom: 18,
+                          ),
+                          child: Column(
+                            children: [
+                              "Out Time".text.size(14).bold.make(),
+                              "-:-" == null || "-:-" == 'Casual Leave'
+                                  ? ''.text.make()
+                                  : "-:-".text.sm.make(),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                    /*Row(
+                      ),
+                    ],
+                  ),
+                  /*Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -629,9 +660,9 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         ),
                       ],
                     ),*/
-                  ],
-                ),
-                /*trailing: IconTheme.merge(
+                ],
+              ),
+              /*trailing: IconTheme.merge(
                   data: const IconThemeData(color: Colors.white),
                       child: AnimatedToggleSwitch<bool>.dual(
                         current: positive,
@@ -678,8 +709,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                             :  Center(child: Text('Out', style: TextStyle(color: Mythemes.whitish),)),
                       ),
                 ),*/
-              ),
-            )
+            ),
+          ),
 
           /* Card(
               elevation: 2,
@@ -729,7 +760,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                             .make()
                             .px8(),
 
-                       *//* Expanded(
+                       */
+          /* Expanded(
                             child: Column(
                               crossAxisAlignment:
                               CrossAxisAlignment.end,
@@ -742,7 +774,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                     context.captionStyle)
                                     .make().px8(),
                               ],
-                            ))*//*
+                            ))*/
+          /*
 
                       ],
                     ).py2(),

@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -37,19 +38,19 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<Listdata>? allUsernew=[];
-List<Listdata>? foundDataNew=[];
+List<Listdata>? allUsernew = [];
+List<Listdata>? foundDataNew = [];
 bool isLoading = true;
 PendingOdReqList? pendingOdReqListLabel;
 PendingOdReqList? pendingOdReqListLabeled;
 
-class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteAware{
+class _PendingOdRequisitionState extends State<PendingOdRequisition>
+    with RouteAware {
   final PendingOdReqList pendingOdReqList;
 
   _PendingOdRequisitionState(this.pendingOdReqList);
 
   var titleName = "OD Pending List";
-
 
   String? odStatus;
   var startDate;
@@ -69,7 +70,7 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
@@ -96,13 +97,14 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<PendingOdReqList> getEmployeeList11 =
-        getPendingOdReqList(sessionId!);
+    Future<PendingOdReqList> getEmployeeList11 = getPendingOdReqList(
+      sessionId!,
+    );
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
@@ -111,14 +113,12 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
         foundDataNew = allUsernew;
         pendingOdReqListLabel = value;
         pendingOdReqListLabeled = pendingOdReqListLabel;
-        if(foundDataNew != null) {
+        if (foundDataNew != null) {
           foundDataNew!.length;
           print("Fetch data $foundDataNew");
           isLoading = false;
         } else {
-          Center(
-            child: "There is no data available right now".text.make(),
-          );
+          Center(child: "There is no data available right now".text.make());
           foundDataNew = [];
         }
       });
@@ -132,19 +132,21 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
     String apiUrl = ApiDetails.odPendingReqListNew;
     print('employeeList11: ${SessionId}');
     PendingOdReqList pendingOdReqList;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "odStatus=$odStatus&"
-        "startDate=$startDate&"
-        "endDate=$endDate");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "odStatus=$odStatus&"
+      "startDate=$startDate&"
+      "endDate=$endDate",
+    );
 
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result'];
-    if (getData == "Error" )  {
+    if (getData == "Error") {
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
@@ -156,11 +158,10 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
   }
 
   var statusColor;
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -177,25 +178,24 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Listdata>?  results = [];
+    List<Listdata>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -208,8 +208,14 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.name!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.name!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -223,6 +229,7 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
       foundDataNew = results;
     });
   }
+
   TextEditingController searchType = TextEditingController();
   int pageIndex = 0;
   int currentIndex = 2;
@@ -234,36 +241,41 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                previousScreen:  OnDutyTypes(),
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: titleName,
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              previousScreen: OnDutyTypes(),
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
@@ -293,47 +305,59 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
                   styleAnimationType: AnimationType.onHover,
                   spacing: 10.0,
                   customSeparatorBuilder: (context, local, global) {
-                    final opacity =
-                    ((global.position - local.position).abs() - 0.5)
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
                         .clamp(0.0, 1.0);
                     return VerticalDivider(
-                        indent: 10.0,
-                        endIndent: 10.0,
-                        color: Colors.white38.withOpacity(opacity));
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
                   },
                   customIconBuilder: (context, local, global) {
-                    final text = const ['Pending', 'Approved', 'Disapproved'][local.index];
+                    final text =
+                        const ['Pending', 'Approved', 'Disapproved'][local
+                            .index];
                     return Center(
-                        child: Text(text,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(Colors.black, Colors.white,
-                                    local.animationValue))));
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   borderWidth: 0.0,
                   onChanged: (i) {
                     setState(() {
                       value = i;
                       print(i);
-
                     });
 
-                    if(value == 0) {
+                    if (value == 0) {
                       isLoading = true;
                       titleName = "OD Pending List";
                       odStatus = "Pending";
-                      Navigator.pushNamed(context, MyRoutings.pendingRequisitionListRoute);
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutings.pendingRequisitionListRoute,
+                      );
                       getSharedPrfanceList();
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
-                    if(value == 1) {
+                    if (value == 1) {
                       isLoading = true;
                       titleName = "OD Approved List";
                       odStatus = "Approved";
                       getSharedPrfanceList();
                       //Navigator.pushNamed(context, MyRoutings.levelOnePendingRoute);
                     }
-                    if(value == 2) {
+                    if (value == 2) {
                       isLoading = true;
                       titleName = "OD Disapproved List";
                       odStatus = "Disapproved";
@@ -341,54 +365,59 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
                       //Navigator.pushNamed(context, MyRoutings.levelTwoPendingRoute);
                     }
                   },
-                )
+                ),
               ],
             ).py(6),
             isLoading
-                ? CircularProgressIndicator().py32() :
-            Expanded(
-                child:
-
-                pendingOdReqListLabeled == null
-                    ? "There is no data available.".text.center.make()
-                    : getPendingOdRequisitionList(pendingOdReqListLabeled!)),
+                ? CircularProgressIndicator().py32()
+                : Expanded(
+                  child:
+                      pendingOdReqListLabeled == null
+                          ? "There is no data available.".text.center.make()
+                          : getPendingOdRequisitionList(
+                            pendingOdReqListLabeled!,
+                          ),
+                ),
           ],
         ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
             print('OD');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -399,10 +428,7 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -430,13 +456,13 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  PendingOdRequisition(PendingOdReqList()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (a, b, c) => PendingOdRequisition(PendingOdReqList()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -452,153 +478,178 @@ class _PendingOdRequisitionState extends State<PendingOdRequisition> with RouteA
           }
           return InkWell(
             onTap: () {
-
               if (statusCheck == 'Approved') {
-
                 Fluttertoast.showToast(
-                    msg: "Your Requisition has already Approved",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 3,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: "Your Requisition has already Approved",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               } else if (statusCheck == 'DisApproved') {
-
                 Fluttertoast.showToast(
-                    msg: "Your Requisition has already Disapproved",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 3,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: "Your Requisition has already Disapproved",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               } else {
-
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                    OdApproveDisapproveReq(pendingOdReqList, itemCount)));
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) =>
+                            OdApproveDisapproveReq(pendingOdReqList, itemCount),
+                  ),
+                );
               }
             },
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          foundDataNew![itemCount].name
-                              .toString()
-                              .text
-                              .make()
-                              .px8()
-                              .py4(),
-                          Expanded(
-                              child: Column(
+              elevation: 2,
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        foundDataNew![itemCount].name
+                            .toString()
+                            .text
+                            .make()
+                            .px8()
+                            .py4(),
+                        Expanded(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               foundDataNew![itemCount].approvalstatus
                                   .toString()
-                                  .text.bold
+                                  .text
+                                  .bold
                                   .color(statusColor)
                                   .sm
                                   .make()
                                   .px8(),
                             ],
-                          ))
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(child: foundDataNew![itemCount].odaddress
-                              .toString()
-                              .text
-                              .textStyle(context.captionStyle)
-                              .make()
-                              .px8(),)
-
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          foundDataNew![itemCount].remark
-                              .toString()
-                              .text
-                              .textStyle(context.captionStyle)
-                              .make()
-                              .px8(),
-                        ],
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.touch_app,
-                                  size: 35,
-                                  color: Mythemes.lightBluishColor,
-                                ),
-                              ],
-                            ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                foundDataNew![itemCount].odtype
-                                    .toString()
-                                    .text
-                                    .sm
-                                    .make(),
-                                foundDataNew![itemCount].odtime
-                                    .toString()
-                                    .text
-                                    .sm
-                                    .make()
-                              ],
-                            ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child:
+                              foundDataNew![itemCount].odaddress
+                                  .toString()
+                                  .text
+                                  .textStyle(context.captionStyle)
+                                  .make()
+                                  .px8(),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        foundDataNew![itemCount].remark
+                            .toString()
+                            .text
+                            .textStyle(context.captionStyle)
+                            .make()
+                            .px8(),
+                      ],
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 5,
+                            right: 3,
+                            bottom: 18,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.date_range,
-                                  size: 35,
-                                  color: Mythemes.lightBluishColor,
-                                ),
-                              ],
-                            ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.touch_app,
+                                size: 35,
+                                color: Mythemes.lightBluishColor,
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Date".text.sm.make(),
-                                DateFormat("dd-MM-yyyy")
-                                    .format(DateTime.parse(foundDataNew![itemCount].date
-                                        .toString()))
-                                    .text
-                                    .sm
-                                    .make()
-                              ],
-                            ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 5,
+                            right: 3,
+                            bottom: 18,
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                )),
+                          child: Column(
+                            children: [
+                              foundDataNew![itemCount].odtype
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                              foundDataNew![itemCount].odtime
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 5,
+                            right: 3,
+                            bottom: 18,
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.date_range,
+                                size: 35,
+                                color: Mythemes.lightBluishColor,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 5,
+                            right: 3,
+                            bottom: 18,
+                          ),
+                          child: Column(
+                            children: [
+                              "Date".text.sm.make(),
+                              DateFormat("dd-MM-yyyy")
+                                  .format(
+                                    DateTime.parse(
+                                      foundDataNew![itemCount].date.toString(),
+                                    ),
+                                  )
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),

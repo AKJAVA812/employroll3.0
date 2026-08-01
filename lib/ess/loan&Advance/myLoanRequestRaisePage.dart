@@ -4,6 +4,7 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/commanNotificationPage.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
@@ -12,6 +13,7 @@ class LoanRequestPage extends StatefulWidget {
   @override
   _LoanRequestPageState createState() => _LoanRequestPageState();
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
@@ -36,7 +38,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
   List<String?> loanTypeId = [];
   List<String?> loanTypeSend = [];
 
-/*  List<Map<String, String>> breakupList = [
+  /*  List<Map<String, String>> breakupList = [
     {
       "employee": "Bharat Rajora (EMP-1024)",
       "months": "June-25",
@@ -61,12 +63,15 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
         children: [
           Icon(icon, size: 18, color: Colors.blueGrey),
           const SizedBox(width: 10),
-          Expanded(child: Text("$label:", style: TextStyle(color: Colors.black54))),
+          Expanded(
+            child: Text("$label:", style: TextStyle(color: Colors.black54)),
+          ),
           Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
         ],
       ),
     );
   }
+
   bool isFormExpanded = true;
   var requestType = "loan";
   var loanId = "";
@@ -75,32 +80,31 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
   TextEditingController branchController = TextEditingController();
   TextEditingController employeeNameController = TextEditingController();
 
-
   Future getLoanTypeMaster(String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanTypeMasterApi;
 
     //print('employeeList11: ${SessionId}');
 
-    var urlapi = Uri.parse("$conn$apiUrl?" "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
     print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
 
-    for(int i=0; i<mapResponse['loandata'].length;i++){
+    for (int i = 0; i < mapResponse['loandata'].length; i++) {
       loanTypes.add(mapResponse['loandata'][i]['loanName'].toString());
       loanTypeId.add(mapResponse['loandata'][i]['loanId'].toString());
       loanTypeSend.add(mapResponse['loandata'][i]['loantype'].toString());
       //print('ID -  ${mapResponse['data'][i]['branchId']}');
-
     }
     loanTypeSelected = mapResponse['loandata'][0]['loanName'].toString();
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
@@ -119,9 +123,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     branchController.text = branch ?? '';
     employeeNameController.text = employeeName ?? '';
     getLoanTypeMaster(sessionId!);
-    setState(() {
-
-    });
+    setState(() {});
 
     print("SessionId - $sessionId");
     print("Department - $department");
@@ -172,7 +174,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
               ),
               const SizedBox(height: 16),
 
-              // 🔽 Expand/Collapse Toggle Header
+              // ðŸ”½ Expand/Collapse Toggle Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -181,7 +183,11 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    icon: Icon(isFormExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                    icon: Icon(
+                      isFormExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                    ),
                     onPressed: () {
                       setState(() {
                         isFormExpanded = !isFormExpanded;
@@ -191,157 +197,171 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                 ],
               ),
               const SizedBox(height: 8),
-              
+
               Visibility(
-                  visible: isFormExpanded,
-                  child: Column(
-                children: [
-                  // Department & Branch Name (Row)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: customReadOnlyInput(
-                          icon: Icons.apartment,
-                          label: "Department Name",
-                          controller: departmentController,
+                visible: isFormExpanded,
+                child: Column(
+                  children: [
+                    // Department & Branch Name (Row)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: customReadOnlyInput(
+                            icon: Icons.apartment,
+                            label: "Department Name",
+                            controller: departmentController,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: customReadOnlyInput(
-                          icon: Icons.location_city,
-                          label: "Branch Name",
-                          controller: branchController,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: customReadOnlyInput(
+                            icon: Icons.location_city,
+                            label: "Branch Name",
+                            controller: branchController,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  // Employee Name
-                  customReadOnlyInput(
-                    icon: Icons.person,
-                    label: "Employee Name",
-                    controller: employeeNameController,
-                  ),
+                    // Employee Name
+                    customReadOnlyInput(
+                      icon: Icons.person,
+                      label: "Employee Name",
+                      controller: employeeNameController,
+                    ),
 
-                  // Loan Type Dropdown
-                  customDropdown(
-                    icon: Icons.menu,
-                    label: "Loan Type",
-                    value: selectedLoanType,
-                    items: loanTypes, // Pass the raw list of strings
-                    onChanged: (newVal) {
-                      setState(() {
-                        selectedLoanType = newVal;
+                    // Loan Type Dropdown
+                    customDropdown(
+                      icon: Icons.menu,
+                      label: "Loan Type",
+                      value: selectedLoanType,
+                      items: loanTypes, // Pass the raw list of strings
+                      onChanged: (newVal) {
+                        setState(() {
+                          selectedLoanType = newVal;
 
-                        // Get first matching index
-                        int i = loanTypes.indexOf(newVal);
-                        if (i != -1 && i < loanTypeId.length) {
-                          loanId = loanTypeId[i].toString();
-                          print("depart $loanTypeId");
-                          print("loan Id -  $loanId");
-                        } else {
-                          loanTypeId;
-                          print("Invalid Loan selection");
-                        }
-                        int j = loanTypes.indexOf(newVal);
-                        if (j != -1 && j < loanTypeSend.length) {
-                          loanTypeSending = loanTypeSend[i].toString();
-                          print("loanType -  $loanTypeSending");
-                        } else {
-                          loanTypeSending;
-                          print("Invalid Loan selection");
-                        }
-                      });
-                    },
-                  ),
+                          // Get first matching index
+                          int i = loanTypes.indexOf(newVal);
+                          if (i != -1 && i < loanTypeId.length) {
+                            loanId = loanTypeId[i].toString();
+                            print("depart $loanTypeId");
+                            print("loan Id -  $loanId");
+                          } else {
+                            loanTypeId;
+                            print("Invalid Loan selection");
+                          }
+                          int j = loanTypes.indexOf(newVal);
+                          if (j != -1 && j < loanTypeSend.length) {
+                            loanTypeSending = loanTypeSend[i].toString();
+                            print("loanType -  $loanTypeSending");
+                          } else {
+                            loanTypeSending;
+                            print("Invalid Loan selection");
+                          }
+                        });
+                      },
+                    ),
 
-                  // Amount
-                  customTextField(
-                    icon: Icons.currency_rupee,
-                    label: "Amount",
-                    controller: amountController,
-                    keyboardType: TextInputType.number,
-                  ),
+                    // Amount
+                    customTextField(
+                      icon: Icons.currency_rupee,
+                      label: "Amount",
+                      controller: amountController,
+                      keyboardType: TextInputType.number,
+                    ),
 
-                  // Loan Start Date & Requested Installments (Row)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: customDatePicker(
-                          icon: Icons.date_range,
-                          label: "Loan Start Date",
-                          selectedDate: startDate,
-                          controller: startDateController,
-                          onTap: () async {
-                            DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(2023),
-                              lastDate: DateTime(2030),
-                            );
-                            if (picked != null) {
-                              setState(() {
-                                startDate = picked;
-                                startDateController.text = DateFormat('MMM dd, yyyy').format(picked);
-                              });
-                            }
-                          },
+                    // Loan Start Date & Requested Installments (Row)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: customDatePicker(
+                            icon: Icons.date_range,
+                            label: "Loan Start Date",
+                            selectedDate: startDate,
+                            controller: startDateController,
+                            onTap: () async {
+                              DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2023),
+                                lastDate: DateTime(2030),
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  startDate = picked;
+                                  startDateController.text = DateFormat(
+                                    'MMM dd, yyyy',
+                                  ).format(picked);
+                                });
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: customTextField(
-                          icon: Icons.format_list_numbered,
-                          label: "Installments",
-                          controller: installmentController,
-                          keyboardType: TextInputType.number,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: customTextField(
+                            icon: Icons.format_list_numbered,
+                            label: "Installments",
+                            controller: installmentController,
+                            keyboardType: TextInputType.number,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  // Remark
-                  customTextField(
-                    icon: Icons.comment,
-                    label: "Remark",
-                    controller: remarkController,
-                  ),
+                    // Remark
+                    customTextField(
+                      icon: Icons.comment,
+                      label: "Remark",
+                      controller: remarkController,
+                    ),
 
-                  const SizedBox(height: 15),
-                  // Submit Button
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      final totalAmount = double.tryParse(amountController.text) ?? 0.0;
-                      final totalInstallments = int.tryParse(installmentController.text) ?? 1;
-                      //final employeeName = "Bharat Rajora (EMP-1024)";
+                    const SizedBox(height: 15),
+                    // Submit Button
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final totalAmount =
+                            double.tryParse(amountController.text) ?? 0.0;
+                        final totalInstallments =
+                            int.tryParse(installmentController.text) ?? 1;
+                        //final employeeName = "Bharat Rajora (EMP-1024)";
 
-                      if (startDate != null && totalAmount > 0 && totalInstallments > 0 && selectedLoanType != null) {
-                        /*setState(() {
+                        if (startDate != null &&
+                            totalAmount > 0 &&
+                            totalInstallments > 0 &&
+                            selectedLoanType != null) {
+                          /*setState(() {
                           isLoading = true;
                         });*/
-                        sendLoanRequest(context);
-
-                      } else {
-                        // Optionally show error if fields are missing
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please fill all required fields')),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          sendLoanRequest(context);
+                        } else {
+                          // Optionally show error if fields are missing
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Please fill all required fields'),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.lightBlue,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.send),
+                      label: const Text(
+                        "Request",
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
-                    icon: const Icon(Icons.send),
-                    label: const Text(
-                      "Request",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              )),
+                  ],
+                ),
+              ),
 
               //const SizedBox(height: 32),
               if (isLoading)
@@ -363,7 +383,9 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                   itemBuilder: (context, index) {
                     final item = breakupList[index];
                     return Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 3,
                       margin: const EdgeInsets.only(bottom: 16),
                       child: Padding(
@@ -374,28 +396,54 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(item['employee']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                Text(
+                                  item['employee']!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: item['status'] == 'Approved' ? Colors.green.shade100 : Colors.orange.shade100,
+                                    color:
+                                        item['status'] == 'Approved'
+                                            ? Colors.green.shade100
+                                            : Colors.orange.shade100,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
                                     item['status']!,
                                     style: TextStyle(
-                                      color: item['status'] == 'Approved' ? Colors.green.shade800 : Colors.orange.shade800,
+                                      color:
+                                          item['status'] == 'Approved'
+                                              ? Colors.green.shade800
+                                              : Colors.orange.shade800,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 12,
                                     ),
                                   ),
-                                )
+                                ),
                               ],
                             ),
                             const SizedBox(height: 10),
-                            infoRow(Icons.calendar_today, "Installment Months", item['months']!),
-                            infoRow(Icons.payments, "Installment Amount", "₹ ${item['amount']}"),
-                            infoRow(Icons.date_range, "Disbursement Date", item['date']!),
+                            infoRow(
+                              Icons.calendar_today,
+                              "Installment Months",
+                              item['months']!,
+                            ),
+                            infoRow(
+                              Icons.payments,
+                              "Installment Amount",
+                              "â‚¹ ${item['amount']}",
+                            ),
+                            infoRow(
+                              Icons.date_range,
+                              "Disbursement Date",
+                              item['date']!,
+                            ),
                           ],
                         ),
                       ),
@@ -403,9 +451,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                   },
                 ),
               ],
-
-
-
             ],
           ),
         ),
@@ -414,7 +459,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
   }
 
   Future<void> sendLoanRequest(BuildContext context) async {
-    // ✅ Proceed with the API call if both checks pass
+    // âœ… Proceed with the API call if both checks pass
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanRequestRaiseApi;
     CommonNotificationPage.showLoaderDialog(context);
@@ -447,23 +492,29 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
         if (result.compareToIgnoringCase("Success") == 0) {
           showDialgSucess(context, reason.upperCamelCase + " ", "Success");
           final totalAmount = double.tryParse(amountController.text) ?? 0.0;
-          final totalInstallments = int.tryParse(installmentController.text) ?? 1;
+          final totalInstallments =
+              int.tryParse(installmentController.text) ?? 1;
 
           // Simulate delay (e.g., API call)
           await Future.delayed(Duration(seconds: 2));
 
-          final monthlyAmount = (totalAmount / totalInstallments).toStringAsFixed(2);
+          final monthlyAmount = (totalAmount / totalInstallments)
+              .toStringAsFixed(2);
 
           List<Map<String, String>> generatedList = [];
 
           for (int i = 0; i < totalInstallments; i++) {
-            final installmentDate = DateTime(startDate!.year, startDate!.month + i, startDate!.day);
+            final installmentDate = DateTime(
+              startDate!.year,
+              startDate!.month + i,
+              startDate!.day,
+            );
             generatedList.add({
               "employee": employeeName.toString(),
               "months": DateFormat('MMMM yyyy').format(installmentDate),
               "amount": monthlyAmount,
               "date": DateFormat('MMM dd, yyyy').format(installmentDate),
-              "status": "Pending"
+              "status": "Pending",
             });
           }
 
@@ -477,13 +528,17 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
         }
       }
     } catch (e) {
-      print('❌ Exception during API call: $e');
+      print('âŒ Exception during API call: $e');
     }
   }
 
-  static showDialgSucess(BuildContext buildContext, String result, String alert) {
+  static showDialgSucess(
+    BuildContext buildContext,
+    String result,
+    String alert,
+  ) {
     if (buildContext == null) {
-      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
       return;
     }
 
@@ -495,20 +550,20 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
-          title: Row(
-            children: [
-              Expanded(child: Text(alert)),
-            ],
-          ),
+          title: Row(children: [Expanded(child: Text(alert))]),
           content: Text(result),
           actions: [
             TextButton(
               onPressed: () {
-                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                if (Navigator.of(context).canPop()) {
+                  // âœ… Using `context` inside the builder
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pop(); // Close the dialog
                   //Navigator.of(buildContext).maybePop();
                 } else {
-                  print("⚠️ Warning: No route to close.");
+                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -557,9 +612,10 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
           //fillColor: Colors.grey.shade100,
         ),
         value: value,
-        items: items.map((item) {
-          return DropdownMenuItem<String>(value: item, child: Text(item!));
-        }).toList(),
+        items:
+            items.map((item) {
+              return DropdownMenuItem<String>(value: item, child: Text(item!));
+            }).toList(),
         onChanged: onChanged,
       ),
     );
@@ -604,7 +660,9 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
             decoration: InputDecoration(
               prefixIcon: Icon(icon, color: Colors.deepOrange),
               labelText: label,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),

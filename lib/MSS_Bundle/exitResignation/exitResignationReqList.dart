@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
@@ -18,9 +19,11 @@ import '../../themes/empThemes.dart';
 import 'exitModalClasses/exitResignationRequisitionListModal.dart';
 import 'exitResignationReqL1AppovalPage.dart';
 import 'exitResignationReqL2ApprovalPage.dart';
+
 class ExitResignationRequestPage extends StatefulWidget {
   @override
-  _ExitResignationRequestPageState createState() => _ExitResignationRequestPageState();
+  _ExitResignationRequestPageState createState() =>
+      _ExitResignationRequestPageState();
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -32,9 +35,9 @@ String? statusChange = "LEVEL_ONE_PENDING";
 dynamic getOrgId;
 dynamic userPermissions;
 dynamic getDefaultProfileId;
-List<ListData>? allUsernew=[];
-List<ListData>? foundDataNew=[];
-List pendingData =[];
+List<ListData>? allUsernew = [];
+List<ListData>? foundDataNew = [];
+List pendingData = [];
 dynamic exitResignationL1ApprovalShow;
 dynamic exitResignationL1ApprovalView;
 dynamic exitResignationL2ApprovalShow;
@@ -43,9 +46,10 @@ dynamic exitResignationL2ApprovalView;
 ExitResignationRquisitionListModal? exitResignationRequisitionListLabel;
 ExitResignationRquisitionListModal? exitResignationRequisitionListLabeled;
 int valueChange = 0;
-class _ExitResignationRequestPageState extends State<ExitResignationRequestPage> with RouteAware{
-  String selectedFilter = "L1";
 
+class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
+    with RouteAware {
+  String selectedFilter = "L1";
 
   @override
   void didChangeDependencies() {
@@ -61,10 +65,11 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -130,10 +135,10 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         exitResignationRequisitionListLabeled=exitResignationRequisitionListLabel;
       });
       print('All LIST - ${exitResignationRequisitionListLabel!.data!.length}');
-     *//* print('L1 LIST - ${exitResignationRequisitionListLabel!.dottedEmpList!.length}');
+     */ /* print('L1 LIST - ${exitResignationRequisitionListLabel!.dottedEmpList!.length}');
       print('L2 LIST - ${exitResignationRequisitionListLabel!.sharedEmpList!.length}');
       print('Approved LIST - ${exitResignationRequisitionListLabel!.directEmpList!.length}');
-      print('Disapproved LIST - ${exitResignationRequisitionListLabel!.designatedEmpList!.length}');*//*
+      print('Disapproved LIST - ${exitResignationRequisitionListLabel!.designatedEmpList!.length}');*/ /*
     });
 
 
@@ -144,27 +149,35 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
     getOrgId = await shared!.getOrgId();
     userPermissions = await shared!.getUserPanel();
     getDefaultProfileId = await shared!.getDefaultProfileId();
-    exitResignationL1ApprovalShow = await shared!.getExitResignationApproveL1Show();
-    exitResignationL1ApprovalView = await shared!.getExitResignationApproveL1View();
-    exitResignationL2ApprovalShow = await shared!.getExitResignationApproveL2Show();
-    exitResignationL2ApprovalView = await shared!.getExitResignationApproveL2View();
+    exitResignationL1ApprovalShow =
+        await shared!.getExitResignationApproveL1Show();
+    exitResignationL1ApprovalView =
+        await shared!.getExitResignationApproveL1View();
+    exitResignationL2ApprovalShow =
+        await shared!.getExitResignationApproveL2Show();
+    exitResignationL2ApprovalView =
+        await shared!.getExitResignationApproveL2View();
 
-    // 👇 Skip resetting selectedFilter if triggered from user selection
+    // ðŸ‘‡ Skip resetting selectedFilter if triggered from user selection
     if (!fromUser) {
-      if (exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1") {
+      if (exitResignationL1ApprovalShow == "true" ||
+          exitResignationL1ApprovalView == "1") {
         selectedFilter = "L1";
       }
-      if (exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1") {
+      if (exitResignationL2ApprovalShow == "true" ||
+          exitResignationL2ApprovalView == "1") {
         selectedFilter = "L2";
       }
-      if ((exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1") &&
-          (exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1")) {
+      if ((exitResignationL2ApprovalShow == "true" ||
+              exitResignationL2ApprovalView == "1") &&
+          (exitResignationL1ApprovalShow == "true" ||
+              exitResignationL1ApprovalView == "1")) {
         selectedFilter = "All";
       }
     }
 
     Future<ExitResignationRquisitionListModal> getEmployeeList11 =
-    getResignationRequisitionList(sessionId!);
+        getResignationRequisitionList(sessionId!);
 
     getEmployeeList11.then((value) {
       setState(() {
@@ -178,17 +191,17 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         }
 
         exitResignationRequisitionListLabel = value;
-        exitResignationRequisitionListLabeled = exitResignationRequisitionListLabel;
+        exitResignationRequisitionListLabeled =
+            exitResignationRequisitionListLabel;
       });
       print('All LIST - ${exitResignationRequisitionListLabel!.data!.length}');
     });
   }
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -205,26 +218,27 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   bool isLoading = false;
   bool isLoadingCount = true;
 
-  Future<ExitResignationRquisitionListModal> getResignationRequisitionList(String sessionId) async {
+  Future<ExitResignationRquisitionListModal> getResignationRequisitionList(
+    String sessionId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.employeeResignationMSSList;
 
@@ -239,17 +253,19 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
       statusChange = "LEVEL_TWO_PENDING";
     }
     setState(() {
-      isLoadingCount = true; // ✅ Start loader before API
+      isLoadingCount = true; // âœ… Start loader before API
     });
 
     try {
-      var urlapi = Uri.parse("$conn$apiUrl?"
-          "sessionId=$sessionId&"
-          "status=$statusChange&"
-          "orgId=$getOrgId&"
-          "profId=$getDefaultProfileId&"
-          "permission=$userPermissions");
-      final response = await http.post(urlapi);
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "status=$statusChange&"
+        "orgId=$getOrgId&"
+        "profId=$getDefaultProfileId&"
+        "permission=$userPermissions",
+      );
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       print('responseemployeeList ${response.body}');
       print('URL ${response.request}');
@@ -263,29 +279,27 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         showNodata(context, "Oops", "There is no any requisition.");
       }
 
-      ExitResignationRquisitionListModal exitResignationRequisitionList = ExitResignationRquisitionListModal.fromJson(mapResponse);
+      ExitResignationRquisitionListModal exitResignationRequisitionList =
+          ExitResignationRquisitionListModal.fromJson(mapResponse);
       print("mymanger ${exitResignationRequisitionList.data}");
       // Assign data based on selected filter
       allUsernew = exitResignationRequisitionList.data!;
 
-
-      setState(() {
-
-      });
+      setState(() {});
       return exitResignationRequisitionList;
     } catch (e) {
       print("Error fetching reporting officers: $e");
       rethrow;
     } finally {
       setState(() {
-        isLoadingCount = false; // ✅ Always stop loader
+        isLoadingCount = false; // âœ… Always stop loader
       });
     }
   }
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<ListData>?  resultsAll = [];
+    List<ListData>? resultsAll = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -299,8 +313,14 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      resultsAll = allUsernew?.where((element) =>
-          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      resultsAll =
+          allUsernew
+              ?.where(
+                (element) => element.empName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
 
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
@@ -317,32 +337,17 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
   }
 
   final List<Map<String, String>> officers = [
-    {
-      "name": "Rajesh Kumar",
-      "type": "Direct",
-      "level": "Level 1",
-    },
-    {
-      "name": "Anita Sharma",
-      "type": "Dotted",
-      "level": "Level 2",
-    },
-    {
-      "name": "Vikram Singh",
-      "type": "Designated",
-      "level": "Level 1",
-    },
-    {
-      "name": "Priya Mehta",
-      "type": "Shared",
-      "level": "Level 3",
-    },
+    {"name": "Rajesh Kumar", "type": "Direct", "level": "Level 1"},
+    {"name": "Anita Sharma", "type": "Dotted", "level": "Level 2"},
+    {"name": "Vikram Singh", "type": "Designated", "level": "Level 1"},
+    {"name": "Priya Mehta", "type": "Shared", "level": "Level 3"},
   ];
 
   List<Map<String, String>> get filteredOfficers {
     if (selectedFilter == "All") return officers;
     return officers.where((o) => o["type"] == selectedFilter).toList();
   }
+
   TextEditingController searchType = TextEditingController();
   int currentIndex = 2;
   @override
@@ -352,38 +357,44 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: "Resignation Request List - ${foundDataNew!.length}",
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: "Resignation Request List - ${foundDataNew!.length}",
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
+
       /*body: Column(
         children: [
           // Filter buttons
@@ -455,43 +466,50 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
           ),
         ],
       ),*/
-
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             print('My Requests');
           }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => EssAdminDashboardHead(EssDashboarrdModel()),
+              ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -502,10 +520,7 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -726,13 +741,13 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
 
             ],
           ),*/
-
           Expanded(
-            child: isLoadingCount
-                ? Center(child: CircularProgressIndicator()) // Show loader
-                : exitResignationRequisitionListLabeled == null
-                ? Center(child: Text("No Data Available"))
-                : getMyReportings(exitResignationRequisitionListLabeled!),
+            child:
+                isLoadingCount
+                    ? Center(child: CircularProgressIndicator()) // Show loader
+                    : exitResignationRequisitionListLabeled == null
+                    ? Center(child: Text("No Data Available"))
+                    : getMyReportings(exitResignationRequisitionListLabeled!),
           ),
         ],
       ),
@@ -743,13 +758,13 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  ExitResignationRequestPage(),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (a, b, c) => ExitResignationRequestPage(),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: Column(
@@ -762,17 +777,25 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
               child: Row(
                 children: [
                   Visibility(
-                    visible: (exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1") && (exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1"),
-                      child: filterChip("All")
+                    visible:
+                        (exitResignationL1ApprovalShow == "true" ||
+                            exitResignationL1ApprovalView == "1") &&
+                        (exitResignationL2ApprovalShow == "true" ||
+                            exitResignationL2ApprovalView == "1"),
+                    child: filterChip("All"),
                   ),
 
                   Visibility(
-                    visible: exitResignationL1ApprovalShow == "true" || exitResignationL1ApprovalView == "1",
-                      child: filterChip("L1")
+                    visible:
+                        exitResignationL1ApprovalShow == "true" ||
+                        exitResignationL1ApprovalView == "1",
+                    child: filterChip("L1"),
                   ),
                   Visibility(
-                    visible: exitResignationL2ApprovalShow == "true" || exitResignationL2ApprovalView == "1",
-                      child: filterChip("L2")
+                    visible:
+                        exitResignationL2ApprovalShow == "true" ||
+                        exitResignationL2ApprovalView == "1",
+                    child: filterChip("L2"),
                   ),
                 ],
               ),
@@ -789,7 +812,8 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
                 return Card(
                   margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 4,
                   child: Container(
                     decoration: BoxDecoration(
@@ -805,44 +829,58 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
                       onTap: () {
                         requestIdSend = foundDataNew![index].requestId;
                         if (selectedFilter == "All") {
-                          if(foundDataNew![index].statusShow == "LEVEL_1_PENDING") {
+                          if (foundDataNew![index].statusShow ==
+                              "LEVEL_1_PENDING") {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ExitResignationL1ApprovalPage(
-                                  requestId:requestIdSend
-                              )),
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => ExitResignationL1ApprovalPage(
+                                      requestId: requestIdSend,
+                                    ),
+                              ),
                             );
-                          } else if(foundDataNew![index].statusShow == "LEVEL_2_PENDING") {
+                          } else if (foundDataNew![index].statusShow ==
+                              "LEVEL_2_PENDING") {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ExitResignationL2ApprovalPage(
-                                  requestId:requestIdSend
-                              )),
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => ExitResignationL2ApprovalPage(
+                                      requestId: requestIdSend,
+                                    ),
+                              ),
                             );
                           }
                         }
                         if (selectedFilter == "L1") {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => ExitResignationL1ApprovalPage(
-                                requestId:requestIdSend
-                            )),
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ExitResignationL1ApprovalPage(
+                                    requestId: requestIdSend,
+                                  ),
+                            ),
                           );
                         }
                         if (selectedFilter == "L2") {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => ExitResignationL2ApprovalPage(
-                                requestId:requestIdSend
-                            )),
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ExitResignationL2ApprovalPage(
+                                    requestId: requestIdSend,
+                                  ),
+                            ),
                           );
                         }
-
                       },
-                      contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      title:
-                      Row(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      title: Row(
                         children: [
                           Expanded(
                             child: Text(
@@ -854,7 +892,13 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
                               ),
                             ),
                           ),
-                          foundDataNew![index].statusShow.toString().text.fontWeight(FontWeight.w900).size(14).color(Mythemes.lightBluishColor).make()
+                          foundDataNew![index].statusShow
+                              .toString()
+                              .text
+                              .fontWeight(FontWeight.w900)
+                              .size(14)
+                              .color(Mythemes.lightBluishColor)
+                              .make(),
                         ],
                       ),
 
@@ -864,32 +908,36 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
                           Text(
                             "Department: ${foundDataNew![index].department.toString()}",
                             style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Mythemes.blackish),
+                              fontWeight: FontWeight.w600,
+                              color: Mythemes.blackish,
+                            ),
                           ),
                           SizedBox(height: 4),
                           Text(
                             "DOJ: ${foundDataNew![index].doj.toString()}",
                             style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Mythemes.blackish),
+                              fontWeight: FontWeight.w600,
+                              color: Mythemes.blackish,
+                            ),
                           ),
                           Text(
                             "Raised On: ${foundDataNew![index].requestDate.toString()}",
                             style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Mythemes.blackish),
+                              fontWeight: FontWeight.w600,
+                              color: Mythemes.blackish,
+                            ),
                           ),
                           Text(
                             "Requisition Date: ${foundDataNew![index].requestDate.toString()}",
                             style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Mythemes.blackish),
+                              fontWeight: FontWeight.w600,
+                              color: Mythemes.blackish,
+                            ),
                           ),
                         ],
                       ),
                       //trailing: foundDataNew![index].statusShow.toString().text.bold.size(14).color(Mythemes.lightBluishColor).make(),
-                     /* leading: CircleAvatar(
+                      /* leading: CircleAvatar(
                         backgroundColor: Colors.deepPurple.shade100,
                         child: Icon(Icons.person, color: Colors.deepPurple),
                       ),*/
@@ -909,11 +957,13 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: ChoiceChip(
         checkmarkColor: selectedFilter == label ? Colors.white : Colors.black87,
-        label: Text(label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: selectedFilter == label ? Colors.white : Colors.black87,
-            )),
+        label: Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: selectedFilter == label ? Colors.white : Colors.black87,
+          ),
+        ),
         selected: selectedFilter == label,
         selectedColor: Colors.deepPurple,
         onSelected: (val) {
@@ -928,9 +978,11 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
               statusChange = "LEVEL_TWO_PENDING";
             }
 
-            // ✅ Prevent auto-reset
+            // âœ… Prevent auto-reset
             getSharedPrfanceList(fromUser: true);
-            print("Selected Filter - $selectedFilter, statusChange - $statusChange");
+            print(
+              "Selected Filter - $selectedFilter, statusChange - $statusChange",
+            );
           });
         },
       ),

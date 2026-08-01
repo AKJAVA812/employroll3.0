@@ -7,48 +7,85 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../themes/empThemes.dart';
+import '../utils/profile_image_provider.dart';
+import '../services/mobile_profile_cache.dart';
+import '../mss_profiles/global_profile.dart';
+import '../mss_profiles/profileListModal.dart';
+
 class DrawerFile extends StatefulWidget {
   @override
   State<DrawerFile> createState() => _DrawerFileState();
 }
 
+SessionManager shared = SessionManager();
 
-SessionManager shared= SessionManager();
 class _DrawerFileState extends State<DrawerFile> {
   String urlImage = "";
-  String emailid="abc@gmail.com";
-  String name="Employee Name ";
+  String emailid = "abc@gmail.com";
+  String name = "Employee Name ";
+  List<ProfileData> profileListGetter = <ProfileData>[];
+  bool isLoadingProfiles = false;
 
-   Future getUserNameImage() async {
-    urlImage= await shared.getProfileImage();
-    name= await shared.getempName();
-    emailid=await shared.getEmailId();
+  Future getUserNameImage() async {
+    urlImage = await shared.getProfileImage();
+    name = await shared.getempName();
+    emailid = await shared.getEmailId();
     print('drawer: ${urlImage}');
     print('drawer: ${name}');
 
-    print('drawer: ${emailid}');
-    setState(() { });
+    print('drawer: ');
+    await getProfileList();
+    setState(() {});
   }
+
+  Future<void> getProfileList() async {
+    setState(() {
+      isLoadingProfiles = true;
+    });
+    try {
+      final profileListModal = await MobileProfileCache.loadProfileList();
+      profileListGetter = profileListModal.data ?? <ProfileData>[];
+      print(
+        '[MOBILE-AUTH] DRAWER_PROFILE_CACHE -> count=${profileListGetter.length}',
+      );
+      if (profileListGetter.isNotEmpty) {
+        final selectedId = await shared.getDefaultProfileId();
+        final selectedName = await shared.getDefaultProfileName();
+        selectedProfileIdNotifier.value = selectedId ?? 0;
+        selectedProfileNameNotifier.value = selectedName ?? '';
+      }
+    } catch (e) {
+      print('[MOBILE-AUTH] DRAWER_PROFILE_CACHE -> error=$e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoadingProfiles = false;
+        });
+      }
+    }
+  }
+
   @override
   void didChangeDependencies() {
-     //getUserNameImage();
-     print('drawer: didChangeDependencies');
+    //getUserNameImage();
+    print('drawer: didChangeDependencies');
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
+
   @override
   void initState() {
-
-     getUserNameImage();
+    getUserNameImage();
 
     print('drawer: initState');
     // TODO: implement initState
 
-     print('drawer: ${urlImage}');
-     print('drawer: ${name}');
+    print('drawer: ${urlImage}');
+    print('drawer: ${name}');
 
     super.initState();
   }
+
   @override
   void didUpdateWidget(covariant DrawerFile oldWidget) {
     //getUserNameImage();
@@ -56,16 +93,17 @@ class _DrawerFileState extends State<DrawerFile> {
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
   }
+
   @override
   void setState(VoidCallback fn) {
-     //getUserNameImage();
-     print('drawer: setState');
+    //getUserNameImage();
+    print('drawer: setState');
     // TODO: implement setState
     super.setState(fn);
   }
 
   @override
-  Widget build(BuildContext context)  {
+  Widget build(BuildContext context) {
     timeDilation = 1.8;
     return Drawer(
       child: Container(
@@ -74,34 +112,36 @@ class _DrawerFileState extends State<DrawerFile> {
           children: [
             SingleChildScrollView(
               child: DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Mythemes.greyishade
-                ),
+                decoration: BoxDecoration(color: Mythemes.greyishade),
                 padding: EdgeInsets.zero,
                 child: UserAccountsDrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Mythemes.greyishade
+                  decoration: BoxDecoration(color: Mythemes.greyishade),
+                  accountName: Text(
+                    name,
+                    style: TextStyle(
+                      color: Mythemes.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  accountName: Text(name , style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.bold)),
-                  accountEmail: Text(emailid, style: TextStyle(color: Mythemes.black)),
+                  accountEmail: Text(
+                    emailid,
+                    style: TextStyle(color: Mythemes.black),
+                  ),
                   margin: EdgeInsets.zero,
                   /*   decoration: BoxDecoration(
                     color:Colors.red,
                   ),*/
-                  currentAccountPicture:
-                      CircleAvatar(backgroundImage: NetworkImage(urlImage)
-                      ),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundImage: profileImageProvider(urlImage),
+                  ),
                 ),
               ),
             ),
 
             ListTile(
               leading: Icon(CupertinoIcons.profile_circled),
-              title: Text(
-                "Profile",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
+              title: Text("Profile", textScaleFactor: 1.2),
+              onTap: () {
                 print("profile click");
                 /*Fluttertoast.showToast(
                     msg: "Profile Click",
@@ -113,36 +153,29 @@ class _DrawerFileState extends State<DrawerFile> {
                     fontSize: 16.0
                 );*/
                 Navigator.pushNamed(context, MyRoutings.profileRoute);
-               // Navigator.pop(context);
+                // Navigator.pop(context);
               },
             ),
             ListTile(
               leading: Icon(CupertinoIcons.chart_bar_square),
-              title: Text(
-                "Dashboard ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
+              title: Text("Dashboard ", textScaleFactor: 1.2),
+              onTap: () {
                 Fluttertoast.showToast(
-                    msg: "Dashboard Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: "Dashboard Click",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               },
             ),
 
             ListTile(
               leading: Icon(CupertinoIcons.antenna_radiowaves_left_right),
-              title: Text(
-                "Workflow ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
-
+              title: Text("Workflow ", textScaleFactor: 1.2),
+              onTap: () {
                 Navigator.pop(context);
               },
             ),
@@ -151,28 +184,26 @@ class _DrawerFileState extends State<DrawerFile> {
               tag: 'animatedDrawer',
               child: ListTile(
                 leading: Icon(CupertinoIcons.list_bullet_below_rectangle),
-                title: Text(
-                  "Employee List",
-                  textScaleFactor: 1.2,
-                ),
+                title: Text("Employee List", textScaleFactor: 1.2),
                 onTap: () async {
-                  bool internetCheck = await InternetConnectionChecker().hasConnection;
-                  if(internetCheck == false) {
+                  bool internetCheck =
+                      await InternetConnectionChecker().hasConnection;
+                  if (internetCheck == false) {
                     setState(() {
                       AlertDialog(
-                        content: "Please check your internet connection".text.make(),
+                        content:
+                            "Please check your internet connection".text.make(),
                       );
                       Fluttertoast.showToast(
-                          msg: "Please check your Internet connection",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM_RIGHT,
-                          timeInSecForIosWeb: 4,
-                          backgroundColor: Mythemes.black,
-                          textColor: Colors.white,
-                          fontSize: 17.0
+                        msg: "Please check your Internet connection",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM_RIGHT,
+                        timeInSecForIosWeb: 4,
+                        backgroundColor: Mythemes.black,
+                        textColor: Colors.white,
+                        fontSize: 17.0,
                       );
                     });
-
                   } else {
                     Navigator.pushNamed(context, MyRoutings.empListRoute);
                   }
@@ -180,51 +211,84 @@ class _DrawerFileState extends State<DrawerFile> {
               ),
             ),
 
+            if (profileListGetter.isNotEmpty) ...[
+              Padding(
+                padding: EdgeInsets.only(left: 16, top: 8, bottom: 4),
+                child: Text(
+                  'Profiles',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+              ValueListenableBuilder<int>(
+                valueListenable: selectedProfileIdNotifier,
+                builder: (context, currentSelectedId, _) {
+                  return Column(
+                    children:
+                        profileListGetter.map((profile) {
+                          final profileId = profile.profileId ?? 0;
+                          final profileName = profile.profileName ?? '';
+                          final isSelected = currentSelectedId == profileId;
+                          return ListTile(
+                            dense: true,
+                            leading: Icon(CupertinoIcons.person_2_square_stack),
+                            title: Text(profileName, textScaleFactor: 1.05),
+                            subtitle: Text(
+                              '${profile.profilePermission?.length ?? 0} permissions',
+                            ),
+                            trailing:
+                                isSelected
+                                    ? Icon(Icons.check, color: Colors.green)
+                                    : null,
+                            tileColor: isSelected ? Colors.grey.shade200 : null,
+                            onTap: () async {
+                              await shared.setDefaultProfileId(profileId);
+                              await shared.setDefaultProfileName(profileName);
+                              selectedProfileIdNotifier.value = profileId;
+                              selectedProfileNameNotifier.value = profileName;
+                              Navigator.pop(context);
+                            },
+                          );
+                        }).toList(),
+                  );
+                },
+              ),
+            ],
             ListTile(
               leading: Icon(CupertinoIcons.settings_solid),
-              title: Text(
-                "Settings ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
+              title: Text("Settings ", textScaleFactor: 1.2),
+              onTap: () {
                 Fluttertoast.showToast(
-                    msg: "Settings Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: "Settings Click",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
                 Navigator.pop(context);
               },
             ),
             ListTile(
               leading: Icon(CupertinoIcons.folder),
-              title: Text(
-                "Reports ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
+              title: Text("Reports ", textScaleFactor: 1.2),
+              onTap: () {
                 Fluttertoast.showToast(
-                    msg: "Reports Click",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: "Reports Click",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
                 Navigator.pop(context);
               },
             ),
             ListTile(
               leading: Icon(Icons.support_agent_rounded),
-              title: Text(
-                "Helpdesk ",
-                textScaleFactor: 1.2,
-              ),
-              onTap: (){
+              title: Text("Helpdesk ", textScaleFactor: 1.2),
+              onTap: () {
                 Navigator.pushNamed(context, MyRoutings.helpDeskItemsRoute);
                 /*Fluttertoast.showToast(
                     msg: "Helpdesk Click",
@@ -413,7 +477,7 @@ List<MyModule> sideList = <MyModule>[
       new MyModule("title"),
       new MyModule("title"),
     ]),
-  ])
+  ]),
 ];
 
 class MyListReturn extends StatelessWidget {
@@ -425,7 +489,6 @@ class MyListReturn extends StatelessWidget {
   Widget build(BuildContext context) {
     return _buildTill(myModuleReturn);
   }
-
 }
 
 Widget _buildTill(MyModule myModule1) {
@@ -446,5 +509,4 @@ Widget _buildTill(MyModule myModule1) {
     title: new Text(myModule1.title),
     children: myModule1.myModule.map(_buildTill).toList(),
   );
-
 }

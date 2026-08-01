@@ -5,6 +5,7 @@ import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/employeePage/employeeListPage.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -17,6 +18,7 @@ import 'empTimeLinePage.dart';
 import 'modalClasses/historyTrackModal.dart';
 import 'modalClasses/liveTrackModal.dart';
 import 'dart:ui' as ui;
+
 class LiveMapView extends StatefulWidget {
   String empName;
   int? empId;
@@ -32,13 +34,14 @@ SessionManager shared = SessionManager();
 String? sessionId;
 LiveTrackingModal? liveTrackingModalGlobal;
 String? selectedDate;
+
 class _LiveMapViewState extends State<LiveMapView> {
   CustomInfoWindowController _customInfoWindowController =
-  CustomInfoWindowController();
+      CustomInfoWindowController();
 
   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
 
-  final List <Marker> _markers = <Marker>[];
+  final List<Marker> _markers = <Marker>[];
 
   late BitmapDescriptor icon;
   _LiveMapViewState(String empName, int? empId);
@@ -83,10 +86,11 @@ class _LiveMapViewState extends State<LiveMapView> {
     FocusScope.of(context).requestFocus(new FocusNode());
 
     date = await showDatePicker(
-        context: context,
-        initialDate: date,
-        firstDate:DateTime(1947),
-        lastDate: DateTime.now().add(Duration(days: 0)));
+      context: context,
+      initialDate: date,
+      firstDate: DateTime(1947),
+      lastDate: DateTime.now().add(Duration(days: 0)),
+    );
     setState(() {
       singleDateString = DateFormat('dd-MM-yyyy').format(date!);
       _dateController.text = DateFormat("yyyy-MM-dd").format(date!);
@@ -99,30 +103,27 @@ class _LiveMapViewState extends State<LiveMapView> {
     print(date);
   }
 
-
-
   Future<LiveTrackingModal> getTracking(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.historyTracking;
     print('employeeList11: ${SessionId}');
     LiveTrackingModal liveTrackingModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "date=$todayDate&"
-        "empId=$empId"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "date=$todayDate&"
+      "empId=$empId",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
-
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    liveTrackingModal=LiveTrackingModal.fromJson(mapResponse);
+    liveTrackingModal = LiveTrackingModal.fromJson(mapResponse);
 
-
-    for(int i=0; i<liveTrackingModal!.attData!.length;i++){
+    for (int i = 0; i < liveTrackingModal!.attData!.length; i++) {
       inImage = liveTrackingModal!.attData![i].inPhoto;
 
       print('inImage $inImage');
@@ -144,36 +145,39 @@ class _LiveMapViewState extends State<LiveMapView> {
       //print('Response1111c $currentPostion');
 
       StreamSubscription<ServiceStatus> serviceStatusStream =
-      Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
-        print('Response1111s $status');
-      });
+          Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
+            print('Response1111s $status');
+          });
       print('Response1111s $serviceStatusStream');
     });
-
   }
-
 
   Uint8List? marketimages;
   List<String> images = ['assets/images/workdoneMarker.png'];
 
-
-  Future<Uint8List> getImages(String path, int width) async{
+  Future<Uint8List> getImages(String path, int width) async {
     ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetHeight: width);
+    ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetHeight: width,
+    );
     ui.FrameInfo fi = await codec.getNextFrame();
-    return(await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
-
+    return (await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    ))!.buffer.asUint8List();
   }
-
 
   final Set<Polyline> _polyline = {};
 
   loadData() async {
-    List<LatLng> newPunchLatlng=[];
-    List<LatLng> newAddLatlng=[];
+    List<LatLng> newPunchLatlng = [];
+    List<LatLng> newAddLatlng = [];
 
-    for(int i=0 ; i<liveTrackingModalGlobal!.attData!.length;i++){
-      final Uint8List markIcons = await getImages('assets/images/fingerMaker.png', 200);
+    for (int i = 0; i < liveTrackingModalGlobal!.attData!.length; i++) {
+      final Uint8List markIcons = await getImages(
+        'assets/images/fingerMaker.png',
+        200,
+      );
       print('lengthPunchIn $i');
       var long = liveTrackingModalGlobal!.attData![i].inlng;
       print('object2 $long');
@@ -181,103 +185,117 @@ class _LiveMapViewState extends State<LiveMapView> {
       var inImage = liveTrackingModalGlobal!.attData![i].inPhoto;
       newPunchLatlng.add(LatLng(lati, long));
       setState(() {
-        _markers.add(Marker(markerId: MarkerId(i.toString()), icon: BitmapDescriptor.fromBytes(markIcons),
+        _markers.add(
+          Marker(
+            markerId: MarkerId(i.toString()),
+            icon: BitmapDescriptor.fromBytes(markIcons),
             position: LatLng(lati, long),
             onTap: () {
-
               _customInfoWindowController.addInfoWindow!(
-                  Card(
-                    child: Container(
-                      height: 300,
-                      width: 200,
-                      child:  Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: 100,
-                            width: 300,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage('$inImage'),
-                                fit: BoxFit.fitWidth,
-                                filterQuality: FilterQuality.high,
-                              ),
-                              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-
+                Card(
+                  child: Container(
+                    height: 300,
+                    width: 200,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 100,
+                          width: 300,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage('$inImage'),
+                              fit: BoxFit.fitWidth,
+                              filterQuality: FilterQuality.high,
+                            ),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10.0),
                             ),
                           ),
-                          Padding(padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        liveTrackingModalGlobal!.attData![i].inAddress.toString(), style: TextStyle(color: Mythemes.black),
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: 10,
+                            left: 10,
+                            right: 10,
+                            bottom: 10,
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      liveTrackingModalGlobal!
+                                          .attData![i]
+                                          .inAddress
+                                          .toString(),
+                                      style: TextStyle(color: Mythemes.black),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      liveTrackingModalGlobal!.attData![i].inDate.toString(), style: TextStyle(color: Mythemes.black),
-                                    ),
-
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      liveTrackingModalGlobal!.attData![i].inTime.toString(), style: TextStyle(color: Mythemes.black),
-                                    ),
-
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    liveTrackingModalGlobal!.attData![i].inDate
+                                        .toString(),
+                                    style: TextStyle(color: Mythemes.black),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    liveTrackingModalGlobal!.attData![i].inTime
+                                        .toString(),
+                                    style: TextStyle(color: Mythemes.black),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
 
-                  newPunchLatlng[i]
+                newPunchLatlng[i],
               );
-            }
-        ));
+            },
+          ),
+        );
       });
 
-
-
-      setState(() {
-
-      });
+      setState(() {});
       _polyline.add(
-          Polyline(
-            geodesic: true,
-            endCap: Cap.roundCap,
-            jointType: JointType.mitered,
-            width: 10,
-            polylineId: PolylineId('1'),
-            points: newPunchLatlng,
-            color: Mythemes.lightBluishColor,
-          )
+        Polyline(
+          geodesic: true,
+          endCap: Cap.roundCap,
+          jointType: JointType.mitered,
+          width: 10,
+          polylineId: PolylineId('1'),
+          points: newPunchLatlng,
+          color: Mythemes.lightBluishColor,
+        ),
       );
     }
 
-    for(int i=0 ; i<liveTrackingModalGlobal!.taskData!.length;i++){
-      final Uint8List markIcons = await getImages('assets/images/workdoneMarker.png', 200);
+    for (int i = 0; i < liveTrackingModalGlobal!.taskData!.length; i++) {
+      final Uint8List markIcons = await getImages(
+        'assets/images/workdoneMarker.png',
+        200,
+      );
       print('lengthI $i');
       var latlng = double.parse(liveTrackingModalGlobal!.taskData![i].tasklng);
       var ltt = double.parse(liveTrackingModalGlobal!.taskData![i].tasklat);
@@ -285,103 +303,116 @@ class _LiveMapViewState extends State<LiveMapView> {
       newAddLatlng.add(LatLng(ltt, latlng));
       setState(() {
         _markers.add(
-            Marker(
-
-                draggable: true,
-                zIndex: 0,
-                markerId: MarkerId(i.toString()), icon: BitmapDescriptor.fromBytes(markIcons),
-                position: LatLng(ltt, latlng),
-                onTap: () {
-                  _customInfoWindowController.addInfoWindow!(
-                      Card(
-                        child: Container(
-                          height: 300,
-                          width: 200,
-                          child:  Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+          Marker(
+            draggable: true,
+            zIndex: 0,
+            markerId: MarkerId(i.toString()),
+            icon: BitmapDescriptor.fromBytes(markIcons),
+            position: LatLng(ltt, latlng),
+            onTap: () {
+              _customInfoWindowController.addInfoWindow!(
+                Card(
+                  child: Container(
+                    height: 300,
+                    width: 200,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 100,
+                          width: 300,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage('$taskImage'),
+                              fit: BoxFit.fitWidth,
+                              filterQuality: FilterQuality.high,
+                            ),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10.0),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: 10,
+                            left: 10,
+                            right: 10,
+                          ),
+                          child: Column(
                             children: [
-                              Container(
-                                height: 100,
-                                width: 300,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage('$taskImage'),
-                                    fit: BoxFit.fitWidth,
-                                    filterQuality: FilterQuality.high,
-
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    liveTrackingModalGlobal!
+                                        .taskData![i]
+                                        .comment
+                                        .toString(),
+                                    style: TextStyle(color: Mythemes.black),
                                   ),
-                                  borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-
-                                ),
+                                ],
                               ),
-                              Padding(padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          liveTrackingModalGlobal!.taskData![i].comment.toString(), style: TextStyle(color: Mythemes.black),
-                                        ),
-
-                                      ],
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      liveTrackingModalGlobal!
+                                          .taskData![i]
+                                          .address
+                                          .toString(),
+                                      style: TextStyle(color: Mythemes.black),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            liveTrackingModalGlobal!.taskData![i].address.toString(), style: TextStyle(color: Mythemes.black),maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          liveTrackingModalGlobal!.taskData![i].taskDate.toString(), style: TextStyle(color: Mythemes.black),
-                                        ),
-
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    liveTrackingModalGlobal!
+                                        .taskData![i]
+                                        .taskDate
+                                        .toString(),
+                                    style: TextStyle(color: Mythemes.black),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
-                      ),
-                      newAddLatlng[i]
-                  );
-                }
-            ));
+                      ],
+                    ),
+                  ),
+                ),
+                newAddLatlng[i],
+              );
+            },
+          ),
+        );
       });
 
-
-
-      setState(() {
-
-      });
+      setState(() {});
       _polyline.add(
-          Polyline(
-            geodesic: true,
-            endCap: Cap.roundCap,
-            jointType: JointType.mitered,
-            width: 10,
-            polylineId: PolylineId('3'),
-            points: newAddLatlng,
-            color: Mythemes.successColor,
-          )
+        Polyline(
+          geodesic: true,
+          endCap: Cap.roundCap,
+          jointType: JointType.mitered,
+          width: 10,
+          polylineId: PolylineId('3'),
+          points: newAddLatlng,
+          color: Mythemes.successColor,
+        ),
       );
     }
   }
+
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
@@ -390,18 +421,18 @@ class _LiveMapViewState extends State<LiveMapView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
-        liveTrackingModalGlobal=value;
+        liveTrackingModalGlobal = value;
         loadData();
       });
       print('employeeList00${liveTrackingModalGlobal!.data!.length}');
 
-     /* for(int i=0; i<liveTrackingModalGlobal!.data!.length;i++){
+      /* for(int i=0; i<liveTrackingModalGlobal!.data!.length;i++){
         ltt = liveTrackingModalGlobal!.data![i].lat;
         lngg = liveTrackingModalGlobal!.data![i].lng;
 
@@ -430,27 +461,23 @@ class _LiveMapViewState extends State<LiveMapView> {
 
     //Position position = await _determinePosition();
 
-
     /*googleMapController
         .animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: LatLng(28.5318562, 77.2731763), zoom: 17)));*/
 
-
-
-
-      print('Response1111c Onpressed $position');
-
+    print('Response1111c Onpressed $position');
   }
-  LatLng _center = LatLng(32.5367794, -121.2714404);
 
+  LatLng _center = LatLng(32.5367794, -121.2714404);
 
   getCurrentLocation() async {
     position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
     return position;
   }
 
-  String singleDateString="";
+  String singleDateString = "";
 
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -481,7 +508,8 @@ class _LiveMapViewState extends State<LiveMapView> {
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     // When we reach here, permissions are granted and we can
@@ -489,11 +517,7 @@ class _LiveMapViewState extends State<LiveMapView> {
     return await Geolocator.getCurrentPosition();
   }
 
-  Set<Marker> markers = {
-
-
-  };
-
+  Set<Marker> markers = {};
 
   static final _initialCameraPosition = CameraPosition(
     zoom: 10,
@@ -509,12 +533,14 @@ class _LiveMapViewState extends State<LiveMapView> {
 
         actions: [
           Center(
-            child: "Live".text.xl.color(Mythemes.black).make().px8()
-                .badge(
-              size: 10,
-              color: Mythemes.dangerColor
-            ).px8(),
-          )
+            child:
+                "Live".text.xl
+                    .color(Mythemes.black)
+                    .make()
+                    .px8()
+                    .badge(size: 10, color: Mythemes.dangerColor)
+                    .px8(),
+          ),
         ],
       ),
       bottomNavigationBar: Container(
@@ -525,57 +551,67 @@ class _LiveMapViewState extends State<LiveMapView> {
           children: [
             Expanded(
               child: ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  buttonPadding: Vx.mOnly(right: 30),
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                            //primary: Mythemes.whitish,
-                        elevation: 0
+                alignment: MainAxisAlignment.center,
+                buttonPadding: Vx.mOnly(right: 30),
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      //primary: Mythemes.whitish,
+                      elevation: 0,
+                    ),
 
-                        ),
-
-                        onPressed: (){},
-                        child: Column(
+                    onPressed: () {},
+                    child: Column(
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                             children: [
-                               "Date".text.color(Mythemes.blackish).make(),
-                             ],
-                            ),
-                            Row(
-                              children: [
-
-                                todayDate == null ? defaultDate.text.color(Mythemes.blackish).make() :
-
-                                DateFormat('dd-MM-yyyy').format(DateTime.parse(todayDate)).text.color(Mythemes.blackish).make()
-                              ],
-                            ),
+                            "Date".text.color(Mythemes.blackish).make(),
                           ],
                         ),
-                    ).px16(),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          //primary: Mythemes.whitish, elevation: 0
-                      ),
-                      onPressed: (){},
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              "Distance".text.color(Mythemes.blackish).make(),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              distanceLength == null ? "0 KM".text.color(Mythemes.blackish).make() :
-                              '$distanceLength KM'.toString().text.color(Mythemes.blackish).make()
-                            ],
-                          ),
-                        ],
-                      ),
-                    ).px16(),
-                  ]),
+                        Row(
+                          children: [
+                            todayDate == null
+                                ? defaultDate.text
+                                    .color(Mythemes.blackish)
+                                    .make()
+                                : DateFormat('dd-MM-yyyy')
+                                    .format(DateTime.parse(todayDate))
+                                    .text
+                                    .color(Mythemes.blackish)
+                                    .make(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ).px16(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      //primary: Mythemes.whitish, elevation: 0
+                    ),
+                    onPressed: () {},
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            "Distance".text.color(Mythemes.blackish).make(),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            distanceLength == null
+                                ? "0 KM".text.color(Mythemes.blackish).make()
+                                : '$distanceLength KM'
+                                    .toString()
+                                    .text
+                                    .color(Mythemes.blackish)
+                                    .make(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ).px16(),
+                ],
+              ),
             ),
           ],
         ),
@@ -601,23 +637,25 @@ class _LiveMapViewState extends State<LiveMapView> {
             },
           ),
 
-          CustomInfoWindow(controller: _customInfoWindowController,
+          CustomInfoWindow(
+            controller: _customInfoWindowController,
             height: 250,
             width: 300,
             offset: 35,
-          )
-        ]
+          ),
+        ],
       ),
 
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-              TimeLineEmp(empId,selectedDate)));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TimeLineEmp(empId, selectedDate),
+            ),
+          );
         },
         backgroundColor: Mythemes.lightBluishColor,
-        child: Icon(
-          Icons.timeline, color: Mythemes.whitish, size: 28,
-        ),
+        child: Icon(Icons.timeline, color: Mythemes.whitish, size: 28),
       ),
       /*floatingActionButton: FloatingActionButton(
         onPressed: () async {

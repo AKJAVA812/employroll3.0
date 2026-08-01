@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../adminPage/adminDashboard/absentEmpList.dart';
 import '../../adminPage/adminDashboard/earlyGoEmpList.dart';
 import '../../adminPage/adminDashboard/halfDayEmpList.dart';
@@ -64,6 +65,7 @@ bool isLoading = true;
 bool isLoadingEvent = true;
 String valuenew = "listText";
 String shiftValue = "listText";
+
 class _UIS_DashboardState extends State<UIS_Dashboard> {
   final DashboardModel dashboardModel1;
 
@@ -87,8 +89,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
   var dropdownNewvalue;
   var dropdownNewvalueShift;
 
-
-
   Future getSharedPrfanceList() async {
     setState(() {
       isLoading = true; // Start loading
@@ -102,7 +102,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
     Future<EventsListModal> getEmployeeList14 = getEventData(sessionId!);
-    getEmployeeList11.then( (value) {
+    getEmployeeList11.then((value) {
       setState(() {
         dashboardModelGlobal = value;
         setState(() {
@@ -134,8 +134,8 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     });
 
     setState(() async {
-      empRole= await shared.getEmpRoll();
-      roRole= await shared.getRoRole();
+      empRole = await shared.getEmpRoll();
+      roRole = await shared.getRoRole();
       //print('EmpRole $empRole');
       //print('roRole $roRole');
     });
@@ -160,15 +160,17 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 
     //print('employeeList11: ${SessionId}');
     DashboardModel dashboardModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "branch=$branchId&"
-        "shift=$shift&"
-        "date=$singleDateString&"
-        "profileId=$defaultProfileId&"
-        "userPermission=$userPanel&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "branch=$branchId&"
+      "shift=$shift&"
+      "date=$singleDateString&"
+      "profileId=$defaultProfileId&"
+      "userPermission=$userPanel&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     //print('response body ${response.body}');
@@ -187,11 +189,13 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 
     //print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "userPermission=$userPanelPermission&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "userPermission=$userPanelPermission&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('BRANCH URL ${response.request}');
     //print('response body ${response.body}');
@@ -215,11 +219,13 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 
     print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "userPermission=$userPanel&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "userPermission=$userPanel&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
@@ -245,15 +251,17 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     setState(() {
       isLoadingEvent = true;
     });
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "branch=$branchId&"
-        "shift=$shift&"
-        "date=$singleDateString&"
-        "profileId=$defaultProfileId&"
-        "userPermission=$userPanel&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "branch=$branchId&"
+      "shift=$shift&"
+      "date=$singleDateString&"
+      "profileId=$defaultProfileId&"
+      "userPermission=$userPanel&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
@@ -278,14 +286,12 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
             margin: EdgeInsets.all(8),
             child: CircularProgressIndicator(),
           ),
-          new Text("Please Wait...",
-              style: TextStyle(
-                fontSize: 20,
-              )),
+          new Text("Please Wait...", style: TextStyle(fontSize: 20)),
         ],
       ),
     );
   }
+
   @override
   void initState() {
     super.initState();
@@ -299,15 +305,20 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 
     // TODO: implement initState
   }
+
   int pageIndex = 0;
   int currentIndex = 3;
   var titleName = "Dashboard";
   void _handleOption1(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Option 1 Selected')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Option 1 Selected')));
   }
 
   void _handleOption2(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Option 2 Selected')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Option 2 Selected')));
   }
 
   @override
@@ -317,11 +328,13 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          date = (await showDatePicker(
-              context: context,
-              initialDate: date,
-              firstDate: DateTime(1947),
-              lastDate: DateTime.now().add(Duration(days: 0))))!;
+          date =
+              (await showDatePicker(
+                context: context,
+                initialDate: date,
+                firstDate: DateTime(1947),
+                lastDate: DateTime.now().add(Duration(days: 0)),
+              ))!;
 
           setState(() {
             loader();
@@ -376,9 +389,10 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                     child: ValueListenableBuilder<String>(
                       valueListenable: selectedProfileNameNotifier,
                       builder: (context, value, _) {
-                        final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
-                            ? "COMPANY_EMPLOYEE"
-                            : value;
+                        final displayText =
+                            (userPanelPermission == "COMPANY_EMPLOYEE")
+                                ? "COMPANY_EMPLOYEE"
+                                : value;
 
                         return Text(
                           displayText,
@@ -419,34 +433,35 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
           ),
         ],*/
       ),
-      body: dashboardModelGlobal == null
-          ? loader()
-          : RefreshIndicator(
-          onRefresh: () {
-            return getSharedPrfanceList();
-          },
-          child: DashboardWidgets(dashboardModelGlobal!)),
+      body:
+          dashboardModelGlobal == null
+              ? loader()
+              : RefreshIndicator(
+                onRefresh: () {
+                  return getSharedPrfanceList();
+                },
+                child: DashboardWidgets(dashboardModelGlobal!),
+              ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
+          if (index == 0) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const PunchInOUtActivity(selectedIndex: 0),
+                builder:
+                    (context) => const PunchInOUtActivity(selectedIndex: 0),
               ),
             );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
+          if (index == 1) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -457,24 +472,26 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('workflow');
           }
-          if(index==2){
+          if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const PunchInOUtActivity(selectedIndex: 2),
+                builder:
+                    (context) => const PunchInOUtActivity(selectedIndex: 2),
               ),
             );
             print('Reports');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.uisNewDashboardRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             print('Profile');
           }
@@ -484,10 +501,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_rounded),
             label: 'Workflow',
@@ -531,7 +545,8 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     var oldEventLength;
     var oldJobLength;
     var oldJobEvent;
-    if (eventsListModalGlobal != null && eventsListModalGlobal!.bdayList != null) {
+    if (eventsListModalGlobal != null &&
+        eventsListModalGlobal!.bdayList != null) {
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
@@ -541,7 +556,8 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
       print("bdayList is null or eventsListModalGlobal is null");
     }
 
-    if (eventsListModalGlobal != null && eventsListModalGlobal!.joblist != null) {
+    if (eventsListModalGlobal != null &&
+        eventsListModalGlobal!.joblist != null) {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
@@ -593,36 +609,49 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       spacing: 2.0,
                       customSeparatorBuilder: (context, local, global) {
                         final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
                         return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
+                          indent: 10.0,
+                          endIndent: 10.0,
+                          color: Colors.white38.withOpacity(opacity),
+                        );
                       },
                       customIconBuilder: (context, local, global) {
                         final text = const ['ESS', 'MSS'][local.index];
                         return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: Color.lerp(
+                                Colors.black,
+                                Colors.white,
+                                local.animationValue,
+                              ),
+                            ),
+                          ),
+                        );
                       },
                       borderWidth: 0.0,
                       onChanged: (i) {
                         setState(() {
                           value = i;
                           print(i);
-
                         });
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
+                        if (value == 1) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.mssNewDashboardRoute,
+                          );
                         }
-                        if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        if (value == 0) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.essDashboardNavigateRoute,
+                          );
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -651,36 +680,49 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       spacing: 2.0,
                       customSeparatorBuilder: (context, local, global) {
                         final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
                         return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
+                          indent: 10.0,
+                          endIndent: 10.0,
+                          color: Colors.white38.withOpacity(opacity),
+                        );
                       },
                       customIconBuilder: (context, local, global) {
                         final text = const ['ESS', 'MSS MO'][local.index];
                         return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: Color.lerp(
+                                Colors.black,
+                                Colors.white,
+                                local.animationValue,
+                              ),
+                            ),
+                          ),
+                        );
                       },
                       borderWidth: 0.0,
                       onChanged: (i) {
                         setState(() {
                           value = i;
                           print(i);
-
                         });
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                        if (value == 1) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.mssMoNewDashboardRoute,
+                          );
                         }
-                        if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        if (value == 0) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.essDashboardNavigateRoute,
+                          );
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -803,8 +845,12 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                         ),
                         child: DropdownButtonFormField<int>(
                           isExpanded: true,
-                          icon: Visibility(visible: false, child: Icon(Icons.arrow_downward)),
-                          value: dropdownNewvalue, // Ensure this is initialized properly
+                          icon: Visibility(
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
+                          value:
+                              dropdownNewvalue, // Ensure this is initialized properly
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "All Branches",
@@ -814,13 +860,21 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                           items: [
                             DropdownMenuItem<int>(
                               value: 0,
-                              child: Text("All Branches", style: TextStyle(fontSize: 10)),
+                              child: Text(
+                                "All Branches",
+                                style: TextStyle(fontSize: 10),
+                              ),
                             ),
-                            ...?branchListModalGloabal?.data?.map<DropdownMenuItem<int>>((branch) {
+                            ...?branchListModalGloabal?.data?.map<
+                              DropdownMenuItem<int>
+                            >((branch) {
                               return DropdownMenuItem<int>(
-                                value: branch.branchId, // Use branchId as the unique value
+                                value:
+                                    branch
+                                        .branchId, // Use branchId as the unique value
                                 child: Text(
-                                  branch.branchName!.trim(), // Ensure clean display
+                                  branch.branchName!
+                                      .trim(), // Ensure clean display
                                   style: TextStyle(fontSize: 10),
                                 ),
                               );
@@ -850,25 +904,43 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                         ),
                         child: DropdownButtonFormField<int>(
                           isExpanded: true,
-                          icon: Visibility(visible: false, child: Icon(Icons.arrow_downward)),
-                          value: dropdownNewvalueShift, // Ensure this is initialized properly
+                          icon: Visibility(
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
+                          value:
+                              dropdownNewvalueShift, // Ensure this is initialized properly
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "All Shifts",
-                            hintStyle: TextStyle(fontSize: 14.2, overflow: TextOverflow.ellipsis),
+                            hintStyle: TextStyle(
+                              fontSize: 14.2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             contentPadding: EdgeInsets.all(5),
                           ),
                           items: [
                             DropdownMenuItem<int>(
                               value: 0,
-                              child: Text("All Shifts", style: TextStyle(fontSize: 10)),
+                              child: Text(
+                                "All Shifts",
+                                style: TextStyle(fontSize: 10),
+                              ),
                             ),
-                            ...?shiftListModalGlobal?.data?.map<DropdownMenuItem<int>>((shift) {
+                            ...?shiftListModalGlobal?.data?.map<
+                              DropdownMenuItem<int>
+                            >((shift) {
                               return DropdownMenuItem<int>(
-                                value: shift.shiftId, // Use shiftId as the unique value
+                                value:
+                                    shift
+                                        .shiftId, // Use shiftId as the unique value
                                 child: Text(
-                                  shift.shiftName!.trim(), // Remove unnecessary spaces/tabs
-                                  style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 10),
+                                  shift.shiftName!
+                                      .trim(), // Remove unnecessary spaces/tabs
+                                  style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: 10,
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -897,21 +969,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onTap: () {
                         if (totalPresentEmp == 0 || totalPresentEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      PresentEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  PresentEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -930,34 +1004,33 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$totalPresentEmp / $totalEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.lightBluishColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$totalPresentEmp / $totalEmp"
+                                              .text
+                                              .xl2
+                                              .bold
+                                              .color(Mythemes.lightBluishColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.groups,
-                                            size: 58,
-                                            color: Mythemes.lightBluishColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.groups,
+                                          size: 58,
+                                          color: Mythemes.lightBluishColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Attendance"
-                                          .text
-                                          .xl
+                                      "Attendance".text.xl
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .px8(),
@@ -976,21 +1049,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onTap: () {
                         if (totalAbsentEmp == 0 || totalAbsentEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      AbsentEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  AbsentEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1009,35 +1084,30 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$totalAbsentEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$totalAbsentEmp".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.not_interested,
                                           size: 55,
                                           color: Mythemes.dangerColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Not In"
-                                          .text
-                                          .xl
+                                      "Not In".text.xl
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .px8(),
@@ -1062,21 +1132,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onTap: () {
                         if (misPunchEmp == 0 || misPunchEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      MissPunchEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  MissPunchEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1095,34 +1167,30 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$misPunchEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.warningColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$misPunchEmp".text.xl2.bold
+                                              .color(Mythemes.warningColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.touch_app,
-                                            size: 58,
-                                            color: Mythemes.warningColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.touch_app,
+                                          size: 58,
+                                          color: Mythemes.warningColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Mispunch"
-                                          .text
-                                          .xl
+                                      "Mispunch".text.xl
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .px8(),
@@ -1141,21 +1209,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onTap: () {
                         if (onDuty == 0 || onDuty == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OnDutyEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  OnDutyEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1174,35 +1244,30 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$onDuty"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.successColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$onDuty".text.xl2.bold
+                                              .color(Mythemes.successColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.business_center,
                                           size: 55,
                                           color: Mythemes.successColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "On Duty"
-                                          .text
-                                          .xl
+                                      "On Duty".text.xl
                                           .color(Mythemes.successColor)
                                           .make()
                                           .px8(),
@@ -1227,21 +1292,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onTap: () {
                         if (lateIn == 0 || lateIn == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      LateInEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  LateInEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1260,34 +1327,30 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$lateIn"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.alertColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$lateIn".text.xl2.bold
+                                              .color(Mythemes.alertColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.assignment_late,
-                                            size: 58,
-                                            color: Mythemes.alertColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.assignment_late,
+                                          size: 58,
+                                          color: Mythemes.alertColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Late In"
-                                          .text
-                                          .xl
+                                      "Late In".text.xl
                                           .color(Mythemes.alertColor)
                                           .make()
                                           .px8(),
@@ -1306,21 +1369,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onTap: () {
                         if (earlyOutEmp == 0 || earlyOutEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      EarlyGoEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  EarlyGoEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1339,35 +1404,30 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$earlyOutEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.lightBluishColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$earlyOutEmp".text.xl2.bold
+                                              .color(Mythemes.lightBluishColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.directions_run,
                                           size: 55,
                                           color: Mythemes.lightBluishColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Early Go"
-                                          .text
-                                          .xl
+                                      "Early Go".text.xl
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .px8(),
@@ -1392,21 +1452,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onTap: () {
                         if (halfEmp == 0 || halfEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      HalfDayEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  HalfDayEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1425,34 +1487,30 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$halfEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.warningColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$halfEmp".text.xl2.bold
+                                              .color(Mythemes.warningColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.calendar_month,
-                                            size: 58,
-                                            color: Mythemes.warningColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.calendar_month,
+                                          size: 58,
+                                          color: Mythemes.warningColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Half Day"
-                                          .text
-                                          .xl
+                                      "Half Day".text.xl
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .px8(),
@@ -1471,21 +1529,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onTap: () {
                         if (overTime == 0 || overTime == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OverTimeEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  OverTimeEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1504,41 +1564,36 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      overTime == null ? "0".text.xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8() :
-                                      "$overTime"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : overTime == null
+                                          ? "0".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8()
+                                          : "$overTime".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.timelapse,
                                           size: 55,
                                           color: Mythemes.dangerColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Over Time"
-                                          .text
-                                          .xl
+                                      "Over Time".text.xl
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .px8(),
@@ -1554,89 +1609,98 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                   ),
                 ],
               ).pLTRB(0, 0, 0, 10.0),
-              empRole == 1 || roRole == 1 ?
-              DefaultTabController(
-                length: 3,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    // TabBar
-                    Material(
-                      color: Mythemes.whitish,
-                      child: TabBar(
-                        indicatorColor: Colors.deepPurple,
-                        indicatorWeight: 3,
-                        labelColor: Colors.deepPurple,
-                        unselectedLabelColor: Mythemes.blackishade,
-                        tabs: const [
-                          Tab(icon: Icon(Icons.celebration), text: "Birthday"),
-                          Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
-                          Tab(icon: Icon(Icons.today), text: "Today Events"),
-                        ],
-                      ),
-                    ),
-
-                    // Tab Views
-                    SizedBox(
-                      height: 400,
-                      child: TabBarView(
-                        children: [
-                          // 🎂 Birthday Tab
-                          buildEventList(
-                            isLoading: isLoadingEvent,
-                            items: eventsListModalGlobal?.bdayList ?? [],
-                            emptyText: "No birthdays today 🎉",
-                            titleBuilder: (item) => item.fullName,
-                            subtitleBuilder: (item) => item.department,
-                            trailingBuilder: (item) => item.dob,
-                            imageBuilder: (item) => item.image,
+              empRole == 1 || roRole == 1
+                  ? DefaultTabController(
+                    length: 3,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        // TabBar
+                        Material(
+                          color: Mythemes.whitish,
+                          child: TabBar(
+                            indicatorColor: Colors.deepPurple,
+                            indicatorWeight: 3,
+                            labelColor: Colors.deepPurple,
+                            unselectedLabelColor: Mythemes.blackishade,
+                            tabs: const [
+                              Tab(
+                                icon: Icon(Icons.celebration),
+                                text: "Birthday",
+                              ),
+                              Tab(
+                                icon: Icon(Icons.workspace_premium_outlined),
+                                text: "Work Anniversary",
+                              ),
+                              Tab(
+                                icon: Icon(Icons.today),
+                                text: "Today Events",
+                              ),
+                            ],
                           ),
+                        ),
 
-                          // 🏅 Anniversary Tab
-                          buildEventList(
-                            isLoading: isLoadingEvent,
-                            items: eventsListModalGlobal?.joblist ?? [],
-                            emptyText: "No anniversaries today 🎊",
-                            titleBuilder: (item) => item.fullName,
-                            subtitleBuilder: (item) => item.department,
-                            trailingBuilder: (item) => item.doj,
-                            imageBuilder: (item) => item.image,
-                          ),
-
-                          // 📅 Today Events Tab (combine lists)
-                          ListView(
+                        // Tab Views
+                        SizedBox(
+                          height: 400,
+                          child: TabBarView(
                             children: [
+                              // ðŸŽ‚ Birthday Tab
                               buildEventList(
                                 isLoading: isLoadingEvent,
                                 items: eventsListModalGlobal?.bdayList ?? [],
-                                emptyText: "No birthday events today 🎂",
+                                emptyText: "No birthdays today ðŸŽ‰",
                                 titleBuilder: (item) => item.fullName,
                                 subtitleBuilder: (item) => item.department,
                                 trailingBuilder: (item) => item.dob,
                                 imageBuilder: (item) => item.image,
                               ),
+
+                              // ðŸ… Anniversary Tab
                               buildEventList(
                                 isLoading: isLoadingEvent,
                                 items: eventsListModalGlobal?.joblist ?? [],
-                                emptyText: "No work anniversaries today 🎉",
+                                emptyText: "No anniversaries today ðŸŽŠ",
                                 titleBuilder: (item) => item.fullName,
                                 subtitleBuilder: (item) => item.department,
                                 trailingBuilder: (item) => item.doj,
                                 imageBuilder: (item) => item.image,
                               ),
+
+                              // ðŸ“… Today Events Tab (combine lists)
+                              ListView(
+                                children: [
+                                  buildEventList(
+                                    isLoading: isLoadingEvent,
+                                    items:
+                                        eventsListModalGlobal?.bdayList ?? [],
+                                    emptyText: "No birthday events today ðŸŽ‚",
+                                    titleBuilder: (item) => item.fullName,
+                                    subtitleBuilder: (item) => item.department,
+                                    trailingBuilder: (item) => item.dob,
+                                    imageBuilder: (item) => item.image,
+                                  ),
+                                  buildEventList(
+                                    isLoading: isLoadingEvent,
+                                    items: eventsListModalGlobal?.joblist ?? [],
+                                    emptyText:
+                                        "No work anniversaries today ðŸŽ‰",
+                                    titleBuilder: (item) => item.fullName,
+                                    subtitleBuilder: (item) => item.department,
+                                    trailingBuilder: (item) => item.doj,
+                                    imageBuilder: (item) => item.image,
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ) :
-              //TabSection(EventsListModal()!) :
-              SizedBox(
-                height: 0,
-              )
-              ,
+                        ),
+                      ],
+                    ),
+                  )
+                  :
+                  //TabSection(EventsListModal()!) :
+                  SizedBox(height: 0),
             ],
           ),
         ),
@@ -1654,9 +1718,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     required String Function(T) imageBuilder,
   }) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(strokeWidth: 3),
-      );
+      return const Center(child: CircularProgressIndicator(strokeWidth: 3));
     }
 
     if (items.isEmpty) {
@@ -1699,10 +1761,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
             ),
             subtitle: Text(
               subtitleBuilder(item),
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
             trailing: Text(
               trailingBuilder(item),
@@ -1723,13 +1782,13 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     var oldEventLength;
     var oldJobLength;
     var oldJobEvent;
-    for(int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
+    for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
       print("oldEvent $oldEvent");
     }
 
-    for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
+    for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
       print("oldJobEvent $oldJobEvent");
@@ -1751,17 +1810,11 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
               child: TabBar(
                 tabs: [
                   Tab(
-                    icon: Icon(
-                      Icons.cake,
-                      color: Mythemes.blackishade,
-                    ),
+                    icon: Icon(Icons.cake, color: Mythemes.blackishade),
                     text: "Birthday",
                   ),
                   Tab(
-                    icon: Icon(
-                      Icons.cake,
-                      color: Mythemes.blackishade,
-                    ),
+                    icon: Icon(Icons.cake, color: Mythemes.blackishade),
                     text: "Anniversary",
                   ),
                   Tab(
@@ -1777,175 +1830,234 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: TabBarView(children: [
-
-              Container(
-                // height: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child:
-                  oldEventLength == null ? "There is no data available.".text.center.make().py16() :
-                  ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: eventsListModalGlobal!.bdayList!.length,
-                      itemBuilder: (context, itemCount) {
-                        return Card(
-                          child: ListTile(
-                            //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
-                            title: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].fullName
-                                .toString()),
-                            subtitle: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].department
-                                .toString()),
-                            trailing: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].dob
-                                .toString()),
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                    eventsListModalGlobal!
-                                        .bdayList![itemCount].image
-                                        .toString()),
-                                backgroundColor: Colors.grey,
-                                // child: Image.network(imageString!),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-              ),
-              Container(
-                // height: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child:
-                  oldJobLength == null ? "There is no data available.".text.center.make().py16() :
-                  ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: eventsListModalGlobal!.joblist!.length,
-                      itemBuilder: (context, itemCount) {
-                        return Card(
-                          child: ListTile(
-                            title: Text(eventsListModalGlobal!
-                                .joblist![itemCount].fullName
-                                .toString()),
-                            subtitle: Text(eventsListModalGlobal!
-                                .joblist![itemCount].department
-                                .toString()),
-                            trailing: Text(eventsListModalGlobal!
-                                .joblist![itemCount].doj
-                                .toString()),
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                    eventsListModalGlobal!
-                                        .joblist![itemCount].image
-                                        .toString()),
-                                backgroundColor: Colors.grey,
-                                // child: Image.network(imageString!),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-              ),
-              Container(
-                // height: 1,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                      oldEvent != todayEvent ? "There is no data available.".text.make().py16() :
-
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: eventsListModalGlobal!.bdayList!.length,
-                          itemBuilder: (context, itemCount) {
-
-                            return Card(
-                              child: ListTile(
-                                title: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].fullName
-                                    .toString()),
-                                subtitle: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].department
-                                    .toString()),
-                                trailing: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].dob
-                                    .toString()),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                        eventsListModalGlobal!
-                                            .bdayList![itemCount].image
-                                            .toString()),
-                                    backgroundColor: Colors.grey,
-                                    // child: Image.network(imageString!),
+            child: TabBarView(
+              children: [
+                Container(
+                  // height: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        oldEventLength == null
+                            ? "There is no data available.".text.center
+                                .make()
+                                .py16()
+                            : ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount:
+                                  eventsListModalGlobal!.bdayList!.length,
+                              itemBuilder: (context, itemCount) {
+                                return Card(
+                                  child: ListTile(
+                                    //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
+                                    title: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .fullName
+                                          .toString(),
+                                    ),
+                                    subtitle: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .department
+                                          .toString(),
+                                    ),
+                                    trailing: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .dob
+                                          .toString(),
+                                    ),
+                                    leading: Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .image
+                                              .toString(),
+                                        ),
+                                        backgroundColor: Colors.grey,
+                                        // child: Image.network(imageString!),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                      oldJobEvent != todayEvent ? "".text.make() :
-
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: eventsListModalGlobal!.joblist!.length,
-                          itemBuilder: (context, itemCount) {
-                            return Card(
-                              child: ListTile(
-                                title: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].fullName
-                                    .toString()),
-                                subtitle: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].department
-                                    .toString()),
-                                trailing: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].doj
-                                    .toString()),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                        eventsListModalGlobal!
-                                            .bdayList![itemCount].image
-                                            .toString()),
-                                    backgroundColor: Colors.grey,
-                                    // child: Image.network(imageString!),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
+                                );
+                              },
+                            ),
+                  ),
                 ),
-              ),
-            ]),
-          )
+                Container(
+                  // height: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        oldJobLength == null
+                            ? "There is no data available.".text.center
+                                .make()
+                                .py16()
+                            : ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: eventsListModalGlobal!.joblist!.length,
+                              itemBuilder: (context, itemCount) {
+                                return Card(
+                                  child: ListTile(
+                                    title: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .fullName
+                                          .toString(),
+                                    ),
+                                    subtitle: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .department
+                                          .toString(),
+                                    ),
+                                    trailing: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .doj
+                                          .toString(),
+                                    ),
+                                    leading: Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .image
+                                              .toString(),
+                                        ),
+                                        backgroundColor: Colors.grey,
+                                        // child: Image.network(imageString!),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                  ),
+                ),
+                Container(
+                  // height: 1,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            oldEvent != todayEvent
+                                ? "There is no data available.".text
+                                    .make()
+                                    .py16()
+                                : ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      eventsListModalGlobal!.bdayList!.length,
+                                  itemBuilder: (context, itemCount) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .fullName
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .department
+                                              .toString(),
+                                        ),
+                                        trailing: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .dob
+                                              .toString(),
+                                        ),
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount]
+                                                  .image
+                                                  .toString(),
+                                            ),
+                                            backgroundColor: Colors.grey,
+                                            // child: Image.network(imageString!),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            oldJobEvent != todayEvent
+                                ? "".text.make()
+                                : ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      eventsListModalGlobal!.joblist!.length,
+                                  itemBuilder: (context, itemCount) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .fullName
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .department
+                                              .toString(),
+                                        ),
+                                        trailing: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .doj
+                                              .toString(),
+                                        ),
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount]
+                                                  .image
+                                                  .toString(),
+                                            ),
+                                            backgroundColor: Colors.grey,
+                                            // child: Image.network(imageString!),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -1996,12 +2108,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               border: OutlineInputBorder(),
             ),
             value: selectedOrg,
-            items: organizations.map((org) {
-              return DropdownMenuItem(
-                value: org,
-                child: Text(org),
-              );
-            }).toList(),
+            items:
+                organizations.map((org) {
+                  return DropdownMenuItem(value: org, child: Text(org));
+                }).toList(),
             onChanged: (value) {
               setState(() {
                 selectedOrg = value;
@@ -2022,7 +2132,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               if (pickedDate != null) {
                 setState(() {
                   selectedDate = pickedDate;
-                  selectedDateFormatted = DateFormat('dd-MM-yyyy').format(pickedDate);
+                  selectedDateFormatted = DateFormat(
+                    'dd-MM-yyyy',
+                  ).format(pickedDate);
                 });
               }
             },

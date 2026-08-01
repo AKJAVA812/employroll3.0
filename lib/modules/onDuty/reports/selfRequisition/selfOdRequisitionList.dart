@@ -17,6 +17,7 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'modalClass/selfOdReqListModal.dart';
 
@@ -24,9 +25,11 @@ class SelfODRequisitionList extends StatefulWidget {
   final String startDate;
   final String endDate;
 
-  const SelfODRequisitionList(
-      {Key? key, required this.startDate, required this.endDate})
-      : super(key: key);
+  const SelfODRequisitionList({
+    Key? key,
+    required this.startDate,
+    required this.endDate,
+  }) : super(key: key);
 
   @override
   State<SelfODRequisitionList> createState() =>
@@ -40,7 +43,8 @@ String? sessionId;
 bool isLoading = false;
 SelfOdReqListModal? selfOdReqListLabel;
 
-class _SelfODRequisitionListState extends State<SelfODRequisitionList> with RouteAware {
+class _SelfODRequisitionListState extends State<SelfODRequisitionList>
+    with RouteAware {
   String startDate;
   String endDate;
   var empNewId;
@@ -62,10 +66,11 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
     empNewId = "0";
@@ -75,7 +80,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
     super.initState();
   }
 
-/*  Future getEmpId() async {
+  /*  Future getEmpId() async {
     empNewId = await shared!.getEmpId();
     print('Response snapshot: ${empNewId}');
   }*/
@@ -86,12 +91,16 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
     print('ResponseAttendance: ${startDate}');
     print('ResponseAttendance: ${endDate}');
     //await Future.delayed(Duration(seconds: 3));
-    Future<SelfOdReqListModal> getEmployeeList11 =
-        getSelfOdReqList(sessionId!, startDate, endDate);
+    Future<SelfOdReqListModal> getEmployeeList11 = getSelfOdReqList(
+      sessionId!,
+      startDate,
+      endDate,
+    );
     if (getEmployeeList11 == null) {
-      return Center(child: "HIi".text.make()
-          //CircularProgressIndicator()
-          );
+      return Center(
+        child: "HIi".text.make(),
+        //CircularProgressIndicator()
+      );
     }
     getEmployeeList11.then((value) {
       setState(() {
@@ -157,18 +166,23 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
     }
   }
 
-
-  Future<SelfOdReqListModal> getSelfOdReqList(String sessionId, String startDate, String endDate) async {
+  Future<SelfOdReqListModal> getSelfOdReqList(
+    String sessionId,
+    String startDate,
+    String endDate,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.selfOdReqList;
     print('employeeList11: ${sessionId}');
     SelfOdReqListModal selfOdReqListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "empid=$empNewId&"
-        "startdate=$endDate&"
-        "enddate=$startDate");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "empid=$empNewId&"
+      "startdate=$endDate&"
+      "enddate=$startDate",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
     if (response.statusCode == 200) {
@@ -184,7 +198,11 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
         //String reason = mapResponse['reason'];
         if (result.compareToIgnoringCase("error") == 0) {
           //Navigator.of(context, rootNavigator: true).pop();
-          showNullDialog(context, "There is no any requisition.".upperCamelCase + " ", "Error");
+          showNullDialog(
+            context,
+            "There is no any requisition.".upperCamelCase + " ",
+            "Error",
+          );
           // showDialgSucess(context, reason, "Success");
         }
       }
@@ -203,11 +221,10 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
     return selfOdReqListModal;
   }
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -224,93 +241,100 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             //Navigator.pop(buildContext);
-
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
+
   int pageIndex = 0;
   int currentIndex = 3;
   @override
   Widget build(BuildContext context) {
     return DismissKeyboard(
       child: Scaffold(
-        appBar: AppBar(
-          title: "My OD Requests".text.make(),
-        ),
+        appBar: AppBar(title: "My OD Requests".text.make()),
         body: Container(
           child: Column(
             children: [
               Row(
                 children: [
                   Expanded(
-                    child:  TextFormField(
-                      onTap: () async{
-                        _selectDate(context);
-                      },
-                      readOnly: true,
-                      enabled: true,
-                      controller: _fromDateController,
-                      // initialValue: "Head Office",
-                      decoration: InputDecoration(
-                        suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                        enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                          borderSide: BorderSide(
-                              width: 1, color: Mythemes.blackishade),
-                        ),
-                        labelText: "From Date",
-                        hintStyle: TextStyle(
-                          fontSize: 12,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        /*border: OutlineInputBorder(
+                    child:
+                        TextFormField(
+                          onTap: () async {
+                            _selectDate(context);
+                          },
+                          readOnly: true,
+                          enabled: true,
+                          controller: _fromDateController,
+                          // initialValue: "Head Office",
+                          decoration: InputDecoration(
+                            suffixIcon: Icon(Icons.calendar_month, size: 18),
+                            enabledBorder: UnderlineInputBorder(
+                              //<-- SEE HERE
+                              borderSide: BorderSide(
+                                width: 1,
+                                color: Mythemes.blackishade,
+                              ),
+                            ),
+                            labelText: "From Date",
+                            hintStyle: TextStyle(fontSize: 12),
+                            contentPadding: EdgeInsets.all(5),
+                            /*border: OutlineInputBorder(
                                           borderRadius:
                                           BorderRadius.all(Radius.circular(8))),*/
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500,fontSize: 13,
-                            color: Mythemes.blackish),
-                      ),
-                    ).p8(),
+                            // labelText: "Location",
+                            labelStyle: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                              color: Mythemes.blackish,
+                            ),
+                          ),
+                        ).p8(),
                   ),
 
                   Expanded(
-                    child:  TextFormField(
-                      onTap: () async{
-                        _selectToDate(context);
-                      },
-                      readOnly: true,
-                      enabled: true,
-                      controller: _toDateController,
-                      // initialValue: "Head Office",
-                      decoration: InputDecoration(
-                        suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                        enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                          borderSide: BorderSide(
-                              width: 1, color: Mythemes.blackishade),
-                        ),
-                        labelText: "To Date",
-                        hintStyle: TextStyle(
-                          fontSize: 12,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        /*border: OutlineInputBorder(
+                    child:
+                        TextFormField(
+                          onTap: () async {
+                            _selectToDate(context);
+                          },
+                          readOnly: true,
+                          enabled: true,
+                          controller: _toDateController,
+                          // initialValue: "Head Office",
+                          decoration: InputDecoration(
+                            suffixIcon: Icon(Icons.calendar_month, size: 18),
+                            enabledBorder: UnderlineInputBorder(
+                              //<-- SEE HERE
+                              borderSide: BorderSide(
+                                width: 1,
+                                color: Mythemes.blackishade,
+                              ),
+                            ),
+                            labelText: "To Date",
+                            hintStyle: TextStyle(fontSize: 12),
+                            contentPadding: EdgeInsets.all(5),
+                            /*border: OutlineInputBorder(
                                           borderRadius:
                                           BorderRadius.all(Radius.circular(8))),*/
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500,fontSize: 13,
-                            color: Mythemes.blackish),
-                      ),
-                    ).p8(),
+                            // labelText: "Location",
+                            labelStyle: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                              color: Mythemes.blackish,
+                            ),
+                          ),
+                        ).p8(),
                   ),
                 ],
               ).pLTRB(0, 0, 0, 8),
@@ -323,27 +347,36 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                       if (_date.compareTo(_newdate) > 0) {
                         return setState(() {
                           AlertDialog(
-                            content: "Please select valid date range".text.make(),
+                            content:
+                                "Please select valid date range".text.make(),
                           );
                           print("select valid date range");
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("Please Select Valid Date Range "),
-                          ));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Please Select Valid Date Range "),
+                            ),
+                          );
                         });
                       }
 
                       if (changeDates == false && changeNewDate == false) {
-                        bool result = await InternetConnectionChecker().hasConnection;
-                        if(result == false) {
+                        bool result =
+                            await InternetConnectionChecker().hasConnection;
+                        if (result == false) {
                           setState(() {
                             AlertDialog(
-                              content: "Please check your internet connection".text.make(),
+                              content:
+                                  "Please check your internet connection".text
+                                      .make(),
                             );
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("Please check your Internet connection."),
-                            ));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Please check your Internet connection.",
+                                ),
+                              ),
+                            );
                           });
-
                         } else {
                           isLoading = true;
                           sessionId = await shared!.getSessionId();
@@ -352,7 +385,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                           print('ResponseAttendance: ${endDate}');
                           //await Future.delayed(Duration(seconds: 3));
                           Future<SelfOdReqListModal> getEmployeeList11 =
-                          getSelfOdReqList(sessionId!, startDate, endDate);
+                              getSelfOdReqList(sessionId!, startDate, endDate);
                           getEmployeeList11.then((value) {
                             setState(() {
                               selfOdReqListLabel = value;
@@ -361,70 +394,90 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                             //print('employeeList00${selfOdReqListModal!.listdata!.length}');
                           });
                         }
-
                       } else {
                         print("Please select date");
                         setState(() {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("Please Select Date Range "),
-                          ));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Please Select Date Range "),
+                            ),
+                          );
                         });
                       }
                     },
                     style: ButtonStyle(
-                      backgroundColor:
-                      MaterialStateProperty.all(Mythemes.lightBluishColor),
+                      backgroundColor: MaterialStateProperty.all(
+                        Mythemes.lightBluishColor,
+                      ),
                     ),
                     child: "Submit".text.make(),
                   ).wh(120, 45).py(12),
                 ],
               ),
               Expanded(
-                  child: isLoading
-                      ? CircularProgressIndicator():
-                  selfOdReqListLabel == null
-                      ? Center(child: "Please select date range.".text.make())
-                      : getSelfOdRequisitionList(selfOdReqListLabel!)),
+                child:
+                    isLoading
+                        ? CircularProgressIndicator()
+                        : selfOdReqListLabel == null
+                        ? Center(child: "Please select date range.".text.make())
+                        : getSelfOdRequisitionList(selfOdReqListLabel!),
+              ),
             ],
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+                ),
+              );
               //Navigator.pop(context);
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GetAttendanceDet(showAppBar: true),
+                ),
+              );
               print('My Requests');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyAllReportsPage(showAppBar: true),
+                ),
+              );
 
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('My Reports');
             }
-            if(index==4){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            if (index == 4) {
+              Navigator.pushNamed(
+                context,
+                MyRoutings.essDashboardNavigateRoute,
+              );
 
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Dashboard');
@@ -435,10 +488,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -462,21 +512,17 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
       ),
     );
   }
+
   var statusColor;
   showNullDialog(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-        Radius.circular(10.0),
-      )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Expanded(
-              child: Text(
-            alert,
-            style: TextStyle(fontSize: 18),
-          )),
+          Expanded(child: Text(alert, style: TextStyle(fontSize: 18))),
         ],
       ),
       content: Text(result, style: TextStyle(fontSize: 14)),
@@ -485,32 +531,36 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
         TextButton(
-            onPressed: () {
-              Navigator.of(buildContext, rootNavigator: true).pop();
-              //Navigator.pop(buildContext);
-            },
-            child: Container(
-              child: Text("Ok"),
-            )),
+          onPressed: () {
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            //Navigator.pop(buildContext);
+          },
+          child: Container(child: Text("Ok")),
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   getSelfOdRequisitionList(SelfOdReqListModal selfOdReqListModal) {
     return ListView.builder(
       padding: EdgeInsets.all(5.0),
-      itemCount: selfOdReqListModal.listdata != null ? selfOdReqListModal.listdata!.length : 0,
+      itemCount:
+          selfOdReqListModal.listdata != null
+              ? selfOdReqListModal.listdata!.length
+              : 0,
       shrinkWrap: true,
       itemBuilder: (context, itemCount) {
         length = selfOdReqListModal.listdata!.length;
         print("length of data $length");
-        var statusCheck = selfOdReqListModal.listdata![itemCount].approvalstatus;
+        var statusCheck =
+            selfOdReqListModal.listdata![itemCount].approvalstatus;
         if (statusCheck == 'Approved') {
           statusColor = Mythemes.successColor;
         } else if (statusCheck == 'DisApproved') {
@@ -520,9 +570,10 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
         }
         if (length == null) {
           return showNullDialog(
-              context,
-              "There is no data avialable.".upperCamelCase + " ",
-              "Alert Message");
+            context,
+            "There is no data avialable.".upperCamelCase + " ",
+            "Alert Message",
+          );
         }
 
         return InkWell(
@@ -531,16 +582,19 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
             print("length of data $length");
             if (length == null) {
               return showNullDialog(
-                  context,
-                  "There is no data avialable.".upperCamelCase + " ",
-                  "Alert Message");
+                context,
+                "There is no data avialable.".upperCamelCase + " ",
+                "Alert Message",
+              );
             }
             /* Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
                   OdApproveDisapproveReq(pendingOdReqList, itemCount)));*/
           },
           child: Card(
             elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Padding(
               padding: const EdgeInsets.all(12.0),
@@ -582,7 +636,8 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                           children: [
                             // Name
                             Text(
-                              selfOdReqListModal.listdata![itemCount].name.toString(),
+                              selfOdReqListModal.listdata![itemCount].name
+                                  .toString(),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
@@ -595,12 +650,22 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(Icons.location_on, size: 16, color: Colors.redAccent),
+                                const Icon(
+                                  Icons.location_on,
+                                  size: 16,
+                                  color: Colors.redAccent,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    selfOdReqListModal.listdata![itemCount].odaddress.toString(),
-                                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                    selfOdReqListModal
+                                        .listdata![itemCount]
+                                        .odaddress
+                                        .toString(),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey[700],
+                                    ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -611,12 +676,22 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.redAccent),
+                                const Icon(
+                                  Icons.chat_bubble_outline,
+                                  size: 16,
+                                  color: Colors.redAccent,
+                                ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    selfOdReqListModal.listdata![itemCount].remark.toString(),
-                                    style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                    selfOdReqListModal
+                                        .listdata![itemCount]
+                                        .remark
+                                        .toString(),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey[700],
+                                    ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -634,7 +709,10 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            selfOdReqListModal.listdata![itemCount].approvalstatus.toString(),
+                            selfOdReqListModal
+                                .listdata![itemCount]
+                                .approvalstatus
+                                .toString(),
                             style: TextStyle(
                               color: statusColor,
                               fontWeight: FontWeight.bold,
@@ -664,7 +742,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                         )
                       ],
                     ),*/
-
                   const SizedBox(height: 12),
                   const Divider(height: 1),
 
@@ -679,19 +756,31 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.touch_app, size: 32, color: Mythemes.lightBluishColor),
+                            Icon(
+                              Icons.touch_app,
+                              size: 32,
+                              color: Mythemes.lightBluishColor,
+                            ),
                             const SizedBox(width: 6),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  selfOdReqListModal.listdata![itemCount].odtype.toString(),
-                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                  selfOdReqListModal.listdata![itemCount].odtype
+                                      .toString(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  selfOdReqListModal.listdata![itemCount].odtime.toString(),
-                                  style: const TextStyle(color: Colors.black87, fontSize: 13),
+                                  selfOdReqListModal.listdata![itemCount].odtime
+                                      .toString(),
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -704,20 +793,36 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.date_range, size: 32, color: Mythemes.lightBluishColor),
+                            Icon(
+                              Icons.date_range,
+                              size: 32,
+                              color: Mythemes.lightBluishColor,
+                            ),
                             const SizedBox(width: 6),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
                                   'Date',
-                                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  DateFormat("dd-MM-yyyy")
-                                      .format(DateTime.parse(selfOdReqListModal.listdata![itemCount].date.toString())),
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                  DateFormat("dd-MM-yyyy").format(
+                                    DateTime.parse(
+                                      selfOdReqListModal
+                                          .listdata![itemCount]
+                                          .date
+                                          .toString(),
+                                    ),
+                                  ),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -725,7 +830,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -735,6 +840,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList> with Rout
     );
   }
 }
+
 class SearchItems extends SearchDelegate {
   List<String> searchTerms = [];
 
@@ -775,9 +881,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
@@ -794,9 +898,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

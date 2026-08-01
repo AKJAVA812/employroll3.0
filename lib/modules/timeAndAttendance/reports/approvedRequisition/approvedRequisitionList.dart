@@ -5,6 +5,7 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -21,11 +22,13 @@ import 'approvedRequisitionModel.dart';
 
 class ApprovedRequisiton extends StatefulWidget {
   final ApprovedRequisitionModel approvedRequisitionModel;
-  ApprovedRequisiton (this.approvedRequisitionModel);
+  ApprovedRequisiton(this.approvedRequisitionModel);
 
   @override
-  State<ApprovedRequisiton> createState() => _ApprovedRequisitonState(approvedRequisitionModel);
+  State<ApprovedRequisiton> createState() =>
+      _ApprovedRequisitonState(approvedRequisitionModel);
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
@@ -36,7 +39,8 @@ dynamic getProfileId;
 
 ApprovedRequisitionModel? approvedRequisitionLabel;
 
-class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware{
+class _ApprovedRequisitonState extends State<ApprovedRequisiton>
+    with RouteAware {
   final ApprovedRequisitionModel approvedRequisitionModel;
   _ApprovedRequisitonState(this.approvedRequisitionModel);
   @override
@@ -53,11 +57,10 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
-
 
   @override
   void initState() {
@@ -71,18 +74,20 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
     userPanelPerm = await shared.getUserPanel();
     getProfileId = await shared.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<ApprovedRequisitionModel> getAppReq11 = getApprovedReqList(sessionId!);
+    Future<ApprovedRequisitionModel> getAppReq11 = getApprovedReqList(
+      sessionId!,
+    );
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
-        approvedRequisitionLabel=value;
+        approvedRequisitionLabel = value;
       });
       print('employeeList00${approvedRequisitionLabel!.data!.length}');
     });
@@ -93,12 +98,14 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
     String apiUrl = ApiDetails.approvedAttReqList;
     print('employeeList11: ${SessionId}');
     ApprovedRequisitionModel approvedRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "userPermission=$userPanelPerm&"
-        "profileId=$getProfileId&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "userPermission=$userPanelPerm&"
+      "profileId=$getProfileId&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('Attendance Approved APIs - ${response.request}');
 
     print('responseemployeeList ${response.body}');
@@ -106,10 +113,11 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    approvedRequisitionModel=ApprovedRequisitionModel.fromJson(mapResponse);
+    approvedRequisitionModel = ApprovedRequisitionModel.fromJson(mapResponse);
 
     return approvedRequisitionModel;
   }
+
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 1;
@@ -118,19 +126,18 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
     return Scaffold(
       appBar: AppBar(
         title: "Approved Requisition List".text.make(),
-       /* leading: IconButton(
+        /* leading: IconButton(
             onPressed: () {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             },
             icon: Icon(Icons.arrow_back_ios)),*/
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context, delegate: SearchItems(),
-                );
-
-              }, icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(context: context, delegate: SearchItems());
+            },
+            icon: Icon(Icons.search),
+          ),
         ],
       ),
 
@@ -159,50 +166,58 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
                   styleAnimationType: AnimationType.onHover,
                   spacing: 10.0,
                   customSeparatorBuilder: (context, local, global) {
-                    final opacity =
-                    ((global.position - local.position).abs() - 0.5)
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
                         .clamp(0.0, 1.0);
                     return VerticalDivider(
-                        indent: 10.0,
-                        endIndent: 10.0,
-                        color: Colors.white38.withOpacity(opacity));
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
                   },
                   customIconBuilder: (context, local, global) {
                     final text = const ['Pending', 'Approved'][local.index];
                     return Center(
-                        child: Text(text,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(Colors.black, Colors.white,
-                                    local.animationValue))));
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   borderWidth: 0.0,
                   onChanged: (i) {
                     setState(() {
                       value = i;
                       print(i);
-
                     });
 
-                    if(value == 0) {
+                    if (value == 0) {
                       Navigator.pushNamed(context, MyRoutings.pendingReqRoute);
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
-                    if(value == 1) {
+                    if (value == 1) {
                       Navigator.pushNamed(context, MyRoutings.approvedReqRoute);
                     }
-                   /* if(value == 2) {
+                    /* if(value == 2) {
                       Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
                     }*/
                   },
-                )
+                ),
               ],
             ).py(4),
             Expanded(
-                child: approvedRequisitionLabel == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getAppRovedReqList(approvedRequisitionLabel!)),
+              child:
+                  approvedRequisitionLabel == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getAppRovedReqList(approvedRequisitionLabel!),
+            ),
           ],
         ),
       ),
@@ -213,46 +228,50 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
         ),
         mini: false,
         onPressed: () async {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetAttendanceDet()));
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => GetAttendanceDet()));
         },
         backgroundColor: Mythemes.lightBluishColor,
-        child: Icon(Icons.add, color: Mythemes.whitish,),
+        child: Icon(Icons.add, color: Mythemes.whitish),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             print('My Requests');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -263,10 +282,7 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -294,13 +310,14 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  ApprovedRequisiton(ApprovedRequisitionModel()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) => ApprovedRequisiton(ApprovedRequisitionModel()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -308,89 +325,131 @@ class _ApprovedRequisitonState extends State<ApprovedRequisiton> with RouteAware
         itemCount: approvedRequisitionModel.data!.length,
         itemBuilder: (context, i) {
           return Card(
-              elevation: 2,
-              child: Container(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        approvedRequisitionModel.data![i].empName.toString().text.make().px8().py4(),
-                        Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                "Approved".text.bold.color(Mythemes.successColor).sm.make().px8(),
-                              ],
-                            )
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        approvedRequisitionModel.data![i].onDate.toString().text.textStyle(context.captionStyle).make().px8(),
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.touch_app, size: 35, color: Mythemes.lightBluishColor,
-                              ),
-                            ],
-                          ),
+            elevation: 2,
+            child: Container(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      approvedRequisitionModel.data![i].empName
+                          .toString()
+                          .text
+                          .make()
+                          .px8()
+                          .py4(),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            "Approved".text.bold
+                                .color(Mythemes.successColor)
+                                .sm
+                                .make()
+                                .px8(),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              "In Time".text.sm.make(),
-                              approvedRequisitionModel.data![i].inTime.toString().text.sm.make()
-                            ],
-                          ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      approvedRequisitionModel.data![i].onDate
+                          .toString()
+                          .text
+                          .textStyle(context.captionStyle)
+                          .make()
+                          .px8(),
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15,
+                          left: 5,
+                          right: 3,
+                          bottom: 18,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.touch_app, size: 35, color: Mythemes.lightBluishColor,
-                              ),
-                            ],
-                          ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.touch_app,
+                              size: 35,
+                              color: Mythemes.lightBluishColor,
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              "Out Time".text.sm.make(),
-                              approvedRequisitionModel.data![i].outTime.toString().text.sm.make()
-                            ],
-                          ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15,
+                          left: 5,
+                          right: 3,
+                          bottom: 18,
                         ),
-                      ],
-                    )
-                  ],
-                ),
-              )
+                        child: Column(
+                          children: [
+                            "In Time".text.sm.make(),
+                            approvedRequisitionModel.data![i].inTime
+                                .toString()
+                                .text
+                                .sm
+                                .make(),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15,
+                          left: 5,
+                          right: 3,
+                          bottom: 18,
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.touch_app,
+                              size: 35,
+                              color: Mythemes.lightBluishColor,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15,
+                          left: 5,
+                          right: 3,
+                          bottom: 18,
+                        ),
+                        child: Column(
+                          children: [
+                            "Out Time".text.sm.make(),
+                            approvedRequisitionModel.data![i].outTime
+                                .toString()
+                                .text
+                                .sm
+                                .make(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           );
         },
-
       ),
     );
   }
 }
 
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -415,6 +474,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -427,12 +487,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -445,9 +504,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

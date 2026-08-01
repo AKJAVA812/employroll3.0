@@ -17,8 +17,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.employroll.employroll"
-    compileSdk = flutter.compileSdkVersion
+    namespace = "com.erzone.employroll"
+    compileSdk = 36
     ndkVersion = "29.0.13113456"
 
     compileOptions {
@@ -32,7 +32,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.employroll.employroll"
+        applicationId = "com.erzone.employroll"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

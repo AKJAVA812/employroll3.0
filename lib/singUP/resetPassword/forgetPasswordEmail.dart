@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/routes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../themes/empThemes.dart';
 import '../login_page.dart';
@@ -14,12 +15,13 @@ class ForgotPasswordEmailPage extends StatefulWidget {
   const ForgotPasswordEmailPage({super.key});
 
   @override
-  State<ForgotPasswordEmailPage> createState() => _ForgotPasswordEmailPageState();
+  State<ForgotPasswordEmailPage> createState() =>
+      _ForgotPasswordEmailPageState();
 }
+
 TextEditingController emailController = new TextEditingController();
 
 class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
-
   Future<void> sendOtp(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.otpSendApi;
@@ -35,7 +37,7 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
     );
 
     try {
-      final response = await http.post(url);
+      final response = await MobileHttpClient.instance.post(url);
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
 
@@ -48,17 +50,20 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
           data['result']?.toString().toLowerCase() == 'success') {
         // Show success dialog
         Fluttertoast.showToast(
-            msg: "OTP sent successfully !!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Mythemes.successColor,
-            textColor: Colors.white,
-            fontSize: 16.0
+          msg: "OTP sent successfully !!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Mythemes.successColor,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
 
-        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-            ForgotPasswordOtpPage(emailController.text)));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ForgotPasswordOtpPage(emailController.text),
+          ),
+        );
 
         /*showDialog(
           context: context,
@@ -73,7 +78,7 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => LoginPage()));
                   } else {
-                    print("⚠️ Warning: No route to close.");
+                    print("âš ï¸ Warning: No route to close.");
                   }
                 },
                 child: const Text("OK"),
@@ -85,16 +90,17 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
         // Show error dialog from response
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Error"),
-            content: Text(data['reason'] ?? "Something went wrong"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("OK"),
-              )
-            ],
-          ),
+          builder:
+              (context) => AlertDialog(
+                title: const Text("Error"),
+                content: Text(data['reason'] ?? "Something went wrong"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
         );
       }
     } catch (e) {
@@ -104,16 +110,17 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
       // Show exception error dialog
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Error"),
-          content: Text("Failed to send OTP. Error: $e"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("OK"),
-            )
-          ],
-        ),
+        builder:
+            (context) => AlertDialog(
+              title: const Text("Error"),
+              content: Text("Failed to send OTP. Error: $e"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
       );
     }
   }
@@ -157,8 +164,6 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
               ElevatedButton(
                 onPressed: () {
                   sendOtp(context);
-
-
                 },
                 child: const Text('Send OTP'),
               ),

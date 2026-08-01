@@ -14,6 +14,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import 'allAPIList.dart';
 import 'modalClass/reportingOfficerListModal.dart';
@@ -23,11 +24,15 @@ class UjalaCreditWorkdone extends StatefulWidget {
   final String time;
   final String address;
 
-  const UjalaCreditWorkdone(
-      {required this.value, required this.address, required this.time});
+  const UjalaCreditWorkdone({
+    required this.value,
+    required this.address,
+    required this.time,
+  });
 
   @override
-  State<UjalaCreditWorkdone> createState() => _UjalaCreditWorkdoneState(value, address, time);
+  State<UjalaCreditWorkdone> createState() =>
+      _UjalaCreditWorkdoneState(value, address, time);
 }
 
 late String? sessionId;
@@ -36,7 +41,7 @@ int? orgnizationID = 0;
 SessionManager shared = SessionManager();
 double latt = 0;
 double lngg = 0;
-String? DropValueName="";
+String? DropValueName = "";
 var clientNamesend;
 var clientNamesendTwo;
 var clientNamesendThree;
@@ -81,10 +86,10 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
   ReportingOfficerListModal? reportingOfficerListLabel;
   late List<String?> reportingOfficerList = [];
 
-  SessionManager sessionManager=SessionManager();
+  SessionManager sessionManager = SessionManager();
   Map<String, dynamic> mapResponse = {};
   SessionManager shared = SessionManager();
-  List<String> reportingOfficerGlobal=[];
+  List<String> reportingOfficerGlobal = [];
   @override
   void initState() {
     //getUploadImage();
@@ -94,9 +99,7 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     getSharedPrfanceList();
     imageValue = value;
     print('imageName $imageValue');
-    setState(() {
-
-    });
+    setState(() {});
     // TODO: implement initState
     super.initState();
   }
@@ -112,10 +115,12 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     print('Response snapshot: ${latt}');
     print('Response snapshot: ${lngg}');
     print('Response snapshot: ${orgnizationID}');
-    Future<ReportingOfficerListModal?> getLeaveType12 = getReportingOfficers(sessionId!);
+    Future<ReportingOfficerListModal?> getLeaveType12 = getReportingOfficers(
+      sessionId!,
+    );
     getLeaveType12.then((value) {
       setState(() {
-        reportingOfficerListLabel=value;
+        reportingOfficerListLabel = value;
         //var leaveTypeId = value?.leaveData.leaveTypeList;
         //print('object$leaveTypeId');
       });
@@ -159,7 +164,9 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     print('Response body: ${value}');
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
-    var uri = Uri.parse("http://www.employroll.com/restful/service/task/via/mobile");
+    var uri = Uri.parse(
+      "http://www.employroll.com/restful/service/task/via/mobile",
+    );
     var request = new http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.fields['taskTime'] = formattedDate;
@@ -176,10 +183,16 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+_emailIdController.text),
     ));*/
-    var multipart = new http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
+    var multipart = new http.MultipartFile(
+      'image',
+      stream,
+      length,
+      filename: basename('image.jpg'),
+    );
     request.files.add(multipart);
-    http.Response response = await http.Response.fromStream(await request.send());
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
     result = json.decode(response.body.toString());
     /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+response.body),
@@ -189,10 +202,19 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
       Navigator.pop(context);
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessGo(
-            context, "You have successfully submitted task details on server at".toString() + " " + formattedDate, "Task Submitted");
+          context,
+          "You have successfully submitted task details on server at"
+                  .toString() +
+              " " +
+              formattedDate,
+          "Task Submitted",
+        );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
         CommonNotificationPage.showSuccessGo(
-            context, resultSuccess, " Failed ");
+          context,
+          resultSuccess,
+          " Failed ",
+        );
       }
     } else {
       Navigator.pop(context);
@@ -206,13 +228,15 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     print('Response body: ${result}');
   }
 
-  Future<ReportingOfficerListModal?> getReportingOfficers(String sessionId) async {
+  Future<ReportingOfficerListModal?> getReportingOfficers(
+    String sessionId,
+  ) async {
     reportingOfficerList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.reportingOfficerList;
     print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
@@ -220,7 +244,7 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     print("GETDATA $getData");
 
     print('responseLeaveTypeList $getData');
-    reportingOfficerListLabel=ReportingOfficerListModal.fromJson(mapResponse);
+    reportingOfficerListLabel = ReportingOfficerListModal.fromJson(mapResponse);
     int? length = reportingOfficerListLabel?.listData?.length;
 
     print('totalleaveLength $length ');
@@ -230,9 +254,12 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
 
       print('dataLeaveTypeName $leaveTypeName');
     }*/
-    for(int i=0; i<mapResponse['listData'].length;i++){
-      String? reportingOfficerName = mapResponse['listData'][i]['reportingOfficerName'];
-      reportingOfficerList.add(mapResponse['listData'][i]['reportingOfficerName']);
+    for (int i = 0; i < mapResponse['listData'].length; i++) {
+      String? reportingOfficerName =
+          mapResponse['listData'][i]['reportingOfficerName'];
+      reportingOfficerList.add(
+        mapResponse['listData'][i]['reportingOfficerName'],
+      );
 
       //print('dataLeaveTypeName $leaveTypeName');
       //print("HalfDayShow $halfDayRadioShow");
@@ -254,16 +281,13 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
   var dropdownNewvalue;
   var reportingOfficerId;
   var reportingOfficerName;
-  String valuenew="listText";
+  String valuenew = "listText";
   @override
   Widget build(BuildContext context) {
     return DismissKeyboard(
       child: Scaffold(
         backgroundColor: Mythemes.whitish,
-        appBar: AppBar(
-          elevation: 0.5,
-          title: "Workdone Report ".text.make(),
-        ),
+        appBar: AppBar(elevation: 0.5, title: "Workdone Report ".text.make()),
         body: Container(
           color: Mythemes.whitish,
           child: SingleChildScrollView(
@@ -272,30 +296,28 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
               child: Center(
                 child: Column(
                   children: [
-                    SizedBox(
-                      height: 15,
-                    ),
+                    SizedBox(height: 15),
                     value != null
                         ? CircleAvatar(
-                      backgroundColor: Mythemes.greyish,
-                      maxRadius: 115,
-                      backgroundImage: FileImage(value!),
-                      /*child: Image.file(value!,
+                          backgroundColor: Mythemes.greyish,
+                          maxRadius: 115,
+                          backgroundImage: FileImage(value!),
+                          /*child: Image.file(value!,
                         height: 150,
                         fit: BoxFit.fitWidth,),*/
-                    )
+                        )
                         : Icon(
-                      Icons.verified_user_sharp,
-                      size: 150,
-                      color: Mythemes.greyish,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
+                          Icons.verified_user_sharp,
+                          size: 150,
+                          color: Mythemes.greyish,
+                        ),
+                    SizedBox(height: 10),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 5.0, horizontal: 10.0),
+                        vertical: 5.0,
+                        horizontal: 10.0,
+                      ),
                       child: Column(
                         children: [
                           TextFormField(
@@ -304,109 +326,114 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                             initialValue: currentAddress,
                             maxLines: 3,
                             decoration: InputDecoration(
-                                hintText: "Location",
-                                labelText: "Location",
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Mythemes.blackish),
-                                prefixIcon: IconButton(
-                                  icon: Icon(
-                                    Icons.location_on,
-                                  ),
-                                  onPressed: null,
-                                )),
+                              hintText: "Location",
+                              labelText: "Location",
+                              labelStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Mythemes.blackish,
+                              ),
+                              prefixIcon: IconButton(
+                                icon: Icon(Icons.location_on),
+                                onPressed: null,
+                              ),
+                            ),
                           ),
                           TextFormField(
-                            onChanged: (value){
-                              setState(() {
-                              });
+                            onChanged: (value) {
+                              setState(() {});
                             },
                             enabled: false,
                             initialValue: time,
                             decoration: InputDecoration(
-                                hintText: "Enter Time",
-                                labelText: "Time",
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Mythemes.blackish),
-                                prefixIcon: IconButton(
-                                  icon: Icon(
-                                    Icons.timelapse,
-                                  ),
-                                  onPressed: null,
-                                )),
+                              hintText: "Enter Time",
+                              labelText: "Time",
+                              labelStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Mythemes.blackish,
+                              ),
+                              prefixIcon: IconButton(
+                                icon: Icon(Icons.timelapse),
+                                onPressed: null,
+                              ),
+                            ),
                           ),
                           DropdownButtonFormField(
-                            value:  dropdownNewvalue,
-                              decoration: InputDecoration(
-                                  hintText: "Enter COH Name",
-                                  labelText: "COH",
-                                  labelStyle: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Mythemes.blackish),
-                                  prefixIcon: IconButton(
-                                    icon: Icon(
-                                      Icons.person,
-                                    ),
-                                    onPressed: null,
-                                  )),
-                            items: reportingOfficerList.map<DropdownMenuItem<String>>((String? value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value!),
-                              );
-
-                            }).toList(),
+                            value: dropdownNewvalue,
+                            decoration: InputDecoration(
+                              hintText: "Enter COH Name",
+                              labelText: "COH",
+                              labelStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Mythemes.blackish,
+                              ),
+                              prefixIcon: IconButton(
+                                icon: Icon(Icons.person),
+                                onPressed: null,
+                              ),
+                            ),
+                            items:
+                                reportingOfficerList
+                                    .map<DropdownMenuItem<String>>((
+                                      String? value,
+                                    ) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value!),
+                                      );
+                                    })
+                                    .toList(),
                             onChanged: (newVal) {
                               valuenew = newVal.toString();
-                              int i =reportingOfficerList.indexOf(valuenew);
-                              reportingOfficerId = mapResponse['listData'][i]['reportingOfficerId'];
-                              reportingOfficerName = mapResponse['listData'][i]['reportingOfficerName'];
-                              reportingOfficerGlobal = newVal.toString().split('-');
-                              String idn=reportingOfficerGlobal.last;
+                              int i = reportingOfficerList.indexOf(valuenew);
+                              reportingOfficerId =
+                                  mapResponse['listData'][i]['reportingOfficerId'];
+                              reportingOfficerName =
+                                  mapResponse['listData'][i]['reportingOfficerName'];
+                              reportingOfficerGlobal = newVal.toString().split(
+                                '-',
+                              );
+                              String idn = reportingOfficerGlobal.last;
                               print('reportingOfficerId $reportingOfficerId');
-                              print('reportingOfficerName $reportingOfficerName');
+                              print(
+                                'reportingOfficerName $reportingOfficerName',
+                              );
                               setState(() {
                                 //print('value1 $i');
                                 //print('value $policyidnew');
 
                                 dropdownNewvalue = newVal;
-
                               });
-                            }
-
+                            },
                           ),
 
                           Visibility(
                             visible: clientNOne,
                             child: TextFormField(
-
                               keyboardType: TextInputType.name,
                               controller: _clientNameController,
-                              decoration:  InputDecoration(
-                                  hintText: "Enter Client Name",
-                                  labelText: "Client Name",
-                                  prefixIcon: IconButton(
+                              decoration: InputDecoration(
+                                hintText: "Enter Client Name",
+                                labelText: "Client Name",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.person),
+                                  onPressed: null,
+                                ),
+                                suffixIcon: Visibility(
+                                  visible: iconShow,
+                                  child: IconButton(
                                     icon: Icon(
-                                      Icons.person,
+                                      Icons.add,
+                                      color: Mythemes.lightBluishColor,
+                                      size: 26,
                                     ),
-                                    onPressed: null,
+                                    onPressed: () {
+                                      setState(() {
+                                        iconShow = false;
+                                        clientNTwo = true;
+                                      });
+                                    },
                                   ),
-                                  suffixIcon: Visibility(
-                                    visible: iconShow,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.add, color: Mythemes.lightBluishColor, size: 26,
-                                      ),
-                                      onPressed: () {
-
-                                        setState(() {
-                                          iconShow = false;
-                                          clientNTwo= true;
-                                        });
-                                      },
-                                    ),
-                                  )
+                                ),
                               ),
                             ),
                           ),
@@ -416,49 +443,49 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                               keyboardType: TextInputType.number,
                               inputFormatters: <TextInputFormatter>[
                                 LengthLimitingTextInputFormatter(10),
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]'),
+                                ),
                               ],
                               controller: _contNoController,
                               decoration: const InputDecoration(
-                                  hintText: "Enter Contact Number",
-                                  labelText: "Client Contact Number",
-                                  prefixIcon: IconButton(
-                                    icon: Icon(
-                                      Icons.phone,
-                                    ),
-                                    onPressed: (null),
-                                  )),
+                                hintText: "Enter Contact Number",
+                                labelText: "Client Contact Number",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.phone),
+                                  onPressed: (null),
+                                ),
+                              ),
                             ),
                           ),
                           Visibility(
                             visible: clientNTwo,
                             child: TextFormField(
-
                               keyboardType: TextInputType.name,
                               controller: _clientNameContTwo,
-                              decoration:  InputDecoration(
-                                  hintText: "Enter Client Name",
-                                  labelText: "Client Name",
-                                  prefixIcon: IconButton(
+                              decoration: InputDecoration(
+                                hintText: "Enter Client Name",
+                                labelText: "Client Name",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.person),
+                                  onPressed: null,
+                                ),
+                                suffixIcon: Visibility(
+                                  visible: iconShow1,
+                                  child: IconButton(
                                     icon: Icon(
-                                      Icons.person,
+                                      Icons.add,
+                                      color: Mythemes.lightBluishColor,
+                                      size: 26,
                                     ),
-                                    onPressed: null,
+                                    onPressed: () {
+                                      setState(() {
+                                        iconShow1 = false;
+                                        clientNThree = true;
+                                      });
+                                    },
                                   ),
-                                  suffixIcon: Visibility(
-                                    visible: iconShow1,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.add, color: Mythemes.lightBluishColor, size: 26,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          iconShow1 = false;
-                                          clientNThree= true;
-                                        });
-                                      },
-                                    ),
-                                  )
+                                ),
                               ),
                             ),
                           ),
@@ -468,49 +495,49 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                               keyboardType: TextInputType.number,
                               inputFormatters: <TextInputFormatter>[
                                 LengthLimitingTextInputFormatter(10),
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]'),
+                                ),
                               ],
                               controller: _contNumTwo,
                               decoration: const InputDecoration(
-                                  hintText: "Enter Contact Number",
-                                  labelText: "Client Contact Number",
-                                  prefixIcon: IconButton(
-                                    icon: Icon(
-                                      Icons.phone,
-                                    ),
-                                    onPressed: (null),
-                                  )),
+                                hintText: "Enter Contact Number",
+                                labelText: "Client Contact Number",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.phone),
+                                  onPressed: (null),
+                                ),
+                              ),
                             ),
                           ),
                           Visibility(
                             visible: clientNThree,
                             child: TextFormField(
-
                               keyboardType: TextInputType.name,
                               controller: _clientNameContThree,
-                              decoration:  InputDecoration(
-                                  hintText: "Enter Client Name",
-                                  labelText: "Client Name",
-                                  prefixIcon: IconButton(
+                              decoration: InputDecoration(
+                                hintText: "Enter Client Name",
+                                labelText: "Client Name",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.person),
+                                  onPressed: null,
+                                ),
+                                suffixIcon: Visibility(
+                                  visible: iconShow2,
+                                  child: IconButton(
                                     icon: Icon(
-                                      Icons.person,
+                                      Icons.add,
+                                      color: Mythemes.lightBluishColor,
+                                      size: 26,
                                     ),
-                                    onPressed: null,
+                                    onPressed: () {
+                                      setState(() {
+                                        iconShow2 = false;
+                                        clientNFour = true;
+                                      });
+                                    },
                                   ),
-                                  suffixIcon: Visibility(
-                                    visible: iconShow2,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.add, color: Mythemes.lightBluishColor, size: 26,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          iconShow2 = false;
-                                          clientNFour= true;
-                                        });
-                                      },
-                                    ),
-                                  )
+                                ),
                               ),
                             ),
                           ),
@@ -520,49 +547,49 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                               keyboardType: TextInputType.number,
                               inputFormatters: <TextInputFormatter>[
                                 LengthLimitingTextInputFormatter(10),
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]'),
+                                ),
                               ],
                               controller: _contNumThree,
                               decoration: const InputDecoration(
-                                  hintText: "Enter Contact Number",
-                                  labelText: "Client Contact Number",
-                                  prefixIcon: IconButton(
-                                    icon: Icon(
-                                      Icons.phone,
-                                    ),
-                                    onPressed: (null),
-                                  )),
+                                hintText: "Enter Contact Number",
+                                labelText: "Client Contact Number",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.phone),
+                                  onPressed: (null),
+                                ),
+                              ),
                             ),
                           ),
                           Visibility(
                             visible: clientNFour,
                             child: TextFormField(
-
                               keyboardType: TextInputType.name,
                               controller: _clientNameContFour,
-                              decoration:  InputDecoration(
-                                  hintText: "Enter Client Name",
-                                  labelText: "Client Name",
-                                  prefixIcon: IconButton(
+                              decoration: InputDecoration(
+                                hintText: "Enter Client Name",
+                                labelText: "Client Name",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.person),
+                                  onPressed: null,
+                                ),
+                                suffixIcon: Visibility(
+                                  visible: iconShow3,
+                                  child: IconButton(
                                     icon: Icon(
-                                      Icons.person,
+                                      Icons.add,
+                                      color: Mythemes.lightBluishColor,
+                                      size: 26,
                                     ),
-                                    onPressed: null,
+                                    onPressed: () {
+                                      setState(() {
+                                        iconShow3 = false;
+                                        clientNFive = true;
+                                      });
+                                    },
                                   ),
-                                  suffixIcon: Visibility(
-                                    visible: iconShow3,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.add, color: Mythemes.lightBluishColor, size: 26,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          iconShow3 = false;
-                                          clientNFive= true;
-                                        });
-                                      },
-                                    ),
-                                  )
+                                ),
                               ),
                             ),
                           ),
@@ -572,36 +599,33 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                               keyboardType: TextInputType.number,
                               inputFormatters: <TextInputFormatter>[
                                 LengthLimitingTextInputFormatter(10),
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]'),
+                                ),
                               ],
                               controller: _contNumFour,
                               decoration: const InputDecoration(
-                                  hintText: "Enter Contact Number",
-                                  labelText: "Client Contact Number",
-                                  prefixIcon: IconButton(
-                                    icon: Icon(
-                                      Icons.phone,
-                                    ),
-                                    onPressed: (null),
-                                  )),
+                                hintText: "Enter Contact Number",
+                                labelText: "Client Contact Number",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.phone),
+                                  onPressed: (null),
+                                ),
+                              ),
                             ),
                           ),
                           Visibility(
                             visible: clientNFive,
                             child: TextFormField(
-
                               keyboardType: TextInputType.name,
                               controller: _clientNameContFive,
-                              decoration:  InputDecoration(
-                                  hintText: "Enter Client Name",
-                                  labelText: "Client Name",
-                                  prefixIcon: IconButton(
-                                    icon: Icon(
-                                      Icons.person,
-                                    ),
-                                    onPressed: null,
-                                  ),
-
+                              decoration: InputDecoration(
+                                hintText: "Enter Client Name",
+                                labelText: "Client Name",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.person),
+                                  onPressed: null,
+                                ),
                               ),
                             ),
                           ),
@@ -611,18 +635,19 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                               keyboardType: TextInputType.number,
                               inputFormatters: <TextInputFormatter>[
                                 LengthLimitingTextInputFormatter(10),
-                                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9]'),
+                                ),
                               ],
                               controller: _contNumFive,
                               decoration: const InputDecoration(
-                                  hintText: "Enter Contact Number",
-                                  labelText: "Client Contact Number",
-                                  prefixIcon: IconButton(
-                                    icon: Icon(
-                                      Icons.phone,
-                                    ),
-                                    onPressed: (null),
-                                  )),
+                                hintText: "Enter Contact Number",
+                                labelText: "Client Contact Number",
+                                prefixIcon: IconButton(
+                                  icon: Icon(Icons.phone),
+                                  onPressed: (null),
+                                ),
+                              ),
                             ),
                           ),
 
@@ -630,35 +655,37 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                             keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
                               LengthLimitingTextInputFormatter(10),
-                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9]'),
+                              ),
                             ],
                             controller: _noOfNewMember,
                             decoration: const InputDecoration(
-                                hintText: "Enter No. of New Member",
-                                labelText: "No of New Member",
-                                prefixIcon: IconButton(
-                                  icon: Icon(
-                                    Icons.format_list_numbered,
-                                  ),
-                                  onPressed: (null),
-                                )),
+                              hintText: "Enter No. of New Member",
+                              labelText: "No of New Member",
+                              prefixIcon: IconButton(
+                                icon: Icon(Icons.format_list_numbered),
+                                onPressed: (null),
+                              ),
+                            ),
                           ),
                           TextFormField(
                             keyboardType: TextInputType.number,
                             inputFormatters: <TextInputFormatter>[
                               LengthLimitingTextInputFormatter(10),
-                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'[0-9]'),
+                              ),
                             ],
                             controller: _noOfNewAdvisor,
                             decoration: const InputDecoration(
-                                hintText: "Enter No. of New Advisor",
-                                labelText: "No of New Advisor",
-                                prefixIcon: IconButton(
-                                  icon: Icon(
-                                    Icons.person,
-                                  ),
-                                  onPressed: (null),
-                                )),
+                              hintText: "Enter No. of New Advisor",
+                              labelText: "No of New Advisor",
+                              prefixIcon: IconButton(
+                                icon: Icon(Icons.person),
+                                onPressed: (null),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -669,40 +696,40 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ButtonBar(
-                            alignment: MainAxisAlignment.center,
-                            buttonPadding: Vx.mOnly(right: 16),
-                            children: [
-                              ElevatedButton(
-                                onPressed: () async {
-                                  imageValue = value;
-                                  print('ImageValue $imageValue');
-                                  clientNamesend = _clientNameController.text;
-                                  print("clientNameOne $clientNamesend");
-                                  clientNamesendTwo = _clientNameContTwo.text;
-                                  print("clientNameTwo $clientNamesendTwo");
-                                  clientNamesendThree = _clientNameContThree.text;
-                                  print("clientNameThree $clientNamesendThree");
-                                  clientNamesendFour = _clientNameContFour.text;
-                                  print("clientNameFour $clientNamesendFour");
-                                  clientNamesendFive = _clientNameContFive.text;
-                                  print("clientNameFive $clientNamesendFive");
-                                  clientContactSend = _contNoController.text;
-                                  print("clientContOne $clientContactSend");
-                                  clientContSendTwo = _contNumTwo.text;
-                                  print("clientContTwo $clientContSendTwo");
-                                  clientContSendThree = _contNumThree.text;
-                                  print("clientContThree $clientContSendThree");
-                                  clientContSendFour = _contNumFour.text;
-                                  print("clientContFour $clientContSendFour");
-                                  clientContSendFive = _contNumFive.text;
-                                  print("clientContFive $clientContSendFive");
-                                  noOfNewMem = _noOfNewMember.text;
-                                  print("No of New Member $noOfNewMem");
-                                  noOfNewAdvi = _noOfNewAdvisor.text;
-                                  print("No of New Advisor $noOfNewAdvi");
-                                  DropValueName = reportingOfficerName;
+                          alignment: MainAxisAlignment.center,
+                          buttonPadding: Vx.mOnly(right: 16),
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                imageValue = value;
+                                print('ImageValue $imageValue');
+                                clientNamesend = _clientNameController.text;
+                                print("clientNameOne $clientNamesend");
+                                clientNamesendTwo = _clientNameContTwo.text;
+                                print("clientNameTwo $clientNamesendTwo");
+                                clientNamesendThree = _clientNameContThree.text;
+                                print("clientNameThree $clientNamesendThree");
+                                clientNamesendFour = _clientNameContFour.text;
+                                print("clientNameFour $clientNamesendFour");
+                                clientNamesendFive = _clientNameContFive.text;
+                                print("clientNameFive $clientNamesendFive");
+                                clientContactSend = _contNoController.text;
+                                print("clientContOne $clientContactSend");
+                                clientContSendTwo = _contNumTwo.text;
+                                print("clientContTwo $clientContSendTwo");
+                                clientContSendThree = _contNumThree.text;
+                                print("clientContThree $clientContSendThree");
+                                clientContSendFour = _contNumFour.text;
+                                print("clientContFour $clientContSendFour");
+                                clientContSendFive = _contNumFive.text;
+                                print("clientContFive $clientContSendFive");
+                                noOfNewMem = _noOfNewMember.text;
+                                print("No of New Member $noOfNewMem");
+                                noOfNewAdvi = _noOfNewAdvisor.text;
+                                print("No of New Advisor $noOfNewAdvi");
+                                DropValueName = reportingOfficerName;
 
-                                  /*if(dropdownNewvalue == 1) {
+                                /*if(dropdownNewvalue == 1) {
                                     DropValueName = 'ANIL SAINI';
                                     print("DropValuName $DropValueName");
                                   }
@@ -715,32 +742,48 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                                     print("DropValuName $DropValueName");
                                   }*/
 
-
-                                  if (_formKey.currentState!.validate()) {
-                                    return
-                                      setState(() {
-                                        AlertDialog(
-                                          content: "Please add remarks".text.make(),
-                                        );
-                                        //Navigator.pushNamed(context, MyRoutings.ujalaWdSubmitRoute);
-                                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                                            UjalaCreditWDSubmit(imageValue,DropValueName!,clientNamesend,clientNamesendTwo,clientNamesendThree,clientNamesendFour,
-                                                clientNamesendFive,clientContactSend,clientContSendTwo, clientContSendThree,clientContSendFour,
-                                                clientContSendFive,noOfNewMem,noOfNewAdvi)));
-                                        //uploadImage(context);
-                                      });
-                                  }
-
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                  MaterialStateProperty.all(Mythemes.lightBluishColor),
+                                if (_formKey.currentState!.validate()) {
+                                  return setState(() {
+                                    AlertDialog(
+                                      content: "Please add remarks".text.make(),
+                                    );
+                                    //Navigator.pushNamed(context, MyRoutings.ujalaWdSubmitRoute);
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => UjalaCreditWDSubmit(
+                                              imageValue,
+                                              DropValueName!,
+                                              clientNamesend,
+                                              clientNamesendTwo,
+                                              clientNamesendThree,
+                                              clientNamesendFour,
+                                              clientNamesendFive,
+                                              clientContactSend,
+                                              clientContSendTwo,
+                                              clientContSendThree,
+                                              clientContSendFour,
+                                              clientContSendFive,
+                                              noOfNewMem,
+                                              noOfNewAdvi,
+                                            ),
+                                      ),
+                                    );
+                                    //uploadImage(context);
+                                  });
+                                }
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                  Mythemes.lightBluishColor,
                                 ),
-                                child: "Next".text.make(),
-                              ).wh(150, 40).py12()
-                            ]),
+                              ),
+                              child: "Next".text.make(),
+                            ).wh(150, 40).py12(),
+                          ],
+                        ),
                       ],
-                    )
+                    ),
                     //submitButton(title: 'Submit', onClick: getUploadImage),
                   ],
                 ),

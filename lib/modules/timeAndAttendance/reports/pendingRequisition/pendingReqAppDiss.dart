@@ -19,6 +19,7 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 class ApproveDisapproveReq extends StatefulWidget {
   PendingRequisitionModel pendingRequisitionModel;
@@ -27,7 +28,8 @@ class ApproveDisapproveReq extends StatefulWidget {
   ApproveDisapproveReq(this.pendingRequisitionModel, this.itemCount);
 
   @override
-  State<ApproveDisapproveReq> createState() => _ApproveDisapproveReqState(pendingRequisitionModel,itemCount);
+  State<ApproveDisapproveReq> createState() =>
+      _ApproveDisapproveReqState(pendingRequisitionModel, itemCount);
 }
 
 class _ApproveDisapproveReqState extends State<ApproveDisapproveReq> {
@@ -44,53 +46,56 @@ class _ApproveDisapproveReqState extends State<ApproveDisapproveReq> {
     double height = MediaQuery.of(context).size.height;
     return DismissKeyboard(
       child: Scaffold(
-        appBar: AppBar(
-          title: titleName.text.make(),
-          elevation: 0.5,
-        ),
+        appBar: AppBar(title: titleName.text.make(), elevation: 0.5),
         body: Container(
           height: height,
           color: Mythemes.whitish,
           child: SingleChildScrollView(
-              child: RadioGroups(pendingRequisitionModel,itemCount)),
+            child: RadioGroups(pendingRequisitionModel, itemCount),
+          ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Attendance');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -101,10 +106,7 @@ class _ApproveDisapproveReqState extends State<ApproveDisapproveReq> {
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -137,7 +139,8 @@ class RadioGroups extends StatefulWidget {
   RadioGroups(this.pendingRequisitionModel, this.itemCount);
 
   @override
-  State<RadioGroups> createState() => _RadioGroupsState(pendingRequisitionModel,itemCount);
+  State<RadioGroups> createState() =>
+      _RadioGroupsState(pendingRequisitionModel, itemCount);
 }
 
 class _RadioGroupsState extends State<RadioGroups> {
@@ -165,9 +168,9 @@ class _RadioGroupsState extends State<RadioGroups> {
   String? commentRo;
   int? attReqId;
 
-@override
+  @override
   void initState() {
-   getSharedPrfanceList();
+    getSharedPrfanceList();
 
     // TODO: implement initState
     super.initState();
@@ -178,99 +181,91 @@ class _RadioGroupsState extends State<RadioGroups> {
     userPanel = await shared!.getUserPanel();
     print("User Panel - $userPanel");
 
-    if(userPanel == "MSS") {
+    if (userPanel == "MSS") {
       _inTimePicker = foundDataNewMSS![itemCount].inTime.toString();
       _outTimePicker = foundDataNewMSS![itemCount].outTime.toString();
-      name=foundDataNewMSS![itemCount].empName.toString();
+      name = foundDataNewMSS![itemCount].empName.toString();
 
-      dateSet= foundDataNewMSS![itemCount].onDate;
-      actualInTimeset= foundDataNewMSS![itemCount].actualInTime;
-      inTimeReqset= foundDataNewMSS![itemCount].inTime;
-      inRemarkset= foundDataNewMSS![itemCount].inRemarks;
-      actualOutTimeset= foundDataNewMSS![itemCount].actualOutTime;
-      outTimeReqset= foundDataNewMSS![itemCount].outTime;
-      outRemarkset= foundDataNewMSS![itemCount].outRemarks;
+      dateSet = foundDataNewMSS![itemCount].onDate;
+      actualInTimeset = foundDataNewMSS![itemCount].actualInTime;
+      inTimeReqset = foundDataNewMSS![itemCount].inTime;
+      inRemarkset = foundDataNewMSS![itemCount].inRemarks;
+      actualOutTimeset = foundDataNewMSS![itemCount].actualOutTime;
+      outTimeReqset = foundDataNewMSS![itemCount].outTime;
+      outRemarkset = foundDataNewMSS![itemCount].outRemarks;
       attReqId = foundDataNewMSS![itemCount].requestId;
     }
 
-    if(userPanel == "MSS_MO_ADMIN") {
+    if (userPanel == "MSS_MO_ADMIN") {
       _inTimePicker = foundDataNewMO![itemCount].inTime.toString();
       _outTimePicker = foundDataNewMO![itemCount].outTime.toString();
-      name=foundDataNewMO![itemCount].empName.toString();
+      name = foundDataNewMO![itemCount].empName.toString();
 
-      dateSet= foundDataNewMO![itemCount].onDate;
-      actualInTimeset= foundDataNewMO![itemCount].actualInTime;
-      inTimeReqset= foundDataNewMO![itemCount].inTime;
-      inRemarkset= foundDataNewMO![itemCount].inRemarks;
-      actualOutTimeset= foundDataNewMO![itemCount].actualOutTime;
-      outTimeReqset= foundDataNewMO![itemCount].outTime;
-      outRemarkset= foundDataNewMO![itemCount].outRemarks;
+      dateSet = foundDataNewMO![itemCount].onDate;
+      actualInTimeset = foundDataNewMO![itemCount].actualInTime;
+      inTimeReqset = foundDataNewMO![itemCount].inTime;
+      inRemarkset = foundDataNewMO![itemCount].inRemarks;
+      actualOutTimeset = foundDataNewMO![itemCount].actualOutTime;
+      outTimeReqset = foundDataNewMO![itemCount].outTime;
+      outRemarkset = foundDataNewMO![itemCount].outRemarks;
       attReqId = foundDataNewMO![itemCount].requestId;
     }
 
-    if(userPanel == "USER") {
+    if (userPanel == "USER") {
       _inTimePicker = foundDataNewUIS![itemCount].inTime.toString();
       _outTimePicker = foundDataNewUIS![itemCount].outTime.toString();
-      name=foundDataNewUIS![itemCount].empName.toString();
+      name = foundDataNewUIS![itemCount].empName.toString();
 
-      dateSet= foundDataNewUIS![itemCount].onDate;
-      actualInTimeset= foundDataNewUIS![itemCount].actualInTime;
-      inTimeReqset= foundDataNewUIS![itemCount].inTime;
-      inRemarkset= foundDataNewUIS![itemCount].inRemarks;
-      actualOutTimeset= foundDataNewUIS![itemCount].actualOutTime;
-      outTimeReqset= foundDataNewUIS![itemCount].outTime;
-      outRemarkset= foundDataNewUIS![itemCount].outRemarks;
+      dateSet = foundDataNewUIS![itemCount].onDate;
+      actualInTimeset = foundDataNewUIS![itemCount].actualInTime;
+      inTimeReqset = foundDataNewUIS![itemCount].inTime;
+      inRemarkset = foundDataNewUIS![itemCount].inRemarks;
+      actualOutTimeset = foundDataNewUIS![itemCount].actualOutTime;
+      outTimeReqset = foundDataNewUIS![itemCount].outTime;
+      outRemarkset = foundDataNewUIS![itemCount].outRemarks;
       attReqId = foundDataNewUIS![itemCount].requestId;
     }
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-
-
-
     Future<void> _openInTimepicker(BuildContext context) async {
       final TimeOfDay? n = await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay.now(),
-          builder: (BuildContext context, Widget? child) {
-            return
-              MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-                child: child!,
-              );
-          });
+        context: context,
+        initialTime: TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          );
+        },
+      );
       print('timenew $n');
       _inTimePicker = n.toString();
-      setState(() {
-
-      });
+      setState(() {});
     }
 
     Future<void> _openOutTimepicker(BuildContext context) async {
       final TimeOfDay? o = await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay.now(),
-          builder: (BuildContext context, Widget? child) {
-            return
-              MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-                child: child!,
-              );
-          });
+        context: context,
+        initialTime: TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child!,
+          );
+        },
+      );
       print('timeOutnew $o');
       _outTimePicker = o.toString();
-      setState(() {
-
-      });
+      setState(() {});
       /*if (selectedTimeRTL != null) {
         setState(() {
           _outTimePicker = selectedTimeRTL.format(context);
           print(_outTimePicker);
         });
       }*/
-
     }
 
     return Padding(
@@ -280,82 +275,95 @@ class _RadioGroupsState extends State<RadioGroups> {
           Row(
             children: [
               Expanded(
-                  child: ListTile(
-                    title: "Name".text.maxFontSize(12).make().px4().py2(),
-                    subtitle: TextFormField(
-                      //controller: _locationController,
-                      readOnly: true,
-                      // initialValue: "Head Office",
-                      //maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: name,
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500, color: Mythemes.blackish),
+                child: ListTile(
+                  title: "Name".text.maxFontSize(12).make().px4().py2(),
+                  subtitle: TextFormField(
+                    //controller: _locationController,
+                    readOnly: true,
+                    // initialValue: "Head Office",
+                    //maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: name,
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Mythemes.blackish,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
               Expanded(
-                  child: ListTile(
-                    title: "Date".text.maxFontSize(12).sm.make().px4().py2(),
-                    subtitle: TextFormField(
-                      //controller: _locationController,
-                      readOnly: true,
-                      // initialValue: "Head Office",
-                      // maxLines: 3,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(5),
-                        hintText: dateSet,
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500, color: Mythemes.blackish),
+                child: ListTile(
+                  title: "Date".text.maxFontSize(12).sm.make().px4().py2(),
+                  subtitle: TextFormField(
+                    //controller: _locationController,
+                    readOnly: true,
+                    // initialValue: "Head Office",
+                    // maxLines: 3,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(5),
+                      hintText: dateSet,
+                      hintStyle: TextStyle(fontSize: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Mythemes.blackish,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
           Row(
             children: [
               Expanded(
-                  child: ListTile(
-                    title: "Actual In Time".text.maxFontSize(12).make().px4().py2(),
-                    subtitle: TextFormField(
-                      //controller: _locationController,
-                      readOnly: true,
-                      // initialValue: "Head Office",
-                      //maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: actualInTimeset,
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500, color: Mythemes.blackish),
+                child: ListTile(
+                  title:
+                      "Actual In Time".text.maxFontSize(12).make().px4().py2(),
+                  subtitle: TextFormField(
+                    //controller: _locationController,
+                    readOnly: true,
+                    // initialValue: "Head Office",
+                    //maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: actualInTimeset,
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Mythemes.blackish,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
               Expanded(
-                  child: ListTile(
-                    title: "Requisition In Time".text.maxFontSize(12).sm.make().px4().py2(),
-                    subtitle: InkWell(
-                      onTap: () async{
-                        //_openInTimepicker(context);
-                        /*final TimeOfDay? n = await showTimePicker(
+                child: ListTile(
+                  title:
+                      "Requisition In Time".text
+                          .maxFontSize(12)
+                          .sm
+                          .make()
+                          .px4()
+                          .py2(),
+                  subtitle: InkWell(
+                    onTap: () async {
+                      //_openInTimepicker(context);
+                      /*final TimeOfDay? n = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.now(),
                             builder: (BuildContext context, Widget? child) {
@@ -372,101 +380,104 @@ class _RadioGroupsState extends State<RadioGroups> {
                           print(DateFormat('HH:mm').format(t));
                           _inTimePicker = nT;
                         });*/
-                      },
-                      child: TextFormField(
-                        onTap: () async {
-                        },
-                        controller: _inTimeReqController,
-                        readOnly: true,
-                       //initialValue: _inTimePicker,
-                        // maxLines: 3,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(5),
-                          hintText: _inTimePicker,
-                          hintStyle: TextStyle(
-                            fontSize: 14,
-                          ),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(8))),
-                          // labelText: "Location",
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w500, color: Mythemes.blackish),
+                    },
+                    child: TextFormField(
+                      onTap: () async {},
+                      controller: _inTimeReqController,
+                      readOnly: true,
+                      //initialValue: _inTimePicker,
+                      // maxLines: 3,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(5),
+                        hintText: _inTimePicker,
+                        hintStyle: TextStyle(fontSize: 14),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                        ),
+                        // labelText: "Location",
+                        labelStyle: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Mythemes.blackish,
                         ),
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
           Row(
             children: [
               Expanded(
-                  child: ListTile(
-                    title: "In Remarks".text.maxFontSize(12).make().px4().py2(),
-                    subtitle: TextFormField(
-                      //controller: _locationController,
-                      readOnly: true,
-                      // initialValue: "Head Office",
-                      maxLines: 2,
-                      decoration: InputDecoration(
-                        hintText: inRemarkset,
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        /*enabledBorder: OutlineInputBorder(
+                child: ListTile(
+                  title: "In Remarks".text.maxFontSize(12).make().px4().py2(),
+                  subtitle: TextFormField(
+                    //controller: _locationController,
+                    readOnly: true,
+                    // initialValue: "Head Office",
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      hintText: inRemarkset,
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      /*enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Mythemes.greyishade)
                         ),*/
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Mythemes.greyishade),
-                            borderRadius: BorderRadius.all(Radius.circular(12)
-                            )
-                        ),
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500, color: Mythemes.blackish),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Mythemes.greyishade),
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Mythemes.blackish,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
           Row(
             children: [
               Expanded(
-                  child: ListTile(
-                    title:
-                    "Actual Out Time".text.maxFontSize(12).make().px4().py2(),
-                    subtitle: TextFormField(
-                      //controller: _locationController,
-                      readOnly: true,
-                      // initialValue: "Head Office",
-                      //maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: actualOutTimeset,
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500, color: Mythemes.blackish),
+                child: ListTile(
+                  title:
+                      "Actual Out Time".text.maxFontSize(12).make().px4().py2(),
+                  subtitle: TextFormField(
+                    //controller: _locationController,
+                    readOnly: true,
+                    // initialValue: "Head Office",
+                    //maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: actualOutTimeset,
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                      ),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Mythemes.blackish,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
               Expanded(
-                  child: ListTile(
-                    title: "Requisition Out Time*"
-                        .text
-                        .maxFontSize(12)
-                        .sm
-                        .make()
-                        .px4()
-                        .py2(),
-                    subtitle: InkWell(
-                      onTap: () async{
-                        //_openOutTimepicker(context);
-                        /*final TimeOfDay? o = await showTimePicker(
+                child: ListTile(
+                  title:
+                      "Requisition Out Time*".text
+                          .maxFontSize(12)
+                          .sm
+                          .make()
+                          .px4()
+                          .py2(),
+                  subtitle: InkWell(
+                    onTap: () async {
+                      //_openOutTimepicker(context);
+                      /*final TimeOfDay? o = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.now(),
                             builder: (BuildContext context, Widget? child) {
@@ -483,109 +494,114 @@ class _RadioGroupsState extends State<RadioGroups> {
                           print(DateFormat('HH:mm').format(newt));
                           _outTimePicker = oT;
                         });*/
-                      },
-                      child: TextFormField(
-                        onTap: () async {
-
-
-                        },
-                        controller: _outTimeController,
-                        readOnly: true,
-                        //initialValue: _outTimePicker,
-                        // maxLines: 3,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(5),
-                          hintText: _outTimePicker,
-                          hintStyle: TextStyle(
-                            fontSize: 14,
-                          ),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(8))),
-                          // labelText: "Location",
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              color: Mythemes.blackish),
+                    },
+                    child: TextFormField(
+                      onTap: () async {},
+                      controller: _outTimeController,
+                      readOnly: true,
+                      //initialValue: _outTimePicker,
+                      // maxLines: 3,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(5),
+                        hintText: _outTimePicker,
+                        hintStyle: TextStyle(fontSize: 14),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                        ),
+                        // labelText: "Location",
+                        labelStyle: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Mythemes.blackish,
                         ),
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
           Row(
             children: [
               Expanded(
-                  child: ListTile(
-                    title: "Out Remarks".text.maxFontSize(12).make().px4().py2(),
-                    subtitle: TextFormField(
-                      //controller: _locationController,
-                      readOnly: true,
-                      // initialValue: "Head Office",
-                      maxLines: 2,
-                      decoration: InputDecoration(
-                        hintText: outRemarkset,
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                       /* enabledBorder: OutlineInputBorder(
+                child: ListTile(
+                  title: "Out Remarks".text.maxFontSize(12).make().px4().py2(),
+                  subtitle: TextFormField(
+                    //controller: _locationController,
+                    readOnly: true,
+                    // initialValue: "Head Office",
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      hintText: outRemarkset,
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      /* enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Mythemes.greyishade)
                         ),*/
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Mythemes.greyishade),
-                            borderRadius: BorderRadius.all(Radius.circular(12))),
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500, color: Mythemes.blackish),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Mythemes.greyishade),
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Mythemes.blackish,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
           Row(
             children: [
               Expanded(
-                  child: ListTile(
-                    title: "Comments".text.maxFontSize(12).make().px4().py2(),
-                    subtitle: TextFormField(
-                      controller: _commentController,
-                      // initialValue: "Head Office",
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: "Add Comments",
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Mythemes.greyishade),
-                            borderRadius: BorderRadius.all(Radius.circular(12))
-                        ),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Mythemes.greyishade),
-                            borderRadius: BorderRadius.all(Radius.circular(12))),
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500, color: Mythemes.blackish),
+                child: ListTile(
+                  title: "Comments".text.maxFontSize(12).make().px4().py2(),
+                  subtitle: TextFormField(
+                    controller: _commentController,
+                    // initialValue: "Head Office",
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: "Add Comments",
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Mythemes.greyishade),
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Mythemes.greyishade),
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Mythemes.blackish,
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: ButtonBar(
+              Expanded(
+                child: ButtonBar(
                   alignment: MainAxisAlignment.center,
                   buttonPadding: Vx.mOnly(right: 16),
                   children: [
-
-
                     ElevatedButton(
                       onPressed: () {
-                        disapprovedRequisition(_commentController.text, attReqId);
+                        disapprovedRequisition(
+                          _commentController.text,
+                          attReqId,
+                        );
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all(Mythemes.dangerColorOne),
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.dangerColorOne,
+                        ),
                       ),
                       child: "Disapprove".text.make(),
                     ).wh(150, 40).py12(),
@@ -595,14 +611,17 @@ class _RadioGroupsState extends State<RadioGroups> {
                         approvedRequisition(_commentController.text, attReqId);
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all(Mythemes.successColor),
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.successColor,
+                        ),
                       ),
                       child: "Approve".text.make(),
                     ).wh(150, 40).py12(),
-                  ]))
+                  ],
+                ),
+              ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -612,11 +631,13 @@ class _RadioGroupsState extends State<RadioGroups> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListApprove;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "attReqId=$attReqId&"
-        "comment=$text");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "attReqId=$attReqId&"
+      "comment=$text",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -630,22 +651,27 @@ class _RadioGroupsState extends State<RadioGroups> {
       print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         showDialgSucess1(
-            context, "Attendance Requisition has been Approved." + " ", "Success");
+          context,
+          "Attendance Requisition has been Approved." + " ",
+          "Success",
+        );
       } else if (result.compareToIgnoringCase("error") == 0) {
-        showDialgSucess1(
-            context, reason.upperCamelCase, " Error ");
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
     }
   }
+
   Future<void> disapprovedRequisition(String text, int? attReqId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListDisapprove;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "attReqId=$attReqId&"
-        "comment=$text");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "attReqId=$attReqId&"
+      "comment=$text",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -653,22 +679,28 @@ class _RadioGroupsState extends State<RadioGroups> {
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = "";
-      String body ="";
-      if(result.compareToIgnoringCase("success")==0){
-        showDialgSucess1(context, "Attendance Requisition has been Disapproved.", "Success");
-      }else{
-        showDialgSucess1(context, "Attendance Requisition has Not been Disapproved.", "Error");
+      String body = "";
+      if (result.compareToIgnoringCase("success") == 0) {
+        showDialgSucess1(
+          context,
+          "Attendance Requisition has been Disapproved.",
+          "Success",
+        );
+      } else {
+        showDialgSucess1(
+          context,
+          "Attendance Requisition has Not been Disapproved.",
+          "Error",
+        );
       }
     }
   }
 
-
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -699,13 +731,13 @@ class _RadioGroupsState extends State<RadioGroups> {
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 }
-
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../sharedPrefancePage/ShardPre.dart';
+import '../utils/profile_image_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -12,44 +13,45 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-SessionManager shared= SessionManager();
+SessionManager shared = SessionManager();
 dynamic orgId;
+
 class _ProfilePageState extends State<ProfilePage> {
-  late String name=" ",designation="",mobileNo="",emailId="",dept="",branch="",dateOfBirth="",urlImage="";
+  late String name = " ",
+      designation = "",
+      mobileNo = "",
+      emailId = "",
+      dept = "",
+      branch = "",
+      dateOfBirth = "",
+      urlImage = "";
   Future getUserDetails() async {
-
-
-    urlImage= await shared.getProfileImage();
-    name= await shared.getempName();
-    emailId=await shared.getEmailId();
-    dept=await shared.getDept();
-    branch=await shared.getBranch();
-    dateOfBirth=await shared.getDob();
-    mobileNo=await shared.getMobileNo();
-    designation=await shared.getDesignation();
+    urlImage = await shared.getProfileImage();
+    name = await shared.getempName();
+    emailId = await shared.getEmailId();
+    dept = await shared.getDept();
+    branch = await shared.getBranch();
+    dateOfBirth = await shared.getDob();
+    mobileNo = await shared.getMobileNo();
+    designation = await shared.getDesignation();
     paycode = await shared!.getEnrollId();
     orgId = await shared!.getOrgId();
     if (dateOfBirth.isNotEmpty) {
       try {
-        String formattedDate = DateFormat("dd-MM-yyyy")
-            .format(DateFormat("dd-MM-yyyy").parse(dateOfBirth));
+        String formattedDate = DateFormat(
+          "dd-MM-yyyy",
+        ).format(DateFormat("dd-MM-yyyy").parse(dateOfBirth));
 
         // Use formattedDate in your widget
-        Container(
-          child: formattedDate.text.letterSpacing(1).bold.make(),
-        );
+        Container(child: formattedDate.text.letterSpacing(1).bold.make());
       } catch (e) {
         print('Error parsing dateOfBirth: $e');
         // Handle error, e.g., show a default message or placeholder
-        Container(
-          child: Text('Invalid date format').text.bold.make(),
-        );
+        Container(child: Text('Invalid date format').text.bold.make());
       }
     } else {
       // Handle the case when dateOfBirth is empty or null
-      Container(
-        child: Text('Date of birth not provided').text.bold.make(),
-      );
+      Container(child: Text('Date of birth not provided').text.bold.make());
     }
 
     print('profilePage: ${urlImage}');
@@ -60,11 +62,9 @@ class _ProfilePageState extends State<ProfilePage> {
     print('profilePage: ${dateOfBirth}');
     print('profilePage: ${mobileNo}');
     print('profilePage: ${designation}');
-    setState(() {
-
-    });
-
+    setState(() {});
   }
+
   @override
   void initState() {
     getUserDetails();
@@ -81,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0.5,
         title: "Profile".text.make(),
       ),*/
-     /* body: Container(
+      /* body: Container(
         color: context.canvasColor,
         child: Center(
           child: SafeArea(
@@ -144,238 +144,301 @@ class _ProfilePageState extends State<ProfilePage> {
           SingleChildScrollView(
             child: Column(
               children: [
-                Padding(padding: EdgeInsets.all(20),
-                 // child: "Profile".text.make(),
+                Padding(
+                  padding: EdgeInsets.all(20),
 
+                  // child: "Profile".text.make(),
                 ),
                 Container(
                   padding: EdgeInsets.all(10.0),
-                  width: MediaQuery.of(context).size.width/2,
-                  height: MediaQuery.of(context).size.width/2,
+                  width: MediaQuery.of(context).size.width / 2,
+                  height: MediaQuery.of(context).size.width / 2,
                   decoration: BoxDecoration(
-                      border: Border.all(color: Mythemes.lightBluishColor, width: 3),
-                      shape: BoxShape.circle,
-                      color: Mythemes.whitish,
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(urlImage),
-                      ),
+                    border: Border.all(
+                      color: Mythemes.lightBluishColor,
+                      width: 3,
+                    ),
+                    shape: BoxShape.circle,
+                    color: Mythemes.whitish,
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: profileImageProvider(urlImage),
+                    ),
                   ),
-
                 ),
                 Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Column(
-                        children: [
-                          name.text.xl2.make(),
-                          designation.text.textStyle(context.captionStyle).make(),
-                          orgId == 190 || orgId == 191 ?
-                          "Paycode: $paycode".text.bold.textStyle(context.captionStyle).make():
-                          SizedBox(width: 0,)
-                        ],
-                      ),
-                    )
-
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Column(
+                      children: [
+                        name.text.xl2.make(),
+                        designation.text.textStyle(context.captionStyle).make(),
+                        orgId == 190 || orgId == 191
+                            ? "Paycode: $paycode".text.bold
+                                .textStyle(context.captionStyle)
+                                .make()
+                            : SizedBox(width: 0),
+                      ],
+                    ),
+                  ),
                 ),
 
                 Padding(
                   padding: EdgeInsets.only(top: 20),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 68,
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              Icon(Icons.email, size: 25, color: Mythemes.lightBluishColor,).py16(),
-                            ],
-                          ).px16(),
-                          Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: "Email Id".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                  ),
-                                ),
-
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: emailId.text.letterSpacing(1).bold.make(),
-                                  ),
-                                )
-
-
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 68,
+                        child: Row(
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.email,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
-                            ).px8(),
-                          ),
+                            ).px16(),
+                            Expanded(
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Email Id".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-
-                        ],
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              emailId.text
+                                                  .letterSpacing(1)
+                                                  .bold
+                                                  .make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
+                            ),
+                          ],
+                        ),
                       ),
-
-                    ),
-                    Container(
-                      height: 68,
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              Icon(Icons.phone, size: 25, color: Mythemes.lightBluishColor,).py16(),
-                            ],
-                          ).px16(),
-                          Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: "Mobile No.".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                  ),
-                                ),
-
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: mobileNo.text.letterSpacing(1).bold.make(),
-                                  ),
-                                ),
-
-
+                      Container(
+                        height: 68,
+                        child: Row(
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.phone,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
-                            ).px8(),
-                          ),
+                            ).px16(),
+                            Expanded(
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Mobile No.".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-                        ],
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              mobileNo.text
+                                                  .letterSpacing(1)
+                                                  .bold
+                                                  .make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 68,
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              Icon(Icons.work, size: 25, color: Mythemes.lightBluishColor,).py16(),
-                            ],
-                          ).px16(),
-                          Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: "Department".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                  ),
-                                ),
-
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: dept.text.letterSpacing(1).bold.make(),
-                                  ),
-                                ),
-
-
+                      Container(
+                        height: 68,
+                        child: Row(
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.work,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
-                            ).px8(),
-                          ),
+                            ).px16(),
+                            Expanded(
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Department".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-                        ],
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              dept.text
+                                                  .letterSpacing(1)
+                                                  .bold
+                                                  .make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 68,
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              Icon(Icons.apartment, size: 25, color: Mythemes.lightBluishColor,).py16(),
-                            ],
-                          ).px16(),
-                          Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: "Branch".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                  ),
-                                ),
-
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: branch.text.letterSpacing(1).bold.make(),
-                                  ),
-                                ),
-
-
+                      Container(
+                        height: 68,
+                        child: Row(
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.apartment,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
-                            ).px8(),
-                          ),
+                            ).px16(),
+                            Expanded(
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Branch".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-                        ],
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              branch.text
+                                                  .letterSpacing(1)
+                                                  .bold
+                                                  .make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 68,
-                      child: Row(
-                        children: [
-                          Column(
-                            children: [
-                              Icon(Icons.date_range, size: 25, color: Mythemes.lightBluishColor,).py16(),
-                            ],
-                          ).px16(),
-                          Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: "Date Of Birth".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                  ),
-                                ),
-
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: (dateOfBirth.isNotEmpty)
-                                        ? (() {
-                                      try {
-                                        return DateFormat("dd-MM-yyyy")
-                                            .format(DateFormat("dd-MM-yyyy").parse(dateOfBirth))
-                                            .text.letterSpacing(1).bold.make();
-                                      } catch (e) {
-                                        print('Error parsing dateOfBirth: $e');
-                                        return Text('Invalid date format').text.bold.make();
-                                      }
-                                    }())
-                                        : Text('Date of birth not provided').text.bold.make(),
-                                  ),
-                                ),
+                      Container(
+                        height: 68,
+                        child: Row(
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.date_range,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
-                            ).px8(),
-                          )
+                            ).px16(),
+                            Expanded(
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Date Of Birth".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-                        ],
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              (dateOfBirth.isNotEmpty)
+                                                  ? (() {
+                                                    try {
+                                                      return DateFormat(
+                                                            "dd-MM-yyyy",
+                                                          )
+                                                          .format(
+                                                            DateFormat(
+                                                              "dd-MM-yyyy",
+                                                            ).parse(
+                                                              dateOfBirth,
+                                                            ),
+                                                          )
+                                                          .text
+                                                          .letterSpacing(1)
+                                                          .bold
+                                                          .make();
+                                                    } catch (e) {
+                                                      print(
+                                                        'Error parsing dateOfBirth: $e',
+                                                      );
+                                                      return Text(
+                                                        'Invalid date format',
+                                                      ).text.bold.make();
+                                                    }
+                                                  }())
+                                                  : Text(
+                                                    'Date of birth not provided',
+                                                  ).text.bold.make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                ),
-
-
-
-
-
-
               ],
             ),
           ),
+
           /*Padding(padding: EdgeInsets.only(bottom: 270, left: 184),
             child: CircleAvatar(
               backgroundColor: Mythemes.blackish,
@@ -390,27 +453,26 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
 
           ),*/
-
         ],
       ),
     );
   }
 }
 
-class CurvedHeaderContainer extends CustomPainter{
-
+class CurvedHeaderContainer extends CustomPainter {
   @override
-  void paint(Canvas canvas,Size size ){
-    Paint paint=Paint()..color= const Color(0xff00b0ff);
-    Path path=Path()
-      ..relativeLineTo(0, 130)
-      ..quadraticBezierTo(size.width/2, 225, size.width, 130)
-      ..relativeLineTo(0, -150)
-      ..close();
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()..color = const Color(0xff00b0ff);
+    Path path =
+        Path()
+          ..relativeLineTo(0, 130)
+          ..quadraticBezierTo(size.width / 2, 225, size.width, 130)
+          ..relativeLineTo(0, -150)
+          ..close();
     canvas.drawPath(path, paint);
 
     @override
-    bool shouldRepaint(CustomPainter oldDelegate)=>false;
+    bool shouldRepaint(CustomPainter oldDelegate) => false;
   }
 
   @override

@@ -9,6 +9,7 @@ import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http_parser/http_parser.dart';
 import '../commanScreen/allAPIList.dart';
@@ -24,9 +25,7 @@ class RegistrationScreen extends StatefulWidget {
   //const RegistrationScreen({Key? key}) : super(key: key);
 
   final String empId;
-  const RegistrationScreen(
-      {Key? key, required this.empId})
-      : super(key: key);
+  const RegistrationScreen({Key? key, required this.empId}) : super(key: key);
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState(empId);
 }
@@ -41,14 +40,15 @@ bool showHide = false;
 bool showAdmin = false;
 bool showRo = false;
 dynamic empIdReceived;
+
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final String  empIdReceive;
+  final String empIdReceive;
 
   _RegistrationScreenState(this.empIdReceive);
   //TODO declare variables
   late ImagePicker imagePicker;
   File? _image;
-  int codeAuto =1;
+  int codeAuto = 1;
 
   //TODO declare detector
   late FaceDetector faceDetector;
@@ -63,36 +63,35 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     imagePicker = ImagePicker();
 
     //TODO initialize face detector
-    final options = FaceDetectorOptions(performanceMode: FaceDetectorMode.accurate);
+    final options = FaceDetectorOptions(
+      performanceMode: FaceDetectorMode.accurate,
+    );
     faceDetector = FaceDetector(options: options);
 
     //TODO initialize face recognizer
     recognizer = Recognizer();
-
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
-    empRole= await shared.getEmpRoll();
-    roRole= await shared.getRoRole();
-    adminRole= await shared.getAdminRole();
+    empRole = await shared.getEmpRoll();
+    roRole = await shared.getRoRole();
+    adminRole = await shared.getAdminRole();
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
     empIdReceived = empId;
     print("EMP ID REC -$empId");
     setState(() {
-      if(empRole==1){
-        showHide=true;
+      if (empRole == 1) {
+        showHide = true;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
-      if(empRole==0){
-        showHide=false;
+      if (empRole == 0) {
+        showHide = false;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
@@ -112,14 +111,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         print("Show Ro $showRo");
       }
     });
-
   }
 
   //TODO capture image using camera
   _imgFromCamera() async {
     XFile? pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      setState((){
+      setState(() {
         _image = File(pickedFile.path);
         doFaceDetection();
       });
@@ -128,10 +126,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   //TODO choose image using gallery
   _imgFromGallery() async {
-    XFile? pickedFile =
-        await imagePicker.pickImage(source: ImageSource.gallery);
+    XFile? pickedFile = await imagePicker.pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
-      setState((){
+      setState(() {
         _image = File(pickedFile.path);
         doFaceDetection();
       });
@@ -153,28 +152,41 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     for (Face face in faces) {
       final Rect boundingBox = face.boundingBox;
 
-      num left = boundingBox.left<0?0:boundingBox.left;
-      num right = boundingBox.right>image.width?image.width-1:boundingBox.right;
-      num top = boundingBox.top<0?0:boundingBox.top;
-      num bottom = boundingBox.bottom>image.height?image.height-1:boundingBox.bottom;
-      num width = right-left;
+      num left = boundingBox.left < 0 ? 0 : boundingBox.left;
+      num right =
+          boundingBox.right > image.width ? image.width - 1 : boundingBox.right;
+      num top = boundingBox.top < 0 ? 0 : boundingBox.top;
+      num bottom =
+          boundingBox.bottom > image.height
+              ? image.height - 1
+              : boundingBox.bottom;
+      num width = right - left;
       num height = bottom - top;
 
-      print("Ract Position :- " +boundingBox.toString());
+      print("Ract Position :- " + boundingBox.toString());
       /*if(boundingBox!=null){
         var snackBar = SnackBar(content: Text('Face Id :-'+boundingBox.toString()));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }*/
-      final bytes= _image!.readAsBytesSync();
+      final bytes = _image!.readAsBytesSync();
       img.Image? faceImg = img.decodeImage(bytes!);
-      img.Image croppedFace = img.copyCrop(faceImg!, x: left.toInt(), y: top.toInt(), width: width.toInt(), height: height.toInt());
-      Recognition recognition=  recognizer.recognize(croppedFace, boundingBox);
-      recognizer.registerFaceInDB(textEditingController.text, recognition.embeddings);
+      img.Image croppedFace = img.copyCrop(
+        faceImg!,
+        x: left.toInt(),
+        y: top.toInt(),
+        width: width.toInt(),
+        height: height.toInt(),
+      );
+      Recognition recognition = recognizer.recognize(croppedFace, boundingBox);
+      recognizer.registerFaceInDB(
+        textEditingController.text,
+        recognition.embeddings,
+      );
       uploadFaceRegisters(context, recognition.embeddings.toString(), _image!);
       //showFaceRegistrationDialogue(Uint8List.fromList(img.encodeBmp(croppedFace)), recognition);
     }
     drawRectangleAroundFaces();
-   /* var snackBar = SnackBar(content: Text(" No Face Founded "));
+    /* var snackBar = SnackBar(content: Text(" No Face Founded "));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
 
     //TODO call the method to perform face recognition on detected faces
@@ -182,7 +194,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   //TODO remove rotation of camera images
   removeRotation(File inputImage) async {
-    final img.Image? capturedImage = img.decodeImage(await File(inputImage!.path).readAsBytes());
+    final img.Image? capturedImage = img.decodeImage(
+      await File(inputImage!.path).readAsBytes(),
+    );
     final img.Image orientedImage = img.bakeOrientation(capturedImage!);
     return await File(_image!.path).writeAsBytes(img.encodeJpg(orientedImage));
   }
@@ -191,52 +205,63 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   //TODO Face Registration Dialogue
   TextEditingController textEditingController = TextEditingController();
-  showFaceRegistrationDialogue(Uint8List cropedFace, Recognition recognition){
+  showFaceRegistrationDialogue(Uint8List cropedFace, Recognition recognition) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Face Registration",textAlign: TextAlign.center),alignment: Alignment.center,
-        content: SizedBox(
-          height: 340,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20,),
-              Image.memory(
-                cropedFace,
-                width: 200,
-                height: 200,
-              ),
-              SizedBox(
-                width: 200,
-                child: TextField(
-                  controller: textEditingController,
-                    decoration: const InputDecoration( fillColor: Colors.white, filled: true,hintText: "Enter Name")
-                ),
-              ),
-              const SizedBox(height: 10,),
-              ElevatedButton(
-                  onPressed: () {
-                    recognizer.registerFaceInDB(textEditingController.text, recognition.embeddings);
-                    //uploadFaceRegister(context, recognition.embeddings.toString(), _image!);
-                    textEditingController.text = "";
-                    Navigator.of(context, rootNavigator: true).pop();
-                    /*ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text("Face Registration", textAlign: TextAlign.center),
+            alignment: Alignment.center,
+            content: SizedBox(
+              height: 340,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  Image.memory(cropedFace, width: 200, height: 200),
+                  SizedBox(
+                    width: 200,
+                    child: TextField(
+                      controller: textEditingController,
+                      decoration: const InputDecoration(
+                        fillColor: Colors.white,
+                        filled: true,
+                        hintText: "Enter Name",
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      recognizer.registerFaceInDB(
+                        textEditingController.text,
+                        recognition.embeddings,
+                      );
+                      //uploadFaceRegister(context, recognition.embeddings.toString(), _image!);
+                      textEditingController.text = "";
+                      Navigator.of(context, rootNavigator: true).pop();
+                      /*ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Face Registered"),
                     ));*/
-                  },style: ElevatedButton.styleFrom(backgroundColor: Colors.blue,minimumSize: const Size(200,40)),
-                  child: const Text("Register"))
-            ],
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      minimumSize: const Size(200, 40),
+                    ),
+                    child: const Text("Register"),
+                  ),
+                ],
+              ),
+            ),
+            contentPadding: EdgeInsets.zero,
           ),
-        ),contentPadding: EdgeInsets.zero,
-      ),
     );
   }
+
   //TODO draw rectangles
   var image;
   var registerMsg = "";
   drawRectangleAroundFaces() async {
-
     print("${image.width}   ${image.height}");
     setState(() {
       image;
@@ -247,19 +272,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     print("Image Check - $_image");
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.faceRegistered;
-   *//* Map data = {
+   */ /* Map data = {
       'sessionId': sessionId,
       'empId': empIdReceived,
       'coordinates': coordinates.toString(),
       'image': image.toString(),
-    };*//*
+    };*/ /*
     CommonNotificationPage.showLoaderDialog(context);
-    *//*var urlapi = Uri.parse("$conn$apiUrl");
+    */ /*var urlapi = Uri.parse("$conn$apiUrl");
     var request = new http.MultipartRequest("Post", urlapi);
     request.fields['sessionId'] = sessionId!;
     request.fields['empId'] = empIdReceived!.toString();
     request.fields['coordinates'] =  coordinates.toString();
-    request.files.add(await http.MultipartFile.fromPath('image', image));*//*
+    request.files.add(await http.MultipartFile.fromPath('image', image));*/ /*
 
     var urlapi = Uri.parse("$conn$apiUrl");
     var request = http.MultipartRequest("POST", urlapi);
@@ -290,11 +315,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 // Print the full API URL with parameters
     print('API URL with Parameters: $apiWithParams');
     //http.Response response = await http.Response.fromStream(await request.send());
-    *//*var body = json.encode(data);
+    */ /*var body = json.encode(data);
     //var uri = Uri.parse("$conn$apiUrl");
     var urlapi = Uri.parse("$conn$apiUrl?");
-    var request = new http.MultipartRequest("Post", urlapi);*//*
-    //var response = await http.post(urlapi,headers: {"Content-Type": "application/json"},body: body);
+    var request = new http.MultipartRequest("Post", urlapi);*/ /*
+    //var response = await MobileHttpClient.instance.post(urlapi,headers: {"Content-Type": "application/json"},body: body);
 // Print the full API URL with parameters
     print('API URL with Parameters: $apiWithParams');
     if (response.statusCode == 200) {
@@ -350,12 +375,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         },
       );
     }
-   *//* http.Response response = await http.Response.fromStream(await request.send());
+   */ /* http.Response response = await http.Response.fromStream(await request.send());
 
-    }*//*
+    }*/ /*
   }*/
 
-  Future<void> uploadFaceRegister(BuildContext context, String coordinates, File image) async {
+  Future<void> uploadFaceRegister(
+    BuildContext context,
+    String coordinates,
+    File image,
+  ) async {
     try {
       if (!await image.exists()) {
         throw Exception("File does not exist at path: ${image.path}");
@@ -366,7 +395,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       var urlapi = Uri.parse("$conn$apiUrl");
       CommonNotificationPage.showLoaderDialog(context);
       // Convert only 'coordinates' into JSON
-      Map<String,Object> jsonData={'coordinates': coordinates};
+      Map<String, Object> jsonData = {'coordinates': coordinates};
 
       var request = http.MultipartRequest("POST", urlapi);
 
@@ -376,41 +405,55 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       // Attach JSON data as a field
       request.fields['json'] = json.encode(jsonData);
       // Attach Image File
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        image.path,
-        contentType: MediaType('image', 'jpeg'), // Adjust format accordingly
-      ));
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'image',
+          image.path,
+          contentType: MediaType('image', 'jpeg'), // Adjust format accordingly
+        ),
+      );
 
       // **Debugging Logs**
-      print("🔹 API URL: $urlapi");
-      print("🔹 Request Fields: ${request.fields}");
-      print("🔹 Coordinates JSON: $jsonData");
-      print("🔹 Image Path: ${image.path}");
+      print("ðŸ”¹ API URL: $urlapi");
+      print("ðŸ”¹ Request Fields: ${request.fields}");
+      print("ðŸ”¹ Coordinates JSON: $jsonData");
+      print("ðŸ”¹ Image Path: ${image.path}");
 
       // Send Request
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        print("✅ JSON Upload successful: ${await response.stream.bytesToString()}");
+        print(
+          "âœ… JSON Upload successful: ${await response.stream.bytesToString()}",
+        );
       } else {
-        print("❌ JSON Upload Error: ${response.statusCode}, ${await response.stream.bytesToString()}");
+        print(
+          "âŒ JSON Upload Error: ${response.statusCode}, ${await response.stream.bytesToString()}",
+        );
       }
 
       // Now send the Multipart request
       http.StreamedResponse multipartResponse = await request.send();
 
       if (multipartResponse.statusCode == 200) {
-        print("✅ Multipart Upload successful: ${await multipartResponse.stream.bytesToString()}");
+        print(
+          "âœ… Multipart Upload successful: ${await multipartResponse.stream.bytesToString()}",
+        );
       } else {
-        print("❌ Multipart Upload Error: ${multipartResponse.statusCode}, ${await multipartResponse.stream.bytesToString()}");
+        print(
+          "âŒ Multipart Upload Error: ${multipartResponse.statusCode}, ${await multipartResponse.stream.bytesToString()}",
+        );
       }
     } catch (e) {
-      print("❌ Error uploading file: $e");
+      print("âŒ Error uploading file: $e");
     }
   }
 
-  Future<void> uploadFaceRegisters(BuildContext context, String coordinates, File image) async {
+  Future<void> uploadFaceRegisters(
+    BuildContext context,
+    String coordinates,
+    File image,
+  ) async {
     try {
       if (!await image.exists()) {
         throw Exception("File does not exist at path: ${image.path}");
@@ -429,27 +472,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       // Add other form fields
       request.fields['sessionId'] = sessionId!;
       request.fields['empId'] = empIdReceived!.toString();
-      request.fields['json'] = json.encode(jsonData); // Send coordinates as JSON string
+      request.fields['json'] = json.encode(
+        jsonData,
+      ); // Send coordinates as JSON string
 
       // Attach Image File
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        image.path,
-        contentType: MediaType('image', 'jpeg'),
-      ));
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'image',
+          image.path,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
 
       // **Debugging Logs**
-      print("🔹 API URL: $urlapi");
-      print("🔹 Request Fields: ${request.fields}");
-      print("🔹 Coordinates JSON: $jsonData");
-      print("🔹 Image Path: ${image.path}");
+      print("ðŸ”¹ API URL: $urlapi");
+      print("ðŸ”¹ Request Fields: ${request.fields}");
+      print("ðŸ”¹ Coordinates JSON: $jsonData");
+      print("ðŸ”¹ Image Path: ${image.path}");
 
       // Send Request
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
         String jsonResponse = await response.stream.bytesToString();
-        print("✅ JSON Upload successful: $jsonResponse");
+        print("âœ… JSON Upload successful: $jsonResponse");
 
         Map<String, dynamic> responseData = json.decode(jsonResponse);
 
@@ -499,10 +546,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           },
         );
       } else {
-        print("❌ JSON Upload Error: ${response.statusCode}, ${await response.stream.bytesToString()}");
+        print(
+          "âŒ JSON Upload Error: ${response.statusCode}, ${await response.stream.bytesToString()}",
+        );
       }
     } catch (e) {
-      print("❌ Error uploading file: $e");
+      print("âŒ Error uploading file: $e");
     }
   }
 
@@ -541,10 +590,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       // Send the request
       http.StreamedResponse response = await request.send();
 
-      print("🔹 API URL: $urlapi");
-      print("🔹 Request Fields: ${request.fields}");
-      print("🔹 JSON Data Sent: $coordinatesJson");
-      print("🔹 Image Path: ${image.path}");
+      print("ðŸ”¹ API URL: $urlapi");
+      print("ðŸ”¹ Request Fields: ${request.fields}");
+      print("ðŸ”¹ JSON Data Sent: $coordinatesJson");
+      print("ðŸ”¹ Image Path: ${image.path}");
 
       if (response.statusCode == 200) {
         print("Upload successful: ${await response.stream.bytesToString()}");
@@ -561,46 +610,51 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    int i=0;
+    int i = 0;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: titleName.text.make(),
-      ),
-      bottomNavigationBar:
-      BottomNavigationBar (
+      appBar: AppBar(title: titleName.text.make()),
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>const FaceRecognitinHome()));
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const FaceRecognitinHome(),
+              ),
+            );
             print('Face');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -611,18 +665,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.face_3),
-            label: 'AI',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.face_3), label: 'AI'),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),
             label: 'Dashboard',
@@ -640,38 +688,39 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         children: [
           image != null
               ?
-         // Container(
-                  //margin: const EdgeInsets.only(top: 100),
-                  //width: screenWidth - 50,
-                  //height: screenWidth - 50,
-                  //child: Image.file(_image!),
+              // Container(
+              //margin: const EdgeInsets.only(top: 100),
+              //width: screenWidth - 50,
+              //height: screenWidth - 50,
+              //child: Image.file(_image!),
               //  )
-               Container(
-                 margin: const EdgeInsets.only(
-                     top: 60, left: 30, right: 30, bottom: 0),
-                 child: FittedBox(
-                   child: SizedBox(
-                     width: image.width.toDouble(),
-                     height: image.width.toDouble(),
-                     child: CustomPaint(
-                       painter: FacePainter(
-                           facesList: faces, imageFile: image),
-                     ),
-                   ),
-                 ),
-               )
-              : Container(
-                  margin: const EdgeInsets.only(top: 100),
-                  child: Image.asset(
-                    "assets/images/logo.png",
-                    width: screenWidth - 100,
-                    height: screenWidth - 100,
+              Container(
+                margin: const EdgeInsets.only(
+                  top: 60,
+                  left: 30,
+                  right: 30,
+                  bottom: 0,
+                ),
+                child: FittedBox(
+                  child: SizedBox(
+                    width: image.width.toDouble(),
+                    height: image.width.toDouble(),
+                    child: CustomPaint(
+                      painter: FacePainter(facesList: faces, imageFile: image),
+                    ),
                   ),
                 ),
+              )
+              : Container(
+                margin: const EdgeInsets.only(top: 100),
+                child: Image.asset(
+                  "assets/images/logo.png",
+                  width: screenWidth - 100,
+                  height: screenWidth - 100,
+                ),
+              ),
 
-          Container(
-            height: 50,
-          ),
+          Container(height: 50),
 
           //TODO section which displays buttons for choosing and capturing images
           Container(
@@ -679,7 +728,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-               /* Card(
+                /* Card(
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(200))),
                   child: InkWell(
@@ -696,7 +745,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),*/
                 Card(
                   shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(200))),
+                    borderRadius: BorderRadius.all(Radius.circular(200)),
+                  ),
                   child: InkWell(
                     onTap: () {
                       _imgFromCamera();
@@ -704,14 +754,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     child: SizedBox(
                       width: screenWidth / 2 - 70,
                       height: screenWidth / 2 - 70,
-                      child: Icon(Icons.camera,
-                          color: Colors.blue, size: screenWidth / 7),
+                      child: Icon(
+                        Icons.camera,
+                        color: Colors.blue,
+                        size: screenWidth / 7,
+                      ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -743,5 +796,4 @@ class FacePainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
   }
-
 }

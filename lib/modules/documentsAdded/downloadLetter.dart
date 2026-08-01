@@ -9,6 +9,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -48,8 +49,8 @@ var documentName;
 DocumentDataModal? documentDownloadlGlobal;
 var docIdCheck = "";
 var docNameCheck = "";
-class _DownloadLettersState extends State<DownloadLetters> {
 
+class _DownloadLettersState extends State<DownloadLetters> {
   _DownloadLettersState(docId, docName);
   Dio dio = Dio();
   var progress = 0;
@@ -63,23 +64,17 @@ class _DownloadLettersState extends State<DownloadLetters> {
 
     getEmployeeList11.then((value) {
       setState(() {
-        documentDownloadlGlobal=value;
-        for(int i=0; i<documentDownloadlGlobal!.data!.length;i++){
+        documentDownloadlGlobal = value;
+        for (int i = 0; i < documentDownloadlGlobal!.data!.length; i++) {
           documentUrl = documentDownloadlGlobal!.data![i].letter;
           documentName = documentDownloadlGlobal!.data![i].document;
-          setState(() {
-
-          });
+          setState(() {});
           print('DOC URLGet -  $documentUrl');
           print('DOC Name -  $documentName');
         }
-
       });
     });
-    setState(() {
-
-    });
-
+    setState(() {});
   }
 
   Future<DocumentDataModal> getDocument(String SessionId) async {
@@ -87,20 +82,19 @@ class _DownloadLettersState extends State<DownloadLetters> {
     String apiUrl = ApiDetails.documentDetApi;
     print('employeeList11: ${SessionId}');
     DocumentDataModal documentDataModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "empid=$empId&"
-        "docId=$docId"
-
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "empid=$empId&"
+      "docId=$docId",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
-
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
     print('responseemployeeList $getData');
-    documentDataModal=DocumentDataModal.fromJson(mapResponse);
+    documentDataModal = DocumentDataModal.fromJson(mapResponse);
 
     return documentDataModal;
   }
@@ -114,7 +108,6 @@ class _DownloadLettersState extends State<DownloadLetters> {
     getSharedPrfanceList();
     setState(() {
       documentUrl = "";
-
     });
     /*timeString = _formatDateTime(DateTime.now());
     Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
@@ -126,17 +119,17 @@ class _DownloadLettersState extends State<DownloadLetters> {
     //startDownloading();
   }
 
-
   ReceivePort receivePort = ReceivePort();
   dateSelection() async {
     DateTime? date = DateTime.now();
     FocusScope.of(context).requestFocus(new FocusNode());
 
     date = await showMonthYearPicker(
-        context: context,
-        initialDate: date,
-        firstDate:DateTime(1947),
-        lastDate: DateTime.now().add(Duration(days: 0)));
+      context: context,
+      initialDate: date,
+      firstDate: DateTime(1947),
+      lastDate: DateTime.now().add(Duration(days: 0)),
+    );
     setState(() {
       // singleDateString = DateFormat('dd-MM-yyyy').format(date!);
       _dateController.text = DateFormat("MMMM-yy").format(date!);
@@ -145,11 +138,12 @@ class _DownloadLettersState extends State<DownloadLetters> {
       print('MonthPicker $selectedDate');
       getSharedPrfanceList();
 
-
-
       //  DateFormat.yMd().format(date!).toString();
     });
-    IsolateNameServer.registerPortWithName(receivePort.sendPort, "downloadingPdf");
+    IsolateNameServer.registerPortWithName(
+      receivePort.sendPort,
+      "downloadingPdf",
+    );
     receivePort.listen((message) {
       setState(() {
         progress = message;
@@ -159,27 +153,21 @@ class _DownloadLettersState extends State<DownloadLetters> {
     print(date);
   }
 
-
-
   @override
   void dispose() {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
-
   }
-  static downloadCallback(id, status, progress){
+
+  static downloadCallback(id, status, progress) {
     SendPort? sendPort = IsolateNameServer.lookupPortByName('downloadingPdf');
     sendPort!.send(progress);
-
   }
-
-
-
-
 
   String _formatDateTime(DateTime dateTime) {
     return DateFormat('s').format(dateTime);
   }
+
   void _getTime() {
     final DateTime now = DateTime.now();
     final String formattedDateTime = _formatDateTime(now);
@@ -188,7 +176,6 @@ class _DownloadLettersState extends State<DownloadLetters> {
       timeString = formattedDateTime;
     });
   }
-
 
   /*void startDownloading() async {
      String url =
@@ -220,11 +207,10 @@ class _DownloadLettersState extends State<DownloadLetters> {
     final dir = await getExternalStorageDirectory();
     return "${dir!.path}/$filename";
   }
-  String singleDateString="";
+
+  String singleDateString = "";
   final TextEditingController _dateController = TextEditingController();
   String? selectedDate;
-
-
 
   /* String Progress = "0";
   //Final Dio dio = Dio();
@@ -292,6 +278,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
     // You can also use getApplicationDocumentsDirectory() for the app's documents directory
     return directory!.path;
   }
+
   void findAndroidDataPath() async {
     final externalStorageDir = await getExternalStorageDirectory();
     final androidDataPath = '${externalStorageDir!.path}/Android/data/';
@@ -299,14 +286,14 @@ class _DownloadLettersState extends State<DownloadLetters> {
     print('Android Data Path: $androidDataPath');
   }
 
-  void  _downloadFile() async {
-    for(int i=0; i<documentDownloadlGlobal!.data!.length;i++){
+  void _downloadFile() async {
+    for (int i = 0; i < documentDownloadlGlobal!.data!.length; i++) {
       documentUrl = documentDownloadlGlobal!.data![i].letter;
       documentName = documentDownloadlGlobal!.data![i].document;
       print('DOC URL -  $documentUrl');
       print('DOC Name -  $documentName');
     }
-    String fileName = '$documentName'+'.pdf';
+    String fileName = '$documentName' + '.pdf';
     /*if(Platform.isAndroid) {
       var storagePath = "/storage/emulated/0/Download/$fileName";
       var file = File(storagePath);
@@ -329,39 +316,40 @@ class _DownloadLettersState extends State<DownloadLetters> {
     if (Platform.isAndroid) {
       var storagePath = "/storage/emulated/0/Download/$fileName";
       var file = File(storagePath);
-      var res = await http.get(Uri.parse("$documentUrl"));
+      var res = await MobileHttpClient.instance.get(Uri.parse("$documentUrl"));
       file.writeAsBytes(res.bodyBytes);
       Fluttertoast.showToast(
-          msg: "Download Completed - $fileName",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0
+        msg: "Download Completed - $fileName",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
       );
       _showNotification(storagePath, fileName);
       print("$documentUrl");
       print("$fileName");
       print("$storagePath");
-    }
-    else if (Platform.isIOS) {
+    } else if (Platform.isIOS) {
       print("I am IOS");
       final status = await Permission.storage.request();
       if (status.isGranted) {
         final downloadDir = await getDownloadDirectory();
         final filePath = '$downloadDir/$fileName';
         var file = File(filePath);
-        var res = await http.get(Uri.parse("$documentUrl"));
+        var res = await MobileHttpClient.instance.get(
+          Uri.parse("$documentUrl"),
+        );
         await file.writeAsBytes(res.bodyBytes);
         Fluttertoast.showToast(
-            msg: "Download Completed - $fileName",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0
+          msg: "Download Completed - $fileName",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
         _showNotification(filePath, fileName);
       } else {
@@ -402,21 +390,21 @@ class _DownloadLettersState extends State<DownloadLetters> {
         print('no permission');
       }
     }*/
-
-
   }
 
   void _showNotification(String filePath, String fileName) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
-      channelDescription: 'your_channel_description',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-      icon: '@mipmap/ic_launcher',  // Specify the correct icon resource here
-    );
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails();
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'your_channel_id',
+          'your_channel_name',
+          channelDescription: 'your_channel_description',
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: false,
+          icon: '@mipmap/ic_launcher', // Specify the correct icon resource here
+        );
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+        DarwinNotificationDetails();
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
       iOS: iOSPlatformChannelSpecifics,
@@ -435,21 +423,26 @@ class _DownloadLettersState extends State<DownloadLetters> {
   }
 
   Future<void> _initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
-    final InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) async {
+      onDidReceiveNotificationResponse: (
+        NotificationResponse notificationResponse,
+      ) async {
         if (notificationResponse.payload != null) {
           _onNotificationTap(notificationResponse.payload!);
         }
@@ -457,57 +450,60 @@ class _DownloadLettersState extends State<DownloadLetters> {
     );
   }
 
-  Future<bool> saveNewFile(String url, String fileName) async{
+  Future<bool> saveNewFile(String url, String fileName) async {
     Directory? directory;
     try {
       if (Platform.isAndroid) {
-        if(await _requestPermission(Permission.storage)) {
+        if (await _requestPermission(Permission.storage)) {
           directory = await getExternalStorageDirectory();
 
           String newPath = "";
           List<String> folders = directory!.path.split("/");
-          for(int x = 1; x<folders.length; x++) {
+          for (int x = 1; x < folders.length; x++) {
             String folder = folders[x];
-            if(folder != "Android") {
-              newPath += "/"+folder;
+            if (folder != "Android") {
+              newPath += "/" + folder;
             } else {
               break;
             }
           }
 
-
-
-          newPath = newPath+"/MyPdfs";
+          newPath = newPath + "/MyPdfs";
           directory = Directory(newPath);
           print(directory!.path);
         } else {
           return false;
         }
-      }
-      else{
-        if(await _requestPermission(Permission.photos)) {
+      } else {
+        if (await _requestPermission(Permission.photos)) {
           directory = await getApplicationDocumentsDirectory();
         } else {
           return false;
         }
-
       }
-      if(!await directory.exists()) {
+      if (!await directory.exists()) {
         await directory.create(recursive: true);
       }
-      if(await directory.exists()) {
-        File saveFile = File(directory.path+"/$fileName");
-        await newDio.download(url, saveFile.path, onReceiveProgress: (downloaded, totalSize) {
-          setState(() {
-            newProgress = downloaded/totalSize;
-          });
-        });
-        if(Platform.isIOS) {
-          await ImageGallerySaverPlus.saveFile(saveFile.path, isReturnPathOfIOS: true);
+      if (await directory.exists()) {
+        File saveFile = File(directory.path + "/$fileName");
+        await newDio.download(
+          url,
+          saveFile.path,
+          onReceiveProgress: (downloaded, totalSize) {
+            setState(() {
+              newProgress = downloaded / totalSize;
+            });
+          },
+        );
+        if (Platform.isIOS) {
+          await ImageGallerySaverPlus.saveFile(
+            saveFile.path,
+            isReturnPathOfIOS: true,
+          );
         }
         return true;
       }
-    } catch(e) {
+    } catch (e) {
       print(e);
     }
 
@@ -515,11 +511,11 @@ class _DownloadLettersState extends State<DownloadLetters> {
   }
 
   Future<bool> _requestPermission(Permission permission) async {
-    if(await permission.isGranted) {
+    if (await permission.isGranted) {
       return true;
     } else {
       var result = await permission.request();
-      if(result == PermissionStatus.granted) {
+      if (result == PermissionStatus.granted) {
         return true;
       } else {
         return false;
@@ -529,7 +525,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
 
   bool loading = false;
   newDownloadFile() async {
-    for(int i=0; i<documentDownloadlGlobal!.data!.length;i++){
+    for (int i = 0; i < documentDownloadlGlobal!.data!.length; i++) {
       documentUrl = documentDownloadlGlobal!.data![i].letter;
       documentName = documentDownloadlGlobal!.data![i].document;
       print('DOC URL -  $documentUrl');
@@ -553,6 +549,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
       loading= false;
     });*/
   }
+
   int pageIndex = 3;
   int currentIndex = 3;
   var titleName = 'Download Document';
@@ -577,29 +574,29 @@ class _DownloadLettersState extends State<DownloadLetters> {
         ],*/
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             print('home tab');
           }
-          if(index==1){
+          if (index == 1) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             print('Dashboard');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.documentsAddedRoute);
             print('e-Doc');
           }
@@ -609,10 +606,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),
             label: 'Dashboard',
@@ -630,15 +624,16 @@ class _DownloadLettersState extends State<DownloadLetters> {
         ],
       ),
 
-      body: documentUrl == "-" ? Center(
-        child: "Document not uploaded in the system !!".text.make(),
-      ) :
-      PDF().cachedFromUrl(
-        '$documentUrl',
-        placeholder: (progress) => Center(child: Text('$progress %')),
-        errorWidget: (error) => Center(child: Text(error.toString())),
-      ),
-
+      body:
+          documentUrl == "-"
+              ? Center(
+                child: "Document not uploaded in the system !!".text.make(),
+              )
+              : PDF().cachedFromUrl(
+                '$documentUrl',
+                placeholder: (progress) => Center(child: Text('$progress %')),
+                errorWidget: (error) => Center(child: Text(error.toString())),
+              ),
 
       floatingActionButton: Visibility(
         visible: documentUrl != "-",
@@ -646,7 +641,9 @@ class _DownloadLettersState extends State<DownloadLetters> {
           onPressed: newDownloadFile,
           /*onPressed: () async {
             newDownloadFile();
-            *//*_downloadFile();*//*
+            */
+          /*_downloadFile();*/
+          /*
             //FileDownload().download(context,salarySlip);
            // _download();
             //startDownloading();
@@ -671,9 +668,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
             );
           },*/
           backgroundColor: Mythemes.lightBluishColor,
-          child: Icon(
-            Icons.download, color: Mythemes.whitish, size: 28,
-          ),
+          child: Icon(Icons.download, color: Mythemes.whitish, size: 28),
         ),
       ),
     );

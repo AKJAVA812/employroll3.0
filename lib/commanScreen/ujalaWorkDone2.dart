@@ -16,6 +16,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../adminPage/adminDashboard/adminDashboard.dart';
 import 'allAPIList.dart';
@@ -36,15 +37,39 @@ class UjalaCreditWDSubmit extends StatefulWidget {
   String? noOfNewMem;
   String? noOfNewAdvi;
 
-  UjalaCreditWDSubmit(this.imageValue,this.DropValueName, this.clientNamesend, this.clientNamesendTwo, this.clientNamesendThree,
-      this.clientNamesendFour, this.clientNamesendFive, this.clientContactSend, this.clientContSendTwo,
-      this.clientContSendThree, this.clientContSendFour, this.clientContSendFive, this.noOfNewMem, this.noOfNewAdvi,);
+  UjalaCreditWDSubmit(
+    this.imageValue,
+    this.DropValueName,
+    this.clientNamesend,
+    this.clientNamesendTwo,
+    this.clientNamesendThree,
+    this.clientNamesendFour,
+    this.clientNamesendFive,
+    this.clientContactSend,
+    this.clientContSendTwo,
+    this.clientContSendThree,
+    this.clientContSendFour,
+    this.clientContSendFive,
+    this.noOfNewMem,
+    this.noOfNewAdvi,
+  );
 
   @override
-  State<UjalaCreditWDSubmit> createState() => _UjalaCreditWDSubmitState(imageValue,
-      DropValueName!,clientNamesend!,clientNamesendTwo!,clientNamesendThree!,clientNamesendFour!,
-      clientNamesendFive!,clientContactSend!,clientContSendTwo!, clientContSendThree!,clientContSendFour!,
-      clientContSendFive!,noOfNewMem!,noOfNewAdvi!
+  State<UjalaCreditWDSubmit> createState() => _UjalaCreditWDSubmitState(
+    imageValue,
+    DropValueName!,
+    clientNamesend!,
+    clientNamesendTwo!,
+    clientNamesendThree!,
+    clientNamesendFour!,
+    clientNamesendFive!,
+    clientContactSend!,
+    clientContSendTwo!,
+    clientContSendThree!,
+    clientContSendFour!,
+    clientContSendFive!,
+    noOfNewMem!,
+    noOfNewAdvi!,
   );
 }
 
@@ -57,11 +82,22 @@ double lngg = 0;
 final _formKey = GlobalKey<FormState>();
 
 class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
-  _UjalaCreditWDSubmitState(imageValue,String DropValueName, String clientNamesend, String clientNamesendTwo,
-      String clientNamesendThree, String clientNamesendFour, String clientNamesendFive, String clientContactSend,
-      String clientContSendTwo, String clientContSendThree, String clientContSendFour, String clientContSendFive,
-      String noOfNewMem, String noOfNewAdvi
-      );
+  _UjalaCreditWDSubmitState(
+    imageValue,
+    String DropValueName,
+    String clientNamesend,
+    String clientNamesendTwo,
+    String clientNamesendThree,
+    String clientNamesendFour,
+    String clientNamesendFive,
+    String clientContactSend,
+    String clientContSendTwo,
+    String clientContSendThree,
+    String clientContSendFour,
+    String clientContSendFive,
+    String noOfNewMem,
+    String noOfNewAdvi,
+  );
 
   var titleName = "Workdone Report";
   TextEditingController _ussNoController = new TextEditingController();
@@ -69,21 +105,23 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
   TextEditingController _todayBusiness = new TextEditingController();
   TextEditingController _remarksController = new TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  String singleDateString="";
+  String singleDateString = "";
 
   DateTime _date = (DateTime.now());
   String formattedDate = DateFormat.ABBR_MONTH;
-  String dateFormate = DateFormat("dd-MM-yyyy").format(DateTime.parse("2019-09-30"));
+  String dateFormate = DateFormat(
+    "dd-MM-yyyy",
+  ).format(DateTime.parse("2019-09-30"));
 
-  Future <Null> _selectDate (BuildContext context) async {
-    DateTime? _datePicker =await showDatePicker(
+  Future<Null> _selectDate(BuildContext context) async {
+    DateTime? _datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if(_datePicker != null && _datePicker != _date){
+    if (_datePicker != null && _datePicker != _date) {
       setState(() {
         _date = _datePicker;
       });
@@ -125,8 +163,6 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
     getSharedPrfanceList();
     super.initState();
   }
-
-
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
@@ -178,45 +214,59 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
     print('Response body: ${imageVal}');
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.customWorkDoneApi;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "image=$imageVal&"
-        "address=$currentAddress&"
-        "taskTime=$formattedDate&"
-        "taskDone='DONE'&"
-        "taskDetails=${_remarksController.text}"
-        "lat=$latt&"
-        "lng=$lngg&"
-        "coh=$dropName&"
-        "cname1=$clientNsend&"
-        "cname2=$clientNsendTwo&"
-        "cname3=$clientNsendThree&"
-        "cname4=$clientNsendFour&"
-        "cname5=$clientNsendFive&"
-        "client1number=$clientConSend&"
-        "client2number=$clientConSendTwo&"
-        "client3number=$clientConSendThree&"
-        "client4number=$clientConSendFour&"
-        "client5number=$clientConSendFive&"
-        "noOfNewMember=$clientNoOfNewMem&"
-        "noOfNewAdvisor=$clientNoOfNewAdv&"
-        "uss=${_ussNoController.text}&"
-        "ujalaJyoti=${_ujalaJyoti.text}&"
-        "todayBusiness=${_todayBusiness.text}&"
-        "nextFollowUp=${_dateController.text}&"
-        "ujalaRemarks=${_remarksController.text}"
-
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "image=$imageVal&"
+      "address=$currentAddress&"
+      "taskTime=$formattedDate&"
+      "taskDone='DONE'&"
+      "taskDetails=${_remarksController.text}"
+      "lat=$latt&"
+      "lng=$lngg&"
+      "coh=$dropName&"
+      "cname1=$clientNsend&"
+      "cname2=$clientNsendTwo&"
+      "cname3=$clientNsendThree&"
+      "cname4=$clientNsendFour&"
+      "cname5=$clientNsendFive&"
+      "client1number=$clientConSend&"
+      "client2number=$clientConSendTwo&"
+      "client3number=$clientConSendThree&"
+      "client4number=$clientConSendFour&"
+      "client5number=$clientConSendFive&"
+      "noOfNewMember=$clientNoOfNewMem&"
+      "noOfNewAdvisor=$clientNoOfNewAdv&"
+      "uss=${_ussNoController.text}&"
+      "ujalaJyoti=${_ujalaJyoti.text}&"
+      "todayBusiness=${_todayBusiness.text}&"
+      "nextFollowUp=${_dateController.text}&"
+      "ujalaRemarks=${_remarksController.text}",
     );
-    //final response = await http.post(urlapi);
+    //final response = await MobileHttpClient.instance.post(urlapi);
     var request = new http.MultipartRequest("Post", urlapi);
-    var multipart = new http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
+    var multipart = new http.MultipartFile(
+      'image',
+      stream,
+      length,
+      filename: basename('image.jpg'),
+    );
     request.files.add(multipart);
-    String apiWithParams = urlapi.toString() + '?' + request.fields.entries.map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}').join('&');
+    String apiWithParams =
+        urlapi.toString() +
+        '?' +
+        request.fields.entries
+            .map(
+              (e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+            )
+            .join('&');
 
     // Print the full API URL with parameters
     print('API URL with Parameters: $apiWithParams');
-    http.Response response = await http.Response.fromStream(await request.send());
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
     if (response.statusCode == 200) {
@@ -224,10 +274,15 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
       Navigator.of(context, rootNavigator: true).pop();
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         showSuccessGo(
-            context, "You have successfully submitted task details on server at".toString() + " " + formattedDate, "Task Submitted");
+          context,
+          "You have successfully submitted task details on server at"
+                  .toString() +
+              " " +
+              formattedDate,
+          "Task Submitted",
+        );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
-        showSuccessGo(
-            context, resultSuccess, " Failed ");
+        showSuccessGo(context, resultSuccess, " Failed ");
       }
     } else {
       Navigator.of(context, rootNavigator: true).pop();
@@ -235,66 +290,58 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
     }
   }
 
-
-  showSuccessGo(BuildContext buildContext, result,alert) {
+  showSuccessGo(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Expanded(child: Text( alert, style: TextStyle(
-            fontSize: 20,
-          ),)),
+          Expanded(child: Text(alert, style: TextStyle(fontSize: 20))),
         ],
       ),
       content: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(result),
-            Container(
-              child: Text(
-                "Location",
-                textAlign: TextAlign.left,
-                style: TextStyle(color: Mythemes.greyish),
-              ),
-            ).py12(),
-            Text(
-              currentAddress,
-              style: TextStyle(letterSpacing: 0.5),
-            ),
-          ],
-        ).px8(),
+        child:
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(result),
+                Container(
+                  child: Text(
+                    "Location",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(color: Mythemes.greyish),
+                  ),
+                ).py12(),
+                Text(currentAddress, style: TextStyle(letterSpacing: 0.5)),
+              ],
+            ).px8(),
       ),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
         TextButton(
-            onPressed: () {
-              Navigator.of(buildContext, rootNavigator: true).pop();
-              Navigator.pushNamed(buildContext, MyRoutings.punchInRoute);
-            },
-            child: Container(
-              child: Text("Ok"),
-            )
+          onPressed: () {
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            Navigator.pushNamed(buildContext, MyRoutings.punchInRoute);
+          },
+          child: Container(child: Text("Ok")),
         ),
-
       ],
       elevation: 24.0,
     );
     showDialog(
-        barrierDismissible: false,
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      barrierDismissible: false,
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
-  showDialgError(BuildContext context, result,reason) {
+  showDialgError(BuildContext context, result, reason) {
     var alertDialog = AlertDialog(
       title: Row(
         children: [
@@ -321,26 +368,24 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
             //uploadImage(context);
           },
           child: Text("Retry"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:context,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
-
 
   @override
   Widget build(BuildContext context) {
     return DismissKeyboard(
       child: Scaffold(
         backgroundColor: Mythemes.whitish,
-        appBar: AppBar(
-          title: titleName.text.make(),
-        ),
+        appBar: AppBar(title: titleName.text.make()),
 
         body: Container(
           color: Mythemes.whitish,
@@ -360,14 +405,13 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                         ],
                         controller: _ussNoController,
                         decoration: const InputDecoration(
-                            hintText: "Enter USS Number",
-                            labelText: "USS Number",
-                            prefixIcon: IconButton(
-                              icon: Icon(
-                                Icons.timelapse,
-                              ),
-                              onPressed: (null),
-                            )),
+                          hintText: "Enter USS Number",
+                          labelText: "USS Number",
+                          prefixIcon: IconButton(
+                            icon: Icon(Icons.timelapse),
+                            onPressed: (null),
+                          ),
+                        ),
                       ),
                     ),
                     Padding(
@@ -380,14 +424,13 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                         ],
                         controller: _ujalaJyoti,
                         decoration: const InputDecoration(
-                            hintText: "Enter Ujala Jyoti",
-                            labelText: "Ujala Jyoti",
-                            prefixIcon: IconButton(
-                              icon: Icon(
-                                Icons.edit,
-                              ),
-                              onPressed: (null),
-                            )),
+                          hintText: "Enter Ujala Jyoti",
+                          labelText: "Ujala Jyoti",
+                          prefixIcon: IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: (null),
+                          ),
+                        ),
                       ),
                     ),
                     Padding(
@@ -400,32 +443,35 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                         ],
                         controller: _todayBusiness,
                         decoration: const InputDecoration(
-                            hintText: "Enter Today Business",
-                            labelText: "Today Business",
-                            prefixIcon: IconButton(
-                              icon: Icon(
-                                Icons.edit,
-                              ),
-                              onPressed: (null),
-                            )),
+                          hintText: "Enter Today Business",
+                          labelText: "Today Business",
+                          prefixIcon: IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: (null),
+                          ),
+                        ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-
-                        onTap: () async{
+                        onTap: () async {
                           DateTime? date = DateTime.now();
                           FocusScope.of(context).requestFocus(new FocusNode());
 
                           date = await showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime(2050));
+                            context: context,
+                            initialDate: date,
+                            firstDate: DateTime(1947),
+                            lastDate: DateTime(2050),
+                          );
                           setState(() {
-                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _dateController.text = DateFormat("dd-MM-yyyy").format(date!);
+                            singleDateString = DateFormat(
+                              'dd-MM-yyyy',
+                            ).format(date!);
+                            _dateController.text = DateFormat(
+                              "dd-MM-yyyy",
+                            ).format(date!);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
@@ -435,13 +481,12 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
                         controller: _dateController,
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           labelText: "Next Follow Up",
                           prefixIcon: Icon(Icons.calendar_month),
                           hintText: DateFormat("DD-MM-YYYY").format(_date),
                           // hintText: DateFormat.yMd().format(_date).toString(),
                         ),
-
                       ),
                     ),
                     Padding(
@@ -459,14 +504,13 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                         //keyboardType: TextInputType.number,
                         controller: _remarksController,
                         decoration: const InputDecoration(
-                            hintText: "Enter Remarks",
-                            labelText: "Remarks",
-                            prefixIcon: IconButton(
-                              icon: Icon(
-                                Icons.text_snippet,
-                              ),
-                              onPressed: (null),
-                            )),
+                          hintText: "Enter Remarks",
+                          labelText: "Remarks",
+                          prefixIcon: IconButton(
+                            icon: Icon(Icons.text_snippet),
+                            onPressed: (null),
+                          ),
+                        ),
                       ),
                     ),
 
@@ -475,30 +519,31 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ButtonBar(
-                            alignment: MainAxisAlignment.center,
-                            buttonPadding: Vx.mOnly(right: 16),
-                            children: [
-                              ElevatedButton(
-                                onPressed: ()  {
-                                  if (_formKey.currentState!.validate()) {
-                                    return
-                                      setState(() {
-                                        AlertDialog(
-                                          content: "Please add remarks".text.make(),
-                                        );
-                                        uploadImage(context);
-                                      });
-                                  }
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                  MaterialStateProperty.all(Mythemes.lightBluishColor),
+                          alignment: MainAxisAlignment.center,
+                          buttonPadding: Vx.mOnly(right: 16),
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  return setState(() {
+                                    AlertDialog(
+                                      content: "Please add remarks".text.make(),
+                                    );
+                                    uploadImage(context);
+                                  });
+                                }
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                  Mythemes.lightBluishColor,
                                 ),
-                                child: "Submit".text.make(),
-                              ).wh(150, 40).py12()
-                            ]),
+                              ),
+                              child: "Submit".text.make(),
+                            ).wh(150, 40).py12(),
+                          ],
+                        ),
                       ],
-                    ).py64()
+                    ).py64(),
                   ],
                 ),
               ),

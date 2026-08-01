@@ -9,6 +9,7 @@ import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../adminPage/modelClass/dashboardModel.dart';
 import '../../adminPage/mssDashboard.dart';
@@ -35,8 +36,8 @@ class InactiveListMSS extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNew = [];
 EmployeeListModel? employeeListModelglobel;
 EmployeeListModel? employeeListModelglobeled;
 var empName;
@@ -45,7 +46,8 @@ String? userPanel;
 dynamic getProfileId;
 String? orgId;
 dynamic matchedOrg;
-class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
+
+class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -60,13 +62,13 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     setState(() {
@@ -87,15 +89,15 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        employeeListModelglobel=value;
-        employeeListModelglobeled=employeeListModelglobel;
+        employeeListModelglobel = value;
+        employeeListModelglobeled = employeeListModelglobel;
       });
       print('employeeList00${employeeListModelglobel!.data!.length}');
     });
@@ -114,13 +116,13 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
     try {
       var urlapi = Uri.parse(
         "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "profileId=$getProfileId&"
-            "orgId=0&"
-            "userPermission=$userPanel",
+        "sessionId=$sessionId&"
+        "profileId=$getProfileId&"
+        "orgId=0&"
+        "userPermission=$userPanel",
       );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       print('responseemployeeList ${response.body}');
       print('emp list api - ${response.request}');
@@ -129,7 +131,6 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
       employeeListModelglobeled = EmployeeListModel.fromJson(mapResponse);
 
       allUsernew = employeeListModelglobeled?.data ?? [];
-
     } catch (e) {
       print("Error fetching employee list: $e");
     } finally {
@@ -144,7 +145,7 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
   bool isLoading = true;
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -157,8 +158,14 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.empName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -172,6 +179,7 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
       foundDataNew = results;
     });
   }
+
   TextEditingController searchType = TextEditingController();
   var titleName = "Inactive Employees";
   int value = 1;
@@ -182,112 +190,129 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size(double.infinity, 100),
-          child: SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.white, border: Border(
-                  top: BorderSide.none
-              ), boxShadow: [
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size(double.infinity, 100),
+        child: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
                 BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 0.5,
-                    spreadRadius: 0,
-                    offset: Offset(0, 0.2))
-              ]),
-              child: AnimationSearchBar(
-                  searchFieldDecoration: BoxDecoration(
-                    color: Mythemes.greyishade,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  backIcon: Icons.arrow_back_ios,
-                  backIconColor: Mythemes.black,
-                  textStyle: TextStyle(fontSize: 14),
-                  onChanged: (value) {
-                    _runFilter(value);
-                  },
-                  horizontalPadding: 8,
-                  searchIconColor: Mythemes.black,
-                  centerTitle: "$titleName - ${foundDataNew!.length}",
-                  verticalPadding: 3,
-                  centerTitleStyle: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500,
-                      color: Mythemes.black),
-                  searchTextEditingController: searchType),
+                  color: Colors.grey,
+                  blurRadius: 0.5,
+                  spreadRadius: 0,
+                  offset: Offset(0, 0.2),
+                ),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: "$titleName - ${foundDataNew!.length}",
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
             ),
           ),
         ),
-        bottomNavigationBar:
-        BottomNavigationBar (
-          type: BottomNavigationBarType.fixed,
-          currentIndex: currentIndex,
-          iconSize: 25,
-          selectedFontSize: 12,
-          unselectedFontSize: 10,
-          onTap: (index) {
-
-            if(index==0){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
-              //Navigator.pop(context);
-              print('home tab');
-            }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
-            }
-            if(index==2){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 2,)));
-              print('Reports');
-            }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
-              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
-            }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
-              print('Profile');
-            }
-            /*if(index==3){
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(selectedIndex: 0),
+              ),
+            );
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
+          }
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 2),
+              ),
+            );
+            print('Reports');
+          }
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MSSDashboard(DashboardModel()),
+              ),
+            );
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('Dashboard');
+          }
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
+            );
+            print('Profile');
+          }
+          /*if(index==3){
                 title="Notifications";
               }*/
-            setState(() => currentIndex = index);
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.manage_accounts_outlined),
-              label: 'Workflow',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
-              label: 'Reports',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
-              //backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
-              //backgroundColor: Colors.blue,
-            ),
-          ],
-        ),
-        //floatingActionButton: getFAB(),
-        /*floatingActionButton: FloatingActionButton(
+          setState(() => currentIndex = index);
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'Reports',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_customize),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+            //backgroundColor: Colors.blue,
+          ),
+        ],
+      ),
+
+      //floatingActionButton: getFAB(),
+      /*floatingActionButton: FloatingActionButton(
           onPressed: (){
             Navigator.pushNamed(context, MyRoutings.exitWorkflowRoute);
           },
@@ -300,12 +325,11 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
             Icons.add, color: Mythemes.whitish, size: 28,
           ),
         ),*/
-
-        body: Container(
-          color: Mythemes.whitish,
-          child: Column(
-            children: [
-              /*Container(
+      body: Container(
+        color: Mythemes.whitish,
+        child: Column(
+          children: [
+            /*Container(
                 padding: EdgeInsets.all(8),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -320,29 +344,33 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
                   ),
                 ),
               ),*/
-              Expanded(
-                child: isLoading
-                    ? Center(child: CircularProgressIndicator()) // Loader
-                    : (employeeListModelglobeled == null
-                    ? Center(child: Text("No data found"))
-                    : MyStatelessWidget(employeeListModelglobeled!)),
-              ),
-            ],
-          ),
-        )
+            Expanded(
+              child:
+                  isLoading
+                      ? Center(child: CircularProgressIndicator()) // Loader
+                      : (employeeListModelglobeled == null
+                          ? Center(child: Text("No data found"))
+                          : MyStatelessWidget(employeeListModelglobeled!)),
+            ),
+          ],
+        ),
+      ),
     );
   }
+
   String selectedFilter = "Direct";
   Widget filterChip(String label) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: ChoiceChip(
         checkmarkColor: selectedFilter == label ? Colors.white : Colors.black87,
-        label: Text(label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: selectedFilter == label ? Colors.white : Colors.black87,
-            )),
+        label: Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: selectedFilter == label ? Colors.white : Colors.black87,
+          ),
+        ),
         selected: selectedFilter == label,
         selectedColor: Colors.deepPurple,
         onSelected: (val) {
@@ -357,28 +385,26 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware{
   }
 
   Widget getFAB() {
-    return
-      FloatingActionButton.extended(
-        tooltip: "Go to Exit List",
-        onPressed: (){
-          Navigator.pushNamed(context, MyRoutings.exitEmpListRoute);
-        },
-        backgroundColor: Mythemes.lightBluishColor,
-        icon:  Icon(Icons.not_interested, color: Mythemes.whitish,),
-        label: Text('Go to Exit List', style: TextStyle(color: Mythemes.whitish),),
-      ).py0();
+    return FloatingActionButton.extended(
+      tooltip: "Go to Exit List",
+      onPressed: () {
+        Navigator.pushNamed(context, MyRoutings.exitEmpListRoute);
+      },
+      backgroundColor: Mythemes.lightBluishColor,
+      icon: Icon(Icons.not_interested, color: Mythemes.whitish),
+      label: Text('Go to Exit List', style: TextStyle(color: Mythemes.whitish)),
+    ).py0();
   }
 }
-
 
 class MyStatelessWidget extends StatefulWidget {
   final EmployeeListModel employeeListModel;
 
   MyStatelessWidget(this.employeeListModel);
   @override
-  State<MyStatelessWidget> createState() => _MyStatelessWidgetState(employeeListModel);
+  State<MyStatelessWidget> createState() =>
+      _MyStatelessWidgetState(employeeListModel);
 }
-
 
 class _MyStatelessWidgetState extends State<MyStatelessWidget> {
   final EmployeeListModel employeeListModel;
@@ -391,33 +417,27 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
   var stepFour;
   var stepFive;
 
-
   @override
   Widget build(BuildContext context) {
-    showTrackDialog(BuildContext buildContext, result,alert) {
+    showTrackDialog(BuildContext buildContext, result, alert) {
       var alertDialog = AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0),
-            )
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
         ),
         title: Row(
           children: [
             //Icon(Icons.warning),
-            Expanded(child: Text( alert, style: TextStyle(
-                fontSize: 18
-            ),)),
+            Expanded(child: Text(alert, style: TextStyle(fontSize: 18))),
           ],
         ),
-        content: Text(result , style: TextStyle(
-            fontSize: 14
-        )),
+        content: Text(result, style: TextStyle(fontSize: 14)),
         titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         actions: [
           TextButton(
-              onPressed: () {
-                /*for(int i=0; i<employeeListModel!.data!.length;i++){
+            onPressed: () {
+              /*for(int i=0; i<employeeListModel!.data!.length;i++){
                   setState(() {
                     empId;
                     empName;
@@ -427,48 +447,56 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                   });
 
                 }*/
-                //print('emPI $empId');
-                //print('emName $empName');
-                print("Emp list clicked");
-                Navigator.pop(context);
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                    HistoryMapView(empName,empId)));
-
-                //Navigator.pop(buildContext);
-              },
-              child: Container(
-                child: Text("History"
-                  ,style: TextStyle(color: Mythemes.dangerColor),
+              //print('emPI $empId');
+              //print('emName $empName');
+              print("Emp list clicked");
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => HistoryMapView(empName, empId),
                 ),
-              )
+              );
+
+              //Navigator.pop(buildContext);
+            },
+            child: Container(
+              child: Text(
+                "History",
+                style: TextStyle(color: Mythemes.dangerColor),
+              ),
+            ),
           ),
           TextButton(
-              onPressed: () {
-                Navigator.of(buildContext, rootNavigator: true).pop();
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                    LiveMapView(empName,empId)));
-              },
-              child: Container(
-                child: Text("Live",
-                    style: TextStyle(color: Mythemes.lightBluishColor)
+            onPressed: () {
+              Navigator.of(buildContext, rootNavigator: true).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => LiveMapView(empName, empId),
                 ),
-              )
+              );
+            },
+            child: Container(
+              child: Text(
+                "Live",
+                style: TextStyle(color: Mythemes.lightBluishColor),
+              ),
+            ),
           ),
-
         ],
         elevation: 24.0,
       );
       showDialog(
-          context: buildContext,
-          builder: (BuildContext context) {
-            return alertDialog;
-          });
+        context: buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        },
+      );
     }
+
     return ListView.builder(
       padding: const EdgeInsets.all(8),
       itemCount: foundDataNew!.length,
       itemBuilder: (context, i) {
-
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
@@ -491,19 +519,26 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             },
             child: Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               color: Colors.white,
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12.0,
+                      horizontal: 12,
+                    ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
                           radius: 36,
                           backgroundColor: Mythemes.greyish,
-                          backgroundImage: NetworkImage(foundDataNew![i].empPhoto ?? ""),
+                          backgroundImage: NetworkImage(
+                            foundDataNew![i].empPhoto ?? "",
+                          ),
                         ),
                         SizedBox(width: 16),
                         Expanded(
@@ -512,22 +547,34 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                             children: [
                               Text(
                                 foundDataNew![i].empName ?? '',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               SizedBox(height: 4),
-                              Text("📞 ${foundDataNew![i].empContactNo ?? '-'}"),
-                              Text("🆔${foundDataNew![i].empId ?? '-'}"),
-                              Text("✉️ ${foundDataNew![i].empEmail ?? '-'}"),
-                              Text("🏢 ${foundDataNew![i].empDept ?? '-'}"),
+                              Text(
+                                "ðŸ“ž ${foundDataNew![i].empContactNo ?? '-'}",
+                              ),
+                              Text("ðŸ†”${foundDataNew![i].empId ?? '-'}"),
+                              Text(
+                                "âœ‰ï¸ ${foundDataNew![i].empEmail ?? '-'}",
+                              ),
+                              Text("ðŸ¢ ${foundDataNew![i].empDept ?? '-'}"),
                             ],
                           ),
                         ),
-                        Expanded(child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            "Shared_Services".text.bold.color(Mythemes.lightBluishColor).make().px4()
-                          ],
-                        ))
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              "Shared_Services".text.bold
+                                  .color(Mythemes.lightBluishColor)
+                                  .make()
+                                  .px4(),
+                            ],
+                          ),
+                        ),
                         /* Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,

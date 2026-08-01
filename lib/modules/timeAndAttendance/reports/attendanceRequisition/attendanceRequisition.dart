@@ -20,6 +20,7 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 
@@ -29,18 +30,26 @@ class AttendanceRequisition extends StatefulWidget {
   int indexCont;
 
   AttendanceRequisition(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont);
+    this.attendanceModelGlobel,
+    this.onDateAttModel,
+    this.indexCont,
+  );
 
   @override
   State<AttendanceRequisition> createState() => _AttendanceRequisitionState(
-      attendanceModelGlobel, onDateAttModel, indexCont);
+    attendanceModelGlobel,
+    onDateAttModel,
+    indexCont,
+  );
 }
+
 SessionManager shared = SessionManager();
 Map<String, dynamic> mapResponse = {};
 String? sessionId;
 dynamic orgId;
 
-class _AttendanceRequisitionState extends State<AttendanceRequisition> with RouteAware{
+class _AttendanceRequisitionState extends State<AttendanceRequisition>
+    with RouteAware {
   AttendanceReportModel? attendanceModelGlobel;
   OnDateAttModel? onDateAttModel;
   int indexCont;
@@ -59,9 +68,11 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   String? actualOutTimeset;
   int? empId;
 
-
   _AttendanceRequisitionState(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont);
+    this.attendanceModelGlobel,
+    this.onDateAttModel,
+    this.indexCont,
+  );
 
   Future<void> _loadOrgId() async {
     orgId = await shared.getOrgId();
@@ -77,7 +88,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
     //String empid=onDateAttModel!.empId.toString();
     //print('responseemployeeList $empid');
 
-    if(attendanceModelGlobel!=null){
+    if (attendanceModelGlobel != null) {
       print('attendanceModelGlobel');
       /*branchNameset= attendanceModelGlobel!.data![indexCont].branchName;
       updatedWorkHourSet= attendanceModelGlobel!.data![indexCont].branchName;
@@ -88,7 +99,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
       empId =attendanceModelGlobel!.data![indexCont].empId;*/
 
-      branchNameset= onDateAttModel!.branch;
+      branchNameset = onDateAttModel!.branch;
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
       relaxationHourSet = onDateAttModel!.relaxationHour;
       isShortLeave = onDateAttModel!.isShortLeave ?? false;
@@ -97,12 +108,12 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       print("Short Leave Check - $isShortLeave");
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
-      departmentset= onDateAttModel!.dept;
-      employeeNameset= onDateAttModel!.empName;
-      onDateset= onDateAttModel!.date;
-      actualTimeset= onDateAttModel!.inTime;
-      actualOutTimeset= onDateAttModel!.outTime;
-      empId= onDateAttModel!.empId;
+      departmentset = onDateAttModel!.dept;
+      employeeNameset = onDateAttModel!.empName;
+      onDateset = onDateAttModel!.date;
+      actualTimeset = onDateAttModel!.inTime;
+      actualOutTimeset = onDateAttModel!.outTime;
+      empId = onDateAttModel!.empId;
 
       // Log for debugging
       print('Branch: $branchNameset');
@@ -112,10 +123,9 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       print('In Time: $actualTimeset');
       print('Out Time: $actualOutTimeset');
       print('Employee ID: $empId');
-
-    }else{
+    } else {
       print('onModelrun');
-      branchNameset= onDateAttModel!.branch;
+      branchNameset = onDateAttModel!.branch;
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
       isShortLeave = onDateAttModel!.isShortLeave ?? isShortLeave;
       isOutDuty = onDateAttModel!.isOdReq ?? isOutDuty;
@@ -124,12 +134,12 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       relaxationHourSet = onDateAttModel!.relaxationHour;
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
-      departmentset= onDateAttModel!.dept;
-      employeeNameset= onDateAttModel!.empName;
-      onDateset= onDateAttModel!.date;
-      actualTimeset= onDateAttModel!.inTime;
-      actualOutTimeset= onDateAttModel!.outTime;
-      empId= onDateAttModel!.empId;
+      departmentset = onDateAttModel!.dept;
+      employeeNameset = onDateAttModel!.empName;
+      onDateset = onDateAttModel!.date;
+      actualTimeset = onDateAttModel!.inTime;
+      actualOutTimeset = onDateAttModel!.outTime;
+      empId = onDateAttModel!.empId;
 
       // Log for debugging
       print('Branch: $branchNameset');
@@ -141,19 +151,14 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
       print('Employee ID: $empId');
     }
 
-
     super.initState();
   }
-
-
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     //orgId = await shared!.getOrgId();
     print("orgIDCHECK - $orgId");
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   void _group1Changes(String? value) {
@@ -184,14 +189,17 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   bool isShortLeave = false;
   bool isOutDuty = false;
   bool isCompOff = false;
-  static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
-    <WidgetStatesConstraint, Icon>{
-      WidgetState.selected: Icon(Icons.check),
-      WidgetState.any: Icon(Icons.close),
-    },
-  );
+  static const WidgetStateProperty<Icon> thumbIcon =
+      WidgetStateProperty<Icon>.fromMap(<WidgetStatesConstraint, Icon>{
+        WidgetState.selected: Icon(Icons.check),
+        WidgetState.any: Icon(Icons.close),
+      });
 
-  Widget buildVerticalToggle(String title, bool value, ValueChanged<bool> onChanged) {
+  Widget buildVerticalToggle(
+    String title,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -244,7 +252,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                       ? const SizedBox.shrink() // hides everything until orgId is fetched
                       : Column(
                     children: [
-                      // 🔹 Case 1: For organizations other than 190, 191, 198
+                      // ðŸ”¹ Case 1: For organizations other than 190, 191, 198
                       Visibility(
                         visible: orgId != 190 && orgId != 191 && orgId != 198,
                         child: Row(
@@ -304,7 +312,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                         ),
                       ),
 
-                      // 🔹 Case 2: For organizations 190, 191, or 198
+                      // ðŸ”¹ Case 2: For organizations 190, 191, or 198
                       Visibility(
                         visible: orgId == 190 || orgId == 191 || orgId == 198,
                         child: Row(
@@ -385,8 +393,9 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                         styleAnimationType: AnimationType.onHover,
                         spacing: 3.0,
                         customSeparatorBuilder: (context, local, global) {
-                          final opacity = ((global.position - local.position).abs() - 0.5)
-                              .clamp(0.0, 1.0);
+                          final opacity =
+                              ((global.position - local.position).abs() - 0.5)
+                                  .clamp(0.0, 1.0);
                           return VerticalDivider(
                             indent: 10.0,
                             endIndent: 10.0,
@@ -394,14 +403,18 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                           );
                         },
                         customIconBuilder: (context, local, global) {
-                          final text = const ['Attendance', 'Leave', 'OD'][local.index];
+                          final text =
+                              const ['Attendance', 'Leave', 'OD'][local.index];
                           return Center(
                             child: Text(
                               text,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Color.lerp(
-                                    Colors.black, Colors.white, local.animationValue),
+                                  Colors.black,
+                                  Colors.white,
+                                  local.animationValue,
+                                ),
                               ),
                             ),
                           );
@@ -410,9 +423,15 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                         onChanged: (i) {
                           setState(() => value = i);
                           if (value == 1) {
-                            Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                            Navigator.pushNamed(
+                              context,
+                              MyRoutings.leaveRequisitionRoute,
+                            );
                           } else if (value == 2) {
-                            Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                            Navigator.pushNamed(
+                              context,
+                              MyRoutings.odLocationViewRoute,
+                            );
                           }
                         },
                       ),
@@ -427,39 +446,45 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                       children: [
                         buildVerticalToggle("Night Shift", nightShift, (val) {
                           setState(() => nightShift = val);
-                          compOff=false;
-                          shortLeave=false;
-                          outDuty=false;
+                          compOff = false;
+                          shortLeave = false;
+                          outDuty = false;
                           print("Night Shift - $nightShift");
                         }),
                         Visibility(
                           visible: isCompOff,
-                          child:  buildVerticalToggle("Comp. Off", compOff, (val) {
-                          setState(() => compOff = val);
-                          nightShift=false;
-                          shortLeave=false;
-                          outDuty=false;
-                          print("Comp Off - $compOff");
-                        }),),
-
+                          child: buildVerticalToggle("Comp. Off", compOff, (
+                            val,
+                          ) {
+                            setState(() => compOff = val);
+                            nightShift = false;
+                            shortLeave = false;
+                            outDuty = false;
+                            print("Comp Off - $compOff");
+                          }),
+                        ),
 
                         Visibility(
                           visible: isShortLeave,
-                          child: buildVerticalToggle("Short Leave", shortLeave, (val) {
-                            setState(() => shortLeave = val);
-                            compOff=false;
-                            nightShift=false;
-                            outDuty=false;
-                            print("Short Leave - $shortLeave");
-                          }),
+                          child: buildVerticalToggle(
+                            "Short Leave",
+                            shortLeave,
+                            (val) {
+                              setState(() => shortLeave = val);
+                              compOff = false;
+                              nightShift = false;
+                              outDuty = false;
+                              print("Short Leave - $shortLeave");
+                            },
+                          ),
                         ),
                         Visibility(
                           visible: isOutDuty,
                           child: buildVerticalToggle("OD", outDuty, (val) {
                             setState(() => outDuty = val);
-                            compOff=false;
-                            nightShift=false;
-                            shortLeave=false;
+                            compOff = false;
+                            nightShift = false;
+                            shortLeave = false;
                             print("Out Duty - $outDuty");
                           }),
                         ),
@@ -468,9 +493,9 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                   ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                    /*Expanded(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      /*Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -479,9 +504,11 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                             value: "onDate",
                             groupValue: radios,
                             onChanged: (value) {
-                              *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              */
+                      /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("On Date Click"),
-                              ));*//*
+                              ));*/
+                      /*
                               setState(() {
                                 onDateRadio = "1";
                                 nextDayRadio = "0";
@@ -494,7 +521,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                         ],
                       ),
                     ),*/
-                    /*Expanded(
+                      /*Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -503,9 +530,11 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                             value: "nextDay",
                             groupValue: radios,
                             onChanged: (value) {
-                              *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              */
+                      /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Next Day Click"),
-                              ));*//*
+                              ));*/
+                      /*
                               setState(() {
                                 onDateRadio = "0";
                                 nextDayRadio = "1";
@@ -527,9 +556,11 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                             value: "compOff",
                             groupValue: radios,
                             onChanged: (value) {
-                              *//*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              */
+                      /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Comp Off Click"),
-                              ));*//*
+                              ));*/
+                      /*
                               setState(() {
                                 onDateRadio = "0";
                                 nextDayRadio = "0";
@@ -542,44 +573,45 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                         ],
                       ),
                     ),*/
-
-                  ]).p(5),
-                  SizedBox(
-                    height: 7,
-                  ),
+                    ],
+                  ).p(5),
+                  SizedBox(height: 7),
                   Row(
                     children: [
                       Expanded(
-                        child:  Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: branchNameset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: branchNameset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: branchNameset,
-                                labelText: "Branch Name",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: branchNameset,
+                              labelText: "Branch Name",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
                       ),
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: departmentset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: departmentset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: departmentset,
-                                labelText: "Department",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: departmentset,
+                              labelText: "Department",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
@@ -589,38 +621,37 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                   Row(
                     children: [
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: employeeNameset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: employeeNameset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: employeeNameset,
-                                labelText: "Employee Name",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: employeeNameset,
+                              labelText: "Employee Name",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
-
                       ),
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
+                            style: TextStyle(fontSize: 14),
                             controller: TextEditingController(text: onDateset),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: onDateset,
-                                labelText: "On Date",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: onDateset,
+                              labelText: "On Date",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
@@ -630,162 +661,76 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                   //No Short Leave Case
                   Visibility(
                     visible: shortLeave == false,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child:
-                            Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: TextFormField(
-                                style:TextStyle(fontSize:14),
-                                controller: TextEditingController(text: actualTimeset),
-                                readOnly: true,
-                                //initialValue: "${branchName}",
-                                decoration:  InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 8.0),
-                                    hintText: actualTimeset,
-                                    labelText: "Actual In Time",
-                                    labelStyle: TextStyle(fontSize: 15)
-                                ),
-                              ),
-                            ),
-                          ),
-                          Visibility(
-                            visible: compOff != true,
-                            child: Expanded(
-                              child:
-                              Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: TextFormField(
-                                  onTap: () async {
-                                    //_openInTimepicker(context);
-                                    final TimeOfDay? n = await showTimePicker(
-                                        context: context,
-                                        initialTime: TimeOfDay.now(),
-                                        builder: (BuildContext context, Widget? child) {
-                                          return MediaQuery(
-                                            data: MediaQuery.of(context)
-                                                .copyWith(alwaysUse24HourFormat: true),
-                                            child: child!,
-                                          );
-                                        });
-                                    print('timenewOut $n');
-                                    setState(() {
-                                      var now = DateTime.now();
-                                      DateTime newt = DateTime(now.year, now.month,
-                                          now.day, n!.hour, n!.minute);
-                                      var nT = DateFormat('HH:mm').format(newt);
-                                      print(DateFormat('HH:mm').format(newt));
-                                      _inTimePicker = nT;
-                                    });
-                                  },
-                                  style:TextStyle(fontSize:14),
-                                  controller: TextEditingController(text: _inTimePicker),
-                                  readOnly: true,
-                                  //initialValue: "${branchName}",
-                                  decoration:  InputDecoration(
-                                      contentPadding: EdgeInsets.only(left: 8.0),
-                                      hintText: _inTimePicker,
-                                      labelText: "Changes In Time",
-                                      labelStyle: TextStyle(fontSize: 15)
-                                  ),
-                                ),
-                              ),
-
-                            ),
-                          ),
-                        ],
-                      ),),
-                  Visibility(
-                    visible: shortLeave == false,
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
-                              maxLines: 3,
-                              style:TextStyle(fontSize:14),
-                              controller: inRemarkController,
-                              enabled: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.greyishade),
-                                  ),
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: "Add Remark",
-                                  labelText: "Remarks",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              style: TextStyle(fontSize: 14),
+                              controller: TextEditingController(
+                                text: actualTimeset,
                               ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: shortLeave == false,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: actualOutTimeset),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: actualOutTimeset,
-                                  labelText: "Actual Out Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: actualTimeset,
+                                labelText: "Actual In Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
                         ),
                         Visibility(
-                          visible:  compOff != true,
+                          visible: compOff != true,
                           child: Expanded(
-                            child:
-                            Padding(
+                            child: Padding(
                               padding: EdgeInsets.all(10.0),
                               child: TextFormField(
                                 onTap: () async {
-                                  //_openOutTimepicker(context);
-                                  final TimeOfDay? o = await showTimePicker(
-                                      context: context,
-                                      initialTime: TimeOfDay.now(),
-                                      builder: (BuildContext context, Widget? child) {
-                                        return MediaQuery(
-                                          data: MediaQuery.of(context)
-                                              .copyWith(alwaysUse24HourFormat: true),
-                                          child: child!,
-                                        );
-                                      });
-                                  print('timenewOut $o');
+                                  //_openInTimepicker(context);
+                                  final TimeOfDay? n = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                    builder: (
+                                      BuildContext context,
+                                      Widget? child,
+                                    ) {
+                                      return MediaQuery(
+                                        data: MediaQuery.of(
+                                          context,
+                                        ).copyWith(alwaysUse24HourFormat: true),
+                                        child: child!,
+                                      );
+                                    },
+                                  );
+                                  print('timenewOut $n');
                                   setState(() {
-                                    var newNow = DateTime.now();
-                                    DateTime newt = DateTime(newNow.year, newNow.month,
-                                        newNow.day, o!.hour, o!.minute);
-                                    var oT = DateFormat('HH:mm').format(newt);
+                                    var now = DateTime.now();
+                                    DateTime newt = DateTime(
+                                      now.year,
+                                      now.month,
+                                      now.day,
+                                      n!.hour,
+                                      n!.minute,
+                                    );
+                                    var nT = DateFormat('HH:mm').format(newt);
                                     print(DateFormat('HH:mm').format(newt));
-                                    _outTimePicker = oT;
+                                    _inTimePicker = nT;
                                   });
                                 },
-                                style:TextStyle(fontSize:14),
-                                controller: TextEditingController(text: _outTimePicker),
+                                style: TextStyle(fontSize: 14),
+                                controller: TextEditingController(
+                                  text: _inTimePicker,
+                                ),
                                 readOnly: true,
                                 //initialValue: "${branchName}",
-                                decoration:  InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 8.0),
-                                    hintText: _outTimePicker,
-                                    labelText: "Changes Out Time",
-                                    labelStyle: TextStyle(fontSize: 15)
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: _inTimePicker,
+                                  labelText: "Changes In Time",
+                                  labelStyle: TextStyle(fontSize: 15),
                                 ),
                               ),
                             ),
@@ -799,28 +744,141 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
                               maxLines: 3,
-                              style:TextStyle(fontSize:14),
-                              controller: outRemarkController,
+                              style: TextStyle(fontSize: 14),
+                              controller: inRemarkController,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.greyishade),
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  //<-- SEE HERE
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: Mythemes.greyishade,
                                   ),
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: "Add Remark",
-                                  labelText: "Remarks",
-                                  labelStyle: TextStyle(fontSize: 15)
+                                ),
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: "Add Remark",
+                                labelText: "Remarks",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
-
+                        ),
+                      ],
+                    ),
+                  ),
+                  Visibility(
+                    visible: shortLeave == false,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style: TextStyle(fontSize: 14),
+                              controller: TextEditingController(
+                                text: actualOutTimeset,
+                              ),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: actualOutTimeset,
+                                labelText: "Actual Out Time",
+                                labelStyle: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: compOff != true,
+                          child: Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                onTap: () async {
+                                  //_openOutTimepicker(context);
+                                  final TimeOfDay? o = await showTimePicker(
+                                    context: context,
+                                    initialTime: TimeOfDay.now(),
+                                    builder: (
+                                      BuildContext context,
+                                      Widget? child,
+                                    ) {
+                                      return MediaQuery(
+                                        data: MediaQuery.of(
+                                          context,
+                                        ).copyWith(alwaysUse24HourFormat: true),
+                                        child: child!,
+                                      );
+                                    },
+                                  );
+                                  print('timenewOut $o');
+                                  setState(() {
+                                    var newNow = DateTime.now();
+                                    DateTime newt = DateTime(
+                                      newNow.year,
+                                      newNow.month,
+                                      newNow.day,
+                                      o!.hour,
+                                      o!.minute,
+                                    );
+                                    var oT = DateFormat('HH:mm').format(newt);
+                                    print(DateFormat('HH:mm').format(newt));
+                                    _outTimePicker = oT;
+                                  });
+                                },
+                                style: TextStyle(fontSize: 14),
+                                controller: TextEditingController(
+                                  text: _outTimePicker,
+                                ),
+                                readOnly: true,
+                                //initialValue: "${branchName}",
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 8.0),
+                                  hintText: _outTimePicker,
+                                  labelText: "Changes Out Time",
+                                  labelStyle: TextStyle(fontSize: 15),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Visibility(
+                    visible: shortLeave == false,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              maxLines: 3,
+                              style: TextStyle(fontSize: 14),
+                              controller: outRemarkController,
+                              enabled: true,
+                              //initialValue: "${branchName}",
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  //<-- SEE HERE
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: Mythemes.greyishade,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: "Add Remark",
+                                labelText: "Remarks",
+                                labelStyle: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -832,81 +890,47 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
-                              style:TextStyle(fontSize:14, color: Mythemes.successColor, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: actualTimeset),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Mythemes.successColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: TextEditingController(
+                                text: actualTimeset,
+                              ),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: actualTimeset,
-                                  labelText: "In Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: actualTimeset,
+                                labelText: "In Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
                         ),
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
-                              style:TextStyle(fontSize:14, color: Mythemes.warningColor, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: actualOutTimeset),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: actualOutTimeset,
-                                  labelText: "Out Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Mythemes.warningColor,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Visibility(
-                    visible: shortLeave == true,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: workingHrsSet),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: workingHrsSet,
-                                  labelText: "Actual Work Hours",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              controller: TextEditingController(
+                                text: actualOutTimeset,
                               ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: relaxationHourSet),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: relaxationHourSet,
-                                  labelText: "Short Leave Relaxation Hour",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: actualOutTimeset,
+                                labelText: "Out Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
@@ -920,19 +944,45 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
-                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: updatedWorkHourSet),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: TextEditingController(
+                                text: workingHrsSet,
+                              ),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: updatedWorkHourSet,
-                                  labelText: "Updated Work Hour",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: workingHrsSet,
+                                labelText: "Actual Work Hours",
+                                labelStyle: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: TextEditingController(
+                                text: relaxationHourSet,
+                              ),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: relaxationHourSet,
+                                labelText: "Short Leave Relaxation Hour",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
@@ -946,28 +996,59 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: TextEditingController(
+                                text: updatedWorkHourSet,
+                              ),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: updatedWorkHourSet,
+                                labelText: "Updated Work Hour",
+                                labelStyle: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Visibility(
+                    visible: shortLeave == true,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
                               maxLines: 3,
-                              style:TextStyle(fontSize:14),
+                              style: TextStyle(fontSize: 14),
                               controller: inRemarkController,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.greyishade),
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  //<-- SEE HERE
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: Mythemes.greyishade,
                                   ),
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: "Add Remark",
-                                  labelText: "Remarks",
-                                  labelStyle: TextStyle(fontSize: 15)
+                                ),
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: "Add Remark",
+                                labelText: "Remarks",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
-
                         ),
                       ],
                     ),
@@ -977,31 +1058,245 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
+                        alignment: MainAxisAlignment.center,
+                        buttonPadding: Vx.mOnly(right: 16),
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              String? inTimeReq;
+                              String? outTimeReq;
+                              String logid = "0";
+                              String inRemarkString = inRemarkController.text;
+                              String outRemarkString = outRemarkController.text;
+                              String onDate = DateFormat(
+                                "dd-MM-yyyy",
+                              ).format(DateTime.parse(onDateset!));
+                              var dateformat = onDate;
 
-                                String? inTimeReq;
-                                String? outTimeReq;
-                                String logid ="0";
-                                String inRemarkString = inRemarkController.text;
-                                String outRemarkString = outRemarkController.text;
-                                String onDate = DateFormat("dd-MM-yyyy").format(DateTime.parse(onDateset!));
-                                var dateformat = onDate;
-
-                                if(shortLeave == true){
-                                  inTimeReq= actualTimeset;
-                                  outTimeReq= actualOutTimeset;
-                                  inRemarkString=shortLeaveRemarkController.text;
-                                  outRemarkString="";
-                                  if(inRemarkString == ""){
-                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              if (shortLeave == true) {
+                                inTimeReq = actualTimeset;
+                                outTimeReq = actualOutTimeset;
+                                inRemarkString =
+                                    shortLeaveRemarkController.text;
+                                outRemarkString = "";
+                                if (inRemarkString == "") {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
                                       content: Text(" Please fill remarks !! "),
-                                    ));
+                                    ),
+                                  );
+                                } else {
+                                  sendRequsitionToServerShortLeave(
+                                    context,
+                                    empId!,
+                                    inRemarkString,
+                                    outRemarkString,
+                                    inTimeReq!,
+                                    outTimeReq!,
+                                    logid,
+                                    dateformat,
+                                  );
+                                }
+                              } else {
+                                if (_inTimePicker.compareToIgnoringCase(
+                                      "00:00",
+                                    ) ==
+                                    0) {
+                                  if (actualTimeset!.compareToIgnoringCase(
+                                            "N/A",
+                                          ) ==
+                                          0 ||
+                                      actualTimeset!.compareToIgnoringCase(
+                                            "--:--",
+                                          ) ==
+                                          0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          " Please Select In Time ",
+                                        ),
+                                      ),
+                                    );
                                   } else {
-                                    sendRequsitionToServerShortLeave(
+                                    inTimeReq = actualTimeset;
+                                  }
+                                } else {
+                                  inTimeReq = _inTimePicker;
+                                }
+                                if (actualOutTimeset!.compareToIgnoringCase(
+                                          "N/A",
+                                        ) ==
+                                        0 ||
+                                    actualOutTimeset!.compareToIgnoringCase(
+                                          "--:--",
+                                        ) ==
+                                        0) {
+                                  if (_outTimePicker!.compareToIgnoringCase(
+                                        "00:00",
+                                      ) ==
+                                      0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          " Please Select Out Time ",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    outTimeReq = _outTimePicker;
+                                    print("outtime $outTimeReq");
+                                  }
+                                } else {
+                                  if (_outTimePicker!.compareToIgnoringCase(
+                                        "00:00",
+                                      ) !=
+                                      0) {
+                                    outTimeReq = _outTimePicker;
+                                  } else {
+                                    outTimeReq = actualOutTimeset;
+                                  }
+                                }
+
+                                if (actualTimeset!.compareToIgnoringCase(
+                                          "N/A",
+                                        ) ==
+                                        0 ||
+                                    actualTimeset!.compareToIgnoringCase(
+                                          "--:--",
+                                        ) ==
+                                        0) {
+                                  if (_inTimePicker!.compareToIgnoringCase(
+                                        "00:00",
+                                      ) ==
+                                      0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          " Please Select In Time ",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    inTimeReq = _inTimePicker;
+                                  }
+                                  if (_outTimePicker!.compareToIgnoringCase(
+                                        "00:00",
+                                      ) ==
+                                      0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          " Please Select Out Time ",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    outTimeReq = _outTimePicker;
+                                  }
+                                }
+                                if (nightShift == false &&
+                                    compOff == false &&
+                                    outDuty == false) {
+                                  print("intime $inTimeReq");
+                                  print("outtime $outTimeReq");
+                                  print("night shift  $nightShift");
+                                  print("compoff $compOff");
+
+                                  if (inTimeReq!.compareTo(outTimeReq!) > 0) {
+                                    return setState(() {
+                                      CommonNotificationPage.showWorkDoneSuccess(
+                                        context,
+                                        "Your working hours going to negative, Please select requisition time correctly."
+                                                .upperCamelCase +
+                                            " ",
+                                        "Alert Message",
+                                      );
+                                    });
+                                  } else {
+                                    print("intime $inTimeReq");
+                                    print("outtime $outTimeReq");
+                                    print("night shift  $nightShift");
+                                    print("compoff $compOff");
+                                    if (inRemarkController.text.isEmpty ||
+                                        outRemarkController.text.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            " Please fill remarks !! ",
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      sendRequsitionToServer(
+                                        context,
+                                        empId!,
+                                        inRemarkString,
+                                        outRemarkString,
+                                        inTimeReq,
+                                        outTimeReq,
+                                        logid,
+                                        dateformat,
+                                      );
+                                    }
+                                  }
+                                } else if (nightShift == true) {
+                                  print("intime $inTimeReq");
+                                  print("outtime $outTimeReq");
+                                  print("night shift  $nightShift");
+                                  print("compoff $compOff");
+                                  if (inRemarkController.text.isEmpty ||
+                                      outRemarkController.text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          " Please fill remarks !! ",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    sendRequsitionToServernextDay(
+                                      context,
+                                      empId!,
+                                      inRemarkString,
+                                      outRemarkString,
+                                      inTimeReq!,
+                                      outTimeReq!,
+                                      logid,
+                                      dateformat,
+                                    );
+                                  }
+                                } else if (outDuty == true) {
+                                  if (inTimeReq!.compareTo(outTimeReq!) > 0) {
+                                    return setState(() {
+                                      CommonNotificationPage.showWorkDoneSuccess(
+                                        context,
+                                        "Your working hours going to negative, Please select requisition time correctly."
+                                                .upperCamelCase +
+                                            " ",
+                                        "Alert Message",
+                                      );
+                                    });
+                                  } else {
+                                    print("intime $inTimeReq");
+                                    print("outtime $outTimeReq");
+                                    print("night shift  $nightShift");
+                                    print("compoff $compOff");
+                                    print("outDuty $outDuty");
+                                    if (inRemarkController.text.isEmpty ||
+                                        outRemarkController.text.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            " Please fill remarks !! ",
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      sendRequsitionToServerOutDuty(
                                         context,
                                         empId!,
                                         inRemarkString,
@@ -1009,206 +1304,72 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                                         inTimeReq!,
                                         outTimeReq!,
                                         logid,
-                                        dateformat);
+                                        dateformat,
+                                      );
+                                    }
                                   }
-
+                                } else if (compOff == true) {
+                                  print("intime $inTimeReq");
+                                  print("outtime $outTimeReq");
+                                  print("night shift  $nightShift");
+                                  print("compoff $compOff");
+                                  if (actualTimeset!.compareToIgnoringCase(
+                                            "N/A",
+                                          ) ==
+                                          0 ||
+                                      actualOutTimeset!.compareToIgnoringCase(
+                                            "N/A",
+                                          ) ==
+                                          0 ||
+                                      actualTimeset!.compareToIgnoringCase(
+                                            "--:--",
+                                          ) ==
+                                          0 ||
+                                      actualOutTimeset!.compareToIgnoringCase(
+                                            "--:--",
+                                          ) ==
+                                          0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          " Please Handle Attendance Requisition ",
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    if (inRemarkController.text.isEmpty ||
+                                        outRemarkController.text.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            " Please fill remarks !! ",
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      sendRequsitionToServerCompOff(
+                                        context,
+                                        empId!,
+                                        inRemarkString,
+                                        outRemarkString,
+                                        inTimeReq!,
+                                        outTimeReq!,
+                                        logid,
+                                        dateformat,
+                                      );
+                                    }
+                                  }
                                 }
-                                else
-                                {
-                                  if(_inTimePicker.compareToIgnoringCase("00:00")==0){
-                                    if(actualTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0){
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select In Time "),
-                                      ));
-                                    }else{
-                                      inTimeReq=actualTimeset;
-                                    }
-                                  }else{
-                                    inTimeReq=_inTimePicker;
-                                  }
-                                  if(actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualOutTimeset!.compareToIgnoringCase("--:--")==0)
-                                  {
-                                    if(_outTimePicker!.compareToIgnoringCase("00:00")==0)
-                                    {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select Out Time "),
-                                      ));
-                                    }
-                                    else
-                                    {
-                                      outTimeReq = _outTimePicker;
-                                      print("outtime $outTimeReq");
-                                    }
-                                  }
-                                  else
-                                  {
-                                    if(_outTimePicker!.compareToIgnoringCase("00:00")!=0)
-                                    {
-                                      outTimeReq=_outTimePicker;
-                                    }else{
-                                      outTimeReq=actualOutTimeset;
-                                    }
 
-                                  }
-
-                                  if(actualTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0){
-                                    if(_inTimePicker!.compareToIgnoringCase("00:00")==0){
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select In Time "),
-                                      ));
-                                    }else{
-                                      inTimeReq=_inTimePicker;
-                                    }
-                                    if(_outTimePicker!.compareToIgnoringCase("00:00")==0){
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select Out Time "),
-                                      ));
-                                    }else{
-                                      outTimeReq=_outTimePicker;
-                                    }
-                                  }
-                                  if(nightShift==false && compOff == false && outDuty == false)
-                                  {
-                                    print("intime $inTimeReq");
-                                    print("outtime $outTimeReq");
-                                    print("night shift  $nightShift");
-                                    print("compoff $compOff");
-
-                                    if (inTimeReq!.compareTo(outTimeReq!) > 0) {
-                                      return setState(() {
-                                        CommonNotificationPage
-                                            .showWorkDoneSuccess(
-                                            context,
-                                            "Your working hours going to negative, Please select requisition time correctly."
-                                                .upperCamelCase +
-                                                " ",
-                                            "Alert Message");
-                                      });
-                                    }
-                                    else{
-                                      print("intime $inTimeReq");
-                                      print("outtime $outTimeReq");
-                                      print("night shift  $nightShift");
-                                      print("compoff $compOff");
-                                      if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
-                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                          content: Text(" Please fill remarks !! "),
-                                        ));
-                                      } else {
-                                        sendRequsitionToServer(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq,
-                                            outTimeReq,
-                                            logid,
-                                            dateformat);
-                                      }
-
-                                    }
-                                  }
-                                  else if (nightShift == true){
-                                    print("intime $inTimeReq");
-                                    print("outtime $outTimeReq");
-                                    print("night shift  $nightShift");
-                                    print("compoff $compOff");
-                                    if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please fill remarks !! "),
-                                      ));
-                                    } else {
-                                      sendRequsitionToServernextDay(
-                                          context,
-                                          empId!,
-                                          inRemarkString,
-                                          outRemarkString,
-                                          inTimeReq!,
-                                          outTimeReq!,
-                                          logid,
-                                          dateformat);
-                                    }
-
-                                  }
-                                  else if (outDuty == true){
-                                    if (inTimeReq!.compareTo(outTimeReq!) > 0) {
-                                      return setState(() {
-                                        CommonNotificationPage
-                                            .showWorkDoneSuccess(
-                                            context,
-                                            "Your working hours going to negative, Please select requisition time correctly."
-                                                .upperCamelCase +
-                                                " ",
-                                            "Alert Message");
-                                      });
-                                    } else {
-                                      print("intime $inTimeReq");
-                                      print("outtime $outTimeReq");
-                                      print("night shift  $nightShift");
-                                      print("compoff $compOff");
-                                      print("outDuty $outDuty");
-                                      if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
-                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                          content: Text(" Please fill remarks !! "),
-                                        ));
-                                      } else {
-                                        sendRequsitionToServerOutDuty(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq!,
-                                            outTimeReq!,
-                                            logid,
-                                            dateformat);
-                                      }
-                                    }
-
-
-
-                                  }
-                                  else if (compOff==true)
-                                  {
-                                    print("intime $inTimeReq");
-                                    print("outtime $outTimeReq");
-                                    print("night shift  $nightShift");
-                                    print("compoff $compOff");
-                                    if(actualTimeset!.compareToIgnoringCase("N/A")==0||
-                                        actualOutTimeset!.compareToIgnoringCase("N/A")==0 || actualTimeset!.compareToIgnoringCase("--:--")==0||
-                                        actualOutTimeset!.compareToIgnoringCase("--:--")==0){
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Handle Attendance Requisition "),
-                                      ));
-                                    }
-                                    else{
-                                      if(inRemarkController.text.isEmpty || outRemarkController.text.isEmpty){
-                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                          content: Text(" Please fill remarks !! "),
-                                        ));
-                                      } else {
-                                        sendRequsitionToServerCompOff(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq!,
-                                            outTimeReq!,
-                                            logid,
-                                            dateformat);
-                                      }
-
-                                    }
-                                  }
-
-
-
-                                  /*if (_outTimePicker!.compareToIgnoringCase("00:00") == 0)
+                                /*if (_outTimePicker!.compareToIgnoringCase("00:00") == 0)
                                   {
                                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                       content: Text(" Please Select Out Time "),
                                     ));
                                   }*/
-                                  /*else {
+                                /*else {
                                     //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
                                     if(onDateset!.compareToIgnoringCase("--:--")==0){
                                       inTimeReq = onDateset.toString().compareToIgnoringCase("--:--") == 0 ? _inTimePicker :_inTimePicker;
@@ -1271,18 +1432,19 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                                       }
                                     }
                                   }*/
-                                }
-
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                MaterialStateProperty.all(Mythemes.lightBluishColor),
+                              }
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                Mythemes.lightBluishColor,
                               ),
-                              child: "Send".text.make(),
-                            ).wh(150, 40).py12()
-                          ]),
+                            ),
+                            child: "Send".text.make(),
+                          ).wh(150, 40).py12(),
+                        ],
+                      ),
                     ],
-                  ).py32()
+                  ).py32(),
                 ],
               ),
             ),
@@ -1291,42 +1453,47 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.pop(context);
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Attendance');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -1337,10 +1504,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -1361,37 +1525,34 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
             ),
           ],
         ),
-
       ),
     );
   }
 
-
-
-
-
   String conn = ApiDetails.server;
   String apiUrl = ApiDetails.sendAttendanceReq;
   Future<void> sendRequsitionToServer(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
 
@@ -1412,35 +1573,36 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "⚠️Warning");
+          showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
       print('result ${result} reason ${reason}');
     }
   }
 
-
   Future<void> sendRequsitionToServernextDay(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "nextday=true&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "nextday=true&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -1458,7 +1620,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "⚠️Warning");
+          showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1466,26 +1628,28 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   }
 
   Future<void> sendRequsitionToServerOutDuty(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "isOdReq=1&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "isOdReq=1&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -1503,7 +1667,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "⚠️Warning");
+          showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1511,26 +1675,28 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   }
 
   Future<void> sendRequsitionToServerCompOff(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "compOff=true&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "compOff=true&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -1548,7 +1714,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "⚠️Warning");
+          showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1556,26 +1722,28 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   }
 
   Future<void> sendRequsitionToServerShortLeave(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "shortLeave=1&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "shortLeave=1&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -1593,7 +1761,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           reason = "you have submit Requisition for $onDate";
           showDialgSucess1(context, reason, "Success");
         } else {
-          showDialgSucess1(context, result, "⚠️Warning");
+          showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
       print('result ${result} reason ${reason}');
@@ -1601,12 +1769,10 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
   }
 
   showDialgSucess1(BuildContext buildContext, result, alert) {
-
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -1622,7 +1788,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
             Navigator.of(context).pop();
-           /* Navigator.pop(
+            /* Navigator.pop(
                 context,
                 PageRouteBuilder(
                   pageBuilder: (a, b, c) =>
@@ -1631,24 +1797,22 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition> with Rout
                   maintainState: true,
                 ));*/
             //Navigator.of(context).pop();
-
           },
           child: Text("Ok"),
         ),
       ],
       elevation: 24.0,
     );
-    if(mounted) {
+    if (mounted) {
       showDialog(
-          context: buildContext,
-          builder: (BuildContext context) {
-            return alertDialog;
-          });
+        context: buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        },
+      );
     }
-
   }
 }
-
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;

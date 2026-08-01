@@ -37,6 +37,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import '../adminPage/modelClass/dashboardModel.dart';
 import '../sharedPrefancePage/ShardPre.dart';
@@ -76,171 +77,146 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
     super.initState();
   }
 
-  showLogoutPopup(BuildContext buildContext, result,alert) {
+  showLogoutPopup(BuildContext buildContext, result, alert) {
     String text = "Stop Service";
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Expanded(child: Text( alert, style: TextStyle(
-              fontSize: 20
-          ),)),
+          Expanded(child: Text(alert, style: TextStyle(fontSize: 20))),
         ],
       ),
-      content: Text(result , style: TextStyle(
-          fontSize: 14
-      )),
+      content: Text(result, style: TextStyle(fontSize: 14)),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
         TextButton(
-            onPressed: () async {
-              shared.setSessionId("");
-              shared.setAdminRole(0);
-              shared.setEmpRoll(0);
-              shared.setRoRoll(0);
-              shared.setMobAction(0);
-              getLogout(this.context);
-              final service = FlutterBackgroundService();
-              var isRunning = await service.isRunning();
-              print(isRunning);
-              if (isRunning) {
-                service.invoke("stopService");
-                print("Background Stop");
-              } else {
-                service.startService();
-                print("New service Started");
-              }
-              if (!isRunning) {
-                text = 'Stop Service';
-              } else {
-                text = 'Start Service';
-              }
-              setState(() {});
-              Navigator.of(buildContext, rootNavigator: true).pop();
-              Navigator.pushAndRemoveUntil(
-                buildContext,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-                    (route) => false,
-              );
+          onPressed: () async {
+            await getLogout(this.context);
+            shared.setSessionId("");
+            shared.setAdminRole(0);
+            shared.setEmpRoll(0);
+            shared.setRoRoll(0);
+            shared.setMobAction(0);
+            final service = FlutterBackgroundService();
+            var isRunning = await service.isRunning();
+            print(isRunning);
+            if (isRunning) {
+              service.invoke("stopService");
+              print("Background Stop");
+            }
+            if (!isRunning) {
+              text = 'Stop Service';
+            } else {
+              text = 'Start Service';
+            }
+            setState(() {});
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            Navigator.pushAndRemoveUntil(
+              buildContext,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+              (route) => false,
+            );
 
-
-
-              //Navigator.of(buildContext, rootNavigator: true).pop();
-            },
-            child: Container(
-              child: Text("Yes", style: TextStyle(color: Mythemes.warningColor),),
-            )
+            //Navigator.of(buildContext, rootNavigator: true).pop();
+          },
+          child: Container(
+            child: Text("Yes", style: TextStyle(color: Mythemes.warningColor)),
+          ),
         ),
-
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
-  Future getLogout(BuildContext buildContext) async{
-    //var cameraStatus = await Permission.camera.status;
-    //if(cameraStatus.isGranted) {
-    //String? qrData = await scanner.scan();
+  Future getLogout(BuildContext buildContext) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.logoutAPi;
-    /*var stream = http.ByteStream(value!.openRead());
-    stream.cast();*/
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "type=$type");
-    var request = new http.MultipartRequest("Post", urlapi);
-    print("Request - $request");
-    http.Response response = await http.Response.fromStream(await request.send());
-    mapResponse = json.decode(response.body);
-    String reason = mapResponse['reason'];
-    //String status = mapResponse['status'];
-    String result = mapResponse['result'];
-    print('reason $reason');
-    print('reason${reason}');
+    final currentSessionId = await shared.getMobileSessionId();
+    final accessToken = await shared.getAccessToken();
+    final tokenType = await shared.getTokenType() ?? 'Bearer';
+    final urlapi = Uri.parse("$conn$apiUrl");
+    print('[MOBILE-AUTH] LOGOUT -> POST $urlapi');
+    print(
+      '[MOBILE-AUTH] LOGOUT headers -> tokenPresent=${accessToken != null && accessToken.isNotEmpty} sessionPresent=${currentSessionId != null && currentSessionId.isNotEmpty}',
+    );
 
-    print('URL ${response.request}');
-    if (response.statusCode == 200) {
-      var responseResult = response.body;
-      print('success $responseResult');
-      //Navigator.pop(this.context);
+    final response = await MobileHttpClient.instance.post(
+      urlapi,
+      headers: {
+        if (accessToken != null && accessToken.isNotEmpty)
+          'Authorization': '$tokenType $accessToken',
+        if (currentSessionId != null && currentSessionId.isNotEmpty)
+          'X-Mobile-Session-Id': currentSessionId,
+      },
+    );
+
+    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
+    print(
+      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
+    );
+    if (response.body.isNotEmpty) {
       mapResponse = json.decode(response.body);
-      String reason = mapResponse['reason'];
-      //String status = mapResponse['status'];
-      print('reason both $reason');
-      //print('reason${reason}');
-      if(result.compareToIgnoringCase("success")==0){
-        print("Logout Successfully !!");
-        Fluttertoast.showToast(
-            msg: "Logout Successfully !!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0
-        );
-        //CommonNotificationPage.showDialgSucess(this.context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        print("Logout Error !!");
-        Fluttertoast.showToast(
-            msg: "Logout Error !!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0
-        );
-        //CommonNotificationPage.showDialgSucess(this.context,reason.upperCamelCase, " Error ");
-      }
-
+    } else {
+      mapResponse = <String, dynamic>{};
     }
-    //print("Heloo Bharat  $qrData");
-    /*CommonNotificationPage.showWorkDoneSuccess(
-            context,
-            "$qrData"
-                .upperCamelCase +
-                " ",
-            "Successfully Punch $clockingType");*/
 
-    /*else {
-        var isGrant = await Permission.camera.request();
-        if(isGrant.isGranted){
-          String? qrData = await scanner.scan();
-          print(qrData);
-        }
-      }*/
+    final result =
+        (mapResponse['status'] ?? mapResponse['result'] ?? '').toString();
+    final message =
+        (mapResponse['message'] ?? mapResponse['reason'] ?? '').toString();
 
-
+    if (response.statusCode == 200 &&
+        result.compareToIgnoringCase('success') == 0) {
+      await shared.clearMobileAuth();
+      print('[MOBILE-AUTH] LOGOUT -> success');
+      Fluttertoast.showToast(
+        msg: message.isNotEmpty ? message : "Logout Successfully !!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      print('[MOBILE-AUTH] LOGOUT -> error message=$message');
+      Fluttertoast.showToast(
+        msg: message.isNotEmpty ? message : "Logout Error !!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
   }
+
   logoutApp(context) async {
     String text = "Stop Service";
+    await getLogout(this.context);
     shared.setSessionId("");
     shared.setAdminRole(0);
     shared.setEmpRoll(0);
     shared.setRoRoll(0);
     shared.setMobAction(0);
-    getLogout(this.context);
     final service = FlutterBackgroundService();
     var isRunning = await service.isRunning();
     print(isRunning);
     if (isRunning) {
       service.invoke("stopService");
       print("Background Stop");
-    } else {
-      service.startService();
-      print("New service Started");
     }
     if (!isRunning) {
       text = 'Stop Service';
@@ -252,11 +228,12 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => LoginPage()),
-          (route) => false,
+      (route) => false,
     );
-   /* showLogoutPopup(
+    /* showLogoutPopup(
         context, "Do You Want To Logout?".toString() + " " , "Alert");*/
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -266,10 +243,11 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
         elevation: 0,
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.power_settings_new_outlined),
-              onPressed: () {
-                logoutApp(context);
-              })
+            icon: Icon(Icons.power_settings_new_outlined),
+            onPressed: () {
+              logoutApp(context);
+            },
+          ),
         ],
       ),
       backgroundColor: Mythemes.whitish, // Light grey background
@@ -312,10 +290,7 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
               const SizedBox(height: 20),
               const Text(
                 "Employroll support for this licence has expired. Renew the subscription to keep using Employroll Service.",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.black54),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),

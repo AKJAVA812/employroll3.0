@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../commanScreen/allAPIList.dart';
@@ -14,8 +15,8 @@ class ForgotPasswordOtpPage extends StatefulWidget {
   ForgotPasswordOtpPage(this.emailController);
 
   @override
-  State<ForgotPasswordOtpPage> createState() => _ForgotPasswordOtpPageState(
-      emailController);
+  State<ForgotPasswordOtpPage> createState() =>
+      _ForgotPasswordOtpPageState(emailController);
 }
 
 class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
@@ -27,18 +28,23 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
     super.initState();
     emailControllers = emailController;
   }
-  _ForgotPasswordOtpPageState(
-      this.emailControllers);
+
+  _ForgotPasswordOtpPageState(this.emailControllers);
   final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
 
-  final List<TextEditingController> controllers = List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> controllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
 
   Future<void> verifyOtp(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.verifyOtpApi;
-    final url = Uri.parse('$conn$apiUrl?'
-        'email=${emailControllers.text}&'
-        'otp=${otp}');
+    final url = Uri.parse(
+      '$conn$apiUrl?'
+      'email=${emailControllers.text}&'
+      'otp=${otp}',
+    );
 
     print("Calling API: $url");
 
@@ -50,7 +56,7 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
     );
 
     try {
-      final response = await http.post(url);
+      final response = await MobileHttpClient.instance.post(url);
       print("Response status: ${response.statusCode}");
       print("Response body: ${response.body}");
 
@@ -63,16 +69,19 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
           data['result']?.toString().toLowerCase() == 'success') {
         // Show success dialog
         Fluttertoast.showToast(
-            msg: "OTP verified successfully !!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Mythemes.successColor,
-            textColor: Colors.white,
-            fontSize: 16.0
+          msg: "OTP verified successfully !!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Mythemes.successColor,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
-        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-            ForgotPasswordResetPage(emailControllers)));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ForgotPasswordResetPage(emailControllers),
+          ),
+        );
         /*showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -86,7 +95,7 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => LoginPage()));
                   } else {
-                    print("⚠️ Warning: No route to close.");
+                    print("âš ï¸ Warning: No route to close.");
                   }
                 },
                 child: const Text("OK"),
@@ -98,16 +107,17 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
         // Show error dialog from response
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Error"),
-            content: Text(data['reason'] ?? "Something went wrong"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("OK"),
-              )
-            ],
-          ),
+          builder:
+              (context) => AlertDialog(
+                title: const Text("Error"),
+                content: Text(data['reason'] ?? "Something went wrong"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
         );
       }
     } catch (e) {
@@ -117,16 +127,17 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
       // Show exception error dialog
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Error"),
-          content: Text("Failed to send OTP. Error: $e"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("OK"),
-            )
-          ],
-        ),
+        builder:
+            (context) => AlertDialog(
+              title: const Text("Error"),
+              content: Text("Failed to send OTP. Error: $e"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
       );
     }
   }
@@ -171,9 +182,13 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
                       maxLength: 1,
                       onChanged: (value) {
                         if (value.isNotEmpty && index < 5) {
-                          FocusScope.of(context).requestFocus(focusNodes[index + 1]);
+                          FocusScope.of(
+                            context,
+                          ).requestFocus(focusNodes[index + 1]);
                         } else if (value.isEmpty && index > 0) {
-                          FocusScope.of(context).requestFocus(focusNodes[index - 1]);
+                          FocusScope.of(
+                            context,
+                          ).requestFocus(focusNodes[index - 1]);
                         }
                       },
                       decoration: const InputDecoration(counterText: ''),
@@ -190,10 +205,11 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
                     //Navigator.pushNamed(context, MyRoutings.resetPasswordRoute);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please enter complete 6-digit OTP')),
+                      const SnackBar(
+                        content: Text('Please enter complete 6-digit OTP'),
+                      ),
                     );
                   }
-
                 },
                 child: const Text('Verify'),
               ),

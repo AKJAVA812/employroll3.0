@@ -6,6 +6,7 @@ import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../commanScreen/routes.dart';
@@ -16,12 +17,12 @@ import '../modalClass/appDisReimbListModal.dart';
 
 class ApprovalListReimbursement extends StatefulWidget {
   final AppDisReimbListModal appDisReimbListModal;
-  ApprovalListReimbursement (this.appDisReimbListModal);
+  ApprovalListReimbursement(this.appDisReimbListModal);
   @override
-  State<ApprovalListReimbursement> createState() => _ApprovalListReimbursementState(appDisReimbListModal);
-
-
+  State<ApprovalListReimbursement> createState() =>
+      _ApprovalListReimbursementState(appDisReimbListModal);
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
@@ -30,7 +31,8 @@ String? sessionId;
 
 AppDisReimbListModal? appDisReimbListLabel;
 
-class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> with RouteAware{
+class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
+    with RouteAware {
   final AppDisReimbListModal appDisReimbListModal;
   _ApprovalListReimbursementState(this.appDisReimbListModal);
   @override
@@ -47,14 +49,13 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
 
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     getSharedPrfanceList();
@@ -68,13 +69,13 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
-        appDisReimbListLabel=value;
+        appDisReimbListLabel = value;
       });
       //print('employeeList00${advanceRequestedListLabel!.data!.length}');
     });
@@ -86,14 +87,14 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
     print('employeeList11: ${SessionId}');
     AppDisReimbListModal appDisReimbListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    appDisReimbListModal=AppDisReimbListModal.fromJson(mapResponse);
+    appDisReimbListModal = AppDisReimbListModal.fromJson(mapResponse);
 
     return appDisReimbListModal;
   }
@@ -106,12 +107,11 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
 
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context, delegate: SearchItems(),
-                );
-
-              }, icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(context: context, delegate: SearchItems());
+            },
+            icon: Icon(Icons.search),
+          ),
         ],
       ),
       body: Container(
@@ -119,15 +119,14 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
         child: Column(
           children: [
             Expanded(
-                child: appDisReimbListLabel == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getAppDisList(appDisReimbListLabel!)),
+              child:
+                  appDisReimbListLabel == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getAppDisList(appDisReimbListLabel!),
+            ),
           ],
         ),
       ),
-
-
     );
   }
 
@@ -135,13 +134,14 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  ApprovalListReimbursement(AppDisReimbListModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) => ApprovalListReimbursement(AppDisReimbListModal()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -153,35 +153,44 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
               //Navigator.pushNamed(context, MyRoutings.approveDisReimbursementRoute);
             },
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          appDisReimbListModal!.data![i].empName.toString().text.make().px8().py2(),
-                          Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  appDisReimbListModal!.data![i].status.toString()
-                                      .text
-                                      .color(Mythemes.lightBluishColor)
-                                      .sm
-                                      .make()
-                                      .px8(),
-                                ],
-                              ))
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          appDisReimbListModal!.data![i].reimbName.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /* Expanded(
+              elevation: 2,
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        appDisReimbListModal!.data![i].empName
+                            .toString()
+                            .text
+                            .make()
+                            .px8()
+                            .py2(),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              appDisReimbListModal!.data![i].status
+                                  .toString()
+                                  .text
+                                  .color(Mythemes.lightBluishColor)
+                                  .sm
+                                  .make()
+                                  .px8(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        appDisReimbListModal!.data![i].reimbName
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /* Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -192,15 +201,17 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
 
 
                           )*/
-                        ],
-                      ).py1(),
-                      Row(
-                        children: [
-                          appDisReimbListModal!.data![i].claimNo.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /*Expanded(
+                      ],
+                    ).py1(),
+                    Row(
+                      children: [
+                        appDisReimbListModal!.data![i].claimNo
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /*Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -211,15 +222,17 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
 
 
                           )*/
-                        ],
-                      ).py1(),
-                      Row(
-                        children: [
-                          appDisReimbListModal!.data![i].reqDate.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /* Expanded(
+                      ],
+                    ).py1(),
+                    Row(
+                      children: [
+                        appDisReimbListModal!.data![i].reqDate
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /* Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -230,12 +243,12 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
 
 
                           )*/
-                        ],
-                      ).py0(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          /*Expanded(
+                      ],
+                    ).py0(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        /*Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -245,17 +258,26 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 7, right: 0, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Grade".text.make(),
-                                appDisReimbListModal!.data![i].empGrade.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 7,
+                            right: 0,
+                            bottom: 18,
                           ),
+                          child: Column(
+                            children: [
+                              "Grade".text.make(),
+                              appDisReimbListModal!.data![i].empGrade
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
 
-                          /* Expanded(
+                        /* Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -265,17 +287,26 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 1, right: 0, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Category".text.make(),
-                                appDisReimbListModal!.data![i].catName.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 1,
+                            right: 0,
+                            bottom: 18,
                           ),
+                          child: Column(
+                            children: [
+                              "Category".text.make(),
+                              appDisReimbListModal!.data![i].catName
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
 
-                          /*  Expanded(
+                        /*  Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -285,20 +316,30 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 1, right: 7, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Amount".text.make(),
-                                appDisReimbListModal!.data![i].claimedAmt.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 1,
+                            right: 7,
+                            bottom: 18,
                           ),
-                        ],
-                      ).py1(),
-                    ],
-                  ),
-                )),
+                          child: Column(
+                            children: [
+                              "Amount".text.make(),
+                              appDisReimbListModal!.data![i].claimedAmt
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ).py1(),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
@@ -306,12 +347,8 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement> w
   }
 }
 
-
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -336,6 +373,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -348,12 +386,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -366,9 +403,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

@@ -9,6 +9,7 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../MSS_Bundle/leaveManagement/levelOneLeaveReq.dart';
 import '../../../MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
@@ -22,15 +23,14 @@ import 'levelOneLeaveReq.dart';
 import 'modalClass/levelOnePendingLeaveModal.dart';
 
 class LevelOnePendingApproval extends StatefulWidget {
-
   LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
   int itemCount;
 
-  LevelOnePendingApproval(
-      this.pendingLeaveRequisitionModal, this.itemCount);
+  LevelOnePendingApproval(this.pendingLeaveRequisitionModal, this.itemCount);
 
   @override
-  State<LevelOnePendingApproval> createState() => _LevelOnePendingApprovalState(pendingLeaveRequisitionModal, itemCount);
+  State<LevelOnePendingApproval> createState() =>
+      _LevelOnePendingApprovalState(pendingLeaveRequisitionModal, itemCount);
 }
 
 var userPanelPermissions;
@@ -38,7 +38,10 @@ var userPanelPermissions;
 class _LevelOnePendingApprovalState extends State<LevelOnePendingApproval> {
   LevelOnePendingLeaveModal? pendingLeaveRequisitionModal;
   int itemCount;
-  _LevelOnePendingApprovalState(this.pendingLeaveRequisitionModal, this.itemCount);
+  _LevelOnePendingApprovalState(
+    this.pendingLeaveRequisitionModal,
+    this.itemCount,
+  );
   var titleName = "Level One Approval";
   int pageIndex = 0;
   int currentIndex = 2;
@@ -47,54 +50,59 @@ class _LevelOnePendingApprovalState extends State<LevelOnePendingApproval> {
     double height = MediaQuery.of(context).size.height;
     return DismissKeyboard(
       child: Scaffold(
-        appBar: AppBar(
-          title: titleName.text.make(),
-          elevation: 0.5,
-        ),
+        appBar: AppBar(title: titleName.text.make(), elevation: 0.5),
         body: Container(
           height: height,
           color: Mythemes.whitish,
           child: SingleChildScrollView(
-              child: PendingLeaveApprovalDisapproval(pendingLeaveRequisitionModal!, itemCount)
+            child: PendingLeaveApprovalDisapproval(
+              pendingLeaveRequisitionModal!,
+              itemCount,
+            ),
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
               print('Leave');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -105,10 +113,7 @@ class _LevelOnePendingApprovalState extends State<LevelOnePendingApproval> {
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -138,16 +143,27 @@ class PendingLeaveApprovalDisapproval extends StatefulWidget {
   LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
   int itemCount;
 
-  PendingLeaveApprovalDisapproval(this.pendingLeaveRequisitionModal, this.itemCount);
+  PendingLeaveApprovalDisapproval(
+    this.pendingLeaveRequisitionModal,
+    this.itemCount,
+  );
 
   @override
-  State<PendingLeaveApprovalDisapproval> createState() => _PendingLeaveApprovalDisapprovalState(pendingLeaveRequisitionModal, itemCount);
+  State<PendingLeaveApprovalDisapproval> createState() =>
+      _PendingLeaveApprovalDisapprovalState(
+        pendingLeaveRequisitionModal,
+        itemCount,
+      );
 }
 
-class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDisapproval> {
+class _PendingLeaveApprovalDisapprovalState
+    extends State<PendingLeaveApprovalDisapproval> {
   LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
   int itemCount;
-  _PendingLeaveApprovalDisapprovalState(this.pendingLeaveRequisitionModal, this.itemCount);
+  _PendingLeaveApprovalDisapprovalState(
+    this.pendingLeaveRequisitionModal,
+    this.itemCount,
+  );
   SessionManager shared = SessionManager();
   Map<String, dynamic> mapResponse = {};
   String? sessionId;
@@ -173,7 +189,6 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
   var getComment;
   @override
   void initState() {
-
     leaveType = foundDataNewMSSL1![itemCount].leaveType;
     branchName = foundDataNewMSSL1![itemCount].branchName;
     lBalance = foundDataNewMSSL1![itemCount].totalLeave;
@@ -188,12 +203,13 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
     getSharedPrfanceList();
     //getComment = _commentController;
     super.initState();
-
   }
+
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     userPanelPermissions = await shared!.getUserPanel();
   }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -203,38 +219,37 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
           Row(
             children: [
               Expanded(
-                child:  Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: leaveType),
                     readOnly: true,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: leaveType,
-                        labelText: "Leave Type",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: leaveType,
+                      labelText: "Leave Type",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
               ),
               Expanded(
-                child:
-                Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: "$lBalance"),
                     readOnly: true,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: "$lBalance",
-                        labelText: "Leave Balance",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: "$lBalance",
+                      labelText: "Leave Balance",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
@@ -244,38 +259,37 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
           Row(
             children: [
               Expanded(
-                child:  Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: branchName),
                     readOnly: true,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: branchName,
-                        labelText: "Branch Name",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: branchName,
+                      labelText: "Branch Name",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
               ),
               Expanded(
-                child:
-                Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: department),
                     readOnly: true,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: department,
-                        labelText: "Department",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: department,
+                      labelText: "Department",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
@@ -285,38 +299,37 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
           Row(
             children: [
               Expanded(
-                child:  Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: empName),
                     readOnly: true,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: empName,
-                        labelText: "Employee Name",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: empName,
+                      labelText: "Employee Name",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
               ),
               Expanded(
-                child:
-                Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: applicationDate),
                     readOnly: true,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: applicationDate,
-                        labelText: "Application Date",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: applicationDate,
+                      labelText: "Application Date",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
@@ -326,38 +339,37 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
           Row(
             children: [
               Expanded(
-                child:  Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: fromDate),
                     readOnly: true,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: fromDate,
-                        labelText: "From Date",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: fromDate,
+                      labelText: "From Date",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
               ),
               Expanded(
-                child:
-                Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: toDate),
                     readOnly: true,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: toDate,
-                        labelText: "To Date",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: toDate,
+                      labelText: "To Date",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
@@ -367,21 +379,20 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
           Row(
             children: [
               Expanded(
-                child:
-                Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: TextEditingController(text: reqRemarks),
                     readOnly: true,
                     maxLines: 3,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        enabled: false,
-                        hintText: reqRemarks,
-                        labelText: "Requisition Remarks",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: reqRemarks,
+                      labelText: "Requisition Remarks",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
@@ -391,19 +402,18 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
           Row(
             children: [
               Expanded(
-                child:
-                Padding(
+                child: Padding(
                   padding: EdgeInsets.all(10.0),
                   child: TextFormField(
-                    style:TextStyle(fontSize:14),
+                    style: TextStyle(fontSize: 14),
                     controller: _commentController,
                     maxLines: 3,
                     //initialValue: "${branchName}",
-                    decoration:  InputDecoration(
-                        contentPadding: EdgeInsets.only(left: 8.0),
-                        hintText: approvalRemarks,
-                        labelText: "Approval Remarks",
-                        labelStyle: TextStyle(fontSize: 15)
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      hintText: approvalRemarks,
+                      labelText: "Approval Remarks",
+                      labelStyle: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
@@ -412,35 +422,44 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
           ),
           Row(
             children: [
-              Expanded(child: ButtonBar(
+              Expanded(
+                child: ButtonBar(
                   alignment: MainAxisAlignment.center,
                   buttonPadding: Vx.mOnly(right: 16),
                   children: [
-
-
                     ElevatedButton(
                       onPressed: () {
                         key = "DISAPPROVED";
-                        disApproveLeaveRequisition(_commentController.text, leaveReqId);
+                        disApproveLeaveRequisition(
+                          _commentController.text,
+                          leaveReqId,
+                        );
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all(Mythemes.dangerColorOne),
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.dangerColorOne,
+                        ),
                       ),
                       child: "Disapprove".text.make(),
                     ).wh(150, 40).py12(),
                     ElevatedButton(
                       onPressed: () {
                         key = "APPROVED";
-                        approveLeaveRequisition(_commentController.text, leaveReqId);
+                        approveLeaveRequisition(
+                          _commentController.text,
+                          leaveReqId,
+                        );
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all(Mythemes.successColor),
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.successColor,
+                        ),
                       ),
                       child: "Approve".text.make(),
                     ).wh(150, 40).py12(),
-                  ]))
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -448,16 +467,21 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
     );
   }
 
-  Future<void> approveLeaveRequisition(String getComment, int? leaveReqId) async {
+  Future<void> approveLeaveRequisition(
+    String getComment,
+    int? leaveReqId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveApprovalLevel1Api;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "leavereqid=$leaveReqId&"
-        "status=$key&"
-        "comment=$getComment");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "leavereqid=$leaveReqId&"
+      "status=$key&"
+      "comment=$getComment",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -475,20 +499,24 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       } else if (result.toString().toLowerCase() == "null") {
         showDialgSucess1(context, "Some Error Occurred !", " Error ");
       }
-
     }
   }
 
-  Future<void> disApproveLeaveRequisition(String getComment, int? leaveReqId) async {
+  Future<void> disApproveLeaveRequisition(
+    String getComment,
+    int? leaveReqId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveApprovalLevel1Api;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "leavereqid=$leaveReqId&"
-        "status=$key&"
-        "comment=$getComment");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "leavereqid=$leaveReqId&"
+      "status=$key&"
+      "comment=$getComment",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -499,21 +527,19 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        showDialgSucess1(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        showDialgSucess1(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
-
     }
   }
 
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -544,14 +570,13 @@ class _PendingLeaveApprovalDisapprovalState extends State<PendingLeaveApprovalDi
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 }
-
-
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;

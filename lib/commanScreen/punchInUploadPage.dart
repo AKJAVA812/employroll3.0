@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
@@ -29,16 +30,23 @@ class ImageUploaded extends StatefulWidget {
   final String address;
   final String? punchType;
 
-  ImageUploaded({required this.value, required this.time, required this.address, required this.punchType});
+  ImageUploaded({
+    required this.value,
+    required this.time,
+    required this.address,
+    required this.punchType,
+  });
 
   @override
-  State<ImageUploaded> createState() => _ImageUploadedState(value,time,address,punchType);
+  State<ImageUploaded> createState() =>
+      _ImageUploadedState(value, time, address, punchType);
 }
+
 final attendanceBox = Hive.box('attendanceBox');
 late String? sessionId;
 dynamic orgId;
 dynamic setGeofenceActive;
-int? orgnizationID=0;
+int? orgnizationID = 0;
 SessionManager shared = SessionManager();
 String? deviceId = "Unknown";
 
@@ -61,6 +69,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
     //deleteData();
     super.initState();
   }
+
   //Write Data
   void writeData() async {
     //_myBox!.delete(saveCount);
@@ -68,11 +77,10 @@ class _ImageUploadedState extends State<ImageUploaded> {
     saveCount = (saveCount ?? 0) + 1;
     //_myBox.put('saveCount', saveCount);
     DateTime now = DateTime.now();
-    DateFormat dateFormat=DateFormat("dd-MM-yyyy HH:mm:ss");
+    DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
     String formattedDate = dateFormat.format(now);
-    DateFormat currentDateFormat=DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat currentDateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     String currentDateFormatString = currentDateFormat.format(now);
-
 
     //Image Getter
     var stream = http.ByteStream(value!.openRead());
@@ -80,11 +88,22 @@ class _ImageUploadedState extends State<ImageUploaded> {
     stream.cast();
     var length = await value!.length();
     var bytes = await stream.toBytes();
-    var multipart = http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
+    var multipart = http.MultipartFile(
+      'image',
+      stream,
+      length,
+      filename: basename('image.jpg'),
+    );
 
-
-    final newData = [sessionId, clockingType, currentDateFormatString, currentAddress, lat, lng, bytes];
+    final newData = [
+      sessionId,
+      clockingType,
+      currentDateFormatString,
+      currentAddress,
+      lat,
+      lng,
+      bytes,
+    ];
     //_myBox.put(saveCount, newData);
     // _myBox.put(_myBox.get(1), [sessionId, this.clockingType, currentDateFormatString, currentAddress, lat, lng, bytes]);
   }
@@ -95,7 +114,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       print(_myBox.get(i));
     }
   }*/
-/*  void readData() {
+  /*  void readData() {
     for(int i=0; i<=_myBox.length; i++) {
       print("Data - ${_myBox.get(listCount)}");
     }
@@ -103,10 +122,10 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
   /*void writeData() async{
 
-    *//*if (value == null || sessionId == null || clockingType == null || currentAddress == null || lat == null || lng == null) {
+    */ /*if (value == null || sessionId == null || clockingType == null || currentAddress == null || lat == null || lng == null) {
       print('One or more required fields are null.');
       return;
-    }*//*
+    }*/ /*
     DateTime now = DateTime.now();
     DateFormat dateFormat=DateFormat("dd-MM-yyyy HH:mm:ss");
     String formattedDate = dateFormat.format(now);
@@ -143,9 +162,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
   int _clickCount = 0;
 
   _incrementCounter() {
-
     print("$_clickCount");
   }
+
   String? _platformVersion = 'Unknown', _autoTimezone, _autoTime, _daftar = "";
   Map<String, dynamic>? _list;
   final File? value;
@@ -153,11 +172,11 @@ class _ImageUploadedState extends State<ImageUploaded> {
   final String address;
   final String? clockingType;
   late dynamic result;
-  double lat=0;
-  double lng=0;
-  _ImageUploadedState(this.value,this.time,this.address,this.clockingType);
+  double lat = 0;
+  double lng = 0;
+  _ImageUploadedState(this.value, this.time, this.address, this.clockingType);
 
-/*  Future getUploadImage() async {
+  /*  Future getUploadImage() async {
     try{
       final image = await ImagePicker().pickImage(source: ImageSource.camera);
       if (image == null) return;
@@ -177,8 +196,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     return File(imagePath).copy(image.path);
   }
-
-
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
@@ -218,22 +235,19 @@ class _ImageUploadedState extends State<ImageUploaded> {
     sessionId = await shared!.getSessionId();
     orgId = await shared!.getOrgId();
     setGeofenceActive = await shared!.getGeofenceActive();
-    lat=await shared!.getLatitude();
+    lat = await shared!.getLatitude();
     getGeofenceList(sessionId!);
-    lng=await shared!.getLongitude();
-    orgnizationID=await shared.getOrgId();
+    lng = await shared!.getLongitude();
+    orgnizationID = await shared.getOrgId();
     _getDeviceId();
-/*
+    /*
     print('Response snapshot: ${sessionId}');
     print('Response snapshot: ${lat}');
     print('Response snapshot: ${lng}');
     print('Response snapshot: ${orgnizationID}');*/
-
   }
 
-
-
-  showDialgError(BuildContext context, result,reason) {
+  showDialgError(BuildContext context, result, reason) {
     var alertDialog = AlertDialog(
       title: Row(
         children: [
@@ -250,9 +264,12 @@ class _ImageUploadedState extends State<ImageUploaded> {
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
             print("ORGID - $orgId");
-            if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
-                && setGeofenceActive == true) {
-
+            if ((orgId == 201 ||
+                    orgId == 200 ||
+                    orgId == 199 ||
+                    orgId == 202 ||
+                    orgId == 145) &&
+                setGeofenceActive == true) {
               showGeofenceDialog(
                 context,
                 sessionId: sessionId!,
@@ -272,23 +289,24 @@ class _ImageUploadedState extends State<ImageUploaded> {
             //uploadImage(context);
           },
           child: Text("Retry"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:context,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
-  slowInternetPop(BuildContext context, result,reason) {
+  slowInternetPop(BuildContext context, result, reason) {
     var alertDialog = AlertDialog(
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Text(result,style: TextStyle(fontSize: 14),),
+          Text(result, style: TextStyle(fontSize: 14)),
         ],
       ),
       content: Text(reason),
@@ -299,13 +317,11 @@ class _ImageUploadedState extends State<ImageUploaded> {
         TextButton(
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
-
           },
           child: Text("Cancel"),
         ),
         TextButton(
           onPressed: () {
-
             setState(() {
               _clickCount++;
               //print("$_clickCount");
@@ -314,13 +330,21 @@ class _ImageUploadedState extends State<ImageUploaded> {
             if (_clickCount > 2) {
               //print("I am touched 2 times");
               //Navigator.of(context, rootNavigator: true).pop();
-              savedDataLocally(context,"Data Saved Offline !"+"","Your punch is saved offline, Please sync the punch once you are in network area.");
+              savedDataLocally(
+                context,
+                "Data Saved Offline !" + "",
+                "Your punch is saved offline, Please sync the punch once you are in network area.",
+              );
               writeData();
               //readData();
             } else {
               print("ORGID - $orgId");
-              if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
-                  && setGeofenceActive == true) {
+              if ((orgId == 201 ||
+                      orgId == 200 ||
+                      orgId == 199 ||
+                      orgId == 202 ||
+                      orgId == 145) &&
+                  setGeofenceActive == true) {
                 showGeofenceDialog(
                   context,
                   sessionId: sessionId!,
@@ -332,23 +356,23 @@ class _ImageUploadedState extends State<ImageUploaded> {
               }
             }
 
-
             //Navigator.of(context, rootNavigator: true).pop();
             //uploadImage(context);
           },
           child: Text("Retry"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:context,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
-  savedDataLocally(BuildContext context, result,reason) {
+  savedDataLocally(BuildContext context, result, reason) {
     var alertDialog = AlertDialog(
       title: Row(
         children: [
@@ -393,22 +417,22 @@ class _ImageUploadedState extends State<ImageUploaded> {
       elevation: 24.0,
     );
     showDialog(
-        context:context,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   Future<void> _getDeviceId() async {
     var deviceInfo = DeviceInfoPlugin();
-
 
     try {
       if (Platform.isAndroid) {
         var androidInfo = await deviceInfo.androidInfo;
         //AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
         deviceId = androidInfo.id; // Unique ID on Android
-       /* print('Device ID 1 - ${androidInfo.id}');
+        /* print('Device ID 1 - ${androidInfo.id}');
         print("Device ID 2- ${androidInfo.serialNumber}");
         print("Device ID 3- ${androidInfo.hardware}");
         print("Device ID 4- ${androidInfo.device}");
@@ -445,25 +469,26 @@ class _ImageUploadedState extends State<ImageUploaded> {
     CommonNotificationPage.showLoaderDialog(context);
 
     bool internetCheck = await InternetConnectionChecker().hasConnection;
-    if(internetCheck == false) {
+    if (internetCheck == false) {
       setState(() {
         Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(context,"Slow Internet Connection !"+"","Your Punch in not submitted, Please try again.");
+        slowInternetPop(
+          context,
+          "Slow Internet Connection !" + "",
+          "Your Punch in not submitted, Please try again.",
+        );
       });
-
     }
 
     var stream = http.ByteStream(value!.openRead());
     stream.cast();
 
     DateTime now = DateTime.now();
-    DateFormat dateFormat=DateFormat("dd-MM-yyyy HH:mm:ss");
+    DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
     String formattedDate = dateFormat.format(now);
-    DateFormat currentDateFormat=DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat currentDateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     String currentDateFormatString = currentDateFormat.format(now);
-    setState(() {
-
-    });
+    setState(() {});
     var length = await value!.length();
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/attendance/via/mobile");
@@ -481,20 +506,33 @@ class _ImageUploadedState extends State<ImageUploaded> {
     request.fields['deviceId'] = deviceId!;
     request.fields['battery'] = sessionId!;
 
-
-    var multipart = new http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
+    var multipart = new http.MultipartFile(
+      'image',
+      stream,
+      length,
+      filename: basename('image.jpg'),
+    );
     request.files.add(multipart);
-// Construct API URL with parameters
-    String apiWithParams = uri.toString() + '?' + request.fields.entries.map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}').join('&');
+    // Construct API URL with parameters
+    String apiWithParams =
+        uri.toString() +
+        '?' +
+        request.fields.entries
+            .map(
+              (e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+            )
+            .join('&');
 
-// Print the full API URL with parameters
+    // Print the full API URL with parameters
     print('API URL with Parameters: $apiWithParams');
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
       // Send request once
-      final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
+      final streamedResponse = await request.send().timeout(
+        const Duration(seconds: 30),
+      );
 
       // Convert to Response
       final response = await http.Response.fromStream(streamedResponse);
@@ -503,7 +541,11 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
       if (response.statusCode == 500) {
         Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(context, "Slow Internet Connection !", "Your Punch in not submitted, Please try again.");
+        slowInternetPop(
+          context,
+          "Slow Internet Connection !",
+          "Your Punch in not submitted, Please try again.",
+        );
         return;
       }
 
@@ -519,50 +561,66 @@ class _ImageUploadedState extends State<ImageUploaded> {
       if (response.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
         if (resultSuccess.compareToIgnoringCase("success") == 0) {
-          showSuccessGo(context, reasonSuccess.upperCamelCase + " " + formattedDate, "Successfully Punch $clockingType");
+          showSuccessGo(
+            context,
+            reasonSuccess.upperCamelCase + " " + formattedDate,
+            "Successfully Punch $clockingType",
+          );
         } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
           if (reasonSuccess == "non-geofence area") {
-            showSuccessGo(context, reasonSuccess.upperCamelCase + " " + formattedDate, " Non Geofence Area ");
+            showSuccessGo(
+              context,
+              reasonSuccess.upperCamelCase + " " + formattedDate,
+              " Non Geofence Area ",
+            );
           } else {
             showSuccessGo(context, reasonSuccess.upperCamelCase, "Failed");
           }
         }
       } else {
-        showDialgError(context, result, "Your Punch Not Submitted, Please Try Again");
+        showDialgError(
+          context,
+          result,
+          "Your Punch Not Submitted, Please Try Again",
+        );
       }
     } on TimeoutException catch (_) {
       showDialgError(context, result, "Your Punch Submitted offline");
     }
   }
 
-  Future<void> uploadImageWithGeofence(BuildContext context, dynamic selectedGeofenceId) async {
+  Future<void> uploadImageWithGeofence(
+    BuildContext context,
+    dynamic selectedGeofenceId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchWithGeofenceSelfie;
-    // ✅ Use root context to show dialogs safely
+    // âœ… Use root context to show dialogs safely
     final rootContext = Navigator.of(context, rootNavigator: true).context;
 
     CommonNotificationPage.showLoaderDialog(rootContext);
 
     bool internetCheck = await InternetConnectionChecker().hasConnection;
-    if(internetCheck == false) {
+    if (internetCheck == false) {
       setState(() {
         Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(context,"Slow Internet Connection !"+"","Your Punch in not submitted, Please try again.");
+        slowInternetPop(
+          context,
+          "Slow Internet Connection !" + "",
+          "Your Punch in not submitted, Please try again.",
+        );
       });
-
     }
 
     var stream = http.ByteStream(value!.openRead());
     stream.cast();
 
     DateTime now = DateTime.now();
-    DateFormat dateFormat=DateFormat("dd-MM-yyyy HH:mm:ss");
+    DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
     String formattedDate = dateFormat.format(now);
-    DateFormat currentDateFormat=DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat currentDateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     String currentDateFormatString = currentDateFormat.format(now);
-    setState(() {
-
-    });
+    setState(() {});
     var length = await value!.length();
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/attendance/via/mobile");
@@ -581,39 +639,59 @@ class _ImageUploadedState extends State<ImageUploaded> {
     request.fields['battery'] = sessionId!;
     request.fields['geofenceId'] = selectedGeofenceId!.toString();
 
-
     //print("stream.length");
     //print(stream.length.toString());
 
-    var multipart = new http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
+    var multipart = new http.MultipartFile(
+      'image',
+      stream,
+      length,
+      filename: basename('image.jpg'),
+    );
     request.files.add(multipart);
-// Construct API URL with parameters
-    String apiWithParams = uri.toString() + '?' + request.fields.entries.map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}').join('&');
+    // Construct API URL with parameters
+    String apiWithParams =
+        uri.toString() +
+        '?' +
+        request.fields.entries
+            .map(
+              (e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+            )
+            .join('&');
 
-// Print the full API URL with parameters
+    // Print the full API URL with parameters
     print('API URL with Parameters: $apiWithParams');
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
-      http.Response response = await http.Response.fromStream(await request.send().timeout(const Duration(seconds: 30)));
+      http.Response response = await http.Response.fromStream(
+        await request.send().timeout(const Duration(seconds: 30)),
+      );
       // Process the response here
 
       print('Response received: ${response.body}');
       //print('URL ${response.request}');
 
-      if(response.statusCode==500){
+      if (response.statusCode == 500) {
         Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(context,"Slow Internet Connection !"+"","Your Punch in not submitted, Please try again.");
+        slowInternetPop(
+          context,
+          "Slow Internet Connection !" + "",
+          "Your Punch in not submitted, Please try again.",
+        );
       }
-      result= json.decode(response.body.toString());
-      String resultSuccess=result['result'];
-      String reasonSuccess=result['reason'];
+      result = json.decode(response.body.toString());
+      String resultSuccess = result['result'];
+      String reasonSuccess = result['reason'];
       print('URL ${response.request}');
       print('result${result}');
-      print("Reason: ${result['reason']}, Type: ${result['reason'].runtimeType}");
-      print("Result: ${result['result']}, Type: ${result['result'].runtimeType}");
-
+      print(
+        "Reason: ${result['reason']}, Type: ${result['reason'].runtimeType}",
+      );
+      print(
+        "Result: ${result['result']}, Type: ${result['result'].runtimeType}",
+      );
 
       print('Response body: ${result}');
 
@@ -622,35 +700,41 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
       //var responseData = await response.stream.bytesToString();
 
-
-
-      if(response.statusCode==200){
+      if (response.statusCode == 200) {
         print("I am hit 2 times");
-        // ✅ Always pop loader safely
+        // âœ… Always pop loader safely
         if (rootContext.mounted) {
           Navigator.of(rootContext, rootNavigator: true).pop();
         }
-        if(resultSuccess.compareToIgnoringCase("success")==0){
-          showSuccessGo(rootContext,reasonSuccess.upperCamelCase+" "+formattedDate,"Successfully Punch $clockingType");
-        }else if(resultSuccess.compareToIgnoringCase("failed")==0){
+        if (resultSuccess.compareToIgnoringCase("success") == 0) {
+          showSuccessGo(
+            rootContext,
+            reasonSuccess.upperCamelCase + " " + formattedDate,
+            "Successfully Punch $clockingType",
+          );
+        } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
           if (reasonSuccess == "non-geofence area") {
-            showSuccessGo(rootContext, reasonSuccess.upperCamelCase+" "+formattedDate, " Non Geofence Area ");
+            showSuccessGo(
+              rootContext,
+              reasonSuccess.upperCamelCase + " " + formattedDate,
+              " Non Geofence Area ",
+            );
           } else {
-            showSuccessGo(rootContext,reasonSuccess.upperCamelCase, "Failed");
+            showSuccessGo(rootContext, reasonSuccess.upperCamelCase, "Failed");
           }
-
         }
-      }else {
+      } else {
         //Navigator.pop(context);
-        showDialgError(rootContext, result,"Your Punch Not Submitted, Please Try Again");
+        showDialgError(
+          rootContext,
+          result,
+          "Your Punch Not Submitted, Please Try Again",
+        );
       }
     } on TimeoutException catch (_) {
       // Show retry popup if the request times out
       //showDialgError(context, "Alert", "Please Try again !");
     }
-
-
-
   }
 
   /*Future<void> uploadImage(BuildContext context) async {
@@ -676,13 +760,13 @@ class _ImageUploadedState extends State<ImageUploaded> {
     DateFormat currentDateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
     String currentDateFormatString = currentDateFormat.format(now);
 
-    // ✅ Convert image file to Base64 string
+    // âœ… Convert image file to Base64 string
     List<int> imageBytes = await value!.readAsBytes();
     String base64Image = base64Encode(imageBytes);
 
     var uri = Uri.parse("$conn$apiUrl");
 
-    // ✅ Prepare JSON body
+    // âœ… Prepare JSON body
     Map<String, dynamic> body = {
       "sessionId": sessionId!,
       "currentDate": currentDateFormatString,
@@ -695,7 +779,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       "macAddress": deviceId!,
       "deviceId": deviceId!,
       "battery": sessionId!,
-      "image": base64Image, // ✅ sending as base64 string
+      "image": base64Image, // âœ… sending as base64 string
     };
 
     // Print API with parameters (except image, just for debug readability)
@@ -761,15 +845,15 @@ class _ImageUploadedState extends State<ImageUploaded> {
     }
   }*/
   //code commit
-/*
+  /*
 
   // Save Punch Offline
   void savePunchOffline(Map<String, dynamic> punch) async {
     await attendanceBox.add(punch); // list style save
    */
-/* ScaffoldMessenger.of(context).showSnackBar(
+  /* ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Punch saved offline!")),
-    );*//*
+    );*/ /*
 
     setState(() {}); // Refresh UI
   }
@@ -787,107 +871,103 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     await Future.delayed(Duration(seconds: 2)); // simulate API call
 
-    // अगर सफल हुआ तो delete कर दें
+    // à¤…à¤—à¤° à¤¸à¤«à¤² à¤¹à¥à¤† à¤¤à¥‹ delete à¤•à¤° à¤¦à¥‡à¤‚
     deletePunch(index);
 
    */
-/* ScaffoldMessenger.of(context).showSnackBar(
+  /* ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Punch synced successfully!")),
-    );*//*
+    );*/ /*
 
   }
 */
 
-  showSuccessGo(BuildContext buildContext, result,alert) {
+  showSuccessGo(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Expanded(child: Text( alert, style: TextStyle(
-              fontSize: 20
-          ),)),
+          Expanded(child: Text(alert, style: TextStyle(fontSize: 20))),
         ],
       ),
       content: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text('$result'),
-            /*Container(
+        child:
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text('$result'),
+                /*Container(
               child: "Location".text.align(TextAlign.left).color(Mythemes.greyish).make().py12() ,
             ),*/
-            Container(
-              child: Text(
-                "Location",
-                textAlign: TextAlign.left,
-                style: TextStyle(color: Mythemes.greyish),
-              ),
-            ).py12(),
-            Text(
-              currentAddress,
-              style: TextStyle(letterSpacing: 0.5),
-            ),
-           /* currentAddress.text.letterSpacing(0.5).make(),*/
-          ],
-        ).px8(),
+                Container(
+                  child: Text(
+                    "Location",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(color: Mythemes.greyish),
+                  ),
+                ).py12(),
+                Text(currentAddress, style: TextStyle(letterSpacing: 0.5)),
+                /* currentAddress.text.letterSpacing(0.5).make(),*/
+              ],
+            ).px8(),
       ),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
         TextButton(
-            onPressed: () {
-              Navigator.of(buildContext, rootNavigator: true).pop();
-              Navigator.push(buildContext,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,))
-              );
-            },
-            child: Container(
-              child: Text("Ok"),
-            )
+          onPressed: () {
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            Navigator.push(
+              buildContext,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
+          },
+          child: Container(child: Text("Ok")),
         ),
-
       ],
       elevation: 24.0,
     );
     showDialog(
-        barrierDismissible: false,
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      barrierDismissible: false,
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
-
-
-
-// ✅ Main method to get Geofence list
+  // âœ… Main method to get Geofence list
   Future<GeofenceListModal> getGeofenceList(String sessionId) async {
     try {
       String conn = ApiDetails.server;
       String apiUrl = ApiDetails.geofenceListApi;
       var urlapi = Uri.parse(
-          "$conn$apiUrl?sessionId=$sessionId&empId=$empIdGet&orgId=$orgId");
+        "$conn$apiUrl?sessionId=$sessionId&empId=$empIdGet&orgId=$orgId",
+      );
 
-      print("🔗 Fetching geofence list from: $urlapi");
+      print("ðŸ”— Fetching geofence list from: $urlapi");
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // ✅ Parse into GeofenceListModal directly
+        // âœ… Parse into GeofenceListModal directly
         return GeofenceListModal.fromJson(data);
       } else {
-        throw Exception("Failed to fetch geofence list: ${response.statusCode}");
+        throw Exception(
+          "Failed to fetch geofence list: ${response.statusCode}",
+        );
       }
     } catch (e) {
-      print("🚨 Error fetching geofence list: $e");
-      // ✅ Return empty model in case of failure
+      print("ðŸš¨ Error fetching geofence list: $e");
+      // âœ… Return empty model in case of failure
       return GeofenceListModal(userdata: []);
     }
   }
@@ -899,19 +979,18 @@ class _ImageUploadedState extends State<ImageUploaded> {
     return prefs.getInt(_kSavedGeofenceKey);
   }
 
-// Helper to save geofence id
+  // Helper to save geofence id
   Future<void> _saveGeofenceId(int id) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kSavedGeofenceKey, id);
   }
 
   Future<void> showGeofenceDialog(
-      BuildContext context, {
-        required dynamic sessionId,
-        required dynamic empId,
-        required dynamic orgId,
-      }) async {
-
+    BuildContext context, {
+    required dynamic sessionId,
+    required dynamic empId,
+    required dynamic orgId,
+  }) async {
     // Load saved id first
     int? savedGeofenceId = await _getSavedGeofenceId();
 
@@ -923,19 +1002,25 @@ class _ImageUploadedState extends State<ImageUploaded> {
       if (!context.mounted) return;
       await showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Select Your Location"),
-          content: const Text("No geofence data available"),
-          actions: [
-            TextButton(onPressed: () =>  Navigator.of(context, rootNavigator: true).pop(), child: const Text("OK"))
-          ],
-        ),
+        builder:
+            (_) => AlertDialog(
+              title: const Text("Select Your Location"),
+              content: const Text("No geofence data available"),
+              actions: [
+                TextButton(
+                  onPressed:
+                      () => Navigator.of(context, rootNavigator: true).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
       );
       return;
     }
 
     // Ensure saved id exists in fetched list; otherwise ignore it
-    bool savedExists = savedGeofenceId != null &&
+    bool savedExists =
+        savedGeofenceId != null &&
         geofenceList.userdata!.any((g) => g.id == savedGeofenceId);
 
     int? selectedGeofenceId = savedExists ? savedGeofenceId : null;
@@ -949,7 +1034,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: const Text(
                 "Select Your Location",
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -966,14 +1053,15 @@ class _ImageUploadedState extends State<ImageUploaded> {
                         border: OutlineInputBorder(),
                         labelText: "Select Geofence",
                       ),
-                      items: geofenceList.userdata!
-                          .map(
-                            (geo) => DropdownMenuItem<int>(
-                          value: geo.id,
-                          child: Text("${geo.name ?? 'Unnamed'}"),
-                        ),
-                      )
-                          .toList(),
+                      items:
+                          geofenceList.userdata!
+                              .map(
+                                (geo) => DropdownMenuItem<int>(
+                                  value: geo.id,
+                                  child: Text("${geo.name ?? 'Unnamed'}"),
+                                ),
+                              )
+                              .toList(),
                       onChanged: (value) {
                         setState(() {
                           selectedGeofenceId = value;
@@ -991,7 +1079,10 @@ class _ImageUploadedState extends State<ImageUploaded> {
                           savedExists
                               ? "Saved location will be pre-selected"
                               : "Previously saved location not available in list",
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                   ],
@@ -1002,7 +1093,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () => Navigator.pop(context),
                   child: const Text("Cancel"),
@@ -1011,7 +1104,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () async {
                     if (selectedGeofenceId != null) {
@@ -1027,7 +1122,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please select a geofence")),
+                        const SnackBar(
+                          content: Text("Please select a geofence"),
+                        ),
                       );
                     }
                   },
@@ -1041,18 +1138,18 @@ class _ImageUploadedState extends State<ImageUploaded> {
     );
   }
 
-// ✅ Widget Method to show Geofence Dialog
-/*  Future<void> showGeofenceDialog(
+  // âœ… Widget Method to show Geofence Dialog
+  /*  Future<void> showGeofenceDialog(
       BuildContext context, {
         required dynamic sessionId,
         required dynamic empId,
         required dynamic orgId,
       }) async {
     GeofenceListModal? geofenceList;
-   dynamic selectedGeofenceId; // ✅ Store ID instead of name
+   dynamic selectedGeofenceId; // âœ… Store ID instead of name
     bool isLoading = true;
 
-    // ✅ Fetch geofences
+    // âœ… Fetch geofences
     geofenceList = await getGeofenceList(sessionId);
     isLoading = false;
 
@@ -1094,7 +1191,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
                       items: geofenceList!.userdata!
                           .map(
                             (geo) => DropdownMenuItem<int>(
-                          value: geo.id, // ✅ ID as value
+                          value: geo.id, // âœ… ID as value
                           child: Text(
                             "${geo.name ?? "Unnamed"}",
                           ),
@@ -1104,7 +1201,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
                       onChanged: (value) {
                         setState(() {
                           selectedGeofenceId = value;
-                          print("🆔 Selected Geofence ID: $selectedGeofenceId");
+                          print("ðŸ†” Selected Geofence ID: $selectedGeofenceId");
                         });
                       },
                     ),
@@ -1132,10 +1229,10 @@ class _ImageUploadedState extends State<ImageUploaded> {
                     ),
                   ),
                   onPressed: () {
-                    print("✅ SELECTED GEOFENCE ID - $selectedGeofenceId");
+                    print("âœ… SELECTED GEOFENCE ID - $selectedGeofenceId");
                     if (selectedGeofenceId != null) {
                       Navigator.pop(context, selectedGeofenceId);
-                      uploadImageWithGeofence(context, selectedGeofenceId); // ✅ Pass selected ID to your method
+                      uploadImageWithGeofence(context, selectedGeofenceId); // âœ… Pass selected ID to your method
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -1154,8 +1251,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
     }
   }*/
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1164,46 +1259,49 @@ class _ImageUploadedState extends State<ImageUploaded> {
         elevation: 0.5,
         title: Text('Attendance Punch'),
         leading: BackButton(
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                  PunchInOUtActivity()));
-            }
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
+          },
         ),
       ),
 
       bottomNavigationBar: Container(
         color: context.cardColor,
         child: ButtonBar(
-            alignment: MainAxisAlignment.center,
-            buttonPadding: Vx.mOnly(right: 16),
-            children: [
+          alignment: MainAxisAlignment.center,
+          buttonPadding: Vx.mOnly(right: 16),
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                //getUploadImage();
 
-
-              ElevatedButton(
-                onPressed: (){
-                  //getUploadImage();
-
-                  print("ORGID - $orgId");
-                  if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
-                      && setGeofenceActive == true) {
-
-                    showGeofenceDialog(
-                      context,
-                      sessionId: sessionId!,
-                      empId: empIdGet,
-                      orgId: orgId,
-                    );
-                  } else {
-                    uploadImage(context);
-                  }
-
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Mythemes.lightBluishColor),
+                print("ORGID - $orgId");
+                if ((orgId == 201 ||
+                        orgId == 200 ||
+                        orgId == 199 ||
+                        orgId == 202 ||
+                        orgId == 145) &&
+                    setGeofenceActive == true) {
+                  showGeofenceDialog(
+                    context,
+                    sessionId: sessionId!,
+                    empId: empIdGet,
+                    orgId: orgId,
+                  );
+                } else {
+                  uploadImage(context);
+                }
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Mythemes.lightBluishColor,
                 ),
-                child: "Punch $clockingType".text.make(),
-              ).wh(150, 40).py32()
-            ]
+              ),
+              child: "Punch $clockingType".text.make(),
+            ).wh(150, 40).py32(),
+          ],
         ),
       ),
       body: SingleChildScrollView(
@@ -1211,39 +1309,34 @@ class _ImageUploadedState extends State<ImageUploaded> {
           child: Container(
             color: Mythemes.whitish,
             width: 500,
-            child:
-            Column(
+            child: Column(
               children: [
-                SizedBox(
-                  height: 15,
-                ),
-                value != null ? CircleAvatar(
-                  maxRadius: 115,
-                  backgroundColor: Mythemes.greyish,
-                  backgroundImage: FileImage(value!),
-                  /*child: Image.file(
+                SizedBox(height: 15),
+                value != null
+                    ? CircleAvatar(
+                      maxRadius: 115,
+                      backgroundColor: Mythemes.greyish,
+                      backgroundImage: FileImage(value!),
+                      /*child: Image.file(
                     value!,
 
                     fit: BoxFit.cover,),*/
-                )
-                    : Icon(Icons.verified_user_sharp, size: 150, color: Mythemes.greyish,),
-                SizedBox(
-                  height: 30,
-                ),
+                    )
+                    : Icon(
+                      Icons.verified_user_sharp,
+                      size: 150,
+                      color: Mythemes.greyish,
+                    ),
+                SizedBox(height: 30),
                 UploadedLocation(),
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 UploadedTime(time),
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
 
-                if(shared.getOrgId().toString().compareToIgnoringCase("3")==0)
+                if (shared.getOrgId().toString().compareToIgnoringCase("3") ==
+                    0)
                   UploadedReading(),
-                SizedBox(
-                  height: 100,
-                ),
+                SizedBox(height: 100),
                 //submitButton(title: 'Submit', onClick: getUploadImage),
               ],
             ),
@@ -1275,8 +1368,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
   );
 }*/
 
-
-
 @override
 Widget UploadedLocation() {
   return Container(
@@ -1286,112 +1377,123 @@ Widget UploadedLocation() {
         children: [
           Column(
             children: [
-              Icon(Icons.add_location_outlined, size: 32, color: Mythemes.lightBluishColor,).py16(),
+              Icon(
+                Icons.add_location_outlined,
+                size: 32,
+                color: Mythemes.lightBluishColor,
+              ).py16(),
             ],
           ).px16(),
           Expanded(
-            child: Column(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child:   Container(
-                    child: Text(
-                      "Location",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(color: Mythemes.greyish),
+            child:
+                Column(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child:
+                          Container(
+                            child: Text(
+                              "Location",
+                              textAlign: TextAlign.left,
+                              style: TextStyle(color: Mythemes.greyish),
+                            ),
+                          ).py12(),
                     ),
-                  ).py12(),
-                ),
-                /*currentAddress.text.letterSpacing(0.5).make(),*/
 
-                Text(
-                  currentAddress,
-                  style: TextStyle(letterSpacing: 0.5),
-                ),
-
-              ],
-            ).px8(),
-          )
-
+                    /*currentAddress.text.letterSpacing(0.5).make(),*/
+                    Text(currentAddress, style: TextStyle(letterSpacing: 0.5)),
+                  ],
+                ).px8(),
+          ),
         ],
       ),
     ),
-
   );
 }
 
 @override
 Widget UploadedTime(String time) {
-
   return Container(
     height: 68,
     child: Row(
       children: [
         Column(
           children: [
-            Icon(Icons.access_time, size: 32, color: Mythemes.lightBluishColor,).py8(),
+            Icon(
+              Icons.access_time,
+              size: 32,
+              color: Mythemes.lightBluishColor,
+            ).py8(),
           ],
         ).px16(),
         Expanded(
-          child: Column(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  child: "Time".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  child: time.text.letterSpacing(0.5).make(),
-                ),
-              ),
-
-            ],
-          ).px8(),
-        )
-
+          child:
+              Column(
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      child:
+                          "Time".text
+                              .align(TextAlign.left)
+                              .color(Mythemes.greyish)
+                              .make(),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      child: time.text.letterSpacing(0.5).make(),
+                    ),
+                  ),
+                ],
+              ).px8(),
+        ),
       ],
     ),
-
   );
 }
 
 @override
 Widget UploadedReading() {
   return Container(
-
     height: 68,
     child: Row(
       children: [
         Column(
           children: [
-            Icon(Icons.electric_meter_outlined, size: 32, color: Mythemes.lightBluishColor,).py8(),
+            Icon(
+              Icons.electric_meter_outlined,
+              size: 32,
+              color: Mythemes.lightBluishColor,
+            ).py8(),
           ],
         ).px16(),
         Expanded(
-          child: Column(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  child: "Meter Reading".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                ),
-              ),
+          child:
+              Column(
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      child:
+                          "Meter Reading".text
+                              .align(TextAlign.left)
+                              .color(Mythemes.greyish)
+                              .make(),
+                    ),
+                  ),
 
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  child: "0.0".text.letterSpacing(0.5).make(),
-                ),
-              ),
-            ],
-          ).px8(),
-        )
-
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      child: "0.0".text.letterSpacing(0.5).make(),
+                    ),
+                  ),
+                ],
+              ).px8(),
+        ),
       ],
     ),
-
   );
 }

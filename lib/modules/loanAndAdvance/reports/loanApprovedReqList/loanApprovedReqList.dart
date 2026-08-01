@@ -5,6 +5,7 @@ import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../main.dart';
@@ -18,10 +19,9 @@ class LoanApprovedReqList extends StatefulWidget {
   const LoanApprovedReqList(this.loanApprovedReqModal);
 
   @override
-  State<LoanApprovedReqList> createState() => _LoanApprovedReqListState(loanApprovedReqModal);
-
+  State<LoanApprovedReqList> createState() =>
+      _LoanApprovedReqListState(loanApprovedReqModal);
 }
-
 
 Map<String, dynamic> mapResponse = {};
 
@@ -31,7 +31,9 @@ String? sessionId;
 var loanReqId;
 
 LoanApprovedReqModal? loanApprovedReqModalGlobal;
-class _LoanApprovedReqListState extends State<LoanApprovedReqList> with RouteAware{
+
+class _LoanApprovedReqListState extends State<LoanApprovedReqList>
+    with RouteAware {
   final LoanApprovedReqModal loanApprovedReqModal;
   _LoanApprovedReqListState(this.loanApprovedReqModal);
 
@@ -49,7 +51,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList> with RouteAwa
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
@@ -69,15 +71,17 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList> with RouteAwa
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
-        loanApprovedReqModalGlobal=value;
+        loanApprovedReqModalGlobal = value;
       });
-      print('employeeList00${loanApprovedReqModalGlobal!.loanAppReqDatalist!.length}');
+      print(
+        'employeeList00${loanApprovedReqModalGlobal!.loanAppReqDatalist!.length}',
+      );
     });
   }
 
@@ -87,18 +91,17 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList> with RouteAwa
     print('employeeList11: ${SessionId}');
     LoanApprovedReqModal loanApprovedReqModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['LoanRequiDatalist'];
     print('responseemployeeList $getData');
-    loanApprovedReqModal=LoanApprovedReqModal.fromJson(mapResponse);
+    loanApprovedReqModal = LoanApprovedReqModal.fromJson(mapResponse);
 
     return loanApprovedReqModal;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -108,24 +111,20 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList> with RouteAwa
 
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context, delegate: SearchItems(),
-                );
-
-              }, icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(context: context, delegate: SearchItems());
+            },
+            icon: Icon(Icons.search),
+          ),
         ],
       ),
       body: Container(
         color: context.canvasColor,
         child:
-        loanApprovedReqModalGlobal == null ?
-        Center(
-            child: CircularProgressIndicator()):
-        getApprovedRequestedList(loanApprovedReqModalGlobal!),
+            loanApprovedReqModalGlobal == null
+                ? Center(child: CircularProgressIndicator())
+                : getApprovedRequestedList(loanApprovedReqModalGlobal!),
       ),
-
-
     );
   }
 
@@ -133,13 +132,14 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList> with RouteAwa
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  LoanApprovedReqList(LoanApprovedReqModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) => LoanApprovedReqList(LoanApprovedReqModal()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -147,103 +147,110 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList> with RouteAwa
         itemCount: loanApprovedReqModal!.loanAppReqDatalist!.length,
         itemBuilder: (context, i) {
           return InkWell(
-            onTap: () {
-
-            },
+            onTap: () {},
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          loanApprovedReqModal!.loanAppReqDatalist![i].empName!.text.make().px8().py4(),
-                          Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  loanApprovedReqModal!.loanAppReqDatalist![i].status!
-                                      .text
-                                      .color(Mythemes.lightBluishColor)
-                                      .sm
-                                      .make()
-                                      .px8(),
-                                ],
-                              ))
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          loanApprovedReqModal!.loanAppReqDatalist![i].loanType!
-                              .text
-                              .make()
-                              .px8(),
-                        ],
-                      ).py2(),
-                      Row(
-                        children: [
-                          loanApprovedReqModal!.loanAppReqDatalist![i].loanRaiseDate!
-                              .text
-                              .make()
-                              .px8(),
-                        ],
-                      ).py2(),
-                      Row(
-                        children: [
-                          "Remarks -"
-                              .text
-                              .make()
-                              .px8(),
-                          Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  loanApprovedReqModal!.loanAppReqDatalist![i].remark!.text.textStyle(context.captionStyle).make(),
-                                ],
-                              )
-
-
-                          )
-                        ],
-                      ).py2(),
-                      Row(
-                        children: [
-                          "Raised Amount -"
-                              .text
-                              .make()
-                              .px8(),
-                          Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  loanApprovedReqModal!.loanAppReqDatalist![i].loanAppAmt!.text.textStyle(context.captionStyle).make(),
-                                ],
-                              )
-
-
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                )),
+              elevation: 2,
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        loanApprovedReqModal!
+                            .loanAppReqDatalist![i]
+                            .empName!
+                            .text
+                            .make()
+                            .px8()
+                            .py4(),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              loanApprovedReqModal!
+                                  .loanAppReqDatalist![i]
+                                  .status!
+                                  .text
+                                  .color(Mythemes.lightBluishColor)
+                                  .sm
+                                  .make()
+                                  .px8(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        loanApprovedReqModal!
+                            .loanAppReqDatalist![i]
+                            .loanType!
+                            .text
+                            .make()
+                            .px8(),
+                      ],
+                    ).py2(),
+                    Row(
+                      children: [
+                        loanApprovedReqModal!
+                            .loanAppReqDatalist![i]
+                            .loanRaiseDate!
+                            .text
+                            .make()
+                            .px8(),
+                      ],
+                    ).py2(),
+                    Row(
+                      children: [
+                        "Remarks -".text.make().px8(),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              loanApprovedReqModal!
+                                  .loanAppReqDatalist![i]
+                                  .remark!
+                                  .text
+                                  .textStyle(context.captionStyle)
+                                  .make(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ).py2(),
+                    Row(
+                      children: [
+                        "Raised Amount -".text.make().px8(),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              loanApprovedReqModal!
+                                  .loanAppReqDatalist![i]
+                                  .loanAppAmt!
+                                  .text
+                                  .textStyle(context.captionStyle)
+                                  .make(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
     );
-
   }
 }
 
-
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -268,6 +275,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -280,12 +288,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -298,11 +305,8 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
 }
-

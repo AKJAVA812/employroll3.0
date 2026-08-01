@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../commanScreen/allAPIList.dart';
 import '../../../main.dart';
@@ -10,7 +11,8 @@ import '../newModalClasses/selfClaimRequisitionListModal.dart';
 
 class ClaimRequisitionPageTesting extends StatefulWidget {
   @override
-  _ClaimRequisitionPageTestingState createState() => _ClaimRequisitionPageTestingState();
+  _ClaimRequisitionPageTestingState createState() =>
+      _ClaimRequisitionPageTestingState();
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -19,7 +21,9 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 
-class _ClaimRequisitionPageTestingState extends State<ClaimRequisitionPageTesting> with RouteAware{
+class _ClaimRequisitionPageTestingState
+    extends State<ClaimRequisitionPageTesting>
+    with RouteAware {
   int currentTabIndex = 0; // Tracks the current selected tab
   late Future<ClaimRequisitionModal> futureData;
 
@@ -42,7 +46,7 @@ class _ClaimRequisitionPageTestingState extends State<ClaimRequisitionPageTestin
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
@@ -63,14 +67,14 @@ class _ClaimRequisitionPageTestingState extends State<ClaimRequisitionPageTestin
     String apiUrl = ApiDetails.selfClaimRequestListApi;
     var url = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
 
-    final response = await http.post(url);
+    final response = await MobileHttpClient.instance.post(url);
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       ClaimRequisitionModal claimRequisitionModal =
-      ClaimRequisitionModal.fromJson(data);
+          ClaimRequisitionModal.fromJson(data);
 
       // Filter data into separate lists
-     /* draftList = claimRequisitionModal.claimRequisitionDraftlist!;
+      /* draftList = claimRequisitionModal.claimRequisitionDraftlist!;
       pendingList = claimRequisitionModal.claimRequisitionPendinglist!;
       approvedList = claimRequisitionModal.claimRequisitionApprovedlist!;
       disapprovedList = claimRequisitionModal.claimRequisitionDisapprovelist!;*/
@@ -145,19 +149,34 @@ class _ClaimRequisitionPageTestingState extends State<ClaimRequisitionPageTestin
                     // Adjust icon based on the tab index
                     switch (tab) {
                       case 0:
-                        return Icon(Icons.edit, color: isActive ? Colors.blue : Colors.grey);
+                        return Icon(
+                          Icons.edit,
+                          color: isActive ? Colors.blue : Colors.grey,
+                        );
                       case 1:
-                        return Icon(Icons.pending, color: isActive ? Colors.blue : Colors.grey);
+                        return Icon(
+                          Icons.pending,
+                          color: isActive ? Colors.blue : Colors.grey,
+                        );
                       case 2:
-                        return Icon(Icons.check_circle, color: isActive ? Colors.blue : Colors.grey);
+                        return Icon(
+                          Icons.check_circle,
+                          color: isActive ? Colors.blue : Colors.grey,
+                        );
                       case 3:
-                        return Icon(Icons.cancel, color: isActive ? Colors.blue : Colors.grey);
+                        return Icon(
+                          Icons.cancel,
+                          color: isActive ? Colors.blue : Colors.grey,
+                        );
                       default:
-                        return Icon(Icons.help, color: isActive ? Colors.blue : Colors.grey);
+                        return Icon(
+                          Icons.help,
+                          color: isActive ? Colors.blue : Colors.grey,
+                        );
                     }
                   },
                   onChanged: (index) => setState(() => currentTabIndex = index),
-                )
+                ),
               ),
               Expanded(child: buildTabContent()),
             ],
@@ -167,4 +186,3 @@ class _ClaimRequisitionPageTestingState extends State<ClaimRequisitionPageTestin
     );
   }
 }
-

@@ -20,6 +20,7 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:badges/badges.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../leaveRequisition/leaveRequisitionPage.dart';
 import '../modalClass/selfLeaveRequisitionModal.dart';
@@ -28,10 +29,11 @@ class RequestedRequisitionList extends StatefulWidget {
   final SelfLeaveRequisitionListModal selfLeaveRequisitionListModal;
   const RequestedRequisitionList(this.selfLeaveRequisitionListModal);
 
-
   @override
-  State<RequestedRequisitionList> createState() => _RequestedRequisitionListState(selfLeaveRequisitionListModal);
+  State<RequestedRequisitionList> createState() =>
+      _RequestedRequisitionListState(selfLeaveRequisitionListModal);
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
@@ -40,7 +42,8 @@ String? sessionId;
 
 SelfLeaveRequisitionListModal? selfLeaveRequisitionLabel;
 
-class _RequestedRequisitionListState extends State<RequestedRequisitionList> with RouteAware{
+class _RequestedRequisitionListState extends State<RequestedRequisitionList>
+    with RouteAware {
   final SelfLeaveRequisitionListModal selfLeaveRequisitionListModal;
   _RequestedRequisitionListState(this.selfLeaveRequisitionListModal);
 
@@ -61,13 +64,13 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     getSharedPrfanceList();
@@ -77,15 +80,15 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
 
-    Future<SelfLeaveRequisitionListModal> getAppReq11 = getSelfLeaveReqList(sessionId!);
-    setState(() {
-
-    });
+    Future<SelfLeaveRequisitionListModal> getAppReq11 = getSelfLeaveReqList(
+      sessionId!,
+    );
+    setState(() {});
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
@@ -101,11 +104,10 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
     });
   }
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -122,23 +124,25 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             //Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
+
   bool _isLoading = true;
-  Future<SelfLeaveRequisitionListModal> getSelfLeaveReqList(String SessionId) async {
+  Future<SelfLeaveRequisitionListModal> getSelfLeaveReqList(
+    String SessionId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.requestedReqList;
     print('employeeList11: ${SessionId}');
@@ -147,19 +151,19 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
     });
     SelfLeaveRequisitionListModal approvedLeaveReqModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
     print('API ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse.length;
-    if (getData == 0 )  {
+    if (getData == 0) {
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     print('responseemployeeList $getData');
-    approvedLeaveReqModal=SelfLeaveRequisitionListModal.fromJson(mapResponse);
+    approvedLeaveReqModal = SelfLeaveRequisitionListModal.fromJson(mapResponse);
 
     setState(() {
       _isLoading = false;
@@ -191,32 +195,37 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
         mini: false,
         onPressed: () async {
           bool internetCheck = await InternetConnectionChecker().hasConnection;
-          if(internetCheck == false) {
+          if (internetCheck == false) {
             setState(() {
               AlertDialog(
                 content: "Please check your internet connection".text.make(),
               );
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Please check your Internet connection."),
-              ));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Please check your Internet connection."),
+                ),
+              );
             });
-
           } else {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => LeaveRequisitionPage(showShortcuts: false,)));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => LeaveRequisitionPage(showShortcuts: false),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
           }
         },
         backgroundColor: Mythemes.lightBluishColor,
-        child: Icon(Icons.add, color: Mythemes.whitish,),
+        child: Icon(Icons.add, color: Mythemes.whitish),
       ),
 
       body: Container(
         color: context.canvasColor,
-        child:
-            Column(
-              children: [
-              /*  Row(
+        child: Column(
+          children: [
+            /*  Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -274,63 +283,79 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                     )
                   ],
                 ).py(4),*/
-              /*  Expanded(
+            /*  Expanded(
                   child: selfLeaveRequisitionLabel == null ?
                 Center(
                     child: CircularProgressIndicator()):
                 getSelfReqRequisitionList(selfLeaveRequisitionLabel!) ,
                 )*/
-
-                Expanded(
-                  child: _isLoading
+            Expanded(
+              child:
+                  _isLoading
                       ? Center(child: CircularProgressIndicator())
-                      : (selfLeaveRequisitionLabel == null || selfLeaveRequisitionLabel!.data == null)
-                      ? Center(child: Text('Click on + icon to raise the leave request.'))
+                      : (selfLeaveRequisitionLabel == null ||
+                          selfLeaveRequisitionLabel!.data == null)
+                      ? Center(
+                        child: Text(
+                          'Click on + icon to raise the leave request.',
+                        ),
+                      )
                       : getSelfReqRequisitionList(selfLeaveRequisitionLabel!),
-                ),
-
-              ],
             ),
-
+          ],
+        ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GetAttendanceDet(showAppBar: true),
+              ),
+            );
             print('My All Requests');
           }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyAllReportsPage(showAppBar: true),
+              ),
+            );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
+          if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-           /* Navigator.push(context,
+            /* Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
@@ -342,10 +367,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -369,17 +391,21 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
     );
   }
 
-  getSelfReqRequisitionList(SelfLeaveRequisitionListModal selfLeaveRequisitionListModal){
+  getSelfReqRequisitionList(
+    SelfLeaveRequisitionListModal selfLeaveRequisitionListModal,
+  ) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  RequestedRequisitionList(SelfLeaveRequisitionListModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) =>
+                    RequestedRequisitionList(SelfLeaveRequisitionListModal()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -422,12 +448,18 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
             },
             child: Card(
               elevation: 4,
-              margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
+              margin: const EdgeInsets.symmetric(
+                vertical: 6.0,
+                horizontal: 4.0,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 12.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -436,35 +468,35 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: leaveData.empName
-                              .toString()
-                              .text
-                              .bold
-                              .lg
-                              .make(),
+                          child:
+                              leaveData.empName.toString().text.bold.lg.make(),
                         ),
                         Row(
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: statusCheck == 'APPROVED'
-                                    ? Colors.green.withOpacity(0.15)
-                                    : statusCheck.contains('PENDING')
-                                    ? Colors.orange.withOpacity(0.15)
-                                    : Colors.red.withOpacity(0.15),
+                                color:
+                                    statusCheck == 'APPROVED'
+                                        ? Colors.green.withOpacity(0.15)
+                                        : statusCheck.contains('PENDING')
+                                        ? Colors.orange.withOpacity(0.15)
+                                        : Colors.red.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 statusCheck,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: statusCheck == 'APPROVED'
-                                      ? Colors.green
-                                      : statusCheck.contains('PENDING')
-                                      ? Colors.orange
-                                      : Colors.red,
+                                  color:
+                                      statusCheck == 'APPROVED'
+                                          ? Colors.green
+                                          : statusCheck.contains('PENDING')
+                                          ? Colors.orange
+                                          : Colors.red,
                                   fontSize: 13,
                                 ),
                               ),
@@ -482,11 +514,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                         Row(
                           children: [
                             const SizedBox(width: 6),
-                            leaveData.leavetype
-                                .toString()
-                                .text
-                                .semiBold
-                                .make(),
+                            leaveData.leavetype.toString().text.semiBold.make(),
                           ],
                         ),
                         leaveData.leaveLength
@@ -505,21 +533,30 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: _buildInfoColumn("Start Date", leaveData.startDate.toString()),
+                          child: _buildInfoColumn(
+                            "Start Date",
+                            leaveData.startDate.toString(),
+                          ),
                         ),
                         Expanded(
-                          child: _buildInfoColumn("End Date", leaveData.endDate.toString()),
+                          child: _buildInfoColumn(
+                            "End Date",
+                            leaveData.endDate.toString(),
+                          ),
                         ),
                         Expanded(
-                          child: _buildInfoColumn("Leave Count", leaveData.noOfDay.toString()),
+                          child: _buildInfoColumn(
+                            "Leave Count",
+                            leaveData.noOfDay.toString(),
+                          ),
                         ),
+
                         /*Expanded(
                           child: _buildInfoColumn("In Time", leaveData.startTime.toString()),
                         ),
                         Expanded(
                           child: _buildInfoColumn("Out Time", leaveData.endTime.toString()),
                         ),*/
-
                       ],
                     ),
 
@@ -539,54 +576,48 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        title.text
-            .color(Colors.grey[600]!)
-            .size(12)
-            .make(),
-        value.text
-            .bold.center
-            .color(Colors.black)
-            .make(),
+        title.text.color(Colors.grey[600]!).size(12).make(),
+        value.text.bold.center.color(Colors.black).make(),
       ],
     ).pSymmetric(h: 6);
   }
 
-  showDialgCancel(BuildContext buildContext, result,alert) {
+  showDialgCancel(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Expanded(child: Text( "Cancel Requisition", style: TextStyle(
-              fontSize: 20
-          ),)),
+          Expanded(
+            child: Text("Cancel Requisition", style: TextStyle(fontSize: 20)),
+          ),
         ],
       ),
-      content: Text("Sure you want to cancel requisition?" , style: TextStyle(
-          fontSize: 14
-      )),
+      content: Text(
+        "Sure you want to cancel requisition?",
+        style: TextStyle(fontSize: 14),
+      ),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
         TextButton(
-            onPressed: () {
-              Navigator.of(buildContext, rootNavigator: true).pop();
-              Navigator.of(buildContext).pop();
-            },
-            child: Container(
-              // color: Mythemes.lightBluishColor,
-              child: Text("No", style: TextStyle(color: Mythemes.dangerColor),),
-            )
+          onPressed: () {
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            Navigator.of(buildContext).pop();
+          },
+          child: Container(
+            // color: Mythemes.lightBluishColor,
+            child: Text("No", style: TextStyle(color: Mythemes.dangerColor)),
+          ),
         ),
         TextButton(
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop();
-              //getSelfLeaveReqList(sessionId!);
-              /*Navigator.pushReplacement(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+            //getSelfLeaveReqList(sessionId!);
+            /*Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
                     pageBuilder: (a, b, c) =>
@@ -594,25 +625,25 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                     transitionDuration: Duration(seconds: 1),
                     maintainState: true,
                   ));*/
-              cancelReqRequisitionList(leaveId.toString());
-              getSharedPrfanceList();
-            },
-            child: Container(
-              child: Text("Yes", style: TextStyle(color: Mythemes.warningColor),),
-            )
+            cancelReqRequisitionList(leaveId.toString());
+            getSharedPrfanceList();
+          },
+          child: Container(
+            child: Text("Yes", style: TextStyle(color: Mythemes.warningColor)),
+          ),
         ),
-
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
- /* void showDialgCancel(BuildContext buildContext, result) {
+  /* void showDialgCancel(BuildContext buildContext, result) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10.0),
@@ -627,8 +658,8 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
       ),
       content: Builder(
         builder: (context) {
-          *//* var height = MediaQuery.of(context).size.height;
-          var width = MediaQuery.of(context).size.width;*//*
+          */ /* var height = MediaQuery.of(context).size.height;
+          var width = MediaQuery.of(context).size.width;*/ /*
           return Container(
             height:  15,
             width:  20,
@@ -688,10 +719,12 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.cancelReqRequisition;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "leaveId=$leaveId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "leaveId=$leaveId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -707,23 +740,19 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
       print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(
-              context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
         } else if (result.compareToIgnoringCase("error") == 0) {
-          showDialgSucess1(
-              context, reason.upperCamelCase, " Error ");
+          showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
-        }
-
+      }
     }
   }
 
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -737,7 +766,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
       actions: [
         TextButton(
           onPressed: () {
-
             /*Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
@@ -746,7 +774,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
                   transitionDuration: Duration(seconds: 1),
                   maintainState: true,
                 ));*/
-            if(mounted) {
+            if (mounted) {
               Navigator.of(context, rootNavigator: true).pop();
               getSharedPrfanceList();
             }
@@ -757,10 +785,10 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList> wit
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 }
-

@@ -2,11 +2,19 @@
 class ApiDetails{
    //Base Server Address
    //static var server="http://www.employroll.com/";
-   static var server="http://mobile.employroll.com/";
+   //static var server="http://mobile.employroll.com/";
+   //static var server="https://ermobile.employroll.com";
 
-   //static var server="https://elma-unrestrainable-leda.ngrok-free.dev/";
+   static var server="https://fang-sizing-enrage.ngrok-free.dev";
    //Attendance Punch in and Punch out
-   static String login="restful/service/login";
+   //static String login="restful/service/login";
+
+   static String login="/ermobile/api/auth/login";
+   static String sessionIdAuth="/ermobile/api/auth/session";
+   static String refreshTokenId="/ermobile/api/auth/refresh";
+   static String bootStrap="/ermobile/api/mobile/bootstrap";
+   static String bootStrapVersion="/ermobile/api/mobile/bootstrap/version";
+
    static String punchIn="restful/service/attendance/via/mobile";
    static var getAttendance = "restful/service/current/month/log/list/for/mobile/requisation";
    static var getOtherAttendance = "restful/service/current/month/log/list/for/mobile/requisation";
@@ -114,7 +122,7 @@ class ApiDetails{
    static var documentListApi = "restful/service/get/org/Doc/type/master/list";
    static var documentDetApi = "restful/service/org/get/employee/on/filter/base/document/list";
 
-   static var logoutAPi = "restful/service/employee/logout";
+   static var logoutAPi = "/ermobile/api/auth/logout";
 
    static var tourRequisitionApi = "/restful/service/requisition/tour";
    //HR_IS Update API

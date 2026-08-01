@@ -1,18 +1,93 @@
 class LoginModel {
+  String? status;
+  String? message;
+  String? accessToken;
+  String? tokenType;
+  String? userId;
+  String? permissionsVersion;
+  String? profileVersion;
   Data? data;
+  MobileUser? user;
+  MobileSession? session;
+  EssPermissions? essPermissions;
+  MssInfo? mss;
+  List<ProfileList> profiles = [];
+  List<String> permissions = [];
 
-  LoginModel({this.data});
+  LoginModel({
+    this.status,
+    this.message,
+    this.accessToken,
+    this.tokenType,
+    this.userId,
+    this.permissionsVersion,
+    this.profileVersion,
+    this.data,
+    this.user,
+    this.session,
+    this.essPermissions,
+    this.mss,
+    List<ProfileList>? profiles,
+    List<String>? permissions,
+  }) : profiles = profiles ?? [],
+       permissions = permissions ?? [];
 
   LoginModel.fromJson(Map<String, dynamic> json) {
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    status = json['status']?.toString();
+    message = json['message']?.toString();
+    accessToken = json['accessToken']?.toString();
+    tokenType = json['tokenType']?.toString() ?? 'Bearer';
+    userId = json['userId']?.toString();
+    permissionsVersion = json['permissionsVersion']?.toString();
+    profileVersion = json['profileVersion']?.toString();
+    permissions = _stringList(json['permissions']);
+    profiles = _profileList(json['profiles']);
+    user =
+        json['user'] is Map<String, dynamic>
+            ? MobileUser.fromJson(json['user'])
+            : null;
+    session =
+        json['session'] is Map<String, dynamic>
+            ? MobileSession.fromJson(json['session'])
+            : null;
+    essPermissions =
+        json['essPermissions'] is Map<String, dynamic>
+            ? EssPermissions.fromJson(json['essPermissions'])
+            : null;
+    mss =
+        json['mss'] is Map<String, dynamic>
+            ? MssInfo.fromJson(json['mss'])
+            : null;
+
+    if (json['data'] is Map<String, dynamic>) {
+      data = Data.fromJson(json['data']);
+    } else {
+      data = Data.fromMobileJson(json);
+    }
   }
 
+  bool get isSuccess =>
+      (status ?? data?.result ?? '').toUpperCase() == 'SUCCESS' ||
+      data?.result?.toLowerCase() == 'success';
+
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.data != null) {
-      data['data'] = this.data!.toJson();
-    }
-    return data;
+    final Map<String, dynamic> json = <String, dynamic>{};
+    json['status'] = status;
+    json['message'] = message;
+    json['accessToken'] = accessToken;
+    json['tokenType'] = tokenType;
+    json['userId'] = userId;
+    json['permissionsVersion'] = permissionsVersion;
+    json['profileVersion'] = profileVersion;
+    json['permissions'] = permissions;
+    json['profiles'] = profiles.map((v) => v.toJson()).toList();
+    if (user != null) json['user'] = user!.toJson();
+    if (session != null) json['session'] = session!.toJson();
+    if (essPermissions != null)
+      json['essPermissions'] = essPermissions!.toJson();
+    if (mss != null) json['mss'] = mss!.toJson();
+    if (data != null) json['data'] = data!.toJson();
+    return json;
   }
 }
 
@@ -21,7 +96,6 @@ class Data {
   String? odReq;
   String? compOff;
   var bankName;
-  /*List<String>? userPermissions;*/
   var bankAccNo;
   String? branch;
   int? orgId;
@@ -44,7 +118,6 @@ class Data {
   String? sessionId;
   var aadharNo;
   String? helpdesk;
-  /*List<String>? userRoles;*/
   String? empCode;
   String? dob;
   var esicNo;
@@ -57,220 +130,426 @@ class Data {
   String? endDate;
   String? raisedDate;
   String? approvedDate;
+  String? accessToken;
+  String? tokenType;
+  String? permissionsVersion;
+  String? profileVersion;
 
-  Data(
-      {this.empId,
-        this.odReq,
-        this.compOff,
-        this.bankName,
-       /* this.userPermissions,*/
-        this.bankAccNo,
-        this.branch,
-        this.orgId,
-        this.result,
-        this.userImage,
-        this.expired,
-        this.latestVersionCode,
-        this.contact,
-        this.roRole,
-        this.department,
-        this.userPanel,
-        this.ifscCode,
-        this.adminrole,
-        this.branchId,
-        this.orgName,
-        this.pfNo,
-        this.userLoginned,
-        this.mobAction,
-        this.sessionId,
-        this.aadharNo,
-        this.helpdesk,
-        /*this.userRoles,*/
-        this.empCode,
-        this.dob,
-        this.esicNo,
-        this.empRole,
-        this.designation,
-        this.needUpdation,
-        this.doj,
-        this.enrollId,
-        this.startDate,
-        this.endDate,
-        this.raisedDate,
-        this.approvedDate,
-      });
+  Data({
+    this.empId,
+    this.odReq,
+    this.compOff,
+    this.bankName,
+    this.bankAccNo,
+    this.branch,
+    this.orgId,
+    this.result,
+    this.userImage,
+    this.expired,
+    this.latestVersionCode,
+    this.contact,
+    this.roRole,
+    this.department,
+    this.userPanel,
+    this.ifscCode,
+    this.adminrole,
+    this.branchId,
+    this.orgName,
+    this.pfNo,
+    this.userLoginned,
+    this.mobAction,
+    this.profileList,
+    this.sessionId,
+    this.aadharNo,
+    this.helpdesk,
+    this.empCode,
+    this.dob,
+    this.esicNo,
+    this.empRole,
+    this.designation,
+    this.needUpdation,
+    this.doj,
+    this.enrollId,
+    this.startDate,
+    this.endDate,
+    this.raisedDate,
+    this.approvedDate,
+    this.accessToken,
+    this.tokenType,
+    this.permissionsVersion,
+    this.profileVersion,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
-    empId = json['empId'];
-    odReq = json['odReq'];
-    compOff = json['compOff'];
+    empId = _intValue(json['empId']);
+    odReq = json['odReq']?.toString();
+    compOff = json['compOff']?.toString();
     bankName = json['bankName'];
-   /* userPermissions = json['userPermissions'].cast<String>();*/
     bankAccNo = json['bankAccNo'];
-    branch = json['branch'];
-    orgId = json['orgId'];
-    result = json['result'];
-    userImage = json['userImage'];
-    expired = json['expired'];
-    latestVersionCode = json['latest_version_code'];
-    contact = json['contact'];
-    roRole = json['roRole'].cast<String>();
-    department = json['department'];
-    userPanel = json['userPanel'];
+    branch = json['branch']?.toString();
+    orgId = _intValue(json['orgId']);
+    result = json['result']?.toString();
+    userImage = json['userImage']?.toString();
+    expired = _boolValue(json['expired']) ?? false;
+    latestVersionCode = json['latest_version_code']?.toString();
+    contact = json['contact']?.toString();
+    roRole = _stringList(json['roRole']);
+    department = json['department']?.toString();
+    userPanel = json['userPanel']?.toString();
     ifscCode = json['ifscCode'];
-    adminrole = json['adminrole'].cast<String>();
-    branchId = json['branchId'];
-    orgName = json['orgName'];
+    adminrole = _stringList(json['adminrole']);
+    branchId = _intValue(json['branchId']);
+    orgName = json['orgName']?.toString();
     pfNo = json['pfNo'];
-    userLoginned = json['userLoginned'] != null
-        ? new UserLoginned.fromJson(json['userLoginned'])
-        : null;
-    if (json['mobAction'] != null) {
-      mobAction = <MobAction>[];
-      json['mobAction'].forEach((v) {
-        mobAction!.add(new MobAction.fromJson(v));
-      });
-    }
-    if (json['profileList'] != null) {
-      profileList = <ProfileList>[];
-      json['profileList'].forEach((v) {
-        profileList!.add(new ProfileList.fromJson(v));
-      });
-    }
-    sessionId = json['sessionId'];
+    userLoginned =
+        json['userLoginned'] is Map<String, dynamic>
+            ? UserLoginned.fromJson(json['userLoginned'])
+            : UserLoginned();
+    mobAction = _mobActionList(json['mobAction']);
+    profileList = _profileList(json['profileList']);
+    sessionId = json['sessionId']?.toString();
     aadharNo = json['aadharNo'];
-    helpdesk = json['helpdesk'];
-   /* userRoles = json['userRoles'].cast<String>();*/
-    empCode = json['empCode'];
-    dob = json['dob'];
+    helpdesk = json['helpdesk']?.toString();
+    empCode = json['empCode']?.toString();
+    dob = json['dob']?.toString();
     esicNo = json['esicNo'];
-    empRole = json['empRole'].cast<String>();
-    designation = json['designation'];
-    needUpdation = json['need_updation'];
-    doj = json['doj'];
-    enrollId = json['enrollId'];
-    startDate = json['startDate'];
-    endDate = json['endDate'];
-    raisedDate = json['raisedDeadlineDate'];
-    approvedDate = json['approvelDeadlineDate'];
+    empRole = _stringList(json['empRole']);
+    designation = json['designation']?.toString();
+    needUpdation = _intValue(json['need_updation']) ?? 0;
+    doj = json['doj']?.toString();
+    enrollId = json['enrollId']?.toString();
+    startDate = json['startDate']?.toString();
+    endDate = json['endDate']?.toString();
+    raisedDate = json['raisedDeadlineDate']?.toString();
+    approvedDate = json['approvelDeadlineDate']?.toString();
+    accessToken = json['accessToken']?.toString();
+    tokenType = json['tokenType']?.toString();
+    permissionsVersion = json['permissionsVersion']?.toString();
+    profileVersion = json['profileVersion']?.toString();
+  }
+
+  factory Data.fromMobileJson(Map<String, dynamic> json) {
+    final userJson =
+        json['user'] is Map<String, dynamic>
+            ? json['user'] as Map<String, dynamic>
+            : <String, dynamic>{};
+    final sessionJson =
+        json['session'] is Map<String, dynamic>
+            ? json['session'] as Map<String, dynamic>
+            : <String, dynamic>{};
+    final essJson =
+        json['essPermissions'] is Map<String, dynamic>
+            ? json['essPermissions'] as Map<String, dynamic>
+            : <String, dynamic>{};
+    final permissions = _stringList(json['permissions']);
+    final essPermissionIds = _stringList(essJson['securityGroupIds']);
+    final profileList = _profileList(json['profiles']);
+
+    return Data(
+      empId: _intValue(userJson['employeeId']) ?? 0,
+      orgId: _intValue(userJson['orgId']),
+      orgName: userJson['orgName']?.toString() ?? '',
+      result:
+          (json['status']?.toString().toUpperCase() == 'SUCCESS')
+              ? 'success'
+              : json['status']?.toString(),
+      userImage: userJson['image']?.toString() ?? '',
+      expired: false,
+      roRole: profileList.isNotEmpty ? <String>['MSS'] : <String>[],
+      adminrole:
+          permissions.any((p) => p.toUpperCase().contains('ADMIN'))
+              ? <String>['ADMIN']
+              : <String>[],
+      userPanel: profileList.isNotEmpty ? 'MSS' : 'COMPANY_EMPLOYEE',
+      userLoginned: UserLoginned(
+        name: userJson['name']?.toString(),
+        userId: json['userId']?.toString(),
+        status: 'ACTIVE',
+        userType: 'COMPANY_EMPLOYEE',
+        loggedIn: true,
+        showPayroll:
+            essPermissionIds.contains('ESS_PAYSLIP') ||
+            essPermissionIds.contains('ESS_PAYSLIP_VIEW'),
+        companySetup: true,
+      ),
+      mobAction: <MobAction>[],
+      bankName: '',
+      bankAccNo: '',
+      branch: '',
+      contact: '',
+      department: '',
+      ifscCode: '',
+      pfNo: '',
+      aadharNo: '',
+      dob: '',
+      esicNo: '',
+      designation: '',
+      doj: '',
+      enrollId: '',
+      startDate: '0',
+      endDate: '0',
+      raisedDate: '',
+      approvedDate: '',
+      profileList: profileList,
+      sessionId: sessionJson['sessionId']?.toString(),
+      empCode: userJson['employeeId']?.toString() ?? '',
+      empRole:
+          permissions.contains('COMPANY_EMPLOYEE') ||
+                  essPermissionIds.isNotEmpty
+              ? <String>['COMPANY_EMPLOYEE']
+              : <String>[],
+      needUpdation: 0,
+      accessToken: json['accessToken']?.toString(),
+      tokenType: json['tokenType']?.toString() ?? 'Bearer',
+      permissionsVersion: json['permissionsVersion']?.toString(),
+      profileVersion: json['profileVersion']?.toString(),
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['odReq'] = this.odReq;
-    data['compOff'] = this.compOff;
-    data['bankName'] = this.bankName;
-   /* data['userPermissions'] = this.userPermissions;*/
-    data['bankAccNo'] = this.bankAccNo;
-    data['branch'] = this.branch;
-    data['orgId'] = this.orgId;
-    data['result'] = this.result;
-    data['userImage'] = this.userImage;
-    data['expired'] = this.expired;
-    data['latest_version_code'] = this.latestVersionCode;
-    data['contact'] = this.contact;
-    data['roRole'] = this.roRole;
-    data['department'] = this.department;
-    data['userPanel'] = this.userPanel;
-    data['ifscCode'] = this.ifscCode;
-    data['adminrole'] = this.adminrole;
-    data['branchId'] = this.branchId;
-    data['orgName'] = this.orgName;
-    data['pfNo'] = this.pfNo;
-    if (this.userLoginned != null) {
-      data['userLoginned'] = this.userLoginned!.toJson();
-    }
-    if (this.mobAction != null) {
-      data['mobAction'] = this.mobAction!.map((v) => v.toJson()).toList();
-    }
-    data['sessionId'] = this.sessionId;
-    data['aadharNo'] = this.aadharNo;
-    data['helpdesk'] = this.helpdesk;
-   /* data['userRoles'] = this.userRoles;*/
-    data['empCode'] = this.empCode;
-    data['dob'] = this.dob;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['odReq'] = odReq;
+    data['compOff'] = compOff;
+    data['bankName'] = bankName;
+    data['bankAccNo'] = bankAccNo;
+    data['branch'] = branch;
+    data['orgId'] = orgId;
+    data['result'] = result;
+    data['userImage'] = userImage;
+    data['expired'] = expired;
+    data['latest_version_code'] = latestVersionCode;
+    data['contact'] = contact;
+    data['roRole'] = roRole ?? <String>[];
+    data['department'] = department;
+    data['userPanel'] = userPanel;
+    data['ifscCode'] = ifscCode;
+    data['adminrole'] = adminrole ?? <String>[];
+    data['branchId'] = branchId;
+    data['orgName'] = orgName;
+    data['pfNo'] = pfNo;
+    if (userLoginned != null) data['userLoginned'] = userLoginned!.toJson();
+    data['mobAction'] =
+        (mobAction ?? <MobAction>[]).map((v) => v.toJson()).toList();
+    data['profileList'] =
+        (profileList ?? <ProfileList>[]).map((v) => v.toJson()).toList();
+    data['sessionId'] = sessionId;
+    data['aadharNo'] = aadharNo;
+    data['helpdesk'] = helpdesk;
+    data['empCode'] = empCode;
+    data['dob'] = dob;
     data['esicNo'] = esicNo;
-    data['empRole'] = empRole;
+    data['empRole'] = empRole ?? <String>[];
     data['designation'] = designation;
     data['need_updation'] = needUpdation;
     data['doj'] = doj;
     data['enrollId'] = enrollId;
     data['startDate'] = startDate;
     data['endDate'] = endDate;
-    data['raisedDeadlineDate']=raisedDate;
-    data['approvelDeadlineDate']=approvedDate;
+    data['raisedDeadlineDate'] = raisedDate;
+    data['approvelDeadlineDate'] = approvedDate;
+    data['accessToken'] = accessToken;
+    data['tokenType'] = tokenType;
+    data['permissionsVersion'] = permissionsVersion;
+    data['profileVersion'] = profileVersion;
     return data;
   }
 }
 
+class MobileUser {
+  String? name;
+  String? employeeId;
+  int? orgId;
+  String? orgName;
+  String? image;
+  String? isOld;
+  String? suspend;
+
+  MobileUser({
+    this.name,
+    this.employeeId,
+    this.orgId,
+    this.orgName,
+    this.image,
+    this.isOld,
+    this.suspend,
+  });
+
+  MobileUser.fromJson(Map<String, dynamic> json) {
+    name = json['name']?.toString();
+    employeeId = json['employeeId']?.toString();
+    orgId = _intValue(json['orgId']);
+    orgName = json['orgName']?.toString();
+    image = json['image']?.toString();
+    isOld = json['isOld']?.toString();
+    suspend = json['suspend']?.toString();
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'name': name,
+    'employeeId': employeeId,
+    'orgId': orgId,
+    'orgName': orgName,
+    'image': image,
+    'isOld': isOld,
+    'suspend': suspend,
+  };
+}
+
+class MobileSession {
+  String? sessionId;
+  String? status;
+  String? userId;
+  int? employeeId;
+  int? orgId;
+  String? createdAt;
+  String? lastSeenAt;
+  String? expiresAt;
+
+  MobileSession({
+    this.sessionId,
+    this.status,
+    this.userId,
+    this.employeeId,
+    this.orgId,
+    this.createdAt,
+    this.lastSeenAt,
+    this.expiresAt,
+  });
+
+  MobileSession.fromJson(Map<String, dynamic> json) {
+    sessionId = json['sessionId']?.toString();
+    status = json['status']?.toString();
+    userId = json['userId']?.toString();
+    employeeId = _intValue(json['employeeId']);
+    orgId = _intValue(json['orgId']);
+    createdAt = json['createdAt']?.toString();
+    lastSeenAt = json['lastSeenAt']?.toString();
+    expiresAt = json['expiresAt']?.toString();
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'sessionId': sessionId,
+    'status': status,
+    'userId': userId,
+    'employeeId': employeeId,
+    'orgId': orgId,
+    'createdAt': createdAt,
+    'lastSeenAt': lastSeenAt,
+    'expiresAt': expiresAt,
+  };
+}
+
+class EssPermissions {
+  int? total;
+  List<String> securityGroupIds = [];
+
+  EssPermissions({this.total, List<String>? securityGroupIds})
+    : securityGroupIds = securityGroupIds ?? [];
+
+  EssPermissions.fromJson(Map<String, dynamic> json) {
+    total = _intValue(json['total']);
+    securityGroupIds = _stringList(json['securityGroupIds']);
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'total': total,
+    'securityGroupIds': securityGroupIds,
+  };
+}
+
+class MssInfo {
+  bool enabled = false;
+  List<ProfileList> profiles = [];
+  List<String> permissions = [];
+
+  MssInfo({
+    this.enabled = false,
+    List<ProfileList>? profiles,
+    List<String>? permissions,
+  }) : profiles = profiles ?? [],
+       permissions = permissions ?? [];
+
+  MssInfo.fromJson(Map<String, dynamic> json) {
+    enabled = _boolValue(json['enabled']) ?? false;
+    profiles = _profileList(json['profiles']);
+    permissions = _stringList(json['permissions']);
+    profiles = _profileList(json['profiles']);
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'enabled': enabled,
+    'profiles': profiles.map((v) => v.toJson()).toList(),
+    'permissions': permissions,
+  };
+}
+
 class UserLoginned {
   String? name;
-  Null password;
+  dynamic password;
   String? userId;
   String? status;
   String? userType;
-  Null salt;
-  Null otp;
+  dynamic salt;
+  dynamic otp;
   bool? accountSuspended;
-  Null userProfileImage;
-  Null otpExpiryDateTime;
+  dynamic userProfileImage;
+  dynamic otpExpiryDateTime;
   String? firstLoginDate;
   bool? loggedIn;
   bool? showPayroll;
   bool? companySetup;
 
-  UserLoginned(
-      {this.name,
-        this.password,
-        this.userId,
-        this.status,
-        this.userType,
-        this.salt,
-        this.otp,
-        this.accountSuspended,
-        this.userProfileImage,
-        this.otpExpiryDateTime,
-        this.firstLoginDate,
-        this.loggedIn,
-        this.showPayroll,
-        this.companySetup});
+  UserLoginned({
+    this.name,
+    this.password,
+    this.userId,
+    this.status,
+    this.userType,
+    this.salt,
+    this.otp,
+    this.accountSuspended,
+    this.userProfileImage,
+    this.otpExpiryDateTime,
+    this.firstLoginDate,
+    this.loggedIn,
+    this.showPayroll,
+    this.companySetup,
+  });
 
   UserLoginned.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
+    name = json['name']?.toString();
     password = json['password'];
-    userId = json['userId'];
-    status = json['status'];
-    userType = json['userType'];
+    userId = json['userId']?.toString();
+    status = json['status']?.toString();
+    userType = json['userType']?.toString();
     salt = json['salt'];
     otp = json['otp'];
-    accountSuspended = json['accountSuspended'];
+    accountSuspended = _boolValue(json['accountSuspended']);
     userProfileImage = json['userProfileImage'];
     otpExpiryDateTime = json['otpExpiryDateTime'];
-    firstLoginDate = json['firstLoginDate'];
-    loggedIn = json['loggedIn'];
-    showPayroll = json['showPayroll'];
-    companySetup = json['companySetup'];
+    firstLoginDate = json['firstLoginDate']?.toString();
+    loggedIn = _boolValue(json['loggedIn']);
+    showPayroll = _boolValue(json['showPayroll']);
+    companySetup = _boolValue(json['companySetup']);
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['password'] = this.password;
-    data['userId'] = this.userId;
-    data['status'] = this.status;
-    data['userType'] = this.userType;
-    data['salt'] = this.salt;
-    data['otp'] = this.otp;
-    data['accountSuspended'] = this.accountSuspended;
-    data['userProfileImage'] = this.userProfileImage;
-    data['otpExpiryDateTime'] = this.otpExpiryDateTime;
-    data['firstLoginDate'] = this.firstLoginDate;
-    data['loggedIn'] = this.loggedIn;
-    data['showPayroll'] = this.showPayroll;
-    data['companySetup'] = this.companySetup;
-    return data;
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'name': name,
+    'password': password,
+    'userId': userId,
+    'status': status,
+    'userType': userType,
+    'salt': salt,
+    'otp': otp,
+    'accountSuspended': accountSuspended,
+    'userProfileImage': userProfileImage,
+    'otpExpiryDateTime': otpExpiryDateTime,
+    'firstLoginDate': firstLoginDate,
+    'loggedIn': loggedIn,
+    'showPayroll': showPayroll,
+    'companySetup': companySetup,
+  };
 }
 
 class MobAction {
@@ -280,25 +559,29 @@ class MobAction {
   String? attAction;
   String? time;
 
-  MobAction({this.distance, this.geofenceActive, this.mobAction, this.attAction, this.time});
+  MobAction({
+    this.distance,
+    this.geofenceActive,
+    this.mobAction,
+    this.attAction,
+    this.time,
+  });
 
   MobAction.fromJson(Map<String, dynamic> json) {
-    distance = json['distance'];
+    distance = json['distance']?.toString();
     geofenceActive = json['geofenceActive'];
-    mobAction = json['mobAction'];
-    attAction = json['attAction'];
-    time = json['time'];
+    mobAction = json['mobAction']?.toString();
+    attAction = json['attAction']?.toString();
+    time = json['time']?.toString();
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['distance'] = this.distance;
-    data['geofenceActive'] = this.geofenceActive;
-    data['mobAction'] = this.mobAction;
-    data['attAction'] = this.attAction;
-    data['time'] = this.time;
-    return data;
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'distance': distance,
+    'geofenceActive': geofenceActive,
+    'mobAction': mobAction,
+    'attAction': attAction,
+    'time': time,
+  };
 }
 
 class ProfileList {
@@ -312,32 +595,84 @@ class ProfileList {
   dynamic isDefaultProfile;
   dynamic userId;
 
-  ProfileList({this.profileName, this.roMapId, this.defaultProfile, this.profilePermission, this.profileId, this.profileCode, this.mappedID, this.isDefaultProfile, this.userId});
+  ProfileList({
+    this.profileName,
+    this.roMapId,
+    this.defaultProfile,
+    this.profilePermission,
+    this.profileId,
+    this.profileCode,
+    this.mappedID,
+    this.isDefaultProfile,
+    this.userId,
+  });
 
   ProfileList.fromJson(Map<String, dynamic> json) {
-    profileName = json['profileName'];
+    profileName = json['profileName'] ?? json['displayName'];
     roMapId = json['roMapId'];
     defaultProfile = json['defaultProfile'];
-    profilePermission = json['profilePermission'] != null
-        ? List<String>.from(json['profilePermission'])
-        : [];
+    profilePermission = _stringList(
+      json['profilePermission'] ?? json['permissions'],
+    );
     profileId = json['profileId'];
     profileCode = json['profileCode'];
-    mappedID = json['mappedID'];
-    isDefaultProfile = json['isDefaultProfile'];
+    mappedID = json['mappedID'] ?? json['mappingId'];
+    isDefaultProfile = json['isDefaultProfile'] ?? json['mapped'];
     userId = json['userId'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['profileName'] = this.profileName;
-    data['defaultProfile'] = this.defaultProfile;
-    data['profilePermission'] = this.profilePermission;
-    data['profileId'] = this.profileId;
-    data['profileCode'] = this.profileCode;
-    data['mappedID'] = this.mappedID;
-    data['isDefaultProfile'] = this.isDefaultProfile;
-    data['userId'] = this.userId;
-    return data;
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'profileName': profileName,
+    'roMapId': roMapId,
+    'defaultProfile': defaultProfile,
+    'profilePermission': profilePermission ?? <String>[],
+    'profileId': profileId,
+    'profileCode': profileCode,
+    'mappedID': mappedID,
+    'isDefaultProfile': isDefaultProfile,
+    'userId': userId,
+  };
+}
+
+List<String> _stringList(dynamic value) {
+  if (value == null) return <String>[];
+  if (value is List)
+    return value
+        .where((item) => item != null)
+        .map((item) => item.toString())
+        .toList();
+  return <String>[value.toString()];
+}
+
+List<MobAction> _mobActionList(dynamic value) {
+  if (value is! List) return <MobAction>[];
+  return value
+      .whereType<Map<String, dynamic>>()
+      .map(MobAction.fromJson)
+      .toList();
+}
+
+List<ProfileList> _profileList(dynamic value) {
+  if (value is! List) return <ProfileList>[];
+  return value
+      .whereType<Map<String, dynamic>>()
+      .map(ProfileList.fromJson)
+      .toList();
+}
+
+int? _intValue(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  return int.tryParse(value.toString());
+}
+
+bool? _boolValue(dynamic value) {
+  if (value == null) return null;
+  if (value is bool) return value;
+  final normalized = value.toString().toLowerCase();
+  if (normalized == 'true' || normalized == '1' || normalized == 'yes')
+    return true;
+  if (normalized == 'false' || normalized == '0' || normalized == 'no')
+    return false;
+  return null;
 }

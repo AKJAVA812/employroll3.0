@@ -28,6 +28,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import 'dart:developer' as developer;
@@ -52,11 +53,19 @@ class EssAdminDashboardHead extends StatefulWidget {
   EssAdminDashboardHead(this.dashboardModel1N);
 
   @override
-  State<EssAdminDashboardHead> createState() => _EssAdminDashboardHeadState(dashboardModel1N);
+  State<EssAdminDashboardHead> createState() =>
+      _EssAdminDashboardHeadState(dashboardModel1N);
 }
+
 final DateTime _today = DateTime.now();
-final DateTime _minDateAllowed = DateTime(_today.year, _today.month - 2); // 2 months before
-final DateTime _maxDateAllowed = DateTime(_today.year, _today.month + 1); // 1 month ahead
+final DateTime _minDateAllowed = DateTime(
+  _today.year,
+  _today.month - 2,
+); // 2 months before
+final DateTime _maxDateAllowed = DateTime(
+  _today.year,
+  _today.month + 1,
+); // 1 month ahead
 
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
@@ -86,11 +95,10 @@ bool isLoadingTodayEvent = true;
 bool isLoadingTodayPunch = true;
 String valuenew = "listText";
 String shiftValue = "listText";
-List<dynamic> data=[];
+List<dynamic> data = [];
 var calendarSendData;
 
 class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
-
   final EssDashboarrdModel EssdashboardModel1;
 
   _EssAdminDashboardHeadState(this.EssdashboardModel1);
@@ -128,17 +136,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   var deadlineStartDate;
   var deadlineEndDate;
-  String lockDateStr="";
-
+  String lockDateStr = "";
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
     orgId = await shared.getOrgId();
     userPanel = await shared.getUserPanel();
-    empRole= await shared.getEmpRoll();
-    roRole= await shared.getRoRole();
-    userPanelPermission= await shared.getUserPanel();
-    adminRole= await shared.getAdminRole();
+    empRole = await shared.getEmpRoll();
+    roRole = await shared.getRoRole();
+    userPanelPermission = await shared.getUserPanel();
+    adminRole = await shared.getAdminRole();
     deadlineStartDate = await shared.getPayCycleStart() ?? "0";
     deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
     lockDateStr = await shared.getRaiseRequisition() ?? "0";
@@ -203,17 +210,15 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     });*/
     setState(() {
-      if(empRole==1){
-        showHide=true;
+      if (empRole == 1) {
+        showHide = true;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
-      if(empRole==0){
-        showHide=false;
+      if (empRole == 0) {
+        showHide = false;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
@@ -236,8 +241,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     setState(() {
       loader();
     });
-
-
   }
 
   var showNoData;
@@ -260,22 +263,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     //print('employeeList11: ${SessionId}');
     EssDashboarrdModel dashboardModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "branch=$branchId&"
-        "shift=$shift&"
-        "date=$singleDateString");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "branch=$branchId&"
+      "shift=$shift&"
+      "date=$singleDateString",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     setState(() {
       isLoading = true; // Start loading
     });
     print('URL ${response.request}');
     print('response body ${response.body}');
-    developer.log("response:- " ,name: response.body);
+    developer.log("response:- ", name: response.body);
 
     mapResponse = json.decode(response.body);
     dashboardModel = EssDashboarrdModel.fromJson(mapResponse);
-    // ✅ Save to SharedPreferences
+    // âœ… Save to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('dashboardData', jsonEncode(mapResponse));
     return dashboardModel;
@@ -289,7 +294,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     HolidayESSModal holidayESSModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     setState(() {
       isLoading = true; // Start loading
     });
@@ -318,7 +323,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       print('Holiday URL: ${response.request}');
       print('Response body: ${response.body}');
@@ -326,7 +331,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       final mapResponse = json.decode(response.body);
 
-      // ✅ Handle empty data
+      // âœ… Handle empty data
       if (mapResponse == null || mapResponse.isEmpty) {
         print("No holiday data found");
         showNoData = true;
@@ -336,18 +341,18 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         return null;
       }
 
-      // ✅ Convert response to model
+      // âœ… Convert response to model
       final holidayESSModal = HolidayESSModal.fromJson(mapResponse);
 
-      // ✅ Save to SharedPreferences
+      // âœ… Save to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('holidayData', jsonEncode(mapResponse));
 
-      print("✅ Holiday data saved to SharedPreferences");
+      print("âœ… Holiday data saved to SharedPreferences");
 
       return holidayESSModal;
     } catch (e) {
-      print("❌ Error fetching holiday data: $e");
+      print("âŒ Error fetching holiday data: $e");
       return null;
     } finally {
       setState(() {
@@ -365,7 +370,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "month=$_currentMonth");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     setState(() {
       isLoading = true; // Start loading
     });
@@ -392,7 +397,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     });
 
     try {
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
       if (response.statusCode == 200) {
         print('Calendar URL - ${response.request}');
         print('response body ${response.body}');
@@ -450,9 +455,11 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     print("Current Month - $_currentMonth $_currentMonthc");
 
     CalendarModalClass calendarModalClass;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "month=$_currentMonth");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "month=$_currentMonth",
+    );
     setState(() {
       isLoading = true;
     });
@@ -461,9 +468,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     final prefs = await SharedPreferences.getInstance();
 
-    // ✅ STEP 1: Try loading from SharedPreferences first
-    if(_currentMonthc==_currentMonth){
-
+    // âœ… STEP 1: Try loading from SharedPreferences first
+    if (_currentMonthc == _currentMonth) {
       final cachedData = prefs.getString('calendarData');
       final cachedMonth = prefs.getString('calendarMonth');
 
@@ -473,7 +479,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       if (cachedData != null) {
         print("Cachded Month $cachedMonth");
         try {
-          //print("Loaded calendar data from cache ✅");
+          //print("Loaded calendar data from cache âœ…");
           mapResponse = json.decode(cachedData);
           _buildCalendarFromMap(mapResponse);
         } catch (e) {
@@ -482,23 +488,23 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       }
     }
 
-    // ✅ STEP 2: Now call API (refresh data and overwrite cache)
+    // âœ… STEP 2: Now call API (refresh data and overwrite cache)
     try {
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
       if (response.statusCode == 200) {
         print('Calendar URL - ${response.request}');
         print('Response body - ${response.body}');
         mapResponse = json.decode(response.body);
 
         // Save to SharedPreferences
-        if(_currentMonthc==_currentMonth){
+        if (_currentMonthc == _currentMonth) {
           await prefs.setString('calendarData', json.encode(mapResponse));
           await prefs.setString('calendarMonth', _currentMonth);
         }
         String raiseDate = mapResponse['raisedDeadlineDate'];
         shared.setRaiseRequisition(raiseDate);
         print('object raised $raiseDate');
-        // ✅ Rebuild UI from fresh API data
+        // âœ… Rebuild UI from fresh API data
         _buildCalendarFromMap(mapResponse);
       } else {
         print('Failed to load calendar data: ${response.statusCode}');
@@ -515,24 +521,26 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     return calendarModalClass;
   }
 
-// 🔧 Helper method to rebuild UI from any map data (API or cache)
+  // ðŸ”§ Helper method to rebuild UI from any map data (API or cache)
   void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
       data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
 
       // Build legends
-      _legends = legends.map((legend) {
-        String mobColor = (legend["mobColor"] != null &&
-            legend["mobColor"].toString().trim().isNotEmpty)
-            ? legend["mobColor"].toString()
-            : "0xffaf9f6";
-        return {
-          "mobColor": mobColor,
-          "status": legend["status"].toString(),
-          "statusName": legend["statusName"].toString(),
-        };
-      }).toList();
+      _legends =
+          legends.map((legend) {
+            String mobColor =
+                (legend["mobColor"] != null &&
+                        legend["mobColor"].toString().trim().isNotEmpty)
+                    ? legend["mobColor"].toString()
+                    : "0xffaf9f6";
+            return {
+              "mobColor": mobColor,
+              "status": legend["status"].toString(),
+              "statusName": legend["statusName"].toString(),
+            };
+          }).toList();
 
       // Build marked dates
       _markedDateMap.clear();
@@ -542,10 +550,11 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         DateTime eventDate = DateTime.parse(event['logDate']);
         String title = event['status'] ?? "Event";
         String logDate = event['logDate'];
-        String mobColor = (event["mobColor"] != null &&
-            event["mobColor"].toString().trim().isNotEmpty)
-            ? event["mobColor"].toString()
-            : "0xffaf9f6";
+        String mobColor =
+            (event["mobColor"] != null &&
+                    event["mobColor"].toString().trim().isNotEmpty)
+                ? event["mobColor"].toString()
+                : "0xffaf9f6";
         //print("Calendar event data - $eventDate");
 
         _markedDateMap.add(
@@ -568,7 +577,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       List<dynamic> data = mapResponse['data'] ?? [];
       List<dynamic> legends = mapResponse['legends'] ?? [];
 
-      // Build legends (✅ limit status length to 8 chars + add "...")
+      // Build legends (âœ… limit status length to 8 chars + add "...")
       _legends = legends.map((legend) {
         String status = legend["status"]?.toString() ?? "";
         if (status.length > 8) {
@@ -617,17 +626,18 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       ),
       alignment: Alignment.center,
       child: Text(
-        logDate.split('-').last, // Extract the day from 'logDate' (e.g., "01" from "2024-12-01")
+        logDate
+            .split('-')
+            .last, // Extract the day from 'logDate' (e.g., "01" from "2024-12-01")
         style: TextStyle(
-          color: int.parse(colorHex) == 0xFFFFFF00 ? Colors.black : Colors.white,
+          color:
+              int.parse(colorHex) == 0xFFFFFF00 ? Colors.black : Colors.white,
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
-
-
 
   /*Future<EssEventsListModal> getEventData(String sessionId) async {
     setState(() {
@@ -648,7 +658,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             "date=$singleDateString&"
             "userPermission=COMPANY_EMPLOYEE");
 
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
@@ -669,7 +679,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   static const String _lastApiCallKey = 'lastApiCallDate';
 
   /// Call this before executing your daily API
-/*  static Future<bool> shouldRunApi() async {
+  /*  static Future<bool> shouldRunApi() async {
     final prefs = await SharedPreferences.getInstance();
     final String? lastCallDate = prefs.getString(_lastApiCallKey);
     //prefs.remove(_lastApiCallKey);
@@ -677,12 +687,12 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     final String currentDate = DateTime.now().toIso8601String().split('T')[0];
 
     if (lastCallDate == currentDate) {
-      // ✅ API already called today
+      // âœ… API already called today
       print('API already called today ($currentDate). Skipping call.');
       isLoading =false;
       return false;
     } else {
-      // 🆕 Update date and allow API call
+      // ðŸ†• Update date and allow API call
       await prefs.setString(_lastApiCallKey, currentDate);
       print('Running API for new date: $currentDate');
       return true;
@@ -690,14 +700,14 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }*/
 
   // ===============================================================
-  // ✅ MAIN METHOD - Check and Run API only once per day
+  // âœ… MAIN METHOD - Check and Run API only once per day
   // ===============================================================
   /*void checkAndRunApi() async {
     bool runApi = await shouldRunApi();
 
     if (runApi) {
-      // ✅ Run API only if needed
-      print("🔄 Running API for today...");
+      // âœ… Run API only if needed
+      print("ðŸ”„ Running API for today...");
 
       Future<EssEventsListModal?> getEmployeeList14 =
       getEventData(sessionId!);
@@ -753,8 +763,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         });
       });
     } else {
-      print("⏸ Skipping API. Loading from cache...");
-      await loadSavedData(); // 🔹 Load saved modal data
+      print("â¸ Skipping API. Loading from cache...");
+      await loadSavedData(); // ðŸ”¹ Load saved modal data
     }
   }
 */
@@ -762,29 +772,29 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     bool runApi = await shouldRunApi();
 
     if (!runApi) {
-      print("⏸ Skipping API. Loading from cache...");
+      print("â¸ Skipping API. Loading from cache...");
       await loadSavedData();
       return;
     }
 
-    print("🔄 Running API for today...");
+    print("ðŸ”„ Running API for today...");
 
     try {
       // Parallel API calls
       final results = await Future.wait([
-        getDashboardData(sessionId!),       // 0
-        getCalendarData(sessionId!),        // 1
-        getHolidayData(sessionId!),         // 2
-        getEventData(sessionId!),           // 3
-        getTodayEventData(sessionId!),      // 4
+        getDashboardData(sessionId!), // 0
+        getCalendarData(sessionId!), // 1
+        getHolidayData(sessionId!), // 2
+        getEventData(sessionId!), // 3
+        getTodayEventData(sessionId!), // 4
       ]);
 
       // Assign results
-      final dashboardData   = results[0] as EssDashboarrdModel;
-      final calendarData    = results[1] as CalendarModalClass;
-      final holidayData     = results[2] as HolidayESSModal?;
-      final eventList       = results[3] as EssEventsListModal?;
-      final todayEventList  = results[4] as TodayEventListModal;
+      final dashboardData = results[0] as EssDashboarrdModel;
+      final calendarData = results[1] as CalendarModalClass;
+      final holidayData = results[2] as HolidayESSModal?;
+      final eventList = results[3] as EssEventsListModal?;
+      final todayEventList = results[4] as TodayEventListModal;
 
       // Update UI state only once
       setState(() {
@@ -798,10 +808,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         isLoadingTodayEvent = false;
       });
 
-      print("✅ All APIs loaded successfully.");
-
+      print("âœ… All APIs loaded successfully.");
     } catch (e, st) {
-      print("❌ Error loading APIs: $e");
+      print("âŒ Error loading APIs: $e");
       print(st);
 
       setState(() {
@@ -812,7 +821,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
   // ===============================================================
-  // ✅ Helper - Check if API should run today
+  // âœ… Helper - Check if API should run today
   // ===============================================================
   Future<bool> shouldRunApi() async {
     final prefs = await SharedPreferences.getInstance();
@@ -828,7 +837,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     }
   }
 
-
   /*Future<EssEventsListModal?> getEventData(String sessionId) async {
     */
   /*final prefs = await SharedPreferences.getInstance();
@@ -836,15 +844,15 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     final lastApiCallDate = prefs.getString('lastApiCallDate');
     print("Last API Call Date - $lastApiCallDate");
     print("Current Date - $currentDate");
-    // ✅ Check if today's date matches last call date
+    // âœ… Check if today's date matches last call date
     if (lastApiCallDate == currentDate) {
-      print("⏩ Skipping API call. Already fetched today ($currentDate).");
+      print("â© Skipping API call. Already fetched today ($currentDate).");
       isLoadingEvent = false;
       return eventsListModalGlobal; // Return previously fetched data if available
     }*/
   /*
 
-    // ✅ If date doesn’t match, make the API call
+    // âœ… If date doesnâ€™t match, make the API call
     setState(() {
       isLoadingEvent = true;
     });
@@ -863,7 +871,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             "userPermission=COMPANY_EMPLOYEE",
       );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       print('API Request: ${response.request}');
       print('Response Body: ${response.body}');
@@ -871,15 +879,15 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       final mapResponse = json.decode(response.body);
       final eventsListModal = EssEventsListModal.fromJson(mapResponse);
 
-      // ✅ Save global reference
+      // âœ… Save global reference
       eventsListModalGlobal = eventsListModal;
 
-      // ✅ Save current date as last API call date
+      // âœ… Save current date as last API call date
       //await prefs.setString('lastApiCallDate', currentDate);
 
       return eventsListModal;
     } catch (e) {
-      print("❌ Error fetching event data: $e");
+      print("âŒ Error fetching event data: $e");
       return null;
     } finally {
       setState(() {
@@ -887,7 +895,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       });
     }
   }*/
-  // ✅ Get Event Data and Save to SharedPreferences
+  // âœ… Get Event Data and Save to SharedPreferences
   // ===============================================================
   Future<EssEventsListModal?> getEventData(String sessionId) async {
     setState(() {
@@ -900,24 +908,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       var urlapi = Uri.parse(
         "$conn$apiUrl?sessionId=$sessionId&"
-            "branch=$branchId&shift=$shift&date=$singleDateString&"
-            "userPermission=COMPANY_EMPLOYEE",
+        "branch=$branchId&shift=$shift&date=$singleDateString&"
+        "userPermission=COMPANY_EMPLOYEE",
       );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
       final mapResponse = json.decode(response.body);
 
       print("Event API -${response.request}");
       final eventsListModal = EssEventsListModal.fromJson(mapResponse);
       eventsListModalGlobal = eventsListModal;
 
-      // ✅ Save modal data to SharedPreferences
+      // âœ… Save modal data to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('eventsListModalData', jsonEncode(mapResponse));
 
       return eventsListModal;
     } catch (e) {
-      print("❌ Error fetching event data: $e");
+      print("âŒ Error fetching event data: $e");
       return null;
     } finally {
       setState(() {
@@ -927,7 +935,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
   // ===============================================================
-  // ✅ Get Today's Event Data and Save to SharedPreferences
+  // âœ… Get Today's Event Data and Save to SharedPreferences
   // ===============================================================
   Future<TodayEventListModal> getTodayEventData(String sessionId) async {
     setState(() {
@@ -940,11 +948,11 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       var urlapi = Uri.parse(
         "$conn$apiUrl?sessionId=$sessionId&"
-            "branch=$branchId&shift=$shift&date=$singleDateString&"
-            "userPermission=COMPANY_EMPLOYEE",
+        "branch=$branchId&shift=$shift&date=$singleDateString&"
+        "userPermission=COMPANY_EMPLOYEE",
       );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
       final mapResponse = json.decode(response.body);
 
       print("Today Event - ${response.request}");
@@ -952,13 +960,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       final todayEventListModal = TodayEventListModal.fromJson(mapResponse);
       todayEventModalGlobal = todayEventListModal;
 
-      // ✅ Save modal data to SharedPreferences
+      // âœ… Save modal data to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('todayEventModalData', jsonEncode(mapResponse));
 
       return todayEventListModal;
     } catch (e) {
-      print("❌ Error fetching today’s event data: $e");
+      print("âŒ Error fetching todayâ€™s event data: $e");
       rethrow;
     } finally {
       setState(() {
@@ -968,7 +976,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
   // ===============================================================
-  // ✅ Load saved data from SharedPreferences
+  // âœ… Load saved data from SharedPreferences
   // ===============================================================
   Future<void> loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -986,9 +994,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       //isLoadingEvent = false;
       //isLoading = false;
       //isLoadingTodayEvent = false;
-      print("📦 Loaded eventsJson data from SharedPreferences");
-    }else{
-      print("📦 Loaded eventsJson data not save from SharedPreferences");
+      print("ðŸ“¦ Loaded eventsJson data from SharedPreferences");
+    } else {
+      print("ðŸ“¦ Loaded eventsJson data not save from SharedPreferences");
     }
 
     if (todayEventsJson != null) {
@@ -997,9 +1005,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       //isLoadingEvent = false;
       //isLoading = false;
       //isLoadingTodayEvent = false;
-      print("📦 Loaded todayEventsJson data from SharedPreferences");
-    }else{
-      print("📦 Loaded todayEventsJson data not save from SharedPreferences");
+      print("ðŸ“¦ Loaded todayEventsJson data from SharedPreferences");
+    } else {
+      print("ðŸ“¦ Loaded todayEventsJson data not save from SharedPreferences");
     }
 
     if (holidayJson != null) {
@@ -1012,9 +1020,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         //isLoadingTodayEvent = false;
       });
 
-      print("📦 Loaded Holiday data from SharedPreferences");
+      print("ðŸ“¦ Loaded Holiday data from SharedPreferences");
     } else {
-      print("⚠️ No saved holiday data found in SharedPreferences");
+      print("âš ï¸ No saved holiday data found in SharedPreferences");
     }
 
     print("Calendar Data Loaded - $calendarJson");
@@ -1028,28 +1036,28 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     }*/
     if (calendarJson != null && calendarMonth == _currentMonth) {
       final mapResponse = jsonDecode(calendarJson);
-      print("Loaded calendar data from cache ✅");
+      print("Loaded calendar data from cache âœ…");
       calendarModalGlobal = CalendarModalClass.fromJson(mapResponse);
       _buildCalendarFromMap(mapResponse);
       isLoadingEvent = false;
       isLoadingEvent = false;
       isLoading = false;
       isLoadingTodayEvent = false;
-      print("📦 Loaded calender data from SharedPreferences");
-    }else{
-      print("📦 Loaded calender data from SharedPreferences");
+      print("ðŸ“¦ Loaded calender data from SharedPreferences");
+    } else {
+      print("ðŸ“¦ Loaded calender data from SharedPreferences");
     }
     if (dashboardData != null) {
       final mapResponse = jsonDecode(dashboardData);
-      print("Loaded Dashboard Data data from cache ✅");
+      print("Loaded Dashboard Data data from cache âœ…");
       essDashboardModelGlobal = EssDashboarrdModel.fromJson(mapResponse);
       //isLoadingEvent = false;
       //isLoadingEvent = false;
       //isLoading = false;
       //isLoadingTodayEvent = false;
-      print("📦 Loaded Dashboard data from SharedPreferences");
-    }else{
-      print("📦 Loaded Dashboard data Not Saved from SharedPreferences");
+      print("ðŸ“¦ Loaded Dashboard data from SharedPreferences");
+    } else {
+      print("ðŸ“¦ Loaded Dashboard data Not Saved from SharedPreferences");
     }
     setState(() {
       isLoading = false;
@@ -1075,7 +1083,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             "date=$singleDateString&"
             "userPermission=COMPANY_EMPLOYEE");
 
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
@@ -1106,21 +1114,21 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     TodayPunchesModal todayPunchesModal;
 
     var urlapi = Uri.parse(
-        "$conn$apiUrl?sessionId=$sessionId&"
-            "date=$todayDateFetch");
+      "$conn$apiUrl?sessionId=$sessionId&"
+      "date=$todayDateFetch",
+    );
 
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     print('Body Data $mapResponse');
 
-
     todayPunchesModal = TodayPunchesModal.fromJson(mapResponse);
 
     // assign to global
     todayPunchesModalGlobal = todayPunchesModal;
-    // 👇 after parsing response
+    // ðŸ‘‡ after parsing response
     setPunchData(todayPunchesModal.data);
 
     setState(() {
@@ -1135,24 +1143,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   void setPunchData(List<TodayData>? apiData) {
     if (apiData == null) return; // in case it's null
 
-    todayPunches = apiData.asMap().entries.map((entry) {
-      int index = entry.key;
-      TodayData punch = entry.value; // now it's strongly typed
+    todayPunches =
+        apiData.asMap().entries.map((entry) {
+          int index = entry.key;
+          TodayData punch = entry.value; // now it's strongly typed
 
-      return {
-        "time": punch.time, // directly from your model
+          return {
+            "time": punch.time, // directly from your model
 
-        "punchType": punch.punchType,
+            "punchType": punch.punchType,
 
-        // Green for the first punch, Red for others
-        "color": index == 0 ? Colors.green : Colors.red,
+            // Green for the first punch, Red for others
+            "color": index == 0 ? Colors.green : Colors.red,
 
-        // Show arrow only for first punch
-        "isStart": index == 0
-      };
-    }).toList();
+            // Show arrow only for first punch
+            "isStart": index == 0,
+          };
+        }).toList();
   }
-
 
   loader() {
     return Center(
@@ -1164,20 +1172,18 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             margin: EdgeInsets.all(8),
             child: CircularProgressIndicator(),
           ),
-          new Text("Please Wait...",
-              style: TextStyle(
-                fontSize: 20,
-              )),
+          new Text("Please Wait...", style: TextStyle(fontSize: 20)),
         ],
       ),
     );
   }
 
   static Widget _eventIcon = new Container(
-    decoration:  BoxDecoration(
+    decoration: BoxDecoration(
       //color: Colors.transparent,
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        border: Border.all(color: Colors.blue, width: 4.0)),
+      borderRadius: BorderRadius.all(Radius.circular(20)),
+      border: Border.all(color: Colors.blue, width: 4.0),
+    ),
   );
 
   EventList<Event> _markedDateMap = new EventList<Event>(
@@ -1237,17 +1243,15 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     getSharedPrfanceList();
 
     setState(() {
-      if(empRole==1){
-        showHide=true;
+      if (empRole == 1) {
+        showHide = true;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
-      if(empRole==0){
-        showHide=false;
+      if (empRole == 0) {
+        showHide = false;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
@@ -1273,13 +1277,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     // TODO: implement initState
   }
+
   int pageIndex = 0;
   int currentIndex = 4;
   var titleName = "My Dashboard";
 
   var holidayDate;
   var holidayLength;
-
 
   final Map<String, Color> punchColors = {
     "In": Colors.green,
@@ -1317,7 +1321,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       /* for(double i=0 ;i>=10;i++){
         _scrollController.jumpTo(i);
       }*/
-
     });
   }
 
@@ -1338,101 +1341,106 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     super.dispose();
   }
 
-
-
   var getRealTimeAttButtonShow = true;
   var getRealTimeAttShow = false;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        title: titleName.text.bold.center.make(),
-      ),
+      appBar: AppBar(title: titleName.text.bold.center.make()),
 
-      body: essDashboardModelGlobal == null
-          ? loader()
-          : DashboardWidgets(essDashboardModelGlobal!),
+      body:
+          essDashboardModelGlobal == null
+              ? loader()
+              : DashboardWidgets(essDashboardModelGlobal!),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
-          type: BottomNavigationBarType.fixed,
-          currentIndex: currentIndex,
-          iconSize: 25,
-          selectedFontSize: 12,
-          unselectedFontSize: 10,
-          onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
-              //Navigator.pop(context);
-              print('home tab');
-            }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
-              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
-            }
-            if(index==2){
-              /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Workflow');
+          }
+          if (index == 2) {
+            /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Attendance');*/
-            }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
-              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
-            }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel())));
-              //Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => ProfilePageNew())
-              // );
-              //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
-            }
-            /*if(index==3){
+          }
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyAllReportsPage(showAppBar: true),
+              ),
+            );
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('Dashboard');
+          }
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => EssAdminDashboardHead(EssDashboarrdModel()),
+              ),
+            );
+            //Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            // Navigator.push(context,
+            //     MaterialPageRoute(builder: (context) => ProfilePageNew())
+            // );
+            //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
+            print('Profile');
+          }
+          /*if(index==3){
                 title="Notifications";
               }*/
-            setState(() => currentIndex = index);
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.manage_accounts_outlined),
-              label: 'Workflow',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.app_badge_fill),
-              label: 'My Requests',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
-              label: 'My Reports',
-              //backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard),
-              label: 'Dashboard',
-              //backgroundColor: Colors.blue,
-            ),
-          ],
-        ),
+          setState(() => currentIndex = index);
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.app_badge_fill),
+            label: 'My Requests',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.doc_chart),
+            label: 'My Reports',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
+          ),
+        ],
+      ),
     );
   }
 
   late Future<List<Map<String, dynamic>>> punchesFuture;
-
-
 
   DashboardWidgets(EssDashboarrdModel dashboardModel) {
     paidDaysCount = essDashboardModelGlobal!.countData!.paidDaysCount;
@@ -1467,7 +1475,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       print("bdayList is null");
     }
 
-
     if (eventsListModalGlobal?.joblist != null) {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
@@ -1501,12 +1508,11 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-// Repeat data enough times to scroll indefinitely
+    // Repeat data enough times to scroll indefinitely
     final repeatedPunches = List.generate(
       1000,
-          (index) => punches[index % punches.length],
+      (index) => punches[index % punches.length],
     );
-
 
     return DismissKeyboard(
       child: SingleChildScrollView(
@@ -1541,36 +1547,49 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       spacing: 2.0,
                       customSeparatorBuilder: (context, local, global) {
                         final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
                         return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
+                          indent: 10.0,
+                          endIndent: 10.0,
+                          color: Colors.white38.withOpacity(opacity),
+                        );
                       },
                       customIconBuilder: (context, local, global) {
                         final text = const ['ESS', 'MSS'][local.index];
                         return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: Color.lerp(
+                                Colors.black,
+                                Colors.white,
+                                local.animationValue,
+                              ),
+                            ),
+                          ),
+                        );
                       },
                       borderWidth: 0.0,
                       onChanged: (i) {
                         setState(() {
                           value = i;
                           print(i);
-
                         });
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
+                        if (value == 1) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.mssNewDashboardRoute,
+                          );
                         }
-                        if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        if (value == 0) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.essDashboardNavigateRoute,
+                          );
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -1599,36 +1618,49 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       spacing: 2.0,
                       customSeparatorBuilder: (context, local, global) {
                         final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
                         return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
+                          indent: 10.0,
+                          endIndent: 10.0,
+                          color: Colors.white38.withOpacity(opacity),
+                        );
                       },
                       customIconBuilder: (context, local, global) {
                         final text = const ['ESS', 'MSS MO'][local.index];
                         return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: Color.lerp(
+                                Colors.black,
+                                Colors.white,
+                                local.animationValue,
+                              ),
+                            ),
+                          ),
+                        );
                       },
                       borderWidth: 0.0,
                       onChanged: (i) {
                         setState(() {
                           value = i;
                           print(i);
-
                         });
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                        if (value == 1) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.mssMoNewDashboardRoute,
+                          );
                         }
-                        if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        if (value == 0) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.essDashboardNavigateRoute,
+                          );
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -1636,25 +1668,32 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               Visibility(
                 visible: getRealTimeAttButtonShow,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ), // margin
                   child: SizedBox(
-                    width: double.infinity, // 👈 full width
+                    width: double.infinity, // ðŸ‘ˆ full width
                     child: ElevatedButton.icon(
                       onPressed: () {
                         getRealTimeAttButtonShow = false;
                         getRealTimeAttShow = true;
-                        Future<TodayPunchesModal> getTodayPunch = getTodayPunchData(sessionId!);
+                        Future<TodayPunchesModal> getTodayPunch =
+                            getTodayPunchData(sessionId!);
                         getTodayPunch.then((value) {
                           setState(() {
                             todayPunchesModalGlobal = value;
                             isLoadingTodayPunch = false;
                           });
-
                         });
-                        // 👇 Your action here
+                        // ðŸ‘‡ Your action here
                         print("Get Real-Time Attendance clicked");
                       },
-                      icon: const Icon(Icons.access_time, color: Colors.white, size: 22,),
+                      icon: const Icon(
+                        Icons.access_time,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                       label: const Text(
                         "Get Real-Time Attendance",
                         style: TextStyle(
@@ -1665,7 +1704,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.lightBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14), // height
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                        ), // height
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1693,82 +1734,91 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       ),
                       const SizedBox(height: 5),
 
-                      // 👇 Loader or punches
+                      // ðŸ‘‡ Loader or punches
                       isLoadingTodayPunch
                           ? SizedBox(
-                        height: 60, // match approx. punch card height
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.green,
-                          ),
-                        ),
-                      )
-                          : todayPunches.isEmpty
-                          ? const Text(
-                        "No punches found",
-                        style: TextStyle(color: Colors.grey),
-                      )
-                          : SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            // Arrow always at the start
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 8.0, bottom: 10,top: 5.0),
-                              child: Icon(
-                                Icons.arrow_back,
-                                size: 30,
-                                color: Colors.black,
+                            height: 60, // match approx. punch card height
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.green,
                               ),
                             ),
-                            // Punch cards
-                            ...todayPunches.map((punch) {
-                              return Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 12, bottom: 5),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    border: Border.all(color: Mythemes.greyishade),
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 4,
-                                        offset: Offset(2, 2),
-                                      )
-                                    ],
+                          )
+                          : todayPunches.isEmpty
+                          ? const Text(
+                            "No punches found",
+                            style: TextStyle(color: Colors.grey),
+                          )
+                          : SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                // Arrow always at the start
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 8.0,
+                                    bottom: 10,
+                                    top: 5.0,
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        punch["punchType"] == "DEVICE"
-                                            ? Icons.touch_app
-                                            : Icons.smartphone,
-                                        color: punch["color"],
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        punch["time"],
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: punch["color"],
-                                        ),
-                                      ),
-                                    ],
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    size: 30,
+                                    color: Colors.black,
                                   ),
                                 ),
-                              );
-                            }).toList(),
-                          ],
-                        ),
-                      ),
+                                // Punch cards
+                                ...todayPunches.map((punch) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                      right: 12,
+                                      bottom: 5,
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 15,
+                                        vertical: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        border: Border.all(
+                                          color: Mythemes.greyishade,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            punch["punchType"] == "DEVICE"
+                                                ? Icons.touch_app
+                                                : Icons.smartphone,
+                                            color: punch["color"],
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            punch["time"],
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: punch["color"],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ],
+                            ),
+                          ),
                     ],
                   ),
                 ),
@@ -1803,21 +1853,23 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       onTap: () {
                         if (presentCount == 0 || presentCount == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this month.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this month.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      PresentEmpList(essDashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  PresentEmpList(essDashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1836,34 +1888,33 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8()
+                                              .centered()
+                                              .py8()
+                                              .px8()
                                           : "$presentCount / $totalDays"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.lightBluishColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .text
+                                              .xl2
+                                              .bold
+                                              .color(Mythemes.lightBluishColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.groups,
-                                            size: 58,
-                                            color: Mythemes.lightBluishColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.groups,
+                                          size: 58,
+                                          color: Mythemes.lightBluishColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Attendance"
-                                          .text
-                                          .xl
+                                      "Attendance".text.xl
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .px8(),
@@ -1882,19 +1933,22 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       onTap: () {
                         if (totalAbsentEmp == 0 || totalAbsentEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this month.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this month.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
                           );
-                        }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  AbsentEmpList(essDashboardModelGlobal!)));
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      AbsentEmpList(essDashboardModelGlobal!),
+                            ),
+                          );
                         }
                       },
                       child: Card(
@@ -1914,36 +1968,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8()
-                                          :
-                                      "$totalAbsentEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$totalAbsentEmp".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.not_interested,
                                           size: 55,
                                           color: Mythemes.dangerColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Absent"
-                                          .text
-                                          .xl
+                                      "Absent".text.xl
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .px8(),
@@ -1968,21 +2016,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       onTap: () {
                         if (misPunchEmp == 0 || misPunchEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this month.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this month.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => MissPunchEmpList(
+                                    essDashboardModelGlobal!,
+                                  ),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  MissPunchEmpList(essDashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -2001,35 +2052,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8()
-                                          :
-                                      "$misPunchEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.warningColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$misPunchEmp".text.xl2.bold
+                                              .color(Mythemes.warningColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.touch_app,
-                                            size: 58,
-                                            color: Mythemes.warningColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.touch_app,
+                                          size: 58,
+                                          color: Mythemes.warningColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Mispunch"
-                                          .text
-                                          .xl
+                                      "Mispunch".text.xl
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .px8(),
@@ -2048,21 +2094,23 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       onTap: () {
                         if (totalAttendance == 0 || totalAttendance == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this month.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this month.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OnDutyEmpList(essDashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  OnDutyEmpList(essDashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -2081,36 +2129,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8()
-                                          :
-                                      "$totalAttendance"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.successColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$totalAttendance".text.xl2.bold
+                                              .color(Mythemes.successColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.business_center,
                                           size: 55,
                                           color: Mythemes.successColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Working Days"
-                                          .text
-                                          .xl
+                                      "Working Days".text.xl
                                           .color(Mythemes.successColor)
                                           .make()
                                           .px8(),
@@ -2135,21 +2177,23 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       onTap: () {
                         if (earlyOutEmp == 0 || earlyOutEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this month.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this month.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      EarlyGoEmpList(essDashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  EarlyGoEmpList(essDashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -2168,36 +2212,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8()
-                                          :
-                                      "$earlyOutEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.lightBluishColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$earlyOutEmp".text.xl2.bold
+                                              .color(Mythemes.lightBluishColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.directions_run,
                                           size: 55,
                                           color: Mythemes.lightBluishColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Early Go"
-                                          .text
-                                          .xl
+                                      "Early Go".text.xl
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .px8(),
@@ -2216,21 +2254,23 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       onTap: () {
                         if (lateIn == 0 || lateIn == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this month.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this month.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      LateInEmpList(essDashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  LateInEmpList(essDashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -2249,35 +2289,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8()
-                                          :
-                                      "$lateIn"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.alertColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$lateIn".text.xl2.bold
+                                              .color(Mythemes.alertColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.assignment_late,
-                                            size: 58,
-                                            color: Mythemes.alertColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.assignment_late,
+                                          size: 58,
+                                          color: Mythemes.alertColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Late In"
-                                          .text
-                                          .xl
+                                      "Late In".text.xl
                                           .color(Mythemes.alertColor)
                                           .make()
                                           .px8(),
@@ -2302,21 +2337,23 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       onTap: () {
                         if (overTime == 0 || overTime == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this month.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this month.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OverTimeEmpList(essDashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  OverTimeEmpList(essDashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -2335,42 +2372,36 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8()
-                                          :
-                                      overTime == null ? "0".text.xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8() :
-                                      "$overTime"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : overTime == null
+                                          ? "0".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8()
+                                          : "$overTime".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.timelapse,
                                           size: 55,
                                           color: Mythemes.dangerColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Short Leave"
-                                          .text
-                                          .xl
+                                      "Short Leave".text.xl
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .px8(),
@@ -2389,21 +2420,23 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       onTap: () {
                         if (halfEmp == 0 || halfEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this month.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this month.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      HalfDayEmpList(essDashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  HalfDayEmpList(essDashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -2422,35 +2455,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8()
-                                          :
-                                      "$halfEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.warningColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$halfEmp".text.xl2.bold
+                                              .color(Mythemes.warningColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.calendar_month,
-                                            size: 58,
-                                            color: Mythemes.warningColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.calendar_month,
+                                          size: 58,
+                                          color: Mythemes.warningColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Half Day"
-                                          .text
-                                          .xl
+                                      "Half Day".text.xl
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .px8(),
@@ -2466,46 +2494,56 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: 0,
-              ),
+              SizedBox(height: 0),
 
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ), // margin
                 child: SizedBox(
                   height: 50,
-                  width: double.infinity, // 👈 full width
+                  width: double.infinity, // ðŸ‘ˆ full width
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      _currentMonth = DateFormat('MM-yyyy').format(DateTime.now());
+                      _currentMonth = DateFormat(
+                        'MM-yyyy',
+                      ).format(DateTime.now());
 
-                      // 👇 Reset calendar to current month
+                      // ðŸ‘‡ Reset calendar to current month
                       setState(() {
                         _targetDateTime = DateTime.now();
                         _currentDate = DateTime.now();
                         _currentDate2 = DateTime.now();
-                        _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+                        _currentMonth = DateFormat(
+                          'MM-yyyy',
+                        ).format(_targetDateTime);
                       });
-                      Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
+                      Future<EssDashboarrdModel> getEmployeeList11 =
+                          getDashboardData(sessionId!);
                       getEmployeeList11.then((value) {
                         setState(() {
                           essDashboardModelGlobal = value;
                           isLoading = false;
                         });
-
                       });
-                      Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
+                      Future<CalendarModalClass> getCalendar = getCalendarData(
+                        sessionId!,
+                      );
                       getCalendar.then((value) {
                         setState(() {
                           calendarModalGlobal = value;
                           isLoading = false;
                         });
-
                       });
-                      // 👇 Your action here
+                      // ðŸ‘‡ Your action here
                       print("Update your dashboard clicked");
                     },
-                    icon: const Icon(Icons.dashboard_customize, color: Colors.white, size: 22,),
+                    icon: const Icon(
+                      Icons.dashboard_customize,
+                      color: Colors.white,
+                      size: 22,
+                    ),
                     label: const Text(
                       "Update Your Dashboard",
                       style: TextStyle(
@@ -2516,7 +2554,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Mythemes.successColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12,), // height
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                      ), // height
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -2527,8 +2567,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               ),
               CalendarShow(),
 
-              empRole == 1 || roRole == 1 ?
-              /*DefaultTabController(
+              empRole == 1 || roRole == 1
+                  ?
+                  /*DefaultTabController(
                 length: 4,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -2798,97 +2839,107 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                   ],
                 ),
               )*/
-              DefaultTabController(
-                length: 4,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    // TabBar
-                    Material(
-                      color: Mythemes.whitish,
-                      child: TabBar(
-                        indicatorColor: Colors.deepPurple,
-                        indicatorWeight: 4,
-                        labelColor: Colors.deepPurple,
-                        unselectedLabelColor: Mythemes.blackishade,
-                        tabs: const [
-                          Tab(icon: Icon(Icons.celebration), text: "Birthday"),
-                          Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
-                          Tab(icon: Icon(Icons.today), text: "Today Events"),
-                          Tab(icon: Icon(Icons.holiday_village), text: "Holidays"),
-                        ],
-                      ),
-                    ),
-
-                    // Tab Views
-                    SizedBox(
-                      height: 400,
-                      child: TabBarView(
-                        children: [
-                          // 🎂 Birthday Tab
-                          buildEventList(
-                            isLoading: isLoadingEvent,
-                            items: eventsListModalGlobal?.bdayList ?? [],
-                            emptyText: "No birthdays today 🎉",
-                            titleBuilder: (item) => item.fullName,
-                            subtitleBuilder: (item) => item.department,
-                            trailingBuilder: (item) => item.dob,
-                            imageBuilder: (item) => item.image,
+                  DefaultTabController(
+                    length: 4,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        // TabBar
+                        Material(
+                          color: Mythemes.whitish,
+                          child: TabBar(
+                            indicatorColor: Colors.deepPurple,
+                            indicatorWeight: 4,
+                            labelColor: Colors.deepPurple,
+                            unselectedLabelColor: Mythemes.blackishade,
+                            tabs: const [
+                              Tab(
+                                icon: Icon(Icons.celebration),
+                                text: "Birthday",
+                              ),
+                              Tab(
+                                icon: Icon(Icons.workspace_premium_outlined),
+                                text: "Work Anniversary",
+                              ),
+                              Tab(
+                                icon: Icon(Icons.today),
+                                text: "Today Events",
+                              ),
+                              Tab(
+                                icon: Icon(Icons.holiday_village),
+                                text: "Holidays",
+                              ),
+                            ],
                           ),
-                          // 🏅 Anniversary Tab
-                          buildEventList(
-                            isLoading: isLoadingEvent,
-                            items: eventsListModalGlobal?.joblist ?? [],
-                            emptyText: "No anniversaries today 🎊",
-                            titleBuilder: (item) => item.fullName,
-                            subtitleBuilder: (item) => item.department,
-                            trailingBuilder: (item) => item.doj,
-                            imageBuilder: (item) => item.image,
-                          ),
+                        ),
 
-                          // 📅 Today Events Tab (combine lists)
-
-                          /*  buildEventList(
+                        // Tab Views
+                        SizedBox(
+                          height: 400,
+                          child: TabBarView(
+                            children: [
+                              // ðŸŽ‚ Birthday Tab
+                              buildEventList(
                                 isLoading: isLoadingEvent,
                                 items: eventsListModalGlobal?.bdayList ?? [],
-                                emptyText: "No events today 🎂",
+                                emptyText: "No birthdays today ðŸŽ‰",
+                                titleBuilder: (item) => item.fullName,
+                                subtitleBuilder: (item) => item.department,
+                                trailingBuilder: (item) => item.dob,
+                                imageBuilder: (item) => item.image,
+                              ),
+                              // ðŸ… Anniversary Tab
+                              buildEventList(
+                                isLoading: isLoadingEvent,
+                                items: eventsListModalGlobal?.joblist ?? [],
+                                emptyText: "No anniversaries today ðŸŽŠ",
+                                titleBuilder: (item) => item.fullName,
+                                subtitleBuilder: (item) => item.department,
+                                trailingBuilder: (item) => item.doj,
+                                imageBuilder: (item) => item.image,
+                              ),
+
+                              // ðŸ“… Today Events Tab (combine lists)
+
+                              /*  buildEventList(
+                                isLoading: isLoadingEvent,
+                                items: eventsListModalGlobal?.bdayList ?? [],
+                                emptyText: "No events today ðŸŽ‚",
                                 titleBuilder: (item) => item.fullName,
                                 subtitleBuilder: (item) => item.department,
                                 trailingBuilder: (item) => item.dob,
                                 imageBuilder: (item) => item.image,
                               ),*/
+                              buildEventList(
+                                isLoading: isLoadingTodayEvent,
+                                items:
+                                    todayEventModalGlobal?.todayEventList ?? [],
+                                emptyText: "No events today ðŸŽ‚",
+                                titleBuilder: (item) => item.fullName,
+                                subtitleBuilder: (item) => item.department,
+                                trailingBuilder: (item) => item.dob,
+                                imageBuilder: (item) => item.image,
+                              ),
 
-                          buildEventList(
-                            isLoading: isLoadingTodayEvent,
-                            items: todayEventModalGlobal?.todayEventList ?? [],
-                            emptyText: "No events today 🎂",
-                            titleBuilder: (item) => item.fullName,
-                            subtitleBuilder: (item) => item.department,
-                            trailingBuilder: (item) => item.dob,
-                            imageBuilder: (item) => item.image,
+                              buildHolidayList(
+                                isLoading: isLoadingEvent,
+                                items:
+                                    holidayListModalGlobal!.viewHolidayList ??
+                                    [],
+                                emptyText: "No Holidays",
+                                holidayName: (item) => item.holidayName,
+                                holidayDate: (item) => item.dateOfHoliday,
+                                holidayType: (item) => item.holidayType,
+                              ),
+                            ],
                           ),
-
-                          buildHolidayList(
-                            isLoading: isLoadingEvent,
-                            items: holidayListModalGlobal!
-                                .viewHolidayList ?? [],
-                            emptyText: "No Holidays",
-                            holidayName: (item) => item.holidayName,
-                            holidayDate: (item) => item.dateOfHoliday,
-                            holidayType: (item) => item.holidayType,
-                          ),
-
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ) :
-              //TabSection(EventsListModal()!) :
-              SizedBox(
-                height: 0,
-              )
-              ,
+                        ),
+                      ],
+                    ),
+                  )
+                  :
+                  //TabSection(EventsListModal()!) :
+                  SizedBox(height: 0),
             ],
           ),
         ),
@@ -2905,9 +2956,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     required String Function(T) holidayDate,
   }) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(strokeWidth: 3),
-      );
+      return const Center(child: CircularProgressIndicator(strokeWidth: 3));
     }
 
     if (items.isEmpty) {
@@ -2946,10 +2995,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             ),
             subtitle: Text(
               holidayDate(item),
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
             trailing: Text(
               holidayType(item),
@@ -2974,9 +3020,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     required String Function(T) imageBuilder,
   }) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(strokeWidth: 3),
-      );
+      return const Center(child: CircularProgressIndicator(strokeWidth: 3));
     }
 
     if (items.isEmpty) {
@@ -3019,10 +3063,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             ),
             subtitle: Text(
               subtitleBuilder(item),
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
             trailing: Text(
               trailingBuilder(item),
@@ -3037,7 +3078,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     );
   }
 
-
   int getCalendarRowCount(DateTime month) {
     // 1st day of month
     DateTime firstDay = DateTime(month.year, month.month, 1);
@@ -3051,7 +3091,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     // total days in this month
     int totalDays = lastDay.day;
 
-    // (days + offset) / 7 → number of rows
+    // (days + offset) / 7 â†’ number of rows
     int rows = ((totalDays + (firstWeekday - 1)) / 7).ceil();
 
     return rows;
@@ -3069,9 +3109,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           setState(() => _currentDate = date);
           events.forEach((event) => print(event.title));
         },
-        weekendTextStyle: TextStyle(
-          color: Colors.black,
-        ),
+        weekendTextStyle: TextStyle(color: Colors.black),
         thisMonthDayBorderColor: Colors.grey,
         headerText: 'Custom Header',
         weekFormat: true,
@@ -3081,12 +3119,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         showIconBehindDayText: true,
         markedDateShowIcon: true,
         markedDateIconMaxShown: 2,
-        selectedDayTextStyle: TextStyle(
-          color: Mythemes.lightBluishColor,
-        ),
-        todayTextStyle: TextStyle(
-          color: Colors.blue,
-        ),
+        selectedDayTextStyle: TextStyle(color: Mythemes.lightBluishColor),
+        todayTextStyle: TextStyle(color: Colors.blue),
         todayButtonColor: Colors.transparent,
         todayBorderColor: Colors.transparent,
         markedDateMoreShowTotal: true,
@@ -3095,13 +3129,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
     int rowCount = getCalendarRowCount(_targetDateTime);
 
-// Height per row in your calendar UI
+    // Height per row in your calendar UI
     double rowHeight = 52; // perfect for your design
 
-// Header + padding
+    // Header + padding
     double topPadding = 60;
 
-// Final height
+    // Final height
     double dynamicHeight = (rowCount * rowHeight) + topPadding;
 
     /// Example Calendar Carousel without header and custom prev & next button
@@ -3124,8 +3158,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     },*/
       onDayPressed: (date, events) {
         // Prevent selecting dates older than current month view
-        if (date.month < _targetDateTime.month && date.year == _targetDateTime.year) {
-          print("⛔ Last month dates are not selectable");
+        if (date.month < _targetDateTime.month &&
+            date.year == _targetDateTime.year) {
+          print("â›” Last month dates are not selectable");
           Fluttertoast.showToast(
             msg: "You cannot select last month's dates.",
             toastLength: Toast.LENGTH_SHORT,
@@ -3136,7 +3171,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           );
           return;
         }
-        if (date.month > _targetDateTime.month && date.year == _targetDateTime.year) {
+        if (date.month > _targetDateTime.month &&
+            date.year == _targetDateTime.year) {
           Fluttertoast.showToast(
             msg: "You cannot select next month's dates.",
             toastLength: Toast.LENGTH_SHORT,
@@ -3148,7 +3184,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           return;
         }
         /*if (_targetDateTime.isBefore(DateTime(_today.year, _today.month))) {
-          print("⛔ Date tap disabled for past months");
+          print("â›” Date tap disabled for past months");
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -3188,7 +3224,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         DateTime today = DateTime.now();
         // e.g. "23-11-2024 11:59 AM"
 
-
         //print('raise date New  $lockDateStr');
         //print('raise date  $lockDateTime');
         DateTime monthStart = DateTime(today.year, today.month, 1);
@@ -3200,17 +3235,17 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         //print("Start: $startDayInt");
         //print("End:   $endDayInt");
         //deadlineStartDate - Data get form Login API deadlineEndDate = Data get from Login
-        if (startDay == 0 || endDay == 0){
+        if (startDay == 0 || endDay == 0) {
           startDay = startDayInt;
           endDay = endDayInt;
         }
         print('date start and End $startDay $endDay');
         if (today.day < startDay) {
-          // Current month cycle is last month → this month
+          // Current month cycle is last month â†’ this month
           cycleStart = DateTime(today.year, today.month - 1, startDay);
           cycleEnd = DateTime(today.year, today.month, endDay);
         } else {
-          // Current month cycle is this month → next month
+          // Current month cycle is this month â†’ next month
           cycleStart = DateTime(today.year, today.month, startDay);
           cycleEnd = DateTime(today.year, today.month + 1, endDay);
         }
@@ -3218,58 +3253,67 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         print("Cycle Start: $cycleStart");
         print("Cycle End:   $cycleEnd");
         if (lockDateStr != null && lockDateStr.trim().isNotEmpty) {
-          // Convert String → DateTime
-          DateTime lockDateTime = DateFormat("dd-MM-yyyy hh:mm").parse(lockDateStr);
-          // Step 1 → Execute only if now >= lock date+time
-          if (today.isAfter(lockDateTime) || today.isAtSameMomentAs(lockDateTime)) {
-            // CHECK: If current date is outside paycycle → BLOCK
+          // Convert String â†’ DateTime
+          DateTime lockDateTime = DateFormat(
+            "dd-MM-yyyy hh:mm",
+          ).parse(lockDateStr);
+          // Step 1 â†’ Execute only if now >= lock date+time
+          if (today.isAfter(lockDateTime) ||
+              today.isAtSameMomentAs(lockDateTime)) {
+            // CHECK: If current date is outside paycycle â†’ BLOCK
             if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
               developer.log('date for all true');
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  title: const Text(
-                    "Notice",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  content: const Text(
-                    "You are out of the pay-cycle. Attendance requisition not allowed.",
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("OK"),
+                builder:
+                    (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      title: const Text(
+                        "Notice",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      content: const Text(
+                        "You are out of the pay-cycle. Attendance requisition not allowed.",
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("OK"),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               );
               return; // STOP further action
             }
           }
-        }else{
+        } else {
           if (date.isBefore(cycleStart) || date.isAfter(cycleEnd)) {
             developer.log('date for all true');
             showDialog(
               context: context,
-              builder: (context) => AlertDialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                title: const Text(
-                  "Notice",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                content: const Text(
-                  "You are out of the pay-cycle. Attendance requisition not allowed.",
-                  style: TextStyle(fontSize: 15),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("OK"),
+              builder:
+                  (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    title: const Text(
+                      "Notice",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: const Text(
+                      "You are out of the pay-cycle. Attendance requisition not allowed.",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("OK"),
+                      ),
+                    ],
                   ),
-                ],
-              ),
             );
             return; // STOP further action
           }
@@ -3282,15 +3326,23 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
           int dayOnly = int.parse(DateFormat('dd').format(_currentDate));
           print("Formatted Date - $formattedDate");
-          print(data[dayOnly-1]);
-          calendarSendData = data[dayOnly-1];
+          print(data[dayOnly - 1]);
+          calendarSendData = data[dayOnly - 1];
 
           //print("Formatted Date - $date");
         });
 
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => AttendanceRequisitionCalendar(
-                new AttendanceReportModel(), calendarSendData, 0, "$formattedDate")));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder:
+                (context) => AttendanceRequisitionCalendar(
+                  new AttendanceReportModel(),
+                  calendarSendData,
+                  0,
+                  "$formattedDate",
+                ),
+          ),
+        );
       },
       daysHaveCircularBorder: true,
       showOnlyCurrentMonthDate: false,
@@ -3319,17 +3371,17 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       height: dynamicHeight,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
-      //customGridViewPhysics: NeverScrollableScrollPhysics(),
 
-      markedDateCustomShapeBorder: CircleBorder(side: BorderSide(color: Colors.grey)),
+      //customGridViewPhysics: NeverScrollableScrollPhysics(),
+      markedDateCustomShapeBorder: CircleBorder(
+        side: BorderSide(color: Colors.grey),
+      ),
       markedDateCustomTextStyle: TextStyle(
         fontSize: 18,
         color: Colors.amberAccent,
       ),
       showHeader: false,
-      todayTextStyle: TextStyle(
-        color: Colors.white,
-      ),
+      todayTextStyle: TextStyle(color: Colors.white),
       markedDateShowIcon: true,
       markedDateIconMaxShown: 2,
       markedDateIconBuilder: (event) {
@@ -3337,9 +3389,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       },
       markedDateMoreShowTotal: true,
       todayButtonColor: Mythemes.lightBluishColor,
-      selectedDayTextStyle: TextStyle(
-        color: Mythemes.black,
-      ),
+      selectedDayTextStyle: TextStyle(color: Mythemes.black),
+
       //minSelectedDate: _currentDate.subtract(Duration(days: 360)),
       //maxSelectedDate: _currentDate.add(Duration(days: 360)),
       /*prevDaysTextStyle: TextStyle(
@@ -3369,21 +3420,19 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         //API month change call
       });
     },*/
-
       onCalendarChanged: (DateTime date) async {
-
         // 1. Prevent sliding beyond allowed range
         if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
-          print("⛔ Calendar slide limit reached");
+          print("â›” Calendar slide limit reached");
           return;
         }
 
         // 2. Stop duplicate API calls
-        // Compare only month & year — day changes should NOT trigger new API
+        // Compare only month & year â€” day changes should NOT trigger new API
         if (_lastApiCallMonth != null &&
             _lastApiCallMonth!.month == date.month &&
             _lastApiCallMonth!.year == date.year) {
-          print("⛔ Duplicate onCalendarChanged — API blocked");
+          print("â›” Duplicate onCalendarChanged â€” API blocked");
           return;
         }
 
@@ -3397,16 +3446,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         singleDateString = DateFormat('dd-MM-yyyy').format(date);
         print("Updated Date Change - $singleDateString");
 
-        print("✅ Calling Calendar API for: $_currentMonth");
+        print("âœ… Calling Calendar API for: $_currentMonth");
 
-        // 5. Call API — only ONE time now
+        // 5. Call API â€” only ONE time now
         CalendarModalClass result = await getCalendarData(sessionId!);
 
         setState(() {
           calendarModalGlobal = result;
         });
 
-        print("✔ Calendar API Updated");
+        print("âœ” Calendar API Updated");
       },
       onDayLongPressed: (DateTime date) {
         //print('long pressed date $date');
@@ -3422,7 +3471,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           /* Container(
             margin: EdgeInsets.symmetric(horizontal: 16.0),
             child: _calendarCarousel,
-          ),*/ // This trailing comma makes auto-formatting nicer for build methods.
+          ),*/
+          // This trailing comma makes auto-formatting nicer for build methods.
           //custom icon without header
           Container(
             margin: EdgeInsets.only(
@@ -3434,13 +3484,14 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             child: new Row(
               children: <Widget>[
                 Expanded(
-                    child: Text(
-                      _currentMonth,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w100,
-                        fontSize: 24.0,
-                      ),
-                    )),
+                  child: Text(
+                    _currentMonth,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w100,
+                      fontSize: 24.0,
+                    ),
+                  ),
+                ),
                 /*TextButton(
                   child: Text('PREV'),
                   onPressed: () {
@@ -3455,17 +3506,20 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                 TextButton(
                   child: Text('PREV'),
                   onPressed: () {
-                    final previousMonth = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
+                    final previousMonth = DateTime(
+                      _targetDateTime.year,
+                      _targetDateTime.month - 1,
+                    );
                     if (previousMonth.isBefore(_minDateAllowed)) {
-                      print("⛔ You can’t go beyond last 2 months");
+                      print("â›” You canâ€™t go beyond last 2 months");
                       Fluttertoast.showToast(
-                          msg: "Can't go before this month !!",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.black,
-                          textColor: Colors.white,
-                          fontSize: 16.0
+                        msg: "Can't go before this month !!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.black,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
                       );
                       return;
                     }
@@ -3489,17 +3543,20 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                 TextButton(
                   child: Text('NEXT'),
                   onPressed: () {
-                    final nextMonth = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
+                    final nextMonth = DateTime(
+                      _targetDateTime.year,
+                      _targetDateTime.month + 1,
+                    );
                     if (nextMonth.isAfter(_maxDateAllowed)) {
-                      print("⛔ You can’t go beyond next month");
+                      print("â›” You canâ€™t go beyond next month");
                       Fluttertoast.showToast(
-                          msg: "Can't go beyond this month !!",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.black,
-                          textColor: Colors.white,
-                          fontSize: 16.0
+                        msg: "Can't go beyond this month !!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.black,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
                       );
                       return;
                     }
@@ -3518,14 +3575,11 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           ), //
           if (_legends.isNotEmpty)
             LegendWidget(legends: _legends), // Dynamically show legends
-          if (isLoading)
-            CircularProgressIndicator(),
+          if (isLoading) CircularProgressIndicator(),
         ],
       ),
     );
   }
-
-
 
   TabSection(EventsListModal eventsListModal) {
     var todayEvent;
@@ -3533,14 +3587,14 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     var oldEventLength;
     var oldJobLength;
     var oldJobEvent;
-    for(int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
+    for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
       //print("oldEvent $oldEvent");
       //developer.log("message",name: oldJobEvent);
     }
 
-    for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
+    for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
       print("oldJobEvent $oldJobEvent");
@@ -3562,10 +3616,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               child: TabBar(
                 tabs: [
                   Tab(
-                    icon: Icon(
-                      Icons.celebration,
-                      color: Mythemes.blackishade,
-                    ),
+                    icon: Icon(Icons.celebration, color: Mythemes.blackishade),
                     text: "Birthday",
                   ),
                   Tab(
@@ -3595,258 +3646,346 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: TabBarView(children: [
-
-              Container(
-                // height: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child:
-                  oldEventLength == null ? "There is no data available.".text.center.make().py16() :
-                  ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: eventsListModalGlobal!.bdayList!.length,
-                      itemBuilder: (context, itemCount) {
-                        return Card(
-                          child: ListTile(
-                            //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
-                            title: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].fullName
-                                .toString()),
-                            subtitle: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].department
-                                .toString()),
-                            trailing: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].dob
-                                .toString()),
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                    eventsListModalGlobal!
-                                        .bdayList![itemCount].image
-                                        .toString()),
-                                backgroundColor: Colors.grey,
-                                // child: Image.network(imageString!),
-                              ),
+            child: TabBarView(
+              children: [
+                Container(
+                  // height: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        oldEventLength == null
+                            ? "There is no data available.".text.center
+                                .make()
+                                .py16()
+                            : ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount:
+                                  eventsListModalGlobal!.bdayList!.length,
+                              itemBuilder: (context, itemCount) {
+                                return Card(
+                                  child: ListTile(
+                                    //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
+                                    title: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .fullName
+                                          .toString(),
+                                    ),
+                                    subtitle: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .department
+                                          .toString(),
+                                    ),
+                                    trailing: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .dob
+                                          .toString(),
+                                    ),
+                                    leading: Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .image
+                                              .toString(),
+                                        ),
+                                        backgroundColor: Colors.grey,
+                                        // child: Image.network(imageString!),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                        );
-                      }),
+                  ),
                 ),
-              ),
-              Container(
-                // height: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child:
-                  oldJobLength == null ? "There is no data available.".text.center.make().py16() :
-                  ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: eventsListModalGlobal!.joblist!.length,
-                      itemBuilder: (context, itemCount) {
-                        return Card(
-                          child: ListTile(
-                            title: Text(eventsListModalGlobal!
-                                .joblist![itemCount].fullName
-                                .toString()),
-                            subtitle: Text(eventsListModalGlobal!
-                                .joblist![itemCount].department
-                                .toString()),
-                            trailing: Text(eventsListModalGlobal!
-                                .joblist![itemCount].doj
-                                .toString()),
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                    eventsListModalGlobal!
-                                        .joblist![itemCount].image
-                                        .toString()),
-                                backgroundColor: Colors.grey,
-                                // child: Image.network(imageString!),
-                              ),
+                Container(
+                  // height: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        oldJobLength == null
+                            ? "There is no data available.".text.center
+                                .make()
+                                .py16()
+                            : ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: eventsListModalGlobal!.joblist!.length,
+                              itemBuilder: (context, itemCount) {
+                                return Card(
+                                  child: ListTile(
+                                    title: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .fullName
+                                          .toString(),
+                                    ),
+                                    subtitle: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .department
+                                          .toString(),
+                                    ),
+                                    trailing: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .doj
+                                          .toString(),
+                                    ),
+                                    leading: Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .image
+                                              .toString(),
+                                        ),
+                                        backgroundColor: Colors.grey,
+                                        // child: Image.network(imageString!),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                        );
-                      }),
+                  ),
                 ),
-              ),
-              Container(
-                // height: 1,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                      oldEvent != todayEvent ? "There is no data available.".text.make().py16() :
-
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: eventsListModalGlobal!.bdayList!.length,
-                          itemBuilder: (context, itemCount) {
-
-                            return Card(
-                              child: ListTile(
-                                title: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].fullName
-                                    .toString()),
-                                subtitle: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].department
-                                    .toString()),
-                                trailing: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].dob
-                                    .toString()),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                        eventsListModalGlobal!
-                                            .bdayList![itemCount].image
-                                            .toString()),
-                                    backgroundColor: Colors.grey,
-                                    // child: Image.network(imageString!),
-                                  ),
+                Container(
+                  // height: 1,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            oldEvent != todayEvent
+                                ? "There is no data available.".text
+                                    .make()
+                                    .py16()
+                                : ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      eventsListModalGlobal!.bdayList!.length,
+                                  itemBuilder: (context, itemCount) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .fullName
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .department
+                                              .toString(),
+                                        ),
+                                        trailing: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .dob
+                                              .toString(),
+                                        ),
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount]
+                                                  .image
+                                                  .toString(),
+                                            ),
+                                            backgroundColor: Colors.grey,
+                                            // child: Image.network(imageString!),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                            );
-                          }),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                      oldJobEvent != todayEvent ? "".text.make() :
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: eventsListModalGlobal!.joblist!.length,
-                          itemBuilder: (context, itemCount) {
-                            return Card(
-                              child: ListTile(
-                                title: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].fullName
-                                    .toString()),
-                                subtitle: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].department
-                                    .toString()),
-                                trailing: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].doj
-                                    .toString()),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                        eventsListModalGlobal!
-                                            .bdayList![itemCount].image
-                                            .toString()),
-                                    backgroundColor: Colors.grey,
-                                    // child: Image.network(imageString!),
-                                  ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            oldJobEvent != todayEvent
+                                ? "".text.make()
+                                : ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      eventsListModalGlobal!.joblist!.length,
+                                  itemBuilder: (context, itemCount) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .fullName
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .department
+                                              .toString(),
+                                        ),
+                                        trailing: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .doj
+                                              .toString(),
+                                        ),
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount]
+                                                  .image
+                                                  .toString(),
+                                            ),
+                                            backgroundColor: Colors.grey,
+                                            // child: Image.network(imageString!),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              Container(
-                // height: 1,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                      oldEvent != todayEvent ? "There is no data available.".text.make().py16() :
-
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: eventsListModalGlobal!.bdayList!.length,
-                          itemBuilder: (context, itemCount) {
-
-                            return Card(
-                              child: ListTile(
-                                title: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].fullName
-                                    .toString()),
-                                subtitle: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].department
-                                    .toString()),
-                                trailing: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].dob
-                                    .toString()),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                        eventsListModalGlobal!
-                                            .bdayList![itemCount].image
-                                            .toString()),
-                                    backgroundColor: Colors.grey,
-                                    // child: Image.network(imageString!),
-                                  ),
+                Container(
+                  // height: 1,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            oldEvent != todayEvent
+                                ? "There is no data available.".text
+                                    .make()
+                                    .py16()
+                                : ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      eventsListModalGlobal!.bdayList!.length,
+                                  itemBuilder: (context, itemCount) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .fullName
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .department
+                                              .toString(),
+                                        ),
+                                        trailing: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .dob
+                                              .toString(),
+                                        ),
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount]
+                                                  .image
+                                                  .toString(),
+                                            ),
+                                            backgroundColor: Colors.grey,
+                                            // child: Image.network(imageString!),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                            );
-                          }),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                      oldJobEvent != todayEvent ? "".text.make() :
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: eventsListModalGlobal!.joblist!.length,
-                          itemBuilder: (context, itemCount) {
-                            return Card(
-                              child: ListTile(
-                                title: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].fullName
-                                    .toString()),
-                                subtitle: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].department
-                                    .toString()),
-                                trailing: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].doj
-                                    .toString()),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                        eventsListModalGlobal!
-                                            .bdayList![itemCount].image
-                                            .toString()),
-                                    backgroundColor: Colors.grey,
-                                    // child: Image.network(imageString!),
-                                  ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            oldJobEvent != todayEvent
+                                ? "".text.make()
+                                : ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      eventsListModalGlobal!.joblist!.length,
+                                  itemBuilder: (context, itemCount) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .fullName
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .department
+                                              .toString(),
+                                        ),
+                                        trailing: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .doj
+                                              .toString(),
+                                        ),
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount]
+                                                  .image
+                                                  .toString(),
+                                            ),
+                                            backgroundColor: Colors.grey,
+                                            // child: Image.network(imageString!),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ]),
-          )
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -3902,35 +4041,36 @@ class LegendWidget extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // LEFT SIDE — current legend wrap
+          // LEFT SIDE â€” current legend wrap
           Expanded(
             child: Wrap(
               spacing: 16,
               runSpacing: 8,
-              children: legends.map((legend) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(int.parse(legend['mobColor']!)),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      legend['status']!,
-                      style: TextStyle(fontSize: 14, color: Colors.black),
-                    ),
-                  ],
-                ).py1();
-              }).toList(),
+              children:
+                  legends.map((legend) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(int.parse(legend['mobColor']!)),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          legend['status']!,
+                          style: TextStyle(fontSize: 14, color: Colors.black),
+                        ),
+                      ],
+                    ).py1();
+                  }).toList(),
             ),
           ),
 
-          // RIGHT SIDE — ellipsis icon
+          // RIGHT SIDE â€” ellipsis icon
           GestureDetector(
             onTap: () {
               showModalBottomSheet(
@@ -3947,13 +4087,18 @@ class LegendWidget extends StatelessWidget {
                         children: [
                           Text(
                             "Legend Details",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           SizedBox(height: 12),
 
                           ...legends.map((legend) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 6.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 6.0,
+                              ),
                               child: Row(
                                 children: [
                                   Container(
@@ -3961,15 +4106,19 @@ class LegendWidget extends StatelessWidget {
                                     height: 20,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Color(int.parse(legend['mobColor']!)),
+                                      color: Color(
+                                        int.parse(legend['mobColor']!),
+                                      ),
                                     ),
                                   ),
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
                                       legend['statusName']!,
-                                      style:
-                                      TextStyle(fontSize: 16, color: Colors.black),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ),
                                 ],

@@ -10,6 +10,7 @@ import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../modalClass/advanceTypeModal.dart';
 import '../modalClass/loanAdvanceTypeModal.dart';
@@ -26,7 +27,7 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
   var radios = "loan";
   bool loanShow = true;
   bool advanceShow = false;
-  SessionManager sessionManager=SessionManager();
+  SessionManager sessionManager = SessionManager();
   Map<String, dynamic> mapResponse = {};
   SessionManager shared = SessionManager();
   String? sessionId;
@@ -34,9 +35,9 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
   AdvanceTypeListModal? advanceTypeListLabel;
   late List<String?> loanTypeList = [];
   late List<String?> advanceTypeList = [];
-  String valuenew="listText";
-  String newValue="listText";
-  List<String> loanTypeGlobal=[];
+  String valuenew = "listText";
+  String newValue = "listText";
+  List<String> loanTypeGlobal = [];
   var dropdownNewvalue;
   var advanceDropValue;
   var ids;
@@ -55,19 +56,19 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
     getLeaveType12.then((value) {
       setState(() {
-        loanTypeListLabel=value;
+        loanTypeListLabel = value;
         //var leaveTypeId = value?.leaveData.leaveTypeList;
         //print('object$leaveTypeId');
       });
     });
     getLeaveType13.then((value) {
       setState(() {
-        advanceTypeListLabel=value;
+        advanceTypeListLabel = value;
         //var leaveTypeId = value?.leaveData.leaveTypeList;
         //print('object$leaveTypeId');
       });
@@ -87,16 +88,16 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
     String apiUrl = ApiDetails.loanRequest;
     print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseLeaveTypeList $getData');
-    loanTypeListLabel=LoanTypeListModal.fromJson(mapResponse);
+    loanTypeListLabel = LoanTypeListModal.fromJson(mapResponse);
     int? length = loanTypeListLabel?.loandata?.length;
     print('totalLoanType $length');
-    for(int i=0; i<loanTypeListLabel!.loandata!.length;i++){
+    for (int i = 0; i < loanTypeListLabel!.loandata!.length; i++) {
       String? loanTypeName = loanTypeListLabel!.loandata![i].loanName;
       loanTypeList.add(loanTypeListLabel!.loandata![i].loanName);
       print('dataLeaveTypeName $loanTypeName');
@@ -110,17 +111,18 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
     String apiUrl = ApiDetails.advanceRequest;
     print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseLeaveTypeList $getData');
-    advanceTypeListLabel=AdvanceTypeListModal.fromJson(mapResponse);
+    advanceTypeListLabel = AdvanceTypeListModal.fromJson(mapResponse);
     int? length = advanceTypeListLabel?.advancedata?.length;
     print('totalAdvanceType $length');
-    for(int i=0; i<advanceTypeListLabel!.advancedata!.length;i++){
-      String? advanceTypeName = advanceTypeListLabel!.advancedata![i].advanceName;
+    for (int i = 0; i < advanceTypeListLabel!.advancedata!.length; i++) {
+      String? advanceTypeName =
+          advanceTypeListLabel!.advancedata![i].advanceName;
       advanceTypeList.add(advanceTypeListLabel!.advancedata![i].advanceName);
       print('dataAdvanceType $advanceTypeName');
     }
@@ -129,13 +131,10 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
 
   @override
   Widget build(BuildContext context) {
-
     double height = MediaQuery.of(context).size.height;
     return DismissKeyboard(
       child: Scaffold(
-        appBar: AppBar(
-          title: titleName.text.make(),
-        ),
+        appBar: AppBar(title: titleName.text.make()),
 
         body: Container(
           height: height,
@@ -157,7 +156,7 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                             value: "loan",
                             groupValue: radios,
                             onChanged: (value) {
-                             /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Loan Click"),
                               ));*/
                               setState(() {
@@ -166,8 +165,6 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                                 advanceShow = false;
                                 radios = value.toString();
                               });
-
-
                             },
                           ),
                           "Loan".text.make(),
@@ -189,8 +186,6 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                                 loanShow = false;
                                 radios = value.toString();
                               });
-
-
                             },
                           ),
                           "Advance".text.make(),
@@ -203,55 +198,64 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                     child: Row(
                       children: [
                         Expanded(
-                            child: ListTile(
-                              title:
-                              "Select Type".text.maxFontSize(12).make().px4().py2(),
-                              subtitle:  DropdownButtonFormField(
-                                value:  dropdownNewvalue,
-                                  decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                      borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
-                                    ),
-                                    //labelText: "Select Department",
-                                    hintText: "Select Type",
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                    contentPadding: EdgeInsets.all(5),
-                                    /*border: OutlineInputBorder(
+                          child: ListTile(
+                            title:
+                                "Select Type".text
+                                    .maxFontSize(12)
+                                    .make()
+                                    .px4()
+                                    .py2(),
+                            subtitle: DropdownButtonFormField(
+                              value: dropdownNewvalue,
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  //<-- SEE HERE
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: Mythemes.blackishade,
+                                  ),
+                                ),
+                                //labelText: "Select Department",
+                                hintText: "Select Type",
+                                hintStyle: TextStyle(fontSize: 14),
+                                contentPadding: EdgeInsets.all(5),
+                                /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                    // labelText: "Location",
-                                    labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
-                                  ),
-                                  items: loanTypeList.map<DropdownMenuItem<String>>((String? value) {
+                                // labelText: "Location",
+                                labelStyle: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  color: Mythemes.blackish,
+                                ),
+                              ),
+                              items:
+                                  loanTypeList.map<DropdownMenuItem<String>>((
+                                    String? value,
+                                  ) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text(value!),
                                     );
-
                                   }).toList(),
-                                onChanged: (newVal) {
-                                  valuenew = newVal.toString();
-                                  int i =loanTypeList.indexOf(valuenew);
-                                  loanId = loanTypeListLabel?.loandata?[i].loanId;
-                                  var policyidnew= loanTypeList.elementAt(i);
-                                  loanTypeGlobal = newVal.toString().split('-');
-                                  String idn=loanTypeGlobal.last;
-                                  print('loanId $idn');
-                                  setState(() {
-                                    print('value1 $i');
-                                    print('value $policyidnew');
-                                    print('loanId $loanId');
-                                    dropdownNewvalue = newVal;
-                                  });
-                                },
-
-                              ),
-                            )),
+                              onChanged: (newVal) {
+                                valuenew = newVal.toString();
+                                int i = loanTypeList.indexOf(valuenew);
+                                loanId = loanTypeListLabel?.loandata?[i].loanId;
+                                var policyidnew = loanTypeList.elementAt(i);
+                                loanTypeGlobal = newVal.toString().split('-');
+                                String idn = loanTypeGlobal.last;
+                                print('loanId $idn');
+                                setState(() {
+                                  print('value1 $i');
+                                  print('value $policyidnew');
+                                  print('loanId $loanId');
+                                  dropdownNewvalue = newVal;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -260,125 +264,144 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                     child: Row(
                       children: [
                         Expanded(
-                            child: ListTile(
-                              title:
-                              "Select Type".text.maxFontSize(12).make().px4().py2(),
-                              subtitle:  DropdownButtonFormField(
-                                value: advanceDropValue,
-                                  decoration: InputDecoration(
-                                    enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                      borderSide: BorderSide(
-                                          width: 1, color: Mythemes.blackishade),
-                                    ),
-                                    //labelText: "Select Department",
-                                    hintText: "Select Type",
-                                    hintStyle: TextStyle(
-                                      fontSize: 14,
-                                    ),
-                                    contentPadding: EdgeInsets.all(5),
-                                    /*border: OutlineInputBorder(
+                          child: ListTile(
+                            title:
+                                "Select Type".text
+                                    .maxFontSize(12)
+                                    .make()
+                                    .px4()
+                                    .py2(),
+                            subtitle: DropdownButtonFormField(
+                              value: advanceDropValue,
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  //<-- SEE HERE
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: Mythemes.blackishade,
+                                  ),
+                                ),
+                                //labelText: "Select Department",
+                                hintText: "Select Type",
+                                hintStyle: TextStyle(fontSize: 14),
+                                contentPadding: EdgeInsets.all(5),
+                                /*border: OutlineInputBorder(
                                                   borderRadius:
                                                   BorderRadius.all(Radius.circular(8))),*/
-                                    // labelText: "Location",
-                                    labelStyle: TextStyle(
-                                        fontWeight: FontWeight.w500,fontSize: 13,
-                                        color: Mythemes.blackish),
-                                  ),
-                                  items: advanceTypeList.map<DropdownMenuItem<String>>((String? value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value!),
-                                    );
-
-                                  }).toList(),
-                                onChanged: (valNew) {
-                                  newValue = valNew.toString();
-                                  int i =advanceTypeList.indexOf(newValue);
-                                 advanceId = advanceTypeListLabel?.advancedata?[i].advanceId;
-                                  var policyidnew= advanceTypeList.elementAt(i);
-                                  //loanTypeGlobal = valNew.toString().split('-');
-                                  //String idn=loanTypeGlobal.last;
-                                  //print('loanId $idn');
-                                  setState(() {
-                                    print('value $policyidnew');
-                                    print('advanceId $advanceId');
-                                    advanceDropValue = valNew;
-
-                                  });
-
-                                },
-
+                                // labelText: "Location",
+                                labelStyle: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  color: Mythemes.blackish,
+                                ),
                               ),
-                            )),
+                              items:
+                                  advanceTypeList.map<DropdownMenuItem<String>>(
+                                    (String? value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value!),
+                                      );
+                                    },
+                                  ).toList(),
+                              onChanged: (valNew) {
+                                newValue = valNew.toString();
+                                int i = advanceTypeList.indexOf(newValue);
+                                advanceId =
+                                    advanceTypeListLabel
+                                        ?.advancedata?[i]
+                                        .advanceId;
+                                var policyidnew = advanceTypeList.elementAt(i);
+                                //loanTypeGlobal = valNew.toString().split('-');
+                                //String idn=loanTypeGlobal.last;
+                                //print('loanId $idn');
+                                setState(() {
+                                  print('value $policyidnew');
+                                  print('advanceId $advanceId');
+                                  advanceDropValue = valNew;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   Row(
                     children: [
                       Expanded(
-                          child: ListTile(
-                            title:
-                            "Amount".text.maxFontSize(12).make().px4().py2(),
-                            subtitle:  TextFormField(
-                              keyboardType: TextInputType.number,
-                              controller: amountController,
-                              enabled: true,
-                              // initialValue: "Head Office",
-                              //maxLines: 3,
-                              decoration: InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.blackishade),
+                        child: ListTile(
+                          title:
+                              "Amount".text.maxFontSize(12).make().px4().py2(),
+                          subtitle: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: amountController,
+                            enabled: true,
+                            // initialValue: "Head Office",
+                            //maxLines: 3,
+                            decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Mythemes.blackishade,
                                 ),
-                                //labelText: "Select Department",
-                                hintText: "Amount",
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                ),
-                                contentPadding: EdgeInsets.all(5),
-                                /*border: OutlineInputBorder(
+                              ),
+                              //labelText: "Select Department",
+                              hintText: "Amount",
+                              hintStyle: TextStyle(fontSize: 14),
+                              contentPadding: EdgeInsets.all(5),
+                              /*border: OutlineInputBorder(
                                                 borderRadius:
                                                 BorderRadius.all(Radius.circular(8))),*/
-                                // labelText: "Location",
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,fontSize: 13,
-                                    color: Mythemes.blackish),
+                              // labelText: "Location",
+                              labelStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Mythemes.blackish,
                               ),
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   Row(
                     children: [
                       Expanded(
-                          child: ListTile(
-                            title: "Remarks".text.maxFontSize(12).make().px4().py2(),
-                            subtitle: TextFormField(
-                              enabled: true,
-                              controller: remarkController,
-                              // initialValue: "Head Office",
-                              maxLines: 3,
-                              decoration: InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.blackishade),
+                        child: ListTile(
+                          title:
+                              "Remarks".text.maxFontSize(12).make().px4().py2(),
+                          subtitle: TextFormField(
+                            enabled: true,
+                            controller: remarkController,
+                            // initialValue: "Head Office",
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Mythemes.blackishade,
                                 ),
-                                //labelText: "Select Department",
-                                hintText: "Add Remarks",
-                                hintStyle: TextStyle(
-                                  fontSize: 14,
-                                ),
-                                contentPadding: EdgeInsets.all(5),
-                                /*border: OutlineInputBorder(
+                              ),
+                              //labelText: "Select Department",
+                              hintText: "Add Remarks",
+                              hintStyle: TextStyle(fontSize: 14),
+                              contentPadding: EdgeInsets.all(5),
+                              /*border: OutlineInputBorder(
                                                 borderRadius:
                                                 BorderRadius.all(Radius.circular(8))),*/
-                                // labelText: "Location",
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w500,fontSize: 13,
-                                    color: Mythemes.blackish),
+                              // labelText: "Location",
+                              labelStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Mythemes.blackish,
                               ),
                             ),
-                          )),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -390,48 +413,52 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
           height: 100,
           color: context.cardColor,
           child: ButtonBar(
-              alignment: MainAxisAlignment.center,
-              buttonPadding: Vx.mOnly(right: 16),
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    if(radios == "loan" || loanShow == true) {
-                      ids = loanId;
-                      radioActive = "false";
-                    }
-                    else if (radios == "advance" || loanShow == false){
-                      ids = advanceId;
-                      radioActive = "true";
-                    }
-                    loanAdvanceRequest(amountController.text, remarkController.text);
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                    MaterialStateProperty.all(Mythemes.lightBluishColor),
+            alignment: MainAxisAlignment.center,
+            buttonPadding: Vx.mOnly(right: 16),
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  if (radios == "loan" || loanShow == true) {
+                    ids = loanId;
+                    radioActive = "false";
+                  } else if (radios == "advance" || loanShow == false) {
+                    ids = advanceId;
+                    radioActive = "true";
+                  }
+                  loanAdvanceRequest(
+                    amountController.text,
+                    remarkController.text,
+                  );
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    Mythemes.lightBluishColor,
                   ),
-                  child: "Send".text.make(),
-                ).wh(150, 40).py12()
-              ]),
+                ),
+                child: "Send".text.make(),
+              ).wh(150, 40).py12(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Future<void> loanAdvanceRequest(dynamic loanAmt ,String remarks) async {
-
+  Future<void> loanAdvanceRequest(dynamic loanAmt, String remarks) async {
     //String idn=leavereqIdGlobel.last;
     String dayRadio = "1";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanAdvReqSend;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "loanAdvId=$ids&"
-        "loanAmount=$loanAmt&"
-        "selectedAdvanceRadio=$radioActive&"
-        "remarks=$remarks"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "loanAdvId=$ids&"
+      "loanAmount=$loanAmt&"
+      "selectedAdvanceRadio=$radioActive&"
+      "remarks=$remarks",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -442,12 +469,19 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
       var reason = mapResponse['reason'].toString();
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 }

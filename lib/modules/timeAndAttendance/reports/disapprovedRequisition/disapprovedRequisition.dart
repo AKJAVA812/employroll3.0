@@ -5,6 +5,7 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -21,10 +22,11 @@ import 'disApprovedRequisitionModel.dart';
 
 class DisApprovedRequisiton extends StatefulWidget {
   final DisapprovedRequisitionModel disapprovedRequisitionModel;
-  DisApprovedRequisiton (this.disapprovedRequisitionModel);
+  DisApprovedRequisiton(this.disapprovedRequisitionModel);
 
   @override
-  State<DisApprovedRequisiton> createState() => _DisApprovedRequisitonState(disapprovedRequisitionModel);
+  State<DisApprovedRequisiton> createState() =>
+      _DisApprovedRequisitonState(disapprovedRequisitionModel);
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -36,7 +38,8 @@ dynamic userPanelPerm;
 dynamic getProfileId;
 DisapprovedRequisitionModel? disapprovedRequisitionLabel;
 
-class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with RouteAware{
+class _DisApprovedRequisitonState extends State<DisApprovedRequisiton>
+    with RouteAware {
   final DisapprovedRequisitionModel disapprovedRequisitionModel;
   _DisApprovedRequisitonState(this.disapprovedRequisitionModel);
 
@@ -54,7 +57,7 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
@@ -65,9 +68,9 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
     super.initState();
     getSharedPrfanceList();
   }
-  bool isLoading = true;   // 🔹 Track loading state
-  bool noData = false;
 
+  bool isLoading = true; // ðŸ”¹ Track loading state
+  bool noData = false;
 
   Future getSharedPrfanceList() async {
     setState(() {
@@ -79,8 +82,9 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
     userPanelPerm = await shared!.getUserPanel();
     getProfileId = await shared!.getDefaultProfileId();
 
-    Future<DisapprovedRequisitionModel?> getAppReq11 =
-    getDisapprovedReqList(sessionId!);
+    Future<DisapprovedRequisitionModel?> getAppReq11 = getDisapprovedReqList(
+      sessionId!,
+    );
 
     getAppReq11.then((value) {
       setState(() {
@@ -90,25 +94,29 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
           noData = false;
         } else {
           disapprovedRequisitionLabel = null;
-          noData = true;  // 🔹 Mark as no data
+          noData = true; // ðŸ”¹ Mark as no data
         }
       });
     });
   }
 
-  Future<DisapprovedRequisitionModel?> getDisapprovedReqList(String SessionId) async {
+  Future<DisapprovedRequisitionModel?> getDisapprovedReqList(
+    String SessionId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.disApprovedAttReqList;
     print('employeeList11: $SessionId');
 
     try {
-      var urlapi = Uri.parse("$conn$apiUrl?"
-          "sessionId=$SessionId&"
-          "userPermission=$userPanelPerm&"
-          "profileId=$getProfileId&"
-          "orgId=0");
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?"
+        "sessionId=$SessionId&"
+        "userPermission=$userPanelPerm&"
+        "profileId=$getProfileId&"
+        "orgId=0",
+      );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       print('responseemployeeList ${response.body}');
       print('Attendance DisApproved APIs - ${response.request}');
@@ -122,15 +130,15 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
 
           return DisapprovedRequisitionModel.fromJson(mapResponse);
         } else {
-          print("⚠️ No data found in response");
+          print("âš ï¸ No data found in response");
           return null;
         }
       } else {
-        print("⚠️ API Error: ${response.statusCode}");
+        print("âš ï¸ API Error: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      print("❌ Exception in getDisapprovedReqList: $e");
+      print("âŒ Exception in getDisapprovedReqList: $e");
       return null;
     }
   }
@@ -142,26 +150,29 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: "Disapproved Requisition List".text.overflow(TextOverflow.ellipsis).maxLines(1).make(),
+        title:
+            "Disapproved Requisition List".text
+                .overflow(TextOverflow.ellipsis)
+                .maxLines(1)
+                .make(),
         leading: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            },
-            icon: Icon(Icons.arrow_back_ios)),
+          onPressed: () {
+            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+          },
+          icon: Icon(Icons.arrow_back_ios),
+        ),
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context, delegate: SearchItems(),
-                );
-
-              }, icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(context: context, delegate: SearchItems());
+            },
+            icon: Icon(Icons.search),
+          ),
         ],
       ),
 
       body: Container(
-
-        child:  Column(
+        child: Column(
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,58 +196,70 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
                   styleAnimationType: AnimationType.onHover,
                   spacing: 10.0,
                   customSeparatorBuilder: (context, local, global) {
-                    final opacity =
-                    ((global.position - local.position).abs() - 0.5)
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
                         .clamp(0.0, 1.0);
                     return VerticalDivider(
-                        indent: 10.0,
-                        endIndent: 10.0,
-                        color: Colors.white38.withOpacity(opacity));
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
                   },
                   customIconBuilder: (context, local, global) {
                     final text = const ['Pending', 'Approved'][local.index];
                     return Center(
-                        child: Text(text,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(Colors.black, Colors.white,
-                                    local.animationValue))));
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   borderWidth: 0.0,
                   onChanged: (i) {
                     setState(() {
                       value = i;
                       print(i);
-
                     });
 
-                    if(value == 0) {
+                    if (value == 0) {
                       Navigator.pushNamed(context, MyRoutings.pendingReqRoute);
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
-                    if(value == 1) {
-                      Navigator.pushNamed(context, MyRoutings.essAttendanceApprovedReq);
+                    if (value == 1) {
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutings.essAttendanceApprovedReq,
+                      );
                     }
                     /*if(value == 2) {
                       Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
                     }*/
                   },
-                )
+                ),
               ],
             ).py(4),
             Expanded(
-              child: isLoading
-                  ? Center(
-                child: CircularProgressIndicator(),
-              )
-                  : noData
-                  ? Center(
-                child: Text(
-                  "No data found",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              )
-                  : getDisAppList(disapprovedRequisitionLabel!),
+              child:
+                  isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : noData
+                      ? Center(
+                        child: Text(
+                          "No data found",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                      : getDisAppList(disapprovedRequisitionLabel!),
             ),
           ],
         ),
@@ -248,46 +271,50 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
         ),
         mini: false,
         onPressed: () async {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetAttendanceDet()));
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => GetAttendanceDet()));
         },
         backgroundColor: Mythemes.lightBluishColor,
-        child: Icon(Icons.add, color: Mythemes.whitish,),
+        child: Icon(Icons.add, color: Mythemes.whitish),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             print('My Requests');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -298,10 +325,7 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -329,13 +353,15 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  DisApprovedRequisiton(DisapprovedRequisitionModel()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) =>
+                    DisApprovedRequisiton(DisapprovedRequisitionModel()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -343,103 +369,155 @@ class _DisApprovedRequisitonState extends State<DisApprovedRequisiton> with Rout
         itemCount: disapprovedRequisitionModel!.data!.length,
         itemBuilder: (context, i) {
           return Card(
-              elevation: 2,
-              child: Container(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        disapprovedRequisitionModel.data![i].empName.toString().text.make().px8().py4(),
-                        Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                "Disapproved".text.bold.color(Mythemes.dangerColorOne).sm.make().px8(),
-                              ],
-                            )
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        "On Date:".text.sm.make().px8(),
-                        disapprovedRequisitionModel.data![i].onDate.toString().text.textStyle(context.captionStyle).make().px8(),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        "Update:".text.sm.make().px8(),
-                        disapprovedRequisitionModel.data![i].updationDate.toString().text.textStyle(context.captionStyle).make().px8(),
-                      ],
-                    ),
+            elevation: 2,
+            child: Container(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      disapprovedRequisitionModel.data![i].empName
+                          .toString()
+                          .text
+                          .make()
+                          .px8()
+                          .py4(),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            "Disapproved".text.bold
+                                .color(Mythemes.dangerColorOne)
+                                .sm
+                                .make()
+                                .px8(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      "On Date:".text.sm.make().px8(),
+                      disapprovedRequisitionModel.data![i].onDate
+                          .toString()
+                          .text
+                          .textStyle(context.captionStyle)
+                          .make()
+                          .px8(),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      "Update:".text.sm.make().px8(),
+                      disapprovedRequisitionModel.data![i].updationDate
+                          .toString()
+                          .text
+                          .textStyle(context.captionStyle)
+                          .make()
+                          .px8(),
+                    ],
+                  ),
 
-                    Row(
-                      children: [
-                        "Remarks:".text.sm.make().px8(),
-                        disapprovedRequisitionModel.data![i].remark.toString().text.textStyle(context.captionStyle).make().px8(),
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.touch_app, size: 35, color: Mythemes.dangerColorOne,
-                              ),
-                            ],
-                          ),
+                  Row(
+                    children: [
+                      "Remarks:".text.sm.make().px8(),
+                      disapprovedRequisitionModel.data![i].remark
+                          .toString()
+                          .text
+                          .textStyle(context.captionStyle)
+                          .make()
+                          .px8(),
+                    ],
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15,
+                          left: 5,
+                          right: 3,
+                          bottom: 18,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              "In Time".text.sm.make(),
-                              disapprovedRequisitionModel.data![i].inTime.toString().text.sm.make()
-                            ],
-                          ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.touch_app,
+                              size: 35,
+                              color: Mythemes.dangerColorOne,
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.touch_app, size: 35, color: Mythemes.dangerColorOne,
-                              ),
-                            ],
-                          ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15,
+                          left: 5,
+                          right: 3,
+                          bottom: 18,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                          child: Column(
-                            children: [
-                              "Out Time".text.sm.make(),
-                              disapprovedRequisitionModel.data![i].outtime.toString().text.sm.make()
-                            ],
-                          ),
+                        child: Column(
+                          children: [
+                            "In Time".text.sm.make(),
+                            disapprovedRequisitionModel.data![i].inTime
+                                .toString()
+                                .text
+                                .sm
+                                .make(),
+                          ],
                         ),
-                      ],
-                    )
-                  ],
-                ),
-              )
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15,
+                          left: 5,
+                          right: 3,
+                          bottom: 18,
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.touch_app,
+                              size: 35,
+                              color: Mythemes.dangerColorOne,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15,
+                          left: 5,
+                          right: 3,
+                          bottom: 18,
+                        ),
+                        child: Column(
+                          children: [
+                            "Out Time".text.sm.make(),
+                            disapprovedRequisitionModel.data![i].outtime
+                                .toString()
+                                .text
+                                .sm
+                                .make(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           );
         },
-
       ),
     );
   }
 }
 
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -464,6 +542,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -476,12 +555,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -494,9 +572,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

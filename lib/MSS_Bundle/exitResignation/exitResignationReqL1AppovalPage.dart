@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/commanNotificationPage.dart';
 import '../../commanScreen/homePage.dart';
@@ -21,13 +22,13 @@ import 'exitModalClasses/fetchResignationRequestModal.dart';
 
 class ExitResignationL1ApprovalPage extends StatefulWidget {
   final dynamic requestId;
-  const ExitResignationL1ApprovalPage(
-      {super.key, required this.requestId});
+  const ExitResignationL1ApprovalPage({super.key, required this.requestId});
 
   @override
   State<ExitResignationL1ApprovalPage> createState() =>
       _ExitResignationL1ApprovalPageState(requestId.toString());
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
@@ -40,18 +41,19 @@ var disApproveButtonL1View;
 dynamic requestIdReceived;
 bool isLoading = true;
 bool isLoadingCount = true;
-List<DataNew>? allUsernew=[];
-List<DataNew>? foundDataNew=[];
+List<DataNew>? allUsernew = [];
+List<DataNew>? foundDataNew = [];
+
 class _ExitResignationL1ApprovalPageState
     extends State<ExitResignationL1ApprovalPage> {
-
   FetchSingleResignationRequestModal? fetchSingleResignationRequestLabel;
   FetchSingleResignationRequestModal? fetchSingleResignationRequestLabeled;
 
-  final dynamic  requestIdReceive;
+  final dynamic requestIdReceive;
   _ExitResignationL1ApprovalPageState(this.requestIdReceive);
   final TextEditingController noticePeriodController = TextEditingController();
-  final TextEditingController reasonForLeavingController = TextEditingController();
+  final TextEditingController reasonForLeavingController =
+      TextEditingController();
   final TextEditingController remarksController = TextEditingController();
   final TextEditingController empRemarksController = TextEditingController();
 
@@ -68,7 +70,7 @@ class _ExitResignationL1ApprovalPageState
     "Relocation",
     "Career Change",
     "Health Issues",
-    "Personal Reasons"
+    "Personal Reasons",
   ];
 
   Future getSharedPrfanceList() async {
@@ -89,23 +91,25 @@ class _ExitResignationL1ApprovalPageState
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
-    Future<FetchSingleResignationRequestModal> getEmployeeList11 = getResignationDataForApproval(sessionId!);
+    Future<FetchSingleResignationRequestModal> getEmployeeList11 =
+        getResignationDataForApproval(sessionId!);
     isLoading = true;
 
     getEmployeeList11.then((value) {
       setState(() {
-
         foundDataNew = allUsernew;
-        fetchSingleResignationRequestLabel=value;
-        fetchSingleResignationRequestLabeled=fetchSingleResignationRequestLabel;
+        fetchSingleResignationRequestLabel = value;
+        fetchSingleResignationRequestLabeled =
+            fetchSingleResignationRequestLabel;
         isLoading = false;
         print('Loan Data - ${foundDataNew!.length}');
 
-        reasonForLeavingController.text = foundDataNew![0].seprationName.toString();
+        reasonForLeavingController.text =
+            foundDataNew![0].seprationName.toString();
         registrationDate.text = foundDataNew![0].resignationDate.toString();
         noticePeriodController.text = foundDataNew![0].noticeperiod.toString();
         lastWorkDate.text = foundDataNew![0].lastWorkingDate.toString();
@@ -114,12 +118,12 @@ class _ExitResignationL1ApprovalPageState
         resignationAttachment = foundDataNew![0].attachment.toString();
       });
     });
-
   }
 
   void showAttachmentBottomSheet(BuildContext context, String attachmentUrl) {
     final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
-    final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
+    final isImage =
+        attachmentUrl.toLowerCase().endsWith('.jpg') ||
         attachmentUrl.toLowerCase().endsWith('.jpeg') ||
         attachmentUrl.toLowerCase().endsWith('.png');
     showModalBottomSheet(
@@ -129,60 +133,70 @@ class _ExitResignationL1ApprovalPageState
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SizedBox(
-
-        height: MediaQuery.of(context).size.height * 0.85,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("View Attachment",
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              ),
-            ),
-            // File content viewer
-            Expanded(
-              child: isPdf
-                  ? SfPdfViewer.network(
-                attachmentUrl,
-                canShowScrollStatus: true,
-                canShowPaginationDialog: true,
-              )
-                  : isImage
-                  ? CachedNetworkImage(
-                imageUrl: attachmentUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) => const Center(
-                  child: CircularProgressIndicator(),
+      builder:
+          (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.85,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "View Attachment",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
                 ),
-                errorWidget: (context, url, error) =>
-                const Center(child: Text("❌ Failed to load image")),
-              )
-                  : const Center(
-                child: Text(
-                  "⚠️ File not found !!",
-                  style: TextStyle(fontSize: 16, color: Colors.redAccent),
+                // File content viewer
+                Expanded(
+                  child:
+                      isPdf
+                          ? SfPdfViewer.network(
+                            attachmentUrl,
+                            canShowScrollStatus: true,
+                            canShowPaginationDialog: true,
+                          )
+                          : isImage
+                          ? CachedNetworkImage(
+                            imageUrl: attachmentUrl,
+                            fit: BoxFit.contain,
+                            placeholder:
+                                (context, url) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                            errorWidget:
+                                (context, url, error) => const Center(
+                                  child: Text("âŒ Failed to load image"),
+                                ),
+                          )
+                          : const Center(
+                            child: Text(
+                              "âš ï¸ File not found !!",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                          ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
-
 
   @override
   void initState() {
@@ -192,15 +206,19 @@ class _ExitResignationL1ApprovalPageState
     getSharedPrfanceList();
   }
 
-  Future<FetchSingleResignationRequestModal> getResignationDataForApproval(String SessionId) async {
+  Future<FetchSingleResignationRequestModal> getResignationDataForApproval(
+    String SessionId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.fetchSingleEmployeeExitData;
     print('employeeList11: ${SessionId}');
     FetchSingleResignationRequestModal fetchSingleResignationRequestModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "Id=$requestIdReceived");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "Id=$requestIdReceived",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
     setState(() {
@@ -212,17 +230,15 @@ class _ExitResignationL1ApprovalPageState
     print('responseemployeeList $mapResponse');
     var getData = mapResponse.length;
 
-    fetchSingleResignationRequestModal = FetchSingleResignationRequestModal.fromJson(mapResponse);
+    fetchSingleResignationRequestModal =
+        FetchSingleResignationRequestModal.fromJson(mapResponse);
 
     allUsernew = fetchSingleResignationRequestModal.data;
-
-
 
     setState(() {
       isLoadingCount = false;
       isLoading = false;
     });
-
 
     return fetchSingleResignationRequestModal;
   }
@@ -253,10 +269,14 @@ class _ExitResignationL1ApprovalPageState
       child: Text(
         text,
         style: const TextStyle(
-            fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
       ),
     );
   }
+
   int currentIndex = 2;
   @override
   Widget build(BuildContext context) {
@@ -303,8 +323,9 @@ class _ExitResignationL1ApprovalPageState
         padding: const EdgeInsets.all(16),
         child: Card(
           elevation: 5,
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Column(
@@ -326,9 +347,7 @@ class _ExitResignationL1ApprovalPageState
                 ),*/
                 formLabel("Reason for Leaving"),
                 TextFormField(
-                  style: TextStyle(
-                      color: Mythemes.black
-                  ),
+                  style: TextStyle(color: Mythemes.black),
                   controller: reasonForLeavingController,
                   enabled: false,
                   decoration: const InputDecoration(
@@ -339,9 +358,7 @@ class _ExitResignationL1ApprovalPageState
                 const SizedBox(height: 15),
                 formLabel("Resignation Date"),
                 TextFormField(
-                  style: TextStyle(
-                      color: Mythemes.black
-                  ),
+                  style: TextStyle(color: Mythemes.black),
                   onTap: () async {
                     DateTime? fromDate = DateTime.now();
                     FocusScope.of(context).requestFocus(FocusNode());
@@ -352,7 +369,9 @@ class _ExitResignationL1ApprovalPageState
                       lastDate: DateTime(2060),
                     );
                     setState(() {
-                      registrationDate.text = DateFormat("dd-MM-yyyy").format(fromDate!);
+                      registrationDate.text = DateFormat(
+                        "dd-MM-yyyy",
+                      ).format(fromDate!);
                     });
                   },
                   readOnly: true,
@@ -377,7 +396,10 @@ class _ExitResignationL1ApprovalPageState
                     hintText: "Resignation Date",
                     contentPadding: EdgeInsets.all(5),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(width: 1, color: Mythemes.blackishade),
+                      borderSide: BorderSide(
+                        width: 1,
+                        color: Mythemes.blackishade,
+                      ),
                     ),
                     labelStyle: TextStyle(
                       fontWeight: FontWeight.w500,
@@ -390,9 +412,7 @@ class _ExitResignationL1ApprovalPageState
 
                 formLabel("Notice Period (Official)"),
                 TextFormField(
-                  style: TextStyle(
-                      color: Mythemes.black
-                  ),
+                  style: TextStyle(color: Mythemes.black),
                   controller: noticePeriodController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
@@ -403,11 +423,11 @@ class _ExitResignationL1ApprovalPageState
                 const SizedBox(height: 15),
                 formLabel("Last Working Date"),
                 TextFormField(
-                  style: TextStyle(
-                      color: Mythemes.black
-                  ),
+                  style: TextStyle(color: Mythemes.black),
                   onTap: () async {
-                    FocusScope.of(context).requestFocus(FocusNode()); // to prevent keyboard
+                    FocusScope.of(
+                      context,
+                    ).requestFocus(FocusNode()); // to prevent keyboard
                     DateTime? fromDate = await showDatePicker(
                       context: context,
                       initialDate: DateTime.now(),
@@ -416,7 +436,9 @@ class _ExitResignationL1ApprovalPageState
                     );
                     if (fromDate != null) {
                       setState(() {
-                        lastWorkDate.text = DateFormat("dd-MM-yyyy").format(fromDate);
+                        lastWorkDate.text = DateFormat(
+                          "dd-MM-yyyy",
+                        ).format(fromDate);
                       });
                     }
                   },
@@ -442,7 +464,10 @@ class _ExitResignationL1ApprovalPageState
                     hintText: "Last Working Date",
                     contentPadding: EdgeInsets.all(5),
                     enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(width: 1, color: Mythemes.blackishade),
+                      borderSide: BorderSide(
+                        width: 1,
+                        color: Mythemes.blackishade,
+                      ),
                     ),
                     labelStyle: TextStyle(
                       fontWeight: FontWeight.w500,
@@ -455,9 +480,7 @@ class _ExitResignationL1ApprovalPageState
 
                 formLabel("Reason for Leaving"),
                 TextFormField(
-                  style: TextStyle(
-                      color: Mythemes.black
-                  ),
+                  style: TextStyle(color: Mythemes.black),
                   controller: empRemarksController,
                   readOnly: true,
                   maxLines: 3,
@@ -477,7 +500,9 @@ class _ExitResignationL1ApprovalPageState
                         blurRadius: 8,
                         spreadRadius: 3,
                         offset: Offset(0, 3),
-                        color: Colors.green.withOpacity(0.5), // ✅ Green shadow outside
+                        color: Colors.green.withOpacity(
+                          0.5,
+                        ), // âœ… Green shadow outside
                       ),
                     ],
                   ),
@@ -487,7 +512,9 @@ class _ExitResignationL1ApprovalPageState
                     decoration: const InputDecoration(
                       hintText: "Enter your remarks",
                       border: OutlineInputBorder(
-                        borderSide: BorderSide.none, // ✅ Remove inner border to show shadow clearly
+                        borderSide:
+                            BorderSide
+                                .none, // âœ… Remove inner border to show shadow clearly
                       ),
                       contentPadding: EdgeInsets.all(12),
                     ),
@@ -503,15 +530,23 @@ class _ExitResignationL1ApprovalPageState
                       onPressed: () {
                         if (resignationAttachment != null &&
                             resignationAttachment.toString().isNotEmpty) {
-                          showAttachmentBottomSheet(context, resignationAttachment);
+                          showAttachmentBottomSheet(
+                            context,
+                            resignationAttachment,
+                          );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("No attachment available")),
+                            const SnackBar(
+                              content: Text("No attachment available"),
+                            ),
                           );
                         }
                       },
-                      icon: Icon(Icons.remove_red_eye,
-                          color: Mythemes.lightBluishColor, size: 24),
+                      icon: Icon(
+                        Icons.remove_red_eye,
+                        color: Mythemes.lightBluishColor,
+                        size: 24,
+                      ),
                       tooltip: "View Attachment",
                     ),
                   ],
@@ -520,7 +555,9 @@ class _ExitResignationL1ApprovalPageState
                 Row(
                   children: [
                     Visibility(
-                      visible: disApproveButtonL1Show == "true" || disApproveButtonL1View == "1",
+                      visible:
+                          disApproveButtonL1Show == "true" ||
+                          disApproveButtonL1View == "1",
                       child: Expanded(
                         child: ElevatedButton(
                           onPressed: () {
@@ -529,19 +566,26 @@ class _ExitResignationL1ApprovalPageState
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             elevation: 5,
                           ),
-                          child: const Text("Disapprove",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                          child: const Text(
+                            "Disapprove",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Visibility(
-                      visible: approveButtonL1Show == "true" || approveButtonL1View == "1",
+                      visible:
+                          approveButtonL1Show == "true" ||
+                          approveButtonL1View == "1",
                       child: Expanded(
                         child: ElevatedButton(
                           onPressed: () {
@@ -550,60 +594,73 @@ class _ExitResignationL1ApprovalPageState
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Mythemes.successColor,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             elevation: 5,
                           ),
-                          child: const Text("Approve",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                          child: const Text(
+                            "Approve",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
         ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             print('My Requests');
           }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => EssAdminDashboardHead(EssDashboarrdModel()),
+              ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -614,10 +671,7 @@ class _ExitResignationL1ApprovalPageState
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -641,9 +695,13 @@ class _ExitResignationL1ApprovalPageState
     );
   }
 
-  static showDialgSucess(BuildContext buildContext, String result, String alert) {
+  static showDialgSucess(
+    BuildContext buildContext,
+    String result,
+    String alert,
+  ) {
     if (buildContext == null) {
-      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
       return;
     }
 
@@ -655,20 +713,20 @@ class _ExitResignationL1ApprovalPageState
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
-          title: Row(
-            children: [
-              Expanded(child: Text(alert)),
-            ],
-          ),
+          title: Row(children: [Expanded(child: Text(alert))]),
           content: Text(result),
           actions: [
             TextButton(
               onPressed: () {
-                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                if (Navigator.of(context).canPop()) {
+                  // âœ… Using `context` inside the builder
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("⚠️ Warning: No route to close.");
+                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -687,7 +745,7 @@ class _ExitResignationL1ApprovalPageState
     var urlapi = Uri.parse("$conn$apiUrl");
     var request = http.MultipartRequest("POST", urlapi);
 
-// Add static fields
+    // Add static fields
     request.fields['sessionId'] = sessionId!;
     request.fields['requestId'] = requestIdReceived.toString();
     request.fields['permission'] = "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD";
@@ -695,14 +753,18 @@ class _ExitResignationL1ApprovalPageState
     request.fields['levelOneRemarks'] = remarksController.text;
     request.fields['noticePeriod'] = noticePeriodController.text;
 
-// Construct the API URL with parameters (for debugging)
-    String apiWithParams = urlapi.toString() +
+    // Construct the API URL with parameters (for debugging)
+    String apiWithParams =
+        urlapi.toString() +
         '?' +
         request.fields.entries
-            .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .map(
+              (e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+            )
             .join('&');
 
-// Debugging: Print the full API URL with parameters
+    // Debugging: Print the full API URL with parameters
     print('API URL with Parameters: $apiWithParams');
 
     try {
@@ -742,7 +804,7 @@ class _ExitResignationL1ApprovalPageState
     var urlapi = Uri.parse("$conn$apiUrl");
     var request = http.MultipartRequest("POST", urlapi);
 
-// Add static fields
+    // Add static fields
     request.fields['sessionId'] = sessionId!;
     request.fields['requestId'] = requestIdReceived.toString();
     request.fields['permission'] = "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE";
@@ -750,14 +812,18 @@ class _ExitResignationL1ApprovalPageState
     request.fields['levelOneRemarks'] = remarksController.text;
     request.fields['noticePeriod'] = noticePeriodController.text;
 
-// Construct the API URL with parameters (for debugging)
-    String apiWithParams = urlapi.toString() +
+    // Construct the API URL with parameters (for debugging)
+    String apiWithParams =
+        urlapi.toString() +
         '?' +
         request.fields.entries
-            .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .map(
+              (e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+            )
             .join('&');
 
-// Debugging: Print the full API URL with parameters
+    // Debugging: Print the full API URL with parameters
     print('API URL with Parameters: $apiWithParams');
 
     try {

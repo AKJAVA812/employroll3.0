@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../main.dart';
@@ -15,12 +16,10 @@ import '../modalClass/expensesListModal.dart';
 import 'expenseListDelete.dart';
 
 class ExpenseList extends StatefulWidget {
-
   final ExpensesListModal expensesListModal;
-  ExpenseList (this.expensesListModal);
+  ExpenseList(this.expensesListModal);
   @override
   State<ExpenseList> createState() => _ExpenseListState(expensesListModal);
-
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -28,12 +27,12 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<ClaimRequiDatalist>? allUsernew=[];
-List<ClaimRequiDatalist>? foundDataNew=[];
+List<ClaimRequiDatalist>? allUsernew = [];
+List<ClaimRequiDatalist>? foundDataNew = [];
 ExpensesListModal? expenseListLabel;
 ExpensesListModal? expenseListLabeled;
 
-class _ExpenseListState extends State<ExpenseList> with RouteAware{
+class _ExpenseListState extends State<ExpenseList> with RouteAware {
   final ExpensesListModal expensesListModal;
   _ExpenseListState(this.expensesListModal);
   @override
@@ -50,7 +49,7 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
@@ -75,15 +74,15 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        expenseListLabel=value;
-        expenseListLabeled=expenseListLabel;
+        expenseListLabel = value;
+        expenseListLabeled = expenseListLabel;
       });
       //print('employeeList00${advanceRequestedListLabel!.data!.length}');
     });
@@ -95,14 +94,14 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
     print('employeeList11: ${SessionId}');
     ExpensesListModal expensesListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    expensesListModal=ExpensesListModal.fromJson(mapResponse);
+    expensesListModal = ExpensesListModal.fromJson(mapResponse);
     allUsernew = expensesListModal.claimRequiDatalist;
 
     return expensesListModal;
@@ -111,7 +110,7 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
   var titleName = "Expense List";
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<ClaimRequiDatalist>?  results = [];
+    List<ClaimRequiDatalist>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -124,8 +123,14 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.status!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.status!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -139,6 +144,7 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
       foundDataNew = results;
     });
   }
+
   TextEditingController searchType = TextEditingController();
 
   @override
@@ -148,35 +154,40 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: titleName,
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
@@ -185,25 +196,22 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
         child: Column(
           children: [
             Expanded(
-                child: expenseListLabeled == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getExpList(expenseListLabeled!)),
+              child:
+                  expenseListLabeled == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getExpList(expenseListLabeled!),
+            ),
           ],
         ),
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           Navigator.pushNamed(context, MyRoutings.addExpenseRoute);
         },
         backgroundColor: Mythemes.lightBluishColor,
-        child: Icon(
-          CupertinoIcons.add, color: Mythemes.whitish, size: 25,
-        ),
+        child: Icon(CupertinoIcons.add, color: Mythemes.whitish, size: 25),
       ),
-
-
     );
   }
 
@@ -211,13 +219,13 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  ExpenseList(ExpensesListModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (a, b, c) => ExpenseList(ExpensesListModal()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -226,75 +234,90 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
         itemBuilder: (context, i) {
           return InkWell(
             onTap: () {
-              var statusCheck = foundDataNew![i].status
-                  .toString();
+              var statusCheck = foundDataNew![i].status.toString();
               print("Status list $statusCheck");
 
-              if(statusCheck == 'CANCEL'){
+              if (statusCheck == 'CANCEL') {
                 Fluttertoast.showToast(
-                    msg: "Your Expense has already Cancelled",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 3,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0);
-              }
-              else if(statusCheck == 'APPROVED'){
+                  msg: "Your Expense has already Cancelled",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              } else if (statusCheck == 'APPROVED') {
                 Fluttertoast.showToast(
-                    msg: "Your Expense has already Approved",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 3,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0);
-              }
-              else if(statusCheck == 'DISAPPROVED'){
+                  msg: "Your Expense has already Approved",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              } else if (statusCheck == 'DISAPPROVED') {
                 Fluttertoast.showToast(
-                    msg: "Your Expense has already Disapproved",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 3,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0);
-              }
-              else if(statusCheck == 'LEVEL_ONE_PENDING' || statusCheck == 'LEVEL_TWO_PENDING' || statusCheck == 'LEVEL_THREE_PENDING' || statusCheck == 'PENDING') {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => DeleteExpenseList(
-                    expensesListModal, i)));
+                  msg: "Your Expense has already Disapproved",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              } else if (statusCheck == 'LEVEL_ONE_PENDING' ||
+                  statusCheck == 'LEVEL_TWO_PENDING' ||
+                  statusCheck == 'LEVEL_THREE_PENDING' ||
+                  statusCheck == 'PENDING') {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) => DeleteExpenseList(expensesListModal, i),
+                  ),
+                );
               }
             },
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          foundDataNew![i].empName.toString().text.make().px8().py2(),
-                          Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  foundDataNew![i].status.toString()
-                                      .text
-                                      .color(Mythemes.lightBluishColor)
-                                      .sm
-                                      .make()
-                                      .px8(),
-                                ],
-                              ))
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          foundDataNew![i].reimbName.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /* Expanded(
+              elevation: 2,
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        foundDataNew![i].empName
+                            .toString()
+                            .text
+                            .make()
+                            .px8()
+                            .py2(),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              foundDataNew![i].status
+                                  .toString()
+                                  .text
+                                  .color(Mythemes.lightBluishColor)
+                                  .sm
+                                  .make()
+                                  .px8(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        foundDataNew![i].reimbName
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /* Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -305,15 +328,17 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
 
 
                           )*/
-                        ],
-                      ).py1(),
-                      Row(
-                        children: [
-                          foundDataNew![i].claimNo.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /*Expanded(
+                      ],
+                    ).py1(),
+                    Row(
+                      children: [
+                        foundDataNew![i].claimNo
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /*Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -324,15 +349,17 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
 
 
                           )*/
-                        ],
-                      ).py1(),
-                      Row(
-                        children: [
-                          foundDataNew![i].toDate.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /* Expanded(
+                      ],
+                    ).py1(),
+                    Row(
+                      children: [
+                        foundDataNew![i].toDate
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /* Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -343,12 +370,12 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
 
 
                           )*/
-                        ],
-                      ).py0(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          /*Expanded(
+                      ],
+                    ).py0(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        /*Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -358,17 +385,26 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 7, right: 0, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Grade".text.make(),
-                                foundDataNew![i].empGrade.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 7,
+                            right: 0,
+                            bottom: 18,
                           ),
+                          child: Column(
+                            children: [
+                              "Grade".text.make(),
+                              foundDataNew![i].empGrade
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
 
-                          /* Expanded(
+                        /* Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -378,17 +414,26 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 1, right: 0, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Category".text.make(),
-                                foundDataNew![i].catName.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 1,
+                            right: 0,
+                            bottom: 18,
                           ),
+                          child: Column(
+                            children: [
+                              "Category".text.make(),
+                              foundDataNew![i].catName
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
 
-                          /*  Expanded(
+                        /*  Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -398,20 +443,30 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware{
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 1, right: 7, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Amount".text.make(),
-                                foundDataNew![i].claimedAmt.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 1,
+                            right: 7,
+                            bottom: 18,
                           ),
-                        ],
-                      ).py1(),
-                    ],
-                  ),
-                )),
+                          child: Column(
+                            children: [
+                              "Amount".text.make(),
+                              foundDataNew![i].claimedAmt
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ).py1(),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),

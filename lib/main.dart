@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:er_flutter_project/MSS_Bundle/dashboard/mssDashboard.dart';
 import 'package:er_flutter_project/MSS_Bundle/hris/fnfListMSS.dart';
@@ -235,18 +236,39 @@ import 'modules/timeAndAttendance/reports/otherEmpRequisitionAttendance.dart';
 import 'modules/timeAndAttendance/reports/pendingRequisition/pendingReqAppDiss.dart';
 import 'modules/timeAndAttendance/reports/pendingRequisition/pendingReqListRo.dart';
 import 'modules/timeAndAttendance/reports/pendingRequisition/selfRequisition.dart';
-import 'modules/timeAndAttendance/reports/workDoneReport/RoWorkDoneReportFiltering.dart' as taa;
+import 'modules/timeAndAttendance/reports/workDoneReport/RoWorkDoneReportFiltering.dart'
+    as taa;
 import 'modules/timeAndAttendance/reports/workDoneReport/roWorkDoneReport.dart';
 import 'modules/timeAndAttendance/reports/workDoneReport/workDoneReport.dart';
 import 'modules/timeAndAttendance/reports/workDoneReport/workDoneReportDateSelect.dart';
 import 'modules/visitorManagement/visitorMgntSections.dart';
 import 'ocr/ocr.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'dart:async';
 
 import 'offlineAttendanceSync/offlineAttendanceSyncPage.dart';
+
+const bool showOnlyMobileAuthLogs = true;
+
+final ZoneSpecification _mobileAuthLogZone = ZoneSpecification(
+  print: (self, parent, zone, line) {
+    if (_shouldPrintAppLog(line)) {
+      parent.print(zone, line);
+    }
+  },
+);
+
+bool _shouldPrintAppLog(String line) {
+  if (!showOnlyMobileAuthLogs) return true;
+  return line.contains('[MOBILE-AUTH]') || line.contains('[APP-ERROR]');
+}
+
+void _handleZoneError(Object error, StackTrace stackTrace) {
+  print('[APP-ERROR] $error');
+}
+
 const String taskName = "background_location_task";
-final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 /*void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
 
@@ -272,24 +294,26 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
     return Future.value(true);
   });
 }*/
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  //Need to comment this
-/*  await Firebase.initializeApp(
+void main() {
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      //Need to comment this
+      /*  await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform
   );
   final notificationService = NotificationService();
   await notificationService.initFCM();
   _requestPermission();
   FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);*/
-  //Need to comment this
-  //await initializeService();
-  await Hive.initFlutter();
-  WidgetsFlutterBinding.ensureInitialized();
-  Hive.registerAdapter(AttendancePunchAdapter());
-  await Hive.openBox<AttendancePunch>('attendanceBox');
-  //Need to comment this
-/*  const AndroidInitializationSettings initializationSettingsAndroid =
+      //Need to comment this
+      //await initializeService();
+      await Hive.initFlutter();
+      WidgetsFlutterBinding.ensureInitialized();
+      Hive.registerAdapter(AttendancePunchAdapter());
+      await Hive.openBox<AttendancePunch>('attendanceBox');
+      //Need to comment this
+      /*  const AndroidInitializationSettings initializationSettingsAndroid =
   AndroidInitializationSettings('@mipmap/ic_launcher');
 
   //iOS-specific initialization settings with permission requests
@@ -305,27 +329,31 @@ void main() async {
       iOS: iosInitializationSettings
   );
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);*/
-  //Need to comment this
+      //Need to comment this
 
-  //await Firebase.initializeApp();
-  //await FirebaseApi().initNotifications();
-  //await setupNotificationChannel();
-  // Add try-catch to handle initialization errors
-  /*try {
+      //await Firebase.initializeApp();
+      //await FirebaseApi().initNotifications();
+      //await setupNotificationChannel();
+      // Add try-catch to handle initialization errors
+      /*try {
     await FlutterDownloader.initialize(
       debug: true, // Set to false for production
     );
   } catch (e) {
     print('Error initializing FlutterDownloader: $e');
   }*/
-/*  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+      /*  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
   await Workmanager().registerPeriodicTask(
     "1",
     taskName,
     frequency: Duration(minutes: 10), // Runs every 10 minutes
   );*/
 
-  runApp(const MyApp());
+      runApp(const MyApp());
+    },
+    _handleZoneError,
+    zoneSpecification: _mobileAuthLogZone,
+  );
 }
 
 /*void requestPermission() async {
@@ -360,12 +388,13 @@ void openAppSettingsDialog() {
       return AlertDialog(
         title: Text("Permission Required"),
         content: Text(
-            "Background location permission is permanently denied. Please enable it from app settings."),
+          "Background location permission is permanently denied. Please enable it from app settings.",
+        ),
         actions: [
           TextButton(
             child: Text("Open Settings"),
             onPressed: () {
-             // openAppSettings();
+              // openAppSettings();
               Navigator.of(context).pop();
             },
           ),
@@ -382,7 +411,7 @@ void openAppSettingsDialog() {
 }
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
+    FlutterLocalNotificationsPlugin();
 
 /*Future<void> setupNotificationChannel() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -410,7 +439,6 @@ class MyApp extends StatelessWidget {
 
   const MyApp({super.key});
 
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -427,7 +455,7 @@ class MyApp extends StatelessWidget {
         const Locale('es', 'ES'), // Example of another locale (Spanish)
       ],
       themeMode: ThemeMode.light,
-      theme:Mythemes.lightTheme(context),
+      theme: Mythemes.lightTheme(context),
       darkTheme: Mythemes.darkTheme(context),
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
@@ -437,8 +465,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, 
-    required this.title});
+  const MyHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -461,8 +488,6 @@ class _MyHomePageState extends State<MyHomePage> {
   LocationData? _currentLocation;
   StreamSubscription<LocationData>? _locationSubscription;
 
-
-
   @override
   void initState() {
     getSharedPrfanceList();
@@ -482,17 +507,19 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     super.initState();
   }
+
   Future<void> _showNotification(RemoteNotification notification) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
-      'default_channel', // id
-      'General Notifications', // title
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: true,
+        AndroidNotificationDetails(
+          'default_channel', // id
+          'General Notifications', // title
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: true,
+        );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
     );
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await flutterLocalNotificationsPlugin.show(
       0,
@@ -503,7 +530,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-/*  Future<void> _startLocationTracking() async {
+  /*  Future<void> _startLocationTracking() async {
     bool serviceEnabled = await _location.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await _location.requestService();
@@ -529,7 +556,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
   }
-
 
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -563,8 +589,8 @@ class _MyHomePageState extends State<MyHomePage> {
       // Permissions are denied forever, handle appropriately.
       openAppSettings();
       return Future.error(
-
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     // When we reach here, permissions are granted and we can
@@ -590,12 +616,16 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     positionCheck = await GeolocatorPlatform.instance.getCurrentPosition();
     var lastPositionCheck = await Geolocator.getLastKnownPosition();
-    bool isLocationServiceEnabledCheck = await Geolocator.isLocationServiceEnabled();
+    bool isLocationServiceEnabledCheck =
+        await Geolocator.isLocationServiceEnabled();
     //print('Response1111l $lastPosition');
 
     setState(() {
       if (positionCheck != null) {
-        currentPostion = LatLng(positionCheck!.latitude, positionCheck!.longitude);
+        currentPostion = LatLng(
+          positionCheck!.latitude,
+          positionCheck!.longitude,
+        );
         shared.setLatitude(positionCheck!.latitude);
         shared.setLongitude(positionCheck!.longitude);
         //print('Response1111c $currentAddress');
@@ -603,7 +633,6 @@ class _MyHomePageState extends State<MyHomePage> {
         showAboutDialog(context: this.context);
       }
     });
-
   }
 
   @override
@@ -630,7 +659,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const Locale('es', 'ES'), // Example of another locale (Spanish)
         ],
         themeMode: ThemeMode.light,
-        theme:Mythemes.lightTheme(context),
+        theme: Mythemes.lightTheme(context),
         darkTheme: Mythemes.darkTheme(context),
         debugShowCheckedModeBanner: false,
         debugShowMaterialGrid: false,
@@ -638,20 +667,29 @@ class _MyHomePageState extends State<MyHomePage> {
         //initialRoute: MyRoutings.loginRoute,
         initialRoute: MyRoutings.loginRoute,
         routes: {
-          MyRoutings.customCalender:(context)=>customCalender(),
+          MyRoutings.customCalender: (context) => customCalender(),
           MyRoutings.loginRoute: (context) => LoginPage(),
           MyRoutings.punchInRoute: (context) => PunchInOUtActivity(),
           MyRoutings.reportSection: (context) => ReportPage(),
           MyRoutings.reportSectionHead: (context) => ReportPageHead(),
           MyRoutings.homePageRoute: (context) => HomePage(),
           MyRoutings.adminPanelRoute: (context) => AdminPanelScreen(),
-          MyRoutings.adminPanelDashRoute: (context) => AdminPanelDashboard(DashboardModel()),
+          MyRoutings.adminPanelDashRoute:
+              (context) => AdminPanelDashboard(DashboardModel()),
           MyRoutings.projectListRoute: (context) => ProjectList(),
-          MyRoutings.mapViewRoute: (context) => HistoryMapView('',0),
+          MyRoutings.mapViewRoute: (context) => HistoryMapView('', 0),
           MyRoutings.expendableListRoute: (context) => TileApp(),
-          MyRoutings.imageUploadRoute: (context) => ImageUploaded(value:File("path"), address: " ", time: " ",punchType: " "),
+          MyRoutings.imageUploadRoute:
+              (context) => ImageUploaded(
+                value: File("path"),
+                address: " ",
+                time: " ",
+                punchType: " ",
+              ),
           MyRoutings.empListRoute: (context) => EmpListView(),
-          MyRoutings.workDoneRoute: (context) => WorkDonePage(value:File("path"), address: " ", time: " "),
+          MyRoutings.workDoneRoute:
+              (context) =>
+                  WorkDonePage(value: File("path"), address: " ", time: " "),
           MyRoutings.profileRoute: (context) => ProfilePage(),
           MyRoutings.timeAttRoute: (context) => TimeAndAttendanceReports(),
           MyRoutings.attReportRoute: (context) => AttReport(),
@@ -659,46 +697,95 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.loanAdvanceRoute: (context) => LoanAdvanceReport(),
           MyRoutings.onDutyReportRoute: (context) => OnDutyReports(),
           MyRoutings.helpDeskItemsRoute: (context) => HelpDeskItems(),
-          MyRoutings.attendanceReportRoute: (context) => AttendanceReport(forDateString: " ",toDateString: " "),
-          MyRoutings.attendanceListRoute: (context) => AttendanceList(AttendanceReportModel()),
-          MyRoutings.attendanceRequisitionRoute: (context) => AttendanceRequisition(new AttendanceReportModel(), OnDateAttModel(),0 ),
+          MyRoutings.attendanceReportRoute:
+              (context) =>
+                  AttendanceReport(forDateString: " ", toDateString: " "),
+          MyRoutings.attendanceListRoute:
+              (context) => AttendanceList(AttendanceReportModel()),
+          MyRoutings.attendanceRequisitionRoute:
+              (context) => AttendanceRequisition(
+                new AttendanceReportModel(),
+                OnDateAttModel(),
+                0,
+              ),
           MyRoutings.getAttendanceDetRoute: (context) => GetAttendanceDet(),
-          MyRoutings.pendingReqRoute: (context) => PendingRequisition(SelfRequisitionModel()),
-          MyRoutings.approvedReqRoute: (context) => ApprovedRequisiton(ApprovedRequisitionModel()),
-          MyRoutings.disApprovedReqRoute: (context) => DisApprovedRequisiton(DisapprovedRequisitionModel()),
-          MyRoutings.workDoneDateReportRoute: (context) => WorkDoneReportDateSelect(),
-          MyRoutings.workDoneReportRoute: (context) => WorkDoneReport(forDatePickedString: "", toDatePickedString: ""),
-          MyRoutings.pendingReqRoRoute: (context) => PendingRequisitionRo(PendingRequisitionModel()),
-          MyRoutings.approveDisapproveReqRoute: (context) => ApproveDisapproveReq(new PendingRequisitionModel(),0),
-          MyRoutings.adminDashboardRoute: (context) => AdminDashboard(DashboardModel()),
-          MyRoutings.singleDateAttendanceRoute: (context) => SingleDateAttendance(singleDateString: ""),
+          MyRoutings.pendingReqRoute:
+              (context) => PendingRequisition(SelfRequisitionModel()),
+          MyRoutings.approvedReqRoute:
+              (context) => ApprovedRequisiton(ApprovedRequisitionModel()),
+          MyRoutings.disApprovedReqRoute:
+              (context) => DisApprovedRequisiton(DisapprovedRequisitionModel()),
+          MyRoutings.workDoneDateReportRoute:
+              (context) => WorkDoneReportDateSelect(),
+          MyRoutings.workDoneReportRoute:
+              (context) => WorkDoneReport(
+                forDatePickedString: "",
+                toDatePickedString: "",
+              ),
+          MyRoutings.pendingReqRoRoute:
+              (context) => PendingRequisitionRo(PendingRequisitionModel()),
+          MyRoutings.approveDisapproveReqRoute:
+              (context) =>
+                  ApproveDisapproveReq(new PendingRequisitionModel(), 0),
+          MyRoutings.adminDashboardRoute:
+              (context) => AdminDashboard(DashboardModel()),
+          MyRoutings.singleDateAttendanceRoute:
+              (context) => SingleDateAttendance(singleDateString: ""),
           MyRoutings.leaveBalanceRoute: (context) => LeaveBalancePage(),
           MyRoutings.leaveRequisitionRoute: (context) => LeaveRequisitionPage(),
-          MyRoutings.requestedRequisitionRoute: (context) => RequestedRequisitionList(SelfLeaveRequisitionListModal()),
+          MyRoutings.requestedRequisitionRoute:
+              (context) =>
+                  RequestedRequisitionList(SelfLeaveRequisitionListModal()),
           MyRoutings.othersReqListRoute: (context) => OthersRequisitionList(),
-          MyRoutings.approveDisapproveLeaveReqRoute: (context) => ApproveDisapproveLeaveReq(),
-          MyRoutings.approvedLeaveReqListRoute: (context) => ApprovedLeaveRequisitionList(ApprovedLeaveReqModal()),
+          MyRoutings.approveDisapproveLeaveReqRoute:
+              (context) => ApproveDisapproveLeaveReq(),
+          MyRoutings.approvedLeaveReqListRoute:
+              (context) =>
+                  ApprovedLeaveRequisitionList(ApprovedLeaveReqModal()),
           MyRoutings.loanAdvanceReqRoute: (context) => LoanAdvanceRequisition(),
-          MyRoutings.pendingLoanRequestedRoute: (context) => PendingLoanRequestedList(LoanAdvanceReqModal()),
+          MyRoutings.pendingLoanRequestedRoute:
+              (context) => PendingLoanRequestedList(LoanAdvanceReqModal()),
           MyRoutings.claimItemsListRoute: (context) => ClaimItemsList(),
-          MyRoutings.advanceRequisitionListRoute: (context) => AdvanceRequisitionList(AdvanceRequestedListModal()),
-          MyRoutings.advanceRequisitionPageRoute: (context) => AdvanceRequisitionPage(),
-          MyRoutings.pendingAdvanceReqListRoute: (context) => PendingAdvanceReqList(PendingAdvReqListModal()),
-          MyRoutings.approveDisAdvanceReqRoute: (context) => AppDispPendingAdvanceReq(new PendingAdvReqListModal(), 0),
-          MyRoutings.expenseListRoute: (context) => ExpenseList(ExpensesListModal()),
+          MyRoutings.advanceRequisitionListRoute:
+              (context) => AdvanceRequisitionList(AdvanceRequestedListModal()),
+          MyRoutings.advanceRequisitionPageRoute:
+              (context) => AdvanceRequisitionPage(),
+          MyRoutings.pendingAdvanceReqListRoute:
+              (context) => PendingAdvanceReqList(PendingAdvReqListModal()),
+          MyRoutings.approveDisAdvanceReqRoute:
+              (context) =>
+                  AppDispPendingAdvanceReq(new PendingAdvReqListModal(), 0),
+          MyRoutings.expenseListRoute:
+              (context) => ExpenseList(ExpensesListModal()),
           MyRoutings.addExpenseRoute: (context) => AddExpensePage(),
-          MyRoutings.deleteExpenseListRoute: (context) => DeleteExpenseList(new ExpensesListModal(), 0),
-          MyRoutings.pendingReimbursementRoute: (context) => PendingListReimbursement(PendingReimbListModal()),
-          MyRoutings.approveDisReimbursementRoute: (context) => ApproveDisappReimbursement(new PendingReimbListModal(), 0),
-          MyRoutings.approveDisReimbursementListRoute: (context) => ApprovalListReimbursement(AppDisReimbListModal()),
-          MyRoutings.approveDisAdvanceListRoute: (context) => ApproveDisapAdvanceRequisitionList(AppDisAdvListModal()),
+          MyRoutings.deleteExpenseListRoute:
+              (context) => DeleteExpenseList(new ExpensesListModal(), 0),
+          MyRoutings.pendingReimbursementRoute:
+              (context) => PendingListReimbursement(PendingReimbListModal()),
+          MyRoutings.approveDisReimbursementRoute:
+              (context) =>
+                  ApproveDisappReimbursement(new PendingReimbListModal(), 0),
+          MyRoutings.approveDisReimbursementListRoute:
+              (context) => ApprovalListReimbursement(AppDisReimbListModal()),
+          MyRoutings.approveDisAdvanceListRoute:
+              (context) =>
+                  ApproveDisapAdvanceRequisitionList(AppDisAdvListModal()),
           MyRoutings.onDutyTypes: (context) => OnDutyTypes(),
-          MyRoutings.odRequisitionSelectRoute: (context) => ODRequisitionSelection(),
+          MyRoutings.odRequisitionSelectRoute:
+              (context) => ODRequisitionSelection(),
           MyRoutings.odAttendanceListRoute: (context) => ODAttendanceList(),
-          MyRoutings.odRequisitionPageRoute: (context) => ODRequisitionPage(new AttendanceReportModel(), OnDateAttModel(),0),
-          MyRoutings.pendingRequisitionListRoute: (context) => PendingOdRequisition(PendingOdReqList()),
-          MyRoutings.odApproveDisapproveReqRoute: (context) => OdApproveDisapproveReq(new PendingOdReqList(), 0),
-          MyRoutings.selfOdRequisitionRoute: (context) => SelfODRequisitionList(startDate: "", endDate: "",),
+          MyRoutings.odRequisitionPageRoute:
+              (context) => ODRequisitionPage(
+                new AttendanceReportModel(),
+                OnDateAttModel(),
+                0,
+              ),
+          MyRoutings.pendingRequisitionListRoute:
+              (context) => PendingOdRequisition(PendingOdReqList()),
+          MyRoutings.odApproveDisapproveReqRoute:
+              (context) => OdApproveDisapproveReq(new PendingOdReqList(), 0),
+          MyRoutings.selfOdRequisitionRoute:
+              (context) => SelfODRequisitionList(startDate: "", endDate: ""),
           MyRoutings.odLocationViewRoute: (context) => ODLocationView(),
           MyRoutings.hdOpenTicketRoute: (context) => HDOpenTickets(),
           MyRoutings.hdOverdueTicketRoute: (context) => HDOverdueTickets(),
@@ -708,126 +795,270 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.hdReOpenTicketRoute: (context) => HDReOpenTickets(),
           MyRoutings.hdResolvedTicketRoute: (context) => HDResolvedTickets(),
           MyRoutings.hdCancelledTicketRoute: (context) => HDCancelledTickets(),
-          MyRoutings.hdRaisedTicketReplyRoute: (context) => HDRaisedTicketReply(),
+          MyRoutings.hdRaisedTicketReplyRoute:
+              (context) => HDRaisedTicketReply(),
           MyRoutings.qrItemsRoute: (context) => QRAttTypes(),
           MyRoutings.qrAttLocationRoute: (context) => QRAttLocationPage(),
           MyRoutings.qrAttWithoutLocRoute: (context) => QRAttWithoutLocation(),
-          MyRoutings.pendingLeaveReqListRoute: (context) => PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
-          MyRoutings.levelOnePendingRoute: (context) => LevelOnePendingLeave(LevelOnePendingLeaveModal()),
-          MyRoutings.levelTwoPendingRoute: (context) => LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
-          MyRoutings.pendingLeaveAppDisRoute: (context) => PendingLeaveApproveDisapprove(new PendingLeaveRequisitionModal(), 0),
-          MyRoutings.levelOneApprovalRoute: (context) => LevelOnePendingApproval(new LevelOnePendingLeaveModal(), 0),
+          MyRoutings.pendingLeaveReqListRoute:
+              (context) =>
+                  PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
+          MyRoutings.levelOnePendingRoute:
+              (context) => LevelOnePendingLeave(LevelOnePendingLeaveModal()),
+          MyRoutings.levelTwoPendingRoute:
+              (context) => LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+          MyRoutings.pendingLeaveAppDisRoute:
+              (context) => PendingLeaveApproveDisapprove(
+                new PendingLeaveRequisitionModal(),
+                0,
+              ),
+          MyRoutings.levelOneApprovalRoute:
+              (context) =>
+                  LevelOnePendingApproval(new LevelOnePendingLeaveModal(), 0),
           MyRoutings.projectManageItemsRoute: (context) => ProjectManageItems(),
           MyRoutings.othersEmpReqRoute: (context) => OthersLeaveReqPage(),
           MyRoutings.odSelfReqDateSelectRoute: (context) => OdSelfReqDate(),
-          MyRoutings.ujalaWdSubmitRoute: (context) => UjalaCreditWDSubmit('',DropValueName,'', '', '', '', '','0','0','0','0','0','0','0'),
-          MyRoutings.digiWeighWdSubmitRoute: (context) => DigiWeighWDSubmit('', '', '', '', '', ''),
-          MyRoutings.ujalaWorkDoneRoute: (context) => UjalaCreditWorkdone(value:File("path"), address: " ", time: " "),
-          MyRoutings.digiWeighWorkDoneRoute: (context) => DigiWeighWorkDone(value:File("path"), address: " ", time: " "),
-          MyRoutings.odWorkDoneRoute: (context) => OdWorkDonePage(value:File("path"), address: " ", time: " "),
+          MyRoutings.ujalaWdSubmitRoute:
+              (context) => UjalaCreditWDSubmit(
+                '',
+                DropValueName,
+                '',
+                '',
+                '',
+                '',
+                '',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+                '0',
+              ),
+          MyRoutings.digiWeighWdSubmitRoute:
+              (context) => DigiWeighWDSubmit('', '', '', '', '', ''),
+          MyRoutings.ujalaWorkDoneRoute:
+              (context) => UjalaCreditWorkdone(
+                value: File("path"),
+                address: " ",
+                time: " ",
+              ),
+          MyRoutings.digiWeighWorkDoneRoute:
+              (context) => DigiWeighWorkDone(
+                value: File("path"),
+                address: " ",
+                time: " ",
+              ),
+          MyRoutings.odWorkDoneRoute:
+              (context) =>
+                  OdWorkDonePage(value: File("path"), address: " ", time: " "),
           MyRoutings.alarmSetRoute: (context) => AlarmSetRing(),
           //MyRoutings.testPdfDownload: (context) => TestSalarySlipDownload(),
           MyRoutings.payrollItemRoute: (context) => PayrollItems(),
           MyRoutings.cameraPageRoute: (context) => CameraApp(),
-          MyRoutings.loanApprovedReqRoute: (context) => LoanApprovedReqList(LoanApprovedReqModal()),
+          MyRoutings.loanApprovedReqRoute:
+              (context) => LoanApprovedReqList(LoanApprovedReqModal()),
           //MyRoutings.rosterPageRoute: (context) => RosterCreation(),
           //MyRoutings.rosterCalendarRoute: (context) => RosterCalendar(),
           MyRoutings.inductionOnboardRoute: (context) => OnboardListView(),
-          MyRoutings.addInductionProcessRoute: (context) => AddInductionProcess(),
-          MyRoutings.roWorkDoneFilterRoute: (context) => taa.RoWorkDoneReportFiltering(),
+          MyRoutings.addInductionProcessRoute:
+              (context) => AddInductionProcess(),
+          MyRoutings.roWorkDoneFilterRoute:
+              (context) => taa.RoWorkDoneReportFiltering(),
           MyRoutings.documentsAddedRoute: (context) => DocumentsAdded(),
-          MyRoutings.documentDownloadRoute: (context) => DownloadLetters("0", ""),
-          MyRoutings.roWorkDoneReportRoute: (context) => RoWorkDoneReport(taa.fromDatePickedStringRo, taa.toDatePickedStringRo, taa.filterType, taa.empNewIdRo),
+          MyRoutings.documentDownloadRoute:
+              (context) => DownloadLetters("0", ""),
+          MyRoutings.roWorkDoneReportRoute:
+              (context) => RoWorkDoneReport(
+                taa.fromDatePickedStringRo,
+                taa.toDatePickedStringRo,
+                taa.filterType,
+                taa.empNewIdRo,
+              ),
           MyRoutings.hrDetailsRoute: (context) => HRISDetails(),
           MyRoutings.ocrPageRoute: (context) => OCRPage(),
           MyRoutings.faceRecognitionHome: (context) => FaceRecognitinHome(),
           MyRoutings.testPdfDownload: (context) => SalarySlipDownload(),
-          MyRoutings.visitorManageSections: (context) => VisitorManageSections(),
+          MyRoutings.visitorManageSections:
+              (context) => VisitorManageSections(),
 
           MyRoutings.claimReqListRoute: (context) => ClaimRequisitionList(),
           MyRoutings.claimAdvanceRoute: (context) => ClaimAdvanceList(),
           MyRoutings.landingPageRoute: (context) => LandingPage(),
           MyRoutings.accountSuspend: (context) => AccountSuspendPage(),
           MyRoutings.profilePageHeadRoute: (context) => ProfilePageNew(),
-          MyRoutings.otherEmpReqAttendance: (context) => OthersAttendanceRequisitionPage(),
-          MyRoutings.mssDashboardRoute: (context) => MSSDashboard(DashboardModel()),
-          MyRoutings.otherSingleAttendance: (context) => OthersSingleDateAttendance(singleDateString: "", empId: 0,),
-          MyRoutings.otherAttendanceReq: (context) => OthersAttendanceRequisition(new AttendanceReportModel(), OthersOnDateAttendanceModal(),0 ),
-          MyRoutings.otherAttendanceListRoute: (context) => OthersAttendanceList(AttendanceReportModel(),0),
-          MyRoutings.realTimeLocationRoute: (context) => RealTimeLocationWithAddress(),
-          MyRoutings.essDashboardRoute: (context) => EssAdminDashboard(EssDashboarrdModel()),
-          MyRoutings.essDashboardNavigateRoute: (context) => EssAdminDashboardHead(EssDashboarrdModel()),
-          MyRoutings.attendanceReqCalendar: (context) => AttendanceRequisitionCalendar( AttendanceReportModel(), OnDateAttModel(),0, ""),
-          MyRoutings.travelExpReqRoute: (context) => TravelExpenseRequestRaise(),
+          MyRoutings.otherEmpReqAttendance:
+              (context) => OthersAttendanceRequisitionPage(),
+          MyRoutings.mssDashboardRoute:
+              (context) => MSSDashboard(DashboardModel()),
+          MyRoutings.otherSingleAttendance:
+              (context) =>
+                  OthersSingleDateAttendance(singleDateString: "", empId: 0),
+          MyRoutings.otherAttendanceReq:
+              (context) => OthersAttendanceRequisition(
+                new AttendanceReportModel(),
+                OthersOnDateAttendanceModal(),
+                0,
+              ),
+          MyRoutings.otherAttendanceListRoute:
+              (context) => OthersAttendanceList(AttendanceReportModel(), 0),
+          MyRoutings.realTimeLocationRoute:
+              (context) => RealTimeLocationWithAddress(),
+          MyRoutings.essDashboardRoute:
+              (context) => EssAdminDashboard(EssDashboarrdModel()),
+          MyRoutings.essDashboardNavigateRoute:
+              (context) => EssAdminDashboardHead(EssDashboarrdModel()),
+          MyRoutings.attendanceReqCalendar:
+              (context) => AttendanceRequisitionCalendar(
+                AttendanceReportModel(),
+                OnDateAttModel(),
+                0,
+                "",
+              ),
+          MyRoutings.travelExpReqRoute:
+              (context) => TravelExpenseRequestRaise(),
           MyRoutings.exitListRoute: (context) => ExitListView(),
           MyRoutings.exitWorkflowRoute: (context) => ExitWorkflow(0, ""),
           //MyRoutings.trackingPage:(context)=> const Trackingmain(),
           //MyRoutings.trackingPage:(context)=> const Geolocatortracking(),
-          MyRoutings.claimMssItemsRoute:(context)=>ClaimMSSItemsList(),
-          MyRoutings.travelExpApprovalPageRoute:(context)=>ClaimMSSItemsList(),
-          MyRoutings.empListFaceRegistration:(context)=>EmpListFaceRegistered(),
-          MyRoutings.empListFaceRecognize:(context)=>EmpListFaceRecognize(),
-          MyRoutings.markAiAttendanceRoute:(context)=>MarkAttendanceAI(empId: 0,),
-          MyRoutings.mealScannerRoute:(context)=>MealSelectionPage(),
-          MyRoutings.geoLocationTracking:(context)=>const Geolocatortracking(),
+          MyRoutings.claimMssItemsRoute: (context) => ClaimMSSItemsList(),
+          MyRoutings.travelExpApprovalPageRoute:
+              (context) => ClaimMSSItemsList(),
+          MyRoutings.empListFaceRegistration:
+              (context) => EmpListFaceRegistered(),
+          MyRoutings.empListFaceRecognize: (context) => EmpListFaceRecognize(),
+          MyRoutings.markAiAttendanceRoute:
+              (context) => MarkAttendanceAI(empId: 0),
+          MyRoutings.mealScannerRoute: (context) => MealSelectionPage(),
+          MyRoutings.geoLocationTracking:
+              (context) => const Geolocatortracking(),
           MyRoutings.preOnboardListRoute: (context) => PreOnboardListView(),
-          MyRoutings.pendingPreOnboardListRoute: (context) => PendingPreOnboardingList(),
-          MyRoutings.approvePreOnboardingRoute: (context) => ApprovePreOnboarding("","","","","","","","","","","","","","","","","","","","","",""),
+          MyRoutings.pendingPreOnboardListRoute:
+              (context) => PendingPreOnboardingList(),
+          MyRoutings.approvePreOnboardingRoute:
+              (context) => ApprovePreOnboarding(
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+              ),
           MyRoutings.preOnboardProcessRoute: (context) => PreInductionProcess(),
-          MyRoutings.forgetPasswordEmailRoute: (context) => ForgotPasswordEmailPage(),
-          MyRoutings.forgetPasswordOtpRoute: (context) => ForgotPasswordOtpPage(""),
-          MyRoutings.resetPasswordRoute: (context) => ForgotPasswordResetPage(""),
+          MyRoutings.forgetPasswordEmailRoute:
+              (context) => ForgotPasswordEmailPage(),
+          MyRoutings.forgetPasswordOtpRoute:
+              (context) => ForgotPasswordOtpPage(""),
+          MyRoutings.resetPasswordRoute:
+              (context) => ForgotPasswordResetPage(""),
           MyRoutings.resetPasswordPageRoute: (context) => ResetPasswordPage(),
           MyRoutings.preOnboardItemRoute: (context) => PreOnboardingItems(),
           MyRoutings.exitEmpListRoute: (context) => ExitEmployeeListView(),
-          MyRoutings.essAttendanceApprovedReq: (context) => ESSAttApprovedRequisiton(ApprovedRequisitionModel()),
+          MyRoutings.essAttendanceApprovedReq:
+              (context) => ESSAttApprovedRequisiton(ApprovedRequisitionModel()),
 
           //MSS Bundle
-          MyRoutings.mssAttPendingRequestRoRoute: (context) => MSS_Att_PendingRequisitionRo(PendingRequisitionModel()),
-          MyRoutings.mssAttPendingRequestL1Route: (context) => MSS_Att_PendingRequisitionL1(PendingRequisitionModel()),
-          MyRoutings.mssAttPendingRequestL2Route: (context) => MSS_Att_PendingRequisitionL2(PendingRequisitionModel()),
-          MyRoutings.mssAttPendingRequestL3Route: (context) => MSS_Att_PendingRequisitionL3(PendingRequisitionModel()),
-          MyRoutings.mssPendingOdRequisitionRoute: (context) => MSS_PendingOdRequisition(PendingOdReqList()),
-          MyRoutings.mssOthersAttRequestPageRoute: (context) => MSS_OthersAttendanceRequisitionPage(),
+          MyRoutings.mssAttPendingRequestRoRoute:
+              (context) =>
+                  MSS_Att_PendingRequisitionRo(PendingRequisitionModel()),
+          MyRoutings.mssAttPendingRequestL1Route:
+              (context) =>
+                  MSS_Att_PendingRequisitionL1(PendingRequisitionModel()),
+          MyRoutings.mssAttPendingRequestL2Route:
+              (context) =>
+                  MSS_Att_PendingRequisitionL2(PendingRequisitionModel()),
+          MyRoutings.mssAttPendingRequestL3Route:
+              (context) =>
+                  MSS_Att_PendingRequisitionL3(PendingRequisitionModel()),
+          MyRoutings.mssPendingOdRequisitionRoute:
+              (context) => MSS_PendingOdRequisition(PendingOdReqList()),
+          MyRoutings.mssOthersAttRequestPageRoute:
+              (context) => MSS_OthersAttendanceRequisitionPage(),
 
           //Leave
-          MyRoutings.mssPendingLeaveRequestRoute: (context) => MSS_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
-          MyRoutings.mssLevelOnePendingReqRoute: (context) => MSS_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
-          MyRoutings.mssLevelTwoPendingReqRoute: (context) => MSS_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
-          MyRoutings.mssOtherLeaveReqRoute: (context) => MSS_OthersLeaveReqPage(),
+          MyRoutings.mssPendingLeaveRequestRoute:
+              (context) => MSS_PendingLeaveRequisitionList(
+                PendingLeaveRequisitionModal(),
+              ),
+          MyRoutings.mssLevelOnePendingReqRoute:
+              (context) =>
+                  MSS_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
+          MyRoutings.mssLevelTwoPendingReqRoute:
+              (context) =>
+                  MSS_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+          MyRoutings.mssOtherLeaveReqRoute:
+              (context) => MSS_OthersLeaveReqPage(),
 
           //Dashboards
-          MyRoutings.mssNewDashboardRoute: (context) => MSSNewDashboard(DashboardModel()),
-          MyRoutings.adminNewDashboardRoute: (context) => AdminNewDashboard(DashboardModel()),
+          MyRoutings.mssNewDashboardRoute:
+              (context) => MSSNewDashboard(DashboardModel()),
+          MyRoutings.adminNewDashboardRoute:
+              (context) => AdminNewDashboard(DashboardModel()),
 
           //Reports
-          MyRoutings.mssWorkDoneReportRoute: (context) => mss.MSS_RoWorkDoneReportFiltering(),
+          MyRoutings.mssWorkDoneReportRoute:
+              (context) => mss.MSS_RoWorkDoneReportFiltering(),
 
           //Claim
           MyRoutings.mssClaimItemRoute: (context) => MSS_ClaimMSSItemsList(),
 
-
           //MSS MO Bundle
-          MyRoutings.mssMoAttPendingRequestRoRoute: (context) => MSS_MO_PendingRequisitionRo(PendingRequisitionModel()),
-          MyRoutings.mssMoPendingOdRequisitionRoute: (context) => MSS_MO_PendingOdRequisition(PendingOdReqList()),
-          MyRoutings.mssMoOthersAttRequestPageRoute: (context) => MSS_MO_OthersAttendanceRequisitionPage(),
-          MyRoutings.mssMOPendingAttReqL1: (context) => MSS_MO_Att_PendingRequisitionL1(PendingRequisitionModel()),
-          MyRoutings.mssMOPendingAttReqL2: (context) => MSS_MO_Att_PendingRequisitionL2(PendingRequisitionModel()),
+          MyRoutings.mssMoAttPendingRequestRoRoute:
+              (context) =>
+                  MSS_MO_PendingRequisitionRo(PendingRequisitionModel()),
+          MyRoutings.mssMoPendingOdRequisitionRoute:
+              (context) => MSS_MO_PendingOdRequisition(PendingOdReqList()),
+          MyRoutings.mssMoOthersAttRequestPageRoute:
+              (context) => MSS_MO_OthersAttendanceRequisitionPage(),
+          MyRoutings.mssMOPendingAttReqL1:
+              (context) =>
+                  MSS_MO_Att_PendingRequisitionL1(PendingRequisitionModel()),
+          MyRoutings.mssMOPendingAttReqL2:
+              (context) =>
+                  MSS_MO_Att_PendingRequisitionL2(PendingRequisitionModel()),
           //Leave
-          MyRoutings.mssMoPendingLeaveRequestRoute: (context) => MSS_MO_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
-          MyRoutings.mssMoLevelOnePendingReqRoute: (context) => MSS_MO_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
-          MyRoutings.mssMoLevelTwoPendingReqRoute: (context) => MSS_MO_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
-          MyRoutings.mssMoOtherLeaveReqRoute: (context) => MSS_MO_OthersLeaveReqPage(),
+          MyRoutings.mssMoPendingLeaveRequestRoute:
+              (context) => MSS_MO_PendingLeaveRequisitionList(
+                PendingLeaveRequisitionModal(),
+              ),
+          MyRoutings.mssMoLevelOnePendingReqRoute:
+              (context) =>
+                  MSS_MO_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
+          MyRoutings.mssMoLevelTwoPendingReqRoute:
+              (context) =>
+                  MSS_MO_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+          MyRoutings.mssMoOtherLeaveReqRoute:
+              (context) => MSS_MO_OthersLeaveReqPage(),
 
           //Dashboards
-          MyRoutings.mssMoNewDashboardRoute: (context) => MSS_MO_Dashboard(DashboardModel()),
-          MyRoutings.adminNewMoDashboardRoute: (context) => Admin_MSS_MO_Dashboard(DashboardModel()),
+          MyRoutings.mssMoNewDashboardRoute:
+              (context) => MSS_MO_Dashboard(DashboardModel()),
+          MyRoutings.adminNewMoDashboardRoute:
+              (context) => Admin_MSS_MO_Dashboard(DashboardModel()),
 
           //Reports
-          MyRoutings.mssMoWorkDoneReportRoute: (context) => MSS_MO_RoWorkDoneReportFiltering(),
+          MyRoutings.mssMoWorkDoneReportRoute:
+              (context) => MSS_MO_RoWorkDoneReportFiltering(),
 
           //Claim
-          MyRoutings.mssMoClaimItemRoute: (context) => MSS_MO_ClaimMSSItemsList(),
+          MyRoutings.mssMoClaimItemRoute:
+              (context) => MSS_MO_ClaimMSSItemsList(),
 
           //My Teams MO
           MyRoutings.myTeamMORoute: (context) => EmpListViewMO(),
@@ -838,32 +1069,51 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.pendingLoanListMO: (context) => PendingLoanRequestListMO(),
 
           //UIS Bundle
-          MyRoutings.uisAttPendingRequestRoRoute: (context) => UIS_PendingRequisitionRo(PendingRequisitionModel()),
-          MyRoutings.uisPendingOdRequisitionRoute: (context) => UIS_PendingOdRequisition(PendingOdReqList()),
-          MyRoutings.uisOthersAttRequestPageRoute: (context) => UIS_OthersAttendanceRequisitionPage(),
-          MyRoutings.uisPendingAttReqL1: (context) => MSS_MO_Att_PendingRequisitionL1(PendingRequisitionModel()),
-          MyRoutings.uisPendingAttReqL2: (context) => MSS_MO_Att_PendingRequisitionL2(PendingRequisitionModel()),
+          MyRoutings.uisAttPendingRequestRoRoute:
+              (context) => UIS_PendingRequisitionRo(PendingRequisitionModel()),
+          MyRoutings.uisPendingOdRequisitionRoute:
+              (context) => UIS_PendingOdRequisition(PendingOdReqList()),
+          MyRoutings.uisOthersAttRequestPageRoute:
+              (context) => UIS_OthersAttendanceRequisitionPage(),
+          MyRoutings.uisPendingAttReqL1:
+              (context) =>
+                  MSS_MO_Att_PendingRequisitionL1(PendingRequisitionModel()),
+          MyRoutings.uisPendingAttReqL2:
+              (context) =>
+                  MSS_MO_Att_PendingRequisitionL2(PendingRequisitionModel()),
           //Leave
-          MyRoutings.uisPendingLeaveRequestRoute: (context) => UIS_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
-          MyRoutings.uisLevelOnePendingReqRoute: (context) => UIS_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
-          MyRoutings.uisLevelTwoPendingReqRoute: (context) => UIS_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
-          MyRoutings.uisOtherLeaveReqRoute: (context) => UIS_OthersLeaveReqPage(),
+          MyRoutings.uisPendingLeaveRequestRoute:
+              (context) => UIS_PendingLeaveRequisitionList(
+                PendingLeaveRequisitionModal(),
+              ),
+          MyRoutings.uisLevelOnePendingReqRoute:
+              (context) =>
+                  UIS_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
+          MyRoutings.uisLevelTwoPendingReqRoute:
+              (context) =>
+                  UIS_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+          MyRoutings.uisOtherLeaveReqRoute:
+              (context) => UIS_OthersLeaveReqPage(),
 
           //Dashboards
-          MyRoutings.uisNewDashboardRoute: (context) => UIS_Dashboard(DashboardModel()),
-          MyRoutings.adminNewUisDashboardRoute: (context) => Admin_UIS_Dashboard(DashboardModel()),
+          MyRoutings.uisNewDashboardRoute:
+              (context) => UIS_Dashboard(DashboardModel()),
+          MyRoutings.adminNewUisDashboardRoute:
+              (context) => Admin_UIS_Dashboard(DashboardModel()),
 
           //Reports
-          MyRoutings.uisWorkDoneReportRoute: (context) => UIS_RoWorkDoneReportFiltering(),
+          MyRoutings.uisWorkDoneReportRoute:
+              (context) => UIS_RoWorkDoneReportFiltering(),
 
           //Claim
           MyRoutings.uisClaimItemRoute: (context) => UIS_ClaimMSSItemsList(),
 
           //ESS
           MyRoutings.myAllRequestRoute: (context) => MyAllRequestPage(),
-          MyRoutings.myAllRequestNoHeadRoute: (context) => MyAllRequestPageNoHead(),
-          MyRoutings.myAllReportsRoute: (context) => MyAllReportsPage(showAppBar: true,),
-
+          MyRoutings.myAllRequestNoHeadRoute:
+              (context) => MyAllRequestPageNoHead(),
+          MyRoutings.myAllReportsRoute:
+              (context) => MyAllReportsPage(showAppBar: true),
 
           //Incident Reporting
           MyRoutings.incidentReportListRoute: (context) => IncidentListPage(),
@@ -874,8 +1124,10 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.myLoanRequestRaiseRoute: (context) => LoanRequestPage(),
           MyRoutings.myLoanSummaryRoute: (context) => LoanSummaryPage(),
           MyRoutings.myLoanLedgerRoute: (context) => MyLoanLedgerPage(),
-          MyRoutings.pendingLoanRequestListRoute: (context) => PendingLoanRequestList(),
-          MyRoutings.loanApprovalPageRoute: (context) => LoanApprovalPage(loanReqId: 0,),
+          MyRoutings.pendingLoanRequestListRoute:
+              (context) => PendingLoanRequestList(),
+          MyRoutings.loanApprovalPageRoute:
+              (context) => LoanApprovalPage(loanReqId: 0),
           //Check for updates
           MyRoutings.checkForUpdatesRoute: (context) => UpdateChecker(),
 
@@ -883,36 +1135,36 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.companyPolicyListRoute: (context) => CompanyPoliciesPage(),
 
           //Real-Time Dashboards
-          MyRoutings.realtimeESSDashboard: (context) => RealTimeESSDashboard(EssDashboarrdModel()),
+          MyRoutings.realtimeESSDashboard:
+              (context) => RealTimeESSDashboard(EssDashboarrdModel()),
 
           //Reporting Officer Page
-          MyRoutings.reportingOfficerPageRoute: (context) => ReportingOfficersPage(),
-
+          MyRoutings.reportingOfficerPageRoute:
+              (context) => ReportingOfficersPage(),
 
           //HRIS
           MyRoutings.inactiveListMSSRoute: (context) => InactiveListMSS(),
           MyRoutings.fnfListMSSRoute: (context) => FNFListMSS(),
 
           //Offline Attendance
-          MyRoutings.offlineAttendanceRoute: (context) => OfflineAttendanceSyncPage(),
+          MyRoutings.offlineAttendanceRoute:
+              (context) => OfflineAttendanceSyncPage(),
 
           //Resignation Requisition Page
-          MyRoutings.resignationRequisitionRoute: (context) => ResignationRequisitionPage(),
+          MyRoutings.resignationRequisitionRoute:
+              (context) => ResignationRequisitionPage(),
 
           //Resignation Requisition Page
-          MyRoutings.exitResignationRequestListRoute: (context) => ExitResignationRequestPage(),
-
-
-
+          MyRoutings.exitResignationRequestListRoute:
+              (context) => ExitResignationRequestPage(),
         },
-
       ),
     );
   }
 }
-Future<void> handleBackgroundMessage(RemoteMessage message) async{
+
+Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print('Title: ${message.notification?.title}');
   print('Body: ${message.notification?.body}');
   print('Payload: ${message.data}');
-
 }

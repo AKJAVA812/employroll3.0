@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:er_flutter_project/adminPage/modelClass/branchListModal.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
@@ -19,25 +20,25 @@ class PendingListReimbursement extends StatefulWidget {
   @override
   State<PendingListReimbursement> createState() =>
       _PendingListReimbursementState(pendingReimbListModal);
-
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<ClaimRequiDatalist>? allUsernew=[];
-List<ClaimRequiDatalist>? foundDataNew=[];
+List<ClaimRequiDatalist>? allUsernew = [];
+List<ClaimRequiDatalist>? foundDataNew = [];
 
 PendingReimbListModal? pendingReimbListLabel;
 PendingReimbListModal? pendingReimbListLabeled;
+
 class _PendingListReimbursementState extends State<PendingListReimbursement> {
   final PendingReimbListModal pendingReimbListModal;
 
   _PendingListReimbursementState(this.pendingReimbListModal);
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     setState(() {
@@ -56,15 +57,15 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        pendingReimbListLabel=value;
-        pendingReimbListLabeled=pendingReimbListLabel;
+        pendingReimbListLabel = value;
+        pendingReimbListLabeled = pendingReimbListLabel;
       });
       //print('employeeList00${advanceRequestedListLabel!.data!.length}');
     });
@@ -76,14 +77,14 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
     print('employeeList11: ${SessionId}');
     PendingReimbListModal pendingReimbListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    pendingReimbListModal=PendingReimbListModal.fromJson(mapResponse);
+    pendingReimbListModal = PendingReimbListModal.fromJson(mapResponse);
     allUsernew = pendingReimbListModal.claimRequiDatalist;
 
     return pendingReimbListModal;
@@ -92,7 +93,7 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
   var titleName = "Pending List";
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<ClaimRequiDatalist>?  results = [];
+    List<ClaimRequiDatalist>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -105,8 +106,14 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.empName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -120,6 +127,7 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
       foundDataNew = results;
     });
   }
+
   TextEditingController searchType = TextEditingController();
 
   @override
@@ -129,35 +137,40 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: titleName,
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
@@ -166,15 +179,14 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
         child: Column(
           children: [
             Expanded(
-                child: pendingReimbListLabeled == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getPendingList(pendingReimbListLabeled!)),
+              child:
+                  pendingReimbListLabeled == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getPendingList(pendingReimbListLabeled!),
+            ),
           ],
         ),
       ),
-
-
     );
   }
 
@@ -182,13 +194,14 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  PendingListReimbursement(PendingReimbListModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) => PendingListReimbursement(PendingReimbListModal()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -197,40 +210,54 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
         itemBuilder: (context, i) {
           return InkWell(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => ApproveDisappReimbursement(
-                  pendingReimbListModal, i)));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) =>
+                          ApproveDisappReimbursement(pendingReimbListModal, i),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.approveDisReimbursementRoute);
             },
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          foundDataNew![i].empName.toString().text.make().px8().py2(),
-                          Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  foundDataNew![i].status.toString()
-                                      .text
-                                      .color(Mythemes.lightBluishColor)
-                                      .sm
-                                      .make()
-                                      .px8(),
-                                ],
-                              ))
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          foundDataNew![i].reimbName.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /* Expanded(
+              elevation: 2,
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        foundDataNew![i].empName
+                            .toString()
+                            .text
+                            .make()
+                            .px8()
+                            .py2(),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              foundDataNew![i].status
+                                  .toString()
+                                  .text
+                                  .color(Mythemes.lightBluishColor)
+                                  .sm
+                                  .make()
+                                  .px8(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        foundDataNew![i].reimbName
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /* Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -241,15 +268,17 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
 
 
                           )*/
-                        ],
-                      ).py1(),
-                      Row(
-                        children: [
-                          foundDataNew![i].claimNo.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /*Expanded(
+                      ],
+                    ).py1(),
+                    Row(
+                      children: [
+                        foundDataNew![i].claimNo
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /*Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -260,15 +289,17 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
 
 
                           )*/
-                        ],
-                      ).py1(),
-                      Row(
-                        children: [
-                          foundDataNew![i].toDate.toString()
-                              .text.maxFontSize(12)
-                              .make()
-                              .px8(),
-                          /* Expanded(
+                      ],
+                    ).py1(),
+                    Row(
+                      children: [
+                        foundDataNew![i].toDate
+                            .toString()
+                            .text
+                            .maxFontSize(12)
+                            .make()
+                            .px8(),
+                        /* Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -279,12 +310,12 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
 
 
                           )*/
-                        ],
-                      ).py0(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          /*Expanded(
+                      ],
+                    ).py0(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        /*Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -294,17 +325,26 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 7, right: 0, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Grade".text.make(),
-                                foundDataNew![i].empGrade.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 7,
+                            right: 0,
+                            bottom: 18,
                           ),
+                          child: Column(
+                            children: [
+                              "Grade".text.make(),
+                              foundDataNew![i].empGrade
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
 
-                          /* Expanded(
+                        /* Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -314,17 +354,26 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 1, right: 0, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Category".text.make(),
-                                foundDataNew![i].catName.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 1,
+                            right: 0,
+                            bottom: 18,
                           ),
+                          child: Column(
+                            children: [
+                              "Category".text.make(),
+                              foundDataNew![i].catName
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
 
-                          /*  Expanded(
+                        /*  Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
                               child: Column(
@@ -334,25 +383,33 @@ class _PendingListReimbursementState extends State<PendingListReimbursement> {
                               ),
                             ),
                           ),*/
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10, left: 1, right: 7, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Amount".text.make(),
-                                foundDataNew![i].claimedAmt.toString().text.sm.make()
-                              ],
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 1,
+                            right: 7,
+                            bottom: 18,
                           ),
-                        ],
-                      ).py1(),
-                    ],
-                  ),
-                )),
+                          child: Column(
+                            children: [
+                              "Amount".text.make(),
+                              foundDataNew![i].claimedAmt
+                                  .toString()
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ).py1(),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
     );
   }
-
 }
-

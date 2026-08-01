@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
@@ -10,10 +11,10 @@ import '../modalClass/appDisAdvListModal.dart';
 
 class ApproveDisapAdvanceRequisitionList extends StatefulWidget {
   final AppDisAdvListModal appDisAdvListModal;
-  ApproveDisapAdvanceRequisitionList (this.appDisAdvListModal);
+  ApproveDisapAdvanceRequisitionList(this.appDisAdvListModal);
   @override
-  State<ApproveDisapAdvanceRequisitionList> createState() => _ApproveDisapAdvanceRequisitionListState(appDisAdvListModal);
-
+  State<ApproveDisapAdvanceRequisitionList> createState() =>
+      _ApproveDisapAdvanceRequisitionListState(appDisAdvListModal);
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -24,7 +25,8 @@ String? sessionId;
 
 AppDisAdvListModal? appDisAdvListLabel;
 
-class _ApproveDisapAdvanceRequisitionListState extends State<ApproveDisapAdvanceRequisitionList> {
+class _ApproveDisapAdvanceRequisitionListState
+    extends State<ApproveDisapAdvanceRequisitionList> {
   final AppDisAdvListModal appDisAdvListModal;
   _ApproveDisapAdvanceRequisitionListState(this.appDisAdvListModal);
   @override
@@ -42,13 +44,13 @@ class _ApproveDisapAdvanceRequisitionListState extends State<ApproveDisapAdvance
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
-        appDisAdvListLabel=value;
+        appDisAdvListLabel = value;
       });
       //print('employeeList00${advanceRequestedListLabel!.data!.length}');
     });
@@ -60,14 +62,14 @@ class _ApproveDisapAdvanceRequisitionListState extends State<ApproveDisapAdvance
     print('employeeList11: ${SessionId}');
     AppDisAdvListModal appDisAdvListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    appDisAdvListModal=AppDisAdvListModal.fromJson(mapResponse);
+    appDisAdvListModal = AppDisAdvListModal.fromJson(mapResponse);
 
     return appDisAdvListModal;
   }
@@ -80,12 +82,11 @@ class _ApproveDisapAdvanceRequisitionListState extends State<ApproveDisapAdvance
 
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context, delegate: SearchItems(),
-                );
-
-              }, icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(context: context, delegate: SearchItems());
+            },
+            icon: Icon(Icons.search),
+          ),
         ],
       ),
       body: Container(
@@ -93,15 +94,14 @@ class _ApproveDisapAdvanceRequisitionListState extends State<ApproveDisapAdvance
         child: Column(
           children: [
             Expanded(
-                child: appDisAdvListLabel == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getAppDisAdvanceList(appDisAdvListLabel!)),
+              child:
+                  appDisAdvListLabel == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getAppDisAdvanceList(appDisAdvListLabel!),
+            ),
           ],
         ),
       ),
-
-
     );
   }
 
@@ -109,13 +109,15 @@ class _ApproveDisapAdvanceRequisitionListState extends State<ApproveDisapAdvance
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  ApproveDisapAdvanceRequisitionList(AppDisAdvListModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) =>
+                    ApproveDisapAdvanceRequisitionList(AppDisAdvListModal()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -123,138 +125,144 @@ class _ApproveDisapAdvanceRequisitionListState extends State<ApproveDisapAdvance
         itemCount: appDisAdvListModal!.claimAdvDatalist!.length,
         itemBuilder: (context, i) {
           return Card(
-              elevation: 2,
-              child: Container(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        appDisAdvListModal!.claimAdvDatalist![i].empName.toString().text.make().px8().py4(),
-                        Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                appDisAdvListModal!.claimAdvDatalist![i].approvedStatus.toString()
-                                    .text
-                                    .color(Mythemes.lightBluishColor)
-                                    .sm
-                                    .make()
-                                    .px8(),
-                              ],
-                            ))
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        "Tour -"
-                            .text.maxFontSize(12)
-                            .make()
-                            .px8(),
-                        Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                appDisAdvListModal!.claimAdvDatalist![i].placeTour.toString().text.size(10).textStyle(context.captionStyle).make(),
-                              ],
-                            )
-
-
-                        )
-                      ],
-                    ).py2(),
-                    Row(
-                      children: [
-                        "Purpose"
-                            .text.maxFontSize(12)
-                            .make()
-                            .px8(),
-                        Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                appDisAdvListModal!.claimAdvDatalist![i].purpose.toString().text.size(10).textStyle(context.captionStyle).make()
-                              ],
-                            )
-
-
-                        )
-                      ],
-                    ).py2(),
-                    Row(
-                      children: [
-                        "Day -"
-                            .text.maxFontSize(12)
-                            .make()
-                            .px8(),
-                        Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                appDisAdvListModal!.claimAdvDatalist![i].ndays.toString().text.size(10).textStyle(context.captionStyle).make(),
-                              ],
-                            )
-
-
-                        )
-                      ],
-                    ).py2(),
-                    Row(
-                      children: [
-                        "Amount -"
-                            .text.maxFontSize(12)
-                            .make()
-                            .px8(),
-                        Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                appDisAdvListModal!.claimAdvDatalist![i].advanceAmt.toString().text.size(10).textStyle(context.captionStyle).make(),
-                              ],
-                            )
-
-
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        "Remarks -"
-                            .text.maxFontSize(12)
-                            .make()
-                            .px8(),
-                        Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                appDisAdvListModal!.claimAdvDatalist![i].remark.toString().text.size(10).textStyle(context.captionStyle).make(),
-                              ],
-                            )
-
-
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ));
+            elevation: 2,
+            child: Container(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      appDisAdvListModal!.claimAdvDatalist![i].empName
+                          .toString()
+                          .text
+                          .make()
+                          .px8()
+                          .py4(),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            appDisAdvListModal!
+                                .claimAdvDatalist![i]
+                                .approvedStatus
+                                .toString()
+                                .text
+                                .color(Mythemes.lightBluishColor)
+                                .sm
+                                .make()
+                                .px8(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      "Tour -".text.maxFontSize(12).make().px8(),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            appDisAdvListModal!.claimAdvDatalist![i].placeTour
+                                .toString()
+                                .text
+                                .size(10)
+                                .textStyle(context.captionStyle)
+                                .make(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ).py2(),
+                  Row(
+                    children: [
+                      "Purpose".text.maxFontSize(12).make().px8(),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            appDisAdvListModal!.claimAdvDatalist![i].purpose
+                                .toString()
+                                .text
+                                .size(10)
+                                .textStyle(context.captionStyle)
+                                .make(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ).py2(),
+                  Row(
+                    children: [
+                      "Day -".text.maxFontSize(12).make().px8(),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            appDisAdvListModal!.claimAdvDatalist![i].ndays
+                                .toString()
+                                .text
+                                .size(10)
+                                .textStyle(context.captionStyle)
+                                .make(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ).py2(),
+                  Row(
+                    children: [
+                      "Amount -".text.maxFontSize(12).make().px8(),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            appDisAdvListModal!.claimAdvDatalist![i].advanceAmt
+                                .toString()
+                                .text
+                                .size(10)
+                                .textStyle(context.captionStyle)
+                                .make(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      "Remarks -".text.maxFontSize(12).make().px8(),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            appDisAdvListModal!.claimAdvDatalist![i].remark
+                                .toString()
+                                .text
+                                .size(10)
+                                .textStyle(context.captionStyle)
+                                .make(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
         },
       ),
     );
   }
 }
 
-
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -279,6 +287,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -291,12 +300,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -309,9 +317,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

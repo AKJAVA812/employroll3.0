@@ -6,6 +6,7 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../../adminPage/modelClass/dashboardModel.dart';
@@ -27,9 +28,11 @@ class AttendanceReport extends StatefulWidget {
   final String forDateString;
   final String toDateString;
 
-  const AttendanceReport(
-      {Key? key, required this.forDateString, required this.toDateString})
-      : super(key: key);
+  const AttendanceReport({
+    Key? key,
+    required this.forDateString,
+    required this.toDateString,
+  }) : super(key: key);
 
   @override
   State<AttendanceReport> createState() =>
@@ -38,7 +41,9 @@ class AttendanceReport extends StatefulWidget {
 
 SessionManager shared = SessionManager();
 String? sessionId;
-late AttendanceReportModel? employeeListModelglobel = AttendanceReportModel(data: List.empty());
+late AttendanceReportModel? employeeListModelglobel = AttendanceReportModel(
+  data: List.empty(),
+);
 var status = "Present";
 AttendanceShiftDetailsModal? attendanceShiftDetailsModalGlobal;
 AttendanceShiftDetailsModal? attendanceShiftDetailsModalGlobaled;
@@ -54,7 +59,7 @@ dynamic shortLeaveMax;
 dynamic halfDayMin;
 dynamic halfDayMax;
 
-class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
+class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
   final String forDateString;
   final String toDateString;
 
@@ -74,10 +79,11 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
     getSharedPrfanceList();
@@ -86,23 +92,25 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
     super.initState();
   }
 
-
-
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     print('ResponseAttendance: ${sessionId}');
     print('ResponseAttendance: ${forDateString}');
     print('ResponseAttendance: ${toDateString}');
     //await Future.delayed(Duration(seconds: 3));
-    Future<AttendanceReportModel> getEmployeeList11 =
-        getEmployeeList(sessionId!, toDateString, forDateString);
+    Future<AttendanceReportModel> getEmployeeList11 = getEmployeeList(
+      sessionId!,
+      toDateString,
+      forDateString,
+    );
     //Shift Check
-  /*  Future<AttendanceShiftDetailsModal> getEmployeeList12 =
+    /*  Future<AttendanceShiftDetailsModal> getEmployeeList12 =
       getStatus(sessionId!);*/
     if (getEmployeeList11 == null) {
-      return Center(child: "HIi".text.make()
-          //CircularProgressIndicator()
-          );
+      return Center(
+        child: "HIi".text.make(),
+        //CircularProgressIndicator()
+      );
     }
     getEmployeeList11.then((value) {
       setState(() {
@@ -118,18 +126,17 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
     });*/
   }
 
-  Future<AttendanceShiftDetailsModal> getStatus(
-      String sessionId) async {
+  Future<AttendanceShiftDetailsModal> getStatus(String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.outPunchStatusCheck;
-
 
     print('employeeList11: ${sessionId}');
     AttendanceShiftDetailsModal employeeListModel;
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-            "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
 
@@ -138,13 +145,14 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
     mapResponse = json.decode(response.body);
     employeeListModel = AttendanceShiftDetailsModal.fromJson(mapResponse);
 
-
     return employeeListModel;
   }
 
-
   Future<AttendanceReportModel> getEmployeeList(
-      String sessionId, String fromdate, String toDate) async {
+    String sessionId,
+    String fromdate,
+    String toDate,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.attendanceReport;
     setState(() {
@@ -153,9 +161,10 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
     print('employeeList11: ${sessionId}');
     AttendanceReportModel employeeListModel;
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-        "sessionId=$sessionId&toDate=$fromdate&fromDate=$toDate");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&toDate=$fromdate&fromDate=$toDate",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
     print('API - ${response.request}');
@@ -182,61 +191,74 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
         title: "Attendance Report".text.make(),
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context, delegate: SearchItems(),
-                );
-
-              }, icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(context: context, delegate: SearchItems());
+            },
+            icon: Icon(Icons.search),
+          ),
         ],
       ),
 
       body: Container(
         color: context.canvasColor,
         child: Center(
-          child: isLoading
-              ? const CircularProgressIndicator()
-              : (employeeListModelglobel == null
-              ? const Text("No data available")
-              : AttList(employeeListModelglobel!)),
+          child:
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : (employeeListModelglobel == null
+                      ? const Text("No data available")
+                      : AttList(employeeListModelglobel!)),
         ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GetAttendanceDet(showAppBar: true),
+              ),
+            );
             print('My Requests');
           }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyAllReportsPage(showAppBar: true),
+              ),
+            );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('My Reports');
           }
-          if(index==4){
+          if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
@@ -248,10 +270,7 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware{
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -280,7 +299,6 @@ class AttList extends StatefulWidget {
   final AttendanceReportModel attendanceReportModel1;
 
   AttList(this.attendanceReportModel1);
-
 
   @override
   State<AttList> createState() => _AttListState(attendanceReportModel1);
@@ -344,29 +362,50 @@ class _AttListState extends State<AttList> {
           status = employeeListModelglobel!.data![itemCount].status!;
         }*/
         return Card(
-            elevation: 2,
-            child: Container(
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      employeeListModelglobel!.data![itemCount].employeeName!.text.make().px8().py4(),
-                      Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              "${employeeListModelglobel!.data![itemCount].status}".text.bold.color(employeeListModelglobel!.data![itemCount].status == "Absent" ? Mythemes.dangerColor : Mythemes.successColor).make().px8()
-                              //employeeListModelglobel!.data![itemCount].status!.text.color(employeeListModelglobel!.data![itemCount].status! == "Absent" ? Mythemes.dangerColorOne : Mythemes.lightBluishColor).make().px8(),
-                            ],
-                          )
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      employeeListModelglobel!.data![itemCount].attendanceDate!.text.textStyle(context.captionStyle).make().px8(),
-                      /*Expanded(
+          elevation: 2,
+          child: Container(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    employeeListModelglobel!.data![itemCount].employeeName!.text
+                        .make()
+                        .px8()
+                        .py4(),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          "${employeeListModelglobel!.data![itemCount].status}"
+                              .text
+                              .bold
+                              .color(
+                                employeeListModelglobel!
+                                            .data![itemCount]
+                                            .status ==
+                                        "Absent"
+                                    ? Mythemes.dangerColor
+                                    : Mythemes.successColor,
+                              )
+                              .make()
+                              .px8(),
+                          //employeeListModelglobel!.data![itemCount].status!.text.color(employeeListModelglobel!.data![itemCount].status! == "Absent" ? Mythemes.dangerColorOne : Mythemes.lightBluishColor).make().px8(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    employeeListModelglobel!
+                        .data![itemCount]
+                        .attendanceDate!
+                        .text
+                        .textStyle(context.captionStyle)
+                        .make()
+                        .px8(),
+                    /*Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -379,82 +418,140 @@ class _AttListState extends State<AttList> {
 
 
                       )*/
-                    ],
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.touch_app, size: 25, color: Mythemes.lightBluishColor,
-                            ),
-                          ],
-                        ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        left: 5,
+                        right: 3,
+                        bottom: 18,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                        child: Column(
-                          children: [
-                            "In Time".text.sm.make(),
-                            employeeListModelglobel!.data![itemCount].inTime == null ||
-                                employeeListModelglobel!.data![itemCount].inTime == 'Casual Leave'
-                                ? ''.text.make() :
-                            employeeListModelglobel!.data![itemCount].inTime!.text.sm.make()
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.touch_app,
+                            size: 25,
+                            color: Mythemes.lightBluishColor,
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.touch_app, size: 25, color: Mythemes.lightBluishColor,
-                            ),
-                          ],
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        left: 5,
+                        right: 3,
+                        bottom: 18,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                        child: Column(
-                          children: [
-                            "Out Time".text.sm.make(),
-                            employeeListModelglobel!.data![itemCount].outTime == null ||
-                                employeeListModelglobel!.data![itemCount].outTime == 'Casual Leave'
-                                ? ''.text.make() :
-                            employeeListModelglobel!.data![itemCount].outTime!.text.sm.make()
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          "In Time".text.sm.make(),
+                          employeeListModelglobel!.data![itemCount].inTime ==
+                                      null ||
+                                  employeeListModelglobel!
+                                          .data![itemCount]
+                                          .inTime ==
+                                      'Casual Leave'
+                              ? ''.text.make()
+                              : employeeListModelglobel!
+                                  .data![itemCount]
+                                  .inTime!
+                                  .text
+                                  .sm
+                                  .make(),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top:15, left: 5, right: 3, bottom: 18),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.update, size: 25, color: Mythemes.lightBluishColor,
-                            ),
-                          ],
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        left: 5,
+                        right: 3,
+                        bottom: 18,
                       ),
-                      Padding(
-                        padding:  EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                        child: Column(
-                          children: [
-
-                            "Work Hours".text.sm.make(),
-                            employeeListModelglobel!.data![itemCount].workingHrs!.text.sm.make()
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.touch_app,
+                            size: 25,
+                            color: Mythemes.lightBluishColor,
+                          ),
+                        ],
                       ),
-                    ],
-                  )
-                ],
-              ),
-            )
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        left: 5,
+                        right: 3,
+                        bottom: 18,
+                      ),
+                      child: Column(
+                        children: [
+                          "Out Time".text.sm.make(),
+                          employeeListModelglobel!.data![itemCount].outTime ==
+                                      null ||
+                                  employeeListModelglobel!
+                                          .data![itemCount]
+                                          .outTime ==
+                                      'Casual Leave'
+                              ? ''.text.make()
+                              : employeeListModelglobel!
+                                  .data![itemCount]
+                                  .outTime!
+                                  .text
+                                  .sm
+                                  .make(),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        left: 5,
+                        right: 3,
+                        bottom: 18,
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.update,
+                            size: 25,
+                            color: Mythemes.lightBluishColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: 15,
+                        left: 5,
+                        right: 3,
+                        bottom: 18,
+                      ),
+                      child: Column(
+                        children: [
+                          "Work Hours".text.sm.make(),
+                          employeeListModelglobel!
+                              .data![itemCount]
+                              .workingHrs!
+                              .text
+                              .sm
+                              .make(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ).py2();
       },
     );
@@ -462,10 +559,7 @@ class _AttListState extends State<AttList> {
 }
 
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -490,6 +584,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -502,12 +597,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -520,9 +614,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

@@ -18,6 +18,7 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 
@@ -27,11 +28,14 @@ class ODRequisitionPage extends StatefulWidget {
   int indexCont;
 
   ODRequisitionPage(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont);
+    this.attendanceModelGlobel,
+    this.onDateAttModel,
+    this.indexCont,
+  );
 
   @override
-  State<ODRequisitionPage> createState() => _ODRequisitionPageState(
-      attendanceModelGlobel, onDateAttModel, indexCont);
+  State<ODRequisitionPage> createState() =>
+      _ODRequisitionPageState(attendanceModelGlobel, onDateAttModel, indexCont);
 }
 
 class _ODRequisitionPageState extends State<ODRequisitionPage> {
@@ -51,9 +55,11 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
   String? actualOutTimeset;
   int? empId;
 
-
   _ODRequisitionPageState(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont);
+    this.attendanceModelGlobel,
+    this.onDateAttModel,
+    this.indexCont,
+  );
 
   @override
   void initState() {
@@ -62,25 +68,24 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
     //String empid=onDateAttModel!.empId.toString();
     //print('responseemployeeList $empid');
 
-    if(attendanceModelGlobel!=null){
+    if (attendanceModelGlobel != null) {
       print('attendanceModelGlobel');
-      branchNameset= attendanceModelGlobel!.data![indexCont].branchName;
-      departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
-      employeeNameset= attendanceModelGlobel!.data![indexCont].employeeName;
-      onDateset= attendanceModelGlobel!.data![indexCont].attendanceDate;
-      actualTimeset= attendanceModelGlobel!.data![indexCont].inTime;
-      actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
-      empId =attendanceModelGlobel!.data![indexCont].empId;
-
-    }else{
+      branchNameset = attendanceModelGlobel!.data![indexCont].branchName;
+      departmentset = attendanceModelGlobel!.data![indexCont].departmentName;
+      employeeNameset = attendanceModelGlobel!.data![indexCont].employeeName;
+      onDateset = attendanceModelGlobel!.data![indexCont].attendanceDate;
+      actualTimeset = attendanceModelGlobel!.data![indexCont].inTime;
+      actualOutTimeset = attendanceModelGlobel!.data![indexCont].outTime;
+      empId = attendanceModelGlobel!.data![indexCont].empId;
+    } else {
       print('onModelrun');
-      branchNameset= onDateAttModel!.branch;
-      departmentset= onDateAttModel!.dept;
-      employeeNameset= onDateAttModel!.empName;
-      onDateset= onDateAttModel!.date;
-      actualTimeset= onDateAttModel!.inTime;
-      actualOutTimeset= onDateAttModel!.outTime;
-      empId= onDateAttModel!.empId;
+      branchNameset = onDateAttModel!.branch;
+      departmentset = onDateAttModel!.dept;
+      employeeNameset = onDateAttModel!.empName;
+      onDateset = onDateAttModel!.date;
+      actualTimeset = onDateAttModel!.inTime;
+      actualOutTimeset = onDateAttModel!.outTime;
+      empId = onDateAttModel!.empId;
     }
 
     getSharedPrfanceList();
@@ -108,10 +113,7 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
     double height = MediaQuery.of(context).size.height;
     return DismissKeyboard(
       child: Scaffold(
-        appBar: AppBar(
-          title: "Requisition By RO".text.make(),
-          elevation: 0.5,
-        ),
+        appBar: AppBar(title: "Requisition By RO".text.make(), elevation: 0.5),
         body: Container(
           height: height,
           color: Mythemes.whitish,
@@ -121,327 +123,348 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
               child: Column(
                 children: [
                   Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                   crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    Row(
-                      /*mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        /*mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,*/
-                      children: [
-                        Radio(
-                          value: "onDate",
-                          groupValue: radios,
-                          onChanged: (value) {
-                            /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        children: [
+                          Radio(
+                            value: "onDate",
+                            groupValue: radios,
+                            onChanged: (value) {
+                              /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text("On Date Click"),
                             ));*/
-                            setState(() {
-                              onDateRadio = "1";
-                              nextDayRadio = "0";
-                              compOffRadio = "0";
-                              radios = value.toString();
-                            });
-                          },
-                        ),
-                        "On Date".text.make(),
-                      ],
-                    ),
-                    Row(
-                     /* mainAxisAlignment: MainAxisAlignment.center,
+                              setState(() {
+                                onDateRadio = "1";
+                                nextDayRadio = "0";
+                                compOffRadio = "0";
+                                radios = value.toString();
+                              });
+                            },
+                          ),
+                          "On Date".text.make(),
+                        ],
+                      ),
+                      Row(
+                        /* mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,*/
-                      children: [
-                        Radio(
-                          value: "nextDay",
-                          groupValue: radios,
-                          onChanged: (value) {
-                            /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        children: [
+                          Radio(
+                            value: "nextDay",
+                            groupValue: radios,
+                            onChanged: (value) {
+                              /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text("Next Day Click"),
                             ));*/
-                            setState(() {
-                              onDateRadio = "0";
-                              nextDayRadio = "1";
-                              compOffRadio = "0";
-                              radios = value.toString();
-                            });
-                          },
+                              setState(() {
+                                onDateRadio = "0";
+                                nextDayRadio = "1";
+                                compOffRadio = "0";
+                                radios = value.toString();
+                              });
+                            },
+                          ),
+                          "Next Day".text.make(),
+                        ],
+                      ).px16(),
+                    ],
+                  ).p(5),
+                  SizedBox(height: 7),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: TextFormField(
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: branchNameset,
+                            ),
+                            readOnly: true,
+                            //initialValue: "${branchName}",
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: branchNameset,
+                              labelText: "Branch Name",
+                              labelStyle: TextStyle(fontSize: 15),
+                            ),
+                          ),
                         ),
-                        "Next Day".text.make(),
-                      ],
-                    ).px16(),
-                  ]).p(5),
-                  SizedBox(
-                    height: 7,
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: TextFormField(
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: departmentset,
+                            ),
+                            readOnly: true,
+                            //initialValue: "${branchName}",
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: departmentset,
+                              labelText: "Department",
+                              labelStyle: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Row(
                     children: [
                       Expanded(
-                          child:  Padding(
-                            padding: EdgeInsets.all(10.0),
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: TextFormField(
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: employeeNameset,
+                            ),
+                            readOnly: true,
+                            //initialValue: "${branchName}",
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: employeeNameset,
+                              labelText: "Employee Name",
+                              labelStyle: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: TextFormField(
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(text: onDateset),
+                            readOnly: true,
+                            //initialValue: "${branchName}",
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: onDateset,
+                              labelText: "On Date",
+                              labelStyle: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: TextFormField(
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: actualTimeset,
+                            ),
+                            readOnly: true,
+                            //initialValue: "${branchName}",
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: actualTimeset,
+                              labelText: "Actual In Time",
+                              labelStyle: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: InkWell(
+                            onTap: () async {
+                              //_openInTimepicker(context);
+                              final TimeOfDay? n = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                                builder: (BuildContext context, Widget? child) {
+                                  return MediaQuery(
+                                    data: MediaQuery.of(
+                                      context,
+                                    ).copyWith(alwaysUse24HourFormat: true),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              print('timenewOut $n');
+                              setState(() {
+                                var now = DateTime.now();
+                                DateTime newt = DateTime(
+                                  now.year,
+                                  now.month,
+                                  now.day,
+                                  n!.hour,
+                                  n!.minute,
+                                );
+                                var nT = DateFormat('HH:mm').format(newt);
+                                print(DateFormat('HH:mm').format(newt));
+                                _inTimePicker = nT;
+                              });
+                            },
                             child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: branchNameset),
+                              style: TextStyle(fontSize: 14),
+                              controller: TextEditingController(
+                                text: _inTimePicker,
+                              ),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
                                 enabled: false,
-                                  hintText: branchNameset,
-                                  labelText: "Branch Name",
-                                labelStyle: TextStyle(fontSize: 15)
+                                hintText: _inTimePicker,
+                                labelText: "Changes In Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: TextFormField(
+                            maxLines: 3,
+                            style: TextStyle(fontSize: 14),
+                            controller: inRemarkController,
+                            enabled: true,
+                            //initialValue: "${branchName}",
+                            decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Mythemes.greyishade,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: "Add Remark",
+                              labelText: "Remarks",
+                              labelStyle: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: TextFormField(
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: actualOutTimeset,
+                            ),
+                            readOnly: true,
+                            //initialValue: "${branchName}",
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: actualOutTimeset,
+                              labelText: "Actual Out Time",
+                              labelStyle: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                        ),
                       ),
                       Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: InkWell(
+                            onTap: () async {
+                              //_openOutTimepicker(context);
+                              final TimeOfDay? o = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                                builder: (BuildContext context, Widget? child) {
+                                  return MediaQuery(
+                                    data: MediaQuery.of(
+                                      context,
+                                    ).copyWith(alwaysUse24HourFormat: true),
+                                    child: child!,
+                                  );
+                                },
+                              );
+                              print('timenewOut $o');
+                              setState(() {
+                                var newNow = DateTime.now();
+                                DateTime newt = DateTime(
+                                  newNow.year,
+                                  newNow.month,
+                                  newNow.day,
+                                  o!.hour,
+                                  o!.minute,
+                                );
+                                var oT = DateFormat('HH:mm').format(newt);
+                                print(DateFormat('HH:mm').format(newt));
+                                _outTimePicker = oT;
+                              });
+                            },
                             child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: departmentset),
+                              style: TextStyle(fontSize: 14),
+                              controller: TextEditingController(
+                                text: _outTimePicker,
+                              ),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: departmentset,
-                                  labelText: "Department",
-                                  labelStyle: TextStyle(fontSize: 15)
+                                enabled: false,
+                                hintText: _outTimePicker,
+                                labelText: "Changes Out Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
+                        ),
                       ),
                     ],
                   ),
                   Row(
                     children: [
                       Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: employeeNameset),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: employeeNameset,
-                                  labelText: "Employee Name",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-
-                      ),
-                      Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: onDateset),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: onDateset,
-                                  labelText: "On Date",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: actualTimeset),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: actualTimeset,
-                                  labelText: "Actual In Time",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-                      ),
-                      Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: InkWell(
-                              onTap: () async {
-                                //_openInTimepicker(context);
-                                final TimeOfDay? n = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.now(),
-                                    builder: (BuildContext context, Widget? child) {
-                                      return MediaQuery(
-                                        data: MediaQuery.of(context)
-                                            .copyWith(alwaysUse24HourFormat: true),
-                                        child: child!,
-                                      );
-                                    });
-                                print('timenewOut $n');
-                                setState(() {
-                                  var now = DateTime.now();
-                                  DateTime newt = DateTime(now.year, now.month,
-                                      now.day, n!.hour, n!.minute);
-                                  var nT = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
-                                  _inTimePicker = nT;
-                                });
-                              },
-                              child: TextFormField(
-                                style:TextStyle(fontSize:14),
-                                controller: TextEditingController(text: _inTimePicker),
-                                readOnly: true,
-                                //initialValue: "${branchName}",
-                                decoration:  InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 8.0),
-                                    enabled: false,
-                                    hintText: _inTimePicker,
-                                    labelText: "Changes In Time",
-                                    labelStyle: TextStyle(fontSize: 15)
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: TextFormField(
+                            maxLines: 3,
+                            style: TextStyle(fontSize: 14),
+                            controller: outRemarkController,
+                            enabled: true,
+                            //initialValue: "${branchName}",
+                            decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Mythemes.greyishade,
                                 ),
                               ),
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: "Add Remark",
+                              labelText: "Remarks",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
-
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              maxLines: 3,
-                              style:TextStyle(fontSize:14),
-                              controller: inRemarkController,
-                              enabled: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.greyishade),
-                                  ),
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: "Add Remark",
-                                  labelText: "Remarks",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: actualOutTimeset),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: actualOutTimeset,
-                                  labelText: "Actual Out Time",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-                      ),
-                      Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: InkWell(
-                              onTap: () async {
-                                //_openOutTimepicker(context);
-                                final TimeOfDay? o = await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.now(),
-                                    builder: (BuildContext context, Widget? child) {
-                                      return MediaQuery(
-                                        data: MediaQuery.of(context)
-                                            .copyWith(alwaysUse24HourFormat: true),
-                                        child: child!,
-                                      );
-                                    });
-                                print('timenewOut $o');
-                                setState(() {
-                                  var newNow = DateTime.now();
-                                  DateTime newt = DateTime(newNow.year, newNow.month,
-                                      newNow.day, o!.hour, o!.minute);
-                                  var oT = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
-                                  _outTimePicker = oT;
-                                });
-                              },
-                              child: TextFormField(
-                                style:TextStyle(fontSize:14),
-                                controller: TextEditingController(text: _outTimePicker),
-                                readOnly: true,
-                                //initialValue: "${branchName}",
-                                decoration:  InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 8.0),
-                                    enabled: false,
-                                    hintText: _outTimePicker,
-                                    labelText: "Changes Out Time",
-                                    labelStyle: TextStyle(fontSize: 15)
-                                ),
-                              ),
-                            ),
-                          ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              maxLines: 3,
-                              style:TextStyle(fontSize:14),
-                              controller: outRemarkController,
-                              enabled: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.greyishade),
-                                  ),
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: "Add Remark",
-                                  labelText: "Remarks",
-                                  labelStyle: TextStyle(fontSize: 15)
-                              ),
-                            ),
-                          ),
-
+                        ),
                       ),
                     ],
                   ),
@@ -450,85 +473,124 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                String? inTimeReq;
-                                String? outTimeReq;
-                                String logid ="0";
-                                String inRemarkString = inRemarkController.text;
-                                String outRemarkString = outRemarkController.text;
-                                String onDate = DateFormat("dd-MM-yyyy").format(DateTime.parse(onDateset!));
-                                var dateformat = onDate;
+                        alignment: MainAxisAlignment.center,
+                        buttonPadding: Vx.mOnly(right: 16),
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              String? inTimeReq;
+                              String? outTimeReq;
+                              String logid = "0";
+                              String inRemarkString = inRemarkController.text;
+                              String outRemarkString = outRemarkController.text;
+                              String onDate = DateFormat(
+                                "dd-MM-yyyy",
+                              ).format(DateTime.parse(onDateset!));
+                              var dateformat = onDate;
 
-                                if (_outTimePicker!.compareToIgnoringCase("00:00") == 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              if (_outTimePicker!.compareToIgnoringCase(
+                                    "00:00",
+                                  ) ==
+                                  0) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
                                     content: Text(" Please Select Out Time "),
-                                  ));
+                                  ),
+                                );
+                              } else {
+                                //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
+                                if (onDateset!.compareToIgnoringCase("--:--") ==
+                                    0) {
+                                  inTimeReq =
+                                      onDateset
+                                                  .toString()
+                                                  .compareToIgnoringCase(
+                                                    "--:--",
+                                                  ) ==
+                                              0
+                                          ? _inTimePicker
+                                          : _inTimePicker;
                                 } else {
-                                  //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
-                                  if(onDateset!.compareToIgnoringCase("--:--")==0){
-                                    inTimeReq = onDateset.toString().compareToIgnoringCase("--:--") == 0 ? _inTimePicker :_inTimePicker;
-                                  }
-                                  else{
-                                    inTimeReq = onDateset.toString().compareToIgnoringCase("N/A") == 0 ? _inTimePicker :_inTimePicker;
-                                  }
-                                  outTimeReq = _outTimePicker;
-                                  if (radios.compareToIgnoringCase("next") == 0) {
+                                  inTimeReq =
+                                      onDateset
+                                                  .toString()
+                                                  .compareToIgnoringCase(
+                                                    "N/A",
+                                                  ) ==
+                                              0
+                                          ? _inTimePicker
+                                          : _inTimePicker;
+                                }
+                                outTimeReq = _outTimePicker;
+                                if (radios.compareToIgnoringCase("next") == 0) {
+                                } else {
+                                  if (inTimeReq.compareToIgnoringCase(
+                                        "00:00",
+                                      ) ==
+                                      0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          " Please Select In Time ",
+                                        ),
+                                      ),
+                                    );
                                   } else {
-                                    if (inTimeReq.compareToIgnoringCase("00:00") == 0) {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select In Time "),
-                                      ));
-                                    } else {
-                                      if(onDateRadio.compareToIgnoringCase("1")==0){
-                                        if (inTimeReq.compareTo(outTimeReq) > 0) {
-                                          return setState(() {
-                                            CommonNotificationPage.showWorkDoneSuccess(
-                                                context,
-                                                "Your working hours going to negative, Please select requisition time correctly."
-                                                    .upperCamelCase +
-                                                    " ",
-                                                "Alert Message");
-                                          });
-                                        } else {
-                                          sendRequsitionToServer(
-                                              context,
-                                              empId!,
-                                              inRemarkString,
-                                              outRemarkString,
-                                              inTimeReq,
-                                              outTimeReq,
-                                              logid,
-                                              dateformat);
-                                        }
-                                      }else if(nextDayRadio.compareToIgnoringCase("1")==0){
-                                        sendRequsitionToServernextDay(
+                                    if (onDateRadio.compareToIgnoringCase(
+                                          "1",
+                                        ) ==
+                                        0) {
+                                      if (inTimeReq.compareTo(outTimeReq) > 0) {
+                                        return setState(() {
+                                          CommonNotificationPage.showWorkDoneSuccess(
                                             context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq,
-                                            outTimeReq,
-                                            logid,
-                                            dateformat);
+                                            "Your working hours going to negative, Please select requisition time correctly."
+                                                    .upperCamelCase +
+                                                " ",
+                                            "Alert Message",
+                                          );
+                                        });
+                                      } else {
+                                        sendRequsitionToServer(
+                                          context,
+                                          empId!,
+                                          inRemarkString,
+                                          outRemarkString,
+                                          inTimeReq,
+                                          outTimeReq,
+                                          logid,
+                                          dateformat,
+                                        );
                                       }
-
+                                    } else if (nextDayRadio
+                                            .compareToIgnoringCase("1") ==
+                                        0) {
+                                      sendRequsitionToServernextDay(
+                                        context,
+                                        empId!,
+                                        inRemarkString,
+                                        outRemarkString,
+                                        inTimeReq,
+                                        outTimeReq,
+                                        logid,
+                                        dateformat,
+                                      );
                                     }
                                   }
                                 }
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                MaterialStateProperty.all(Mythemes.lightBluishColor),
+                              }
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                Mythemes.lightBluishColor,
                               ),
-                              child: "Send".text.make(),
-                            ).wh(150, 40).py12()
-                          ]),
+                            ),
+                            child: "Send".text.make(),
+                          ).wh(150, 40).py12(),
+                        ],
+                      ),
                     ],
-                  ).py32()
+                  ).py32(),
                 ],
               ),
             ),
@@ -537,42 +599,47 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
               print('OD');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -583,10 +650,7 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -610,28 +674,31 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
       ),
     );
   }
+
   String conn = ApiDetails.server;
   String apiUrl = ApiDetails.odAttendanceReq;
   Future<void> sendRequsitionToServer(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -655,29 +722,30 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
       print('result ${result} reason ${reason}');
     }
   }
-
 
   Future<void> sendRequsitionToServernextDay(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "nextday=true&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "nextday=true&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -701,14 +769,11 @@ class _ODRequisitionPageState extends State<ODRequisitionPage> {
       print('result ${result} reason ${reason}');
     }
   }
-
-
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
   }
 }
-
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;

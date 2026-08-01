@@ -8,6 +8,7 @@ import '../adminPage/mssDashboard.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../commanScreen/routes.dart';
 import '../sharedPrefancePage/ShardPre.dart';
+import '../utils/profile_image_provider.dart';
 
 class ProfilePageNew extends StatefulWidget {
   const ProfilePageNew({Key? key}) : super(key: key);
@@ -16,42 +17,42 @@ class ProfilePageNew extends StatefulWidget {
   State<ProfilePageNew> createState() => _ProfilePageNewState();
 }
 
-SessionManager shared= SessionManager();
+SessionManager shared = SessionManager();
 
 class _ProfilePageNewState extends State<ProfilePageNew> {
-  late String name=" ",designation="",mobileNo="",emailId="",dept="",branch="",dateOfBirth="",urlImage="";
+  late String name = " ",
+      designation = "",
+      mobileNo = "",
+      emailId = "",
+      dept = "",
+      branch = "",
+      dateOfBirth = "",
+      urlImage = "";
   Future getUserDetails() async {
-
-
-    urlImage= await shared.getProfileImage();
-    name= await shared.getempName();
-    emailId=await shared.getEmailId();
-    dept=await shared.getDept();
-    branch=await shared.getBranch();
-    dateOfBirth=await shared.getDob();
-    mobileNo=await shared.getMobileNo();
-    designation=await shared.getDesignation();
+    urlImage = await shared.getProfileImage();
+    name = await shared.getempName();
+    emailId = await shared.getEmailId();
+    dept = await shared.getDept();
+    branch = await shared.getBranch();
+    dateOfBirth = await shared.getDob();
+    mobileNo = await shared.getMobileNo();
+    designation = await shared.getDesignation();
     if (dateOfBirth.isNotEmpty) {
       try {
-        String formattedDate = DateFormat("dd-MM-yyyy")
-            .format(DateFormat("dd-MM-yyyy").parse(dateOfBirth));
+        String formattedDate = DateFormat(
+          "dd-MM-yyyy",
+        ).format(DateFormat("dd-MM-yyyy").parse(dateOfBirth));
 
         // Use formattedDate in your widget
-        Container(
-          child: formattedDate.text.letterSpacing(1).bold.make(),
-        );
+        Container(child: formattedDate.text.letterSpacing(1).bold.make());
       } catch (e) {
         print('Error parsing dateOfBirth: $e');
         // Handle error, e.g., show a default message or placeholder
-        Container(
-          child: Text('Invalid date format').text.bold.make(),
-        );
+        Container(child: Text('Invalid date format').text.bold.make());
       }
     } else {
       // Handle the case when dateOfBirth is empty or null
-      Container(
-        child: Text('Date of birth not provided').text.bold.make(),
-      );
+      Container(child: Text('Date of birth not provided').text.bold.make());
     }
 
     print('profilePage: ${urlImage}');
@@ -62,11 +63,9 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
     print('profilePage: ${dateOfBirth}');
     print('profilePage: ${mobileNo}');
     print('profilePage: ${designation}');
-    setState(() {
-
-    });
-
+    setState(() {});
   }
+
   @override
   void initState() {
     getUserDetails();
@@ -79,10 +78,7 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0.5,
-        title: "Profile".text.make(),
-      ),
+      appBar: AppBar(elevation: 0.5, title: "Profile".text.make()),
       /* body: Container(
         color: context.canvasColor,
         child: Center(
@@ -146,36 +142,38 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
           SingleChildScrollView(
             child: Column(
               children: [
-                Padding(padding: EdgeInsets.all(20),
-                  // child: "Profile".text.make(),
+                Padding(
+                  padding: EdgeInsets.all(20),
 
+                  // child: "Profile".text.make(),
                 ),
                 Container(
                   padding: EdgeInsets.all(10.0),
-                  width: MediaQuery.of(context).size.width/2,
-                  height: MediaQuery.of(context).size.width/2,
+                  width: MediaQuery.of(context).size.width / 2,
+                  height: MediaQuery.of(context).size.width / 2,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Mythemes.lightBluishColor, width: 3),
+                    border: Border.all(
+                      color: Mythemes.lightBluishColor,
+                      width: 3,
+                    ),
                     shape: BoxShape.circle,
                     color: Mythemes.whitish,
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: NetworkImage(urlImage),
+                      image: profileImageProvider(urlImage),
                     ),
                   ),
-
                 ),
                 Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Column(
-                        children: [
-                          name.text.xl2.make(),
-                          designation.text.textStyle(context.captionStyle).make(),
-                        ],
-                      ),
-                    )
-
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Column(
+                      children: [
+                        name.text.xl2.make(),
+                        designation.text.textStyle(context.captionStyle).make(),
+                      ],
+                    ),
+                  ),
                 ),
 
                 Padding(
@@ -188,67 +186,41 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
                           children: [
                             Column(
                               children: [
-                                Icon(Icons.email, size: 25, color: Mythemes.lightBluishColor,).py16(),
+                                Icon(
+                                  Icons.email,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
                             ).px16(),
                             Expanded(
-                              child: Column(
-                                children: <Widget>[
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: "Email Id".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                    ),
-                                  ),
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Email Id".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: emailId.text.letterSpacing(1).bold.make(),
-                                    ),
-                                  )
-
-
-                                ],
-                              ).px8(),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              emailId.text
+                                                  .letterSpacing(1)
+                                                  .bold
+                                                  .make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
                             ),
-
-
-                          ],
-                        ),
-
-                      ),
-                      Container(
-                        height: 68,
-                        child: Row(
-                          children: [
-                            Column(
-                              children: [
-                                Icon(Icons.phone, size: 25, color: Mythemes.lightBluishColor,).py16(),
-                              ],
-                            ).px16(),
-                            Expanded(
-                              child: Column(
-                                children: <Widget>[
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: "Mobile No.".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                    ),
-                                  ),
-
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: mobileNo.text.letterSpacing(1).bold.make(),
-                                    ),
-                                  ),
-
-
-                                ],
-                              ).px8(),
-                            ),
-
                           ],
                         ),
                       ),
@@ -258,31 +230,41 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
                           children: [
                             Column(
                               children: [
-                                Icon(Icons.work, size: 25, color: Mythemes.lightBluishColor,).py16(),
+                                Icon(
+                                  Icons.phone,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
                             ).px16(),
                             Expanded(
-                              child: Column(
-                                children: <Widget>[
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: "Department".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                    ),
-                                  ),
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Mobile No.".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: dept.text.letterSpacing(1).bold.make(),
-                                    ),
-                                  ),
-
-
-                                ],
-                              ).px8(),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              mobileNo.text
+                                                  .letterSpacing(1)
+                                                  .bold
+                                                  .make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
                             ),
-
                           ],
                         ),
                       ),
@@ -292,31 +274,41 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
                           children: [
                             Column(
                               children: [
-                                Icon(Icons.apartment, size: 25, color: Mythemes.lightBluishColor,).py16(),
+                                Icon(
+                                  Icons.work,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
                             ).px16(),
                             Expanded(
-                              child: Column(
-                                children: <Widget>[
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: "Branch".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                    ),
-                                  ),
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Department".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: branch.text.letterSpacing(1).bold.make(),
-                                    ),
-                                  ),
-
-
-                                ],
-                              ).px8(),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              dept.text
+                                                  .letterSpacing(1)
+                                                  .bold
+                                                  .make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
                             ),
-
                           ],
                         ),
                       ),
@@ -326,55 +318,120 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
                           children: [
                             Column(
                               children: [
-                                Icon(Icons.date_range, size: 25, color: Mythemes.lightBluishColor,).py16(),
+                                Icon(
+                                  Icons.apartment,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
                               ],
                             ).px16(),
                             Expanded(
-                              child: Column(
-                                children: <Widget>[
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: "Date Of Birth".text.align(TextAlign.left).color(Mythemes.greyish).make(),
-                                    ),
-                                  ),
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Branch".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: (dateOfBirth.isNotEmpty)
-                                          ? (() {
-                                        try {
-                                          return DateFormat("dd-MM-yyyy")
-                                              .format(DateFormat("dd-MM-yyyy").parse(dateOfBirth))
-                                              .text.letterSpacing(1).bold.make();
-                                        } catch (e) {
-                                          print('Error parsing dateOfBirth: $e');
-                                          return Text('Invalid date format').text.bold.make();
-                                        }
-                                      }())
-                                          : Text('Date of birth not provided').text.bold.make(),
-                                    ),
-                                  ),
-                                ],
-                              ).px8(),
-                            )
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              branch.text
+                                                  .letterSpacing(1)
+                                                  .bold
+                                                  .make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 68,
+                        child: Row(
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.date_range,
+                                  size: 25,
+                                  color: Mythemes.lightBluishColor,
+                                ).py16(),
+                              ],
+                            ).px16(),
+                            Expanded(
+                              child:
+                                  Column(
+                                    children: <Widget>[
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              "Date Of Birth".text
+                                                  .align(TextAlign.left)
+                                                  .color(Mythemes.greyish)
+                                                  .make(),
+                                        ),
+                                      ),
 
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child:
+                                              (dateOfBirth.isNotEmpty)
+                                                  ? (() {
+                                                    try {
+                                                      return DateFormat(
+                                                            "dd-MM-yyyy",
+                                                          )
+                                                          .format(
+                                                            DateFormat(
+                                                              "dd-MM-yyyy",
+                                                            ).parse(
+                                                              dateOfBirth,
+                                                            ),
+                                                          )
+                                                          .text
+                                                          .letterSpacing(1)
+                                                          .bold
+                                                          .make();
+                                                    } catch (e) {
+                                                      print(
+                                                        'Error parsing dateOfBirth: $e',
+                                                      );
+                                                      return Text(
+                                                        'Invalid date format',
+                                                      ).text.bold.make();
+                                                    }
+                                                  }())
+                                                  : Text(
+                                                    'Date of birth not provided',
+                                                  ).text.bold.make(),
+                                        ),
+                                      ),
+                                    ],
+                                  ).px8(),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-
-
-
-
-
-
               ],
             ),
           ),
+
           /*Padding(padding: EdgeInsets.only(bottom: 270, left: 184),
             child: CircleAvatar(
               backgroundColor: Mythemes.blackish,
@@ -389,37 +446,37 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
             ),
 
           ),*/
-
         ],
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
+          if (index == 1) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -430,10 +487,7 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.pending_actions),
             label: 'Attendance',
@@ -454,20 +508,20 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
   }
 }
 
-class CurvedHeaderContainer extends CustomPainter{
-
+class CurvedHeaderContainer extends CustomPainter {
   @override
-  void paint(Canvas canvas,Size size ){
-    Paint paint=Paint()..color= const Color(0xff00b0ff);
-    Path path=Path()
-      ..relativeLineTo(0, 130)
-      ..quadraticBezierTo(size.width/2, 225, size.width, 130)
-      ..relativeLineTo(0, -150)
-      ..close();
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()..color = const Color(0xff00b0ff);
+    Path path =
+        Path()
+          ..relativeLineTo(0, 130)
+          ..quadraticBezierTo(size.width / 2, 225, size.width, 130)
+          ..relativeLineTo(0, -150)
+          ..close();
     canvas.drawPath(path, paint);
 
     @override
-    bool shouldRepaint(CustomPainter oldDelegate)=>false;
+    bool shouldRepaint(CustomPainter oldDelegate) => false;
   }
 
   @override

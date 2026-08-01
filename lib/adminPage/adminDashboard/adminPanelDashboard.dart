@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import '../modelClass/branchListModal.dart';
@@ -28,7 +29,8 @@ class AdminPanelDashboard extends StatefulWidget {
   AdminPanelDashboard(this.dashboardModel1);
 
   @override
-  State<AdminPanelDashboard> createState() => _AdminPanelDashboardState(dashboardModel1);
+  State<AdminPanelDashboard> createState() =>
+      _AdminPanelDashboardState(dashboardModel1);
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -55,6 +57,7 @@ late List<String?>? shiftList = [];
 
 String valuenew = "listText";
 String shiftValue = "listText";
+
 class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
   final DashboardModel dashboardModel1;
 
@@ -78,8 +81,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
   var dropdownNewvalue;
   var dropdownNewvalueShift;
 
-
-
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     userPanelPermission = await shared.getUserPanel();
@@ -88,7 +89,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     Future<DashboardModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
-   // Future<EventsListModal> getEmployeeList14 = getEventData(sessionId!);
+    // Future<EventsListModal> getEmployeeList14 = getEventData(sessionId!);
     getEmployeeList11.then((value) {
       setState(() {
         dashboardModelGlobal = value;
@@ -117,12 +118,10 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
       print('employeeList00${eventsListModalGlobal!.bdayList!.length}');
     });*/
 
-
-      empRole= await shared.getEmpRoll();
-      roRole= await shared.getRoRole();
-      //print('EmpRole $empRole');
-      //print('roRole $roRole');
-
+    empRole = await shared.getEmpRoll();
+    roRole = await shared.getRoRole();
+    //print('EmpRole $empRole');
+    //print('roRole $roRole');
 
     setState(() {
       loader();
@@ -144,12 +143,14 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
 
     print('employeeList11: ${SessionId}');
     DashboardModel dashboardModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "branch=$branchId&"
-        "shift=$shift&"
-        "date=$singleDateString");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "branch=$branchId&"
+      "shift=$shift&"
+      "date=$singleDateString",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
@@ -168,11 +169,13 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
 
     print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "userPermission=$userPanelPermission&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "userPermission=$userPanelPermission&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     //print('response body ${response.body}');
@@ -196,11 +199,13 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
 
     print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "userPermission=$userPanelPermission&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "userPermission=$userPanelPermission&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     //print('response body ${response.body}');
@@ -217,7 +222,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     return shiftListModal;
   }
 
-/*  Future<EventsListModal> getEventData(String SessionId) async {
+  /*  Future<EventsListModal> getEventData(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalApi;
 
@@ -228,7 +233,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
         "branch=$branchId&"
         "shift=$shift&"
         "date=$singleDateString");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
     print('response body ${response.body}');
@@ -250,14 +255,12 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
             margin: EdgeInsets.all(8),
             child: CircularProgressIndicator(),
           ),
-          new Text("Please Wait...",
-              style: TextStyle(
-                fontSize: 20,
-              )),
+          new Text("Please Wait...", style: TextStyle(fontSize: 20)),
         ],
       ),
     );
   }
+
   @override
   void initState() {
     super.initState();
@@ -271,6 +274,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
 
     // TODO: implement initState
   }
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData queryData;
@@ -278,11 +282,13 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          date = (await showDatePicker(
-              context: context,
-              initialDate: date,
-              firstDate: DateTime(1947),
-              lastDate: DateTime.now().add(Duration(days: 0))))!;
+          date =
+              (await showDatePicker(
+                context: context,
+                initialDate: date,
+                firstDate: DateTime(1947),
+                lastDate: DateTime.now().add(Duration(days: 0)),
+              ))!;
 
           setState(() {
             loader();
@@ -299,13 +305,15 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
         backgroundColor: Mythemes.lightBluishColor,
         child: singleDay.toString().text.make(),
       ),
-      body: dashboardModelGlobal == null
-          ? loader()
-          : RefreshIndicator(
-          onRefresh: () {
-            return getSharedPrfanceList();
-          },
-          child: DashboardWidgets(dashboardModelGlobal!)),
+      body:
+          dashboardModelGlobal == null
+              ? loader()
+              : RefreshIndicator(
+                onRefresh: () {
+                  return getSharedPrfanceList();
+                },
+                child: DashboardWidgets(dashboardModelGlobal!),
+              ),
     );
   }
 
@@ -350,19 +358,20 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                             child: DropdownButtonFormField(
                               alignment: AlignmentDirectional.centerStart,
                               icon: Visibility(
-                                  visible: false,
-                                  child: Icon(Icons.arrow_downward)),
+                                visible: false,
+                                child: Icon(Icons.arrow_downward),
+                              ),
                               value: dropdownNewvalue,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "All Branches",
-                                hintStyle: TextStyle(
-                                  fontSize: 15.7,
-                                ),
+                                hintStyle: TextStyle(fontSize: 15.7),
                                 contentPadding: EdgeInsets.all(5),
                               ),
-                              items: branchList?.map<DropdownMenuItem<String>>(
-                                      (String? value) {
+                              items:
+                                  branchList?.map<DropdownMenuItem<String>>((
+                                    String? value,
+                                  ) {
                                     return DropdownMenuItem<String>(
                                       value: value,
                                       child: Text('$value'!),
@@ -371,7 +380,8 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                               onChanged: (newVal) {
                                 valuenew = newVal.toString();
                                 var i = branchList!.indexOf(valuenew);
-                                branchId = branchListModalGloabal!.data![i].branchId!;
+                                branchId =
+                                    branchListModalGloabal!.data![i].branchId!;
                                 print("Branch ID $branchId");
                                 setState(() {
                                   getSharedPrfanceList();
@@ -402,28 +412,35 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                           isExpanded: true,
                           // alignment: AlignmentDirectional.centerStart,
                           icon: Visibility(
-                              visible: false, child: Icon(Icons.arrow_downward)),
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
                           value: dropdownNewvalueShift,
                           decoration: InputDecoration(
                             border: InputBorder.none,
 
                             hintText: "All Shifts",
                             hintStyle: TextStyle(
-                                fontSize: 15.7, overflow: TextOverflow.ellipsis),
+                              fontSize: 15.7,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             contentPadding: EdgeInsets.all(5),
                           ),
-                          items: shiftList
-                              ?.map<DropdownMenuItem<String>>((String? value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                '$value'!,
-                                style: TextStyle(
-                                    overflow: TextOverflow.ellipsis,
-                                    fontSize: 13),
-                              ),
-                            );
-                          }).toList(),
+                          items:
+                              shiftList?.map<DropdownMenuItem<String>>((
+                                String? value,
+                              ) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(
+                                    '$value'!,
+                                    style: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                           onChanged: (newVal) {
                             shiftValue = newVal.toString();
                             var i = shiftList!.indexOf(shiftValue);
@@ -452,21 +469,23 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                       onTap: () {
                         if (totalPresentEmp == 0 || totalPresentEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      PresentEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  PresentEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -485,7 +504,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       "$totalPresentEmp / $totalEmp"
                                           .text
@@ -496,18 +515,17 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                           .py8()
                                           .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.groups,
-                                            size: 58,
-                                            color: Mythemes.lightBluishColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.groups,
+                                          size: 58,
+                                          color: Mythemes.lightBluishColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Attendance"
-                                          .text
-                                          .xl
+                                      "Attendance".text.xl
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .px8(),
@@ -526,21 +544,23 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                       onTap: () {
                         if (totalAbsentEmp == 0 || totalAbsentEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      AbsentEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  AbsentEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -559,12 +579,9 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      "$totalAbsentEmp"
-                                          .text
-                                          .xl2
-                                          .bold
+                                      "$totalAbsentEmp".text.xl2.bold
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .py8()
@@ -575,14 +592,12 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                           size: 55,
                                           color: Mythemes.dangerColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Not In"
-                                          .text
-                                          .xl
+                                      "Not In".text.xl
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .px8(),
@@ -607,21 +622,23 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                       onTap: () {
                         if (misPunchEmp == 0 || misPunchEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      MissPunchEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  MissPunchEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -640,29 +657,25 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      "$misPunchEmp"
-                                          .text
-                                          .xl2
-                                          .bold
+                                      "$misPunchEmp".text.xl2.bold
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .py8()
                                           .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.touch_app,
-                                            size: 58,
-                                            color: Mythemes.warningColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.touch_app,
+                                          size: 58,
+                                          color: Mythemes.warningColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Mispunch"
-                                          .text
-                                          .xl
+                                      "Mispunch".text.xl
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .px8(),
@@ -681,21 +694,23 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                       onTap: () {
                         if (onDuty == 0 || onDuty == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OnDutyEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  OnDutyEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -714,12 +729,9 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      "$onDuty"
-                                          .text
-                                          .xl2
-                                          .bold
+                                      "$onDuty".text.xl2.bold
                                           .color(Mythemes.successColor)
                                           .make()
                                           .py8()
@@ -730,14 +742,12 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                           size: 55,
                                           color: Mythemes.successColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "On Duty"
-                                          .text
-                                          .xl
+                                      "On Duty".text.xl
                                           .color(Mythemes.successColor)
                                           .make()
                                           .px8(),
@@ -762,21 +772,23 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                       onTap: () {
                         if (lateIn == 0 || lateIn == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      LateInEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  LateInEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -795,29 +807,25 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      "$lateIn"
-                                          .text
-                                          .xl2
-                                          .bold
+                                      "$lateIn".text.xl2.bold
                                           .color(Mythemes.alertColor)
                                           .make()
                                           .py8()
                                           .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.assignment_late,
-                                            size: 58,
-                                            color: Mythemes.alertColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.assignment_late,
+                                          size: 58,
+                                          color: Mythemes.alertColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Late In"
-                                          .text
-                                          .xl
+                                      "Late In".text.xl
                                           .color(Mythemes.alertColor)
                                           .make()
                                           .px8(),
@@ -836,21 +844,23 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                       onTap: () {
                         if (earlyOutEmp == 0 || earlyOutEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      EarlyGoEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  EarlyGoEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -869,12 +879,9 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      "$earlyOutEmp"
-                                          .text
-                                          .xl2
-                                          .bold
+                                      "$earlyOutEmp".text.xl2.bold
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .py8()
@@ -885,14 +892,12 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                           size: 55,
                                           color: Mythemes.lightBluishColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Early Go"
-                                          .text
-                                          .xl
+                                      "Early Go".text.xl
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .px8(),
@@ -917,21 +922,23 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                       onTap: () {
                         if (halfEmp == 0 || halfEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      HalfDayEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  HalfDayEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -950,29 +957,25 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      "$halfEmp"
-                                          .text
-                                          .xl2
-                                          .bold
+                                      "$halfEmp".text.xl2.bold
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .py8()
                                           .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.calendar_month,
-                                            size: 58,
-                                            color: Mythemes.warningColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.calendar_month,
+                                          size: 58,
+                                          color: Mythemes.warningColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Half Day"
-                                          .text
-                                          .xl
+                                      "Half Day".text.xl
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .px8(),
@@ -991,21 +994,23 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                       onTap: () {
                         if (overTime == 0 || overTime == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OverTimeEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  OverTimeEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1024,36 +1029,31 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      overTime == null ? "0".text.xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8() :
-                                      "$overTime"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                      overTime == null
+                                          ? "0".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8()
+                                          : "$overTime".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.timelapse,
                                           size: 55,
                                           color: Mythemes.dangerColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Over Time"
-                                          .text
-                                          .xl
+                                      "Over Time".text.xl
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .px8(),
@@ -1069,7 +1069,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                   ),
                 ],
               ).pLTRB(0, 0, 0, 10.0),
-
             ],
           ),
         ),

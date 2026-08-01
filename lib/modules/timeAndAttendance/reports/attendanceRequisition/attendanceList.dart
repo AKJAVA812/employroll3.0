@@ -18,19 +18,20 @@ import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'attendanceRequisitionCurrentMonth.dart';
 import 'model/onDateReportModel.dart';
-
 
 class AttendanceList extends StatefulWidget {
   final AttendanceReportModel attendanceReportModel1;
 
   AttendanceList(this.attendanceReportModel1);
 
-
   @override
-  State<AttendanceList> createState() => _AttendanceListState(attendanceReportModel1);
+  State<AttendanceList> createState() =>
+      _AttendanceListState(attendanceReportModel1);
 }
+
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
@@ -38,7 +39,7 @@ AttendanceReportModel? attendanceModelGlobel;
 OnDateAttModel? onDateAttModel;
 int? empId;
 
-class _AttendanceListState extends State<AttendanceList> with RouteAware{
+class _AttendanceListState extends State<AttendanceList> with RouteAware {
   final AttendanceReportModel attendanceReportModel1;
 
   _AttendanceListState(this.attendanceReportModel1);
@@ -57,7 +58,7 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
@@ -65,19 +66,21 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
   @override
   void initState() {
     getSharedPrfanceList();
-    setState(() {
-    });
+    setState(() {});
     // TODO: implement initState
     super.initState();
   }
+
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
-    empId=await shared!.getEmpId();
+    empId = await shared!.getEmpId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<AttendanceReportModel> getEmployeeList11 = getEmployeeList(sessionId!);
+    Future<AttendanceReportModel> getEmployeeList11 = getEmployeeList(
+      sessionId!,
+    );
     getEmployeeList11.then((value) {
       setState(() {
-        attendanceModelGlobel=value;
+        attendanceModelGlobel = value;
       });
       print('employeeList00${attendanceModelGlobel!.data!.length}');
     });
@@ -89,16 +92,18 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
 
     print('employeeList11: ${SessionId}');
     AttendanceReportModel employeeListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&empId=$empId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&empId=$empId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    employeeListModel=AttendanceReportModel.fromJson(mapResponse);
+    employeeListModel = AttendanceReportModel.fromJson(mapResponse);
 
     return employeeListModel;
   }
@@ -114,54 +119,60 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
         elevation: 0.5,
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context, delegate: SearchItems(),
-                );
-
-              }, icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(context: context, delegate: SearchItems());
+            },
+            icon: Icon(Icons.search),
+          ),
         ],
       ),
 
       body: Container(
         color: context.canvasColor,
-        child: Center(child: attendanceModelGlobel==null?CircularProgressIndicator():getAttList(attendanceModelGlobel!)),
+        child: Center(
+          child:
+              attendanceModelGlobel == null
+                  ? CircularProgressIndicator()
+                  : getAttList(attendanceModelGlobel!),
+        ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -172,10 +183,7 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -199,17 +207,17 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
     );
   }
 
-  getAttList(AttendanceReportModel attendanceReportModel){
+  getAttList(AttendanceReportModel attendanceReportModel) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  AttendanceList(AttendanceReportModel()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (a, b, c) => AttendanceList(AttendanceReportModel()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -219,110 +227,191 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
           return InkWell(
             onTap: () {
               print('attendanceReport$attendanceModelGlobel!.data![itemCount]');
-              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                  AttendanceRequestCurrentMonth(attendanceModelGlobel,onDateAttModel,itemCount)));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => AttendanceRequestCurrentMonth(
+                        attendanceModelGlobel,
+                        onDateAttModel,
+                        itemCount,
+                      ),
+                ),
+              );
             },
             child: Card(
-                elevation: 2,
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          attendanceModelGlobel!.data![itemCount].employeeName!.text.make().px8().py4(),
-                          Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  attendanceModelGlobel!.data![itemCount].status!.text.bold.size(12).color(attendanceModelGlobel!.data![itemCount].status! == "ABSENT" ? Mythemes.dangerColorOne : Mythemes.lightBluishColor).make().px8(),
-                                ],
-                              )
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          attendanceModelGlobel!.data![itemCount].attendanceDate!.text.textStyle(context.captionStyle).make().px8(),
-                          Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Icon(
-                                    Icons.arrow_forward_ios, size: 15, color: Mythemes.lightBluishColor,
-                                  ).px24(),
-                                ],
-                              )
-
-
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
+              elevation: 2,
+              child: Container(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        attendanceModelGlobel!
+                            .data![itemCount]
+                            .employeeName!
+                            .text
+                            .make()
+                            .px8()
+                            .py4(),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              attendanceModelGlobel!
+                                  .data![itemCount]
+                                  .status!
+                                  .text
+                                  .bold
+                                  .size(12)
+                                  .color(
+                                    attendanceModelGlobel!
+                                                .data![itemCount]
+                                                .status! ==
+                                            "ABSENT"
+                                        ? Mythemes.dangerColorOne
+                                        : Mythemes.lightBluishColor,
+                                  )
+                                  .make()
+                                  .px8(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        attendanceModelGlobel!
+                            .data![itemCount]
+                            .attendanceDate!
+                            .text
+                            .textStyle(context.captionStyle)
+                            .make()
+                            .px8(),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Icon(
-                                Icons.touch_app, size: 25, color: Mythemes.lightBluishColor,
+                                Icons.arrow_forward_ios,
+                                size: 15,
+                                color: Mythemes.lightBluishColor,
+                              ).px24(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          children: [
+                            Icon(
+                              Icons.touch_app,
+                              size: 25,
+                              color: Mythemes.lightBluishColor,
+                            ),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            "In Time".text.sm.make(),
+                            attendanceModelGlobel!.data![itemCount].inTime! ==
+                                    "National Holiday"
+                                ? "NH".text.sm.make()
+                                : attendanceModelGlobel!
+                                    .data![itemCount]
+                                    .inTime!
+                                    .text
+                                    .sm
+                                    .make(),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 5,
+                            right: 3,
+                            bottom: 18,
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.touch_app,
+                                size: 25,
+                                color: Mythemes.dangerColor,
                               ),
                             ],
                           ),
-                          Column(
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 5,
+                            right: 3,
+                            bottom: 18,
+                          ),
+                          child: Column(
                             children: [
-                              "In Time".text.sm.make(),
-                              attendanceModelGlobel!.data![itemCount].inTime! == "National Holiday" ? "NH".text.sm.make() :
-                              attendanceModelGlobel!.data![itemCount].inTime!.text.sm.make()
+                              "Out Time".text.sm.make(),
+                              attendanceModelGlobel!
+                                          .data![itemCount]
+                                          .outTime! ==
+                                      "National Holiday"
+                                  ? "NH".text.sm.make()
+                                  : attendanceModelGlobel!
+                                      .data![itemCount]
+                                      .outTime!
+                                      .text
+                                      .sm
+                                      .make(),
                             ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.touch_app, size: 25, color: Mythemes.dangerColor,
-                                ),
-                              ],
-                            ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 5,
+                            right: 3,
+                            bottom: 18,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                "Out Time".text.sm.make(),
-                                attendanceModelGlobel!.data![itemCount].outTime! == "National Holiday" ? "NH".text.sm.make() :
-                                attendanceModelGlobel!.data![itemCount].outTime!.text.sm.make()
-                              ],
-                            ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.update,
+                                size: 25,
+                                color: Mythemes.lightBluishColor,
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top:15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.update, size: 25, color: Mythemes.lightBluishColor,
-                                ),
-                              ],
-                            ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: 15,
+                            left: 5,
+                            right: 3,
+                            bottom: 18,
                           ),
-                          Padding(
-                            padding:  EdgeInsets.only(top: 15, left: 5, right: 3, bottom: 18),
-                            child: Column(
-                              children: [
-
-                                "Work Hours".text.sm.make(),
-                                attendanceModelGlobel!.data![itemCount].workingHrs!.text.sm.make()
-                              ],
-                            ),
+                          child: Column(
+                            children: [
+                              "Work Hours".text.sm.make(),
+                              attendanceModelGlobel!
+                                  .data![itemCount]
+                                  .workingHrs!
+                                  .text
+                                  .sm
+                                  .make(),
+                            ],
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                )
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         },
@@ -332,10 +421,7 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware{
 }
 
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -360,6 +446,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -372,12 +459,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -390,9 +476,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

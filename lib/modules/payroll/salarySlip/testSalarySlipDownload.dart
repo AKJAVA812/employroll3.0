@@ -9,6 +9,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/themes/empThemes.dart';
@@ -132,7 +133,7 @@ class _TestSalarySlipDownloadState extends State<TestSalarySlipDownload> {
         "month=$selectedDate"
 
     );
-    final response = await http.get(urlapi);
+    final response = await MobileHttpClient.instance.get(urlapi);
     print('URL ${response.request}');
 
 
@@ -182,7 +183,7 @@ class _TestSalarySlipDownloadState extends State<TestSalarySlipDownload> {
     ).then((_) {
       Navigator.pop(context);
     });
-  }*//*
+  }*/ /*
 
 
   Future<String> _getFilePath(String filename) async {
@@ -253,7 +254,7 @@ class _TestSalarySlipDownloadState extends State<TestSalarySlipDownload> {
         payload: json
       );
     }
-*//*
+*/ /*
 
 
   final Dio newDio = Dio();
@@ -267,7 +268,7 @@ class _TestSalarySlipDownloadState extends State<TestSalarySlipDownload> {
 /*const downloadsFolderPath = '/storage/emulated/0/Download/';
       Directory dir = Directory(downloadsFolderPath);
       file = File('${dir.path}/$fileNamedemo');
-*//*
+*/ /*
 
       final baseStorage = await getExternalStorageDirectory();
       final id = await FlutterDownloader.enqueue(url: '$salarySlip',
@@ -410,9 +411,9 @@ class _TestSalarySlipDownloadState extends State<TestSalarySlipDownload> {
         */
 /*onPressed: () async {
           newDownloadFile();
-          *//*
+          */ /*
 */
-/*_downloadFile();*//*
+/*_downloadFile();*/ /*
 */
 /*
           //FileDownload().download(context,salarySlip);
@@ -437,7 +438,7 @@ class _TestSalarySlipDownloadState extends State<TestSalarySlipDownload> {
               ],
             ),
           );
-        },*//*
+        },*/ /*
 
         backgroundColor: Mythemes.lightBluishColor,
         child: Icon(

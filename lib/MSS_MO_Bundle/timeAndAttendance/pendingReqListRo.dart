@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -20,14 +21,13 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 
-
-
 class MSS_MO_PendingRequisitionRo extends StatefulWidget {
   final PendingRequisitionModel pendingRequisitionModel;
-  MSS_MO_PendingRequisitionRo (this.pendingRequisitionModel);
+  MSS_MO_PendingRequisitionRo(this.pendingRequisitionModel);
 
   @override
-  State<MSS_MO_PendingRequisitionRo> createState() => _MSS_MO_PendingRequisitionRoState(pendingRequisitionModel);
+  State<MSS_MO_PendingRequisitionRo> createState() =>
+      _MSS_MO_PendingRequisitionRoState(pendingRequisitionModel);
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -35,8 +35,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNewMO=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNewMO = [];
 PendingRequisitionModel? pendingRequisitionLabel;
 PendingRequisitionModel? pendingRequisitionLabeled;
 String? userPanel;
@@ -44,7 +44,10 @@ dynamic getProfileId;
 String? orgId;
 var reqType = "";
 dynamic matchedOrg;
-class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionRo> with RouteAware{
+
+class _MSS_MO_PendingRequisitionRoState
+    extends State<MSS_MO_PendingRequisitionRo>
+    with RouteAware {
   final PendingRequisitionModel pendingRequisitionModel;
   _MSS_MO_PendingRequisitionRoState(this.pendingRequisitionModel);
   bool _isFirstBuild = true;
@@ -96,10 +99,12 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
 
     if (orgListString != null) {
       List<dynamic> decoded = json.decode(orgListString);
-      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+      storedOrgList =
+          decoded.map((item) => Map<String, dynamic>.from(item)).toList();
 
       // Populate dropdown list
-      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+      organizations =
+          storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
       //selectedOrg = null;
@@ -108,6 +113,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
       setState(() {});
     }
   }
+
   bool isLoading = false;
 
   Future getSharedPrfanceList() async {
@@ -117,32 +123,36 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
     }
     loadOrgListFromPrefs();
   }
+
   var levelChange = "PENDING";
   Future<PendingRequisitionModel> getPendingReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListRo;
     print('employeeList11: ${SessionId}');
     PendingRequisitionModel pendingRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "userPermission=$userPanel&"
-        "profileId=$getProfileId&"
-        "orgId=$getOrgId&"
-        "status=$levelChange");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "userPermission=$userPanel&"
+      "profileId=$getProfileId&"
+      "orgId=$getOrgId&"
+      "status=$levelChange",
+    );
 
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    pendingRequisitionModel=PendingRequisitionModel.fromJson(mapResponse);
+    pendingRequisitionModel = PendingRequisitionModel.fromJson(mapResponse);
 
     allUsernew = pendingRequisitionModel!.data;
 
     return pendingRequisitionModel;
   }
+
   var titleName = "Pending Requisition List";
 
   TextEditingController searchType = TextEditingController();
@@ -150,7 +160,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -163,8 +173,14 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.empName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -182,10 +198,8 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
   int pageIndex = 0;
   int currentIndex = 2;
 
-
-
   void _showFilterBottomSheet() {
-    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    if (_isBottomSheetOpen) return; // âœ… Prevent multiple opens
     _isBottomSheetOpen = true;
     showModalBottomSheet(
       context: context,
@@ -222,7 +236,10 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
                     ),
                     Text(
                       'Filter',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 16),
 
@@ -239,10 +256,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
                           child: Text('Select'),
                         ),
                         ...organizations.map((org) {
-                          return DropdownMenuItem(
-                            value: org,
-                            child: Text(org),
-                          );
+                          return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
                       onChanged: (value) {
@@ -251,7 +265,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
 
                           // Match selected org name to get ID
                           matchedOrg = storedOrgList.firstWhere(
-                                (org) => org['orgName'] == value,
+                            (org) => org['orgName'] == value,
                             orElse: () => {},
                           );
 
@@ -274,34 +288,34 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
                           Navigator.of(bottomSheetContext).pop();
                           await Future.delayed(Duration(milliseconds: 100));
 
-                                // Now perform async logic
-                                setState(() {
-                                pendingRequisitionLabeled = null;
-                                isLoading = true;
-                                });
+                          // Now perform async logic
+                          setState(() {
+                            pendingRequisitionLabeled = null;
+                            isLoading = true;
+                          });
 
-                                sessionId = await shared!.getSessionId();
-                                userPanel = await shared!.getUserPanel();
-                                getProfileId = await shared!.getDefaultProfileId();
-                                getOrgId = matchedOrg['id']?.toString() ?? '';
-                                print("ORG ID - $getOrgId");
-                                try {
-                                final value = await getPendingReqList(sessionId!);
+                          sessionId = await shared!.getSessionId();
+                          userPanel = await shared!.getUserPanel();
+                          getProfileId = await shared!.getDefaultProfileId();
+                          getOrgId = matchedOrg['id']?.toString() ?? '';
+                          print("ORG ID - $getOrgId");
+                          try {
+                            final value = await getPendingReqList(sessionId!);
 
-                                setState(() {
-                                foundDataNewMO = allUsernew;
-                                pendingRequisitionLabel = value;
-                                pendingRequisitionLabeled = value;
-                                isLoading = false;
-                                });
+                            setState(() {
+                              foundDataNewMO = allUsernew;
+                              pendingRequisitionLabel = value;
+                              pendingRequisitionLabeled = value;
+                              isLoading = false;
+                            });
 
-                                print('employeeList00: ${value.data?.length}');
-                                } catch (e) {
-                                setState(() {
-                                isLoading = false;
-                                });
-                                print('Error while fetching requisitions: $e');
-                                }
+                            print('employeeList00: ${value.data?.length}');
+                          } catch (e) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                            print('Error while fetching requisitions: $e');
+                          }
                         },
                         icon: Icon(Icons.filter_alt),
                         label: Text("Apply Filter"),
@@ -309,7 +323,7 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
                           backgroundColor: Mythemes.successColor,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 );
               },
@@ -318,11 +332,9 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
         );
       },
     ).whenComplete(() {
-      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+      _isBottomSheetOpen = false; // âœ… Reset when sheet is dismissed
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -331,90 +343,111 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-              top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: "$titleName - ${foundDataNewMO!.length}",
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: "$titleName - ${foundDataNewMO!.length}",
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showFilterBottomSheet,
-        child: Icon(Icons.filter_list, color: Mythemes.whitish,),
+        child: Icon(Icons.filter_list, color: Mythemes.whitish),
       ),
       body: Container(
         padding: EdgeInsets.all(8.0),
-        child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
-          children: [
-            Expanded(
-              child: pendingRequisitionLabeled == null
-                  ? Center(child: "Please select Organisation first!".text.bold.center.make())
-                  : getPendingRequisitionRo(pendingRequisitionLabeled!),
-            ),
-          ],
-        ),
+        child:
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                  children: [
+                    Expanded(
+                      child:
+                          pendingRequisitionLabeled == null
+                              ? Center(
+                                child:
+                                    "Please select Organisation first!"
+                                        .text
+                                        .bold
+                                        .center
+                                        .make(),
+                              )
+                              : getPendingRequisitionRo(
+                                pendingRequisitionLabeled!,
+                              ),
+                    ),
+                  ],
+                ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             Navigator.pop(context);
             print('Attendance');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('My Reports');
           }
-          if(index==4){
+          if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             /*Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
@@ -427,11 +460,8 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
               }*/
           setState(() => currentIndex = index);
         },
-        items:  [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -452,104 +482,114 @@ class _MSS_MO_PendingRequisitionRoState extends State<MSS_MO_PendingRequisitionR
           ),
         ],
       ),
-
-
     );
   }
 
-  getPendingRequisitionRo(PendingRequisitionModel pendingRequisitionModel){
+  getPendingRequisitionRo(PendingRequisitionModel pendingRequisitionModel) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  MSS_MO_PendingRequisitionRo(PendingRequisitionModel()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) =>
+                    MSS_MO_PendingRequisitionRo(PendingRequisitionModel()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
-      child:
-      ListView.builder(
-          itemCount: foundDataNewMO!.length,
-          itemBuilder: (context, itemCount) {
-            if(foundDataNewMO![itemCount].attendanceRequisionType == true) {
-              reqType = "Attendance Request";
-            }
-            if (foundDataNewMO![itemCount].compOffRequistionType == true) {
-              reqType = "Compensatory Off Request";
-            }
-            if (foundDataNewMO![itemCount].nightRequistionType == true) {
-              reqType = "Night Shift Request";
-            }
-            if (foundDataNewMO![itemCount].shortLeaveRequistionType == true) {
-              reqType = "Short Leave Request";
-            }
-            if (foundDataNewMO![itemCount].odRequistionType == true) {
-              reqType = "Out Duty Request";
-            }
-            return  Column(
-              children: [
-                // if (_isVisible)
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    onTap: () {
-                      print(foundDataNewMO!.length);
-                      //Navigator.pushNamed(context, MyRoutings.approveDisapproveReqRoute);
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                          ApproveDisapproveReq(pendingRequisitionModel,itemCount)));
-                    },
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.blue.shade100,
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.blue.shade700,
+      child: ListView.builder(
+        itemCount: foundDataNewMO!.length,
+        itemBuilder: (context, itemCount) {
+          if (foundDataNewMO![itemCount].attendanceRequisionType == true) {
+            reqType = "Attendance Request";
+          }
+          if (foundDataNewMO![itemCount].compOffRequistionType == true) {
+            reqType = "Compensatory Off Request";
+          }
+          if (foundDataNewMO![itemCount].nightRequistionType == true) {
+            reqType = "Night Shift Request";
+          }
+          if (foundDataNewMO![itemCount].shortLeaveRequistionType == true) {
+            reqType = "Short Leave Request";
+          }
+          if (foundDataNewMO![itemCount].odRequistionType == true) {
+            reqType = "Out Duty Request";
+          }
+          return Column(
+            children: [
+              // if (_isVisible)
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  onTap: () {
+                    print(foundDataNewMO!.length);
+                    //Navigator.pushNamed(context, MyRoutings.approveDisapproveReqRoute);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ApproveDisapproveReq(
+                              pendingRequisitionModel,
+                              itemCount,
+                            ),
                       ),
-                    ),
-                    title: foundDataNewMO![itemCount].empName.toString().text.bold.xl.make(),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 4),
-                        foundDataNewMO![itemCount].onDate
-                            .toString()
-                            .text
-                            .sm
-                            .color(Colors.grey.shade700)
-                            .make(),
-                        SizedBox(height: 4),
-                        "Request Type: $reqType"
-                            .toString()
-                            .text
-                            .sm
-                            .color(Colors.grey.shade700)
-                            .make(),
-                      ],
-                    ),
-                    trailing: Icon(
-                      CupertinoIcons.chevron_forward,
-                      color: Colors.grey.shade600,
-                    ),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    );
+                  },
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.blue.shade100,
+                    child: Icon(Icons.person, color: Colors.blue.shade700),
                   ),
-                )
-              ],
-            );
-          }),
+                  title:
+                      foundDataNewMO![itemCount].empName
+                          .toString()
+                          .text
+                          .bold
+                          .xl
+                          .make(),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 4),
+                      foundDataNewMO![itemCount].onDate
+                          .toString()
+                          .text
+                          .sm
+                          .color(Colors.grey.shade700)
+                          .make(),
+                      SizedBox(height: 4),
+                      "Request Type: $reqType"
+                          .toString()
+                          .text
+                          .sm
+                          .color(Colors.grey.shade700)
+                          .make(),
+                    ],
+                  ),
+                  trailing: Icon(
+                    CupertinoIcons.chevron_forward,
+                    color: Colors.grey.shade600,
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
 
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -574,6 +614,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -586,12 +627,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -604,9 +644,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

@@ -14,6 +14,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../adminPage/adminDashboard/adminDashboard.dart';
 import '../sharedPrefancePage/ShardPre.dart';
@@ -28,10 +29,23 @@ class DigiWeighWDSubmit extends StatefulWidget {
   String? natureComplaint;
   String? dateComplaint;
 
-
-  DigiWeighWDSubmit(this.imageValu, this.custName, this.custLocation,this.systemDet,this.natureComplaint,this.dateComplaint);
+  DigiWeighWDSubmit(
+    this.imageValu,
+    this.custName,
+    this.custLocation,
+    this.systemDet,
+    this.natureComplaint,
+    this.dateComplaint,
+  );
   @override
-  State<DigiWeighWDSubmit> createState() => _DigiWeighWDSubmitState(imageValu,custName!, custLocation!,systemDet!,natureComplaint!,dateComplaint!);
+  State<DigiWeighWDSubmit> createState() => _DigiWeighWDSubmitState(
+    imageValu,
+    custName!,
+    custLocation!,
+    systemDet!,
+    natureComplaint!,
+    dateComplaint!,
+  );
 }
 
 late String? sessionId;
@@ -42,9 +56,14 @@ double latt = 0;
 double lngg = 0;
 
 class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
-
-  _DigiWeighWDSubmitState(imageValu, String custName, String custLocation, String systemDet, String natureComplaint, String dateComplaint);
-
+  _DigiWeighWDSubmitState(
+    imageValu,
+    String custName,
+    String custLocation,
+    String systemDet,
+    String natureComplaint,
+    String dateComplaint,
+  );
 
   var titleName = "Workdone Report";
   TextEditingController _rectificationController = new TextEditingController();
@@ -55,20 +74,22 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
   final TextEditingController _amcPeriod = TextEditingController();
   final TextEditingController _prospect = TextEditingController();
   final TextEditingController _remarksController = TextEditingController();
-  String singleDateString="";
+  String singleDateString = "";
 
   DateTime _date = (DateTime.now());
   String formattedDate = DateFormat.ABBR_MONTH;
-  String dateFormate = DateFormat("dd-MM-yyyy").format(DateTime.parse("2019-09-30"));
-  Future <Null> _selectDate (BuildContext context) async {
-    DateTime? _datePicker =await showDatePicker(
+  String dateFormate = DateFormat(
+    "dd-MM-yyyy",
+  ).format(DateTime.parse("2019-09-30"));
+  Future<Null> _selectDate(BuildContext context) async {
+    DateTime? _datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if(_datePicker != null && _datePicker != _date){
+    if (_datePicker != null && _datePicker != _date) {
       setState(() {
         _date = _datePicker;
       });
@@ -99,7 +120,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
     systemDetGet = systemDet;
     natureCompGet = natureComplaint;
     dateCompGet = dateComplaint;
-
 
     getSharedPrfanceList();
     // TODO: implement initState
@@ -164,43 +184,47 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
     print('Response body: ${imageVal}');
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.customWorkDoneApi;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "image=$imageVal&"
-        "address=$currentAddress&"
-        "taskTime=$formattedDate&"
-        "taskDone='DONE'&"
-        "taskDetails=$remarks"
-        "lat=$latt&"
-        "lng=$lngg&"
-        "battery= 90&"
-        "customerName=$custNameGet&"
-        "location=$custLocationGet&"
-        "systemDetails=$systemDetGet&"
-        "complaintNature=$natureCompGet&"
-        "dateOfComplain=$dateCompGet&"
-        "dateOfAttending=$attendingDate&"
-        "rectificationDet=$rectification&"
-        "dateOfRectification=$rectificationDate&"
-        "dateOfStamping=$stampingDate&"
-        "dateOfAMCVisit=$amcVisit&"
-        "amcPeriod=$amcPeriod&"
-        "prospect=$prospect&"
-        "remarkUser=$remarks"
-
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "image=$imageVal&"
+      "address=$currentAddress&"
+      "taskTime=$formattedDate&"
+      "taskDone='DONE'&"
+      "taskDetails=$remarks"
+      "lat=$latt&"
+      "lng=$lngg&"
+      "battery= 90&"
+      "customerName=$custNameGet&"
+      "location=$custLocationGet&"
+      "systemDetails=$systemDetGet&"
+      "complaintNature=$natureCompGet&"
+      "dateOfComplain=$dateCompGet&"
+      "dateOfAttending=$attendingDate&"
+      "rectificationDet=$rectification&"
+      "dateOfRectification=$rectificationDate&"
+      "dateOfStamping=$stampingDate&"
+      "dateOfAMCVisit=$amcVisit&"
+      "amcPeriod=$amcPeriod&"
+      "prospect=$prospect&"
+      "remarkUser=$remarks",
     );
-    //final response = await http.post(urlapi);
+    //final response = await MobileHttpClient.instance.post(urlapi);
     var request = new http.MultipartRequest("Post", urlapi);
-    var multipart = new http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
+    var multipart = new http.MultipartFile(
+      'image',
+      stream,
+      length,
+      filename: basename('image.jpg'),
+    );
     request.files.add(multipart);
-    http.Response response = await http.Response.fromStream(await request.send());
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
     result = json.decode(response.body.toString());
     print('responseemployeeList ${response.request}');
     print('response body ${response.body}');
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
-
-
 
     /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+response.body),
@@ -210,10 +234,19 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
       Navigator.pop(context);
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessGo(
-            context, "You have successfully submitted task details on server at".toString() + " " + formattedDate, "Task Submitted");
+          context,
+          "You have successfully submitted task details on server at"
+                  .toString() +
+              " " +
+              formattedDate,
+          "Task Submitted",
+        );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
         CommonNotificationPage.showSuccessGo(
-            context, resultSuccess, " Failed ");
+          context,
+          resultSuccess,
+          " Failed ",
+        );
       }
     } else {
       Navigator.pop(context);
@@ -232,9 +265,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
     return DismissKeyboard(
       child: Scaffold(
         backgroundColor: Mythemes.whitish,
-        appBar: AppBar(
-          title: titleName.text.make(),
-        ),
+        appBar: AppBar(title: titleName.text.make()),
 
         body: Container(
           color: Mythemes.whitish,
@@ -246,19 +277,23 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-
-                        onTap: () async{
+                        onTap: () async {
                           DateTime? date = DateTime.now();
                           FocusScope.of(context).requestFocus(new FocusNode());
 
                           date = await showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime(2050));
+                            context: context,
+                            initialDate: date,
+                            firstDate: DateTime(1947),
+                            lastDate: DateTime(2050),
+                          );
                           setState(() {
-                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _attendingDate.text = DateFormat("dd-MM-yyyy").format(date!);
+                            singleDateString = DateFormat(
+                              'dd-MM-yyyy',
+                            ).format(date!);
+                            _attendingDate.text = DateFormat(
+                              "dd-MM-yyyy",
+                            ).format(date!);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
@@ -268,13 +303,12 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
                         controller: _attendingDate,
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           labelText: "Date of Attending",
                           prefixIcon: Icon(Icons.calendar_month),
                           hintText: DateFormat("DD-MM-YYYY").format(_date),
                           // hintText: DateFormat.yMd().format(_date).toString(),
                         ),
-
                       ),
                     ),
                     Padding(
@@ -282,32 +316,35 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       child: TextFormField(
                         controller: _rectificationController,
                         decoration: const InputDecoration(
-                            hintText: "Enter Rectification Details",
-                            labelText: "Rectification Details",
-                            prefixIcon: IconButton(
-                              icon: Icon(
-                                Icons.text_snippet,
-                              ),
-                              onPressed: (null),
-                            )),
+                          hintText: "Enter Rectification Details",
+                          labelText: "Rectification Details",
+                          prefixIcon: IconButton(
+                            icon: Icon(Icons.text_snippet),
+                            onPressed: (null),
+                          ),
+                        ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-
-                        onTap: () async{
+                        onTap: () async {
                           DateTime? date = DateTime.now();
                           FocusScope.of(context).requestFocus(new FocusNode());
 
                           date = await showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime(2050));
+                            context: context,
+                            initialDate: date,
+                            firstDate: DateTime(1947),
+                            lastDate: DateTime(2050),
+                          );
                           setState(() {
-                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _rectificationDate.text = DateFormat("dd-MM-yyyy").format(date!);
+                            singleDateString = DateFormat(
+                              'dd-MM-yyyy',
+                            ).format(date!);
+                            _rectificationDate.text = DateFormat(
+                              "dd-MM-yyyy",
+                            ).format(date!);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
@@ -317,31 +354,34 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
                         controller: _rectificationDate,
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           labelText: "Date of Rectification",
                           prefixIcon: Icon(Icons.calendar_month),
                           hintText: DateFormat("DD-MM-YYYY").format(_date),
                           // hintText: DateFormat.yMd().format(_date).toString(),
                         ),
-
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-
-                        onTap: () async{
+                        onTap: () async {
                           DateTime? date = DateTime.now();
                           FocusScope.of(context).requestFocus(new FocusNode());
 
                           date = await showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime(2050));
+                            context: context,
+                            initialDate: date,
+                            firstDate: DateTime(1947),
+                            lastDate: DateTime(2050),
+                          );
                           setState(() {
-                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _stampingDate.text = DateFormat("dd-MM-yyyy").format(date!);
+                            singleDateString = DateFormat(
+                              'dd-MM-yyyy',
+                            ).format(date!);
+                            _stampingDate.text = DateFormat(
+                              "dd-MM-yyyy",
+                            ).format(date!);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
@@ -351,31 +391,34 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
                         controller: _stampingDate,
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           labelText: "Date of Stamping",
                           prefixIcon: Icon(Icons.calendar_month),
                           hintText: DateFormat("DD-MM-YYYY").format(_date),
                           // hintText: DateFormat.yMd().format(_date).toString(),
                         ),
-
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-
-                        onTap: () async{
+                        onTap: () async {
                           DateTime? date = DateTime.now();
                           FocusScope.of(context).requestFocus(new FocusNode());
 
                           date = await showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime(2050));
+                            context: context,
+                            initialDate: date,
+                            firstDate: DateTime(1947),
+                            lastDate: DateTime(2050),
+                          );
                           setState(() {
-                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _amcVisit.text = DateFormat("dd-MM-yyyy").format(date!);
+                            singleDateString = DateFormat(
+                              'dd-MM-yyyy',
+                            ).format(date!);
+                            _amcVisit.text = DateFormat(
+                              "dd-MM-yyyy",
+                            ).format(date!);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
@@ -385,13 +428,12 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
                         controller: _amcVisit,
-                        decoration:  InputDecoration(
+                        decoration: InputDecoration(
                           labelText: "Date of AMC Visit",
                           prefixIcon: Icon(Icons.calendar_month),
                           hintText: DateFormat("DD-MM-YYYY").format(_date),
                           // hintText: DateFormat.yMd().format(_date).toString(),
                         ),
-
                       ),
                     ),
                     Padding(
@@ -399,14 +441,13 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       child: TextFormField(
                         controller: _amcPeriod,
                         decoration: const InputDecoration(
-                            hintText: "Enter AMC Period",
-                            labelText: "AMC Period",
-                            prefixIcon: IconButton(
-                              icon: Icon(
-                                Icons.text_snippet,
-                              ),
-                              onPressed: (null),
-                            )),
+                          hintText: "Enter AMC Period",
+                          labelText: "AMC Period",
+                          prefixIcon: IconButton(
+                            icon: Icon(Icons.text_snippet),
+                            onPressed: (null),
+                          ),
+                        ),
                       ),
                     ),
                     Padding(
@@ -414,14 +455,13 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       child: TextFormField(
                         controller: _prospect,
                         decoration: const InputDecoration(
-                            hintText: "Enter Prospect",
-                            labelText: "Prospect",
-                            prefixIcon: IconButton(
-                              icon: Icon(
-                                Icons.text_snippet,
-                              ),
-                              onPressed: (null),
-                            )),
+                          hintText: "Enter Prospect",
+                          labelText: "Prospect",
+                          prefixIcon: IconButton(
+                            icon: Icon(Icons.text_snippet),
+                            onPressed: (null),
+                          ),
+                        ),
                       ),
                     ),
                     Padding(
@@ -429,14 +469,13 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       child: TextFormField(
                         controller: _remarksController,
                         decoration: const InputDecoration(
-                            hintText: "Enter Remarks",
-                            labelText: "Remarks",
-                            prefixIcon: IconButton(
-                              icon: Icon(
-                                Icons.text_snippet,
-                              ),
-                              onPressed: (null),
-                            )),
+                          hintText: "Enter Remarks",
+                          labelText: "Remarks",
+                          prefixIcon: IconButton(
+                            icon: Icon(Icons.text_snippet),
+                            onPressed: (null),
+                          ),
+                        ),
                       ),
                     ),
 
@@ -445,22 +484,24 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ButtonBar(
-                            alignment: MainAxisAlignment.center,
-                            buttonPadding: Vx.mOnly(right: 16),
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  uploadImage(context);
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                  MaterialStateProperty.all(Mythemes.lightBluishColor),
+                          alignment: MainAxisAlignment.center,
+                          buttonPadding: Vx.mOnly(right: 16),
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                uploadImage(context);
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                  Mythemes.lightBluishColor,
                                 ),
-                                child: "Submit".text.make(),
-                              ).wh(150, 40).py12()
-                            ]),
+                              ),
+                              child: "Submit".text.make(),
+                            ).wh(150, 40).py12(),
+                          ],
+                        ),
                       ],
-                    ).py12()
+                    ).py12(),
                   ],
                 ),
               ),

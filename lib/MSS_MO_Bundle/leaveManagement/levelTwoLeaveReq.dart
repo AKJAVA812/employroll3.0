@@ -16,6 +16,7 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:badges/badges.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
@@ -31,17 +32,18 @@ class MSS_MO_LevelTwoPendingLeave extends StatefulWidget {
   final LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
   const MSS_MO_LevelTwoPendingLeave(this.pendingLeaveRequisitionModal);
 
-
   @override
-  State<MSS_MO_LevelTwoPendingLeave> createState() => _MSS_MO_LevelTwoPendingLeaveState(pendingLeaveRequisitionModal);
+  State<MSS_MO_LevelTwoPendingLeave> createState() =>
+      _MSS_MO_LevelTwoPendingLeaveState(pendingLeaveRequisitionModal);
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNewMOL2=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNewMOL2 = [];
 String? userPanel;
 dynamic getProfileId;
 dynamic matchedOrg;
@@ -49,7 +51,9 @@ dynamic matchedOrg;
 LevelTwoPendingLeaveModal? pendingLeaveReqLabel;
 LevelTwoPendingLeaveModal? pendingLeaveReqLabeled;
 
-class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeave> with RouteAware {
+class _MSS_MO_LevelTwoPendingLeaveState
+    extends State<MSS_MO_LevelTwoPendingLeave>
+    with RouteAware {
   final LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
   _MSS_MO_LevelTwoPendingLeaveState(this.pendingLeaveRequisitionModal);
 
@@ -102,10 +106,12 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
 
     if (orgListString != null) {
       List<dynamic> decoded = json.decode(orgListString);
-      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+      storedOrgList =
+          decoded.map((item) => Map<String, dynamic>.from(item)).toList();
 
       // Populate dropdown list
-      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+      organizations =
+          storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
       //selectedOrg = null;
@@ -114,6 +120,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
       setState(() {});
     }
   }
+
   bool isLoading = false;
 
   Future getSharedPrfanceList() async {
@@ -125,7 +132,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
   }
 
   void _showFilterBottomSheet() {
-    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    if (_isBottomSheetOpen) return; // âœ… Prevent multiple opens
     _isBottomSheetOpen = true;
     showModalBottomSheet(
       context: context,
@@ -162,7 +169,10 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                     ),
                     Text(
                       'Filter',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 16),
 
@@ -179,10 +189,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                           child: Text('Select'),
                         ),
                         ...organizations.map((org) {
-                          return DropdownMenuItem(
-                            value: org,
-                            child: Text(org),
-                          );
+                          return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
                       onChanged: (value) {
@@ -191,7 +198,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
 
                           // Match selected org name to get ID
                           matchedOrg = storedOrgList.firstWhere(
-                                (org) => org['orgName'] == value,
+                            (org) => org['orgName'] == value,
                             orElse: () => {},
                           );
 
@@ -234,14 +241,17 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
 
                             setState(() {
                               foundDataNewMOL2 = allUsernew;
-                              pendingLeaveReqLabel=value;
-                              pendingLeaveReqLabeled=pendingLeaveReqLabel;
-                              if(foundDataNewMOL2 != null) {
+                              pendingLeaveReqLabel = value;
+                              pendingLeaveReqLabeled = pendingLeaveReqLabel;
+                              if (foundDataNewMOL2 != null) {
                                 foundDataNewMOL2!.length;
                                 print("Fetch data $foundDataNewMOL2");
                               } else {
                                 Center(
-                                  child: "There is no data available right now".text.make(),
+                                  child:
+                                      "There is no data available right now"
+                                          .text
+                                          .make(),
                                 );
                                 foundDataNewMOL2 = [];
                               }
@@ -260,7 +270,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                           backgroundColor: Mythemes.successColor,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 );
               },
@@ -269,15 +279,14 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
         );
       },
     ).whenComplete(() {
-      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+      _isBottomSheetOpen = false; // âœ… Reset when sheet is dismissed
     });
   }
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -294,20 +303,19 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
             Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   Future<LevelTwoPendingLeaveModal> getPendingLeaveReq(String SessionId) async {
@@ -315,23 +323,27 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
     String apiUrl = ApiDetails.pendingLeaveReqList;
     print('employeeList11: ${SessionId}');
     LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "profileId=$getProfileId&"
-        "userPermission=$userPanel&"
-        "orgId=$getOrgId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "profileId=$getProfileId&"
+      "userPermission=$userPanel&"
+      "orgId=$getOrgId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
-    if (getData == null )  {
+    if (getData == null) {
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     print('responseemployeeList $getData');
-    pendingLeaveRequisitionModal=LevelTwoPendingLeaveModal.fromJson(mapResponse);
+    pendingLeaveRequisitionModal = LevelTwoPendingLeaveModal.fromJson(
+      mapResponse,
+    );
 
     allUsernew = pendingLeaveRequisitionModal.result!.data;
 
@@ -344,7 +356,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -357,8 +369,14 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.employeeName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.employeeName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -378,11 +396,13 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
     attachmentUrl = attachmentUrl.replaceAll("File: '", "").replaceAll("'", "");
 
     final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
-    final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
+    final isImage =
+        attachmentUrl.toLowerCase().endsWith('.jpg') ||
         attachmentUrl.toLowerCase().endsWith('.jpeg') ||
         attachmentUrl.toLowerCase().endsWith('.png');
 
-    final isLocalFile = attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
+    final isLocalFile =
+        attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
 
     showModalBottomSheet(
       context: context,
@@ -391,57 +411,69 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.85,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("View Attachment",
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: isPdf
-                  ? SfPdfViewer.network(attachmentUrl)
-                  : isImage
-                  ? (isLocalFile
-                  ? Image.file(
-                File(attachmentUrl),
-                fit: BoxFit.contain,
-              )
-                  : CachedNetworkImage(
-                imageUrl: attachmentUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Center(
-                    child: Text("❌ Failed to load image")),
-              ))
-                  : const Center(
-                child: Text(
-                  "⚠️ Unsupported file format",
-                  style:
-                  TextStyle(fontSize: 16, color: Colors.redAccent),
+      builder:
+          (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.85,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "View Attachment",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+
+                Expanded(
+                  child:
+                      isPdf
+                          ? SfPdfViewer.network(attachmentUrl)
+                          : isImage
+                          ? (isLocalFile
+                              ? Image.file(
+                                File(attachmentUrl),
+                                fit: BoxFit.contain,
+                              )
+                              : CachedNetworkImage(
+                                imageUrl: attachmentUrl,
+                                fit: BoxFit.contain,
+                                placeholder:
+                                    (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                errorWidget:
+                                    (context, url, error) => const Center(
+                                      child: Text("âŒ Failed to load image"),
+                                    ),
+                              ))
+                          : const Center(
+                            child: Text(
+                              "âš ï¸ Unsupported file format",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                          ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -455,36 +487,40 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                previousScreen:  LeaveManageReports(),
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              previousScreen: LeaveManageReports(),
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
               centerTitle: "$titleName - ${foundDataNewMOL2!.length}",
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
             ),
           ),
         ),
@@ -492,57 +528,54 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
 
       body: Container(
         color: context.canvasColor,
-        child:
-            Column(
-              children: [
-
-                Expanded(child:
-                pendingLeaveReqLabeled == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getPendingLeaveReqList(pendingLeaveReqLabeled!),
-                )
-
-              ]
-
-            )
-
+        child: Column(
+          children: [
+            Expanded(
+              child:
+                  pendingLeaveReqLabeled == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getPendingLeaveReqList(pendingLeaveReqLabeled!),
+            ),
+          ],
+        ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
             print('Leave');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -553,18 +586,12 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group_off),
-            label: 'Leave',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.group_off), label: 'Leave'),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),
             label: 'Dashboard',
@@ -580,17 +607,21 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
     );
   }
 
-  getPendingLeaveReqList(LevelTwoPendingLeaveModal pendingLeaveRequisitionModal) {
+  getPendingLeaveReqList(
+    LevelTwoPendingLeaveModal pendingLeaveRequisitionModal,
+  ) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  MSS_MO_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) =>
+                    MSS_MO_LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -599,10 +630,17 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
         itemBuilder: (context, index) {
           final item = foundDataNewMOL2![index];
           return InkWell(
-            onTap: (){
+            onTap: () {
               print(foundDataNewMOL2!.length);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => LevelTwoPendingApproval(
-                  pendingLeaveRequisitionModal, index)));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => LevelTwoPendingApproval(
+                        pendingLeaveRequisitionModal,
+                        index,
+                      ),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.pendingLeaveAppDisRoute);
               //CommonNotificationPage.showDeleteMessage(context, context, context);
             },
@@ -623,7 +661,11 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.person, color: Colors.blueAccent, size: 20),
+                            const Icon(
+                              Icons.person,
+                              color: Colors.blueAccent,
+                              size: 20,
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               item.employeeName.toString(),
@@ -637,19 +679,25 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: item.status.toString().toLowerCase() == 'pending'
-                                ? Colors.orange.withOpacity(0.2)
-                                : Colors.green.withOpacity(0.2),
+                            color:
+                                item.status.toString().toLowerCase() ==
+                                        'pending'
+                                    ? Colors.orange.withOpacity(0.2)
+                                    : Colors.green.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           child: Text(
                             item.status.toString(),
                             style: TextStyle(
-                              color: item.status.toString().toLowerCase() == 'pending'
-                                  ? Colors.orange
-                                  : Colors.green,
+                              color:
+                                  item.status.toString().toLowerCase() ==
+                                          'pending'
+                                      ? Colors.orange
+                                      : Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -662,8 +710,11 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                     /// Leave Type + Length
                     Row(
                       children: [
-                        const Icon(Icons.work_outline,
-                            color: Colors.indigoAccent, size: 18),
+                        const Icon(
+                          Icons.work_outline,
+                          color: Colors.indigoAccent,
+                          size: 18,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -686,12 +737,17 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                         color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildDateColumn("Start Date", item.startDate.toString()),
+                          _buildDateColumn(
+                            "Start Date",
+                            item.startDate.toString(),
+                          ),
                           _buildDateColumn("End Date", item.endDate.toString()),
                           //_buildDateColumn("In Time", "00:00"),
                           //_buildDateColumn("Out Time", "00:00"),
@@ -703,12 +759,15 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
 
                     /// Attachment Row
                     Visibility(
-                      visible: item.document != null &&
+                      visible:
+                          item.document != null &&
                           item.document.toString().isNotEmpty,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          "View Attachment".text.bold.color(Mythemes.lightBluishColor).make(),
+                          "View Attachment".text.bold
+                              .color(Mythemes.lightBluishColor)
+                              .make(),
                           IconButton(
                             tooltip: "View Attachment",
                             icon: const Icon(
@@ -716,15 +775,20 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
                               color: Colors.blueAccent,
                             ),
                             onPressed: () {
-                              print("Attachment tapped for ${item.employeeName}");
+                              print(
+                                "Attachment tapped for ${item.employeeName}",
+                              );
                               if (item.document != null &&
                                   item.document.toString().isNotEmpty) {
                                 showAttachmentBottomSheet(
-                                    context, item.document.toString());
+                                  context,
+                                  item.document.toString(),
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text("No attachment available")),
+                                    content: Text("No attachment available"),
+                                  ),
                                 );
                               }
                             },
@@ -742,7 +806,7 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
     );
   }
 
-  /// 🔹 Helper method for date columns
+  /// ðŸ”¹ Helper method for date columns
   Widget _buildDateColumn(String title, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -768,6 +832,3 @@ class _MSS_MO_LevelTwoPendingLeaveState extends State<MSS_MO_LevelTwoPendingLeav
     );
   }
 }
-
-
-

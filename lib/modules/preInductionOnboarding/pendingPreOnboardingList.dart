@@ -9,6 +9,7 @@ import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../adminPage/modelClass/dashboardModel.dart';
 import '../../adminPage/mssDashboard.dart';
@@ -31,14 +32,15 @@ class PendingPreOnboardingList extends StatefulWidget {
   static const String _title = 'Employee List';
 
   @override
-  State<PendingPreOnboardingList> createState() => _PendingPreOnboardingListState();
+  State<PendingPreOnboardingList> createState() =>
+      _PendingPreOnboardingListState();
 }
 
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
-List<PreOnboardListData>? allUsernew=[];
-List<PreOnboardListData>? foundDataNew=[];
+List<PreOnboardListData>? allUsernew = [];
+List<PreOnboardListData>? foundDataNew = [];
 PreOnboardListModal? employeeListModelglobel;
 PreOnboardListModal? employeeListModelglobeled;
 var empNameExited;
@@ -68,7 +70,9 @@ String nomineeName = "";
 String nomineeAadhar = "";
 String nomineeRelation = "";
 Future<PreOnboardListModal>? futureExitEmpList;
-class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> with RouteAware{
+
+class _PendingPreOnboardingListState extends State<PendingPreOnboardingList>
+    with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -83,13 +87,13 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     setState(() {
@@ -110,15 +114,15 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        employeeListModelglobel=value;
-        employeeListModelglobeled=employeeListModelglobel;
+        employeeListModelglobel = value;
+        employeeListModelglobeled = employeeListModelglobel;
       });
     });
   }
@@ -128,9 +132,11 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
     String apiUrl = ApiDetails.preOnboardListApi;
     print('employeeList11: ${SessionId}');
     PreOnboardListModal employeeListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId&"
-        "status=$statusUpdate");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?sessionId=$SessionId&"
+      "status=$statusUpdate",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
     print('PreOnboard API - ${response.request}');
@@ -138,10 +144,10 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    employeeListModel=PreOnboardListModal.fromJson(mapResponse);
+    employeeListModel = PreOnboardListModal.fromJson(mapResponse);
     allUsernew = employeeListModel.list;
     setState(() {
-      isLoading = false; // ✅ Hide loader after API success
+      isLoading = false; // âœ… Hide loader after API success
     });
 
     return employeeListModel;
@@ -150,9 +156,8 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -166,7 +171,6 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
       actions: [
         TextButton(
           onPressed: () {
-
             /*Navigator.pushReplacement(
                 context,
                 PageRouteBuilder(
@@ -175,14 +179,11 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                   transitionDuration: Duration(seconds: 1),
                   maintainState: true,
                 ));*/
-            if(mounted) {
-              isLoading=true;
+            if (mounted) {
+              isLoading = true;
               Navigator.of(context, rootNavigator: true).pop();
               getSharedPrfanceList();
             }
-
-
-
           },
           child: Text("Ok"),
         ),
@@ -190,15 +191,16 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<PreOnboardListData>?  results = [];
+    List<PreOnboardListData>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -211,8 +213,14 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.fullName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.fullName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -226,6 +234,7 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
       foundDataNew = results;
     });
   }
+
   TextEditingController searchType = TextEditingController();
   var titleName = "Pre-Onboarding List";
   int value = 0;
@@ -235,77 +244,84 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
   var dropdownvalue;
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: "$titleName - ${foundDataNew!.length}",
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: "$titleName - ${foundDataNew!.length}",
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.preOnboardItemRoute);
             print('Pre-Onboard');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -316,10 +332,7 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -366,7 +379,9 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                 styleAnimationType: AnimationType.onHover,
                 spacing: 2.0,
                 customSeparatorBuilder: (context, local, global) {
-                  final opacity = ((global.position - local.position).abs() - 0.5).clamp(0.0, 1.0);
+                  final opacity = ((global.position - local.position).abs() -
+                          0.5)
+                      .clamp(0.0, 1.0);
                   return VerticalDivider(
                     indent: 10.0,
                     endIndent: 10.0,
@@ -374,12 +389,17 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                   );
                 },
                 customIconBuilder: (context, local, global) {
-                  final text = const ['Pending', 'Approved', 'Disapprove'][local.index];
+                  final text =
+                      const ['Pending', 'Approved', 'Disapprove'][local.index];
                   return Center(
                     child: Text(
                       text,
                       style: TextStyle(
-                        color: Color.lerp(Colors.black, Colors.white, local.animationValue),
+                        color: Color.lerp(
+                          Colors.black,
+                          Colors.white,
+                          local.animationValue,
+                        ),
                       ),
                     ),
                   );
@@ -403,7 +423,6 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                       statusUpdate = "DISAPPROVED";
                       getSharedPrfanceList();
                     }
-
                   });
                 },
               ),
@@ -418,7 +437,7 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                 if (isLoading) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text("❌ Error loading data"));
+                  return Center(child: Text("âŒ Error loading data"));
                 }
                 return RefreshIndicator(
                   onRefresh: () {
@@ -457,10 +476,14 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                             dob = foundDataNew![i].dob!;
                             doj = foundDataNew![i].dateOfJoining!;
                             contactNo = foundDataNew![i].contact!;
-                            inHandSalary = foundDataNew![i].inHandSalary!.toString();
-                            accomodationCheck = foundDataNew![i].withAccomodation!.toString();
-                            aadharCardFront = foundDataNew![i].aadharDocumentFront!;
-                            aadharCardBack = foundDataNew![i].aadharDocumentBack!;
+                            inHandSalary =
+                                foundDataNew![i].inHandSalary!.toString();
+                            accomodationCheck =
+                                foundDataNew![i].withAccomodation!.toString();
+                            aadharCardFront =
+                                foundDataNew![i].aadharDocumentFront!;
+                            aadharCardBack =
+                                foundDataNew![i].aadharDocumentBack!;
                             panCard = foundDataNew![i].panDocument!;
                             empPhoto = foundDataNew![i].empPhoto!;
                             branchName = foundDataNew![i].branchName!;
@@ -474,32 +497,35 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                             ifscCode = foundDataNew![i].ifscCode!;
                             idCheck = foundDataNew![i].id!.toString();
 
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ApprovePreOnboarding(
-                                typeOfHiring,
-                                aadharNo,
-                                fullName,
-                                dob,
-                                doj,
-                                contactNo,
-                                inHandSalary,
-                                accomodationCheck,
-                                aadharCardFront,
-                                aadharCardBack,
-                                panCard,
-                                empPhoto,
-                                branchName,
-                                departmentName,
-                                designationName,
-                                bankName,
-                                accountNo,
-                                ifscCode,
-                                nomineeName,
-                                nomineeAadhar,
-                                nomineeRelation,
-                                idCheck,
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => ApprovePreOnboarding(
+                                      typeOfHiring,
+                                      aadharNo,
+                                      fullName,
+                                      dob,
+                                      doj,
+                                      contactNo,
+                                      inHandSalary,
+                                      accomodationCheck,
+                                      aadharCardFront,
+                                      aadharCardBack,
+                                      panCard,
+                                      empPhoto,
+                                      branchName,
+                                      departmentName,
+                                      designationName,
+                                      bankName,
+                                      accountNo,
+                                      ifscCode,
+                                      nomineeName,
+                                      nomineeAadhar,
+                                      nomineeRelation,
+                                      idCheck,
+                                    ),
                               ),
-                            ));
+                            );
                           } else if (status == "DISAPPROVED") {
                             Fluttertoast.showToast(
                               msg: "Already Disapproved !",
@@ -515,7 +541,17 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
-                            border: Border(left: BorderSide(color: foundDataNew![i].reqStatus! == "PENDING" || foundDataNew![i].reqStatus! == "APPROVED" ? Mythemes.successColor : Mythemes.dangerColor, width: 5)),
+                            border: Border(
+                              left: BorderSide(
+                                color:
+                                    foundDataNew![i].reqStatus! == "PENDING" ||
+                                            foundDataNew![i].reqStatus! ==
+                                                "APPROVED"
+                                        ? Mythemes.successColor
+                                        : Mythemes.dangerColor,
+                                width: 5,
+                              ),
+                            ),
                             borderRadius: BorderRadius.circular(8),
                             color: Colors.white,
                             boxShadow: [
@@ -537,31 +573,44 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      foundDataNew![i].reqStatus!
-                                          .text
+                                      foundDataNew![i].reqStatus!.text
                                           .size(14)
                                           .align(TextAlign.right)
                                           .bold
-                                          .color(foundDataNew![i].reqStatus! == "PENDING" || foundDataNew![i].reqStatus! == "APPROVED" ? Mythemes.successColor : Mythemes.dangerColor,)
+                                          .color(
+                                            foundDataNew![i].reqStatus! ==
+                                                        "PENDING" ||
+                                                    foundDataNew![i]
+                                                            .reqStatus! ==
+                                                        "APPROVED"
+                                                ? Mythemes.successColor
+                                                : Mythemes.dangerColor,
+                                          )
                                           .make()
                                           .px8()
-                                          .py4()
+                                          .py4(),
                                     ],
                                   ),
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         flex: 0,
-                                        child: CircleAvatar(
-                                          minRadius: 48,
-                                          backgroundColor: Mythemes.greyish,
-                                          backgroundImage: NetworkImage(foundDataNew![i].empPhoto.toString()),
-                                        ).px(8).py8(),
+                                        child:
+                                            CircleAvatar(
+                                              minRadius: 48,
+                                              backgroundColor: Mythemes.greyish,
+                                              backgroundImage: NetworkImage(
+                                                foundDataNew![i].empPhoto
+                                                    .toString(),
+                                              ),
+                                            ).px(8).py8(),
                                       ),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             foundDataNew![i].fullName
                                                 .toString()
@@ -577,8 +626,7 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                                                 .color(Colors.grey[700])
                                                 .make()
                                                 .px1(),
-                                            "Type of Hire:"
-                                                .text
+                                            "Type of Hire:".text
                                                 .size(13)
                                                 .bold
                                                 .make()
@@ -591,8 +639,7 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
                                                 .color(Colors.black87)
                                                 .make()
                                                 .px1(),
-                                            "Date of Joining:"
-                                                .text
+                                            "Date of Joining:".text
                                                 .size(13)
                                                 .bold
                                                 .make()
@@ -624,7 +671,6 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList> wit
           ),
         ],
       ),
-
     );
   }
 }

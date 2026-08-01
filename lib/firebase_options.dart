@@ -63,7 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '653851260783',
     projectId: 'pushnotificationsnew-27533',
     storageBucket: 'pushnotificationsnew-27533.firebasestorage.app',
-    iosBundleId: 'com.employroll.employrollFlutter',
+    iosBundleId: 'com.erzone.employroll',
   );
 
 }

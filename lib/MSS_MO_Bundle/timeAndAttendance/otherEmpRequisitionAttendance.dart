@@ -10,6 +10,7 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../employeePage/employeeListModel.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
@@ -27,27 +28,32 @@ class MSS_MO_OthersAttendanceRequisitionPage extends StatefulWidget {
   const MSS_MO_OthersAttendanceRequisitionPage({Key? key}) : super(key: key);
 
   @override
-  State<MSS_MO_OthersAttendanceRequisitionPage> createState() => _MSS_MO_OthersAttendanceRequisitionPageState();
+  State<MSS_MO_OthersAttendanceRequisitionPage> createState() =>
+      _MSS_MO_OthersAttendanceRequisitionPageState();
 }
-List<String> leavereqIdGlobel=[];
+
+List<String> leavereqIdGlobel = [];
 var empNewIdMO;
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 RequistionEmpListModel? employeeListModelglobel;
 LeaveBalanceModel? leaveBalanceLabel;
-String valuenew="listText";
+String valuenew = "listText";
 late List<String?> list = [];
 late List<String?> leaveTypeList = [];
 String? branchName;
 String? deptName;
 String? empName;
-String singleDateString="";
+String singleDateString = "";
 String? userPanel;
 dynamic getProfileId;
 String? orgId;
 dynamic matchedOrg;
-class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAttendanceRequisitionPage> with RouteAware{
+
+class _MSS_MO_OthersAttendanceRequisitionPageState
+    extends State<MSS_MO_OthersAttendanceRequisitionPage>
+    with RouteAware {
   var titleName = "Other Employee's Requisition";
   //static const List<String> list = <String>['Casual Leave', 'Leave Monthly'];
   //String dropdownValue = list.first;
@@ -58,7 +64,8 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
   bool halfDayShow = false;
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
-  final TextEditingController fromTimePickerController = TextEditingController();
+  final TextEditingController fromTimePickerController =
+      TextEditingController();
   final TextEditingController toTimePickerController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
   String _fromTimePicker = '00:00';
@@ -70,7 +77,6 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
 
   var leaveTypeId;
   var nominee;
-
 
   bool _isFirstBuild = true;
   bool _isBottomSheetOpen = false;
@@ -119,12 +125,11 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
       _showFilterBottomSheet();
     }
     loadOrgListFromPrefs();
-    branchName = await shared!.getBranch()??"N/A";
-    deptName = await shared!.getDept()??"N/A";
-    empName = await shared!.getempName()??"N/A";
+    branchName = await shared!.getBranch() ?? "N/A";
+    deptName = await shared!.getDept() ?? "N/A";
+    empName = await shared!.getempName() ?? "N/A";
 
-
-   /* getLeaveType12.then((value) {
+    /* getLeaveType12.then((value) {
       setState(() {
         leaveBalanceLabel=value;
         //var leaveTypeId = value?.leaveData.leaveTypeList;
@@ -140,21 +145,23 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
     String apiUrl = ApiDetails.othersReqEmpList;
     print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "userPermission=$userPanel&"
-        "profileId=$getProfileId&"
-        "orgId=$getOrgId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "userPermission=$userPanel&"
+      "profileId=$getProfileId&"
+      "orgId=$getOrgId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    requistionEmpListModel=RequistionEmpListModel.fromJson(mapResponse);
+    requistionEmpListModel = RequistionEmpListModel.fromJson(mapResponse);
     int length = requistionEmpListModel.data!.length;
     print('totallenth $length ');
-    for(int i=0; i<requistionEmpListModel.data!.length;i++){
+    for (int i = 0; i < requistionEmpListModel.data!.length; i++) {
       String? empName = requistionEmpListModel.data![i].empName;
       list.add(requistionEmpListModel.data![i].empName);
       print('dataExpenseType $empName');
@@ -168,18 +175,26 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
     String apiUrl = ApiDetails.leaveBalanceApi;
     print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseLeaveTypeList $getData');
-    leaveBalanceLabel=LeaveBalanceModel.fromJson(mapResponse);
-    int? length = leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
+    leaveBalanceLabel = LeaveBalanceModel.fromJson(mapResponse);
+    int? length =
+        leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
     print('totalleaveLength $length ');
-    for(int i=0; i<leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;i++){
-      String? leaveTypeName = leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i];
-      leaveTypeList.add(leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i]);
+    for (
+      int i = 0;
+      i < leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;
+      i++
+    ) {
+      String? leaveTypeName =
+          leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i];
+      leaveTypeList.add(
+        leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i],
+      );
       print('dataLeaveTypeName $leaveTypeName');
     }
     return leaveBalanceLabel;
@@ -196,10 +211,12 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
 
     if (orgListString != null) {
       List<dynamic> decoded = json.decode(orgListString);
-      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+      storedOrgList =
+          decoded.map((item) => Map<String, dynamic>.from(item)).toList();
 
       // Populate dropdown list
-      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+      organizations =
+          storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
       //selectedOrg = null;
@@ -208,32 +225,35 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
       setState(() {});
     }
   }
+
   bool isLoading = false;
 
   DateTime _date = (DateTime.now());
   String formattedDate = DateFormat.ABBR_MONTH;
-  String dateFormate = DateFormat("dd-MM-yyyy").format(DateTime.parse("2019-09-30"));
-  Future <Null> _selectDate (BuildContext context) async {
-    DateTime? _datePicker =await showDatePicker(
+  String dateFormate = DateFormat(
+    "dd-MM-yyyy",
+  ).format(DateTime.parse("2019-09-30"));
+  Future<Null> _selectDate(BuildContext context) async {
+    DateTime? _datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if(_datePicker != null && _datePicker != _date){
+    if (_datePicker != null && _datePicker != _date) {
       setState(() {
         _date = _datePicker;
       });
     }
   }
+
   final TextEditingController _dateController = TextEditingController();
   int pageIndex = 0;
   int currentIndex = 1;
 
-
   void _showFilterBottomSheet() {
-    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    if (_isBottomSheetOpen) return; // âœ… Prevent multiple opens
     _isBottomSheetOpen = true;
     showModalBottomSheet(
       context: context,
@@ -270,7 +290,10 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                     ),
                     Text(
                       'Filter',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 16),
 
@@ -287,10 +310,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                           child: Text('Select'),
                         ),
                         ...organizations.map((org) {
-                          return DropdownMenuItem(
-                            value: org,
-                            child: Text(org),
-                          );
+                          return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
                       onChanged: (value) {
@@ -299,7 +319,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
 
                           // Match selected org name to get ID
                           matchedOrg = storedOrgList.firstWhere(
-                                (org) => org['orgName'] == value,
+                            (org) => org['orgName'] == value,
                             orElse: () => {},
                           );
 
@@ -327,27 +347,30 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                           sessionId = await shared!.getSessionId();
                           userPanel = await shared!.getUserPanel();
                           getProfileId = await shared!.getDefaultProfileId();
-                          branchName = await shared!.getBranch()??"N/A";
-                          deptName = await shared!.getDept()??"N/A";
-                          empName = await shared!.getempName()??"N/A";
+                          branchName = await shared!.getBranch() ?? "N/A";
+                          deptName = await shared!.getDept() ?? "N/A";
+                          empName = await shared!.getempName() ?? "N/A";
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           print("ORG ID - $getOrgId");
                           // await Future.delayed(Duration(seconds: 5));
-                          Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(sessionId!);
+                          Future<RequistionEmpListModel> getEmployeeList11 =
+                              getEmployeeList(sessionId!);
                           //Future<LeaveBalanceModel?> getLeaveType12 = getLeaveTypeList(sessionId!);
                           final loading = Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               CircularProgressIndicator(),
-                              Text(" Login ... Please wait")
+                              Text(" Login ... Please wait"),
                             ],
                           );
 
                           getEmployeeList11.then((value) {
                             setState(() {
-                              employeeListModelglobel=value;
+                              employeeListModelglobel = value;
                             });
-                            print('employeeList00${employeeListModelglobel!.data!.length}');
+                            print(
+                              'employeeList00${employeeListModelglobel!.data!.length}',
+                            );
                           });
                         },
                         icon: Icon(Icons.filter_alt),
@@ -356,7 +379,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                           backgroundColor: Mythemes.successColor,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 );
               },
@@ -365,7 +388,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
         );
       },
     ).whenComplete(() {
-      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+      _isBottomSheetOpen = false; // âœ… Reset when sheet is dismissed
     });
   }
 
@@ -374,9 +397,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
     return DismissKeyboard(
       child: Scaffold(
         backgroundColor: Mythemes.whitish,
-        appBar: AppBar(
-          title: titleName.text.make(),
-        ),
+        appBar: AppBar(title: titleName.text.make()),
 
         floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -387,11 +408,16 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
               child: FloatingActionButton(
                 heroTag: 'leftFAB',
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => OthersAttendanceList(AttendanceReportModel(),0)));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder:
+                          (context) =>
+                              OthersAttendanceList(AttendanceReportModel(), 0),
+                    ),
+                  );
                   print('Right FAB pressed');
                 },
-                child: Icon(Icons.list, color: Mythemes.whitish,),
+                child: Icon(Icons.list, color: Mythemes.whitish),
               ),
             ),
 
@@ -399,37 +425,45 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
               height: 90,
               color: context.cardColor,
               child: ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  buttonPadding: Vx.mOnly(right: 16),
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
-                        if(singleDateString.compareToIgnoringCase("")==0){
-                          print('responseemployeeList');
-                          setState(() {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                alignment: MainAxisAlignment.center,
+                buttonPadding: Vx.mOnly(right: 16),
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
+                      if (singleDateString.compareToIgnoringCase("") == 0) {
+                        print('responseemployeeList');
+                        setState(() {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
                               content: Text("Please Select Date First "),
-                            ));
-                          });
-                        }else{
-                          print("EmpIdOther - $empNewIdMO");
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => OthersSingleDateAttendance(
-                                singleDateString: singleDateString!, empId: empNewIdMO,
-                              )));
-                          /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+                            ),
+                          );
+                        });
+                      } else {
+                        print("EmpIdOther - $empNewIdMO");
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => OthersSingleDateAttendance(
+                                  singleDateString: singleDateString!,
+                                  empId: empNewIdMO,
+                                ),
+                          ),
+                        );
+                        /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
                           OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*/
-
-                        }
-                      },
-                      style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all(Mythemes.lightBluishColor),
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        Mythemes.lightBluishColor,
                       ),
-                      child: "Get Details".text.make(),
-                    ).wh(150, 40).py12()
-                  ]),
+                    ),
+                    child: "Get Details".text.make(),
+                  ).wh(150, 40).py12(),
+                ],
+              ),
             ),
             // Right FAB
             Padding(
@@ -440,11 +474,9 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                   _showFilterBottomSheet();
                   print('Right FAB pressed');
                 },
-                child: Icon(Icons.filter_list, color: Mythemes.whitish,),
+                child: Icon(Icons.filter_list, color: Mythemes.whitish),
               ),
             ),
-
-
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -472,8 +504,10 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                           builder: (context) => OthersSingleDateAttendance(
                             singleDateString: singleDateString!, empId: empNewId,
                           )));
-                      *//*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                          OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*//*
+                      */
+        /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+                          OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*/
+        /*
 
                     }
                   },
@@ -485,175 +519,182 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
                 ).wh(150, 40).py12()
               ]),
         ),*/
-
         body: SingleChildScrollView(
           child: Form(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField(
-                      value: dropdownvalue,
-                      decoration: InputDecoration(
-                        enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                          borderSide: BorderSide(
-                              width: 1, color: Mythemes.blackishade),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: DropdownButtonFormField(
+                    value: dropdownvalue,
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        //<-- SEE HERE
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: Mythemes.blackishade,
                         ),
-                        labelText: "Select Employee",
-                        hintText: "Employee Name",
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        /*border: OutlineInputBorder(
+                      ),
+                      labelText: "Select Employee",
+                      hintText: "Employee Name",
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500,fontSize: 13,
-                            color: Mythemes.blackish),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: Mythemes.blackish,
                       ),
-                      items: list.map<DropdownMenuItem<String>>((String? value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value!),
+                    ),
+                    items:
+                        list.map<DropdownMenuItem<String>>((String? value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value!),
+                          );
+                        }).toList(),
+                    onChanged: (newVal) {
+                      valuenew = newVal.toString();
+                      int i = list.indexOf(valuenew);
+                      empNewIdMO = employeeListModelglobel?.data?[i].empId;
+                      print("EmpId  $empNewIdMO");
+                      setState(() {
+                        dropdownvalue = newVal;
+                      });
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: TextEditingController(text: branchName),
+                    enabled: false,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      hintText: "Branch Name",
+                      labelText: "Branch Name",
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: TextEditingController(text: deptName),
+                    enabled: false,
+                    //initialValue: deptName,
+                    decoration: InputDecoration(
+                      hintText: "Department Name",
+                      labelText: "Department Name",
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: TextEditingController(text: empName),
+                    enabled: false,
+                    //initialValue: empName,
+                    decoration: InputDecoration(
+                      hintText: "Reporting Officer Name",
+                      labelText: "Reporting Officer Name",
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _selectDate(context);
+                      });
+                    },
+                    child: TextFormField(
+                      onTap: () async {
+                        DateTime? date = DateTime.now();
+                        FocusScope.of(context).requestFocus(new FocusNode());
+
+                        date = await showDatePicker(
+                          context: context,
+                          initialDate: date,
+                          firstDate: DateTime(1947),
+                          lastDate: DateTime.now().add(Duration(days: 0)),
                         );
-
-                      }).toList(),
-                      onChanged: (newVal) {
-                        valuenew = newVal.toString();
-                        int i =list.indexOf(valuenew);
-                        empNewIdMO = employeeListModelglobel?.data?[i].empId;
-                        print("EmpId  $empNewIdMO");
                         setState(() {
+                          singleDateString = DateFormat(
+                            'dd-MM-yyyy',
+                          ).format(date!);
+                          _dateController.text = DateFormat(
+                            "dd-MM-yyyy",
+                          ).format(date!);
 
-                          dropdownvalue = newVal;
-
+                          //  DateFormat.yMd().format(date!).toString();
                         });
+
+                        print(date);
                       },
-
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: TextEditingController(text: branchName),
-                      enabled: false,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          hintText: "Branch Name",
-                          labelText: "Branch Name"
+                      readOnly: true,
+                      //initialValue: "dd-mm-yyyy",
+                      controller: _dateController,
+                      decoration: InputDecoration(
+                        labelText: "Date",
+                        suffixIcon: Icon(Icons.calendar_month),
+                        hintText: DateFormat("DD-MM-YYYY").format(_date),
+                        // hintText: DateFormat.yMd().format(_date).toString(),
                       ),
                     ),
                   ),
-
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: TextEditingController(text: deptName),
-                      enabled: false,
-                      //initialValue: deptName,
-                      decoration:  InputDecoration(
-                          hintText: "Department Name",
-                          labelText: "Department Name"
-
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: TextEditingController(text: empName),
-                      enabled: false,
-                      //initialValue: empName,
-                      decoration:  InputDecoration(
-                          hintText: "Reporting Officer Name",
-                          labelText: "Reporting Officer Name"
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          _selectDate(context);
-                        });
-                      },
-                      child: TextFormField(
-
-                        onTap: () async{
-                          DateTime? date = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
-
-                          date = await showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime.now().add(Duration(days: 0)));
-                          setState(() {
-                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _dateController.text = DateFormat("dd-MM-yyyy").format(date!);
-
-                            //  DateFormat.yMd().format(date!).toString();
-                          });
-
-                          print(date);
-                        },
-                        readOnly: true,
-                        //initialValue: "dd-mm-yyyy",
-                        controller: _dateController,
-                        decoration:  InputDecoration(
-                          labelText: "Date",
-                          suffixIcon: Icon(Icons.calendar_month),
-                          hintText: DateFormat("DD-MM-YYYY").format(_date),
-                          // hintText: DateFormat.yMd().format(_date).toString(),
-                        ),
-
-                      ),
-                    ),
-                  ),
-
-
-                ],
-              )
+                ),
+              ],
+            ),
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+                ),
+              );
               //Navigator.pop(context);
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               Navigator.pop(context);
               print('Attendance');
             }
-            if(index==3){
+            if (index == 3) {
               Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('My Reports');
             }
-            if(index==4){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            if (index == 4) {
+              Navigator.pushNamed(
+                context,
+                MyRoutings.essDashboardNavigateRoute,
+              );
               /*Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
@@ -665,11 +706,8 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
               }*/
             setState(() => currentIndex = index);
           },
-          items:  [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -694,23 +732,28 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
     );
   }
 
-  Future<void> singleDayRequisition(String getRemark, int? idn, fromDate, empNewId) async {
-
-    String idn=leavereqIdGlobel.last;
+  Future<void> singleDayRequisition(
+    String getRemark,
+    int? idn,
+    fromDate,
+    empNewId,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "1";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "leaveTypeId=$idn&"
-        "fromDate=$fromDate&"
-        "summary=$getRemark&"
-        "radio=$dayRadio&"
-        "empid=$empNewId&"
-        "nominee="
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "leaveTypeId=$idn&"
+      "fromDate=$fromDate&"
+      "summary=$getRemark&"
+      "radio=$dayRadio&"
+      "empid=$empNewId&"
+      "nominee=",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -721,32 +764,46 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 
-  Future<void> multipleDayRequisition(String getRemark, int? idn, toDate, fromDate, empNewId) async {
-    String idn=leavereqIdGlobel.last;
+  Future<void> multipleDayRequisition(
+    String getRemark,
+    int? idn,
+    toDate,
+    fromDate,
+    empNewId,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "2";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "tilldate=$toDate&"
-        "sessionId=$sessionId&"
-        "leaveTypeId=$idn&"
-        "fromDate=$fromDate&"
-        "summary=$getRemark&"
-        "radio=$dayRadio&"
-        "empid=$empNewId&"
-        "nominee="
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "tilldate=$toDate&"
+      "sessionId=$sessionId&"
+      "leaveTypeId=$idn&"
+      "fromDate=$fromDate&"
+      "summary=$getRemark&"
+      "radio=$dayRadio&"
+      "empid=$empNewId&"
+      "nominee=",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -757,33 +814,48 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 
-  Future<void> halfDayRequisition(startTime, endTime, String getRemark,  int? idn, fromDate, empNewId) async {
-    String idn=leavereqIdGlobel.last;
+  Future<void> halfDayRequisition(
+    startTime,
+    endTime,
+    String getRemark,
+    int? idn,
+    fromDate,
+    empNewId,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "3";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "starttime=$startTime&"
-        "endtime=$endTime&"
-        "sessionId=$sessionId&"
-        "leaveTypeId=$idn&"
-        "fromDate=$fromDate&"
-        "summary=$getRemark&"
-        "radio=$dayRadio&"
-        "empid=$empNewId&"
-        "nominee="
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "starttime=$startTime&"
+      "endtime=$endTime&"
+      "sessionId=$sessionId&"
+      "leaveTypeId=$idn&"
+      "fromDate=$fromDate&"
+      "summary=$getRemark&"
+      "radio=$dayRadio&"
+      "empid=$empNewId&"
+      "nominee=",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -794,12 +866,19 @@ class _MSS_MO_OthersAttendanceRequisitionPageState extends State<MSS_MO_OthersAt
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 }

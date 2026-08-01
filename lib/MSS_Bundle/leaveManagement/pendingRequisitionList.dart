@@ -23,6 +23,7 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:badges/badges.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../modules/leaveManagement/reports/leaveManageReport.dart';
 
@@ -30,17 +31,18 @@ class MSS_PendingLeaveRequisitionList extends StatefulWidget {
   final PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
   const MSS_PendingLeaveRequisitionList(this.pendingLeaveRequisitionModal);
 
-
   @override
-  State<MSS_PendingLeaveRequisitionList> createState() => _MSS_PendingLeaveRequisitionListState(pendingLeaveRequisitionModal);
+  State<MSS_PendingLeaveRequisitionList> createState() =>
+      _MSS_PendingLeaveRequisitionListState(pendingLeaveRequisitionModal);
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNewMSS=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNewMSS = [];
 String? levelOne;
 String? levelTwo;
 String? userPanel;
@@ -49,7 +51,9 @@ String? orgId;
 PendingLeaveRequisitionModal? pendingLeaveReqLabel;
 PendingLeaveRequisitionModal? pendingLeaveReqLabeled;
 
-class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequisitionList> with RouteAware{
+class _MSS_PendingLeaveRequisitionListState
+    extends State<MSS_PendingLeaveRequisitionList>
+    with RouteAware {
   final PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
   _MSS_PendingLeaveRequisitionListState(this.pendingLeaveRequisitionModal);
 
@@ -67,10 +71,11 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -83,11 +88,10 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
     });
   }
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -104,20 +108,19 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
             Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   Future getSharedPrfanceList() async {
@@ -129,27 +132,27 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));
-    Future<PendingLeaveRequisitionModal> getAppReq11 = getPendingLeaveReq(sessionId!);
+    Future<PendingLeaveRequisitionModal> getAppReq11 = getPendingLeaveReq(
+      sessionId!,
+    );
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
         foundDataNewMSS = allUsernew;
-        pendingLeaveReqLabel=value;
-        pendingLeaveReqLabeled=pendingLeaveReqLabel;
-        if(foundDataNewMSS != null) {
+        pendingLeaveReqLabel = value;
+        pendingLeaveReqLabeled = pendingLeaveReqLabel;
+        if (foundDataNewMSS != null) {
           foundDataNewMSS!.length;
           print("Fetch data $foundDataNewMSS");
         } else {
-          Center(
-            child: "There is no data available right now".text.make(),
-          );
+          Center(child: "There is no data available right now".text.make());
           foundDataNewMSS = [];
         }
       });
@@ -157,29 +160,35 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
     });
   }
 
-  Future<PendingLeaveRequisitionModal> getPendingLeaveReq(String SessionId) async {
+  Future<PendingLeaveRequisitionModal> getPendingLeaveReq(
+    String SessionId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingLeaveReqList;
     print('employeeList11: ${SessionId}');
     PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "profileId=$getProfileId&"
-        "userPermission=$userPanel&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "profileId=$getProfileId&"
+      "userPermission=$userPanel&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
     print("My Data - $getData");
-    if (getData == null )  {
+    if (getData == null) {
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     print('responseemployeeList $getData');
-    pendingLeaveRequisitionModal=PendingLeaveRequisitionModal.fromJson(mapResponse);
+    pendingLeaveRequisitionModal = PendingLeaveRequisitionModal.fromJson(
+      mapResponse,
+    );
 
     allUsernew = pendingLeaveRequisitionModal.result!.data;
 
@@ -192,7 +201,7 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -205,8 +214,14 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.employeeName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.employeeName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -226,11 +241,13 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
     attachmentUrl = attachmentUrl.replaceAll("File: '", "").replaceAll("'", "");
 
     final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
-    final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
+    final isImage =
+        attachmentUrl.toLowerCase().endsWith('.jpg') ||
         attachmentUrl.toLowerCase().endsWith('.jpeg') ||
         attachmentUrl.toLowerCase().endsWith('.png');
 
-    final isLocalFile = attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
+    final isLocalFile =
+        attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
 
     showModalBottomSheet(
       context: context,
@@ -239,57 +256,69 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.85,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("View Attachment",
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: isPdf
-                  ? SfPdfViewer.network(attachmentUrl)
-                  : isImage
-                  ? (isLocalFile
-                  ? Image.file(
-                File(attachmentUrl),
-                fit: BoxFit.contain,
-              )
-                  : CachedNetworkImage(
-                imageUrl: attachmentUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Center(
-                    child: Text("❌ Failed to load image")),
-              ))
-                  : const Center(
-                child: Text(
-                  "⚠️ Unsupported file format",
-                  style:
-                  TextStyle(fontSize: 16, color: Colors.redAccent),
+      builder:
+          (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.85,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "View Attachment",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+
+                Expanded(
+                  child:
+                      isPdf
+                          ? SfPdfViewer.network(attachmentUrl)
+                          : isImage
+                          ? (isLocalFile
+                              ? Image.file(
+                                File(attachmentUrl),
+                                fit: BoxFit.contain,
+                              )
+                              : CachedNetworkImage(
+                                imageUrl: attachmentUrl,
+                                fit: BoxFit.contain,
+                                placeholder:
+                                    (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                errorWidget:
+                                    (context, url, error) => const Center(
+                                      child: Text("âŒ Failed to load image"),
+                                    ),
+                              ))
+                          : const Center(
+                            child: Text(
+                              "âš ï¸ Unsupported file format",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                          ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -303,46 +332,50 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                previousScreen:  LeaveManageReports(),
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: "$titleName - ${foundDataNewMSS!.length}",
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              previousScreen: LeaveManageReports(),
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: "$titleName - ${foundDataNewMSS!.length}",
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
 
       body: Container(
         color: context.canvasColor,
-        child:
-            Column(
-              children: [
-               /* Visibility(
+        child: Column(
+          children: [
+            /* Visibility(
                   visible: levelOne == "true",
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,51 +439,54 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                     ],
                   ).py(6),
                 ),*/
-
-                Expanded(child:
-                pendingLeaveReqLabeled == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getPendingLeaveReqList(pendingLeaveReqLabeled!),
-                )
-              ],
+            Expanded(
+              child:
+                  pendingLeaveReqLabeled == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getPendingLeaveReqList(pendingLeaveReqLabeled!),
             ),
-
+          ],
+        ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
             Navigator.pop(context);
             print('Leave');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('My Reports');
           }
-          if(index==4){
+          if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
@@ -462,10 +498,7 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -489,17 +522,22 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
     );
   }
 
-  getPendingLeaveReqList(PendingLeaveRequisitionModal pendingLeaveRequisitionModal) {
+  getPendingLeaveReqList(
+    PendingLeaveRequisitionModal pendingLeaveRequisitionModal,
+  ) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  MSS_PendingLeaveRequisitionList(PendingLeaveRequisitionModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) => MSS_PendingLeaveRequisitionList(
+                  PendingLeaveRequisitionModal(),
+                ),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -508,10 +546,17 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
         itemBuilder: (context, index) {
           final item = foundDataNewMSS![index];
           return InkWell(
-            onTap: (){
+            onTap: () {
               print(foundDataNewMSS!.length);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => PendingLeaveApproveDisapprove(
-                  pendingLeaveRequisitionModal, index)));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => PendingLeaveApproveDisapprove(
+                        pendingLeaveRequisitionModal,
+                        index,
+                      ),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.pendingLeaveAppDisRoute);
               //CommonNotificationPage.showDeleteMessage(context, context, context);
             },
@@ -532,7 +577,11 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.person, color: Colors.blueAccent, size: 20),
+                            const Icon(
+                              Icons.person,
+                              color: Colors.blueAccent,
+                              size: 20,
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               item.employeeName.toString(),
@@ -546,19 +595,25 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: item.status.toString().toLowerCase() == 'pending'
-                                ? Colors.orange.withOpacity(0.2)
-                                : Colors.green.withOpacity(0.2),
+                            color:
+                                item.status.toString().toLowerCase() ==
+                                        'pending'
+                                    ? Colors.orange.withOpacity(0.2)
+                                    : Colors.green.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           child: Text(
                             item.status.toString(),
                             style: TextStyle(
-                              color: item.status.toString().toLowerCase() == 'pending'
-                                  ? Colors.orange
-                                  : Colors.green,
+                              color:
+                                  item.status.toString().toLowerCase() ==
+                                          'pending'
+                                      ? Colors.orange
+                                      : Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -571,8 +626,11 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                     /// Leave Type + Length
                     Row(
                       children: [
-                        const Icon(Icons.work_outline,
-                            color: Colors.indigoAccent, size: 18),
+                        const Icon(
+                          Icons.work_outline,
+                          color: Colors.indigoAccent,
+                          size: 18,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -595,12 +653,17 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                         color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildDateColumn("Start Date", item.startDate.toString()),
+                          _buildDateColumn(
+                            "Start Date",
+                            item.startDate.toString(),
+                          ),
                           _buildDateColumn("End Date", item.endDate.toString()),
                           //_buildDateColumn("In Time", "00:00"),
                           //_buildDateColumn("Out Time", "00:00"),
@@ -611,14 +674,16 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                     const SizedBox(height: 10),
 
                     /// Attachment Row
-
                     Visibility(
-                      visible: item.document != null &&
+                      visible:
+                          item.document != null &&
                           item.document.toString().isNotEmpty,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          "View Attachment".text.bold.color(Mythemes.lightBluishColor).make(),
+                          "View Attachment".text.bold
+                              .color(Mythemes.lightBluishColor)
+                              .make(),
                           IconButton(
                             tooltip: "View Attachment",
                             icon: const Icon(
@@ -626,15 +691,20 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
                               color: Colors.blueAccent,
                             ),
                             onPressed: () {
-                              print("Attachment tapped for ${item.employeeName}");
+                              print(
+                                "Attachment tapped for ${item.employeeName}",
+                              );
                               if (item.document != null &&
                                   item.document.toString().isNotEmpty) {
                                 showAttachmentBottomSheet(
-                                    context, item.document.toString());
+                                  context,
+                                  item.document.toString(),
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text("No attachment available")),
+                                    content: Text("No attachment available"),
+                                  ),
                                 );
                               }
                             },
@@ -651,7 +721,8 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
       ),
     );
   }
-  /// 🔹 Helper method for date columns
+
+  /// ðŸ”¹ Helper method for date columns
   Widget _buildDateColumn(String title, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -677,7 +748,6 @@ class _MSS_PendingLeaveRequisitionListState extends State<MSS_PendingLeaveRequis
     );
   }
 }
-
 
 /*class PendingReqList extends StatefulWidget {
   final PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
@@ -791,4 +861,3 @@ class _PendingReqListState extends State<PendingReqList> {
     );
   }
 }*/
-

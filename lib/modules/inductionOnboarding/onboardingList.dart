@@ -8,6 +8,7 @@ import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../adminPage/modelClass/dashboardModel.dart';
 import '../../adminPage/mssDashboard.dart';
@@ -34,16 +35,16 @@ class OnboardListView extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNew = [];
 OnboardingListModal? onboardingListModalGlobal;
 OnboardingListModal? onboardingListModalGlobaled;
 var empName;
 var empId;
 var statusUpdate = "Pending";
 dynamic MyColor;
-class _OnboardListViewState extends State<OnboardListView> with RouteAware{
 
+class _OnboardListViewState extends State<OnboardListView> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -58,13 +59,13 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware{
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     setState(() {
@@ -84,15 +85,15 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware{
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        onboardingListModalGlobal=value;
-        onboardingListModalGlobaled=onboardingListModalGlobal;
+        onboardingListModalGlobal = value;
+        onboardingListModalGlobaled = onboardingListModalGlobal;
       });
       print('employeeList00${onboardingListModalGlobal!.data!.length}');
     });
@@ -103,17 +104,19 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware{
     String apiUrl = ApiDetails.onboardingList;
     print('employeeList11: ${SessionId}');
     OnboardingListModal employeeListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "status=$statusUpdate");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "status=$statusUpdate",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    employeeListModel=OnboardingListModal.fromJson(mapResponse);
+    employeeListModel = OnboardingListModal.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
 
     return employeeListModel;
@@ -121,7 +124,7 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware{
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -134,8 +137,14 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware{
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.firstName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.firstName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -158,211 +167,231 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware{
   int currentIndex = 2;
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size(double.infinity, 100),
-          child: SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.white, border: Border(
-                  top: BorderSide.none
-              ), boxShadow: [
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size(double.infinity, 100),
+        child: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
                 BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 0.5,
-                    spreadRadius: 0,
-                    offset: Offset(0, 0.2))
-              ]),
-              child: AnimationSearchBar(
-                  searchFieldDecoration: BoxDecoration(
-                    color: Mythemes.greyishade,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  backIcon: Icons.arrow_back_ios,
-                  backIconColor: Mythemes.black,
-                  textStyle: TextStyle(fontSize: 14),
-                  onChanged: (value) {
-                    _runFilter(value);
-                  },
-                  horizontalPadding: 8,
-                  searchIconColor: Mythemes.black,
-                  centerTitle: titleName,
-                  verticalPadding: 3,
-                  centerTitleStyle: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500,
-                      color: Mythemes.black),
-                  searchTextEditingController: searchType),
+                  color: Colors.grey,
+                  blurRadius: 0.5,
+                  spreadRadius: 0,
+                  offset: Offset(0, 0.2),
+                ),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
             ),
           ),
         ),
-        bottomNavigationBar:
-        BottomNavigationBar (
-          type: BottomNavigationBarType.fixed,
-          currentIndex: currentIndex,
-          iconSize: 25,
-          selectedFontSize: 12,
-          unselectedFontSize: 10,
-          onTap: (index) {
-
-            if(index==0){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
-              //Navigator.pop(context);
-              print('home tab');
-            }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
-            }
-            if(index==2){
-              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Onboarding');
-            }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
-              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
-            }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
-              print('Profile');
-            }
-            /*if(index==3){
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(selectedIndex: 0),
+              ),
+            );
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
+          }
+          if (index == 2) {
+            //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Onboarding');
+          }
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MSSDashboard(DashboardModel()),
+              ),
+            );
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('Dashboard');
+          }
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
+            );
+            print('Profile');
+          }
+          /*if(index==3){
                 title="Notifications";
               }*/
-            setState(() => currentIndex = index);
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.manage_accounts_outlined),
-              label: 'Workflow',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.add_reaction_rounded),
-              label: 'Onboarding',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
-              //backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
-              //backgroundColor: Colors.blue,
+          setState(() => currentIndex = index);
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_reaction_rounded),
+            label: 'Onboarding',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_customize),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+            //backgroundColor: Colors.blue,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
+        },
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30), // Ensures circular shape
+        ),
+        mini: false,
+        backgroundColor: Mythemes.lightBluishColor,
+        child: Icon(Icons.add, color: Mythemes.whitish, size: 28),
+      ),
+
+      body: Container(
+        color: context.canvasColor,
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedToggleSwitch<int>.size(
+                  height: 25,
+                  current: min(value, 3),
+                  style: ToggleStyle(
+                    backgroundColor: Mythemes.greyishade,
+                    indicatorColor: Mythemes.lightBluishColor,
+                    borderColor: Colors.transparent,
+                    borderRadius: BorderRadius.circular(20.0),
+                    indicatorBorderRadius: BorderRadius.zero,
+                  ),
+                  values: const [0, 1, 2],
+                  iconOpacity: 1.0,
+                  selectedIconScale: 1.0,
+                  indicatorSize: const Size.fromWidth(90),
+                  iconAnimationType: AnimationType.onHover,
+                  styleAnimationType: AnimationType.onHover,
+                  spacing: 2.0,
+                  customSeparatorBuilder: (context, local, global) {
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
+                        .clamp(0.0, 1.0);
+                    return VerticalDivider(
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
+                  },
+                  customIconBuilder: (context, local, global) {
+                    final text =
+                        const ['Draft', 'Pending', 'Approved'][local.index];
+                    return Center(
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  borderWidth: 0.0,
+                  onChanged: (i) {
+                    setState(() {
+                      value = i;
+                      print(i);
+                    });
+                    if (value == 0) {
+                      statusUpdate = "DRAFT";
+
+                      getSharedPrfanceList();
+                      //Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
+                    }
+                    if (value == 1) {
+                      statusUpdate = "PENDING";
+                      getSharedPrfanceList();
+                      //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
+                    }
+                    if (value == 2) {
+                      statusUpdate = "APPROVED";
+                      getSharedPrfanceList();
+                      //Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
+                    }
+                  },
+                ),
+              ],
+            ).py(8),
+            Expanded(
+              child:
+                  onboardingListModalGlobaled == null
+                      ? Center(child: CircularProgressIndicator())
+                      : MyStatelessWidget(onboardingListModalGlobaled!),
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
-          },
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30), // Ensures circular shape
-          ),
-          mini: false,
-          backgroundColor: Mythemes.lightBluishColor,
-          child: Icon(
-            Icons.add, color: Mythemes.whitish, size: 28,
-          ),
-        ),
-
-        body: Container(
-          color: context.canvasColor,
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedToggleSwitch<int>.size(
-                    height: 25,
-                    current: min(value, 3),
-                    style: ToggleStyle(
-                      backgroundColor: Mythemes.greyishade,
-                      indicatorColor: Mythemes.lightBluishColor,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(20.0),
-                      indicatorBorderRadius: BorderRadius.zero,
-                    ),
-                    values: const [0, 1, 2],
-                    iconOpacity: 1.0,
-                    selectedIconScale: 1.0,
-                    indicatorSize: const Size.fromWidth(90),
-                    iconAnimationType: AnimationType.onHover,
-                    styleAnimationType: AnimationType.onHover,
-                    spacing: 2.0,
-                    customSeparatorBuilder: (context, local, global) {
-                      final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
-                      return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
-                    },
-                    customIconBuilder: (context, local, global) {
-                      final text = const ['Draft', 'Pending', 'Approved'][local.index];
-                      return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
-                    },
-                    borderWidth: 0.0,
-                    onChanged: (i) {
-                      setState(() {
-                        value = i;
-                        print(i);
-
-                      });
-                      if(value == 0) {
-                        statusUpdate = "DRAFT";
-
-                        getSharedPrfanceList();
-                        //Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
-                      }
-                      if(value == 1) {
-                        statusUpdate = "PENDING";
-                        getSharedPrfanceList();
-                        //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
-                      }
-                      if(value == 2) {
-                        statusUpdate = "APPROVED";
-                        getSharedPrfanceList();
-                        //Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
-                      }
-
-                    },
-                  )
-                ],
-              ).py(8),
-              Expanded(child: onboardingListModalGlobaled == null ?
-              Center(child: CircularProgressIndicator()): MyStatelessWidget(onboardingListModalGlobaled!)),
-            ],
-          ),
-        )
+      ),
     );
   }
 }
-
 
 class MyStatelessWidget extends StatefulWidget {
   final OnboardingListModal employeeListModel;
 
   MyStatelessWidget(this.employeeListModel);
   @override
-  State<MyStatelessWidget> createState() => _MyStatelessWidgetState(employeeListModel);
+  State<MyStatelessWidget> createState() =>
+      _MyStatelessWidgetState(employeeListModel);
 }
-
 
 class _MyStatelessWidgetState extends State<MyStatelessWidget> {
   final OnboardingListModal employeeListModel;
@@ -375,33 +404,27 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
   var stepFour;
   var stepFive;
 
-
   @override
   Widget build(BuildContext context) {
-    showTrackDialog(BuildContext buildContext, result,alert) {
+    showTrackDialog(BuildContext buildContext, result, alert) {
       var alertDialog = AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0),
-            )
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
         ),
         title: Row(
           children: [
             //Icon(Icons.warning),
-            Expanded(child: Text( alert, style: TextStyle(
-                fontSize: 18
-            ),)),
+            Expanded(child: Text(alert, style: TextStyle(fontSize: 18))),
           ],
         ),
-        content: Text(result , style: TextStyle(
-            fontSize: 14
-        )),
+        content: Text(result, style: TextStyle(fontSize: 14)),
         titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
         actions: [
           TextButton(
-              onPressed: () {
-                /*for(int i=0; i<employeeListModel!.data!.length;i++){
+            onPressed: () {
+              /*for(int i=0; i<employeeListModel!.data!.length;i++){
                   setState(() {
                     empId;
                     empName;
@@ -411,65 +434,73 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                   });
 
                 }*/
-                //print('emPI $empId');
-                //print('emName $empName');
-                print("Emp list clicked");
-                Navigator.pop(context);
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                    HistoryMapView(empName,empId)));
-
-                //Navigator.pop(buildContext);
-              },
-              child: Container(
-                child: Text("History"
-                  ,style: TextStyle(color: Mythemes.dangerColor),
+              //print('emPI $empId');
+              //print('emName $empName');
+              print("Emp list clicked");
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => HistoryMapView(empName, empId),
                 ),
-              )
+              );
+
+              //Navigator.pop(buildContext);
+            },
+            child: Container(
+              child: Text(
+                "History",
+                style: TextStyle(color: Mythemes.dangerColor),
+              ),
+            ),
           ),
           TextButton(
-              onPressed: () {
-                Navigator.of(buildContext, rootNavigator: true).pop();
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                    LiveMapView(empName,empId)));
-              },
-              child: Container(
-                child: Text("Live",
-                    style: TextStyle(color: Mythemes.lightBluishColor)
+            onPressed: () {
+              Navigator.of(buildContext, rootNavigator: true).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => LiveMapView(empName, empId),
                 ),
-              )
+              );
+            },
+            child: Container(
+              child: Text(
+                "Live",
+                style: TextStyle(color: Mythemes.lightBluishColor),
+              ),
+            ),
           ),
-
         ],
         elevation: 24.0,
       );
       showDialog(
-          context: buildContext,
-          builder: (BuildContext context) {
-            return alertDialog;
-          });
+        context: buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        },
+      );
     }
-    return ListView.builder(
 
-      padding: EdgeInsets.only(top: 4, bottom: 4,left: 4, right: 4),
+    return ListView.builder(
+      padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
       itemCount: foundDataNew!.length,
       itemBuilder: (context, i) {
         int activeStep = 0;
         int selectedStep = 2;
         int nbSteps = 5;
         return InkWell(
-            onTap: () {
-              empId = foundDataNew![i].emailId;
-              empName = foundDataNew![i].firstName;
-              print('ID $empId');
-              print('NameCheck $empName');
-              Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
-              //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
-            },
-            child: Card(
-                elevation: 2,
-                child: Column(
-                  children: [
-                    /*LinearProgressBar(
+          onTap: () {
+            empId = foundDataNew![i].emailId;
+            empName = foundDataNew![i].firstName;
+            print('ID $empId');
+            print('NameCheck $empName');
+            Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
+            //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
+          },
+          child: Card(
+            elevation: 2,
+            child: Column(
+              children: [
+                /*LinearProgressBar(
                       maxSteps: 5,
                       minHeight: 5.0,
                       progressType: LinearProgressBar.progressTypeLinear, // Use Linear progress
@@ -478,54 +509,79 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       backgroundColor: Mythemes.greyishade,
                       borderRadius: BorderRadius.circular(10), //  NEW
                     ).p8().pLTRB(10, 2, 0, 0),*/
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                            flex: 0,
-                            child: CircleAvatar(
-                              minRadius: 48,
-                              backgroundColor: Mythemes.greyish,
-                              backgroundImage: foundDataNew![i].empPhoto.toString() == "" ?  NetworkImage("https://s3.ap-south-1.amazonaws.com/employroll.com/images/1705814809103.jpg") :
-                              NetworkImage(foundDataNew![i].empPhoto.toString()),
-                            ).px(8).py8()
-                        ),
-                        Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                foundDataNew![i].firstName.toString().text.make().px1(),
-                                foundDataNew![i].mobileNo.toString().text.make().px1(),
-                                foundDataNew![i].emailId.toString().text.make().px1(),
-                                foundDataNew![i].departmentName.toString().text.make().px1(),
-                              ],
-                            )
-                        ),
-                        Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                "$statusUpdate".text.color( statusUpdate == "DRAFT" ? Mythemes.alertColor : statusUpdate == "PENDING" ? Mythemes.lightBluishColor : Mythemes.successColor).bold.make(),
-                              ],
-                            ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 0,
+                      child:
+                          CircleAvatar(
+                            minRadius: 48,
+                            backgroundColor: Mythemes.greyish,
+                            backgroundImage:
+                                foundDataNew![i].empPhoto.toString() == ""
+                                    ? NetworkImage(
+                                      "https://s3.ap-south-1.amazonaws.com/employroll.com/images/1705814809103.jpg",
+                                    )
+                                    : NetworkImage(
+                                      foundDataNew![i].empPhoto.toString(),
+                                    ),
+                          ).px(8).py8(),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          foundDataNew![i].firstName
+                              .toString()
+                              .text
+                              .make()
+                              .px1(),
+                          foundDataNew![i].mobileNo
+                              .toString()
+                              .text
+                              .make()
+                              .px1(),
+                          foundDataNew![i].emailId.toString().text.make().px1(),
+                          foundDataNew![i].departmentName
+                              .toString()
+                              .text
+                              .make()
+                              .px1(),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          "$statusUpdate".text
+                              .color(
+                                statusUpdate == "DRAFT"
+                                    ? Mythemes.alertColor
+                                    : statusUpdate == "PENDING"
+                                    ? Mythemes.lightBluishColor
+                                    : Mythemes.successColor,
+                              )
+                              .bold
+                              .make(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ).p(12),
 
-                        )
-
-                      ],
-                    ).p(12),
-                    /*  Row(
+                /*  Row(
                     children: [
 
                     ],
                   ),*/
-
-
-                  ],
-                )
+              ],
             ),
+          ),
 
           /* Card(
               elevation: 2,
@@ -575,7 +631,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                             .make()
                             .px8(),
 
-                       *//* Expanded(
+                       */
+          /* Expanded(
                             child: Column(
                               crossAxisAlignment:
                               CrossAxisAlignment.end,
@@ -588,7 +645,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                     context.captionStyle)
                                     .make().px8(),
                               ],
-                            ))*//*
+                            ))*/
+          /*
 
                       ],
                     ).py2(),

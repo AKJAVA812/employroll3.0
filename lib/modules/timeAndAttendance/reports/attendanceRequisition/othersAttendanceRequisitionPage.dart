@@ -18,6 +18,7 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 import 'othersOnDateAttendanceModal.dart';
@@ -28,14 +29,22 @@ class OthersAttendanceRequisition extends StatefulWidget {
   int indexCont;
 
   OthersAttendanceRequisition(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont);
+    this.attendanceModelGlobel,
+    this.onDateAttModel,
+    this.indexCont,
+  );
 
   @override
-  State<OthersAttendanceRequisition> createState() => _OthersAttendanceRequisitionState(
-      attendanceModelGlobel, onDateAttModel, indexCont);
+  State<OthersAttendanceRequisition> createState() =>
+      _OthersAttendanceRequisitionState(
+        attendanceModelGlobel,
+        onDateAttModel,
+        indexCont,
+      );
 }
 
-class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisition> {
+class _OthersAttendanceRequisitionState
+    extends State<OthersAttendanceRequisition> {
   AttendanceReportModel? attendanceModelGlobel;
   OthersOnDateAttendanceModal? onDateAttModel;
   int indexCont;
@@ -52,9 +61,11 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
   String? actualOutTimeset;
   int? empId;
 
-
   _OthersAttendanceRequisitionState(
-      this.attendanceModelGlobel, this.onDateAttModel, this.indexCont);
+    this.attendanceModelGlobel,
+    this.onDateAttModel,
+    this.indexCont,
+  );
 
   @override
   void initState() {
@@ -63,25 +74,24 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
     //String empid=onDateAttModel!.empId.toString();
     //print('responseemployeeList $empid');
 
-    if(attendanceModelGlobel!=null){
+    if (attendanceModelGlobel != null) {
       print('attendanceModelGlobel');
-      branchNameset= attendanceModelGlobel!.data![indexCont].branchName;
-      departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
-      employeeNameset= attendanceModelGlobel!.data![indexCont].employeeName;
-      onDateset= attendanceModelGlobel!.data![indexCont].attendanceDate;
-      actualTimeset= attendanceModelGlobel!.data![indexCont].inTime;
-      actualOutTimeset= attendanceModelGlobel!.data![indexCont].outTime;
-      empId =attendanceModelGlobel!.data![indexCont].empId;
-
-    }else{
+      branchNameset = attendanceModelGlobel!.data![indexCont].branchName;
+      departmentset = attendanceModelGlobel!.data![indexCont].departmentName;
+      employeeNameset = attendanceModelGlobel!.data![indexCont].employeeName;
+      onDateset = attendanceModelGlobel!.data![indexCont].attendanceDate;
+      actualTimeset = attendanceModelGlobel!.data![indexCont].inTime;
+      actualOutTimeset = attendanceModelGlobel!.data![indexCont].outTime;
+      empId = attendanceModelGlobel!.data![indexCont].empId;
+    } else {
       print('onModelrun');
-      branchNameset= onDateAttModel!.branchName;
-      departmentset= onDateAttModel!.departmentName;
-      employeeNameset= onDateAttModel!.employeeName;
-      onDateset= onDateAttModel!.onDate;
-      actualTimeset= onDateAttModel!.inTime;
-      actualOutTimeset= onDateAttModel!.outTime;
-      empId= onDateAttModel!.empId;
+      branchNameset = onDateAttModel!.branchName;
+      departmentset = onDateAttModel!.departmentName;
+      employeeNameset = onDateAttModel!.employeeName;
+      onDateset = onDateAttModel!.onDate;
+      actualTimeset = onDateAttModel!.inTime;
+      actualOutTimeset = onDateAttModel!.outTime;
+      empId = onDateAttModel!.empId;
     }
 
     getSharedPrfanceList();
@@ -123,120 +133,122 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
               child: Column(
                 children: [
                   Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Radio(
-                                value: "onDate",
-                                groupValue: radios,
-                                onChanged: (value) {
-                                  /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Radio(
+                              value: "onDate",
+                              groupValue: radios,
+                              onChanged: (value) {
+                                /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("On Date Click"),
                               ));*/
-                                  setState(() {
-                                    onDateRadio = "1";
-                                    nextDayRadio = "0";
-                                    compOffRadio = "0";
-                                    radios = value.toString();
-                                  });
-                                },
-                              ),
-                              "On Date".text.size(13).make(),
-                            ],
-                          ),
+                                setState(() {
+                                  onDateRadio = "1";
+                                  nextDayRadio = "0";
+                                  compOffRadio = "0";
+                                  radios = value.toString();
+                                });
+                              },
+                            ),
+                            "On Date".text.size(13).make(),
+                          ],
                         ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Radio(
-                                value: "nextDay",
-                                groupValue: radios,
-                                onChanged: (value) {
-                                  /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      ),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Radio(
+                              value: "nextDay",
+                              groupValue: radios,
+                              onChanged: (value) {
+                                /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Next Day Click"),
                               ));*/
-                                  setState(() {
-                                    onDateRadio = "0";
-                                    nextDayRadio = "1";
-                                    compOffRadio = "0";
-                                    radios = value.toString();
-                                  });
-                                },
-                              ),
-                              "Next Day".text.size(13).make(),
-                            ],
-                          ),
+                                setState(() {
+                                  onDateRadio = "0";
+                                  nextDayRadio = "1";
+                                  compOffRadio = "0";
+                                  radios = value.toString();
+                                });
+                              },
+                            ),
+                            "Next Day".text.size(13).make(),
+                          ],
                         ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Radio(
-                                value: "compOff",
-                                groupValue: radios,
-                                onChanged: (value) {
-                                  /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      ),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Radio(
+                              value: "compOff",
+                              groupValue: radios,
+                              onChanged: (value) {
+                                /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Comp Off Click"),
                               ));*/
-                                  setState(() {
-                                    onDateRadio = "0";
-                                    nextDayRadio = "0";
-                                    compOffRadio = "1";
-                                    radios = value.toString();
-                                  });
-                                },
-                              ),
-                              "Comp".text.size(13).make(),
-                            ],
-                          ),
+                                setState(() {
+                                  onDateRadio = "0";
+                                  nextDayRadio = "0";
+                                  compOffRadio = "1";
+                                  radios = value.toString();
+                                });
+                              },
+                            ),
+                            "Comp".text.size(13).make(),
+                          ],
                         ),
-                      ]).p(5),
-                  SizedBox(
-                    height: 7,
-                  ),
+                      ),
+                    ],
+                  ).p(5),
+                  SizedBox(height: 7),
                   Row(
                     children: [
                       Expanded(
-                        child:  Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: branchNameset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: branchNameset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: branchNameset,
-                                labelText: "Branch Name",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: branchNameset,
+                              labelText: "Branch Name",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
                       ),
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: departmentset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: departmentset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: departmentset,
-                                labelText: "Department",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: departmentset,
+                              labelText: "Department",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
@@ -246,40 +258,39 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
                   Row(
                     children: [
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: employeeNameset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: employeeNameset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: employeeNameset,
-                                labelText: "Employee Name",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: employeeNameset,
+                              labelText: "Employee Name",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
-
                       ),
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
+                            style: TextStyle(fontSize: 14),
                             controller: TextEditingController(text: onDateset),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: onDateset,
-                                labelText: "On Date",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: onDateset,
+                              labelText: "On Date",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
@@ -289,92 +300,102 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
                   Row(
                     children: [
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: actualTimeset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: actualTimeset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: actualTimeset,
-                                labelText: "Actual In Time",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: actualTimeset,
+                              labelText: "Actual In Time",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
                       ),
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: InkWell(
                             onTap: () async {
                               //_openInTimepicker(context);
                               final TimeOfDay? n = await showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                  builder: (BuildContext context, Widget? child) {
-                                    return MediaQuery(
-                                      data: MediaQuery.of(context)
-                                          .copyWith(alwaysUse24HourFormat: true),
-                                      child: child!,
-                                    );
-                                  });
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                                builder: (BuildContext context, Widget? child) {
+                                  return MediaQuery(
+                                    data: MediaQuery.of(
+                                      context,
+                                    ).copyWith(alwaysUse24HourFormat: true),
+                                    child: child!,
+                                  );
+                                },
+                              );
                               print('timenewOut $n');
                               setState(() {
                                 var now = DateTime.now();
-                                DateTime newt = DateTime(now.year, now.month,
-                                    now.day, n!.hour, n!.minute);
+                                DateTime newt = DateTime(
+                                  now.year,
+                                  now.month,
+                                  now.day,
+                                  n!.hour,
+                                  n!.minute,
+                                );
                                 var nT = DateFormat('HH:mm').format(newt);
                                 print(DateFormat('HH:mm').format(newt));
                                 _inTimePicker = nT;
                               });
                             },
                             child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: _inTimePicker),
+                              style: TextStyle(fontSize: 14),
+                              controller: TextEditingController(
+                                text: _inTimePicker,
+                              ),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: _inTimePicker,
-                                  labelText: "Changes In Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                enabled: false,
+                                hintText: _inTimePicker,
+                                labelText: "Changes In Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
                         ),
-
                       ),
                     ],
                   ),
                   Row(
                     children: [
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
                             maxLines: 3,
-                            style:TextStyle(fontSize:14),
+                            style: TextStyle(fontSize: 14),
                             controller: inRemarkController,
                             enabled: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.greyishade),
+                            decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Mythemes.greyishade,
                                 ),
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: "Add Remark",
-                                labelText: "Remarks",
-                                labelStyle: TextStyle(fontSize: 15)
+                              ),
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: "Add Remark",
+                              labelText: "Remarks",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
@@ -384,62 +405,71 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
                   Row(
                     children: [
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: actualOutTimeset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: actualOutTimeset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                enabled: false,
-                                hintText: actualOutTimeset,
-                                labelText: "Actual Out Time",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              enabled: false,
+                              hintText: actualOutTimeset,
+                              labelText: "Actual Out Time",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
                       ),
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: InkWell(
                             onTap: () async {
                               //_openOutTimepicker(context);
                               final TimeOfDay? o = await showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                  builder: (BuildContext context, Widget? child) {
-                                    return MediaQuery(
-                                      data: MediaQuery.of(context)
-                                          .copyWith(alwaysUse24HourFormat: true),
-                                      child: child!,
-                                    );
-                                  });
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                                builder: (BuildContext context, Widget? child) {
+                                  return MediaQuery(
+                                    data: MediaQuery.of(
+                                      context,
+                                    ).copyWith(alwaysUse24HourFormat: true),
+                                    child: child!,
+                                  );
+                                },
+                              );
                               print('timenewOut $o');
                               setState(() {
                                 var newNow = DateTime.now();
-                                DateTime newt = DateTime(newNow.year, newNow.month,
-                                    newNow.day, o!.hour, o!.minute);
+                                DateTime newt = DateTime(
+                                  newNow.year,
+                                  newNow.month,
+                                  newNow.day,
+                                  o!.hour,
+                                  o!.minute,
+                                );
                                 var oT = DateFormat('HH:mm').format(newt);
                                 print(DateFormat('HH:mm').format(newt));
                                 _outTimePicker = oT;
                               });
                             },
                             child: TextFormField(
-                              style:TextStyle(fontSize:14),
-                              controller: TextEditingController(text: _outTimePicker),
+                              style: TextStyle(fontSize: 14),
+                              controller: TextEditingController(
+                                text: _outTimePicker,
+                              ),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  enabled: false,
-                                  hintText: _outTimePicker,
-                                  labelText: "Changes Out Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                enabled: false,
+                                hintText: _outTimePicker,
+                                labelText: "Changes Out Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
@@ -450,28 +480,29 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
                   Row(
                     children: [
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
                             maxLines: 3,
-                            style:TextStyle(fontSize:14),
+                            style: TextStyle(fontSize: 14),
                             controller: outRemarkController,
                             enabled: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                  borderSide: BorderSide(
-                                      width: 1, color: Mythemes.greyishade),
+                            decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Mythemes.greyishade,
                                 ),
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: "Add Remark",
-                                labelText: "Remarks",
-                                labelStyle: TextStyle(fontSize: 15)
+                              ),
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: "Add Remark",
+                              labelText: "Remarks",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
-
                       ),
                     ],
                   ),
@@ -480,95 +511,137 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                String? inTimeReq;
-                                String? outTimeReq;
-                                String logid ="0";
-                                String inRemarkString = inRemarkController.text;
-                                String outRemarkString = outRemarkController.text;
-                                String onDate = DateFormat("dd-MM-yyyy").format(DateTime.parse(onDateset!));
-                                var dateformat = onDate;
+                        alignment: MainAxisAlignment.center,
+                        buttonPadding: Vx.mOnly(right: 16),
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              String? inTimeReq;
+                              String? outTimeReq;
+                              String logid = "0";
+                              String inRemarkString = inRemarkController.text;
+                              String outRemarkString = outRemarkController.text;
+                              String onDate = DateFormat(
+                                "dd-MM-yyyy",
+                              ).format(DateTime.parse(onDateset!));
+                              var dateformat = onDate;
 
-                                if (_outTimePicker!.compareToIgnoringCase("00:00") == 0) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              if (_outTimePicker!.compareToIgnoringCase(
+                                    "00:00",
+                                  ) ==
+                                  0) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
                                     content: Text(" Please Select Out Time "),
-                                  ));
+                                  ),
+                                );
+                              } else {
+                                //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
+                                if (onDateset!.compareToIgnoringCase("--:--") ==
+                                    0) {
+                                  inTimeReq =
+                                      onDateset
+                                                  .toString()
+                                                  .compareToIgnoringCase(
+                                                    "--:--",
+                                                  ) ==
+                                              0
+                                          ? _inTimePicker
+                                          : _inTimePicker;
                                 } else {
-                                  //  var intimecompair = attendanceModelGlobel!.data![indexCont].inTime ?? onDateAttModel!.inTime;
-                                  if(onDateset!.compareToIgnoringCase("--:--")==0){
-                                    inTimeReq = onDateset.toString().compareToIgnoringCase("--:--") == 0 ? _inTimePicker :_inTimePicker;
-                                  }
-                                  else{
-                                    inTimeReq = onDateset.toString().compareToIgnoringCase("N/A") == 0 ? _inTimePicker :_inTimePicker;
-                                  }
-                                  outTimeReq = _outTimePicker;
-                                  if (radios.compareToIgnoringCase("next") == 0) {
+                                  inTimeReq =
+                                      onDateset
+                                                  .toString()
+                                                  .compareToIgnoringCase(
+                                                    "N/A",
+                                                  ) ==
+                                              0
+                                          ? _inTimePicker
+                                          : _inTimePicker;
+                                }
+                                outTimeReq = _outTimePicker;
+                                if (radios.compareToIgnoringCase("next") == 0) {
+                                } else {
+                                  if (inTimeReq.compareToIgnoringCase(
+                                        "00:00",
+                                      ) ==
+                                      0) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          " Please Select In Time ",
+                                        ),
+                                      ),
+                                    );
                                   } else {
-                                    if (inTimeReq.compareToIgnoringCase("00:00") == 0) {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text(" Please Select In Time "),
-                                      ));
-                                    } else {
-                                      if(onDateRadio.compareToIgnoringCase("1")==0){
-                                        if (inTimeReq.compareTo(outTimeReq) > 0) {
-                                          return setState(() {
-                                            CommonNotificationPage.showWorkDoneSuccess(
-                                                context,
-                                                "Your working hours going to negative, Please select requisition time correctly."
+                                    if (onDateRadio.compareToIgnoringCase(
+                                          "1",
+                                        ) ==
+                                        0) {
+                                      if (inTimeReq.compareTo(outTimeReq) > 0) {
+                                        return setState(() {
+                                          CommonNotificationPage.showWorkDoneSuccess(
+                                            context,
+                                            "Your working hours going to negative, Please select requisition time correctly."
                                                     .upperCamelCase +
-                                                    " ",
-                                                "Alert Message");
-                                          });
-                                        } else {
-                                          sendRequsitionToServer(
-                                              context,
-                                              empId!,
-                                              inRemarkString,
-                                              outRemarkString,
-                                              inTimeReq,
-                                              outTimeReq,
-                                              logid,
-                                              dateformat);
-                                        }
-                                      }else if(nextDayRadio.compareToIgnoringCase("1")==0){
-                                        sendRequsitionToServernextDay(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq,
-                                            outTimeReq,
-                                            logid,
-                                            dateformat);
-                                      }else if(compOffRadio.compareToIgnoringCase("1")==0){
-                                        sendRequsitionToServerCompOff(
-                                            context,
-                                            empId!,
-                                            inRemarkString,
-                                            outRemarkString,
-                                            inTimeReq,
-                                            outTimeReq,
-                                            logid,
-                                            dateformat);
+                                                " ",
+                                            "Alert Message",
+                                          );
+                                        });
+                                      } else {
+                                        sendRequsitionToServer(
+                                          context,
+                                          empId!,
+                                          inRemarkString,
+                                          outRemarkString,
+                                          inTimeReq,
+                                          outTimeReq,
+                                          logid,
+                                          dateformat,
+                                        );
                                       }
-
+                                    } else if (nextDayRadio
+                                            .compareToIgnoringCase("1") ==
+                                        0) {
+                                      sendRequsitionToServernextDay(
+                                        context,
+                                        empId!,
+                                        inRemarkString,
+                                        outRemarkString,
+                                        inTimeReq,
+                                        outTimeReq,
+                                        logid,
+                                        dateformat,
+                                      );
+                                    } else if (compOffRadio
+                                            .compareToIgnoringCase("1") ==
+                                        0) {
+                                      sendRequsitionToServerCompOff(
+                                        context,
+                                        empId!,
+                                        inRemarkString,
+                                        outRemarkString,
+                                        inTimeReq,
+                                        outTimeReq,
+                                        logid,
+                                        dateformat,
+                                      );
                                     }
                                   }
                                 }
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                MaterialStateProperty.all(Mythemes.lightBluishColor),
+                              }
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                Mythemes.lightBluishColor,
                               ),
-                              child: "Send".text.make(),
-                            ).wh(150, 40).py12()
-                          ]),
+                            ),
+                            child: "Send".text.make(),
+                          ).wh(150, 40).py12(),
+                        ],
+                      ),
                     ],
-                  ).py32()
+                  ).py32(),
                 ],
               ),
             ),
@@ -577,42 +650,47 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.pop(context);
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Attendance');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -623,10 +701,7 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -655,30 +730,30 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
     sessionId = await shared!.getSessionId();
   }
 
-
-
   String conn = ApiDetails.server;
   String apiUrl = ApiDetails.sendOthersAttendanceReq;
   Future<void> sendRequsitionToServer(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
 
@@ -706,28 +781,29 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
     }
   }
 
-
   Future<void> sendRequsitionToServernextDay(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "nextday=true&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "nextday=true&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -753,26 +829,28 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
   }
 
   Future<void> sendRequsitionToServerCompOff(
-      BuildContext context,
-      int empId,
-      String inRemarkString,
-      String outRemarkString,
-      String inTimeReq,
-      String outTimeReq,
-      String logid,
-      var onDate) async {
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate,
+  ) async {
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
-            "sessionId=$sessionId&"
-            "id=$empId&"
-            "onDate=$onDate&"
-            "inTimeRemarks=$inRemarkString&"
-            "outTimeRemarks=$outRemarkString&"
-            "inTime=$inTimeReq&"
-            "compOff=true&"
-            "outTime=$outTimeReq");
-    final response = await http.post(urlapi);
+      "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+      "sessionId=$sessionId&"
+      "id=$empId&"
+      "onDate=$onDate&"
+      "inTimeRemarks=$inRemarkString&"
+      "outTimeRemarks=$outRemarkString&"
+      "inTime=$inTimeReq&"
+      "compOff=true&"
+      "outTime=$outTimeReq",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -798,12 +876,10 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
   }
 
   showDialgSucess1(BuildContext buildContext, result, alert) {
-
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -828,24 +904,22 @@ class _OthersAttendanceRequisitionState extends State<OthersAttendanceRequisitio
                   maintainState: true,
                 ));*/
             //Navigator.of(context).pop();
-
           },
           child: Text("Ok"),
         ),
       ],
       elevation: 24.0,
     );
-    if(mounted) {
+    if (mounted) {
       showDialog(
-          context: buildContext,
-          builder: (BuildContext context) {
-            return alertDialog;
-          });
+        context: buildContext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        },
+      );
     }
-
   }
 }
-
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;

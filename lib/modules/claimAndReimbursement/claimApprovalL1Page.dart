@@ -15,6 +15,7 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
@@ -37,8 +38,8 @@ String? setPath;
 File? file;
 var imageValue;
 Future<File> _fileFromImageUrl() async {
-  final response = await http.get(Uri.parse('https://s3.ap-south-1.amazonaws.com/employroll.com/images/1707640420694.png'));
-  //final responseNew = await http.get(Uri.parse('https://s3.ap-south-1.amazonaws.com/employroll.com/images/1707640420694.png'));
+  final response = await MobileHttpClient.instance.get(Uri.parse('https://s3.ap-south-1.amazonaws.com/employroll.com/images/1707640420694.png'));
+  //final responseNew = await MobileHttpClient.instance.get(Uri.parse('https://s3.ap-south-1.amazonaws.com/employroll.com/images/1707640420694.png'));
 
   final documentDirectory = await getApplicationDocumentsDirectory();
   file = File(join(documentDirectory.path, 'imagetest.png'));
@@ -217,7 +218,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
         "status=LEVEL_ONE_PENDING&"
         "empId=$empId"
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
     print('API -  ${response.request}');
@@ -301,7 +302,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
     String apiUrl = ApiDetails.addExpDropPolicy;
     var baseUrl = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
 
-    final response = await http.post(baseUrl);
+    final response = await MobileHttpClient.instance.post(baseUrl);
     print('responseemployeeList ${response.body}');
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
@@ -522,7 +523,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  "₹${totalClaimedAmt} - Total CA".text
+                  "â‚¹${totalClaimedAmt} - Total CA".text
                       .size(13)
                       .bold
                       .color(Mythemes.successColor)
@@ -577,7 +578,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
                               Uri
                                   .parse(documentName)
                                   .isAbsolute) {
-                            var res = await http.get(Uri.parse(documentName));
+                            var res = await MobileHttpClient.instance.get(Uri.parse(documentName));
                             file.writeAsBytes(res.bodyBytes);
                             Fluttertoast.showToast(
                               msg: "Download Completed - $fileName",
@@ -612,7 +613,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
                                 documentName.isNotEmpty && Uri
                                 .parse(documentName)
                                 .isAbsolute) {
-                              var res = await http.get(Uri.parse(documentName));
+                              var res = await MobileHttpClient.instance.get(Uri.parse(documentName));
                               await file.writeAsBytes(res.bodyBytes);
                               Fluttertoast.showToast(
                                 msg: "Download Completed - $fileName",
@@ -651,7 +652,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
                           title: "Claim ${index + 1}"
                               .text
                               .make(),
-                          trailing: "₹${foundDataNew![index].claimAMount
+                          trailing: "â‚¹${foundDataNew![index].claimAMount
                               .toString()}".text.bold.color(
                               Mythemes.successColor).make(),
                           children: [
@@ -1745,7 +1746,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
                   ).wh(150, 40).py12(),
 
                 ]),
-          ),*//*
+          ),*/ /*
 
 
         ),
@@ -1770,7 +1771,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
           "claimRaiseId=$claimId"
       );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
       print(response.request);
       var responseResult = response.body;
       print('success $responseResult');
@@ -1820,7 +1821,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
           "claimRaiseId=$claimId"
       );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
       print(response.request);
       var responseResult = response.body;
       print('success $responseResult');
@@ -1929,7 +1930,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
       String jsonString = createJsonWithImage(imageValue);
 
       // Make an HTTP post request with the JSON string
-      final response = await http.post(
+      final response = await MobileHttpClient.instance.post(
         'your_api_endpoint',
         headers: {'Content-Type': 'application/json'},
         body: jsonString,
@@ -1977,7 +1978,7 @@ class _ClaimApprovalL1PageState extends State<ClaimApprovalL1Page> {
       http.Response response = await http.Response.fromStream(
           await request.send());
 
-      //final response = await http.post(urlapi);
+      //final response = await MobileHttpClient.instance.post(urlapi);
       print('URL ${response.request}');
       if (response.statusCode == 200) {
         var responseResult = response.body;

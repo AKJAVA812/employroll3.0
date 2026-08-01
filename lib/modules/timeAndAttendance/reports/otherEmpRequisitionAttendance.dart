@@ -8,6 +8,7 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../employeePage/employeeListModel.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
@@ -25,23 +26,27 @@ class OthersAttendanceRequisitionPage extends StatefulWidget {
   const OthersAttendanceRequisitionPage({Key? key}) : super(key: key);
 
   @override
-  State<OthersAttendanceRequisitionPage> createState() => _OthersAttendanceRequisitionPageState();
+  State<OthersAttendanceRequisitionPage> createState() =>
+      _OthersAttendanceRequisitionPageState();
 }
-List<String> leavereqIdGlobel=[];
+
+List<String> leavereqIdGlobel = [];
 var empNewId;
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 RequistionEmpListModel? employeeListModelglobel;
 LeaveBalanceModel? leaveBalanceLabel;
-String valuenew="listText";
+String valuenew = "listText";
 late List<String?> list = [];
 late List<String?> leaveTypeList = [];
 String? branchName;
 String? deptName;
 String? empName;
-String singleDateString="";
-class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequisitionPage> {
+String singleDateString = "";
+
+class _OthersAttendanceRequisitionPageState
+    extends State<OthersAttendanceRequisitionPage> {
   var titleName = "Other Employee's Requisition";
   //static const List<String> list = <String>['Casual Leave', 'Leave Monthly'];
   //String dropdownValue = list.first;
@@ -52,7 +57,8 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
   bool halfDayShow = false;
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
-  final TextEditingController fromTimePickerController = TextEditingController();
+  final TextEditingController fromTimePickerController =
+      TextEditingController();
   final TextEditingController toTimePickerController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
   String _fromTimePicker = '00:00';
@@ -64,7 +70,6 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
 
   var leaveTypeId;
   var nominee;
-
 
   @override
   void initState() {
@@ -78,28 +83,30 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
-    branchName = await shared!.getBranch()??"N/A";
-    deptName = await shared!.getDept()??"N/A";
-    empName = await shared!.getempName()??"N/A";
+    branchName = await shared!.getBranch() ?? "N/A";
+    deptName = await shared!.getDept() ?? "N/A";
+    empName = await shared!.getempName() ?? "N/A";
     // await Future.delayed(Duration(seconds: 5));
-    Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(sessionId!);
+    Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(
+      sessionId!,
+    );
     //Future<LeaveBalanceModel?> getLeaveType12 = getLeaveTypeList(sessionId!);
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
-        employeeListModelglobel=value;
+        employeeListModelglobel = value;
       });
       print('employeeList00${employeeListModelglobel!.data!.length}');
     });
 
-   /* getLeaveType12.then((value) {
+    /* getLeaveType12.then((value) {
       setState(() {
         leaveBalanceLabel=value;
         //var leaveTypeId = value?.leaveData.leaveTypeList;
@@ -116,16 +123,16 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
     print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    requistionEmpListModel=RequistionEmpListModel.fromJson(mapResponse);
+    requistionEmpListModel = RequistionEmpListModel.fromJson(mapResponse);
     int length = requistionEmpListModel.data!.length;
     print('totallenth $length ');
-    for(int i=0; i<requistionEmpListModel.data!.length;i++){
+    for (int i = 0; i < requistionEmpListModel.data!.length; i++) {
       String? empName = requistionEmpListModel.data![i].empName;
       list.add(requistionEmpListModel.data![i].empName);
       print('dataExpenseType $empName');
@@ -139,18 +146,26 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
     String apiUrl = ApiDetails.leaveBalanceApi;
     print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseLeaveTypeList $getData');
-    leaveBalanceLabel=LeaveBalanceModel.fromJson(mapResponse);
-    int? length = leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
+    leaveBalanceLabel = LeaveBalanceModel.fromJson(mapResponse);
+    int? length =
+        leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
     print('totalleaveLength $length ');
-    for(int i=0; i<leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;i++){
-      String? leaveTypeName = leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i];
-      leaveTypeList.add(leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i]);
+    for (
+      int i = 0;
+      i < leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;
+      i++
+    ) {
+      String? leaveTypeName =
+          leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i];
+      leaveTypeList.add(
+        leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i],
+      );
       print('dataLeaveTypeName $leaveTypeName');
     }
     return leaveBalanceLabel;
@@ -158,21 +173,24 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
 
   DateTime _date = (DateTime.now());
   String formattedDate = DateFormat.ABBR_MONTH;
-  String dateFormate = DateFormat("dd-MM-yyyy").format(DateTime.parse("2019-09-30"));
-  Future <Null> _selectDate (BuildContext context) async {
-    DateTime? _datePicker =await showDatePicker(
+  String dateFormate = DateFormat(
+    "dd-MM-yyyy",
+  ).format(DateTime.parse("2019-09-30"));
+  Future<Null> _selectDate(BuildContext context) async {
+    DateTime? _datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if(_datePicker != null && _datePicker != _date){
+    if (_datePicker != null && _datePicker != _date) {
       setState(() {
         _date = _datePicker;
       });
     }
   }
+
   final TextEditingController _dateController = TextEditingController();
   int pageIndex = 0;
   int currentIndex = 1;
@@ -182,20 +200,21 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
     return DismissKeyboard(
       child: Scaffold(
         backgroundColor: Mythemes.whitish,
-        appBar: AppBar(
-          title: titleName.text.make(),
-        ),
+        appBar: AppBar(title: titleName.text.make()),
 
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
+          onPressed: () {
             //Navigator.pushNamed(context, MyRoutings.otherAttendanceListRoute);
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => OthersAttendanceList(AttendanceReportModel(),0)));
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder:
+                    (context) =>
+                        OthersAttendanceList(AttendanceReportModel(), 0),
+              ),
+            );
           },
           backgroundColor: Mythemes.lightBluishColor,
-          child: Icon(
-            Icons.list, color: Mythemes.whitish, size: 28,
-          ),
+          child: Icon(Icons.list, color: Mythemes.whitish, size: 28),
         ),
 
         /*bottomNavigationBar: Container(
@@ -221,8 +240,10 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
                           builder: (context) => OthersSingleDateAttendance(
                             singleDateString: singleDateString!, empId: empNewId,
                           )));
-                      *//*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                          OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*//*
+                      */
+        /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+                          OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*/
+        /*
 
                     }
                   },
@@ -234,205 +255,218 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
                 ).wh(150, 40).py12()
               ]),
         ),*/
-
         body: SingleChildScrollView(
           child: Form(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: DropdownButtonFormField(
-                      value: dropdownvalue,
-                      decoration: InputDecoration(
-                        enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                          borderSide: BorderSide(
-                              width: 1, color: Mythemes.blackishade),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: DropdownButtonFormField(
+                    value: dropdownvalue,
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        //<-- SEE HERE
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: Mythemes.blackishade,
                         ),
-                        labelText: "Select Employee",
-                        hintText: "Employee Name",
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        /*border: OutlineInputBorder(
+                      ),
+                      labelText: "Select Employee",
+                      hintText: "Employee Name",
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500,fontSize: 13,
-                            color: Mythemes.blackish),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: Mythemes.blackish,
                       ),
-                      items: list.map<DropdownMenuItem<String>>((String? value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value!),
+                    ),
+                    items:
+                        list.map<DropdownMenuItem<String>>((String? value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value!),
+                          );
+                        }).toList(),
+                    onChanged: (newVal) {
+                      valuenew = newVal.toString();
+                      int i = list.indexOf(valuenew);
+                      empNewId = employeeListModelglobel?.data?[i].empId;
+                      print("EmpId  $empNewId");
+                      setState(() {
+                        dropdownvalue = newVal;
+                      });
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: TextEditingController(text: branchName),
+                    enabled: false,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      hintText: "Branch Name",
+                      labelText: "Branch Name",
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: TextEditingController(text: deptName),
+                    enabled: false,
+                    //initialValue: deptName,
+                    decoration: InputDecoration(
+                      hintText: "Department Name",
+                      labelText: "Department Name",
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: TextEditingController(text: empName),
+                    enabled: false,
+                    //initialValue: empName,
+                    decoration: InputDecoration(
+                      hintText: "Reporting Officer Name",
+                      labelText: "Reporting Officer Name",
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _selectDate(context);
+                      });
+                    },
+                    child: TextFormField(
+                      onTap: () async {
+                        DateTime? date = DateTime.now();
+                        FocusScope.of(context).requestFocus(new FocusNode());
+
+                        date = await showDatePicker(
+                          context: context,
+                          initialDate: date,
+                          firstDate: DateTime(1947),
+                          lastDate: DateTime.now().add(Duration(days: 0)),
                         );
-
-                      }).toList(),
-                      onChanged: (newVal) {
-                        valuenew = newVal.toString();
-                        int i =list.indexOf(valuenew);
-                        empNewId = employeeListModelglobel?.data?[i].empId;
-                        print("EmpId  $empNewId");
                         setState(() {
+                          singleDateString = DateFormat(
+                            'dd-MM-yyyy',
+                          ).format(date!);
+                          _dateController.text = DateFormat(
+                            "dd-MM-yyyy",
+                          ).format(date!);
 
-                          dropdownvalue = newVal;
-
+                          //  DateFormat.yMd().format(date!).toString();
                         });
+
+                        print(date);
                       },
-
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: TextEditingController(text: branchName),
-                      enabled: false,
-                      //initialValue: "${branchName}",
-                      decoration:  InputDecoration(
-                          hintText: "Branch Name",
-                          labelText: "Branch Name"
+                      readOnly: true,
+                      //initialValue: "dd-mm-yyyy",
+                      controller: _dateController,
+                      decoration: InputDecoration(
+                        labelText: "Date",
+                        suffixIcon: Icon(Icons.calendar_month),
+                        hintText: DateFormat("DD-MM-YYYY").format(_date),
+                        // hintText: DateFormat.yMd().format(_date).toString(),
                       ),
                     ),
                   ),
+                ),
 
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: TextEditingController(text: deptName),
-                      enabled: false,
-                      //initialValue: deptName,
-                      decoration:  InputDecoration(
-                          hintText: "Department Name",
-                          labelText: "Department Name"
-
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: TextEditingController(text: empName),
-                      enabled: false,
-                      //initialValue: empName,
-                      decoration:  InputDecoration(
-                          hintText: "Reporting Officer Name",
-                          labelText: "Reporting Officer Name"
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: InkWell(
-                      onTap: () {
-                        setState(() {
-                          _selectDate(context);
-                        });
-                      },
-                      child: TextFormField(
-
-                        onTap: () async{
-                          DateTime? date = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
-
-                          date = await showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime.now().add(Duration(days: 0)));
-                          setState(() {
-                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _dateController.text = DateFormat("dd-MM-yyyy").format(date!);
-
-                            //  DateFormat.yMd().format(date!).toString();
-                          });
-
-                          print(date);
-                        },
-                        readOnly: true,
-                        //initialValue: "dd-mm-yyyy",
-                        controller: _dateController,
-                        decoration:  InputDecoration(
-                          labelText: "Date",
-                          suffixIcon: Icon(Icons.calendar_month),
-                          hintText: DateFormat("DD-MM-YYYY").format(_date),
-                          // hintText: DateFormat.yMd().format(_date).toString(),
-                        ),
-
-                      ),
-                    ),
-                  ),
-
-                  Container(
-                    height: 90,
-                    color: context.cardColor,
-                    child: ButtonBar(
-                        alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
-                              if(singleDateString.compareToIgnoringCase("")==0){
-                                print('responseemployeeList');
-                                setState(() {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text("Please Select Date First "),
-                                  ));
-                                });
-                              }else{
-                                print("EmpIdOther - $empNewId");
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => OthersSingleDateAttendance(
-                                      singleDateString: singleDateString!, empId: empNewId,
-                                    )));
-                                /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
+                Container(
+                  height: 90,
+                  color: context.cardColor,
+                  child: ButtonBar(
+                    alignment: MainAxisAlignment.center,
+                    buttonPadding: Vx.mOnly(right: 16),
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
+                          if (singleDateString.compareToIgnoringCase("") == 0) {
+                            print('responseemployeeList');
+                            setState(() {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Please Select Date First "),
+                                ),
+                              );
+                            });
+                          } else {
+                            print("EmpIdOther - $empNewId");
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => OthersSingleDateAttendance(
+                                      singleDateString: singleDateString!,
+                                      empId: empNewId,
+                                    ),
+                              ),
+                            );
+                            /*Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
                           OthersSingleDateAttendance(null, onDateAttModelGlobel,1)));*/
-
-                              }
-                            },
-                            style: ButtonStyle(
-                              backgroundColor:
-                              MaterialStateProperty.all(Mythemes.lightBluishColor),
-                            ),
-                            child: "Get Details".text.make(),
-                          ).wh(150, 40).py12()
-                        ]),
-                  ).py(80),
-                ],
-              )
+                          }
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Mythemes.lightBluishColor,
+                          ),
+                        ),
+                        child: "Get Details".text.make(),
+                      ).wh(150, 40).py12(),
+                    ],
+                  ),
+                ).py(80),
+              ],
+            ),
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pop(context);
               print('home tab');
             }
-            if(index==1){
+            if (index == 1) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Attendance');
             }
-            if(index==2){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -443,10 +477,7 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.pending_actions),
               label: 'Attendance',
@@ -467,23 +498,28 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
     );
   }
 
-  Future<void> singleDayRequisition(String getRemark, int? idn, fromDate, empNewId) async {
-
-    String idn=leavereqIdGlobel.last;
+  Future<void> singleDayRequisition(
+    String getRemark,
+    int? idn,
+    fromDate,
+    empNewId,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "1";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "leaveTypeId=$idn&"
-        "fromDate=$fromDate&"
-        "summary=$getRemark&"
-        "radio=$dayRadio&"
-        "empid=$empNewId&"
-        "nominee="
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "leaveTypeId=$idn&"
+      "fromDate=$fromDate&"
+      "summary=$getRemark&"
+      "radio=$dayRadio&"
+      "empid=$empNewId&"
+      "nominee=",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -494,32 +530,46 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 
-  Future<void> multipleDayRequisition(String getRemark, int? idn, toDate, fromDate, empNewId) async {
-    String idn=leavereqIdGlobel.last;
+  Future<void> multipleDayRequisition(
+    String getRemark,
+    int? idn,
+    toDate,
+    fromDate,
+    empNewId,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "2";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "tilldate=$toDate&"
-        "sessionId=$sessionId&"
-        "leaveTypeId=$idn&"
-        "fromDate=$fromDate&"
-        "summary=$getRemark&"
-        "radio=$dayRadio&"
-        "empid=$empNewId&"
-        "nominee="
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "tilldate=$toDate&"
+      "sessionId=$sessionId&"
+      "leaveTypeId=$idn&"
+      "fromDate=$fromDate&"
+      "summary=$getRemark&"
+      "radio=$dayRadio&"
+      "empid=$empNewId&"
+      "nominee=",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -530,33 +580,48 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 
-  Future<void> halfDayRequisition(startTime, endTime, String getRemark,  int? idn, fromDate, empNewId) async {
-    String idn=leavereqIdGlobel.last;
+  Future<void> halfDayRequisition(
+    startTime,
+    endTime,
+    String getRemark,
+    int? idn,
+    fromDate,
+    empNewId,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "3";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "starttime=$startTime&"
-        "endtime=$endTime&"
-        "sessionId=$sessionId&"
-        "leaveTypeId=$idn&"
-        "fromDate=$fromDate&"
-        "summary=$getRemark&"
-        "radio=$dayRadio&"
-        "empid=$empNewId&"
-        "nominee="
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "starttime=$startTime&"
+      "endtime=$endTime&"
+      "sessionId=$sessionId&"
+      "leaveTypeId=$idn&"
+      "fromDate=$fromDate&"
+      "summary=$getRemark&"
+      "radio=$dayRadio&"
+      "empid=$empNewId&"
+      "nominee=",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -567,12 +632,19 @@ class _OthersAttendanceRequisitionPageState extends State<OthersAttendanceRequis
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 }

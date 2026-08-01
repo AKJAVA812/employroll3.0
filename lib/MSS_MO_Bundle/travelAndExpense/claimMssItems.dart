@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
@@ -28,7 +29,8 @@ class MSS_MO_ClaimMSSItemsList extends StatefulWidget {
   static const String _title = 'Employee List';
 
   @override
-  State<MSS_MO_ClaimMSSItemsList> createState() => _MSS_MO_ClaimMSSItemsListState();
+  State<MSS_MO_ClaimMSSItemsList> createState() =>
+      _MSS_MO_ClaimMSSItemsListState();
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -48,8 +50,8 @@ var lOne = false;
 var lTwo = false;
 var lThree = false;
 
-List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNew = [];
 ClaimApproverListModalClass? claimApproverListModalGlobal;
 ClaimApproverListModalClass? claimApproverListModalGlobaled;
 var empName;
@@ -63,7 +65,9 @@ dynamic matchedOrg;
 dynamic levelStatusCheckMO;
 var statusUpdate = "LEVEL_ONE_PENDING";
 dynamic MyColor;
-class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> with RouteAware{
+
+class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
+    with RouteAware {
   /*@override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -78,7 +82,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
@@ -223,10 +227,12 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
 
     if (orgListString != null) {
       List<dynamic> decoded = json.decode(orgListString);
-      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+      storedOrgList =
+          decoded.map((item) => Map<String, dynamic>.from(item)).toList();
 
       // Populate dropdown list
-      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+      organizations =
+          storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
       //selectedOrg = null;
@@ -235,6 +241,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
       setState(() {});
     }
   }
+
   bool isLoading = false;
 
   Future getSharedPrfanceList() async {
@@ -245,9 +252,8 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
     loadOrgListFromPrefs();
   }
 
-
   void _showFilterBottomSheet() {
-    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    if (_isBottomSheetOpen) return; // âœ… Prevent multiple opens
     _isBottomSheetOpen = true;
     showModalBottomSheet(
       context: context,
@@ -284,7 +290,10 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                     ),
                     Text(
                       'Filter',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 16),
 
@@ -301,10 +310,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                           child: Text('Select'),
                         ),
                         ...organizations.map((org) {
-                          return DropdownMenuItem(
-                            value: org,
-                            child: Text(org),
-                          );
+                          return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
                       onChanged: (value) {
@@ -313,7 +319,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
 
                           // Match selected org name to get ID
                           matchedOrg = storedOrgList.firstWhere(
-                                (org) => org['orgName'] == value,
+                            (org) => org['orgName'] == value,
                             orElse: () => {},
                           );
 
@@ -340,20 +346,24 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                           sessionId = await shared!.getSessionId();
                           userPanel = await shared!.getUserPanel();
                           getProfileId = await shared!.getDefaultProfileId();
-                          getProfileName = await shared!.getDefaultProfileName();
+                          getProfileName =
+                              await shared!.getDefaultProfileName();
                           claimLevelOne = await shared!.getClaimLevelOne();
                           claimLevelTwo = await shared!.getClaimLevelTwo();
                           claimLevelThree = await shared!.getClaimLevelThree();
 
-                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
+                          if (claimLevelOne ==
+                              "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
                             permissionId = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
                             statusUpdate = "LEVEL_ONE_PENDING";
                           }
-                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_TWO_VIEW") {
+                          if (claimLevelOne ==
+                              "CLAIM_APPROVAL_LEVEL_TWO_VIEW") {
                             permissionId = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
                             statusUpdate = "LEVEL_TWO_PENDING";
                           }
-                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
+                          if (claimLevelOne ==
+                              "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
                             permissionId = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
                             statusUpdate = "LEVEL_THREE_PENDING";
                           }
@@ -362,12 +372,15 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                           print("Claim L3 $claimLevelThree");
                           print("Status $statusUpdate");
 
+                          lOne =
+                              claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
+                          lTwo =
+                              claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
+                          lThree =
+                              claimLevelThree ==
+                              "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
 
-                          lOne = claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
-                          lTwo = claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
-                          lThree = claimLevelThree == "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
-
-// Ensure higher levels include lower levels
+                          // Ensure higher levels include lower levels
                           if (lThree) {
                             lOne = true;
                             lTwo = true;
@@ -375,39 +388,52 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                             lOne = true;
                           }
 
-                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
+                          if (claimLevelOne ==
+                              "CLAIM_APPROVAL_LEVEL_ONE_VIEW") {
                             lOne = true;
                             lTwo = false;
                             lThree = false;
                           }
-                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW" || claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW") {
+                          if (claimLevelOne ==
+                                  "CLAIM_APPROVAL_LEVEL_ONE_VIEW" ||
+                              claimLevelTwo ==
+                                  "CLAIM_APPROVAL_LEVEL_TWO_VIEW") {
                             lOne = true;
                             lTwo = true;
                             lThree = false;
                           }
-                          if(claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW" || claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW" || claimLevelThree == "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
+                          if (claimLevelOne ==
+                                  "CLAIM_APPROVAL_LEVEL_ONE_VIEW" ||
+                              claimLevelTwo ==
+                                  "CLAIM_APPROVAL_LEVEL_TWO_VIEW" ||
+                              claimLevelThree ==
+                                  "CLAIM_APPROVAL_LEVEL_THREE_VIEW") {
                             lOne = true;
                             lTwo = true;
                             lThree = true;
                           }
                           // await Future.delayed(Duration(seconds: 5));
-                          Future<ClaimApproverListModalClass> getEmployeeList11 = getEmployeeList(sessionId!);
+                          Future<ClaimApproverListModalClass>
+                          getEmployeeList11 = getEmployeeList(sessionId!);
                           final loading = Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               CircularProgressIndicator(),
-                              Text(" Login ... Please wait")
+                              Text(" Login ... Please wait"),
                             ],
                           );
 
                           getEmployeeList11.then((value) {
                             setState(() {
                               foundDataNew = allUsernew;
-                              claimApproverListModalGlobal=value;
-                              claimApproverListModalGlobaled=claimApproverListModalGlobal;
+                              claimApproverListModalGlobal = value;
+                              claimApproverListModalGlobaled =
+                                  claimApproverListModalGlobal;
                               isLoading = false;
                             });
-                            print('employeeList00${claimApproverListModalGlobal!.data!.length}');
+                            print(
+                              'employeeList00${claimApproverListModalGlobal!.data!.length}',
+                            );
                           });
                         },
                         icon: Icon(Icons.filter_alt),
@@ -416,7 +442,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                           backgroundColor: Mythemes.successColor,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 );
               },
@@ -425,7 +451,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
         );
       },
     ).whenComplete(() {
-      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+      _isBottomSheetOpen = false; // âœ… Reset when sheet is dismissed
     });
   }
 
@@ -446,14 +472,16 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
     String apiUrl = ApiDetails.claimApproveListApi;
     print('employeeList11: ${SessionId}');
     ClaimApproverListModalClass employeeListModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "permissionId=$permissionId&"
-        "status=$statusUpdate&"
-        "orgId=$orgId&"
-        "userPermission=$userPanel&"
-        "profileId=$getProfileId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "permissionId=$permissionId&"
+      "status=$statusUpdate&"
+      "orgId=$orgId&"
+      "userPermission=$userPanel&"
+      "profileId=$getProfileId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
     setState(() {
@@ -463,7 +491,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    employeeListModel=ClaimApproverListModalClass.fromJson(mapResponse);
+    employeeListModel = ClaimApproverListModalClass.fromJson(mapResponse);
     totalDraftAmt = employeeListModel.draftList;
     totalDisApproved = employeeListModel.disAppList;
     totalApprovedAmt = employeeListModel.appList;
@@ -479,7 +507,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -492,8 +520,14 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.empName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.empName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -518,110 +552,119 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size(double.infinity, 100),
-          child: SafeArea(
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.white, border: Border(
-                  top: BorderSide.none
-              ), boxShadow: [
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size(double.infinity, 100),
+        child: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
                 BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 0.5,
-                    spreadRadius: 0,
-                    offset: Offset(0, 0.2))
-              ]),
-              child: AnimationSearchBar(
-                  searchFieldDecoration: BoxDecoration(
-                    color: Mythemes.greyishade,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  backIcon: Icons.arrow_back_ios,
-                  backIconColor: Mythemes.black,
-                  textStyle: TextStyle(fontSize: 14),
-                  onChanged: (value) {
-                    _runFilter(value);
-                  },
-                  horizontalPadding: 8,
-                  searchIconColor: Mythemes.black,
-                  centerTitle: titleName,
-                  verticalPadding: 3,
-                  centerTitleStyle: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w500,
-                      color: Mythemes.black),
-                  searchTextEditingController: searchType),
+                  color: Colors.grey,
+                  blurRadius: 0.5,
+                  spreadRadius: 0,
+                  offset: Offset(0, 0.2),
+                ),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
             ),
           ),
         ),
-        bottomNavigationBar:
-        BottomNavigationBar (
-          type: BottomNavigationBarType.fixed,
-          currentIndex: currentIndex,
-          iconSize: 25,
-          selectedFontSize: 12,
-          unselectedFontSize: 10,
-          onTap: (index) {
-
-            if(index==0){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
-              //Navigator.pop(context);
-              print('home tab');
-            }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
-            }
-            if(index==2){
-              Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
-            }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
-              );
-              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
-            }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
-              );
-              print('Profile');
-            }
-            /*if(index==3){
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: currentIndex,
+        iconSize: 25,
+        selectedFontSize: 12,
+        unselectedFontSize: 10,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+            //Navigator.pop(context);
+            print('home tab');
+          }
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
+          }
+          if (index == 2) {
+            Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+            print('Attendance');
+          }
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MSSDashboard(DashboardModel()),
+              ),
+            );
+            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+            print('Dashboard');
+          }
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
+            );
+            print('Profile');
+          }
+          /*if(index==3){
                 title="Notifications";
               }*/
-            setState(() => currentIndex = index);
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.manage_accounts_outlined),
-              label: 'Workflow',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.pending_actions),
-              label: 'Attendance',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_customize),
-              label: 'Dashboard',
-              //backgroundColor: Colors.blue,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              label: 'Profile',
-              //backgroundColor: Colors.blue,
-            ),
-          ],
-        ),
-        /*floatingActionButton: FloatingActionButton(
+          setState(() => currentIndex = index);
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts_outlined),
+            label: 'Workflow',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pending_actions),
+            label: 'Attendance',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_customize),
+            label: 'Dashboard',
+            //backgroundColor: Colors.blue,
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profile',
+            //backgroundColor: Colors.blue,
+          ),
+        ],
+      ),
+
+      /*floatingActionButton: FloatingActionButton(
           onPressed: (){
             Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
           },
@@ -634,180 +677,208 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
             Icons.add, color: Mythemes.whitish, size: 28,
           ),
         ),*/
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showFilterBottomSheet,
+        child: Icon(Icons.filter_list, color: Mythemes.whitish),
+      ),
 
-        floatingActionButton: FloatingActionButton(
-          onPressed: _showFilterBottomSheet,
-          child: Icon(Icons.filter_list, color: Mythemes.whitish,),
-        ),
-
-        body: Container(
-          color: context.canvasColor,
-          child: Column(
-            children: [
-              GridView.count(
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                padding: EdgeInsets.all(6.0),
-                crossAxisCount: 4,
-                children: <Widget>[
-                  Hero(
-                    tag: 'nrCount',
-                    child: Card(
-                      color: Mythemes.alertColor,
-                      child: InkWell(
-                        onTap: () {
-                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-
-                            Center(
-                              child: isLoadingCount
-                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                  :"$totalDraftAmt".text.bold.color(Mythemes.whitish).size(16).make(),
-                            ),
-                            Center(
-                              child: Container(
-                                //margin: EdgeInsets.only(top: 30, left: 10),
-                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 5),
-                                child: Text(
-                                  'Draft',
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style:
-                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+      body: Container(
+        color: context.canvasColor,
+        child: Column(
+          children: [
+            GridView.count(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              padding: EdgeInsets.all(6.0),
+              crossAxisCount: 4,
+              children: <Widget>[
+                Hero(
+                  tag: 'nrCount',
+                  child: Card(
+                    color: Mythemes.alertColor,
+                    child: InkWell(
+                      onTap: () {
+                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Center(
+                            child:
+                                isLoadingCount
+                                    ? CircularProgressIndicator(
+                                      color: Mythemes.whitish,
+                                    ) // Loader when fetching data
+                                    : "$totalDraftAmt".text.bold
+                                        .color(Mythemes.whitish)
+                                        .size(16)
+                                        .make(),
+                          ),
+                          Center(
+                            child: Container(
+                              //margin: EdgeInsets.only(top: 30, left: 10),
+                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 5),
+                              child: Text(
+                                'Draft',
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  color: Mythemes.whitish,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  Hero(
-                    tag: 'WR',
-                    child: Card(
-                      color: Mythemes.warningColor,
-                      child: InkWell(
-                        onTap: () {
-                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-
-                            Center(
-                              child: isLoadingCount
-                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                  :"$totalPendingAmt".text.bold.color(Mythemes.whitish).size(16).make(),
-                            ),
-                            Center(
-                              child: Container(
-                                //margin: EdgeInsets.only(top: 70, left: 10),
-                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                                child: Text(
-                                  'Pending',
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style:
-                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                Hero(
+                  tag: 'WR',
+                  child: Card(
+                    color: Mythemes.warningColor,
+                    child: InkWell(
+                      onTap: () {
+                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Center(
+                            child:
+                                isLoadingCount
+                                    ? CircularProgressIndicator(
+                                      color: Mythemes.whitish,
+                                    ) // Loader when fetching data
+                                    : "$totalPendingAmt".text.bold
+                                        .color(Mythemes.whitish)
+                                        .size(16)
+                                        .make(),
+                          ),
+                          Center(
+                            child: Container(
+                              //margin: EdgeInsets.only(top: 70, left: 10),
+                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                              child: Text(
+                                'Pending',
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  color: Mythemes.whitish,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  Hero(
-                    tag: 'AP',
-                    child: Card(
-                      color: Mythemes.successColor,
-                      child: InkWell(
-                        onTap: () {
-                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Center(
-                              child: isLoadingCount
-                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                  :"$totalApprovedAmt".text.bold.color(Mythemes.whitish).size(16).make(),
-                            ),
-                            Center(
-                              child: Container(
-                                //margin: EdgeInsets.only(top: 70, left: 10),
-                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                                child: Text(
-                                  'Approve',
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style:
-                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                Hero(
+                  tag: 'AP',
+                  child: Card(
+                    color: Mythemes.successColor,
+                    child: InkWell(
+                      onTap: () {
+                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Center(
+                            child:
+                                isLoadingCount
+                                    ? CircularProgressIndicator(
+                                      color: Mythemes.whitish,
+                                    ) // Loader when fetching data
+                                    : "$totalApprovedAmt".text.bold
+                                        .color(Mythemes.whitish)
+                                        .size(16)
+                                        .make(),
+                          ),
+                          Center(
+                            child: Container(
+                              //margin: EdgeInsets.only(top: 70, left: 10),
+                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                              child: Text(
+                                'Approve',
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  color: Mythemes.whitish,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  Hero(
-                    tag: 'PR',
-                    child: Card(
-                      color: Mythemes.dangerColor,
-                      child: InkWell(
-                        onTap: () {
-                          //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Center(
-                              child: isLoadingCount
-                                  ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                  :"$totalDisApproved".text.bold.color(Mythemes.whitish).size(16).make(),
-                            ),
-                            Center(
-                              child: Container(
-                                //margin: EdgeInsets.only(top: 70, left: 10),
-                                //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
-                                child: Text(
-                                  'Disapprove',
-                                  textAlign: TextAlign.center,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style:
-                                  TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                Hero(
+                  tag: 'PR',
+                  child: Card(
+                    color: Mythemes.dangerColor,
+                    child: InkWell(
+                      onTap: () {
+                        //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Center(
+                            child:
+                                isLoadingCount
+                                    ? CircularProgressIndicator(
+                                      color: Mythemes.whitish,
+                                    ) // Loader when fetching data
+                                    : "$totalDisApproved".text.bold
+                                        .color(Mythemes.whitish)
+                                        .size(16)
+                                        .make(),
+                          ),
+                          Center(
+                            child: Container(
+                              //margin: EdgeInsets.only(top: 70, left: 10),
+                              //padding: EdgeInsets.fromLTRB(2, 5, 10, 0),
+                              child: Text(
+                                'Disapprove',
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  color: Mythemes.whitish,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-
-                ],
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                 /* AnimatedToggleSwitch<int>.size(
+                ),
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                /* AnimatedToggleSwitch<int>.size(
                     height: 30,
                     current: min(valueChange, 3),
                     style: ToggleStyle(
@@ -873,74 +944,83 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                       }
                     },
                   ),*/
-
-                  AnimatedToggleSwitch<int>.size(
-                    height: 30,
-                    current: approvalLevel,  // Controlled by approvalLevel state
-                    values: const [0, 1, 2],
-                    style: ToggleStyle(
-                      backgroundColor: Mythemes.greyishade,
-                      indicatorColor: Mythemes.lightBluishColor,
-                      borderColor: Colors.transparent,
-                      borderRadius: BorderRadius.circular(10.0),
-                      indicatorBorderRadius: BorderRadius.zero,
-                    ),
-                    iconOpacity: 1.0,
-                    selectedIconScale: 1.0,
-                    indicatorSize: const Size.fromWidth(80),
-                    iconAnimationType: AnimationType.onHover,
-                    styleAnimationType: AnimationType.onHover,
-                    spacing: 4.0,
-                    customSeparatorBuilder: (context, local, global) {
-                      final opacity = ((global.position - local.position).abs() - 0.5).clamp(0.0, 1.0);
-                      return VerticalDivider(
-                        indent: 10.0,
-                        endIndent: 10.0,
-                        color: Colors.white38.withOpacity(opacity),
-                      );
-                    },
-                    customIconBuilder: (context, local, global) {
-                      final text = const ['Level One', 'Level Two', 'Level Three'][local.index];
-                      return Center(
-                        child: Text(
-                          text,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color.lerp(Colors.black, Colors.white, local.animationValue),
+                AnimatedToggleSwitch<int>.size(
+                  height: 30,
+                  current: approvalLevel, // Controlled by approvalLevel state
+                  values: const [0, 1, 2],
+                  style: ToggleStyle(
+                    backgroundColor: Mythemes.greyishade,
+                    indicatorColor: Mythemes.lightBluishColor,
+                    borderColor: Colors.transparent,
+                    borderRadius: BorderRadius.circular(10.0),
+                    indicatorBorderRadius: BorderRadius.zero,
+                  ),
+                  iconOpacity: 1.0,
+                  selectedIconScale: 1.0,
+                  indicatorSize: const Size.fromWidth(80),
+                  iconAnimationType: AnimationType.onHover,
+                  styleAnimationType: AnimationType.onHover,
+                  spacing: 4.0,
+                  customSeparatorBuilder: (context, local, global) {
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
+                        .clamp(0.0, 1.0);
+                    return VerticalDivider(
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
+                  },
+                  customIconBuilder: (context, local, global) {
+                    final text =
+                        const ['Level One', 'Level Two', 'Level Three'][local
+                            .index];
+                    return Center(
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
                           ),
                         ),
-                      );
-                    },
-                    borderWidth: 0.0,
-                    onChanged: (i) async {
-                      setState(() {
-                        isLoading = true; // Show loader
-                        isLoadingCount = true;
-                        approvalLevel = i;  // Update the selected level
-                      });
+                      ),
+                    );
+                  },
+                  borderWidth: 0.0,
+                  onChanged: (i) async {
+                    setState(() {
+                      isLoading = true; // Show loader
+                      isLoadingCount = true;
+                      approvalLevel = i; // Update the selected level
+                    });
 
-                      await Future.delayed(Duration(seconds: 1)); // Simulate data fetching
+                    await Future.delayed(
+                      Duration(seconds: 1),
+                    ); // Simulate data fetching
 
-                      if (approvalLevel == 0) {
-                        permissionId = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
-                        statusUpdate = "LEVEL_ONE_PENDING";
-                      } else if (approvalLevel == 1) {
-                        permissionId = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
-                        statusUpdate = "LEVEL_TWO_PENDING";
-                      } else if (approvalLevel == 2) {
-                        permissionId = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
-                        statusUpdate = "LEVEL_THREE_PENDING";
-                      }
+                    if (approvalLevel == 0) {
+                      permissionId = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
+                      statusUpdate = "LEVEL_ONE_PENDING";
+                    } else if (approvalLevel == 1) {
+                      permissionId = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
+                      statusUpdate = "LEVEL_TWO_PENDING";
+                    } else if (approvalLevel == 2) {
+                      permissionId = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
+                      statusUpdate = "LEVEL_THREE_PENDING";
+                    }
 
-                      getSharedPrfanceList();
+                    getSharedPrfanceList();
 
-                      setState(() {
-                        isLoading = false; // Hide loader
-                        isLoadingCount = false;
-                      });
-                    },
-                  ),
-                  /*AnimatedToggleSwitch<int>.size(
+                    setState(() {
+                      isLoading = false; // Hide loader
+                      isLoadingCount = false;
+                    });
+                  },
+                ),
+                /*AnimatedToggleSwitch<int>.size(
                     height: 30,
                     current: min(valueChange, 3),
                     style: ToggleStyle(
@@ -1003,22 +1083,24 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                       });
                     },
                   ),*/
-                ],
-              ).py(4),
+              ],
+            ).py(4),
 
-              Expanded(
-                child: isLoading
-                    ? Center(child: CircularProgressIndicator()) // Show loader
-                    : claimApproverListModalGlobaled == null
-                    ? Center(child: Text("No Data Available"))
-                    : getClaimSelfReqList(claimApproverListModalGlobaled!),
-              ),
-            ],
-          ),
-        )
+            Expanded(
+              child:
+                  isLoading
+                      ? Center(
+                        child: CircularProgressIndicator(),
+                      ) // Show loader
+                      : claimApproverListModalGlobaled == null
+                      ? Center(child: Text("No Data Available"))
+                      : getClaimSelfReqList(claimApproverListModalGlobaled!),
+            ),
+          ],
+        ),
+      ),
     );
   }
-
 
   getClaimSelfReqList(ClaimApproverListModalClass claimRequisitionModal) {
     return Column(
@@ -1026,76 +1108,108 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
         Expanded(
           child: ListView.builder(
             //controller: _controller,
-              itemCount: foundDataNew!.length,
-              itemBuilder: (context , i) {
-                foundDataNew![i].status;
-                print(foundDataNew![i].status);
-                return InkWell(
-                  onTap: () {
-                    levelStatusCheckMO = foundDataNew![i].status;
-                    empIdSendMO = foundDataNew![i].empId.toString();
-                    print("EMP ID --> $empIdSendMO");
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => ClaimMssApproval(
-                          levelStatus: levelStatusCheckMO!, empId: empIdSendMO
-                        )));
-                    /*Navigator.push(context,
+            itemCount: foundDataNew!.length,
+            itemBuilder: (context, i) {
+              foundDataNew![i].status;
+              print(foundDataNew![i].status);
+              return InkWell(
+                onTap: () {
+                  levelStatusCheckMO = foundDataNew![i].status;
+                  empIdSendMO = foundDataNew![i].empId.toString();
+                  print("EMP ID --> $empIdSendMO");
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder:
+                          (context) => ClaimMssApproval(
+                            levelStatus: levelStatusCheckMO!,
+                            empId: empIdSendMO,
+                          ),
+                    ),
+                  );
+                  /*Navigator.push(context,
                         MaterialPageRoute(builder: (context) => ClaimMssApproval()));*/
-                  },
-                  child: Card(
-                    elevation: 3,
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min, // Prevent infinite width issues
-                          children: List.generate(3, (index) {
-                            // List of levels
-                            List<String> levels = [
-                              "LEVEL_ONE_PENDING",
-                              "LEVEL_TWO_PENDING",
-                              "LEVEL_THREE_PENDING"
-                            ];
+                },
+                child:
+                    Card(
+                      elevation: 3,
+                      child: Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize:
+                                MainAxisSize
+                                    .min, // Prevent infinite width issues
+                            children: List.generate(3, (index) {
+                              // List of levels
+                              List<String> levels = [
+                                "LEVEL_ONE_PENDING",
+                                "LEVEL_TWO_PENDING",
+                                "LEVEL_THREE_PENDING",
+                              ];
 
-                            // Check if the current step or any previous steps are reached
-                            bool isActive = levels.indexOf(foundDataNew![i].status) >= index;
+                              // Check if the current step or any previous steps are reached
+                              bool isActive =
+                                  levels.indexOf(foundDataNew![i].status) >=
+                                  index;
 
-                            return Row(
-                              mainAxisSize: MainAxisSize.min, // Ensure inner Row doesn't expand infinitely
-                              children: [
-                                // Step Indicator
-                                GestureDetector(
-                                  child: Container(
-                                    width: 15,
-                                    height: 15,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
-                                      color: isActive ? Mythemes.successColor : Mythemes.greyishade,
-                                      border: Border.all(
-                                        width: 1.5,
-                                        color: isActive ? Mythemes.successColor : Mythemes.greyishade,
+                              return Row(
+                                mainAxisSize:
+                                    MainAxisSize
+                                        .min, // Ensure inner Row doesn't expand infinitely
+                                children: [
+                                  // Step Indicator
+                                  GestureDetector(
+                                    child: Container(
+                                      width: 15,
+                                      height: 15,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
+                                        color:
+                                            isActive
+                                                ? Mythemes.successColor
+                                                : Mythemes.greyishade,
+                                        border: Border.all(
+                                          width: 1.5,
+                                          color:
+                                              isActive
+                                                  ? Mythemes.successColor
+                                                  : Mythemes.greyishade,
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.circle,
+                                          size: 12,
+                                          color: Mythemes.whitish,
+                                        ),
                                       ),
                                     ),
-                                    child: Center(
-                                      child: Icon(Icons.circle, size: 12, color: Mythemes.whitish),
-                                    ),
                                   ),
-                                ),
-                                if (index < 2) // Avoid line after the last step
-                                  Flexible( // Use Flexible instead of Expanded
-                                    fit: FlexFit.loose, // Allow it to take space only if available
-                                    child: Container(
-                                      height: 2,
-                                      width: 80, // Set a fixed width to prevent unbounded error
-                                      color: isActive ? Mythemes.successColor : Mythemes.greyishade,
+                                  if (index <
+                                      2) // Avoid line after the last step
+                                    Flexible(
+                                      // Use Flexible instead of Expanded
+                                      fit:
+                                          FlexFit
+                                              .loose, // Allow it to take space only if available
+                                      child: Container(
+                                        height: 2,
+                                        width:
+                                            80, // Set a fixed width to prevent unbounded error
+                                        color:
+                                            isActive
+                                                ? Mythemes.successColor
+                                                : Mythemes.greyishade,
+                                      ),
                                     ),
-                                  ),
-                              ],
-                            );
-                          }),
-                        ).p8(),
-                        /*Row(
+                                ],
+                              );
+                            }),
+                          ).p8(),
+                          /*Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -1237,25 +1351,40 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
 
                           ],
                         ).p8(),*/
-                        Row(
+                          Row(
                             children: [
-                              foundDataNew![i].empName.toString().text.size(12).make().pLTRB(5, 3, 0, 4),
+                              foundDataNew![i].empName
+                                  .toString()
+                                  .text
+                                  .size(12)
+                                  .make()
+                                  .pLTRB(5, 3, 0, 4),
                               Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      foundDataNew![i].statusShow.toString().text.bold.color(Mythemes.alertColor).size(12).make().px8(),
-
-                                    ],
-                                  )
-
-                              )
-                            ]
-                        ).pLTRB(0, 0, 0, 8.0),
-                        Row(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    foundDataNew![i].statusShow
+                                        .toString()
+                                        .text
+                                        .bold
+                                        .color(Mythemes.alertColor)
+                                        .size(12)
+                                        .make()
+                                        .px8(),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ).pLTRB(0, 0, 0, 8.0),
+                          Row(
                             children: [
-                              foundDataNew![i].reimbName.toString().text.size(12).make().pLTRB(5, 3, 0, 4),
+                              foundDataNew![i].reimbName
+                                  .toString()
+                                  .text
+                                  .size(12)
+                                  .make()
+                                  .pLTRB(5, 3, 0, 4),
                               /*Expanded(
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.end,
@@ -1267,50 +1396,65 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
                                     )
 
                                 )*/
-                            ]
-                        ).pLTRB(0, 0, 0, 8.0),
-                        Row(
+                            ],
+                          ).pLTRB(0, 0, 0, 8.0),
+                          Row(
                             children: [
-                              "Raised On- ${foundDataNew![i].raisedOn.toString()}".text.size(12).make().pLTRB(5, 3, 0, 4),
+                              "Raised On- ${foundDataNew![i].raisedOn.toString()}"
+                                  .text
+                                  .size(12)
+                                  .make()
+                                  .pLTRB(5, 3, 0, 4),
                               Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      "Category - ${foundDataNew![i].empName.toString()}".text.size(12).make().px8(),
-
-                                    ],
-                                  )
-
-                              )
-                            ]
-                        ).pLTRB(0, 0, 0, 8.0),
-                        Row(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    "Category - ${foundDataNew![i].empName.toString()}"
+                                        .text
+                                        .size(12)
+                                        .make()
+                                        .px8(),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ).pLTRB(0, 0, 0, 8.0),
+                          Row(
                             children: [
-                              "Claimed Amount - ${foundDataNew![i].claimAmount.toString()}".text.bold.color(Mythemes.lightBluishColor).size(12).make().pLTRB(5, 3, 0, 4),
+                              "Claimed Amount - ${foundDataNew![i].claimAmount.toString()}"
+                                  .text
+                                  .bold
+                                  .color(Mythemes.lightBluishColor)
+                                  .size(12)
+                                  .make()
+                                  .pLTRB(5, 3, 0, 4),
                               Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      "Approved Amount - ${foundDataNew![i].approvedAmount.toString()}".text.bold.color(Mythemes.successColor).size(12).make().px8(),
-
-                                    ],
-                                  )
-
-                              )
-                            ]
-                        ).pLTRB(0, 0, 0, 8.0),
-                      ],
-                    ),
-                  ).p4(),
-                );
-              }
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    "Approved Amount - ${foundDataNew![i].approvedAmount.toString()}"
+                                        .text
+                                        .bold
+                                        .color(Mythemes.successColor)
+                                        .size(12)
+                                        .make()
+                                        .px8(),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ).pLTRB(0, 0, 0, 8.0),
+                        ],
+                      ),
+                    ).p4(),
+              );
+            },
           ),
         ),
       ],
     );
-
 
     /*if(foundDataNew == []) {
       print("FETCH NEW DATA");
@@ -1318,6 +1462,5 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList> wit
         child: "There is no data availabel right now".text.make(),
       );
     }*/
-
   }
 }

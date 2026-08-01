@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:slide_switcher/slide_switcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -20,7 +21,6 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../employeePage/employeeListModel.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
-
 
 class UIS_RoWorkDoneReportFiltering extends StatefulWidget {
   const UIS_RoWorkDoneReportFiltering({Key? key}) : super(key: key);
@@ -34,13 +34,13 @@ late String toDatePickedStringRo, fromDatePickedStringRo;
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNew = [];
 EmployeeListModel? employeeListModelglobel;
 EmployeeListModel? employeeListModelglobeled;
 
 late List<String?> list = [];
-String valuenew="listText";
+String valuenew = "listText";
 var empNewIdRo;
 var filterType;
 
@@ -72,7 +72,6 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
     // TODO: implement initState
     super.initState();
   }
-
 
   bool pickDates = true;
   bool pickNewDate = true;
@@ -119,9 +118,9 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
 
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
-    empRole= await shared.getEmpRoll();
-    roRole= await shared.getRoRole();
-    adminRole= await shared.getAdminRole();
+    empRole = await shared.getEmpRoll();
+    roRole = await shared.getRoRole();
+    adminRole = await shared.getAdminRole();
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
@@ -131,31 +130,29 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getEmployeeList11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        employeeListModelglobel=value;
-        employeeListModelglobeled=employeeListModelglobel;
+        employeeListModelglobel = value;
+        employeeListModelglobeled = employeeListModelglobel;
       });
       print('employeeList00${employeeListModelglobel!.data!.length}');
     });
 
     setState(() {
-      if(empRole==1){
-        showHide=true;
+      if (empRole == 1) {
+        showHide = true;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
-      if(empRole==0){
-        showHide=false;
+      if (empRole == 0) {
+        showHide = false;
         print('Show Emp $showHide');
-        setState(() {
-        });
+        setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
@@ -184,23 +181,22 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
     print('employeeList11: ${sessionId}');
     EmployeeListModel requistionEmpListModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    requistionEmpListModel=EmployeeListModel.fromJson(mapResponse);
+    requistionEmpListModel = EmployeeListModel.fromJson(mapResponse);
     int length = requistionEmpListModel.data!.length;
     print('totallenth $length ');
-    for(int i=0; i<requistionEmpListModel.data!.length;i++){
+    for (int i = 0; i < requistionEmpListModel.data!.length; i++) {
       String? empName = requistionEmpListModel.data![i].empName;
       list.add(requistionEmpListModel.data![i].empName);
       print('dataExpenseType $empName');
     }
     return requistionEmpListModel;
   }
-
 
   var dropdownvalue;
   int switcherIndex1 = 0;
@@ -216,45 +212,52 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
         appBar: AppBar(
           elevation: 0.5,
           leading: IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-              },
-              icon: Icon(Icons.arrow_back_ios)),
+            onPressed: () {
+              Navigator.pushNamed(context, MyRoutings.reportSectionHead);
+            },
+            icon: Icon(Icons.arrow_back_ios),
+          ),
           title: "Workdone Report".text.make(),
         ),
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.pop(context);
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Attendance');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               print('Profile');
             }
@@ -264,10 +267,7 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -291,7 +291,7 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
         body: Column(
           children: [
             Visibility(
-              visible: showRo  || showAdmin,
+              visible: showRo || showAdmin,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -315,42 +315,55 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
                     spacing: 2.0,
                     customSeparatorBuilder: (context, local, global) {
                       final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
+                          ((global.position - local.position).abs() - 0.5)
+                              .clamp(0.0, 1.0);
                       return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
+                        indent: 10.0,
+                        endIndent: 10.0,
+                        color: Colors.white38.withOpacity(opacity),
+                      );
                     },
                     customIconBuilder: (context, local, global) {
                       final text = const ['Self', 'Team'][local.index];
                       return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            color: Color.lerp(
+                              Colors.black,
+                              Colors.white,
+                              local.animationValue,
+                            ),
+                          ),
+                        ),
+                      );
                     },
                     borderWidth: 0.0,
                     onChanged: (i) {
                       setState(() {
                         value = i;
                         print(i);
-
                       });
-                      if(value == 1) {
-                        Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
+                      if (value == 1) {
+                        Navigator.pushNamed(
+                          context,
+                          MyRoutings.roWorkDoneFilterRoute,
+                        );
                       }
-                      if(value == 0) {
-                        Navigator.pushNamed(context, MyRoutings.workDoneDateReportRoute);
+                      if (value == 0) {
+                        Navigator.pushNamed(
+                          context,
+                          MyRoutings.workDoneDateReportRoute,
+                        );
                       }
                     },
-                  )
+                  ),
                 ],
               ),
             ).py(8),
 
             Visibility(
-              visible: showRo  || showAdmin,
+              visible: showRo || showAdmin,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -374,29 +387,36 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
                     spacing: 2.0,
                     customSeparatorBuilder: (context, local, global) {
                       final opacity =
-                      ((global.position - local.position).abs() - 0.5)
-                          .clamp(0.0, 1.0);
+                          ((global.position - local.position).abs() - 0.5)
+                              .clamp(0.0, 1.0);
                       return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity));
+                        indent: 10.0,
+                        endIndent: 10.0,
+                        color: Colors.white38.withOpacity(opacity),
+                      );
                     },
                     customIconBuilder: (context, local, global) {
                       final text = const ['All', 'Employee'][local.index];
                       return Center(
-                          child: Text(text,
-                              style: TextStyle(
-                                  color: Color.lerp(Colors.black, Colors.white,
-                                      local.animationValue))));
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            color: Color.lerp(
+                              Colors.black,
+                              Colors.white,
+                              local.animationValue,
+                            ),
+                          ),
+                        ),
+                      );
                     },
                     borderWidth: 0.0,
                     onChanged: (i) {
                       setState(() {
                         switcherIndex1 = i;
                         print(i);
-
                       });
-                      if(switcherIndex1 == 0) {
+                      if (switcherIndex1 == 0) {
                         filterType = "0";
                         empNewIdRo = "";
                       } else {
@@ -404,7 +424,7 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
                       }
                       print("FilterTYPE - $filterType");
                     },
-                  )
+                  ),
                 ],
               ),
             ).py(8),
@@ -443,82 +463,92 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
             ),*/
             Visibility(
               visible: switcherIndex1 == 1,
-                child: Form(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: DropdownButtonFormField<String>(
-                            value: list.contains(dropdownvalue) ? dropdownvalue : null,
-                            decoration: InputDecoration(
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(width: 1, color: Mythemes.blackishade),
-                              ),
-                              hintText: "Employee List",
-                              hintStyle: TextStyle(fontSize: 14),
-                              contentPadding: EdgeInsets.all(10),
-                              labelStyle: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Mythemes.blackish,
-                              ),
+              child: Form(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: DropdownButtonFormField<String>(
+                        value:
+                            list.contains(dropdownvalue) ? dropdownvalue : null,
+                        decoration: InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 1,
+                              color: Mythemes.blackishade,
                             ),
-                            items: list.toSet().toList().map<DropdownMenuItem<String>>((String? value) {
-                              return DropdownMenuItem<String>(
-                                alignment: Alignment.centerLeft,
-                                value: value,
-                                child: Text(value!),
-                              );
-                            }).toList(),
-                            onChanged: (newVal) {
-                              if (newVal != null) {
-                                valuenew = newVal;
-                                int i = list.indexOf(valuenew);
-                                empNewIdRo = employeeListModelglobel?.data?[i].empId.toString();
-                                print("EmpId  $empNewIdRo");
-                                setState(() {
-                                  dropdownvalue = newVal;
-                                });
-                              }
-                            },
                           ),
-                        )
-                      ],
-                    )
+                          hintText: "Employee List",
+                          hintStyle: TextStyle(fontSize: 14),
+                          contentPadding: EdgeInsets.all(10),
+                          labelStyle: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: Mythemes.blackish,
+                          ),
+                        ),
+                        items:
+                            list.toSet().toList().map<DropdownMenuItem<String>>(
+                              (String? value) {
+                                return DropdownMenuItem<String>(
+                                  alignment: Alignment.centerLeft,
+                                  value: value,
+                                  child: Text(value!),
+                                );
+                              },
+                            ).toList(),
+                        onChanged: (newVal) {
+                          if (newVal != null) {
+                            valuenew = newVal;
+                            int i = list.indexOf(valuenew);
+                            empNewIdRo =
+                                employeeListModelglobel?.data?[i].empId
+                                    .toString();
+                            print("EmpId  $empNewIdRo");
+                            setState(() {
+                              dropdownvalue = newVal;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
+              ),
             ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 Column(
                   children: [
                     Column(
-                        children: [
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectDate(context);
-                          });
-                        },
-                        child: Card(
-                          borderOnForeground: true,
-                          /*shape: RoundedRectangleBorder(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectDate(context);
+                            });
+                          },
+                          child: Card(
+                            borderOnForeground: true,
+                            /*shape: RoundedRectangleBorder(
                                 side: BorderSide(color: Mythemes.whiteShadeSeventy, width: 1),
                                 borderRadius: BorderRadius.circular(10)
                             ),*/
-                          elevation: 4,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10)),
-                            height: 110,
-                            width: 110,
-                            // color: Mythemes.whitish,
+                            elevation: 4,
                             child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              height: 110,
+                              width: 110,
+                              // color: Mythemes.whitish,
+                              child: Container(
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: Mythemes.lightBluishColor),
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Mythemes.lightBluishColor,
+                                ),
                                 child: Column(
                                   children: [
                                     pickDates
@@ -533,44 +563,52 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
                                             .xl2
                                             .make(),
                                     Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                            color: Mythemes.blueShade),
-                                        margin: EdgeInsets.only(
-                                            left: 5, right: 5, top: 2),
-                                        height: 72,
-                                        //color: Mythemes.greyish,
-                                        child: Column(
-                                          children: [
-                                            Center(
-                                              child: pickDates
-                                                  ? date.text.xl.make()
-                                                  : _datePick.day
-                                                      .toString()
-                                                      .text
-                                                      .xl
-                                                      .make()
-                                                      .py4(),
-                                            ),
-                                            Center(
-                                              child: pickDates
-                                                  ? month.text.xl.make().py8()
-                                                  : DateFormat.MMM()
-                                                      .format(_datePick)
-                                                      .toString()
-                                                      .text
-                                                      .xl
-                                                      .make(),
-                                            ),
-                                          ],
-                                        ))
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Mythemes.blueShade,
+                                      ),
+                                      margin: EdgeInsets.only(
+                                        left: 5,
+                                        right: 5,
+                                        top: 2,
+                                      ),
+                                      height: 72,
+                                      //color: Mythemes.greyish,
+                                      child: Column(
+                                        children: [
+                                          Center(
+                                            child:
+                                                pickDates
+                                                    ? date.text.xl.make()
+                                                    : _datePick.day
+                                                        .toString()
+                                                        .text
+                                                        .xl
+                                                        .make()
+                                                        .py4(),
+                                          ),
+                                          Center(
+                                            child:
+                                                pickDates
+                                                    ? month.text.xl.make().py8()
+                                                    : DateFormat.MMM()
+                                                        .format(_datePick)
+                                                        .toString()
+                                                        .text
+                                                        .xl
+                                                        .make(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ],
-                                )),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ])
+                      ],
+                    ),
                   ],
                 ),
                 Column(
@@ -582,36 +620,38 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
                         size: 50,
                         color: Mythemes.greyish,
                       ),
-                    )
+                    ),
                   ],
                 ),
                 Column(
                   children: [
                     Column(
-                        children: [
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectToDate(context);
-                          });
-                        },
-                        child: Card(
-                          borderOnForeground: true,
-                          /*shape: RoundedRectangleBorder(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectToDate(context);
+                            });
+                          },
+                          child: Card(
+                            borderOnForeground: true,
+                            /*shape: RoundedRectangleBorder(
                                 side: BorderSide(color: Mythemes.whiteShadeSeventy, width: 1),
                                 borderRadius: BorderRadius.circular(10)
                             ),*/
-                          elevation: 4,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10)),
-                            height: 110,
-                            width: 110,
-                            // color: Mythemes.whitish,
+                            elevation: 4,
                             child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              height: 110,
+                              width: 110,
+                              // color: Mythemes.whitish,
+                              child: Container(
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: Mythemes.lightBluishColor),
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Mythemes.lightBluishColor,
+                                ),
                                 child: Column(
                                   children: [
                                     pickNewDate
@@ -626,42 +666,50 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
                                             .xl2
                                             .make(),
                                     Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                            color: Mythemes.blueShade),
-                                        margin: EdgeInsets.only(
-                                            left: 5, right: 5, top: 2),
-                                        height: 72,
-                                        //color: Mythemes.greyish,
-                                        child: Column(
-                                          children: [
-                                            Center(
-                                              child: pickNewDate
-                                                  ? date.text.xl.make()
-                                                  : _newDatePick.day.text.xl
-                                                      .make()
-                                                      .py4(),
-                                            ),
-                                            Center(
-                                              child: pickNewDate
-                                                  ? month.text.xl.make().py8()
-                                                  : DateFormat.MMM()
-                                                      .format(_newDatePick)
-                                                      .text
-                                                      .xl
-                                                      .make(),
-                                            ),
-                                          ],
-                                        ))
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Mythemes.blueShade,
+                                      ),
+                                      margin: EdgeInsets.only(
+                                        left: 5,
+                                        right: 5,
+                                        top: 2,
+                                      ),
+                                      height: 72,
+                                      //color: Mythemes.greyish,
+                                      child: Column(
+                                        children: [
+                                          Center(
+                                            child:
+                                                pickNewDate
+                                                    ? date.text.xl.make()
+                                                    : _newDatePick.day.text.xl
+                                                        .make()
+                                                        .py4(),
+                                          ),
+                                          Center(
+                                            child:
+                                                pickNewDate
+                                                    ? month.text.xl.make().py8()
+                                                    : DateFormat.MMM()
+                                                        .format(_newDatePick)
+                                                        .text
+                                                        .xl
+                                                        .make(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ],
-                                )),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ])
+                      ],
+                    ),
                   ],
-                )
+                ),
               ],
             ).py32(),
             Row(
@@ -670,65 +718,84 @@ class _WorkDoneReport extends State<UIS_RoWorkDoneReportFiltering> {
               children: [
                 Container(
                   child: ButtonBar(
-                      alignment: MainAxisAlignment.center,
-                      buttonPadding: Vx.mOnly(right: 16),
-                      children: [
-                        ElevatedButton(
-                          /*onPressed: (){
+                    alignment: MainAxisAlignment.center,
+                    buttonPadding: Vx.mOnly(right: 16),
+                    children: [
+                      ElevatedButton(
+                        /*onPressed: (){
                     Navigator.pushNamed(context, MyRoutings.workDoneReportRoute);
                   },*/
+                        onPressed: () async {
+                          if (_datePick.compareTo(_newDatePick) > 0) {
+                            return setState(() {
+                              AlertDialog(
+                                content:
+                                    "Please select valid date range".text
+                                        .make(),
+                              );
+                              print("select valid date range");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Please Select Valid Date Range ",
+                                  ),
+                                ),
+                              );
+                            });
+                          }
 
-                          onPressed: () async {
-                            if (_datePick.compareTo(_newDatePick) > 0) {
-                              return setState(() {
-                                AlertDialog(
-                                  content: "Please select valid date range".text.make(),
-                                );
-                                print("select valid date range");
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text("Please Select Valid Date Range "),
-                                ));
-                              });
-                            }
-
-                            if (pickDates == false && pickNewDate == false) {
-                              bool result = await InternetConnectionChecker().hasConnection;
-                              if(result == false) {
-                                setState(() {
-                                  AlertDialog(
-                                    content: "Please check your internet connection".text.make(),
-                                  );
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    content: Text("Please check your Internet connection."),
-                                  ));
-                                });
-
-                              } else {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => RoWorkDoneReport(
-                                      toDatePickedStringRo!,
-                                      fromDatePickedStringRo!, filterType, empNewIdRo,
-                                    )));
-                              }
-
-
-
-                            } else {
-                              print("Please select date");
+                          if (pickDates == false && pickNewDate == false) {
+                            bool result =
+                                await InternetConnectionChecker().hasConnection;
+                            if (result == false) {
                               setState(() {
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text("Please Select Date Range "),
-                                ));
+                                AlertDialog(
+                                  content:
+                                      "Please check your internet connection"
+                                          .text
+                                          .make(),
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Please check your Internet connection.",
+                                    ),
+                                  ),
+                                );
                               });
+                            } else {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => RoWorkDoneReport(
+                                        toDatePickedStringRo!,
+                                        fromDatePickedStringRo!,
+                                        filterType,
+                                        empNewIdRo,
+                                      ),
+                                ),
+                              );
                             }
-                          },
-                          style: ButtonStyle(
-                            backgroundColor:
-                            MaterialStateProperty.all(Mythemes.lightBluishColor),
+                          } else {
+                            print("Please select date");
+                            setState(() {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Please Select Date Range "),
+                                ),
+                              );
+                            });
+                          }
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Mythemes.lightBluishColor,
                           ),
-                          child: "Submit".text.make(),
-                        ).wh(120, 40).py32()
-                      ]),
+                        ),
+                        child: "Submit".text.make(),
+                      ).wh(120, 40).py32(),
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -14,6 +14,7 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 class ODRequisitionSelection extends StatefulWidget {
   const ODRequisitionSelection({Key? key}) : super(key: key);
@@ -22,16 +23,14 @@ class ODRequisitionSelection extends StatefulWidget {
   State<ODRequisitionSelection> createState() => _ODRequisitionSelectionState();
 }
 
-
-
-
-SessionManager sessionManager=SessionManager();
+SessionManager sessionManager = SessionManager();
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 String? branchName;
 String? deptName;
 String? empName;
+
 class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
   String dayRadio = "1";
   bool singleDayShow = true;
@@ -48,28 +47,28 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
      content: Text("Sucessfully Run"),
    ));*/
-    setState(() {
-
-    });
+    setState(() {});
     // TODO: implement initState
     super.initState();
   }
+
   Future getSharedPrfanceList() async {
     //await Future.delayed(Duration(seconds: 1));
 
-    sessionId = await shared!.getSessionId()??"N/A";
-    branchName = await shared!.getBranch()??"N/A";
-    deptName = await shared!.getDept()??"N/A";
-    empName = await shared!.getempName()??"N/A";
+    sessionId = await shared!.getSessionId() ?? "N/A";
+    branchName = await shared!.getBranch() ?? "N/A";
+    deptName = await shared!.getDept() ?? "N/A";
+    empName = await shared!.getempName() ?? "N/A";
     setState(() {
-      print('ResponseAttendance: ${sessionId}' );
+      print('ResponseAttendance: ${sessionId}');
     });
-
   }
+
   Future getEmpId() async {
     empNewId = await shared!.getEmpId();
     print('Response snapshot: ${empNewId}');
   }
+
   int pageIndex = 0;
   int currentIndex = 2;
   @override
@@ -78,9 +77,8 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
     return DismissKeyboard(
       child: Scaffold(
         backgroundColor: Mythemes.whitish,
-        appBar: AppBar(
-          title: titleName.text.make(),
-        ),
+        appBar: AppBar(title: titleName.text.make()),
+
         /*floatingActionButton: FloatingActionButton(
           onPressed: (){
             Navigator.pushNamed(context, MyRoutings.odAttendanceListRoute);
@@ -90,7 +88,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
             Icons.list, color: Mythemes.whitish, size: 28,
           ),
         ),*/
-
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -143,9 +140,9 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                   controller: TextEditingController(text: branchName),
                   readOnly: true,
                   //initialValue: "${branchName}",
-                  decoration:  InputDecoration(
-                      hintText: "Branch Name",
-                      labelText: "Branch Name"
+                  decoration: InputDecoration(
+                    hintText: "Branch Name",
+                    labelText: "Branch Name",
                   ),
                 ),
               ),
@@ -156,10 +153,9 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                   controller: TextEditingController(text: deptName),
                   readOnly: true,
                   //initialValue: deptName,
-                  decoration:  InputDecoration(
-                      hintText: "Department Name",
-                      labelText: "Department Name"
-
+                  decoration: InputDecoration(
+                    hintText: "Department Name",
+                    labelText: "Department Name",
                   ),
                 ),
               ),
@@ -170,9 +166,9 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                   controller: TextEditingController(text: empName),
                   readOnly: true,
                   //initialValue: empName,
-                  decoration:  InputDecoration(
-                      hintText: "Employee Name",
-                      labelText: "Employee Name"
+                  decoration: InputDecoration(
+                    hintText: "Employee Name",
+                    labelText: "Employee Name",
                   ),
                 ),
               ),
@@ -182,189 +178,207 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                      child:  Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Radio(
-                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                value: "1",
-                                groupValue: dayRadio,
-                                onChanged: (value) {
-                                  setState(() {
-                                    singleDayShow = true;
-                                    multipleDayShow = false;
-                                    print("day show $singleDayShow");
-                                    print("multi show $multipleDayShow");
-                                    /*  _singleDayShow == _singleDayShow;
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Radio(
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              value: "1",
+                              groupValue: dayRadio,
+                              onChanged: (value) {
+                                setState(() {
+                                  singleDayShow = true;
+                                  multipleDayShow = false;
+                                  print("day show $singleDayShow");
+                                  print("multi show $multipleDayShow");
+                                  /*  _singleDayShow == _singleDayShow;
                                            _multipleDayShow == _multipleDayShow;*/
-                                  });
-                                  setState(() {
-                                    dayRadio = value.toString();
-                                  });
-                                },
-                              ),
-                              "Single Day".text.make(),
-                            ],
-                          ).px8(),
-                          Row(
-                            /*mainAxisAlignment: MainAxisAlignment.start,
+                                });
+                                setState(() {
+                                  dayRadio = value.toString();
+                                });
+                              },
+                            ),
+                            "Single Day".text.make(),
+                          ],
+                        ).px8(),
+                        Row(
+                          /*mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,*/
-                            children: [
-                              Radio(
-                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                value: "2",
-                                groupValue: dayRadio,
-                                onChanged: (value) {
-                                  setState(() {
-                                    singleDayShow = true;
-                                    multipleDayShow = true;
-                                    print("day show $singleDayShow");
-                                    print("multi show $multipleDayShow");
-                                    /*  _singleDayShow =_singleDayShow;
+                          children: [
+                            Radio(
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              value: "2",
+                              groupValue: dayRadio,
+                              onChanged: (value) {
+                                setState(() {
+                                  singleDayShow = true;
+                                  multipleDayShow = true;
+                                  print("day show $singleDayShow");
+                                  print("multi show $multipleDayShow");
+                                  /*  _singleDayShow =_singleDayShow;
                                           _multipleDayShow =! _multipleDayShow;*/
-                                  });
-                                  setState(() {
-                                    dayRadio = value.toString();
-                                  });
-                                },
-                              ),
-                              "Multiple Day".text.make(),
-                            ],
-                          ).px8(),
-                          Visibility(
-                            visible: false,
-                            child: Row(
-                              /* mainAxisAlignment: MainAxisAlignment.start,
+                                });
+                                setState(() {
+                                  dayRadio = value.toString();
+                                });
+                              },
+                            ),
+                            "Multiple Day".text.make(),
+                          ],
+                        ).px8(),
+                        Visibility(
+                          visible: false,
+                          child:
+                              Row(
+                                /* mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.center,*/
-                              children: [
-                                Radio(
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  value: "3",
-                                  groupValue: dayRadio,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      singleDayShow = true;
-                                      multipleDayShow = false;
-                                      print("day show $singleDayShow");
-                                      print("multi show $multipleDayShow");
-                                      /* _singleDayShow == _singleDayShow;
+                                children: [
+                                  Radio(
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    value: "3",
+                                    groupValue: dayRadio,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        singleDayShow = true;
+                                        multipleDayShow = false;
+                                        print("day show $singleDayShow");
+                                        print("multi show $multipleDayShow");
+                                        /* _singleDayShow == _singleDayShow;
                                             _multipleDayShow = !_multipleDayShow;*/
-                                    });
-                                    setState(() {
-                                      dayRadio = value.toString();
-                                    });
-                                  },
-                                ),
-                                "Half Day".text.make(),
-                              ],
-                            ).px1(),
-                          ),
-                        ],
-                      ).pLTRB(0, 0, 5, 5)
-
+                                      });
+                                      setState(() {
+                                        dayRadio = value.toString();
+                                      });
+                                    },
+                                  ),
+                                  "Half Day".text.make(),
+                                ],
+                              ).px1(),
+                        ),
+                      ],
+                    ).pLTRB(0, 0, 5, 5),
                   ),
                 ],
               ),
 
               Row(
                 children: [
-
                   Visibility(
                     visible: singleDayShow,
                     child: Expanded(
-                      child:  TextFormField(
-                        onTap: () async{
-                          DateTime? fromDate = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
+                      child:
+                          TextFormField(
+                            onTap: () async {
+                              DateTime? fromDate = DateTime.now();
+                              FocusScope.of(
+                                context,
+                              ).requestFocus(new FocusNode());
 
-                          fromDate = await showDatePicker(
-                              context: context,
-                              initialDate: fromDate,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime(2040)
-                          );
-                          setState(() {
-                            //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _fromDateController.text = DateFormat("dd-MM-yyyy").format(fromDate!);
-                          });
+                              fromDate = await showDatePicker(
+                                context: context,
+                                initialDate: fromDate,
+                                firstDate: DateTime(1947),
+                                lastDate: DateTime(2040),
+                              );
+                              setState(() {
+                                //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                                _fromDateController.text = DateFormat(
+                                  "dd-MM-yyyy",
+                                ).format(fromDate!);
+                              });
 
-                          print(fromDate);
-                        },
-                        readOnly: true,
-                        enabled: true,
-                        controller: _fromDateController,
-                        // initialValue: "Head Office",
-                        decoration: InputDecoration(
-                          suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                          enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                            borderSide: BorderSide(
-                                width: 1, color: Mythemes.blackishade),
-                          ),
-                          labelText: "From Date",
-                          hintStyle: TextStyle(
-                            fontSize: 12,
-                          ),
-                          contentPadding: EdgeInsets.all(5),
-                          /*border: OutlineInputBorder(
+                              print(fromDate);
+                            },
+                            readOnly: true,
+                            enabled: true,
+                            controller: _fromDateController,
+                            // initialValue: "Head Office",
+                            decoration: InputDecoration(
+                              suffixIcon: Icon(Icons.calendar_month, size: 18),
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Mythemes.blackishade,
+                                ),
+                              ),
+                              labelText: "From Date",
+                              hintStyle: TextStyle(fontSize: 12),
+                              contentPadding: EdgeInsets.all(5),
+                              /*border: OutlineInputBorder(
                                             borderRadius:
                                             BorderRadius.all(Radius.circular(8))),*/
-                          // labelText: "Location",
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w500,fontSize: 13,
-                              color: Mythemes.blackish),
-                        ),
-                      ).p8(),
+                              // labelText: "Location",
+                              labelStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Mythemes.blackish,
+                              ),
+                            ),
+                          ).p8(),
                     ),
                   ),
 
                   Visibility(
                     visible: multipleDayShow,
                     child: Expanded(
-                      child:  TextFormField(
-                        onTap: () async{
-                          DateTime? toDate = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
+                      child:
+                          TextFormField(
+                            onTap: () async {
+                              DateTime? toDate = DateTime.now();
+                              FocusScope.of(
+                                context,
+                              ).requestFocus(new FocusNode());
 
-                          toDate = await showDatePicker(
-                              context: context,
-                              initialDate: toDate,
-                              firstDate:DateTime(1947),
-                              lastDate: DateTime(2040)
-                          );
-                          setState(() {
-                            //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                            _toDateController.text = DateFormat("dd-MM-yyyy").format(toDate!);
-                          });
+                              toDate = await showDatePicker(
+                                context: context,
+                                initialDate: toDate,
+                                firstDate: DateTime(1947),
+                                lastDate: DateTime(2040),
+                              );
+                              setState(() {
+                                //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                                _toDateController.text = DateFormat(
+                                  "dd-MM-yyyy",
+                                ).format(toDate!);
+                              });
 
-                          print(toDate);
-                        },
-                        readOnly: true,
-                        enabled: true,
-                        controller: _toDateController,
-                        // initialValue: "Head Office",
-                        decoration: InputDecoration(
-                          suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                          enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                            borderSide: BorderSide(
-                                width: 1, color: Mythemes.blackishade),
-                          ),
-                          labelText: "To Date",
-                          hintStyle: TextStyle(
-                            fontSize: 12,
-                          ),
-                          contentPadding: EdgeInsets.all(5),
-                          /*border: OutlineInputBorder(
+                              print(toDate);
+                            },
+                            readOnly: true,
+                            enabled: true,
+                            controller: _toDateController,
+                            // initialValue: "Head Office",
+                            decoration: InputDecoration(
+                              suffixIcon: Icon(Icons.calendar_month, size: 18),
+                              enabledBorder: UnderlineInputBorder(
+                                //<-- SEE HERE
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Mythemes.blackishade,
+                                ),
+                              ),
+                              labelText: "To Date",
+                              hintStyle: TextStyle(fontSize: 12),
+                              contentPadding: EdgeInsets.all(5),
+                              /*border: OutlineInputBorder(
                                             borderRadius:
                                             BorderRadius.all(Radius.circular(8))),*/
-                          // labelText: "Location",
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w500,fontSize: 13,
-                              color: Mythemes.blackish),
-                        ),
-                      ).p8(),
+                              // labelText: "Location",
+                              labelStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Mythemes.blackish,
+                              ),
+                            ),
+                          ).p8(),
                     ),
                   ),
                 ],
@@ -377,13 +391,10 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                   maxLines: 2,
                   enabled: true,
                   //initialValue: deptName,
-                  decoration:  InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.textsms
-                    ),
-                      hintText: "Add remarks",
-                      labelText: "Remarks"
-
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.textsms),
+                    hintText: "Add remarks",
+                    labelText: "Remarks",
                   ),
                 ),
               ),
@@ -395,63 +406,77 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                   ElevatedButton(
                     onPressed: () {
                       if (dayRadio == '1') {
-                        singleDayRequisition(_remarkController.text, _fromDateController.text, empNewId);
-                      }
-                      else if(dayRadio == '2') {
-                        multipleDayRequisition(_remarkController.text, _toDateController.text, _fromDateController.text, empNewId);
+                        singleDayRequisition(
+                          _remarkController.text,
+                          _fromDateController.text,
+                          empNewId,
+                        );
+                      } else if (dayRadio == '2') {
+                        multipleDayRequisition(
+                          _remarkController.text,
+                          _toDateController.text,
+                          _fromDateController.text,
+                          empNewId,
+                        );
                       }
 
                       //key = "APPROVED";
                       //approveLeaveRequisition(_commentController.text, leaveReqId);
                     },
                     style: ButtonStyle(
-                      backgroundColor:
-                      MaterialStateProperty.all(Mythemes.lightBluishColor),
+                      backgroundColor: MaterialStateProperty.all(
+                        Mythemes.lightBluishColor,
+                      ),
                     ),
                     child: "Send".text.make(),
                   ).wh(150, 40).py24(),
                 ],
-              )
+              ),
             ],
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
               print('OD');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -462,10 +487,7 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -486,26 +508,29 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
             ),
           ],
         ),
-
       ),
     );
   }
 
-  Future<void> singleDayRequisition(String getRemark, fromDate, empNewId) async {
-
+  Future<void> singleDayRequisition(
+    String getRemark,
+    fromDate,
+    empNewId,
+  ) async {
     //String idn=leavereqIdGlobel.last;
     String dayRadio = "1";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.tourRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "fromDate=$fromDate&"
-        "summary=$getRemark&"
-        "radio=$dayRadio&"
-        "empid=$empNewId"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "fromDate=$fromDate&"
+      "summary=$getRemark&"
+      "radio=$dayRadio&"
+      "empid=$empNewId",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -516,30 +541,43 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 
-  Future<void> multipleDayRequisition(String getRemark, toDate, fromDate, empNewId) async {
+  Future<void> multipleDayRequisition(
+    String getRemark,
+    toDate,
+    fromDate,
+    empNewId,
+  ) async {
     //String idn=leavereqIdGlobel.last;
     String dayRadio = "2";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.tourRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "tilldate=$toDate&"
-        "sessionId=$sessionId&"
-        "fromDate=$fromDate&"
-        "summary=$getRemark&"
-        "radio=$dayRadio&"
-        "empid=$empNewId"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "tilldate=$toDate&"
+      "sessionId=$sessionId&"
+      "fromDate=$fromDate&"
+      "summary=$getRemark&"
+      "radio=$dayRadio&"
+      "empid=$empNewId",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
@@ -550,12 +588,19 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
       String reason = mapResponse['result']['reason'];
       print('result both $result $reason');
       print('result${result}');
-      if(result.compareToIgnoringCase("success")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase+" ","Success");
-      }else if(result.compareToIgnoringCase("error")==0){
-        CommonNotificationPage.showDialgSucess(context,reason.upperCamelCase, " Error ");
+      if (result.compareToIgnoringCase("success") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase + " ",
+          "Success",
+        );
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          reason.upperCamelCase,
+          " Error ",
+        );
       }
-
     }
   }
 }

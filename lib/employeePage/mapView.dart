@@ -5,6 +5,7 @@ import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/employeePage/employeeListPage.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -36,14 +37,15 @@ var ltt = 0.0;
 var lngg = 0.0;
 var taskLtt;
 var taskLang;
+
 class _HistoryMapViewState extends State<HistoryMapView> {
   CustomInfoWindowController _customInfoWindowController =
-  CustomInfoWindowController();
+      CustomInfoWindowController();
 
   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
 
-   final List <Marker> _markers = <Marker>[];
-  final List <LatLng> _latlng = <LatLng>[
+  final List<Marker> _markers = <Marker>[];
+  final List<LatLng> _latlng = <LatLng>[
     //LatLng(ltt, lngg), LatLng(taskLtt!, taskLang!),
   ];
 
@@ -70,9 +72,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
 
     Future.delayed(Duration.zero, () {
       dateSelection();
-      final List <LatLng> _latlng = <LatLng>[
-
-      ];
+      final List<LatLng> _latlng = <LatLng>[];
     });
 
     // TODO: implement initState
@@ -81,20 +81,18 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     _getUserLocation();
     //selectedDate = _dateController;
     print('selectedDate $selectedDate');
-
   }
-
-
 
   dateSelection() async {
     DateTime? date = DateTime.now();
     FocusScope.of(context).requestFocus(new FocusNode());
 
     date = await showDatePicker(
-        context: context,
-        initialDate: date,
-        firstDate:DateTime(1947),
-        lastDate: DateTime.now().add(Duration(days: 0)));
+      context: context,
+      initialDate: date,
+      firstDate: DateTime(1947),
+      lastDate: DateTime.now().add(Duration(days: 0)),
+    );
     setState(() {
       singleDateString = DateFormat('dd-MM-yyyy').format(date!);
       _dateController.text = DateFormat("yyyy-MM-dd").format(date!);
@@ -107,46 +105,50 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     print(date);
   }
 
-
-
   Future<HistoryTrackingModal> getTracking(String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.historyTracking;
-    print('Fetching Tracking Data for Session: $sessionId on Date: $selectedDate');
+    print(
+      'Fetching Tracking Data for Session: $sessionId on Date: $selectedDate',
+    );
 
-    // ✅ Clear previous tracking data before fetching new data
+    // âœ… Clear previous tracking data before fetching new data
     setState(() {
       _markers.clear();
       _polyline.clear();
     });
 
-    // ✅ API Call
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&date=$selectedDate&empId=$empId");
-    final response = await http.post(urlapi);
+    // âœ… API Call
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?sessionId=$sessionId&date=$selectedDate&empId=$empId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('API URL: ${response.request}');
 
-    // ✅ Decode JSON Response
+    // âœ… Decode JSON Response
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('Tracking Data: $getData');
 
-    // ✅ Parse Response into Model
-    HistoryTrackingModal historyTrackingModal = HistoryTrackingModal.fromJson(mapResponse);
+    // âœ… Parse Response into Model
+    HistoryTrackingModal historyTrackingModal = HistoryTrackingModal.fromJson(
+      mapResponse,
+    );
 
-    // ✅ Ensure Distance Data is Updated
+    // âœ… Ensure Distance Data is Updated
     distanceLength = historyTrackingModal.distance;
 
-    // ✅ Clear previous images before loading new ones
+    // âœ… Clear previous images before loading new ones
     inImage = null;
     outImage = null;
 
-    // ✅ Load Punch In & Out Images
+    // âœ… Load Punch In & Out Images
     for (int i = 0; i < historyTrackingModal.attData!.length; i++) {
       inImage = historyTrackingModal.attData![i].inPhoto;
       outImage = historyTrackingModal.attData![i].outPhoto;
     }
 
-    // ✅ Ensure UI updates with new data
+    // âœ… Ensure UI updates with new data
     setState(() {});
 
     return historyTrackingModal;
@@ -154,27 +156,29 @@ class _HistoryMapViewState extends State<HistoryMapView> {
 
   void addCustomIcon() {
     BitmapDescriptor.fromAssetImage(
-        const ImageConfiguration(), "assets/images/workdoneMarker.png")
-        .then(
-          (icon) {
-        setState(() {
-          markerIcon = icon;
-          print('icon Name $markerIcon');
-        });
-      },
-    );
+      const ImageConfiguration(),
+      "assets/images/workdoneMarker.png",
+    ).then((icon) {
+      setState(() {
+        markerIcon = icon;
+        print('icon Name $markerIcon');
+      });
+    });
   }
 
   Uint8List? marketimages;
   List<String> images = ['assets/images/workdoneMarker.png'];
 
-
-  Future<Uint8List> getImages(String path, int width) async{
+  Future<Uint8List> getImages(String path, int width) async {
     ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetHeight: width);
+    ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetHeight: width,
+    );
     ui.FrameInfo fi = await codec.getNextFrame();
-    return(await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
-
+    return (await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    ))!.buffer.asUint8List();
   }
 
   final Set<Polyline> _polyline = {};
@@ -504,15 +508,17 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     }
   }*/
 
-
   void loadData() async {
     List<LatLng> newPunchLatlng = [];
     List<LatLng> newPunchOutLatlng = [];
     List<LatLng> newAddLatlng = [];
 
-    // ✅ Load "In Time" Punch Data
+    // âœ… Load "In Time" Punch Data
     for (int i = 0; i < historyTrackingModalGlobal!.attData!.length; i++) {
-      final Uint8List markIconsIn = await getImages('assets/images/fingerMaker.png', 150);
+      final Uint8List markIconsIn = await getImages(
+        'assets/images/fingerMaker.png',
+        150,
+      );
       var inLat = historyTrackingModalGlobal!.attData![i].inlat;
       var inLng = historyTrackingModalGlobal!.attData![i].inlng;
       var inImage = historyTrackingModalGlobal!.attData![i].inPhoto;
@@ -522,7 +528,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
         newPunchLatlng.add(inLatLng);
 
         _addMarker(
-          'in_$i',  // ✅ Unique ID for "In Time" markers
+          'in_$i', // âœ… Unique ID for "In Time" markers
           markIconsIn,
           inLatLng,
           inImage,
@@ -533,9 +539,12 @@ class _HistoryMapViewState extends State<HistoryMapView> {
       }
     }
 
-    // ✅ Load "Out Time" Punch Data
+    // âœ… Load "Out Time" Punch Data
     for (int i = 0; i < historyTrackingModalGlobal!.attData!.length; i++) {
-      final Uint8List markIconsOut = await getImages('assets/images/fingerMakerOut.png', 150);
+      final Uint8List markIconsOut = await getImages(
+        'assets/images/fingerMakerOut.png',
+        150,
+      );
       var outLat = historyTrackingModalGlobal!.attData![i].outlat;
       var outLng = historyTrackingModalGlobal!.attData![i].outlng;
       var outImage = historyTrackingModalGlobal!.attData![i].outPhoto;
@@ -545,7 +554,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
         newPunchOutLatlng.add(outLatLng);
 
         _addMarker(
-          'out_$i',  // ✅ Unique ID for "Out Time" markers
+          'out_$i', // âœ… Unique ID for "Out Time" markers
           markIconsOut,
           outLatLng,
           outImage,
@@ -556,19 +565,19 @@ class _HistoryMapViewState extends State<HistoryMapView> {
       }
     }
 
-    // ✅ Add Polyline for In Punch Data
+    // âœ… Add Polyline for In Punch Data
     if (newPunchLatlng.isNotEmpty) {
       _addPolyline('in_polyline', newPunchLatlng, Colors.blue);
     }
 
-    // ✅ Add Polyline for Out Punch Data
+    // âœ… Add Polyline for Out Punch Data
     if (newPunchOutLatlng.isNotEmpty) {
       _addPolyline('out_polyline', newPunchOutLatlng, Colors.red);
     }
 
     setState(() {});
 
-    // ✅ Load Tracking Data (data)
+    // âœ… Load Tracking Data (data)
     List<LatLng> trackingLatLng = [];
     for (int i = 0; i < historyTrackingModalGlobal!.data!.length; i++) {
       var lat = historyTrackingModalGlobal!.data![i].lat;
@@ -578,25 +587,45 @@ class _HistoryMapViewState extends State<HistoryMapView> {
         trackingLatLng.add(LatLng(lat, lng));
       }
     }
-    if (trackingLatLng.isNotEmpty) _addPolyline('3', trackingLatLng, Colors.green);
+    if (trackingLatLng.isNotEmpty)
+      _addPolyline('3', trackingLatLng, Colors.green);
 
-    // ✅ Load Task Data
+    // âœ… Load Task Data
     for (int i = 0; i < historyTrackingModalGlobal!.taskData!.length; i++) {
-      final Uint8List markIcons = await getImages('assets/images/workdoneMarker.png', 150);
-      var latlng = double.parse(historyTrackingModalGlobal!.taskData![i].tasklng);
+      final Uint8List markIcons = await getImages(
+        'assets/images/workdoneMarker.png',
+        150,
+      );
+      var latlng = double.parse(
+        historyTrackingModalGlobal!.taskData![i].tasklng,
+      );
       var ltt = double.parse(historyTrackingModalGlobal!.taskData![i].tasklat);
       var taskImage = historyTrackingModalGlobal!.taskData![i].taskPhoto;
       LatLng taskLatLng = LatLng(ltt, latlng);
 
       newAddLatlng.add(taskLatLng);
 
-      _addTaskMarker(i, markIcons, taskLatLng, taskImage, historyTrackingModalGlobal!.taskData![i]);
+      _addTaskMarker(
+        i,
+        markIcons,
+        taskLatLng,
+        taskImage,
+        historyTrackingModalGlobal!.taskData![i],
+      );
     }
     if (newAddLatlng.isNotEmpty) _addPolyline('4', newAddLatlng, Colors.orange);
   }
 
-// ✅ Function to Add a Marker for Punch In & Out
-  void _addMarker(dynamic index, Uint8List icon, LatLng position, String? image, String? address, String? date, String? time) {
+  // âœ… Function to Add a Marker for Punch In & Out
+  void _addMarker(
+    dynamic index,
+    Uint8List icon,
+    LatLng position,
+    String? image,
+    String? address,
+    String? date,
+    String? time,
+  ) {
     _markers.add(
       Marker(
         markerId: MarkerId('marker_$index'),
@@ -613,8 +642,14 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     setState(() {});
   }
 
-// ✅ Function to Add a Marker for Tasks
-  void _addTaskMarker(int index, Uint8List icon, LatLng position, String? image, dynamic taskData) {
+  // âœ… Function to Add a Marker for Tasks
+  void _addTaskMarker(
+    int index,
+    Uint8List icon,
+    LatLng position,
+    String? image,
+    dynamic taskData,
+  ) {
     _markers.add(
       Marker(
         markerId: MarkerId('task_marker_$index'),
@@ -631,9 +666,10 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     setState(() {});
   }
 
-// ✅ Function to Add a Polyline
+  // âœ… Function to Add a Polyline
   void _addPolyline(String id, List<LatLng> points, Color color) {
-    if (points.length < 2) return; // Prevents creating polylines with < 2 points
+    if (points.length < 2)
+      return; // Prevents creating polylines with < 2 points
     _polyline.add(
       Polyline(
         polylineId: PolylineId(id),
@@ -648,8 +684,13 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     setState(() {});
   }
 
-// ✅ Info Window for Punch In/Out
-  Widget _buildInfoWindow(String? image, String? address, String? date, String? time) {
+  // âœ… Info Window for Punch In/Out
+  Widget _buildInfoWindow(
+    String? image,
+    String? address,
+    String? date,
+    String? time,
+  ) {
     return Card(
       child: Container(
         height: 250,
@@ -657,16 +698,16 @@ class _HistoryMapViewState extends State<HistoryMapView> {
         child: Column(
           children: [
             _buildImageContainer(image),
-            _buildInfoRow("📍 Address:", address),
-            _buildInfoRow("📅 Date:", date),
-            _buildInfoRow("⏰ Time:", time),
+            _buildInfoRow("ðŸ“ Address:", address),
+            _buildInfoRow("ðŸ“… Date:", date),
+            _buildInfoRow("â° Time:", time),
           ],
         ),
       ),
     );
   }
 
-// ✅ Info Window for Task Data
+  // âœ… Info Window for Task Data
   Widget _buildTaskInfoWindow(String? image, dynamic taskData) {
     return Card(
       child: Container(
@@ -675,16 +716,16 @@ class _HistoryMapViewState extends State<HistoryMapView> {
         child: Column(
           children: [
             _buildImageContainer(image),
-            _buildInfoRow("📌 Comment:", taskData.comment),
-            _buildInfoRow("📍 Address:", taskData.address),
-            _buildInfoRow("📅 Date:", taskData.taskDate),
+            _buildInfoRow("ðŸ“Œ Comment:", taskData.comment),
+            _buildInfoRow("ðŸ“ Address:", taskData.address),
+            _buildInfoRow("ðŸ“… Date:", taskData.taskDate),
           ],
         ),
       ),
     );
   }
 
-// ✅ Helper Function to Build Image Container
+  // âœ… Helper Function to Build Image Container
   Widget _buildImageContainer(String? imageUrl) {
     return Container(
       height: 100,
@@ -700,7 +741,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     );
   }
 
-// ✅ Helper Function to Build Info Row
+  // âœ… Helper Function to Build Info Row
   Widget _buildInfoRow(String label, String? value) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -708,11 +749,18 @@ class _HistoryMapViewState extends State<HistoryMapView> {
         children: [
           Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
           SizedBox(width: 5),
-          Expanded(child: Text(value ?? "N/A", overflow: TextOverflow.ellipsis, maxLines: 2)),
+          Expanded(
+            child: Text(
+              value ?? "N/A",
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
+          ),
         ],
       ),
     );
   }
+
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
@@ -721,7 +769,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
@@ -729,19 +777,12 @@ class _HistoryMapViewState extends State<HistoryMapView> {
       setState(() {
         print('marker Icon $markerIcon');
 
-        historyTrackingModalGlobal=value;
+        historyTrackingModalGlobal = value;
 
         loadData();
-        
-
-
       });
-
-
     });
-
   }
-
 
   LatLng _center = LatLng(32.5367794, -121.2714404);
 
@@ -751,11 +792,12 @@ class _HistoryMapViewState extends State<HistoryMapView> {
 
   getCurrentLocation() async {
     position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
     return position;
   }
 
-  String singleDateString="";
+  String singleDateString = "";
 
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -786,14 +828,14 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition();
   }
-
 
   void _getUserLocation() async {
     var position = await GeolocatorPlatform.instance.getCurrentPosition();
@@ -807,11 +849,10 @@ class _HistoryMapViewState extends State<HistoryMapView> {
 
       StreamSubscription<ServiceStatus> serviceStatusStream =
           Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
-        print('Response1111s $status');
-      });
+            print('Response1111s $status');
+          });
       print('Response1111s $serviceStatusStream');
     });
-
   }
 
   static final _initialCameraPosition = CameraPosition(
@@ -828,15 +869,19 @@ class _HistoryMapViewState extends State<HistoryMapView> {
 
         actions: [
           IconButton(
-              onPressed: () {
-                dateSelection();
-              }, icon: Icon(Icons.date_range_rounded))
+            onPressed: () {
+              dateSelection();
+            },
+            icon: Icon(Icons.date_range_rounded),
+          ),
         ],
       ),
       bottomNavigationBar: Container(
         height: 80,
         color: Mythemes.whitish,
-        padding: EdgeInsets.symmetric(horizontal: 16), // ✅ Adds spacing for responsiveness
+        padding: EdgeInsets.symmetric(
+          horizontal: 16,
+        ), // âœ… Adds spacing for responsiveness
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -846,50 +891,71 @@ class _HistoryMapViewState extends State<HistoryMapView> {
                 direction: Axis.horizontal,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  // ✅ Date Button (Flexible)
+                  // âœ… Date Button (Flexible)
                   Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        padding: EdgeInsets.symmetric(vertical: 10), // ✅ Ensures equal padding
-                        backgroundColor: Mythemes.whitish, // ✅ Background color
-                      ),
-                      onPressed: () {},
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          "Date".text.bold.color(Mythemes.black).make(), // ✅ Title
-                          selectedDate == null ? defaultDate.text.color(Mythemes.whitish).make() :
-                          DateFormat('dd-MM-yyyy')
-                              .format(DateTime.parse(selectedDate.toString()))
-                              .text.bold
-                              .color(Mythemes.black)
-                              .make(), // ✅ Formatted Date
-                        ],
-                      ),
-                    ).px8(),
+                    child:
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                            ), // âœ… Ensures equal padding
+                            backgroundColor:
+                                Mythemes.whitish, // âœ… Background color
+                          ),
+                          onPressed: () {},
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              "Date".text.bold
+                                  .color(Mythemes.black)
+                                  .make(), // âœ… Title
+                              selectedDate == null
+                                  ? defaultDate.text
+                                      .color(Mythemes.whitish)
+                                      .make()
+                                  : DateFormat('dd-MM-yyyy')
+                                      .format(
+                                        DateTime.parse(selectedDate.toString()),
+                                      )
+                                      .text
+                                      .bold
+                                      .color(Mythemes.black)
+                                      .make(), // âœ… Formatted Date
+                            ],
+                          ),
+                        ).px8(),
                   ),
 
-                  // ✅ Distance Button (Flexible)
+                  // âœ… Distance Button (Flexible)
                   Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        padding: EdgeInsets.symmetric(vertical: 10), // ✅ Ensures equal padding
-                        backgroundColor: Mythemes.whitish, // ✅ Background color
-                      ),
-                      onPressed: () {},
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          "Distance".text.bold.color(Mythemes.black).make(), // ✅ Title
-                          (distanceLength == null ? "0 KM" : "$distanceLength KM")
-                              .text.bold
-                              .color(Mythemes.black)
-                              .make(), // ✅ Dynamic Distance
-                        ],
-                      ),
-                    ).px8(),
+                    child:
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                            ), // âœ… Ensures equal padding
+                            backgroundColor:
+                                Mythemes.whitish, // âœ… Background color
+                          ),
+                          onPressed: () {},
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              "Distance".text.bold
+                                  .color(Mythemes.black)
+                                  .make(), // âœ… Title
+                              (distanceLength == null
+                                      ? "0 KM"
+                                      : "$distanceLength KM")
+                                  .text
+                                  .bold
+                                  .color(Mythemes.black)
+                                  .make(), // âœ… Dynamic Distance
+                            ],
+                          ),
+                        ).px8(),
                   ),
                 ],
               ),
@@ -922,23 +988,25 @@ class _HistoryMapViewState extends State<HistoryMapView> {
             },
           ),
 
-          CustomInfoWindow(controller: _customInfoWindowController,
-          height: 250,
+          CustomInfoWindow(
+            controller: _customInfoWindowController,
+            height: 250,
             width: 300,
             offset: 35,
-          )
-        ]
+          ),
+        ],
       ),
 
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-              TimeLineEmp(empId,selectedDate)));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TimeLineEmp(empId, selectedDate),
+            ),
+          );
         },
         backgroundColor: Mythemes.lightBluishColor,
-        child: Icon(
-          Icons.timeline, color: Mythemes.whitish, size: 28,
-        ),
+        child: Icon(Icons.timeline, color: Mythemes.whitish, size: 28),
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,

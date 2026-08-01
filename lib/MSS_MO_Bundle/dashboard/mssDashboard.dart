@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../adminPage/adminDashboard/absentEmpList.dart';
 import '../../adminPage/adminDashboard/earlyGoEmpList.dart';
 import '../../adminPage/adminDashboard/halfDayEmpList.dart';
@@ -37,7 +38,8 @@ class MSS_MO_Dashboard extends StatefulWidget {
   MSS_MO_Dashboard(this.dashboardModel1);
 
   @override
-  State<MSS_MO_Dashboard> createState() => _MSS_MO_DashboardState(dashboardModel1);
+  State<MSS_MO_Dashboard> createState() =>
+      _MSS_MO_DashboardState(dashboardModel1);
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -66,8 +68,8 @@ bool isLoadingEvent = true;
 String valuenew = "listText";
 String shiftValue = "listText";
 dynamic matchedOrg;
-class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
+class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
   final DashboardModel dashboardModel1;
 
   _MSS_MO_DashboardState(this.dashboardModel1);
@@ -145,10 +147,12 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
     if (orgListString != null) {
       List<dynamic> decoded = json.decode(orgListString);
-      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+      storedOrgList =
+          decoded.map((item) => Map<String, dynamic>.from(item)).toList();
 
       // Populate dropdown list
-      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+      organizations =
+          storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
       //selectedOrg = null;
@@ -165,7 +169,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
   bool isBranchLoading = false;
 
   Future getSharedPrfanceList() async {
-
     if (!_isBottomSheetOpen) {
       await Future.delayed(Duration(milliseconds: 100));
       _showFilterBottomSheet();
@@ -180,7 +183,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
   String? selectedDateFormatted;
 
   void _showFilterBottomSheet() {
-    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    if (_isBottomSheetOpen) return; // âœ… Prevent multiple opens
     _isBottomSheetOpen = true;
 
     showModalBottomSheet(
@@ -219,7 +222,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       ),
                       Text(
                         'Filter',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       SizedBox(height: 16),
 
@@ -259,7 +265,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
                           // Step 3: Get Org ID
                           matchedOrg = storedOrgList.firstWhere(
-                                (org) => org['orgName'] == value,
+                            (org) => org['orgName'] == value,
                             orElse: () => {},
                           );
                           getOrgId = matchedOrg['id']?.toString() ?? '';
@@ -270,12 +276,14 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                           await getBranchList(sessionId!);
 
                           // Step 5: Populate Branch Dropdown List
-                          storedBranchList = branchListModalGloabal?.data?.map((branch) {
-                            return {
-                              'branchId': branch.branchId,
-                              'branchName': branch.branchName?.trim() ?? '',
-                            };
-                          }).toList() ?? [];
+                          storedBranchList =
+                              branchListModalGloabal?.data?.map((branch) {
+                                return {
+                                  'branchId': branch.branchId,
+                                  'branchName': branch.branchName?.trim() ?? '',
+                                };
+                              }).toList() ??
+                              [];
 
                           // Step 6: Stop loader
                           setState(() {
@@ -291,72 +299,87 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       /// Branch Dropdown
                       DropdownButtonFormField<String>(
                         decoration: InputDecoration(
-                          labelText: isBranchLoading ? 'Loading Branches...' : 'Select Branch',
+                          labelText:
+                              isBranchLoading
+                                  ? 'Loading Branches...'
+                                  : 'Select Branch',
                           border: OutlineInputBorder(),
                         ),
                         value: selectedBranchName,
-                        items: isBranchLoading
-                            ? [
-                          DropdownMenuItem<String>(
-                            value: null,
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 15,
-                                  height: 15,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                                SizedBox(width: 10),
-                                Text("Loading...")
-                              ],
-                            ),
-                          )
-                        ]
-                            : [
-                          const DropdownMenuItem<String>(
-                            value: null,
-                            child: Text('Select'),
-                          ),
-                          ...storedBranchList.map((branch) {
-                            return DropdownMenuItem<String>(
-                              value: branch['branchName'],
-                              child: Text(branch['branchName']),
-                            );
-                          }),
-                        ],
-                        onChanged: isBranchLoading
-                            ? null
-                            : (value) {
-                          setState(() {
-                            selectedBranchName = value;
+                        items:
+                            isBranchLoading
+                                ? [
+                                  DropdownMenuItem<String>(
+                                    value: null,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 15,
+                                          height: 15,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Text("Loading..."),
+                                      ],
+                                    ),
+                                  ),
+                                ]
+                                : [
+                                  const DropdownMenuItem<String>(
+                                    value: null,
+                                    child: Text('Select'),
+                                  ),
+                                  ...storedBranchList.map((branch) {
+                                    return DropdownMenuItem<String>(
+                                      value: branch['branchName'],
+                                      child: Text(branch['branchName']),
+                                    );
+                                  }),
+                                ],
+                        onChanged:
+                            isBranchLoading
+                                ? null
+                                : (value) {
+                                  setState(() {
+                                    selectedBranchName = value;
 
-                            final matchedBranch = storedBranchList.firstWhere(
-                                  (branch) => branch['branchName'] == value,
-                              orElse: () => {},
-                            );
+                                    final matchedBranch = storedBranchList
+                                        .firstWhere(
+                                          (branch) =>
+                                              branch['branchName'] == value,
+                                          orElse: () => {},
+                                        );
 
-                            selectedBranchId = matchedBranch['branchId'] ?? 0;
-                            print('Branch Name: $selectedBranchName');
-                            print('Branch ID: $selectedBranchId');
-                          });
+                                    selectedBranchId =
+                                        matchedBranch['branchId'] ?? 0;
+                                    print('Branch Name: $selectedBranchName');
+                                    print('Branch ID: $selectedBranchId');
+                                  });
 
-                          setModalState(() {});
-                        },
+                                  setModalState(() {});
+                                },
                       ),
                       SizedBox(height: 8),
+
                       /// Date Picker Field
                       GestureDetector(
                         onTap: () async {
-                          date = (await showDatePicker(
-                              context: context,
-                              initialDate: date,
-                              firstDate: DateTime(1947),
-                              lastDate: DateTime.now().add(Duration(days: 0))))!;
+                          date =
+                              (await showDatePicker(
+                                context: context,
+                                initialDate: date,
+                                firstDate: DateTime(1947),
+                                lastDate: DateTime.now().add(Duration(days: 0)),
+                              ))!;
 
                           setState(() {
                             loader();
                             //getSharedPrfanceList();
-                            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                            singleDateString = DateFormat(
+                              'dd-MM-yyyy',
+                            ).format(date!);
                             singleDay = DateFormat('dd').format(date!);
                             print("SingleDateNew $singleDateString");
                             print("singleDay $singleDay");
@@ -402,7 +425,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 getDashboardData(sessionId!),
                                 //getBranchList(sessionId!),
                                 getShiftList(sessionId!),
-                                getEventData(sessionId!)
+                                getEventData(sessionId!),
                               ]);
 
                               final dashboard = results[0] as DashboardModel;
@@ -423,7 +446,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 roRole = roRoleLocal;
                                 isLoading = false; // Stop loader
                               });
-
                             } catch (e) {
                               print("Error while fetching dashboard data: $e");
                               setState(() {
@@ -431,9 +453,13 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                               });
 
                               // Optional: Show error message
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text("Something went wrong while fetching data."),
-                              ));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Something went wrong while fetching data.",
+                                  ),
+                                ),
+                              );
                             }
                           },
                           icon: Icon(Icons.filter_alt),
@@ -442,7 +468,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                             backgroundColor: Mythemes.successColor,
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 );
@@ -452,10 +478,9 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
         );
       },
     ).whenComplete(() {
-      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+      _isBottomSheetOpen = false; // âœ… Reset when sheet is dismissed
     });
   }
-
 
   Future getSharedPrfanceLists() async {
     setState(() {
@@ -466,7 +491,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
     Future<EventsListModal> getEmployeeList14 = getEventData(sessionId!);
-    getEmployeeList11.then( (value) {
+    getEmployeeList11.then((value) {
       setState(() {
         dashboardModelGlobal = value;
         setState(() {
@@ -498,8 +523,8 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     });
 
     setState(() async {
-      empRole= await shared.getEmpRoll();
-      roRole= await shared.getRoRole();
+      empRole = await shared.getEmpRoll();
+      roRole = await shared.getRoRole();
       //print('EmpRole $empRole');
       //print('roRole $roRole');
     });
@@ -524,15 +549,17 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
     //print('employeeList11: ${SessionId}');
     DashboardModel dashboardModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "branch=$selectedBranchId&"
-        "shift=$shift&"
-        "date=$singleDateString&"
-        "profileId=$defaultProfileId&"
-        "userPermission=$userPanelPermission&"
-        "orgId=$getOrgId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "branch=$selectedBranchId&"
+      "shift=$shift&"
+      "date=$singleDateString&"
+      "profileId=$defaultProfileId&"
+      "userPermission=$userPanelPermission&"
+      "orgId=$getOrgId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     //print('response body ${response.body}');
@@ -553,7 +580,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     BranchListModal branchListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('BRANCH URL ${response.request}');
     //print('response body ${response.body}');
@@ -576,11 +603,13 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     String apiUrl = ApiDetails.branchListApi;
 
     BranchListModal branchListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "userPermission=$userPanelPermission&"
-        "orgId=$getOrgId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "userPermission=$userPanelPermission&"
+      "orgId=$getOrgId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('BRANCH URL ${response.request}');
 
@@ -605,11 +634,13 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
 
     print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "userPermission=$userPanelPermission&"
-        "orgId=$getOrgId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "userPermission=$userPanelPermission&"
+      "orgId=$getOrgId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
@@ -630,22 +661,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalNewApi;
 
-
     print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
     setState(() {
-      isLoadingEvent=true;
+      isLoadingEvent = true;
     });
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "branch=$selectedBranchId&"
-        "shift=$shift&"
-        "date=$singleDateString&"
-        "profileId=$defaultProfileId&"
-        "userPermission=$userPanelPermission&"
-        "orgId=$getOrgId");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "branch=$selectedBranchId&"
+      "shift=$shift&"
+      "date=$singleDateString&"
+      "profileId=$defaultProfileId&"
+      "userPermission=$userPanelPermission&"
+      "orgId=$getOrgId",
+    );
 
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
@@ -655,7 +687,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     print('Body Data $getData');
     eventsListModal = EventsListModal.fromJson(mapResponse);
     setState(() {
-      isLoadingEvent=false;
+      isLoadingEvent = false;
     });
     return eventsListModal;
   }
@@ -670,10 +702,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
             margin: EdgeInsets.all(8),
             child: CircularProgressIndicator(),
           ),
-          new Text("Please Wait...",
-              style: TextStyle(
-                fontSize: 20,
-              )),
+          new Text("Please Wait...", style: TextStyle(fontSize: 20)),
         ],
       ),
     );
@@ -683,11 +712,15 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
   int currentIndex = 3;
   var titleName = "Dashboard";
   void _handleOption1(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Option 1 Selected')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Option 1 Selected')));
   }
 
   void _handleOption2(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Option 2 Selected')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Option 2 Selected')));
   }
 
   @override
@@ -720,7 +753,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
       ),*/
       floatingActionButton: FloatingActionButton(
         onPressed: _showFilterBottomSheet,
-        child: Icon(Icons.filter_list, color: Mythemes.whitish,),
+        child: Icon(Icons.filter_list, color: Mythemes.whitish),
       ),
       appBar: AppBar(
         title: FittedBox(
@@ -747,9 +780,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                     child: ValueListenableBuilder<String>(
                       valueListenable: selectedProfileNameNotifier,
                       builder: (context, value, _) {
-                        final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
-                            ? "COMPANY_EMPLOYEE"
-                            : value;
+                        final displayText =
+                            (userPanelPermission == "COMPANY_EMPLOYEE")
+                                ? "COMPANY_EMPLOYEE"
+                                : value;
 
                         return Text(
                           displayText,
@@ -790,41 +824,51 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
           ),
         ],*/
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          Expanded(child: dashboardModelGlobal == null
-              ? Center(child: "Please select Organisation first!".text.bold.center.make())
-              : RefreshIndicator(
-              onRefresh: () {
-                return getSharedPrfanceList();
-              },
-              child: DashboardWidgets(dashboardModelGlobal!)),)
-        ],
-      ),
+      body:
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  Expanded(
+                    child:
+                        dashboardModelGlobal == null
+                            ? Center(
+                              child:
+                                  "Please select Organisation first!"
+                                      .text
+                                      .bold
+                                      .center
+                                      .make(),
+                            )
+                            : RefreshIndicator(
+                              onRefresh: () {
+                                return getSharedPrfanceList();
+                              },
+                              child: DashboardWidgets(dashboardModelGlobal!),
+                            ),
+                  ),
+                ],
+              ),
 
-
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
+          if (index == 0) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const PunchInOUtActivity(selectedIndex: 0),
+                builder:
+                    (context) => const PunchInOUtActivity(selectedIndex: 0),
               ),
             );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
+          if (index == 1) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -835,24 +879,26 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('workflow');
           }
-          if(index==2){
+          if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const PunchInOUtActivity(selectedIndex: 2),
+                builder:
+                    (context) => const PunchInOUtActivity(selectedIndex: 2),
               ),
             );
             print('Reports');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             print('Profile');
           }
@@ -862,10 +908,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_rounded),
             label: 'Workflow',
@@ -909,40 +952,42 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     var oldEventLength;
     var oldJobLength;
     var oldJobEvent;
-    if (eventsListModalGlobal != null && eventsListModalGlobal!.bdayList != null) {
+    if (eventsListModalGlobal != null &&
+        eventsListModalGlobal!.bdayList != null) {
       setState(() {
-        isLoadingEvent=true;
+        isLoadingEvent = true;
       });
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
         print("oldEvent $oldEvent");
         setState(() {
-          isLoadingEvent=false;
+          isLoadingEvent = false;
         });
       }
     } else {
       setState(() {
-        isLoadingEvent=false;
+        isLoadingEvent = false;
       });
       print("bdayList is null or eventsListModalGlobal is null");
     }
 
-    if (eventsListModalGlobal != null && eventsListModalGlobal!.joblist != null) {
+    if (eventsListModalGlobal != null &&
+        eventsListModalGlobal!.joblist != null) {
       setState(() {
-        isLoadingEvent=true;
+        isLoadingEvent = true;
       });
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
         print("oldJobEvent $oldJobEvent");
         setState(() {
-          isLoadingEvent=false;
+          isLoadingEvent = false;
         });
       }
     } else {
       setState(() {
-        isLoadingEvent=false;
+        isLoadingEvent = false;
       });
       print("job list is null or eventsListModalGlobal is null");
     }
@@ -989,36 +1034,49 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       spacing: 2.0,
                       customSeparatorBuilder: (context, local, global) {
                         final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
                         return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
+                          indent: 10.0,
+                          endIndent: 10.0,
+                          color: Colors.white38.withOpacity(opacity),
+                        );
                       },
                       customIconBuilder: (context, local, global) {
                         final text = const ['ESS', 'MSS'][local.index];
                         return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: Color.lerp(
+                                Colors.black,
+                                Colors.white,
+                                local.animationValue,
+                              ),
+                            ),
+                          ),
+                        );
                       },
                       borderWidth: 0.0,
                       onChanged: (i) {
                         setState(() {
                           value = i;
                           print(i);
-
                         });
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssNewDashboardRoute);
+                        if (value == 1) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.mssNewDashboardRoute,
+                          );
                         }
-                        if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        if (value == 0) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.essDashboardNavigateRoute,
+                          );
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -1047,36 +1105,49 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       spacing: 2.0,
                       customSeparatorBuilder: (context, local, global) {
                         final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
+                            ((global.position - local.position).abs() - 0.5)
+                                .clamp(0.0, 1.0);
                         return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
+                          indent: 10.0,
+                          endIndent: 10.0,
+                          color: Colors.white38.withOpacity(opacity),
+                        );
                       },
                       customIconBuilder: (context, local, global) {
                         final text = const ['ESS', 'MSS MO'][local.index];
                         return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: Color.lerp(
+                                Colors.black,
+                                Colors.white,
+                                local.animationValue,
+                              ),
+                            ),
+                          ),
+                        );
                       },
                       borderWidth: 0.0,
                       onChanged: (i) {
                         setState(() {
                           value = i;
                           print(i);
-
                         });
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
+                        if (value == 1) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.mssMoNewDashboardRoute,
+                          );
                         }
-                        if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+                        if (value == 0) {
+                          Navigator.pushNamed(
+                            context,
+                            MyRoutings.essDashboardNavigateRoute,
+                          );
                         }
                       },
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -1199,8 +1270,12 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                         ),
                         child: DropdownButtonFormField<int>(
                           isExpanded: true,
-                          icon: Visibility(visible: false, child: Icon(Icons.arrow_downward)),
-                          value: dropdownNewvalue, // Ensure this is initialized properly
+                          icon: Visibility(
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
+                          value:
+                              dropdownNewvalue, // Ensure this is initialized properly
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "All Branches",
@@ -1210,13 +1285,21 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                           items: [
                             DropdownMenuItem<int>(
                               value: 0,
-                              child: Text("All Branches", style: TextStyle(fontSize: 10)),
+                              child: Text(
+                                "All Branches",
+                                style: TextStyle(fontSize: 10),
+                              ),
                             ),
-                            ...?branchListModalGloabal?.data?.map<DropdownMenuItem<int>>((branch) {
+                            ...?branchListModalGloabal?.data?.map<
+                              DropdownMenuItem<int>
+                            >((branch) {
                               return DropdownMenuItem<int>(
-                                value: branch.branchId, // Use branchId as the unique value
+                                value:
+                                    branch
+                                        .branchId, // Use branchId as the unique value
                                 child: Text(
-                                  branch.branchName!.trim(), // Ensure clean display
+                                  branch.branchName!
+                                      .trim(), // Ensure clean display
                                   style: TextStyle(fontSize: 10),
                                 ),
                               );
@@ -1246,25 +1329,43 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                         ),
                         child: DropdownButtonFormField<int>(
                           isExpanded: true,
-                          icon: Visibility(visible: false, child: Icon(Icons.arrow_downward)),
-                          value: dropdownNewvalueShift, // Ensure this is initialized properly
+                          icon: Visibility(
+                            visible: false,
+                            child: Icon(Icons.arrow_downward),
+                          ),
+                          value:
+                              dropdownNewvalueShift, // Ensure this is initialized properly
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "All Shifts",
-                            hintStyle: TextStyle(fontSize: 14.2, overflow: TextOverflow.ellipsis),
+                            hintStyle: TextStyle(
+                              fontSize: 14.2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             contentPadding: EdgeInsets.all(5),
                           ),
                           items: [
                             DropdownMenuItem<int>(
                               value: 0,
-                              child: Text("All Shifts", style: TextStyle(fontSize: 10)),
+                              child: Text(
+                                "All Shifts",
+                                style: TextStyle(fontSize: 10),
+                              ),
                             ),
-                            ...?shiftListModalGlobal?.data?.map<DropdownMenuItem<int>>((shift) {
+                            ...?shiftListModalGlobal?.data?.map<
+                              DropdownMenuItem<int>
+                            >((shift) {
                               return DropdownMenuItem<int>(
-                                value: shift.shiftId, // Use shiftId as the unique value
+                                value:
+                                    shift
+                                        .shiftId, // Use shiftId as the unique value
                                 child: Text(
-                                  shift.shiftName!.trim(), // Remove unnecessary spaces/tabs
-                                  style: TextStyle(overflow: TextOverflow.ellipsis, fontSize: 10),
+                                  shift.shiftName!
+                                      .trim(), // Remove unnecessary spaces/tabs
+                                  style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: 10,
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -1293,21 +1394,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       onTap: () {
                         if (totalPresentEmp == 0 || totalPresentEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      PresentEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  PresentEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1326,34 +1429,33 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$totalPresentEmp / $totalEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.lightBluishColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$totalPresentEmp / $totalEmp"
+                                              .text
+                                              .xl2
+                                              .bold
+                                              .color(Mythemes.lightBluishColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.groups,
-                                            size: 58,
-                                            color: Mythemes.lightBluishColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.groups,
+                                          size: 58,
+                                          color: Mythemes.lightBluishColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Attendance"
-                                          .text
-                                          .xl
+                                      "Attendance".text.xl
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .px8(),
@@ -1372,21 +1474,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       onTap: () {
                         if (totalAbsentEmp == 0 || totalAbsentEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      AbsentEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  AbsentEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1405,35 +1509,30 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$totalAbsentEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$totalAbsentEmp".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.not_interested,
                                           size: 55,
                                           color: Mythemes.dangerColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Not In"
-                                          .text
-                                          .xl
+                                      "Not In".text.xl
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .px8(),
@@ -1458,21 +1557,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       onTap: () {
                         if (misPunchEmp == 0 || misPunchEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      MissPunchEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  MissPunchEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1491,34 +1592,30 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$misPunchEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.warningColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$misPunchEmp".text.xl2.bold
+                                              .color(Mythemes.warningColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.touch_app,
-                                            size: 58,
-                                            color: Mythemes.warningColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.touch_app,
+                                          size: 58,
+                                          color: Mythemes.warningColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Mispunch"
-                                          .text
-                                          .xl
+                                      "Mispunch".text.xl
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .px8(),
@@ -1537,21 +1634,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       onTap: () {
                         if (onDuty == 0 || onDuty == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OnDutyEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  OnDutyEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1570,35 +1669,30 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$onDuty"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.successColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$onDuty".text.xl2.bold
+                                              .color(Mythemes.successColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.business_center,
                                           size: 55,
                                           color: Mythemes.successColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "On Duty"
-                                          .text
-                                          .xl
+                                      "On Duty".text.xl
                                           .color(Mythemes.successColor)
                                           .make()
                                           .px8(),
@@ -1623,21 +1717,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       onTap: () {
                         if (lateIn == 0 || lateIn == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      LateInEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  LateInEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1656,34 +1752,30 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$lateIn"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.alertColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$lateIn".text.xl2.bold
+                                              .color(Mythemes.alertColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.assignment_late,
-                                            size: 58,
-                                            color: Mythemes.alertColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.assignment_late,
+                                          size: 58,
+                                          color: Mythemes.alertColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Late In"
-                                          .text
-                                          .xl
+                                      "Late In".text.xl
                                           .color(Mythemes.alertColor)
                                           .make()
                                           .px8(),
@@ -1702,21 +1794,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       onTap: () {
                         if (earlyOutEmp == 0 || earlyOutEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      EarlyGoEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  EarlyGoEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1735,35 +1829,30 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$earlyOutEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.lightBluishColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$earlyOutEmp".text.xl2.bold
+                                              .color(Mythemes.lightBluishColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.directions_run,
                                           size: 55,
                                           color: Mythemes.lightBluishColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Early Go"
-                                          .text
-                                          .xl
+                                      "Early Go".text.xl
                                           .color(Mythemes.lightBluishColor)
                                           .make()
                                           .px8(),
@@ -1788,21 +1877,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       onTap: () {
                         if (halfEmp == 0 || halfEmp == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      HalfDayEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  HalfDayEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1821,34 +1912,30 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      "$halfEmp"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.warningColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : "$halfEmp".text.xl2.bold
+                                              .color(Mythemes.warningColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
-                                          child: Icon(
-                                            Icons.calendar_month,
-                                            size: 58,
-                                            color: Mythemes.warningColor,
-                                          )).px8()
+                                        child: Icon(
+                                          Icons.calendar_month,
+                                          size: 58,
+                                          color: Mythemes.warningColor,
+                                        ),
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Half Day"
-                                          .text
-                                          .xl
+                                      "Half Day".text.xl
                                           .color(Mythemes.warningColor)
                                           .make()
                                           .px8(),
@@ -1867,21 +1954,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                       onTap: () {
                         if (overTime == 0 || overTime == null) {
                           Fluttertoast.showToast(
-                              msg: "There is no data available for this date.",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.black,
-                              textColor: Colors.white,
-                              fontSize: 16.0
+                            msg: "There is no data available for this date.",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      OverTimeEmpList(dashboardModelGlobal!),
+                            ),
                           );
                         }
-                        else{
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  OverTimeEmpList(dashboardModelGlobal!)));
-                        }
-
                       },
                       child: Card(
                         elevation: 4,
@@ -1900,41 +1989,36 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                                 children: [
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       isLoading
                                           ? CircularProgressIndicator()
-                                          .centered()
-                                          .py8()
-                                          .px8():
-                                      overTime == null ? "0".text.xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8() :
-                                      "$overTime"
-                                          .text
-                                          .xl2
-                                          .bold
-                                          .color(Mythemes.dangerColor)
-                                          .make()
-                                          .py8()
-                                          .px8(),
+                                              .centered()
+                                              .py8()
+                                              .px8()
+                                          : overTime == null
+                                          ? "0".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8()
+                                          : "$overTime".text.xl2.bold
+                                              .color(Mythemes.dangerColor)
+                                              .make()
+                                              .py8()
+                                              .px8(),
                                       Container(
                                         child: Icon(
                                           Icons.timelapse,
                                           size: 55,
                                           color: Mythemes.dangerColor,
                                         ),
-                                      ).px8()
+                                      ).px8(),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      "Over Time"
-                                          .text
-                                          .xl
+                                      "Over Time".text.xl
                                           .color(Mythemes.dangerColor)
                                           .make()
                                           .px8(),
@@ -1950,8 +2034,9 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                   ),
                 ],
               ).pLTRB(0, 0, 0, 10.0),
-              empRole == 1 || roRole == 1 ?
-              /*DefaultTabController(
+              empRole == 1 || roRole == 1
+                  ?
+                  /*DefaultTabController(
                 length: 3,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -2179,88 +2264,97 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                   ],
                 ),
               )*/
-              DefaultTabController(
-                length: 3,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    // TabBar
-                    Material(
-                      color: Mythemes.whitish,
-                      child: TabBar(
-                        indicatorColor: Colors.deepPurple,
-                        indicatorWeight: 3,
-                        labelColor: Colors.deepPurple,
-                        unselectedLabelColor: Mythemes.blackishade,
-                        tabs: const [
-                          Tab(icon: Icon(Icons.celebration), text: "Birthday"),
-                          Tab(icon: Icon(Icons.workspace_premium_outlined), text: "Work Anniversary"),
-                          Tab(icon: Icon(Icons.today), text: "Today Events"),
-                        ],
-                      ),
-                    ),
-
-                    // Tab Views
-                    SizedBox(
-                      height: 400,
-                      child: TabBarView(
-                        children: [
-                          // 🎂 Birthday Tab
-                          buildEventList(
-                            isLoading: isLoadingEvent,
-                            items: eventsListModalGlobal?.bdayList ?? [],
-                            emptyText: "No birthdays today 🎉",
-                            titleBuilder: (item) => item.fullName,
-                            subtitleBuilder: (item) => item.department,
-                            trailingBuilder: (item) => item.dob,
-                            imageBuilder: (item) => item.image,
+                  DefaultTabController(
+                    length: 3,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        // TabBar
+                        Material(
+                          color: Mythemes.whitish,
+                          child: TabBar(
+                            indicatorColor: Colors.deepPurple,
+                            indicatorWeight: 3,
+                            labelColor: Colors.deepPurple,
+                            unselectedLabelColor: Mythemes.blackishade,
+                            tabs: const [
+                              Tab(
+                                icon: Icon(Icons.celebration),
+                                text: "Birthday",
+                              ),
+                              Tab(
+                                icon: Icon(Icons.workspace_premium_outlined),
+                                text: "Work Anniversary",
+                              ),
+                              Tab(
+                                icon: Icon(Icons.today),
+                                text: "Today Events",
+                              ),
+                            ],
                           ),
+                        ),
 
-                          // 🏅 Anniversary Tab
-                          buildEventList(
-                            isLoading: isLoadingEvent,
-                            items: eventsListModalGlobal?.joblist ?? [],
-                            emptyText: "No anniversaries today 🎊",
-                            titleBuilder: (item) => item.fullName,
-                            subtitleBuilder: (item) => item.department,
-                            trailingBuilder: (item) => item.doj,
-                            imageBuilder: (item) => item.image,
-                          ),
-
-                          // 📅 Today Events Tab (combine lists)
-                          ListView(
+                        // Tab Views
+                        SizedBox(
+                          height: 400,
+                          child: TabBarView(
                             children: [
+                              // ðŸŽ‚ Birthday Tab
                               buildEventList(
                                 isLoading: isLoadingEvent,
                                 items: eventsListModalGlobal?.bdayList ?? [],
-                                emptyText: "No birthday events today 🎂",
+                                emptyText: "No birthdays today ðŸŽ‰",
                                 titleBuilder: (item) => item.fullName,
                                 subtitleBuilder: (item) => item.department,
                                 trailingBuilder: (item) => item.dob,
                                 imageBuilder: (item) => item.image,
                               ),
+
+                              // ðŸ… Anniversary Tab
                               buildEventList(
                                 isLoading: isLoadingEvent,
                                 items: eventsListModalGlobal?.joblist ?? [],
-                                emptyText: "No work anniversaries today 🎉",
+                                emptyText: "No anniversaries today ðŸŽŠ",
                                 titleBuilder: (item) => item.fullName,
                                 subtitleBuilder: (item) => item.department,
                                 trailingBuilder: (item) => item.doj,
                                 imageBuilder: (item) => item.image,
                               ),
+
+                              // ðŸ“… Today Events Tab (combine lists)
+                              ListView(
+                                children: [
+                                  buildEventList(
+                                    isLoading: isLoadingEvent,
+                                    items:
+                                        eventsListModalGlobal?.bdayList ?? [],
+                                    emptyText: "No birthday events today ðŸŽ‚",
+                                    titleBuilder: (item) => item.fullName,
+                                    subtitleBuilder: (item) => item.department,
+                                    trailingBuilder: (item) => item.dob,
+                                    imageBuilder: (item) => item.image,
+                                  ),
+                                  buildEventList(
+                                    isLoading: isLoadingEvent,
+                                    items: eventsListModalGlobal?.joblist ?? [],
+                                    emptyText:
+                                        "No work anniversaries today ðŸŽ‰",
+                                    titleBuilder: (item) => item.fullName,
+                                    subtitleBuilder: (item) => item.department,
+                                    trailingBuilder: (item) => item.doj,
+                                    imageBuilder: (item) => item.image,
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ) :
-              //TabSection(EventsListModal()!) :
-              SizedBox(
-                height: 0,
-              )
-              ,
+                        ),
+                      ],
+                    ),
+                  )
+                  :
+                  //TabSection(EventsListModal()!) :
+                  SizedBox(height: 0),
             ],
           ),
         ),
@@ -2278,9 +2372,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     required String Function(T) imageBuilder,
   }) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(strokeWidth: 3),
-      );
+      return const Center(child: CircularProgressIndicator(strokeWidth: 3));
     }
 
     if (items.isEmpty) {
@@ -2323,10 +2415,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
             ),
             subtitle: Text(
               subtitleBuilder(item),
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
             trailing: Text(
               trailingBuilder(item),
@@ -2341,20 +2430,19 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
     );
   }
 
-
   TabSection(EventsListModal eventsListModal) {
     var todayEvent;
     var oldEvent;
     var oldEventLength;
     var oldJobLength;
     var oldJobEvent;
-    for(int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
+    for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
       print("oldEvent $oldEvent");
     }
 
-    for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
+    for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
       print("oldJobEvent $oldJobEvent");
@@ -2376,10 +2464,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
               child: TabBar(
                 tabs: [
                   Tab(
-                    icon: Icon(
-                      Icons.celebration,
-                      color: Mythemes.blackishade,
-                    ),
+                    icon: Icon(Icons.celebration, color: Mythemes.blackishade),
                     text: "Birthday",
                   ),
                   Tab(
@@ -2390,10 +2475,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
                     text: "Anniversary",
                   ),
                   Tab(
-                    icon: Icon(
-                      Icons.today,
-                      color: Mythemes.blackishade,
-                    ),
+                    icon: Icon(Icons.today, color: Mythemes.blackishade),
                     text: "Today events",
                   ),
                 ],
@@ -2402,175 +2484,234 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware{
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: TabBarView(children: [
-
-              Container(
-                // height: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child:
-                  oldEventLength == null ? "There is no data available.".text.center.make().py16() :
-                  ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: eventsListModalGlobal!.bdayList!.length,
-                      itemBuilder: (context, itemCount) {
-                        return Card(
-                          child: ListTile(
-                            //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
-                            title: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].fullName
-                                .toString()),
-                            subtitle: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].department
-                                .toString()),
-                            trailing: Text(eventsListModalGlobal!
-                                .bdayList![itemCount].dob
-                                .toString()),
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                    eventsListModalGlobal!
-                                        .bdayList![itemCount].image
-                                        .toString()),
-                                backgroundColor: Colors.grey,
-                                // child: Image.network(imageString!),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-              ),
-              Container(
-                // height: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child:
-                  oldJobLength == null ? "There is no data available.".text.center.make().py16() :
-                  ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: eventsListModalGlobal!.joblist!.length,
-                      itemBuilder: (context, itemCount) {
-                        return Card(
-                          child: ListTile(
-                            title: Text(eventsListModalGlobal!
-                                .joblist![itemCount].fullName
-                                .toString()),
-                            subtitle: Text(eventsListModalGlobal!
-                                .joblist![itemCount].department
-                                .toString()),
-                            trailing: Text(eventsListModalGlobal!
-                                .joblist![itemCount].doj
-                                .toString()),
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                    eventsListModalGlobal!
-                                        .joblist![itemCount].image
-                                        .toString()),
-                                backgroundColor: Colors.grey,
-                                // child: Image.network(imageString!),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-              ),
-              Container(
-                // height: 1,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                      oldEvent != todayEvent ? "There is no data available.".text.make().py16() :
-
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: eventsListModalGlobal!.bdayList!.length,
-                          itemBuilder: (context, itemCount) {
-
-                            return Card(
-                              child: ListTile(
-                                title: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].fullName
-                                    .toString()),
-                                subtitle: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].department
-                                    .toString()),
-                                trailing: Text(eventsListModalGlobal!
-                                    .bdayList![itemCount].dob
-                                    .toString()),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                        eventsListModalGlobal!
-                                            .bdayList![itemCount].image
-                                            .toString()),
-                                    backgroundColor: Colors.grey,
-                                    // child: Image.network(imageString!),
+            child: TabBarView(
+              children: [
+                Container(
+                  // height: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        oldEventLength == null
+                            ? "There is no data available.".text.center
+                                .make()
+                                .py16()
+                            : ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount:
+                                  eventsListModalGlobal!.bdayList!.length,
+                              itemBuilder: (context, itemCount) {
+                                return Card(
+                                  child: ListTile(
+                                    //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
+                                    title: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .fullName
+                                          .toString(),
+                                    ),
+                                    subtitle: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .department
+                                          .toString(),
+                                    ),
+                                    trailing: Text(
+                                      eventsListModalGlobal!
+                                          .bdayList![itemCount]
+                                          .dob
+                                          .toString(),
+                                    ),
+                                    leading: Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .image
+                                              .toString(),
+                                        ),
+                                        backgroundColor: Colors.grey,
+                                        // child: Image.network(imageString!),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                      oldJobEvent != todayEvent ? "".text.make() :
-
-                      ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: eventsListModalGlobal!.joblist!.length,
-                          itemBuilder: (context, itemCount) {
-                            return Card(
-                              child: ListTile(
-                                title: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].fullName
-                                    .toString()),
-                                subtitle: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].department
-                                    .toString()),
-                                trailing: Text(eventsListModalGlobal!
-                                    .joblist![itemCount].doj
-                                    .toString()),
-                                leading: Container(
-                                  width: 40,
-                                  height: 40,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                        eventsListModalGlobal!
-                                            .bdayList![itemCount].image
-                                            .toString()),
-                                    backgroundColor: Colors.grey,
-                                    // child: Image.network(imageString!),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
+                                );
+                              },
+                            ),
+                  ),
                 ),
-              ),
-            ]),
-          )
+                Container(
+                  // height: 1,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        oldJobLength == null
+                            ? "There is no data available.".text.center
+                                .make()
+                                .py16()
+                            : ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: eventsListModalGlobal!.joblist!.length,
+                              itemBuilder: (context, itemCount) {
+                                return Card(
+                                  child: ListTile(
+                                    title: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .fullName
+                                          .toString(),
+                                    ),
+                                    subtitle: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .department
+                                          .toString(),
+                                    ),
+                                    trailing: Text(
+                                      eventsListModalGlobal!
+                                          .joblist![itemCount]
+                                          .doj
+                                          .toString(),
+                                    ),
+                                    leading: Container(
+                                      width: 40,
+                                      height: 40,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .image
+                                              .toString(),
+                                        ),
+                                        backgroundColor: Colors.grey,
+                                        // child: Image.network(imageString!),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                  ),
+                ),
+                Container(
+                  // height: 1,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            oldEvent != todayEvent
+                                ? "There is no data available.".text
+                                    .make()
+                                    .py16()
+                                : ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      eventsListModalGlobal!.bdayList!.length,
+                                  itemBuilder: (context, itemCount) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .fullName
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .department
+                                              .toString(),
+                                        ),
+                                        trailing: Text(
+                                          eventsListModalGlobal!
+                                              .bdayList![itemCount]
+                                              .dob
+                                              .toString(),
+                                        ),
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount]
+                                                  .image
+                                                  .toString(),
+                                            ),
+                                            backgroundColor: Colors.grey,
+                                            // child: Image.network(imageString!),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child:
+                            oldJobEvent != todayEvent
+                                ? "".text.make()
+                                : ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      eventsListModalGlobal!.joblist!.length,
+                                  itemBuilder: (context, itemCount) {
+                                    return Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .fullName
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .department
+                                              .toString(),
+                                        ),
+                                        trailing: Text(
+                                          eventsListModalGlobal!
+                                              .joblist![itemCount]
+                                              .doj
+                                              .toString(),
+                                        ),
+                                        leading: Container(
+                                          width: 40,
+                                          height: 40,
+                                          child: CircleAvatar(
+                                            radius: 30,
+                                            backgroundImage: NetworkImage(
+                                              eventsListModalGlobal!
+                                                  .bdayList![itemCount]
+                                                  .image
+                                                  .toString(),
+                                            ),
+                                            backgroundColor: Colors.grey,
+                                            // child: Image.network(imageString!),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -2621,12 +2762,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               border: OutlineInputBorder(),
             ),
             value: selectedOrg,
-            items: organizations.map((org) {
-              return DropdownMenuItem(
-                value: org,
-                child: Text(org),
-              );
-            }).toList(),
+            items:
+                organizations.map((org) {
+                  return DropdownMenuItem(value: org, child: Text(org));
+                }).toList(),
             onChanged: (value) {
               setState(() {
                 selectedOrg = value;
@@ -2647,7 +2786,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               if (pickedDate != null) {
                 setState(() {
                   selectedDate = pickedDate;
-                  selectedDateFormatted = DateFormat('dd-MM-yyyy').format(pickedDate);
+                  selectedDateFormatted = DateFormat(
+                    'dd-MM-yyyy',
+                  ).format(pickedDate);
                 });
               }
             },

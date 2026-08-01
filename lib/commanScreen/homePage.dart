@@ -44,6 +44,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import '../adminPage/modelClass/dashboardModel.dart';
 import '../ess/myAllReports.dart';
@@ -57,12 +58,15 @@ import '../reports/reportPage.dart';
 import '../settings/checkForUpdates.dart';
 import '../settings/companyPolicyList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
+import '../services/mobile_auth_service.dart';
+import '../services/mobile_profile_cache.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../singUP/resetPassword/resetPasswordPage.dart';
 import 'allAPIList.dart';
+import '../utils/profile_image_provider.dart';
 import 'commanNotificationPage.dart';
 import 'digiWeighWorkDone.dart';
 import 'modalClass/geofenceListModal.dart';
@@ -70,7 +74,6 @@ import 'modalClass/geofenceListModal.dart';
 class HomePage extends StatefulWidget {
   final int selectedIndex;
   const HomePage({super.key, this.selectedIndex = 0});
-
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -88,16 +91,17 @@ var exitResignationApproveL2View = "0";
 var exitResignationDisApproveL1View = "0";
 var exitResignationDisApproveL2View = "0";
 Position? positionCheck = Position(
-    longitude: 0.0,
-    latitude: 0.0,
-    timestamp: date,
-    accuracy: 0.0,
-    altitude: 0.0,
-    altitudeAccuracy: 0.0,
-    heading: 0.0,
-    headingAccuracy: 0.0,
-    speed: 0.0,
-    speedAccuracy: 0.0);
+  longitude: 0.0,
+  latitude: 0.0,
+  timestamp: date,
+  accuracy: 0.0,
+  altitude: 0.0,
+  altitudeAccuracy: 0.0,
+  heading: 0.0,
+  headingAccuracy: 0.0,
+  speed: 0.0,
+  speedAccuracy: 0.0,
+);
 
 LatLng? currentPostion;
 late GoogleMapController googleMapControllerNew;
@@ -108,9 +112,9 @@ late LoginModel _loginModel;
 String timeStringNew = "";
 String? sessionId;
 String? userType;
-int? orgnizationID=0;
-late String UserName="Employee Name";
-late String employeeCode="101";
+int? orgnizationID = 0;
+late String UserName = "Employee Name";
+late String employeeCode = "101";
 String? imageStringNew;
 String? defaultProfileName;
 dynamic defaultProfileId;
@@ -190,11 +194,12 @@ class _HomePageState extends State<HomePage> {
     var newFormat = new DateFormat('dd-MM-yyyy');
     todayDateShowNew = newFormat.format(now);
     getUserNameImage();
+    MobileAuthService.instance.syncOnAppOpen();
     super.initState();
   }
 
   var type = "0";
-
+  var title = "Home";
 
   void loadProfileFromPrefs() async {
     String? name = await shared.getDefaultProfileName();
@@ -216,17 +221,12 @@ class _HomePageState extends State<HomePage> {
     String text = "Stop Service";
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Expanded(
-              child: Text(
-                alert,
-                style: TextStyle(fontSize: 20),
-              )),
+          Expanded(child: Text(alert, style: TextStyle(fontSize: 20))),
         ],
       ),
       content: Text(result, style: TextStyle(fontSize: 14)),
@@ -235,109 +235,119 @@ class _HomePageState extends State<HomePage> {
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
         TextButton(
-            onPressed: () async {
-              shared.setSessionId("");
-              shared.setAdminRole(0);
-              shared.setEmpRoll(0);
-              shared.setRoRoll(0);
-              shared.setMobAction(0);
-              getLogout(this.context);
-              final service = FlutterBackgroundService();
-              var isRunning = await service.isRunning();
+          onPressed: () async {
+            await getLogout(this.context);
+            shared.setSessionId("");
+            shared.setAdminRole(0);
+            shared.setEmpRoll(0);
+            shared.setRoRoll(0);
+            shared.setMobAction(0);
+            final service = FlutterBackgroundService();
+            var isRunning = await service.isRunning();
 
-              if (isRunning) {
-                service.invoke("stopService");
+            if (isRunning) {
+              service.invoke("stopService");
+            }
+            if (!isRunning) {
+              text = 'Stop Service';
+            } else {
+              text = 'Start Service';
+            }
+            setState(() {});
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            Navigator.pushAndRemoveUntil(
+              buildContext,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+              (route) => false,
+            );
 
-              } else {
-                service.startService();
-
-              }
-              if (!isRunning) {
-                text = 'Stop Service';
-              } else {
-                text = 'Start Service';
-              }
-              setState(() {});
-              Navigator.of(buildContext, rootNavigator: true).pop();
-              Navigator.pushAndRemoveUntil(
-                buildContext,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-                    (route) => false,
-              );
-
-              //Navigator.of(buildContext, rootNavigator: true).pop();
-            },
-            child: Container(
-              child: Text(
-                "Yes",
-                style: TextStyle(color: Mythemes.warningColor),
-              ),
-            )),
+            //Navigator.of(buildContext, rootNavigator: true).pop();
+          },
+          child: Container(
+            child: Text("Yes", style: TextStyle(color: Mythemes.warningColor)),
+          ),
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   Future getLogout(BuildContext buildContext) async {
-
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.logoutAPi;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "type=$type");
-    var request =  http.MultipartRequest("Post", urlapi);
-    http.Response response =
-    await http.Response.fromStream(await request.send());
-    mapResponse = json.decode(response.body);
+    final currentSessionId = await shared.getMobileSessionId();
+    final accessToken = await shared.getAccessToken();
+    final tokenType = await shared.getTokenType() ?? 'Bearer';
+    final urlapi = Uri.parse("$conn$apiUrl");
+    print('[MOBILE-AUTH] LOGOUT -> POST $urlapi');
+    print(
+      '[MOBILE-AUTH] LOGOUT headers -> tokenPresent=${accessToken != null && accessToken.isNotEmpty} sessionPresent=${currentSessionId != null && currentSessionId.isNotEmpty}',
+    );
 
-    String result = mapResponse['result'];
+    final response = await MobileHttpClient.instance.post(
+      urlapi,
+      headers: {
+        if (accessToken != null && accessToken.isNotEmpty)
+          'Authorization': '$tokenType $accessToken',
+        if (currentSessionId != null && currentSessionId.isNotEmpty)
+          'X-Mobile-Session-Id': currentSessionId,
+      },
+    );
 
-    print('URL ${response.request}');
-    if (response.statusCode == 200) {
-      var responseResult = response.body;
-      print('success $responseResult');
-      //Navigator.pop(this.context);
+    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
+    print(
+      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
+    );
+    if (response.body.isNotEmpty) {
       mapResponse = json.decode(response.body);
-      String reason = mapResponse['reason'];
-      //String status = mapResponse['status'];
-      print('reason both $reason');
-      //print('reason${reason}');
-      if (result.compareToIgnoringCase("success") == 0) {
-        print("Logout Successfully !!");
-        Fluttertoast.showToast(
-            msg: "Logout Successfully !!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        //CommonNotificationPage.showDialgSucess(this.context,reason.upperCamelCase+" ","Success");
-      } else if (result.compareToIgnoringCase("error") == 0) {
-        print("Logout Error !!");
-        Fluttertoast.showToast(
-            msg: "Logout Error !!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        //CommonNotificationPage.showDialgSucess(this.context,reason.upperCamelCase, " Error ");
-      }
+    } else {
+      mapResponse = <String, dynamic>{};
+    }
+
+    final result =
+        (mapResponse['status'] ?? mapResponse['result'] ?? '').toString();
+    final message =
+        (mapResponse['message'] ?? mapResponse['reason'] ?? '').toString();
+
+    if (response.statusCode == 200 &&
+        result.compareToIgnoringCase('success') == 0) {
+      await shared.clearMobileAuth();
+      print('[MOBILE-AUTH] LOGOUT -> success');
+      Fluttertoast.showToast(
+        msg: message.isNotEmpty ? message : "Logout Successfully !!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      print('[MOBILE-AUTH] LOGOUT -> error message=$message');
+      Fluttertoast.showToast(
+        msg: message.isNotEmpty ? message : "Logout Error !!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 
-  var title = "Home";
-
   logoutApp(context) {
     showLogoutPopup(
-        context, "Do You Want To Logout?".toString() + " ", "Alert");
+      context,
+      "Do You Want To Logout?".toString() + " ",
+      "Alert",
+    );
   }
 
   Future getUserNameImage() async {
@@ -347,7 +357,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future getSharedPrfanceList() async {
-
     sessionId = await shared.getSessionId();
     orgId = await shared.getOrgId();
     setGeofenceActive = await shared.getGeofenceActive();
@@ -361,20 +370,16 @@ class _HomePageState extends State<HomePage> {
     Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
     getOrgList.then((value) {
       setState(() {
-        organisationListModal=value;
+        organisationListModal = value;
       });
-
     });
-    setState(() {
-
-    });
+    setState(() {});
 
     imageStringNew = await shared.getProfileImage();
     UserName = await shared.getempName();
     employeeCode = await shared.getEmpCode();
-    lat= await shared.getLatitude();
+    lat = await shared.getLatitude();
     lng = await shared.getLongitude();
-
   }
 
   Future<OrganisationListModal> getOrganisationList(String sessionId) async {
@@ -382,8 +387,10 @@ class _HomePageState extends State<HomePage> {
       String conn = ApiDetails.server;
       String apiUrl = ApiDetails.orgListApi;
 
-      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission");
-      final response = await http.post(urlapi);
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission",
+      );
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       var mapResponse = json.decode(response.body);
       organisationListModal = OrganisationListModal.fromJson(mapResponse);
@@ -405,9 +412,8 @@ class _HomePageState extends State<HomePage> {
   showDialgSucess(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -417,10 +423,7 @@ class _HomePageState extends State<HomePage> {
       content: Container(
         //width: MediaQuery.of(buildContext).size.width,
         padding: EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [Center()],
-        ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [Center()]),
       ),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
@@ -438,19 +441,20 @@ class _HomePageState extends State<HomePage> {
             Navigator.pushAndRemoveUntil(
               this.context,
               MaterialPageRoute(builder: (context) => LoginPage()),
-                  (route) => false,
+              (route) => false,
             );
           },
           child: "Logout".text.color(Mythemes.warningColor).make(),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   @override
@@ -495,9 +499,10 @@ class _HomePageState extends State<HomePage> {
                       child: ValueListenableBuilder<String>(
                         valueListenable: selectedProfileNameNotifier,
                         builder: (context, value, _) {
-                          final displayText = (userPanelPermission == "COMPANY_EMPLOYEE")
-                              ? "ESS"
-                              : value;
+                          final displayText =
+                              (userPanelPermission == "COMPANY_EMPLOYEE")
+                                  ? "ESS"
+                                  : value;
 
                           return Text(
                             displayText,
@@ -598,7 +603,9 @@ class _HomePageState extends State<HomePage> {
         children: [
           CircularProgressIndicator(),
           Container(
-              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
+            margin: EdgeInsets.only(left: 7),
+            child: Text("Loading..."),
+          ),
         ],
       ),
     );
@@ -617,9 +624,7 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Info'),
-          content: const Text(
-            'Do you really want to close this app?',
-          ),
+          content: const Text('Do you really want to close this app?'),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
@@ -650,9 +655,8 @@ class _HomePageState extends State<HomePage> {
   void showAppCloseDialog(BuildContext buildContext, result) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -677,25 +681,21 @@ class _HomePageState extends State<HomePage> {
             });
           },
           child: "Yes".text.color(Mythemes.warningColor).make(),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: this.context,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: this.context,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   void showDialgErro(BuildContext buildContext, result) {
     var alertDialog = AlertDialog(
-      title: Row(
-        children: [
-          Icon(Icons.warning),
-          Text("   Alert Dialog"),
-        ],
-      ),
+      title: Row(children: [Icon(Icons.warning), Text("   Alert Dialog")]),
       content: Text(result),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
@@ -707,15 +707,16 @@ class _HomePageState extends State<HomePage> {
             print('response11 ${result}');
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: this.context,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: this.context,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 }
 
@@ -729,7 +730,6 @@ class DefaultPage extends StatefulWidget {
 Map<String, dynamic> mapResponse = {};
 
 class _DefaultPageState extends State<DefaultPage> {
-
   String? _platformVersion = 'Unknown', _autoTimezone, _autoTime, _daftar = "";
   Map<String, dynamic>? _list;
   SessionManager sessionManager = SessionManager();
@@ -759,6 +759,7 @@ class _DefaultPageState extends State<DefaultPage> {
     initPlatformState();
     super.initState();
   }
+
   StreamSubscription<Position>? positionStream;
   @override
   void dispose() {
@@ -767,14 +768,16 @@ class _DefaultPageState extends State<DefaultPage> {
     positionStream?.cancel();
     super.dispose();
   }
+
   void _startLocationTracking() {
     const LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 5, // update every 5 meter movement
     );
 
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position pos) {
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen((Position pos) {
       setState(() {
         currentPostion = LatLng(pos.latitude, pos.longitude);
       });
@@ -789,40 +792,40 @@ class _DefaultPageState extends State<DefaultPage> {
       // Update map center dynamically
       if (_mapController != null) {
         _mapController!.animateCamera(
-          CameraUpdate.newLatLng(
-            LatLng(pos.latitude, pos.longitude),
-          ),
+          CameraUpdate.newLatLng(LatLng(pos.latitude, pos.longitude)),
         );
       }
 
-      print('🏃‍♂️ Position Updated: $currentPostion');
+      print('ðŸƒâ€â™‚ï¸ Position Updated: $currentPostion');
     });
   }
 
-
-// ✅ Main method to get Geofence list
+  // âœ… Main method to get Geofence list
   Future<GeofenceListModal> getGeofenceList(String sessionId) async {
     try {
       String conn = ApiDetails.server;
       String apiUrl = ApiDetails.geofenceListApi;
       var urlapi = Uri.parse(
-          "$conn$apiUrl?sessionId=$sessionId&empId=$empIdGet&orgId=$orgId");
+        "$conn$apiUrl?sessionId=$sessionId&empId=$empIdGet&orgId=$orgId",
+      );
 
-      print("🔗 Fetching geofence list from: $urlapi");
+      print("ðŸ”— Fetching geofence list from: $urlapi");
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // ✅ Parse into GeofenceListModal directly
+        // âœ… Parse into GeofenceListModal directly
         return GeofenceListModal.fromJson(data);
       } else {
-        throw Exception("Failed to fetch geofence list: ${response.statusCode}");
+        throw Exception(
+          "Failed to fetch geofence list: ${response.statusCode}",
+        );
       }
     } catch (e) {
-      print("🚨 Error fetching geofence list: $e");
-      // ✅ Return empty model in case of failure
+      print("ðŸš¨ Error fetching geofence list: $e");
+      // âœ… Return empty model in case of failure
       return GeofenceListModal(userdata: []);
     }
   }
@@ -834,7 +837,7 @@ class _DefaultPageState extends State<DefaultPage> {
     return prefs.getInt(_kSavedGeofenceKey);
   }
 
-// Helper to save geofence id
+  // Helper to save geofence id
   Future<void> _saveGeofenceId(int id) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_kSavedGeofenceKey, id);
@@ -842,12 +845,11 @@ class _DefaultPageState extends State<DefaultPage> {
 
   // Show dialog (updated)
   Future<void> showGeofenceDialog(
-      BuildContext context, {
-        required dynamic sessionId,
-        required dynamic empId,
-        required dynamic orgId,
-      }) async {
-
+    BuildContext context, {
+    required dynamic sessionId,
+    required dynamic empId,
+    required dynamic orgId,
+  }) async {
     // Load saved id first
     int? savedGeofenceId = await _getSavedGeofenceId();
 
@@ -859,19 +861,25 @@ class _DefaultPageState extends State<DefaultPage> {
       if (!context.mounted) return;
       await showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Select Your Location"),
-          content: const Text("No geofence data available"),
-          actions: [
-            TextButton(onPressed: () =>  Navigator.of(context, rootNavigator: true).pop(), child: const Text("OK"))
-          ],
-        ),
+        builder:
+            (_) => AlertDialog(
+              title: const Text("Select Your Location"),
+              content: const Text("No geofence data available"),
+              actions: [
+                TextButton(
+                  onPressed:
+                      () => Navigator.of(context, rootNavigator: true).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
       );
       return;
     }
 
     // Ensure saved id exists in fetched list; otherwise ignore it
-    bool savedExists = savedGeofenceId != null &&
+    bool savedExists =
+        savedGeofenceId != null &&
         geofenceList.userdata!.any((g) => g.id == savedGeofenceId);
 
     int? selectedGeofenceId = savedExists ? savedGeofenceId : null;
@@ -885,7 +893,9 @@ class _DefaultPageState extends State<DefaultPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: const Text(
                 "Select Your Location",
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -902,14 +912,15 @@ class _DefaultPageState extends State<DefaultPage> {
                         border: OutlineInputBorder(),
                         labelText: "Select Geofence",
                       ),
-                      items: geofenceList.userdata!
-                          .map(
-                            (geo) => DropdownMenuItem<int>(
-                          value: geo.id,
-                          child: Text("${geo.name ?? 'Unnamed'}"),
-                        ),
-                      )
-                          .toList(),
+                      items:
+                          geofenceList.userdata!
+                              .map(
+                                (geo) => DropdownMenuItem<int>(
+                                  value: geo.id,
+                                  child: Text("${geo.name ?? 'Unnamed'}"),
+                                ),
+                              )
+                              .toList(),
                       onChanged: (value) {
                         setState(() {
                           selectedGeofenceId = value;
@@ -927,7 +938,10 @@ class _DefaultPageState extends State<DefaultPage> {
                           savedExists
                               ? "Saved location will be pre-selected"
                               : "Previously saved location not available in list",
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                   ],
@@ -938,7 +952,9 @@ class _DefaultPageState extends State<DefaultPage> {
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () => Navigator.pop(context),
                   child: const Text("Cancel"),
@@ -947,7 +963,9 @@ class _DefaultPageState extends State<DefaultPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () async {
                     if (selectedGeofenceId != null) {
@@ -963,7 +981,9 @@ class _DefaultPageState extends State<DefaultPage> {
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please select a geofence")),
+                        const SnackBar(
+                          content: Text("Please select a geofence"),
+                        ),
                       );
                     }
                   },
@@ -978,12 +998,11 @@ class _DefaultPageState extends State<DefaultPage> {
   }
 
   Future<void> showGeofenceDialogPunchOut(
-      BuildContext context, {
-        required dynamic sessionId,
-        required dynamic empId,
-        required dynamic orgId,
-      }) async {
-
+    BuildContext context, {
+    required dynamic sessionId,
+    required dynamic empId,
+    required dynamic orgId,
+  }) async {
     // Load saved id first
     int? savedGeofenceId = await _getSavedGeofenceId();
 
@@ -995,19 +1014,25 @@ class _DefaultPageState extends State<DefaultPage> {
       if (!context.mounted) return;
       await showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Select Your Location"),
-          content: const Text("No geofence data available"),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(context, rootNavigator: true).pop(), child: const Text("OK"))
-          ],
-        ),
+        builder:
+            (_) => AlertDialog(
+              title: const Text("Select Your Location"),
+              content: const Text("No geofence data available"),
+              actions: [
+                TextButton(
+                  onPressed:
+                      () => Navigator.of(context, rootNavigator: true).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
       );
       return;
     }
 
     // Ensure saved id exists in fetched list; otherwise ignore it
-    bool savedExists = savedGeofenceId != null &&
+    bool savedExists =
+        savedGeofenceId != null &&
         geofenceList.userdata!.any((g) => g.id == savedGeofenceId);
 
     int? selectedGeofenceId = savedExists ? savedGeofenceId : null;
@@ -1021,7 +1046,9 @@ class _DefaultPageState extends State<DefaultPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: const Text(
                 "Select Your Location",
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -1038,14 +1065,15 @@ class _DefaultPageState extends State<DefaultPage> {
                         border: OutlineInputBorder(),
                         labelText: "Select Geofence",
                       ),
-                      items: geofenceList.userdata!
-                          .map(
-                            (geo) => DropdownMenuItem<int>(
-                          value: geo.id,
-                          child: Text("${geo.name ?? 'Unnamed'}"),
-                        ),
-                      )
-                          .toList(),
+                      items:
+                          geofenceList.userdata!
+                              .map(
+                                (geo) => DropdownMenuItem<int>(
+                                  value: geo.id,
+                                  child: Text("${geo.name ?? 'Unnamed'}"),
+                                ),
+                              )
+                              .toList(),
                       onChanged: (value) {
                         setState(() {
                           selectedGeofenceId = value;
@@ -1063,7 +1091,10 @@ class _DefaultPageState extends State<DefaultPage> {
                           savedExists
                               ? "Saved location will be pre-selected"
                               : "Previously saved location not available in list",
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                   ],
@@ -1074,7 +1105,9 @@ class _DefaultPageState extends State<DefaultPage> {
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () => Navigator.pop(context),
                   child: const Text("Cancel"),
@@ -1083,7 +1116,9 @@ class _DefaultPageState extends State<DefaultPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () async {
                     if (selectedGeofenceId != null) {
@@ -1095,11 +1130,16 @@ class _DefaultPageState extends State<DefaultPage> {
 
                       // Call your punch-in method with selected id
                       if (context.mounted) {
-                        getPunchOutWithGeofence(context, selectedGeofenceId); // ✅ Pass selected ID to your method
+                        getPunchOutWithGeofence(
+                          context,
+                          selectedGeofenceId,
+                        ); // âœ… Pass selected ID to your method
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Please select a geofence")),
+                        const SnackBar(
+                          content: Text("Please select a geofence"),
+                        ),
                       );
                     }
                   },
@@ -1141,7 +1181,8 @@ class _DefaultPageState extends State<DefaultPage> {
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     // When we reach here, permissions are granted and we can
@@ -1150,9 +1191,9 @@ class _DefaultPageState extends State<DefaultPage> {
   }
 
   _getUserLocation() async {
-    double lat=shared.getLatitude();
-    double lng =shared.getLongitude();
-    currentPostion = LatLng(lat,lng);
+    double lat = shared.getLatitude();
+    double lng = shared.getLongitude();
+    currentPostion = LatLng(lat, lng);
     print('Setcurrent ');
     positionCheck = await GeolocatorPlatform.instance.getCurrentPosition();
     //position = await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
@@ -1162,7 +1203,10 @@ class _DefaultPageState extends State<DefaultPage> {
     // bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (positionCheck != null) {
       setState(() {
-        currentPostion = LatLng(positionCheck!.latitude, positionCheck!.longitude);
+        currentPostion = LatLng(
+          positionCheck!.latitude,
+          positionCheck!.longitude,
+        );
         shared.setLatitude(positionCheck!.latitude);
         shared.setLongitude(positionCheck!.longitude);
         getAddress(positionCheck!);
@@ -1173,8 +1217,10 @@ class _DefaultPageState extends State<DefaultPage> {
   }
 
   Future<void> getAddress(Position positionCheck) async {
-    List<Placemark> pleaceMark =
-    await placemarkFromCoordinates(positionCheck!.latitude, positionCheck.longitude);
+    List<Placemark> pleaceMark = await placemarkFromCoordinates(
+      positionCheck!.latitude,
+      positionCheck.longitude,
+    );
     Placemark placemarkee = pleaceMark[0];
     print('currentPosition $currentAddressNew');
     var contryName = placemarkee.country;
@@ -1185,7 +1231,8 @@ class _DefaultPageState extends State<DefaultPage> {
     var postalCode = placemarkee.postalCode;
     var nameAdd = placemarkee.name;
     setState(() {
-      currentAddressNew = '$street ' +
+      currentAddressNew =
+          '$street ' +
           '$nameAdd ' +
           '$sublocality ' +
           '$locality ' +
@@ -1227,7 +1274,9 @@ class _DefaultPageState extends State<DefaultPage> {
     lng = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
     attAction = await shared.getAttAction();
-    print("LatLong - ${LatLng(positionCheck!.latitude, positionCheck!.longitude)}");
+    print(
+      "LatLong - ${LatLng(positionCheck!.latitude, positionCheck!.longitude)}",
+    );
     //print("Long - $lng");
     currentPostion = LatLng(positionCheck!.latitude, positionCheck!.longitude);
 
@@ -1300,42 +1349,56 @@ class _DefaultPageState extends State<DefaultPage> {
 
   @override
   Widget build(BuildContext context) {
-
     getImageForWorkdone() async {
       try {
         final imageValue = await ImagePicker()
             .pickImage(source: ImageSource.camera)
             .then((value) {
-          if (value != null) this._workDoneImage = File(value!.path);
-          if (value == null) {
-            Navigator.pushNamed(context, MyRoutings.punchInRoute);
-            //Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
-          } else {
-            setState(() {
-              if (orgnizationID == 108) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => UjalaCreditWorkdone(
-                        value: _workDoneImage,
-                        address: currentAddressNew,
-                        time: timeStringNew)));
-              } else if (orgnizationID == 110) {
-                // Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SkyDecorWorkDone(value: _workDoneImage, address: currentAddressNew, time: timeStringNew )));
-              } else if (orgnizationID == 119) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => DigiWeighWorkDone(
-                        value: _workDoneImage,
-                        address: currentAddressNew,
-                        time: timeStringNew)));
+              if (value != null) this._workDoneImage = File(value!.path);
+              if (value == null) {
+                Navigator.pushNamed(context, MyRoutings.punchInRoute);
+                //Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
               } else {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => WorkDonePage(
-                        value: _workDoneImage,
-                        address: currentAddressNew,
-                        time: timeStringNew)));
+                setState(() {
+                  if (orgnizationID == 108) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => UjalaCreditWorkdone(
+                              value: _workDoneImage,
+                              address: currentAddressNew,
+                              time: timeStringNew,
+                            ),
+                      ),
+                    );
+                  } else if (orgnizationID == 110) {
+                    // Navigator.of(context).push(MaterialPageRoute(builder: (context)=>SkyDecorWorkDone(value: _workDoneImage, address: currentAddressNew, time: timeStringNew )));
+                  } else if (orgnizationID == 119) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => DigiWeighWorkDone(
+                              value: _workDoneImage,
+                              address: currentAddressNew,
+                              time: timeStringNew,
+                            ),
+                      ),
+                    );
+                  } else {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => WorkDonePage(
+                              value: _workDoneImage,
+                              address: currentAddressNew,
+                              time: timeStringNew,
+                            ),
+                      ),
+                    );
+                  }
+                });
               }
             });
-          }
-        });
         //if(imageValue==null) return;
 
         //final imagePath= File(imageValue.path);
@@ -1351,15 +1414,20 @@ class _DefaultPageState extends State<DefaultPage> {
         final imageValue = await ImagePicker()
             .pickImage(source: ImageSource.camera)
             .then((value) {
-          this._workDoneImage = File(value!.path);
-        });
+              this._workDoneImage = File(value!.path);
+            });
 
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ImageUploaded(
-                value: _workDoneImage,
-                address: currentAddressNew,
-                time: timeStringNew,
-                punchType: clockingType)));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder:
+                (context) => ImageUploaded(
+                  value: _workDoneImage,
+                  address: currentAddressNew,
+                  time: timeStringNew,
+                  punchType: clockingType,
+                ),
+          ),
+        );
       } catch (e) {
         print('failed to upload: $e');
       }
@@ -1371,24 +1439,25 @@ class _DefaultPageState extends State<DefaultPage> {
           Container(
             height: MediaQuery.of(context).size.height * 0.4,
             child: Card(
-              child: currentPostion == null
-                  ? Center(child: CircularProgressIndicator())
-                  : GoogleMap(
-                onMapCreated: (controller) {
-                  _mapController = controller;
-                },
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(
-                    currentPostion!.latitude,
-                    currentPostion!.longitude,
-                  ),
-                  zoom: 16,
-                ),
-                myLocationButtonEnabled: true,
-                zoomControlsEnabled: false,
-                myLocationEnabled: true,
-                mapToolbarEnabled: false,
-              ),
+              child:
+                  currentPostion == null
+                      ? Center(child: CircularProgressIndicator())
+                      : GoogleMap(
+                        onMapCreated: (controller) {
+                          _mapController = controller;
+                        },
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(
+                            currentPostion!.latitude,
+                            currentPostion!.longitude,
+                          ),
+                          zoom: 16,
+                        ),
+                        myLocationButtonEnabled: true,
+                        zoomControlsEnabled: false,
+                        myLocationEnabled: true,
+                        mapToolbarEnabled: false,
+                      ),
             ),
           ),
           //Container(height: 10),
@@ -1401,14 +1470,15 @@ class _DefaultPageState extends State<DefaultPage> {
               leading: Container(
                 width: 45,
                 height: 45,
-                child: imageStringNew == null
-                    ? Center(child: CircularProgressIndicator())
-                    : CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(imageStringNew!),
-                  backgroundColor: Colors.grey,
-                  // child: Image.network(imageStringNew!),
-                ),
+                child:
+                    imageStringNew == null
+                        ? Center(child: CircularProgressIndicator())
+                        : CircleAvatar(
+                          radius: 30,
+                          backgroundImage: profileImageProvider(imageStringNew),
+                          backgroundColor: Colors.grey,
+                          // child: Image.network(imageStringNew!),
+                        ),
               ),
             ),
           ),
@@ -1437,9 +1507,7 @@ class _DefaultPageState extends State<DefaultPage> {
                         child: Text(
                           '$todayDateShowNew',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
+                          style: TextStyle(fontSize: 18),
                         ),
                       ),
                     ],
@@ -1463,9 +1531,7 @@ class _DefaultPageState extends State<DefaultPage> {
                         child: Text(
                           timeStringNew,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
+                          style: TextStyle(fontSize: 18),
                         ),
                       ),
                     ],
@@ -1475,84 +1541,91 @@ class _DefaultPageState extends State<DefaultPage> {
             ],
           ),
           mobAction == 0
-              ? SizedBox(
-            height: 0,
-          )
+              ? SizedBox(height: 0)
               : SingleChildScrollView(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                child: Column(
                   children: [
-                    //punch in
-                    Expanded(
-                      child: Card(
-                        color: Colors.transparent,
-                        elevation: 0,
-                        margin: EdgeInsets.all(5),
-                        child: InkWell(
-                          onTap: () async {
-                            bool internetCheck =
-                            await InternetConnectionChecker()
-                                .hasConnection;
-                            if (internetCheck == false) {
-                              setState(() {
-                                AlertDialog(
-                                  content:
-                                  "Please check your internet connection"
-                                      .text
-                                      .make(),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(
-                                      "Please check your Internet connection."),
-                                ));
-                              });
-                            } else if (Platform.isAndroid) {
-                              bool isFakeLocation =
-                              await DetectFakeLocation().detectFakeLocation();
-                              print("Fake Location - $isFakeLocation");
-                              if(isFakeLocation == true) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Mock Location Detected'),
-                                      content: Text(
-                                          'You have enabled a mock or fake location. Please disable it to proceed with marking your attendance.'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: Text('OK'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        //punch in
+                        Expanded(
+                          child: Card(
+                            color: Colors.transparent,
+                            elevation: 0,
+                            margin: EdgeInsets.all(5),
+                            child: InkWell(
+                              onTap: () async {
+                                bool internetCheck =
+                                    await InternetConnectionChecker()
+                                        .hasConnection;
+                                if (internetCheck == false) {
+                                  setState(() {
+                                    AlertDialog(
+                                      content:
+                                          "Please check your internet connection"
+                                              .text
+                                              .make(),
                                     );
-                                  },
-                                );
-                              } else {
-                                bool timeAuto =
-                                await DatetimeSetting.timeIsAuto();
-                                bool timezoneAuto =
-                                await DatetimeSetting.timeZoneIsAuto();
-                                print("AUTO TIME $timeAuto");
-                                print("AUTO TIME ZONE $timezoneAuto");
-                                if (!timeAuto) {
-                                  //DatetimeSetting.openSetting();
-                                  showAutoTimeZone(
-                                      context,
-                                      "Your mobile timing not updated, please change time setting to auto.",
-                                      "Info ");
-                                } else {
-                                  clockingType = "In";
-                                  if (attAction == '0') {
-                                    print("ORGID - $orgId");
-                                    if (orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145) {
-                                      /*showDialog(
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Please check your Internet connection.",
+                                        ),
+                                      ),
+                                    );
+                                  });
+                                } else if (Platform.isAndroid) {
+                                  bool isFakeLocation =
+                                      await DetectFakeLocation()
+                                          .detectFakeLocation();
+                                  print("Fake Location - $isFakeLocation");
+                                  if (isFakeLocation == true) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Mock Location Detected'),
+                                          content: Text(
+                                            'You have enabled a mock or fake location. Please disable it to proceed with marking your attendance.',
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text('OK'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  } else {
+                                    bool timeAuto =
+                                        await DatetimeSetting.timeIsAuto();
+                                    bool timezoneAuto =
+                                        await DatetimeSetting.timeZoneIsAuto();
+                                    print("AUTO TIME $timeAuto");
+                                    print("AUTO TIME ZONE $timezoneAuto");
+                                    if (!timeAuto) {
+                                      //DatetimeSetting.openSetting();
+                                      showAutoTimeZone(
+                                        context,
+                                        "Your mobile timing not updated, please change time setting to auto.",
+                                        "Info ",
+                                      );
+                                    } else {
+                                      clockingType = "In";
+                                      if (attAction == '0') {
+                                        print("ORGID - $orgId");
+                                        if (orgId == 201 ||
+                                            orgId == 200 ||
+                                            orgId == 199 ||
+                                            orgId == 202 ||
+                                            orgId == 145) {
+                                          /*showDialog(
                                               context: context,
                                               barrierDismissible: false, // user can't close by tapping outside
                                               builder: (BuildContext context) {
@@ -1581,7 +1654,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                                         child: Column(
                                                           mainAxisSize: MainAxisSize.min,
                                                           children: [
-                                                            // 📍 Dropdown List
+                                                            // ðŸ“ Dropdown List
                                                             DropdownButtonFormField<String>(
                                                               value: selectedGeofence,
                                                               isExpanded: true,
@@ -1605,7 +1678,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                                         ),
                                                       ),
 
-                                                      // 🔘 Buttons
+                                                      // ðŸ”˜ Buttons
                                                       actions: [
                                                         TextButton(
                                                           style: TextButton.styleFrom(
@@ -1643,6 +1716,74 @@ class _DefaultPageState extends State<DefaultPage> {
                                                 );
                                               },
                                             );*/
+                                          showGeofenceDialog(
+                                            context,
+                                            sessionId: sessionId!,
+                                            empId: empIdGet,
+                                            orgId: orgId,
+                                          );
+                                        } else {
+                                          getPunchIn(context);
+                                        }
+                                      } else if (attAction == '1') {
+                                        //getImagePunchIn();
+                                        try {
+                                          //ImagePicker picker = ImagePicker();
+                                          var imageValue = await _picker
+                                              .pickImage(
+                                                source: ImageSource.camera,
+                                                imageQuality: 20,
+                                              );
+                                          // Navigator.pushNamed(context, MyRoutings.cameraPageRoute);
+                                          /*final imageValue = await _picker.pickImage(source: ImageSource.camera).then((value) {
+                                    if(value!=null){
+                                      this._workDoneImage=File(value!.path);
+                                    }else{
+                                      return;
+                                    }
+
+                                  });*/
+                                          //picker.dispose();
+                                          if (imageValue == null) return;
+                                          print(
+                                            "Heloo ji "
+                                            "$imageValue",
+                                          );
+                                          setState(() {
+                                            final imagePath = File(
+                                              imageValue!.path,
+                                            );
+                                            this._workDoneImage = imagePath;
+                                          });
+                                          imageValue = null;
+                                          //imageCache.clear();
+                                          Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => ImageUploaded(
+                                                    value: _workDoneImage,
+                                                    address: currentAddressNew,
+                                                    time: timeStringNew,
+                                                    punchType: clockingType,
+                                                  ),
+                                            ),
+                                          );
+                                        } on Exception catch (e) {
+                                          print('failed to upload: $e');
+                                        }
+                                      }
+                                    }
+                                  }
+                                } else {
+                                  clockingType = "In";
+                                  if (attAction == '0') {
+                                    print("ORGID - $orgId");
+                                    if ((orgId == 201 ||
+                                            orgId == 200 ||
+                                            orgId == 199 ||
+                                            orgId == 202 ||
+                                            orgId == 145) &&
+                                        setGeofenceActive == true) {
                                       showGeofenceDialog(
                                         context,
                                         sessionId: sessionId!,
@@ -1656,8 +1797,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                     //getImagePunchIn();
                                     try {
                                       //ImagePicker picker = ImagePicker();
-                                      var imageValue =
-                                      await _picker.pickImage(
+                                      var imageValue = await _picker.pickImage(
                                         source: ImageSource.camera,
                                         imageQuality: 20,
                                       );
@@ -1672,89 +1812,35 @@ class _DefaultPageState extends State<DefaultPage> {
                                   });*/
                                       //picker.dispose();
                                       if (imageValue == null) return;
-                                      print("Heloo ji " "$imageValue");
+                                      print(
+                                        "Heloo ji "
+                                        "$imageValue",
+                                      );
                                       setState(() {
-                                        final imagePath =
-                                        File(imageValue!.path);
+                                        final imagePath = File(
+                                          imageValue!.path,
+                                        );
                                         this._workDoneImage = imagePath;
                                       });
                                       imageValue = null;
                                       //imageCache.clear();
                                       Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ImageUploaded(
-                                                      value: _workDoneImage,
-                                                      address:
-                                                      currentAddressNew,
-                                                      time: timeStringNew,
-                                                      punchType:
-                                                      clockingType)));
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => ImageUploaded(
+                                                value: _workDoneImage,
+                                                address: currentAddressNew,
+                                                time: timeStringNew,
+                                                punchType: clockingType,
+                                              ),
+                                        ),
+                                      );
                                     } on Exception catch (e) {
                                       print('failed to upload: $e');
                                     }
                                   }
-                                }
-                              }
 
-                            } else {
-                              clockingType = "In";
-                              if (attAction == '0') {
-                                print("ORGID - $orgId");
-                                if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
-                                    && setGeofenceActive == true) {
-
-                                  showGeofenceDialog(
-                                    context,
-                                    sessionId: sessionId!,
-                                    empId: empIdGet,
-                                    orgId: orgId,
-                                  );
-                                } else {
-                                  getPunchIn(context);
-                                }
-                              } else if (attAction == '1') {
-                                //getImagePunchIn();
-                                try {
-                                  //ImagePicker picker = ImagePicker();
-                                  var imageValue =
-                                  await _picker.pickImage(
-                                      source: ImageSource.camera,
-                                    imageQuality: 20,);
-                                  // Navigator.pushNamed(context, MyRoutings.cameraPageRoute);
-                                  /*final imageValue = await _picker.pickImage(source: ImageSource.camera).then((value) {
-                                    if(value!=null){
-                                      this._workDoneImage=File(value!.path);
-                                    }else{
-                                      return;
-                                    }
-
-                                  });*/
-                                  //picker.dispose();
-                                  if (imageValue == null) return;
-                                  print("Heloo ji " "$imageValue");
-                                  setState(() {
-                                    final imagePath =
-                                    File(imageValue!.path);
-                                    this._workDoneImage = imagePath;
-                                  });
-                                  imageValue = null;
-                                  //imageCache.clear();
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ImageUploaded(
-                                                  value: _workDoneImage,
-                                                  address: currentAddressNew,
-                                                  time: timeStringNew,
-                                                  punchType:
-                                                  clockingType)));
-                                } on Exception catch (e) {
-                                  print('failed to upload: $e');
-                                }
-                              }
-
-                              /*   if(_autoTimezone == "1") {
+                                  /*   if(_autoTimezone == "1") {
 
                               }
                               else if(_autoTimezone == "0") {
@@ -1762,221 +1848,253 @@ class _DefaultPageState extends State<DefaultPage> {
                                     context, "Your mobile timing is not updated, please change time settings", "Info ");
                               }*/
 
-                              // getUploadImage();
-                            }
-                            /*    getUploadImage();
+                                  // getUploadImage();
+                                }
+                                /*    getUploadImage();
                               clockingType = "In";
                               print("click in");
                               _getId();
                               */ /*await AndroidMultipleIdentifier
                                               .requestPermission();*/ /*
                               punchInnew(sessionId);*/
-                          },
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: CircleAvatar(
-                                  child: Icon(
-                                    Icons.touch_app,
-                                    size: 30,
-                                    color: Mythemes.creamColor,
+                              },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: CircleAvatar(
+                                      child: Icon(
+                                        Icons.touch_app,
+                                        size: 30,
+                                        color: Mythemes.creamColor,
+                                      ),
+                                      backgroundColor: Mythemes.successColor,
+                                      radius: 30,
+                                    ),
                                   ),
-                                  backgroundColor: Mythemes.successColor,
-                                  radius: 30,
-                                ),
-                              ),
-                              Container(height: 5),
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                //margin: EdgeInsets.all(5),
-                                child: Text(
-                                  "Punch In",
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                  Container(height: 5),
+                                  Container(
+                                    padding: EdgeInsets.all(8),
+                                    //margin: EdgeInsets.all(5),
+                                    child: Text(
+                                      "Punch In",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    //work done
-                    Expanded(
-                      child: Card(
-                        color: Colors.transparent,
-                        elevation: 0,
-                        margin: EdgeInsets.all(5),
-                        child: InkWell(
-                          onTap: () async {
-                            bool internetCheck =
-                            await InternetConnectionChecker()
-                                .hasConnection;
-                            if (internetCheck == false) {
-                              setState(() {
-                                AlertDialog(
-                                  content:
-                                  "Please check your internet connection"
-                                      .text
-                                      .make(),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(
-                                      "Please check your Internet connection."),
-                                ));
-                              });
-                            } else if (Platform.isAndroid) {
-                              bool isFakeLocation =
-                              await DetectFakeLocation().detectFakeLocation();
-                              print("Fake Location - $isFakeLocation");
-                              if(isFakeLocation == true) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Mock Location Detected'),
-                                      content: Text(
-                                          'You have enabled a mock or fake location. Please disable it to proceed with marking your work done.'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: Text('OK'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
+                        //work done
+                        Expanded(
+                          child: Card(
+                            color: Colors.transparent,
+                            elevation: 0,
+                            margin: EdgeInsets.all(5),
+                            child: InkWell(
+                              onTap: () async {
+                                bool internetCheck =
+                                    await InternetConnectionChecker()
+                                        .hasConnection;
+                                if (internetCheck == false) {
+                                  setState(() {
+                                    AlertDialog(
+                                      content:
+                                          "Please check your internet connection"
+                                              .text
+                                              .make(),
                                     );
-                                  },
-                                );
-                              } else {
-                                bool timeAuto =
-                                await DatetimeSetting.timeIsAuto();
-                                bool timezoneAuto =
-                                await DatetimeSetting.timeZoneIsAuto();
-                                print("AUTO TIME $timeAuto");
-                                print("AUTO TIME ZONE $timezoneAuto");
-                                if (!timeAuto) {
-                                  //DatetimeSetting.openSetting();
-                                  showAutoTimeZone(
-                                      context,
-                                      "Your mobile timing not updated, please change time setting to auto.",
-                                      "Info ");
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Please check your Internet connection.",
+                                        ),
+                                      ),
+                                    );
+                                  });
+                                } else if (Platform.isAndroid) {
+                                  bool isFakeLocation =
+                                      await DetectFakeLocation()
+                                          .detectFakeLocation();
+                                  print("Fake Location - $isFakeLocation");
+                                  if (isFakeLocation == true) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Mock Location Detected'),
+                                          content: Text(
+                                            'You have enabled a mock or fake location. Please disable it to proceed with marking your work done.',
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text('OK'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  } else {
+                                    bool timeAuto =
+                                        await DatetimeSetting.timeIsAuto();
+                                    bool timezoneAuto =
+                                        await DatetimeSetting.timeZoneIsAuto();
+                                    print("AUTO TIME $timeAuto");
+                                    print("AUTO TIME ZONE $timezoneAuto");
+                                    if (!timeAuto) {
+                                      //DatetimeSetting.openSetting();
+                                      showAutoTimeZone(
+                                        context,
+                                        "Your mobile timing not updated, please change time setting to auto.",
+                                        "Info ",
+                                      );
+                                    } else {
+                                      getImageForWorkdone();
+                                    }
+                                  }
                                 } else {
                                   getImageForWorkdone();
                                 }
-                              }
-
-                            } else {
-                              getImageForWorkdone();
-                            }
-                          },
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: CircleAvatar(
-                                  child: Icon(
-                                    Icons.work_history,
-                                    size: 30,
-                                    color: Mythemes.creamColor,
+                              },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: CircleAvatar(
+                                      child: Icon(
+                                        Icons.work_history,
+                                        size: 30,
+                                        color: Mythemes.creamColor,
+                                      ),
+                                      backgroundColor:
+                                          Mythemes.lightBluishColor,
+                                      radius: 30,
+                                    ),
                                   ),
-                                  backgroundColor:
-                                  Mythemes.lightBluishColor,
-                                  radius: 30,
-                                ),
-                              ),
-                              Container(height: 5),
-                              Padding(padding: EdgeInsets.all(0)),
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: Text(
-                                  "Work Done",
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                  Container(height: 5),
+                                  Padding(padding: EdgeInsets.all(0)),
+                                  Container(
+                                    padding: EdgeInsets.all(8),
+                                    child: Text(
+                                      "Work Done",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    //punch out
-                    Expanded(
-                      child: Card(
-                        color: Colors.transparent,
-                        elevation: 0,
-                        margin: EdgeInsets.all(5),
-                        child: InkWell(
-                          onTap: () async {
-                            bool internetCheck =
-                            await InternetConnectionChecker()
-                                .hasConnection;
-                            if (internetCheck == false) {
-                              setState(() {
-                                AlertDialog(
-                                  content:
-                                  "Please check your internet connection"
-                                      .text
-                                      .make(),
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(
-                                      "Please check your Internet connection."),
-                                ));
-                              });
-                            } else if (Platform.isAndroid) {
-                              bool isFakeLocation =
-                              await DetectFakeLocation().detectFakeLocation();
-                              print("Fake Location - $isFakeLocation");
-                              if(isFakeLocation == true) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Mock Location Detected'),
-                                      content: Text(
-                                          'You have enabled a mock or fake location. Please disable it to proceed with marking your attendance.'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: Text('OK'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
+                        //punch out
+                        Expanded(
+                          child: Card(
+                            color: Colors.transparent,
+                            elevation: 0,
+                            margin: EdgeInsets.all(5),
+                            child: InkWell(
+                              onTap: () async {
+                                bool internetCheck =
+                                    await InternetConnectionChecker()
+                                        .hasConnection;
+                                if (internetCheck == false) {
+                                  setState(() {
+                                    AlertDialog(
+                                      content:
+                                          "Please check your internet connection"
+                                              .text
+                                              .make(),
                                     );
-                                  },
-                                );
-                              } else {
-                                bool timeAuto =
-                                await DatetimeSetting.timeIsAuto();
-                                bool timezoneAuto =
-                                await DatetimeSetting.timeZoneIsAuto();
-                                print("AUTO TIME $timeAuto");
-                                print("AUTO TIME ZONE $timezoneAuto");
-                                if (!timeAuto) {
-                                  //DatetimeSetting.openSetting();
-                                  showAutoTimeZone(
-                                      context,
-                                      "Your mobile timing not updated, please change time setting to auto.",
-                                      "Info ");
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Please check your Internet connection.",
+                                        ),
+                                      ),
+                                    );
+                                  });
+                                } else if (Platform.isAndroid) {
+                                  bool isFakeLocation =
+                                      await DetectFakeLocation()
+                                          .detectFakeLocation();
+                                  print("Fake Location - $isFakeLocation");
+                                  if (isFakeLocation == true) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Mock Location Detected'),
+                                          content: Text(
+                                            'You have enabled a mock or fake location. Please disable it to proceed with marking your attendance.',
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text('OK'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  } else {
+                                    bool timeAuto =
+                                        await DatetimeSetting.timeIsAuto();
+                                    bool timezoneAuto =
+                                        await DatetimeSetting.timeZoneIsAuto();
+                                    print("AUTO TIME $timeAuto");
+                                    print("AUTO TIME ZONE $timezoneAuto");
+                                    if (!timeAuto) {
+                                      //DatetimeSetting.openSetting();
+                                      showAutoTimeZone(
+                                        context,
+                                        "Your mobile timing not updated, please change time setting to auto.",
+                                        "Info ",
+                                      );
+                                    } else {
+                                      clockingType = "Out";
+                                      if (attAction == '0') {
+                                        print("ORGID - $orgId");
+                                        if ((orgId == 201 ||
+                                                orgId == 200 ||
+                                                orgId == 199 ||
+                                                orgId == 202 ||
+                                                orgId == 145) &&
+                                            setGeofenceActive == true) {
+                                          showGeofenceDialogPunchOut(
+                                            context,
+                                            sessionId: sessionId!,
+                                            empId: empIdGet,
+                                            orgId: orgId,
+                                          );
+                                        } else {
+                                          getPunchOut(context);
+                                        }
+                                      } else if (attAction == '1') {
+                                        getImagePunchOut();
+                                      }
+                                    }
+                                  }
                                 } else {
                                   clockingType = "Out";
                                   if (attAction == '0') {
                                     print("ORGID - $orgId");
-                                    if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
-                                        && setGeofenceActive == true) {
+                                    if ((orgId == 201 ||
+                                            orgId == 200 ||
+                                            orgId == 199 ||
+                                            orgId == 202 ||
+                                            orgId == 145) &&
+                                        setGeofenceActive == true) {
                                       showGeofenceDialogPunchOut(
                                         context,
                                         sessionId: sessionId!,
                                         empId: empIdGet,
                                         orgId: orgId,
                                       );
-
                                     } else {
                                       getPunchOut(context);
                                     }
@@ -1984,66 +2102,40 @@ class _DefaultPageState extends State<DefaultPage> {
                                     getImagePunchOut();
                                   }
                                 }
-                              }
-
-                            } else {
-                              clockingType = "Out";
-                              if (attAction == '0') {
-                                print("ORGID - $orgId");
-                                if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
-                                    && setGeofenceActive == true) {
-
-                                  showGeofenceDialogPunchOut(
-                                    context,
-                                    sessionId: sessionId!,
-                                    empId: empIdGet,
-                                    orgId: orgId,
-                                  );
-
-                                } else {
-                                  getPunchOut(context);
-                                }
-                              } else if (attAction == '1') {
-                                getImagePunchOut();
-                              }
-                            }
-                          },
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: CircleAvatar(
-                                  child: Icon(
-                                    Icons.touch_app,
-                                    size: 30,
-                                    color: Mythemes.creamColor,
+                              },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: CircleAvatar(
+                                      child: Icon(
+                                        Icons.touch_app,
+                                        size: 30,
+                                        color: Mythemes.creamColor,
+                                      ),
+                                      backgroundColor: Mythemes.dangerColorOne,
+                                      radius: 30,
+                                    ),
                                   ),
-                                  backgroundColor:
-                                  Mythemes.dangerColorOne,
-                                  radius: 30,
-                                ),
-                              ),
-                              Container(height: 5),
-                              Padding(padding: EdgeInsets.all(0)),
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: Text(
-                                  "Punch Out",
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                  Container(height: 5),
+                                  Padding(padding: EdgeInsets.all(0)),
+                                  Container(
+                                    padding: EdgeInsets.all(8),
+                                    child: Text(
+                                      "Punch Out",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
         ],
       ),
     );
@@ -2072,46 +2164,44 @@ class _DefaultPageState extends State<DefaultPage> {
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             print("ORGID - $orgId");
-            if ((orgId == 201 || orgId == 200 || orgId == 199 || orgId == 202 || orgId == 145)
-                && setGeofenceActive == true) {
-
+            if ((orgId == 201 ||
+                    orgId == 200 ||
+                    orgId == 199 ||
+                    orgId == 202 ||
+                    orgId == 145) &&
+                setGeofenceActive == true) {
               showGeofenceDialog(
                 buildContext,
                 sessionId: sessionId!,
                 empId: empIdGet,
                 orgId: orgId,
               );
-
             } else {
               getPunchIn(buildContext);
             }
           },
           child: Text("Retry"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   showAutoTimeZone(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Expanded(
-              child: Text(
-                alert,
-                style: TextStyle(fontSize: 18),
-              )),
+          Expanded(child: Text(alert, style: TextStyle(fontSize: 18))),
         ],
       ),
       content: Text(result, style: TextStyle(fontSize: 14)),
@@ -2120,22 +2210,22 @@ class _DefaultPageState extends State<DefaultPage> {
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
         TextButton(
-            onPressed: () {
-              DatetimeSetting.openSetting();
-              Navigator.of(buildContext, rootNavigator: true).pop();
-            },
-            child: Container(
-              child: Text("Ok"),
-            )),
+          onPressed: () {
+            DatetimeSetting.openSetting();
+            Navigator.of(buildContext, rootNavigator: true).pop();
+          },
+          child: Container(child: Text("Ok")),
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        barrierDismissible: false,
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      barrierDismissible: false,
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   getTimeUpdate() {
@@ -2163,52 +2253,68 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "address=$currentAddressNew&"
-        "clocking=$sessionId&"
-        "clockingType=$clockingType&"
-        "lat=$lat&"
-        "lng=$lng&"
-        "currentDate=$todayDate&"
-        "firstImei=$sessionId&"
-        "secondImei=$sessionId&"
-        "macAddress=$sessionId&"
-        "deviceId=$sessionId&"
-        "battery=$sessionId");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "address=$currentAddressNew&"
+      "clocking=$sessionId&"
+      "clockingType=$clockingType&"
+      "lat=$lat&"
+      "lng=$lng&"
+      "currentDate=$todayDate&"
+      "firstImei=$sessionId&"
+      "secondImei=$sessionId&"
+      "macAddress=$sessionId&"
+      "deviceId=$sessionId&"
+      "battery=$sessionId",
+    );
     var request = new http.MultipartRequest("Post", urlapi);
-    http.Response response =
-    await http.Response.fromStream(await request.send());
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
     print('result${result}');
 
-    print('URL ${response.request}');
+    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
+    print(
+      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
+    );
     if (response.statusCode == 200) {
       print("I m Punch in");
       Navigator.of(context, rootNavigator: true).pop();
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessStay(
-            context,
-            reasonSuccess.upperCamelCase + " " + formattedDate,
-            "Successfully Punch In");
+          context,
+          reasonSuccess.upperCamelCase + " " + formattedDate,
+          "Successfully Punch In",
+        );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
         CommonNotificationPage.showSuccessStay(
-            context, reasonSuccess.upperCamelCase, " Failed ");
+          context,
+          reasonSuccess.upperCamelCase,
+          " Failed ",
+        );
       }
     } else {
       Navigator.of(context, rootNavigator: true).pop();
       showDialgError(
-          context, result, "Your Punch Not Submitted, Please Try Again");
+        context,
+        result,
+        "Your Punch Not Submitted, Please Try Again",
+      );
     }
   }
 
-  Future<void> getPunchInWithGeofence(BuildContext context, dynamic selectedGeofenceId) async {
+  Future<void> getPunchInWithGeofence(
+    BuildContext context,
+    dynamic selectedGeofenceId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchWithGeofence;
 
-    // ✅ Use root context to show dialogs safely
+    // âœ… Use root context to show dialogs safely
     final rootContext = Navigator.of(context, rootNavigator: true).context;
 
     CommonNotificationPage.showLoaderDialog(rootContext);
@@ -2224,38 +2330,44 @@ class _DefaultPageState extends State<DefaultPage> {
 
     getTimeUpdate();
 
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "address=$currentAddressNew&"
-        "clocking=$sessionId&"
-        "clockingType=$clockingType&"
-        "lat=$lat&"
-        "lng=$lng&"
-        "currentDate=$todayDate&"
-        "firstImei=$sessionId&"
-        "secondImei=$sessionId&"
-        "macAddress=$sessionId&"
-        "deviceId=$sessionId&"
-        "battery=$sessionId&"
-        "geofenceId=$selectedGeofenceId");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "address=$currentAddressNew&"
+      "clocking=$sessionId&"
+      "clockingType=$clockingType&"
+      "lat=$lat&"
+      "lng=$lng&"
+      "currentDate=$todayDate&"
+      "firstImei=$sessionId&"
+      "secondImei=$sessionId&"
+      "macAddress=$sessionId&"
+      "deviceId=$sessionId&"
+      "battery=$sessionId&"
+      "geofenceId=$selectedGeofenceId",
+    );
 
     var request = http.MultipartRequest("POST", urlapi);
-    http.Response response =
-    await http.Response.fromStream(await request.send());
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
 
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
 
-    print('URL ${response.request}');
+    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
+    print(
+      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
+    );
     print("I m Punch in");
 
-    // ✅ Always pop loader safely
+    // âœ… Always pop loader safely
     if (rootContext.mounted) {
       Navigator.of(rootContext, rootNavigator: true).pop();
     }
 
-    // ✅ Use rootContext to show success popup (not the old one)
+    // âœ… Use rootContext to show success popup (not the old one)
     if (response.statusCode == 200) {
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessStay(
@@ -2293,52 +2405,68 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "address=$currentAddressNew&"
-        "clocking=$sessionId&"
-        "clockingType=$clockingType&"
-        "lat=$lat&"
-        "lng=$lng&"
-        "currentDate=$todayDate&"
-        "firstImei=$sessionId&"
-        "secondImei=$sessionId&"
-        "macAddress=$sessionId&"
-        "deviceId=$sessionId&"
-        "battery=$sessionId");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "address=$currentAddressNew&"
+      "clocking=$sessionId&"
+      "clockingType=$clockingType&"
+      "lat=$lat&"
+      "lng=$lng&"
+      "currentDate=$todayDate&"
+      "firstImei=$sessionId&"
+      "secondImei=$sessionId&"
+      "macAddress=$sessionId&"
+      "deviceId=$sessionId&"
+      "battery=$sessionId",
+    );
     var request = new http.MultipartRequest("Post", urlapi);
-    http.Response response =
-    await http.Response.fromStream(await request.send());
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
     print('result${result}');
 
-    print('URL ${response.request}');
+    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
+    print(
+      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
+    );
     if (response.statusCode == 200) {
       print("I m Punch Out");
       Navigator.of(context, rootNavigator: true).pop();
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessStay(
-            context,
-            reasonSuccess.upperCamelCase + " " + formattedDate,
-            "Successfully Punch Out");
+          context,
+          reasonSuccess.upperCamelCase + " " + formattedDate,
+          "Successfully Punch Out",
+        );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
         CommonNotificationPage.showSuccessStay(
-            context, reasonSuccess.upperCamelCase, " Failed ");
+          context,
+          reasonSuccess.upperCamelCase,
+          " Failed ",
+        );
       }
     } else {
       Navigator.of(context, rootNavigator: true).pop();
       showDialgError(
-          context, result, "Your Punch Not Submitted, Please Try Again");
+        context,
+        result,
+        "Your Punch Not Submitted, Please Try Again",
+      );
     }
   }
 
-  Future<void> getPunchOutWithGeofence(BuildContext context, dynamic selectedGeofenceId) async {
+  Future<void> getPunchOutWithGeofence(
+    BuildContext context,
+    dynamic selectedGeofenceId,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchWithGeofence;
 
-    // ✅ Use root context to show dialogs safely
+    // âœ… Use root context to show dialogs safely
     final rootContext = Navigator.of(context, rootNavigator: true).context;
 
     CommonNotificationPage.showLoaderDialog(rootContext);
@@ -2352,49 +2480,62 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "address=$currentAddressNew&"
-        "clocking=$sessionId&"
-        "clockingType=$clockingType&"
-        "lat=$lat&"
-        "lng=$lng&"
-        "currentDate=$todayDate&"
-        "firstImei=$sessionId&"
-        "secondImei=$sessionId&"
-        "macAddress=$sessionId&"
-        "deviceId=$sessionId&"
-        "battery=$sessionId&"
-        "geofenceId=$selectedGeofenceId");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "address=$currentAddressNew&"
+      "clocking=$sessionId&"
+      "clockingType=$clockingType&"
+      "lat=$lat&"
+      "lng=$lng&"
+      "currentDate=$todayDate&"
+      "firstImei=$sessionId&"
+      "secondImei=$sessionId&"
+      "macAddress=$sessionId&"
+      "deviceId=$sessionId&"
+      "battery=$sessionId&"
+      "geofenceId=$selectedGeofenceId",
+    );
     var request = new http.MultipartRequest("Post", urlapi);
-    http.Response response =
-    await http.Response.fromStream(await request.send());
+    http.Response response = await http.Response.fromStream(
+      await request.send(),
+    );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
     print('result${result}');
 
-    print('URL ${response.request}');
+    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
+    print(
+      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
+    );
     if (response.statusCode == 200) {
       print("I m Punch Out");
-      // ✅ Always pop loader safely
+      // âœ… Always pop loader safely
       if (rootContext.mounted) {
         Navigator.of(rootContext, rootNavigator: true).pop();
       }
       // Navigator.of(context, rootNavigator: true).pop();
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessStay(
-            rootContext,
-            reasonSuccess.upperCamelCase + " " + formattedDate,
-            "Successfully Punch Out");
+          rootContext,
+          reasonSuccess.upperCamelCase + " " + formattedDate,
+          "Successfully Punch Out",
+        );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
         CommonNotificationPage.showSuccessStay(
-            rootContext, reasonSuccess.upperCamelCase, " Failed ");
+          rootContext,
+          reasonSuccess.upperCamelCase,
+          " Failed ",
+        );
       }
     } else {
       Navigator.of(rootContext, rootNavigator: true).pop();
       showDialgError(
-          rootContext, result, "Your Punch Not Submitted, Please Try Again");
+        rootContext,
+        result,
+        "Your Punch Not Submitted, Please Try Again",
+      );
     }
   }
 
@@ -2404,20 +2545,21 @@ class _DefaultPageState extends State<DefaultPage> {
     print('click $lat');
     print('click $lng');
     var urlapi = Uri.parse(
-        "http://www.employroll.com/restful/service/attendance/via/mobile/without/image?"
-            "sessionId=$sessionId&"
-            "address=$currentAddressNew&"
-            "clocking=$sessionId&"
-            "clockingType=$clockingType&"
-            "lat=$lat&"
-            "lng=$lng&"
-            "currentDate=$todayDate&"
-            "firstImei=$sessionId&"
-            "secondImei=$sessionId&"
-            "macAddress=$sessionId&"
-            "deviceId=$sessionId&"
-            "battery=$sessionId&");
-    final response = await http.get(urlapi);
+      "http://www.employroll.com/restful/service/attendance/via/mobile/without/image?"
+      "sessionId=$sessionId&"
+      "address=$currentAddressNew&"
+      "clocking=$sessionId&"
+      "clockingType=$clockingType&"
+      "lat=$lat&"
+      "lng=$lng&"
+      "currentDate=$todayDate&"
+      "firstImei=$sessionId&"
+      "secondImei=$sessionId&"
+      "macAddress=$sessionId&"
+      "deviceId=$sessionId&"
+      "battery=$sessionId&",
+    );
+    final response = await MobileHttpClient.instance.get(urlapi);
     print({response.request});
   }
 
@@ -2458,7 +2600,7 @@ class MyRequests extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  GetAttendanceDet(showAppBar: false);
+    return GetAttendanceDet(showAppBar: false);
   }
 }
 
@@ -2467,7 +2609,7 @@ class Report extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MyAllReportsPage(showAppBar: false,);
+    return MyAllReportsPage(showAppBar: false);
   }
 }
 
@@ -2497,9 +2639,9 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return userPanelPermission == "USER" ?
-    mss.Admin_UIS_Dashboard(DashboardModel()) :
-    ess.EssAdminDashboard(EssDashboarrdModel());
+    return userPanelPermission == "USER"
+        ? mss.Admin_UIS_Dashboard(DashboardModel())
+        : ess.EssAdminDashboard(EssDashboarrdModel());
   }
 }
 
@@ -2528,7 +2670,6 @@ class _DrawerFileState extends State<DrawerFile> {
     //getUserNameImage();
     super.initState();
   }
-
 
   Future<void> getSharedPreferences() async {
     orgId = await shared.getOrgId();
@@ -2567,95 +2708,38 @@ class _DrawerFileState extends State<DrawerFile> {
     });
 
     try {
-      String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.profileListApi;
-
-      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission");
-      final response = await http.post(urlapi);
-
-      var mapResponse = json.decode(response.body);
-      profileListModal = ProfileListModal.fromJson(mapResponse);
-
+      profileListModal = await MobileProfileCache.loadProfileList();
       profileListGetter.clear();
       profileListGetter.addAll(profileListModal?.data ?? []);
 
-      print("${response.request}");
+      print('[MOBILE-AUTH] PROFILE_CACHE -> count=${profileListGetter.length}');
       for (int i = 0; i < profileListGetter.length; i++) {
-        List<String>? userPermission = profileListGetter[i].profilePermission;
-
-        print("User Permission for profile ${i + 1} - $userPermission");
-        /*//MSS MO
-        //Attendance Pending Request & Other Attendance Request
-        if (userPermission != null &&
-            userPermission.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD")) {
-          pendingAttendanceReqMOPermission = "1";
-        }
-        //Leave Pending Request
-        if (userPermission != null &&
-            userPermission.contains("LEAVE_REQ_APPROVAL_MO_ADD")) {
-          pendingLeaveReqMOPermission = "1";
-        }
-        //Leave Pending Request L1
-        if (userPermission != null &&
-            userPermission.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD")) {
-          pendingLeaveReqL1MOPermission = "1";
-        }
-        //Leave Pending Request L2
-        if (userPermission != null &&
-            userPermission.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD")) {
-          pendingLeaveReqL2MOPermission = "1";
-        }
-        //Other Leave Request
-        if (userPermission != null &&
-            userPermission.contains("OTHERS_LEAVE_REQUEST_MO_ADD")) {
-          othersLeaveReqMOPermission = "1";
-        }
-
-        //MSS
-        //Attendance Pending Request & Other Attendance Request
-        if (userPermission != null &&
-            userPermission.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD")) {
-          pendingAttendanceReqMOPermission = "1";
-        }
-        //Leave Pending Request
-        if (userPermission != null &&
-            userPermission.contains("LEAVE_REQ_APPROVAL_ADD")) {
-          pendingLeaveReqMOPermission = "1";
-        }
-        //Leave Pending Request L1
-        if (userPermission != null &&
-            userPermission.contains("LEVEL_ONE_LEAVE_APPROVE_ADD")) {
-          pendingLeaveReqL1MOPermission = "1";
-        }
-        //Leave Pending Request L2
-        if (userPermission != null &&
-            userPermission.contains("LEVEL_TWO_LEAVE_APPROVE_ADD")) {
-          pendingLeaveReqL2MOPermission = "1";
-        }
-        //Other Leave Request
-        if (userPermission != null &&
-            userPermission.contains("OTHERS_LEAVE_REQUEST_ADD")) {
-          othersLeaveReqMOPermission = "1";
-        }*/
-
-        print("Attendance Permission - $pendingAttendanceReqMOPermission");
+        print(
+          'Profile ${i + 1} -> ${profileListGetter[i].profileName} permissions=${profileListGetter[i].profilePermission?.length ?? 0}',
+        );
       }
 
       if (profileListGetter.isNotEmpty) {
-        var defaultProfile = profileListGetter.firstWhere(
-              (p) => p.isDefaultProfile == true,
+        final defaultProfile = profileListGetter.firstWhere(
+          (p) => p.isDefaultProfile == true || p.defaultProfile == true,
           orElse: () => profileListGetter.first,
         );
-        selectedProfileId = defaultProfile.profileId;
+        selectedProfileId = defaultProfile.profileId ?? 0;
+        selectedProfileName = defaultProfile.profileName ?? '';
+        await shared.setDefaultProfileId(selectedProfileId);
+        await shared.setDefaultProfileName(selectedProfileName);
+        selectedProfileIdNotifier.value = selectedProfileId ?? 0;
+        selectedProfileNameNotifier.value = selectedProfileName ?? '';
       } else {
         selectedProfileId = 0;
-        print("⚠️ profileListGetter is empty.");
+        selectedProfileName = '';
+        print('[MOBILE-AUTH] PROFILE_CACHE -> profile list is empty');
       }
 
-      return profileListModal!;
+      return profileListModal ?? ProfileListModal(data: <ProfileData>[]);
     } catch (e) {
-      print("Error loading profiles: $e");
-      rethrow;
+      print('[MOBILE-AUTH] PROFILE_CACHE -> error=$e');
+      return ProfileListModal(data: <ProfileData>[]);
     } finally {
       setState(() {
         isLoadingProfiles = false;
@@ -2672,7 +2756,9 @@ class _DrawerFileState extends State<DrawerFile> {
     tourReqCount = prefs.getInt("tourReqCount") ?? 0;
     attReqCount = prefs.getInt("attReqCount") ?? 0;
 
-    print("Loaded counts → attReqCount: $attReqCount, leaveReqCount: $leaveReqCount");
+    print(
+      "Loaded counts â†’ attReqCount: $attReqCount, leaveReqCount: $leaveReqCount",
+    );
   }
 
   Future<void> getRequisitionCounts(String sessionId) async {
@@ -2680,12 +2766,14 @@ class _DrawerFileState extends State<DrawerFile> {
       String conn = ApiDetails.server;
       String apiUrl = ApiDetails.reqCountApi;
 
-      var urlapi = Uri.parse("$conn$apiUrl?"
-          "sessionId=$sessionId&"
-          "profileId=$defaultProfileId&"
-          "userPermission=$userPanelPermission");
+      var urlapi = Uri.parse(
+        "$conn$apiUrl?"
+        "sessionId=$sessionId&"
+        "profileId=$defaultProfileId&"
+        "userPermission=$userPanelPermission",
+      );
 
-      final response = await http.post(urlapi);
+      final response = await MobileHttpClient.instance.post(urlapi);
 
       print("Requisition Count API - ${response.request}");
       print("Response Body - ${response.body}");
@@ -2697,26 +2785,25 @@ class _DrawerFileState extends State<DrawerFile> {
       int leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
       int mobOdCount = mapResponse['mobOdCount'] ?? 0;
 
-// ✅ Update global notifiers
+      // âœ… Update global notifiers
       attReqCountNotifier.value = attReqCount;
       leaveReqCountNotifier.value = leaveReqCount;
       odReqCountNotifier.value = mobOdCount;
 
-// ✅ Also persist in SharedPreferences for app relaunch
+      // âœ… Also persist in SharedPreferences for app relaunch
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setInt("attReqCount", attReqCount);
       await prefs.setInt("leaveReqCount", leaveReqCount);
       await prefs.setInt("mobOdCount", mobOdCount);
 
-      // ✅ Assign values to variables
+      // âœ… Assign values to variables
       mobOdCount = mapResponse['mobOdCount'] ?? 0;
       leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
       odReqCount = mapResponse['odReqCount'] ?? 0;
       tourReqCount = mapResponse['tourReqCount'] ?? 0;
       attReqCount = mapResponse['attReqCount'] ?? 0;
 
-
-      // ✅ Save all data into SharedPreferences
+      // âœ… Save all data into SharedPreferences
       //final prefs = await SharedPreferences.getInstance();
       await prefs.setInt("mobOdCount", mobOdCount);
       await prefs.setInt("leaveReqCount", leaveReqCount);
@@ -2724,8 +2811,7 @@ class _DrawerFileState extends State<DrawerFile> {
       await prefs.setInt("tourReqCount", tourReqCount);
       await prefs.setInt("attReqCount", attReqCount);
 
-      print("Saved Requisition Counts to SharedPreferences ✅");
-
+      print("Saved Requisition Counts to SharedPreferences âœ…");
     } catch (e) {
       print("Error fetching requisition counts: $e");
     } finally {
@@ -2735,9 +2821,7 @@ class _DrawerFileState extends State<DrawerFile> {
     }
   }
 
-
   bool isLoadingProfiles = false;
-
 
   getUserRoles() async {
     empRole = await shared.getEmpRoll();
@@ -2776,11 +2860,11 @@ class _DrawerFileState extends State<DrawerFile> {
 
   @override
   Widget build(BuildContext context) {
-
     //timeDilation = 1.8;
     return Drawer(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween, // ✅ Pushes bottom content down
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween, // âœ… Pushes bottom content down
         children: [
           Column(
             children: [
@@ -2789,24 +2873,36 @@ class _DrawerFileState extends State<DrawerFile> {
                 padding: EdgeInsets.zero,
                 child: UserAccountsDrawerHeader(
                   decoration: BoxDecoration(color: Mythemes.whiteShadeSeventy),
-                  accountName: Text(name, style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.bold)),
-                  accountEmail: Text(emailid, style: TextStyle(color: Mythemes.black)),
+                  accountName: Text(
+                    name,
+                    style: TextStyle(
+                      color: Mythemes.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  accountEmail: Text(
+                    emailid,
+                    style: TextStyle(color: Mythemes.black),
+                  ),
                   margin: EdgeInsets.zero,
                   currentAccountPicture: CircleAvatar(
-                    backgroundImage: NetworkImage(profileImage),
+                    backgroundImage: profileImageProvider(profileImage),
                     backgroundColor: Mythemes.greyish,
                   ),
                 ),
               ),
               Visibility(
-                visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN" || userPanelPermission == "USER",
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    "Profiles".text.bold.size(17).make()
-                  ],
-                ).p8(),),
+                visible:
+                    userPanelPermission == "MSS" ||
+                    userPanelPermission == "MSS_MO_ADMIN" ||
+                    userPanelPermission == "USER",
+                child:
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: ["Profiles".text.bold.size(17).make()],
+                    ).p8(),
+              ),
 
               /*Visibility(
             visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN",
@@ -2843,689 +2939,1208 @@ class _DrawerFileState extends State<DrawerFile> {
             ),
           ),*/
               Visibility(
-                visible: userPanelPermission == "MSS" || userPanelPermission == "MSS_MO_ADMIN" || userPanelPermission == "USER",
-                child: isLoadingProfiles
-                    ? Center(child: CircularProgressIndicator()).p12()
-                    : ValueListenableBuilder<int>(
-                  valueListenable: selectedProfileIdNotifier,
-                  builder: (context, currentSelectedId, _) {
-                    return Column(
-                      children: profileListGetter.map((profile) {
-                        bool isSelected = currentSelectedId == profile.profileId;
+                visible:
+                    userPanelPermission == "MSS" ||
+                    userPanelPermission == "MSS_MO_ADMIN" ||
+                    userPanelPermission == "USER",
+                child:
+                    isLoadingProfiles
+                        ? Center(child: CircularProgressIndicator()).p12()
+                        : ValueListenableBuilder<int>(
+                          valueListenable: selectedProfileIdNotifier,
+                          builder: (context, currentSelectedId, _) {
+                            return Column(
+                              children:
+                                  profileListGetter.map((profile) {
+                                    bool isSelected =
+                                        currentSelectedId == profile.profileId;
 
-                        return ListTile(
-                            title: Text(
-                              profile.profileName ?? '',
-                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-                            ),
-                            trailing: isSelected ? Icon(Icons.check, color: Colors.green) : null,
-                            tileColor: isSelected ? Colors.grey.shade200 : null,
-                            onTap: () async {
-                              selectedProfileId = profile.profileId!;
-                              selectedProfileName = profile.profileName!;
+                                    return ListTile(
+                                      title: Text(
+                                        profile.profileName ?? '',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      trailing:
+                                          isSelected
+                                              ? Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                              )
+                                              : null,
+                                      tileColor:
+                                          isSelected
+                                              ? Colors.grey.shade200
+                                              : null,
+                                      onTap: () async {
+                                        selectedProfileId = profile.profileId!;
+                                        selectedProfileName =
+                                            profile.profileName!;
 
-                              // 🟢 Find the selected profile from the list using profileId
-                              final selected = profileListGetter.firstWhere(
-                                    (p) => p.profileId == selectedProfileId,
-                                orElse: () => profile,
-                              );
+                                        // ðŸŸ¢ Find the selected profile from the list using profileId
+                                        final selected = profileListGetter
+                                            .firstWhere(
+                                              (p) =>
+                                                  p.profileId ==
+                                                  selectedProfileId,
+                                              orElse: () => profile,
+                                            );
 
-                              //MSS MO
-                              // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                              /*String pendingAttReqMOPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") ?? false)
+                                        //MSS MO
+                                        // ðŸŸ¢ Check if the selected profile has the Pending Attendance Request permission
+                                        /*String pendingAttReqMOPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD") == true) {
-                                shared.setPendingAttendanceReqMSSMOPermission("1");
-                              } else {
-                                shared.setPendingAttendanceReqMSSMOPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request permission
-                              /*String leaveReqMOPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "ATTENDANCE_REQ_APPROVAL_DETAILS_MO_ADD",
+                                            ) ==
+                                            true) {
+                                          shared
+                                              .setPendingAttendanceReqMSSMOPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingAttendanceReqMSSMOPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request permission
+                                        /*String leaveReqMOPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_MO_ADD") == true || selected.profilePermission?.contains("LEAVE_REQ_MYTEAM_ADD") == true) {
-                                shared.setPendingLeaveReqMSSMOPermission("1");
-                              } else {
-                                shared.setPendingLeaveReqMSSMOPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L1 permission
-                              /*String leaveReqL1MOPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                                  "LEAVE_REQ_APPROVAL_MO_ADD",
+                                                ) ==
+                                                true ||
+                                            selected.profilePermission
+                                                    ?.contains(
+                                                      "LEAVE_REQ_MYTEAM_ADD",
+                                                    ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqMSSMOPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqMSSMOPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L1 permission
+                                        /*String leaveReqL1MOPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MO_ADD") == true || selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
-                                shared.setPendingLeaveReqL1MSSMOPermission("1");
-                              } else {
-                                shared.setPendingLeaveReqL1MSSMOPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              /* String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                                  "LEVEL_ONE_LEAVE_APPROVE_MO_ADD",
+                                                ) ==
+                                                true ||
+                                            selected.profilePermission?.contains(
+                                                  "LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD",
+                                                ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqL1MSSMOPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqL1MSSMOPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L2 permission
+                                        /* String leaveReqL2MOPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MO_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true || selected.profilePermission?.contains("FINAL_LEVEL_LEAVE_APPROVE_MO_ADD") == true) {
-                                shared.setPendingLeaveReqL2MSSMOPermission("1");
-                              } else {
-                                shared.setPendingLeaveReqL2MSSMOPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              /* String othersLeaveReqMOPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                                  "LEVEL_TWO_LEAVE_APPROVE_MO_ADD",
+                                                ) ==
+                                                true ||
+                                            selected.profilePermission?.contains(
+                                                  "LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD",
+                                                ) ==
+                                                true ||
+                                            selected.profilePermission?.contains(
+                                                  "FINAL_LEVEL_LEAVE_APPROVE_MO_ADD",
+                                                ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqL2MSSMOPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqL2MSSMOPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L2 permission
+                                        /* String othersLeaveReqMOPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_MO_ADD") == true) {
-                                shared.setOthersLeaveReqMSSMOPermission("1");
-                              } else {
-                                shared.setOthersLeaveReqMSSMOPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L1 permission
-                              /*String pendingClaimL1MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "OTHERS_LEAVE_REQUEST_MO_ADD",
+                                                ) ==
+                                            true) {
+                                          shared
+                                              .setOthersLeaveReqMSSMOPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setOthersLeaveReqMSSMOPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L1 permission
+                                        /*String pendingClaimL1MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
-                                shared.setClaimLevelOneMO("1");
-                                shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
-                                permissionNotifier.updatePermission("1");
-                              } else {
-                                shared.setClaimLevelOneMO("0");
-                                shared.setClaimLevelOne("");
-                                permissionNotifier.updatePermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L2 permission
-                              /*String pendingClaimL2MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelOneMO("1");
+                                          shared.setClaimLevelOne(
+                                            "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
+                                          );
+                                          permissionNotifier.updatePermission(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelOneMO("0");
+                                          shared.setClaimLevelOne("");
+                                          permissionNotifier.updatePermission(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L2 permission
+                                        /*String pendingClaimL2MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
-                                shared.setClaimLevelTwoMO("1");
-                                shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
-                                permissionNotifier.updatePermission("1");
-                              } else {
-                                shared.setClaimLevelTwoMO("0");
-                                shared.setClaimLevelTwo("");
-                                permissionNotifier.updatePermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L3 permission
-                              /*String pendingClaimL3MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelTwoMO("1");
+                                          shared.setClaimLevelTwo(
+                                            "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
+                                          );
+                                          permissionNotifier.updatePermission(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelTwoMO("0");
+                                          shared.setClaimLevelTwo("");
+                                          permissionNotifier.updatePermission(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L3 permission
+                                        /*String pendingClaimL3MOPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
-                                shared.setClaimLevelThreeMO("1");
-                                shared.setClaimLevelThree("CLAIM_APPROVAL_LEVEL_THREE_VIEW");
-                                permissionNotifier.updatePermission("1");
-                              } else {
-                                shared.setClaimLevelThreeMO("0");
-                                shared.setClaimLevelThree("");
-                                permissionNotifier.updatePermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Pending List permission
-                              /* String pendingODListMOPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_THREE_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelThreeMO("1");
+                                          shared.setClaimLevelThree(
+                                            "CLAIM_APPROVAL_LEVEL_THREE_VIEW",
+                                          );
+                                          permissionNotifier.updatePermission(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelThreeMO("0");
+                                          shared.setClaimLevelThree("");
+                                          permissionNotifier.updatePermission(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Pending List permission
+                                        /* String pendingODListMOPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
-                                shared.setODPendingListMO("1");
-                              } else {
-                                shared.setODPendingListMO("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Activate permission
-                              /*String odActivateMOPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "MOBILE_OD_PENDING_REQ_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setODPendingListMO("1");
+                                        } else {
+                                          shared.setODPendingListMO("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Activate permission
+                                        /*String odActivateMOPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
-                                shared.setODActivateMO("1");
-                              } else {
-                                shared.setODActivateMO("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Activate permission
-                              /*String loanActivateMOPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "MOBILE_OD_ACTIVATE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setODActivateMO("1");
+                                        } else {
+                                          shared.setODActivateMO("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Activate permission
+                                        /*String loanActivateMOPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
-                                shared.setLoanPendingListMO("1");
-                              } else {
-                                shared.setLoanPendingListMO("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
-                              /*String loanApprovalL1Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanPendingListMO("1");
+                                        } else {
+                                          shared.setLoanPendingListMO("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L1 permission
+                                        /*String loanApprovalL1Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
-                                shared.setLoanApprovalL1MO("LOAN_APPROVAL_LEVEL_ONE_ADD");
-                              } else {
-                                shared.setLoanApprovalL1MO("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
-                              /*String loanApprovalL2Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanApprovalL1MO(
+                                            "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL1MO("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L2 permission
+                                        /*String loanApprovalL2Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") == true) {
-                                shared.setLoanApprovalL2MO("LOAN_APPROVAL_LEVEL_TWO_ADD");
-                              } else {
-                                shared.setLoanApprovalL2MO("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
-                              /*String loanApprovalL3Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_TWO_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanApprovalL2MO(
+                                            "LOAN_APPROVAL_LEVEL_TWO_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL2MO("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L3 permission
+                                        /*String loanApprovalL3Permission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") == true) {
-                                shared.setLoanApprovalL3MO("LOAN_APPROVAL_LEVEL_THREE_ADD");
-                              } else {
-                                shared.setLoanApprovalL3MO("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
-                              /*String loanApprovalL1DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_THREE_ADD",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalL3MO(
+                                            "LOAN_APPROVAL_LEVEL_THREE_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL3MO("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L1 Delete permission
+                                        /*String loanApprovalL1DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL1MO("LOAN_APPROVAL_LEVEL_ONE_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL1MO("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
-                              /*String loanApprovalL2DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_ONE_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL1MO(
+                                            "LOAN_APPROVAL_LEVEL_ONE_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL1MO("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L2 Delete permission
+                                        /*String loanApprovalL2DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL2MO("LOAN_APPROVAL_LEVEL_TWO_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL2MO("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
-                              /*String loanApprovalL3DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_TWO_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL2MO(
+                                            "LOAN_APPROVAL_LEVEL_TWO_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL2MO("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L3 Delete permission
+                                        /*String loanApprovalL3DeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL3MO("LOAN_APPROVAL_LEVEL_THREE_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL3MO("0");
-                              }
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_THREE_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL3MO(
+                                            "LOAN_APPROVAL_LEVEL_THREE_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL3MO("0");
+                                        }
 
-                              // 🟢 Check if the selected profile has the OD Pending List permission
-                              /*String pendingAttendanceRequestMOL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                        // ðŸŸ¢ Check if the selected profile has the OD Pending List permission
+                                        /*String pendingAttendanceRequestMOL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATT_APP_ONE_ADD") == true) {
-                                shared.setPendingAttendanceReqL1MO("1");
-                              } else {
-                                shared.setPendingAttendanceReqL1MO("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Activate permission
-                              /*String pendingAttendanceRequestMOL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains("ATT_APP_ONE_ADD") ==
+                                            true) {
+                                          shared.setPendingAttendanceReqL1MO(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setPendingAttendanceReqL1MO(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Activate permission
+                                        /*String pendingAttendanceRequestMOL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATT_APP_TWO_ADD") == true) {
-                                shared.setPendingAttendanceReqL2MO("1");
-                              } else {
-                                shared.setPendingAttendanceReqL2MO("0");
-                              }
-                              // 🟢 Check if the selected profile has the MY Team Activate permission
-                              /* myTeamShow = (selected.profilePermission?.contains("HRIS_EMP_LIST_VIEW") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains("ATT_APP_TWO_ADD") ==
+                                            true) {
+                                          shared.setPendingAttendanceReqL2MO(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setPendingAttendanceReqL2MO(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the MY Team Activate permission
+                                        /* myTeamShow = (selected.profilePermission?.contains("HRIS_EMP_LIST_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("HRIS_EMP_LIST_VIEW") == true){
-                                shared.setMyTeamShow("true");
-                                shared.setMyTeamPageShow("1");
-                              } else {
-                                shared.setMyTeamShow("false");
-                                shared.setMyTeamPageShow("0");
-                              }
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "HRIS_EMP_LIST_VIEW",
+                                                ) ==
+                                            true) {
+                                          shared.setMyTeamShow("true");
+                                          shared.setMyTeamPageShow("1");
+                                        } else {
+                                          shared.setMyTeamShow("false");
+                                          shared.setMyTeamPageShow("0");
+                                        }
 
-                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
-                              // exitResignationListView = (selected.profilePermission?.contains("EXIT_RESIGN_REQUEST_LIST_VIEW") ?? false)
-                              //     ? "1"
-                              //     : "0";
-                              if(selected.profilePermission?.contains("EXIT_RESIGN_REQUEST_LIST_VIEW") == true) {
-                                print("true");
-                                shared.setExitResignationListShow("true");
-                                shared.setExitResignationListView("1");
-                              }
-                              else {
-                                print("false");
-                                shared.setExitResignationListShow("false");
-                                shared.setExitResignationListView("0");
-                              }
-                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
-                              /*exitResignationApproveL1View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                        // ðŸŸ¢ Check if the selected profile has the Exit Resignation List Activate permission
+                                        // exitResignationListView = (selected.profilePermission?.contains("EXIT_RESIGN_REQUEST_LIST_VIEW") ?? false)
+                                        //     ? "1"
+                                        //     : "0";
+                                        if (selected.profilePermission?.contains(
+                                              "EXIT_RESIGN_REQUEST_LIST_VIEW",
+                                            ) ==
+                                            true) {
+                                          print("true");
+                                          shared.setExitResignationListShow(
+                                            "true",
+                                          );
+                                          shared.setExitResignationListView(
+                                            "1",
+                                          );
+                                        } else {
+                                          print("false");
+                                          shared.setExitResignationListShow(
+                                            "false",
+                                          );
+                                          shared.setExitResignationListView(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Exit Resignation List Activate permission
+                                        /*exitResignationApproveL1View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD") == true) {
-                                shared.setExitResignationApproveL1View("1");
-                                shared.setExitResignationApproveL1Show("true");
-                              } else {
-                                shared.setExitResignationApproveL1View("0");
-                                shared.setExitResignationApproveL1Show("false");
-                              }
-                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
-                              /*exitResignationApproveL2View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD",
+                                            ) ==
+                                            true) {
+                                          shared
+                                              .setExitResignationApproveL1View(
+                                                "1",
+                                              );
+                                          shared
+                                              .setExitResignationApproveL1Show(
+                                                "true",
+                                              );
+                                        } else {
+                                          shared
+                                              .setExitResignationApproveL1View(
+                                                "0",
+                                              );
+                                          shared
+                                              .setExitResignationApproveL1Show(
+                                                "false",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Exit Resignation List Activate permission
+                                        /*exitResignationApproveL2View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD") == true) {
-                                shared.setExitResignationApproveL2View("1");
-                                shared.setExitResignationApproveL2Show("true");
+                                        if (selected.profilePermission?.contains(
+                                              "EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD",
+                                            ) ==
+                                            true) {
+                                          shared
+                                              .setExitResignationApproveL2View(
+                                                "1",
+                                              );
+                                          shared
+                                              .setExitResignationApproveL2Show(
+                                                "true",
+                                              );
+                                        } else {
+                                          shared
+                                              .setExitResignationApproveL2View(
+                                                "0",
+                                              );
+                                          shared
+                                              .setExitResignationApproveL2Show(
+                                                "false",
+                                              );
+                                        }
 
-                              } else {
-                                shared.setExitResignationApproveL2View("0");
-                                shared.setExitResignationApproveL2Show("false");
-                              }
-
-                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
-                              /* exitResignationDisApproveL1View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                        // ðŸŸ¢ Check if the selected profile has the Exit Resignation List Activate permission
+                                        /* exitResignationDisApproveL1View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE") == true) {
-                                shared.setExitResignationDisApproveL1View("1");
-                                shared.setExitResignationDisApproveL1Show("true");
-                              } else {
-                                shared.setExitResignationDisApproveL1View("0");
-                                shared.setExitResignationDisApproveL1Show("false");
-                              }
-                              // 🟢 Check if the selected profile has the Exit Resignation List Activate permission
-                              /*exitResignationDisApproveL2View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared
+                                              .setExitResignationDisApproveL1View(
+                                                "1",
+                                              );
+                                          shared
+                                              .setExitResignationDisApproveL1Show(
+                                                "true",
+                                              );
+                                        } else {
+                                          shared
+                                              .setExitResignationDisApproveL1View(
+                                                "0",
+                                              );
+                                          shared
+                                              .setExitResignationDisApproveL1Show(
+                                                "false",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Exit Resignation List Activate permission
+                                        /*exitResignationDisApproveL2View = (selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE") == true) {
-                                shared.setExitResignationDisApproveL2View("1");
-                                shared.setExitResignationDisApproveL2Show("true");
-                              } else {
-                                shared.setExitResignationDisApproveL2View("0");
-                                shared.setExitResignationDisApproveL2Show("false");
-                              }
+                                        if (selected.profilePermission?.contains(
+                                              "EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared
+                                              .setExitResignationDisApproveL2View(
+                                                "1",
+                                              );
+                                          shared
+                                              .setExitResignationDisApproveL2Show(
+                                                "true",
+                                              );
+                                        } else {
+                                          shared
+                                              .setExitResignationDisApproveL2View(
+                                                "0",
+                                              );
+                                          shared
+                                              .setExitResignationDisApproveL2Show(
+                                                "false",
+                                              );
+                                        }
 
-
-                              //MSS
-                              // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                              /*String pendingAttReqMSSPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+                                        //MSS
+                                        // ðŸŸ¢ Check if the selected profile has the Pending Attendance Request permission
+                                        /*String pendingAttReqMSSPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") == true) {
-                                shared.setPendingAttendanceReqMSSPermission("1");
-                              } else {
-                                shared.setPendingAttendanceReqMSSPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request permission
-                              /*String leaveReqMSSPermValue =
+                                        if (selected.profilePermission?.contains(
+                                              "ATTENDANCE_REQ_APPROVAL_DETAILS_ADD",
+                                            ) ==
+                                            true) {
+                                          shared
+                                              .setPendingAttendanceReqMSSPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingAttendanceReqMSSPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request permission
+                                        /*String leaveReqMSSPermValue =
                               ((selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";*/
 
-                              if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") == true || selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") == true) {
-                                shared.setPendingLeaveReqMSSPermission("1");
-                              } else {
-                                shared.setPendingLeaveReqMSSPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L1 permission
-                              /* String leaveReqL1MSSPermValue =
+                                        if (selected.profilePermission
+                                                    ?.contains(
+                                                      "LEAVE_REQ_APPROVAL_ADD",
+                                                    ) ==
+                                                true ||
+                                            selected.profilePermission
+                                                    ?.contains(
+                                                      "LEAVE_APP_MYTEAM_ADD",
+                                                    ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqMSSPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqMSSPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L1 permission
+                                        /* String leaveReqL1MSSPermValue =
                               ((selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";*/
 
-                              if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
-                                shared.setPendingLeaveReqL1MSSPermission("1");
-                                shared.setLevelOne("true");
-                              } else {
-                                shared.setPendingLeaveReqL1MSSPermission("0");
-                                shared.setLevelOne("false");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              /* String leaveReqL2MSSPermValue =
+                                        if (selected.profilePermission?.contains(
+                                                  "LEVEL_ONE_LEAVE_APPROVE_ADD",
+                                                ) ==
+                                                true ||
+                                            selected.profilePermission?.contains(
+                                                  "LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD",
+                                                ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqL1MSSPermission(
+                                                "1",
+                                              );
+                                          shared.setLevelOne("true");
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqL1MSSPermission(
+                                                "0",
+                                              );
+                                          shared.setLevelOne("false");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L2 permission
+                                        /* String leaveReqL2MSSPermValue =
                               ((selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
-                                shared.setPendingLeaveReqL2MSSPermission("1");
-                                shared.setLevelTwo("true");
-                              } else {
-                                shared.setPendingLeaveReqL2MSSPermission("0");
-                                shared.setLevelTwo("false");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              /*String othersLeaveReqMSSPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                                  "LEVEL_TWO_LEAVE_APPROVE_ADD",
+                                                ) ==
+                                                true ||
+                                            selected.profilePermission?.contains(
+                                                  "LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD",
+                                                ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqL2MSSPermission(
+                                                "1",
+                                              );
+                                          shared.setLevelTwo("true");
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqL2MSSPermission(
+                                                "0",
+                                              );
+                                          shared.setLevelTwo("false");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L2 permission
+                                        /*String othersLeaveReqMSSPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") == true) {
-                                shared.setOthersLeaveReqMSSPermission("1");
-                              } else {
-                                shared.setOthersLeaveReqMSSPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L1 permission
-                              /*String pendingClaimL1Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "OTHERS_LEAVE_REQUEST_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setOthersLeaveReqMSSPermission(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setOthersLeaveReqMSSPermission(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L1 permission
+                                        /*String pendingClaimL1Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
-                                shared.setClaimLevelOne("1");
-                                shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
-                                permissionNotifier.updatePermission("1");
-                              } else {
-                                shared.setClaimLevelOne("0");
-                                shared.setClaimLevelOne("");
-                                permissionNotifier.updatePermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L2 permission
-                              /*String pendingClaimL2Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelOne("1");
+                                          shared.setClaimLevelOne(
+                                            "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
+                                          );
+                                          permissionNotifier.updatePermission(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelOne("0");
+                                          shared.setClaimLevelOne("");
+                                          permissionNotifier.updatePermission(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L2 permission
+                                        /*String pendingClaimL2Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
-                                shared.setClaimLevelTwo("1");
-                                shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
-                                permissionNotifier.updatePermission("1");
-                              } else {
-                                shared.setClaimLevelTwo("0");
-                                shared.setClaimLevelTwo("");
-                                permissionNotifier.updatePermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L3 permission
-                              /* String pendingClaimL3Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelTwo("1");
+                                          shared.setClaimLevelTwo(
+                                            "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
+                                          );
+                                          permissionNotifier.updatePermission(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelTwo("0");
+                                          shared.setClaimLevelTwo("");
+                                          permissionNotifier.updatePermission(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L3 permission
+                                        /* String pendingClaimL3Permission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
-                                shared.setClaimLevelThree("1");
-                                permissionNotifier.updatePermission("1");
-                              } else {
-                                shared.setClaimLevelThree("0");
-                                permissionNotifier.updatePermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Pending List permission
-                              /*String pendingODListPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_THREE_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelThree("1");
+                                          permissionNotifier.updatePermission(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelThree("0");
+                                          permissionNotifier.updatePermission(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Pending List permission
+                                        /*String pendingODListPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
-                                shared.setODPendingList("1");
-                              } else {
-                                shared.setODPendingList("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Activate permission
-                              /*String odActivatePermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "MOBILE_OD_PENDING_REQ_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setODPendingList("1");
+                                        } else {
+                                          shared.setODPendingList("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Activate permission
+                                        /*String odActivatePermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
-                                shared.setODActivate("1");
-                              } else {
-                                shared.setODActivate("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Activate permission
-                              /* String loanActivatePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "MOBILE_OD_ACTIVATE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setODActivate("1");
+                                        } else {
+                                          shared.setODActivate("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Activate permission
+                                        /* String loanActivatePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
-                                shared.setLoanPendingList("1");
-                              } else {
-                                shared.setLoanPendingList("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
-                              /*String loanApprovalL1MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanPendingList("1");
+                                        } else {
+                                          shared.setLoanPendingList("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L1 permission
+                                        /*String loanApprovalL1MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
-                                shared.setLoanApprovalL1MSS("LOAN_APPROVAL_LEVEL_ONE_ADD");
-                              } else {
-                                shared.setLoanApprovalL1MSS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
-                              /*String loanApprovalL2MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanApprovalL1MSS(
+                                            "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL1MSS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L2 permission
+                                        /*String loanApprovalL2MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") == true) {
-                                shared.setLoanApprovalL2MSS("LOAN_APPROVAL_LEVEL_TWO_ADD");
-                              } else {
-                                shared.setLoanApprovalL2MSS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
-                              /*String loanApprovalL3MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_TWO_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanApprovalL2MSS(
+                                            "LOAN_APPROVAL_LEVEL_TWO_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL2MSS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L3 permission
+                                        /*String loanApprovalL3MSSPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") == true) {
-                                shared.setLoanApprovalL3MSS("LOAN_APPROVAL_LEVEL_THREE_ADD");
-                              } else {
-                                shared.setLoanApprovalL3MSS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
-                              /*String loanApprovalL1MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_THREE_ADD",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalL3MSS(
+                                            "LOAN_APPROVAL_LEVEL_THREE_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL3MSS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L1 Delete permission
+                                        /*String loanApprovalL1MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL1MSS("LOAN_APPROVAL_LEVEL_ONE_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL1MSS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
-                              /*String loanApprovalL2MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_ONE_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL1MSS(
+                                            "LOAN_APPROVAL_LEVEL_ONE_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL1MSS(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L2 Delete permission
+                                        /*String loanApprovalL2MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL2MSS("LOAN_APPROVAL_LEVEL_TWO_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL2MSS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
-                              /*String loanApprovalL3MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_TWO_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL2MSS(
+                                            "LOAN_APPROVAL_LEVEL_TWO_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL2MSS(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L3 Delete permission
+                                        /*String loanApprovalL3MSSDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL3MSS("LOAN_APPROVAL_LEVEL_THREE_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL3MSS("0");
-                              }
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_THREE_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL3MSS(
+                                            "LOAN_APPROVAL_LEVEL_THREE_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL3MSS(
+                                            "0",
+                                          );
+                                        }
 
-                              // 🟢 Check if the selected profile has the OD Pending List permission
-                              /* String pendingAttendanceRequestMSSL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                        // ðŸŸ¢ Check if the selected profile has the OD Pending List permission
+                                        /* String pendingAttendanceRequestMSSL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATT_APP_ONE_ADD") == true) {
-                                shared.setPendingAttendanceReqL1MSS("1");
-                              } else {
-                                shared.setPendingAttendanceReqL1MSS("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Activate permission
-                              /*String pendingAttendanceRequestMSSL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains("ATT_APP_ONE_ADD") ==
+                                            true) {
+                                          shared.setPendingAttendanceReqL1MSS(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setPendingAttendanceReqL1MSS(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Activate permission
+                                        /*String pendingAttendanceRequestMSSL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATT_APP_TWO_ADD") == true) {
-                                shared.setPendingAttendanceReqL2MSS("1");
-                              } else {
-                                shared.setPendingAttendanceReqL2MSS("0");
-                              }
+                                        if (selected.profilePermission
+                                                ?.contains("ATT_APP_TWO_ADD") ==
+                                            true) {
+                                          shared.setPendingAttendanceReqL2MSS(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setPendingAttendanceReqL2MSS(
+                                            "0",
+                                          );
+                                        }
 
-                              //USER
-                              // 🟢 Check if the selected profile has the Pending Attendance Request permission
-                              /*String pendingAttReqUISPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
+                                        //USER
+                                        // ðŸŸ¢ Check if the selected profile has the Pending Attendance Request permission
+                                        /*String pendingAttReqUISPermValue = (selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATTENDANCE_REQ_APPROVAL_DETAILS_ADD") == true) {
-                                shared.setPendingAttendanceReqUISPermission("1");
-                              } else {
-                                shared.setPendingAttendanceReqUISPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request permission
-                              /* String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "ATTENDANCE_REQ_APPROVAL_DETAILS_ADD",
+                                            ) ==
+                                            true) {
+                                          shared
+                                              .setPendingAttendanceReqUISPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingAttendanceReqUISPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request permission
+                                        /* String leaveReqUISPermValue = (selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false)
                                   ? "1"
                                   : "0";
-                              // 🟢 Check if the selected profile has the Leave Request L1 permission
+                              // ðŸŸ¢ Check if the selected profile has the Leave Request L1 permission
                               String leaveReqL1UISPermValue = (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false)
                                   ? "1"
                                   : "0";
-                              // 🟢 Check if the selected profile has the Leave Request L2 permission
+                              // ðŸŸ¢ Check if the selected profile has the Leave Request L2 permission
                               String leaveReqL2UISPermValue = (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              /*String leaveReqUISPermValue =
+                                        /*String leaveReqUISPermValue =
                               ((selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEAVE_REQ_APPROVAL_ADD") == true || selected.profilePermission?.contains("LEAVE_APP_MYTEAM_ADD") == true) {
-                                shared.setPendingLeaveReqUISPermission("1");
-                                shared.setPendingLeaveReq("true");
-                              } else {
-                                shared.setPendingLeaveReqUISPermission("0");
-                                shared.setPendingLeaveReq("false");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L1 permission
-                              /* String leaveReqL1UISPermValue =
+                                        if (selected.profilePermission
+                                                    ?.contains(
+                                                      "LEAVE_REQ_APPROVAL_ADD",
+                                                    ) ==
+                                                true ||
+                                            selected.profilePermission
+                                                    ?.contains(
+                                                      "LEAVE_APP_MYTEAM_ADD",
+                                                    ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqUISPermission(
+                                                "1",
+                                              );
+                                          shared.setPendingLeaveReq("true");
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqUISPermission(
+                                                "0",
+                                              );
+                                          shared.setPendingLeaveReq("false");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L1 permission
+                                        /* String leaveReqL1UISPermValue =
                               ((selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD") == true) {
-                                shared.setPendingLeaveReqL1UISPermission("1");
-                              } else {
-                                shared.setPendingLeaveReqL1UISPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              /*String leaveReqL2UISPermValue =
+                                        if (selected.profilePermission?.contains(
+                                                  "LEVEL_ONE_LEAVE_APPROVE_ADD",
+                                                ) ==
+                                                true ||
+                                            selected.profilePermission?.contains(
+                                                  "LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD",
+                                                ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqL1UISPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqL1UISPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L2 permission
+                                        /*String leaveReqL2UISPermValue =
                               ((selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") ?? false) ||
                                   (selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") ?? false))
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_ADD") == true || selected.profilePermission?.contains("LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD") == true) {
-                                shared.setPendingLeaveReqL2UISPermission("1");
-                              } else {
-                                shared.setPendingLeaveReqL2UISPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Leave Request L2 permission
-                              /*  String othersLeaveReqUISPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                                  "LEVEL_TWO_LEAVE_APPROVE_ADD",
+                                                ) ==
+                                                true ||
+                                            selected.profilePermission?.contains(
+                                                  "LEVEL_TWO_LEAVE_APPROVE_MYTEAM_ADD",
+                                                ) ==
+                                                true) {
+                                          shared
+                                              .setPendingLeaveReqL2UISPermission(
+                                                "1",
+                                              );
+                                        } else {
+                                          shared
+                                              .setPendingLeaveReqL2UISPermission(
+                                                "0",
+                                              );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Leave Request L2 permission
+                                        /*  String othersLeaveReqUISPermValue = (selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("OTHERS_LEAVE_REQUEST_ADD") == true) {
-                                shared.setOthersLeaveReqUISPermission("1");
-                              } else {
-                                shared.setOthersLeaveReqUISPermission("0");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L1 permission
-                              /*String pendingClaimL1UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "OTHERS_LEAVE_REQUEST_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setOthersLeaveReqUISPermission(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setOthersLeaveReqUISPermission(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L1 permission
+                                        /*String pendingClaimL1UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_ONE_VIEW") == true) {
-                                shared.setClaimLevelOneUIS("1");
-                                shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
-                              } else {
-                                shared.setClaimLevelOneUIS("0");
-                                shared.setClaimLevelOne("");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L2 permission
-                              /*String pendingClaimL2UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelOneUIS("1");
+                                          shared.setClaimLevelOne(
+                                            "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelOneUIS("0");
+                                          shared.setClaimLevelOne("");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L2 permission
+                                        /*String pendingClaimL2UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_TWO_VIEW") == true) {
-                                shared.setClaimLevelTwoUIS("1");
-                                shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
-                              } else {
-                                shared.setClaimLevelTwoUIS("0");
-                                shared.setClaimLevelTwo("");
-                              }
-                              // 🟢 Check if the selected profile has the Claim L3 permission
-                              /*String pendingClaimL3UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelTwoUIS("1");
+                                          shared.setClaimLevelTwo(
+                                            "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelTwoUIS("0");
+                                          shared.setClaimLevelTwo("");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Claim L3 permission
+                                        /*String pendingClaimL3UISPermission = (selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("CLAIM_APPROVAL_LEVEL_THREE_VIEW") == true) {
-                                shared.setClaimLevelThreeUIS("1");
-                                shared.setClaimLevelThree("CLAIM_APPROVAL_LEVEL_THREE_VIEW");
-                              } else {
-                                shared.setClaimLevelThreeUIS("0");
-                                shared.setClaimLevelThree("");
-                              }
-                              // 🟢 Check if the selected profile has the OD Pending List permission
-                              /*String pendingODListUISPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "CLAIM_APPROVAL_LEVEL_THREE_VIEW",
+                                            ) ==
+                                            true) {
+                                          shared.setClaimLevelThreeUIS("1");
+                                          shared.setClaimLevelThree(
+                                            "CLAIM_APPROVAL_LEVEL_THREE_VIEW",
+                                          );
+                                        } else {
+                                          shared.setClaimLevelThreeUIS("0");
+                                          shared.setClaimLevelThree("");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Pending List permission
+                                        /*String pendingODListUISPermission = (selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("MOBILE_OD_PENDING_REQ_ADD") == true) {
-                                shared.setODPendingListUIS("1");
-                              } else {
-                                shared.setODPendingListUIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Activate permission
-                              /*String odActivateUISPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "MOBILE_OD_PENDING_REQ_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setODPendingListUIS("1");
+                                        } else {
+                                          shared.setODPendingListUIS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Activate permission
+                                        /*String odActivateUISPermission = (selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("MOBILE_OD_ACTIVATE_ADD") == true) {
-                                shared.setODActivateUIS("1");
-                              } else {
-                                shared.setODActivateUIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Activate permission
-                              /*String loanActivateUISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "MOBILE_OD_ACTIVATE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setODActivateUIS("1");
+                                        } else {
+                                          shared.setODActivateUIS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Activate permission
+                                        /*String loanActivateUISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
-                                shared.setLoanPendingListUIS("1");
-                              } else {
-                                shared.setLoanPendingListUIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L1 permission
-                              /*String loanApprovalL1UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanPendingListUIS("1");
+                                        } else {
+                                          shared.setLoanPendingListUIS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L1 permission
+                                        /*String loanApprovalL1UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_ADD") == true) {
-                                shared.setLoanApprovalL1UIS("LOAN_APPROVAL_LEVEL_ONE_ADD");
-                              } else {
-                                shared.setLoanApprovalL1UIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L2 permission
-                              /*String loanApprovalL2UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanApprovalL1UIS(
+                                            "LOAN_APPROVAL_LEVEL_ONE_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL1UIS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L2 permission
+                                        /*String loanApprovalL2UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_ADD") == true) {
-                                shared.setLoanApprovalL2UIS("LOAN_APPROVAL_LEVEL_TWO_ADD");
-                              } else {
-                                shared.setLoanApprovalL2UIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L3 permission
-                              /*String loanApprovalL3UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains(
+                                                  "LOAN_APPROVAL_LEVEL_TWO_ADD",
+                                                ) ==
+                                            true) {
+                                          shared.setLoanApprovalL2UIS(
+                                            "LOAN_APPROVAL_LEVEL_TWO_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL2UIS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L3 permission
+                                        /*String loanApprovalL3UISPermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_ADD"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_ADD") == true) {
-                                shared.setLoanApprovalL3UIS("LOAN_APPROVAL_LEVEL_THREE_ADD");
-                              } else {
-                                shared.setLoanApprovalL3UIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L1 Delete permission
-                              /*String loanApprovalL1UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_THREE_ADD",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalL3UIS(
+                                            "LOAN_APPROVAL_LEVEL_THREE_ADD",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalL3UIS("0");
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L1 Delete permission
+                                        /*String loanApprovalL1UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_ONE_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_ONE_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL1UIS("LOAN_APPROVAL_LEVEL_ONE_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL1UIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L2 Delete permission
-                              /*String loanApprovalL2UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_ONE_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL1UIS(
+                                            "LOAN_APPROVAL_LEVEL_ONE_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL1UIS(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L2 Delete permission
+                                        /*String loanApprovalL2UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_TWO_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_TWO_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL2UIS("LOAN_APPROVAL_LEVEL_TWO_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL2UIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the Loan Approval L3 Delete permission
-                              /*String loanApprovalL3UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_TWO_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL2UIS(
+                                            "LOAN_APPROVAL_LEVEL_TWO_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL2UIS(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the Loan Approval L3 Delete permission
+                                        /*String loanApprovalL3UISDeletePermission = (selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") ?? false)
                                   ? "LOAN_APPROVAL_LEVEL_THREE_DELETE"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("LOAN_APPROVAL_LEVEL_THREE_DELETE") == true) {
-                                shared.setLoanApprovalDeleteL3UIS("LOAN_APPROVAL_LEVEL_THREE_DELETE");
-                              } else {
-                                shared.setLoanApprovalDeleteL3UIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Pending List permission
-                              /*String pendingAttendanceRequestUISL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
+                                        if (selected.profilePermission?.contains(
+                                              "LOAN_APPROVAL_LEVEL_THREE_DELETE",
+                                            ) ==
+                                            true) {
+                                          shared.setLoanApprovalDeleteL3UIS(
+                                            "LOAN_APPROVAL_LEVEL_THREE_DELETE",
+                                          );
+                                        } else {
+                                          shared.setLoanApprovalDeleteL3UIS(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Pending List permission
+                                        /*String pendingAttendanceRequestUISL1 = (selected.profilePermission?.contains("ATT_APP_ONE_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATT_APP_ONE_ADD") == true) {
-                                shared.setPendingAttendanceReqL1UIS("1");
-                              } else {
-                                shared.setPendingAttendanceReqL1UIS("0");
-                              }
-                              // 🟢 Check if the selected profile has the OD Activate permission
-                              /*String pendingAttendanceRequestUISL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
+                                        if (selected.profilePermission
+                                                ?.contains("ATT_APP_ONE_ADD") ==
+                                            true) {
+                                          shared.setPendingAttendanceReqL1UIS(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setPendingAttendanceReqL1UIS(
+                                            "0",
+                                          );
+                                        }
+                                        // ðŸŸ¢ Check if the selected profile has the OD Activate permission
+                                        /*String pendingAttendanceRequestUISL2 = (selected.profilePermission?.contains("ATT_APP_TWO_ADD") ?? false)
                                   ? "1"
                                   : "0";*/
-                              if(selected.profilePermission?.contains("ATT_APP_TWO_ADD") == true) {
-                                shared.setPendingAttendanceReqL2UIS("1");
-                              } else {
-                                shared.setPendingAttendanceReqL2UIS("0");
-                              }
+                                        if (selected.profilePermission
+                                                ?.contains("ATT_APP_TWO_ADD") ==
+                                            true) {
+                                          shared.setPendingAttendanceReqL2UIS(
+                                            "1",
+                                          );
+                                        } else {
+                                          shared.setPendingAttendanceReqL2UIS(
+                                            "0",
+                                          );
+                                        }
 
-
-                              // 🟢 Save the MSS MO permission to SharedPreferences
-                              /*await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
+                                        // ðŸŸ¢ Save the MSS MO permission to SharedPreferences
+                                        /*await shared.setPendingAttendanceReqMSSMOPermission(pendingAttReqMOPermValue);
                               await shared.setPendingLeaveReqMSSMOPermission(leaveReqMOPermValue);
                               await shared.setPendingLeaveReqL1MSSMOPermission(leaveReqL1MOPermValue);
                               await shared.setPendingLeaveReqL2MSSMOPermission(leaveReqL2MOPermValue);
@@ -3550,33 +4165,33 @@ class _DrawerFileState extends State<DrawerFile> {
                               shared.setExitResignationApproveL2View(exitResignationApproveL2View);
                               shared.setExitResignationDisApproveL1View(exitResignationDisApproveL1View);
                               shared.setExitResignationDisApproveL2View(exitResignationDisApproveL2View);
-                              print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
-                              print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
-                              print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
-                              print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MOPermValue");
-                              print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMOPermValue");
-                              print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1MOPermission");
-                              print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2MOPermission");
-                              print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3MOPermission");
-                              print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateMOPermission");
-                              print("✅ Pending OD Permission for profileId $selectedProfileId: $pendingODListMOPermission");
-                              print("✅ Loan Activate Permission for profileId $selectedProfileId: $loanActivateMOPermission");
-                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1Permission");
-                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2Permission");
-                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3Permission");
-                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1DeletePermission");
-                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2DeletePermission");
-                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3DeletePermission");
-                              print("✅ Pending Attendance L1 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL1");
-                              print("✅ Pending Attendance L2 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL2");
-                              print("✅ My Team MO Permission for profileId $selectedProfileId: $myTeamShow");
-                              print("✅ Exit Resignation List Permission for profileId $selectedProfileId: $exitResignationListView");
-                              print("✅ Exit Resignation Approve L1 Permission for profileId $selectedProfileId: $exitResignationApproveL1View");
-                              print("✅ Exit Resignation Approve L2 Permission for profileId $selectedProfileId: $exitResignationApproveL2View");
-                              print("✅ Exit Resignation Disapprove L1 Permission for profileId $selectedProfileId: $exitResignationDisApproveL1View");
-                              print("✅ Exit Resignation Disapprove L2 Permission for profileId $selectedProfileId: $exitResignationDisApproveL2View");
+                              print("âœ… Attendance Permission for profileId $selectedProfileId: $pendingAttReqMOPermValue");
+                              print("âœ… Leave Permission for profileId $selectedProfileId: $leaveReqMOPermValue");
+                              print("âœ… Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MOPermValue");
+                              print("âœ… Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MOPermValue");
+                              print("âœ… Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMOPermValue");
+                              print("âœ… Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1MOPermission");
+                              print("âœ… Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2MOPermission");
+                              print("âœ… Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3MOPermission");
+                              print("âœ… OD Activate Permission for profileId $selectedProfileId: $odActivateMOPermission");
+                              print("âœ… Pending OD Permission for profileId $selectedProfileId: $pendingODListMOPermission");
+                              print("âœ… Loan Activate Permission for profileId $selectedProfileId: $loanActivateMOPermission");
+                              print("âœ… Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1Permission");
+                              print("âœ… Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2Permission");
+                              print("âœ… Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3Permission");
+                              print("âœ… Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1DeletePermission");
+                              print("âœ… Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2DeletePermission");
+                              print("âœ… Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3DeletePermission");
+                              print("âœ… Pending Attendance L1 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL1");
+                              print("âœ… Pending Attendance L2 MO Permission for profileId $selectedProfileId: $pendingAttendanceRequestMOL2");
+                              print("âœ… My Team MO Permission for profileId $selectedProfileId: $myTeamShow");
+                              print("âœ… Exit Resignation List Permission for profileId $selectedProfileId: $exitResignationListView");
+                              print("âœ… Exit Resignation Approve L1 Permission for profileId $selectedProfileId: $exitResignationApproveL1View");
+                              print("âœ… Exit Resignation Approve L2 Permission for profileId $selectedProfileId: $exitResignationApproveL2View");
+                              print("âœ… Exit Resignation Disapprove L1 Permission for profileId $selectedProfileId: $exitResignationDisApproveL1View");
+                              print("âœ… Exit Resignation Disapprove L2 Permission for profileId $selectedProfileId: $exitResignationDisApproveL2View");
 
-                              // 🟢 Save the MSS permission to SharedPreferences
+                              // ðŸŸ¢ Save the MSS permission to SharedPreferences
                               await shared.setPendingAttendanceReqMSSPermission(pendingAttReqMSSPermValue);
                               await shared.setPendingLeaveReqMSSPermission(leaveReqMSSPermValue);
                               await shared.setPendingLeaveReqL1MSSPermission(leaveReqL1MSSPermValue);
@@ -3596,25 +4211,25 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setLoanApprovalDeleteL3MSS(loanApprovalL3MSSDeletePermission);
                               shared.setPendingAttendanceReqL1MSS(pendingAttendanceRequestMSSL1);
                               shared.setPendingAttendanceReqL2MSS(pendingAttendanceRequestMSSL2);
-                              print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqMSSPermValue");
-                              print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqMSSPermValue");
-                              print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MSSPermValue");
-                              print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MSSPermValue");
-                              print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMSSPermValue");
-                              print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1Permission");
-                              print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2Permission");
-                              print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3Permission");
-                              print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivatePermission");
-                              print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListPermission");
-                              print("✅ Loan Activate Permission for profileId $selectedProfileId: $loanActivatePermission");
-                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1MSSPermission");
-                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2MSSPermission");
-                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3MSSPermission");
-                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1MSSDeletePermission");
-                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2MSSDeletePermission");
-                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3MSSDeletePermission");
-                              print("✅ Pending Attendance L1 MSS Permission for profileId $selectedProfileId: $pendingAttendanceRequestMSSL1");
-                              print("✅ Pending Attendance L2 MSS Permission for profileId $selectedProfileId: $pendingAttendanceRequestMSSL2");
+                              print("âœ… Attendance Permission for profileId $selectedProfileId: $pendingAttReqMSSPermValue");
+                              print("âœ… Leave Permission for profileId $selectedProfileId: $leaveReqMSSPermValue");
+                              print("âœ… Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1MSSPermValue");
+                              print("âœ… Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2MSSPermValue");
+                              print("âœ… Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqMSSPermValue");
+                              print("âœ… Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1Permission");
+                              print("âœ… Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2Permission");
+                              print("âœ… Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3Permission");
+                              print("âœ… OD Activate Permission for profileId $selectedProfileId: $odActivatePermission");
+                              print("âœ… Pending OD List Permission for profileId $selectedProfileId: $pendingODListPermission");
+                              print("âœ… Loan Activate Permission for profileId $selectedProfileId: $loanActivatePermission");
+                              print("âœ… Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1MSSPermission");
+                              print("âœ… Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2MSSPermission");
+                              print("âœ… Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3MSSPermission");
+                              print("âœ… Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1MSSDeletePermission");
+                              print("âœ… Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2MSSDeletePermission");
+                              print("âœ… Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3MSSDeletePermission");
+                              print("âœ… Pending Attendance L1 MSS Permission for profileId $selectedProfileId: $pendingAttendanceRequestMSSL1");
+                              print("âœ… Pending Attendance L2 MSS Permission for profileId $selectedProfileId: $pendingAttendanceRequestMSSL2");
                               // Notify global listener
                               permissionNotifier.updatePermission(pendingClaimL1Permission);
                               permissionNotifier.updatePermission(pendingClaimL2Permission);
@@ -3622,7 +4237,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               permissionNotifier.updatePermission(pendingClaimL1MOPermission);
                               permissionNotifier.updatePermission(pendingClaimL2MOPermission);
                               permissionNotifier.updatePermission(pendingClaimL3MOPermission);
-                              // 🟢 Save the UIS permission to SharedPreferences
+                              // ðŸŸ¢ Save the UIS permission to SharedPreferences
                               await shared.setPendingAttendanceReqUISPermission(pendingAttReqUISPermValue);
                               await shared.setPendingLeaveReqUISPermission(leaveReqUISPermValue);
                               await shared.setPendingLeaveReqL1UISPermission(leaveReqL1UISPermValue);
@@ -3642,48 +4257,57 @@ class _DrawerFileState extends State<DrawerFile> {
                               await shared.setLoanApprovalDeleteL3UIS(loanApprovalL3UISDeletePermission);
                               shared.setPendingAttendanceReqL1UIS(pendingAttendanceRequestUISL1);
                               shared.setPendingAttendanceReqL2UIS(pendingAttendanceRequestUISL2);
-                              print("✅ Attendance Permission for profileId $selectedProfileId: $pendingAttReqUISPermValue");
-                              print("✅ Leave Permission for profileId $selectedProfileId: $leaveReqUISPermValue");
-                              print("✅ Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1UISPermValue");
-                              print("✅ Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2UISPermValue");
-                              print("✅ Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqUISPermValue");
-                              print("✅ Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1UISPermission");
-                              print("✅ Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2UISPermission");
-                              print("✅ Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3UISPermission");
-                              print("✅ OD Activate Permission for profileId $selectedProfileId: $odActivateUISPermission");
-                              print("✅ Pending OD List Permission for profileId $selectedProfileId: $pendingODListUISPermission");
-                              print("✅ Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1UISPermission");
-                              print("✅ Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2UISPermission");
-                              print("✅ Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3UISPermission");
-                              print("✅ Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1UISDeletePermission");
-                              print("✅ Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2UISDeletePermission");
-                              print("✅ Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3UISDeletePermission");
-                              print("✅ Pending Attendance L1 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL1");
-                              print("✅ Pending Attendance L2 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL2");*/
-                              // 🟢 Save selected profile details
-                              await shared.setDefaultProfileId(selectedProfileId);
-                              await shared.setDefaultProfileName(selectedProfileName);
+                              print("âœ… Attendance Permission for profileId $selectedProfileId: $pendingAttReqUISPermValue");
+                              print("âœ… Leave Permission for profileId $selectedProfileId: $leaveReqUISPermValue");
+                              print("âœ… Leave L1 Permission for profileId $selectedProfileId: $leaveReqL1UISPermValue");
+                              print("âœ… Leave L2 Permission for profileId $selectedProfileId: $leaveReqL2UISPermValue");
+                              print("âœ… Others Leave Permission for profileId $selectedProfileId: $othersLeaveReqUISPermValue");
+                              print("âœ… Claim L1 Permission for profileId $selectedProfileId: $pendingClaimL1UISPermission");
+                              print("âœ… Claim L2 Permission for profileId $selectedProfileId: $pendingClaimL2UISPermission");
+                              print("âœ… Claim L3 Permission for profileId $selectedProfileId: $pendingClaimL3UISPermission");
+                              print("âœ… OD Activate Permission for profileId $selectedProfileId: $odActivateUISPermission");
+                              print("âœ… Pending OD List Permission for profileId $selectedProfileId: $pendingODListUISPermission");
+                              print("âœ… Loan Approval L1 Permission for profileId $selectedProfileId: $loanApprovalL1UISPermission");
+                              print("âœ… Loan Approval L2 Permission for profileId $selectedProfileId: $loanApprovalL2UISPermission");
+                              print("âœ… Loan Approval L3 Permission for profileId $selectedProfileId: $loanApprovalL3UISPermission");
+                              print("âœ… Loan Approval L1 Delete Permission for profileId $selectedProfileId: $loanApprovalL1UISDeletePermission");
+                              print("âœ… Loan Approval L2 Delete Permission for profileId $selectedProfileId: $loanApprovalL2UISDeletePermission");
+                              print("âœ… Loan Approval L3 Delete Permission for profileId $selectedProfileId: $loanApprovalL3UISDeletePermission");
+                              print("âœ… Pending Attendance L1 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL1");
+                              print("âœ… Pending Attendance L2 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL2");*/
+                                        // ðŸŸ¢ Save selected profile details
+                                        await shared.setDefaultProfileId(
+                                          selectedProfileId,
+                                        );
+                                        await shared.setDefaultProfileName(
+                                          selectedProfileName,
+                                        );
 
-                              selectedProfileIdNotifier.value = selectedProfileId!;
-                              selectedProfileNameNotifier.value = selectedProfileName!;
-                              setState(() {
-
-                              });
-                              getRequisitionCounts(sessionId!);
-                              Navigator.pop(context);
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 1,))
-                              );
-                            }
-                        );
-                      }).toList(),
-                    );
-                  },
-                ),
+                                        selectedProfileIdNotifier.value =
+                                            selectedProfileId!;
+                                        selectedProfileNameNotifier.value =
+                                            selectedProfileName!;
+                                        setState(() {});
+                                        getRequisitionCounts(sessionId!);
+                                        Navigator.pop(context);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) =>
+                                                    HomePage(selectedIndex: 1),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }).toList(),
+                            );
+                          },
+                        ),
               ),
             ],
           ),
-          // 🔽 Bottom section (Settings)
+          // ðŸ”½ Bottom section (Settings)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -3698,12 +4322,17 @@ class _DrawerFileState extends State<DrawerFile> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ResetPasswordPage()),
+                    MaterialPageRoute(
+                      builder: (context) => ResetPasswordPage(),
+                    ),
                   );
                 },
               ),
               ListTile(
-                leading: Icon(Icons.security_update_good_outlined, color: Mythemes.black),
+                leading: Icon(
+                  Icons.security_update_good_outlined,
+                  color: Mythemes.black,
+                ),
                 title: Text(
                   'Check for Updates',
                   style: TextStyle(color: Mythemes.black),
@@ -3724,13 +4353,14 @@ class _DrawerFileState extends State<DrawerFile> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CompanyPoliciesPage()),
+                    MaterialPageRoute(
+                      builder: (context) => CompanyPoliciesPage(),
+                    ),
                   );
                 },
               ),
             ],
           ).py32(),
-
 
           /*...profileListGetter.map((profile) {
             bool isSelected = selectedProfileId == profile.profileId;
@@ -3759,7 +4389,6 @@ class _DrawerFileState extends State<DrawerFile> {
           }).toList(),*/
         ],
       ),
-
     );
   }
 }

@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -38,8 +39,8 @@ Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
-List<Listdata>? allUsernew=[];
-List<Listdata>? foundDataNewMO=[];
+List<Listdata>? allUsernew = [];
+List<Listdata>? foundDataNewMO = [];
 bool isLoading = true;
 PendingOdReqList? pendingOdReqListLabel;
 PendingOdReqList? pendingOdReqListLabeled;
@@ -47,13 +48,15 @@ String? userPanel;
 dynamic getProfileId;
 String? orgId;
 dynamic matchedOrg;
-class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisition> with RouteAware{
+
+class _MSS_MO_PendingOdRequisitionState
+    extends State<MSS_MO_PendingOdRequisition>
+    with RouteAware {
   final PendingOdReqList pendingOdReqList;
 
   _MSS_MO_PendingOdRequisitionState(this.pendingOdReqList);
 
   var titleName = "OD Pending List";
-
 
   String? odStatus;
   var startDate;
@@ -121,10 +124,12 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
 
     if (orgListString != null) {
       List<dynamic> decoded = json.decode(orgListString);
-      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+      storedOrgList =
+          decoded.map((item) => Map<String, dynamic>.from(item)).toList();
 
       // Populate dropdown list
-      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+      organizations =
+          storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
       //selectedOrg = null;
@@ -133,6 +138,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
       setState(() {});
     }
   }
+
   bool isLoading = false;
 
   Future getSharedPrfanceList() async {
@@ -144,7 +150,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
   }
 
   void _showFilterBottomSheet() {
-    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    if (_isBottomSheetOpen) return; // âœ… Prevent multiple opens
     _isBottomSheetOpen = true;
     showModalBottomSheet(
       context: context,
@@ -181,7 +187,10 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                     ),
                     Text(
                       'Filter',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 16),
 
@@ -198,10 +207,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                           child: Text('Select'),
                         ),
                         ...organizations.map((org) {
-                          return DropdownMenuItem(
-                            value: org,
-                            child: Text(org),
-                          );
+                          return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
                       onChanged: (value) {
@@ -210,7 +216,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
 
                           // Match selected org name to get ID
                           matchedOrg = storedOrgList.firstWhere(
-                                (org) => org['orgName'] == value,
+                            (org) => org['orgName'] == value,
                             orElse: () => {},
                           );
 
@@ -245,12 +251,12 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           // await Future.delayed(Duration(seconds: 5));
                           Future<PendingOdReqList> getEmployeeList11 =
-                          getPendingOdReqList(sessionId!);
+                              getPendingOdReqList(sessionId!);
                           final loading = Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               CircularProgressIndicator(),
-                              Text(" Login ... Please wait")
+                              Text(" Login ... Please wait"),
                             ],
                           );
 
@@ -259,13 +265,16 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                               foundDataNewMO = allUsernew;
                               pendingOdReqListLabel = value;
                               pendingOdReqListLabeled = pendingOdReqListLabel;
-                              if(foundDataNewMO != null) {
+                              if (foundDataNewMO != null) {
                                 foundDataNewMO!.length;
                                 print("Fetch data $foundDataNewMO");
                                 isLoading = false;
                               } else {
                                 Center(
-                                  child: "There is no data available right now".text.make(),
+                                  child:
+                                      "There is no data available right now"
+                                          .text
+                                          .make(),
                                 );
                                 foundDataNewMO = [];
                               }
@@ -280,7 +289,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                           backgroundColor: Mythemes.successColor,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 );
               },
@@ -289,20 +298,21 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
         );
       },
     ).whenComplete(() {
-      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+      _isBottomSheetOpen = false; // âœ… Reset when sheet is dismissed
     });
   }
 
   Future getSharedPrfanceLists() async {
     sessionId = await shared!.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<PendingOdReqList> getEmployeeList11 =
-        getPendingOdReqList(sessionId!);
+    Future<PendingOdReqList> getEmployeeList11 = getPendingOdReqList(
+      sessionId!,
+    );
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
@@ -311,14 +321,12 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
         foundDataNewMO = allUsernew;
         pendingOdReqListLabel = value;
         pendingOdReqListLabeled = pendingOdReqListLabel;
-        if(foundDataNewMO != null) {
+        if (foundDataNewMO != null) {
           foundDataNewMO!.length;
           print("Fetch data $foundDataNewMO");
           isLoading = false;
         } else {
-          Center(
-            child: "There is no data available right now".text.make(),
-          );
+          Center(child: "There is no data available right now".text.make());
           foundDataNewMO = [];
         }
       });
@@ -332,22 +340,24 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
     String apiUrl = ApiDetails.odPendingReqListNew;
     print('employeeList11: ${SessionId}');
     PendingOdReqList pendingOdReqList;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "odStatus=$odStatus&"
-        "startDate=$startDate&"
-        "endDate=$endDate&"
-        "profileId=$getProfileId&"
-        "userPermission=$userPanel&"
-        "orgId=$getOrgId");
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "odStatus=$odStatus&"
+      "startDate=$startDate&"
+      "endDate=$endDate&"
+      "profileId=$getProfileId&"
+      "userPermission=$userPanel&"
+      "orgId=$getOrgId",
+    );
 
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result'];
-    if (getData == "Error" )  {
+    if (getData == "Error") {
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
@@ -359,11 +369,10 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
   }
 
   var statusColor;
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -380,25 +389,24 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Listdata>?  results = [];
+    List<Listdata>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -411,8 +419,14 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.name!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.name!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -426,6 +440,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
       foundDataNewMO = results;
     });
   }
+
   TextEditingController searchType = TextEditingController();
   int pageIndex = 0;
   int currentIndex = 2;
@@ -437,36 +452,41 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                previousScreen:  OnDutyTypes(),
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: titleName,
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              previousScreen: OnDutyTypes(),
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
@@ -496,32 +516,41 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                   styleAnimationType: AnimationType.onHover,
                   spacing: 10.0,
                   customSeparatorBuilder: (context, local, global) {
-                    final opacity =
-                    ((global.position - local.position).abs() - 0.5)
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
                         .clamp(0.0, 1.0);
                     return VerticalDivider(
-                        indent: 10.0,
-                        endIndent: 10.0,
-                        color: Colors.white38.withOpacity(opacity));
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
                   },
                   customIconBuilder: (context, local, global) {
-                    final text = const ['Pending', 'Approved', 'Disapproved'][local.index];
+                    final text =
+                        const ['Pending', 'Approved', 'Disapproved'][local
+                            .index];
                     return Center(
-                        child: Text(text,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(Colors.black, Colors.white,
-                                    local.animationValue))));
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   borderWidth: 0.0,
                   onChanged: (i) {
                     setState(() {
                       value = i;
                       print(i);
-
                     });
 
-                    if(value == 0) {
+                    if (value == 0) {
                       isLoading = true;
                       titleName = "OD Pending List";
                       odStatus = "Pending";
@@ -529,14 +558,14 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                       getSharedPrfanceList();
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
-                    if(value == 1) {
+                    if (value == 1) {
                       isLoading = true;
                       titleName = "OD Approved List";
                       odStatus = "Approved";
                       getSharedPrfanceList();
                       //Navigator.pushNamed(context, MyRoutings.levelOnePendingRoute);
                     }
-                    if(value == 2) {
+                    if (value == 2) {
                       isLoading = true;
                       titleName = "OD Disapproved List";
                       odStatus = "Disapproved";
@@ -544,54 +573,59 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                       //Navigator.pushNamed(context, MyRoutings.levelTwoPendingRoute);
                     }
                   },
-                )
+                ),
               ],
             ).py(6),
             isLoading
-                ? CircularProgressIndicator().py32() :
-            Expanded(
-                child:
-
-                pendingOdReqListLabeled == null
-                    ? "There is no data available.".text.center.make()
-                    : getPendingOdRequisitionList(pendingOdReqListLabeled!)),
+                ? CircularProgressIndicator().py32()
+                : Expanded(
+                  child:
+                      pendingOdReqListLabeled == null
+                          ? "There is no data available.".text.center.make()
+                          : getPendingOdRequisitionList(
+                            pendingOdReqListLabeled!,
+                          ),
+                ),
           ],
         ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
             print('OD');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -602,10 +636,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -633,13 +664,14 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  MSS_MO_PendingOdRequisition(PendingOdReqList()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) => MSS_MO_PendingOdRequisition(PendingOdReqList()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -655,38 +687,41 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
           }
           return InkWell(
             onTap: () {
-
               if (statusCheck == 'Approved') {
-
                 Fluttertoast.showToast(
-                    msg: "Your Requisition has already Approved",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 3,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: "Your Requisition has already Approved",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               } else if (statusCheck == 'DisApproved') {
-
                 Fluttertoast.showToast(
-                    msg: "Your Requisition has already Disapproved",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 3,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: "Your Requisition has already Disapproved",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               } else {
-
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>
-                    OdApproveDisapproveReq(pendingOdReqList, itemCount)));
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) =>
+                            OdApproveDisapproveReq(pendingOdReqList, itemCount),
+                  ),
+                );
               }
             },
             child: Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
@@ -701,11 +736,17 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                         CircleAvatar(
                           radius: 28,
                           backgroundColor: Colors.grey.shade200,
-                          backgroundImage: (foundDataNewMO![itemCount].image != null &&
-                              foundDataNewMO![itemCount].image.toString().isNotEmpty)
-                              ? NetworkImage(foundDataNewMO![itemCount].image.toString())
-                          as ImageProvider
-                              : AssetImage('assets/images/avtar7.png'),
+                          backgroundImage:
+                              (foundDataNewMO![itemCount].image != null &&
+                                      foundDataNewMO![itemCount].image
+                                          .toString()
+                                          .isNotEmpty)
+                                  ? NetworkImage(
+                                        foundDataNewMO![itemCount].image
+                                            .toString(),
+                                      )
+                                      as ImageProvider
+                                  : AssetImage('assets/images/avtar7.png'),
                         ),
 
                         const SizedBox(width: 12),
@@ -730,12 +771,20 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.location_on, size: 16, color: Colors.redAccent),
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: Colors.redAccent,
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      foundDataNewMO![itemCount].odaddress.toString(),
-                                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                      foundDataNewMO![itemCount].odaddress
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[700],
+                                      ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -746,12 +795,20 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.chat_bubble_outline, size: 16, color: Colors.redAccent),
+                                  const Icon(
+                                    Icons.chat_bubble_outline,
+                                    size: 16,
+                                    color: Colors.redAccent,
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      foundDataNewMO![itemCount].remark.toString(),
-                                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                                      foundDataNewMO![itemCount].remark
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[700],
+                                      ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -769,7 +826,8 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              foundDataNewMO![itemCount].approvalstatus.toString(),
+                              foundDataNewMO![itemCount].approvalstatus
+                                  .toString(),
                               style: TextStyle(
                                 color: statusColor,
                                 fontWeight: FontWeight.bold,
@@ -799,7 +857,6 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                         )
                       ],
                     ),*/
-
                     const SizedBox(height: 12),
                     const Divider(height: 1),
 
@@ -814,19 +871,31 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.touch_app, size: 32, color: Mythemes.lightBluishColor),
+                              Icon(
+                                Icons.touch_app,
+                                size: 32,
+                                color: Mythemes.lightBluishColor,
+                              ),
                               const SizedBox(width: 6),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    foundDataNewMO![itemCount].odtype.toString(),
-                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                    foundDataNewMO![itemCount].odtype
+                                        .toString(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    foundDataNewMO![itemCount].odtime.toString(),
-                                    style: const TextStyle(color: Colors.black87, fontSize: 13),
+                                    foundDataNewMO![itemCount].odtime
+                                        .toString(),
+                                    style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -839,20 +908,34 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.date_range, size: 32, color: Mythemes.lightBluishColor),
+                              Icon(
+                                Icons.date_range,
+                                size: 32,
+                                color: Mythemes.lightBluishColor,
+                              ),
                               const SizedBox(width: 6),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
                                     'Date',
-                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    DateFormat("dd-MM-yyyy")
-                                        .format(DateTime.parse(foundDataNewMO![itemCount].date.toString())),
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                    DateFormat("dd-MM-yyyy").format(
+                                      DateTime.parse(
+                                        foundDataNewMO![itemCount].date
+                                            .toString(),
+                                      ),
+                                    ),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -860,7 +943,7 @@ class _MSS_MO_PendingOdRequisitionState extends State<MSS_MO_PendingOdRequisitio
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),

@@ -11,7 +11,6 @@ import 'package:path_provider/path_provider.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../commanScreen/punchInUploadPage.dart';
 import 'package:intl/intl.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 class CameraApp extends StatefulWidget {
   const CameraApp({Key? key}) : super(key: key);

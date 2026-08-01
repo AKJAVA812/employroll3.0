@@ -28,6 +28,7 @@ import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDe
 import '../modalClass/leaveBalModal.dart';
 import '../modalClass/leaveBalanceModel.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 class LeaveRequisitionPage extends StatefulWidget {
   final bool showShortcuts;
@@ -36,7 +37,8 @@ class LeaveRequisitionPage extends StatefulWidget {
   @override
   State<LeaveRequisitionPage> createState() => _LeaveRequisitionPageState();
 }
-SessionManager sessionManager=SessionManager();
+
+SessionManager sessionManager = SessionManager();
 Map<String, dynamic> mapResponse = {};
 Map<String, dynamic> mapResponseLBalance = {};
 SessionManager shared = SessionManager();
@@ -44,11 +46,13 @@ String? sessionId;
 var doj;
 LeaveBalModal? leaveBalLabel;
 LeaveBalanceModel? leaveBalanceLabel;
-String valuenew="listText";
-List<String> leavereqIdGlobel=[];
+String valuenew = "listText";
+List<String> leavereqIdGlobel = [];
 late List<String?> list = [];
 late List<String?> leaveTypeList = [];
-class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteAware{
+
+class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
+    with RouteAware {
   var titleName = "Leave Requisition";
   String? branchName;
   String? deptName;
@@ -66,7 +70,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
   bool halfDayShow = false;
   final TextEditingController _fromDateController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
-  final TextEditingController fromTimePickerController = TextEditingController();
+  final TextEditingController fromTimePickerController =
+      TextEditingController();
   final TextEditingController toTimePickerController = TextEditingController();
   final TextEditingController _nomineeController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
@@ -78,9 +83,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
   var nominee;
   final _formKey = GlobalKey<FormState>();
 
-
-
- /* Future getSharedPrfanceList() async {
+  /* Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     //Future<LeaveBalModal> getAppReq11 = getLeaveBalance(sessionId!);
@@ -118,19 +121,18 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     getLeaveTypeList(sessionId!).then((data) {
       if (data != null) {
         setState(() {
-          leaveBalanceLabel = data.leaveBalanceModel;  // full model
-          leaveBalLabel = data.leaveBalModal;          // only leaveData part
+          leaveBalanceLabel = data.leaveBalanceModel; // full model
+          leaveBalLabel = data.leaveBalModal; // only leaveData part
         });
       }
     });
-   // fetchLeaveBalance(sessionId!);
+    // fetchLeaveBalance(sessionId!);
   }
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -149,24 +151,25 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
             Navigator.pop(buildContext);
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
- /* Future<LeaveBalModal> getLeaveBalance(String SessionId) async {
+  /* Future<LeaveBalModal> getLeaveBalance(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBal;
     print('employeeList11: ${SessionId}');
     LeaveBalModal leaveBalModal = new LeaveBalModal();
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     //print('responseemployeeList ${response.body}');
 
@@ -197,7 +200,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     LeaveBalModal leaveBalModal;
     print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
@@ -234,7 +237,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
 
     print('employeeList11: $sessionId');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     print('responseLeaveTypeList ${response.body}');
@@ -248,31 +251,34 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     // Extract only leaveData for LeaveBalModal
     var leaveGetData = mapResponse["leaveData"];
     LeaveBalModal? modelLeaveData =
-    leaveGetData != null ? LeaveBalModal.fromJson({"leaveData": leaveGetData}) : null;
+        leaveGetData != null
+            ? LeaveBalModal.fromJson({"leaveData": leaveGetData})
+            : null;
 
     print("Parsed LeaveBalModal leaveData: ${modelLeaveData?.leaveData}");
-    print("Parsed LeaveBalModal leaveData: ${modelLeaveData?.leaveData?.leaveDetails}");
+    print(
+      "Parsed LeaveBalModal leaveData: ${modelLeaveData?.leaveData?.leaveDetails}",
+    );
     setState(() {
       leaveBalances = {};
       leaveTypes = [];
 
-      // ✅ Step 1: Ensure we have valid data
+      // âœ… Step 1: Ensure we have valid data
       if (modelLeaveData!.leaveData == null) {
-        print("❌ No leaveData found in API response");
+        print("âŒ No leaveData found in API response");
         return;
       }
 
-      // ✅ Step 2: Extract the parsed balances directly from model
+      // âœ… Step 2: Extract the parsed balances directly from model
       final parsedBalances = modelLeaveData.leaveData!.getParsedBalances();
 
-      // ✅ Step 3: Set the data for UI
+      // âœ… Step 3: Set the data for UI
       leaveBalances = parsedBalances;
       leaveTypes = parsedBalances.keys.toList();
 
-      // ✅ Debug info
-      print("✅ leaveTypes: $leaveTypes");
-      print("✅ leaveBalances: $leaveBalances");
-
+      // âœ… Debug info
+      print("âœ… leaveTypes: $leaveTypes");
+      print("âœ… leaveBalances: $leaveBalances");
     });
     // Populate dropdown list
     if (mapResponse['leaveTypeList'] != null) {
@@ -337,12 +343,12 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
               final t = type.toLowerCase();
               //print("value1111T $t");
               return lower.startsWith('$t-');
-              // ✅ fixed
+              // âœ… fixed
             },
             orElse: () => '',
           );
-          print("🔍 Matching type=$type with keys=${leaveDataMap.keys}");
-          print("✅ matchedKey=$matchedKey -> ${leaveDataMap[matchedKey]}");
+          print("ðŸ” Matching type=$type with keys=${leaveDataMap.keys}");
+          print("âœ… matchedKey=$matchedKey -> ${leaveDataMap[matchedKey]}");
 
           if (matchedKey.isNotEmpty) {
             final val = leaveDataMap[matchedKey];
@@ -364,11 +370,11 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         }
 
         // debug prints
-        print("✅ leaveTypes: $leaveTypes");
-        print("✅ leaveBalances: $leaveBalances");
+        print("âœ… leaveTypes: $leaveTypes");
+        print("âœ… leaveBalances: $leaveBalances");
       });
     } catch (e, st) {
-      print("❌ Error in fetchLeaveBalance: $e");
+      print("âŒ Error in fetchLeaveBalance: $e");
       print(st);
       // optional: setState to clear loader or show fallback UI
       setState(() {
@@ -380,32 +386,31 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
 
   Future<void> fetchLeaveBalance(String sessionId) async {
     try {
-     // LeaveBalModal leaveBalModal = await getLeaveBalance(sessionId);
+      // LeaveBalModal leaveBalModal = await getLeaveBalance(sessionId);
 
       setState(() {
         leaveBalances = {};
         leaveTypes = [];
 
-        // ✅ Step 1: Ensure we have valid data
+        // âœ… Step 1: Ensure we have valid data
         if (leaveBalLabel!.leaveData == null) {
-          print("❌ No leaveData found in API response");
+          print("âŒ No leaveData found in API response");
           return;
         }
 
-        // ✅ Step 2: Extract the parsed balances directly from model
+        // âœ… Step 2: Extract the parsed balances directly from model
         final parsedBalances = leaveBalLabel!.leaveData!.getParsedBalances();
 
-        // ✅ Step 3: Set the data for UI
+        // âœ… Step 3: Set the data for UI
         leaveBalances = parsedBalances;
         leaveTypes = parsedBalances.keys.toList();
 
-        // ✅ Debug info
-        print("✅ leaveTypes: $leaveTypes");
-        print("✅ leaveBalances: $leaveBalances");
-
+        // âœ… Debug info
+        print("âœ… leaveTypes: $leaveTypes");
+        print("âœ… leaveBalances: $leaveBalances");
       });
     } catch (e, st) {
-      print("❌ Error in fetchLeaveBalance: $e");
+      print("âŒ Error in fetchLeaveBalance: $e");
       print(st);
       setState(() {
         leaveBalances = {};
@@ -424,21 +429,23 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     getEmpId();
     getOrgId();
     getSharedPrfanceList();
-
   }
 
   Future getUserName() async {
     empName = await shared.getempName();
     print('Response snapshot: ${empName}');
   }
+
   Future getDept() async {
-  deptName = await shared.getDept();
+    deptName = await shared.getDept();
     print('Response snapshot: ${deptName}');
   }
+
   Future getBranch() async {
     branchName = await shared.getBranch();
     print('Response snapshot: ${branchName}');
   }
+
   Future getEmpId() async {
     empNewId = await shared.getEmpId();
     print('Response snapshot: ${empNewId}');
@@ -467,51 +474,63 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Wrap(
-          children: [
-            Center(
-              child: Container(
-                width: 50,
-                height: 5,
-                decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10)),
-              ),
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(20),
+            child: Wrap(
+              children: [
+                Center(
+                  child: Container(
+                    width: 50,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                const Center(
+                  child: Text(
+                    "Upload Medical",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt, color: Colors.blue),
+                  title: const Text("Use Camera"),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final ImagePicker picker = ImagePicker();
+                    final XFile? image = await picker.pickImage(
+                      source: ImageSource.camera,
+                    );
+                    if (image != null) {
+                      setState(() => uploadedFile = File(image.path));
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.insert_drive_file,
+                    color: Colors.teal,
+                  ),
+                  title: const Text("Upload from Files"),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    FilePickerResult? result =
+                        await FilePicker.platform.pickFiles();
+                    if (result != null && result.files.single.path != null) {
+                      setState(
+                        () => uploadedFile = File(result.files.single.path!),
+                      );
+                    }
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 15),
-            const Center(
-                child: Text("Upload Medical",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-            const SizedBox(height: 10),
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: Colors.blue),
-              title: const Text("Use Camera"),
-              onTap: () async {
-                Navigator.pop(context);
-                final ImagePicker picker = ImagePicker();
-                final XFile? image =
-                await picker.pickImage(source: ImageSource.camera);
-                if (image != null) {
-                  setState(() => uploadedFile = File(image.path));
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.insert_drive_file, color: Colors.teal),
-              title: const Text("Upload from Files"),
-              onTap: () async {
-                Navigator.pop(context);
-                FilePickerResult? result = await FilePicker.platform.pickFiles();
-                if (result != null && result.files.single.path != null) {
-                  setState(() => uploadedFile = File(result.files.single.path!));
-                }
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -520,11 +539,13 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     attachmentUrl = attachmentUrl.replaceAll("File: '", "").replaceAll("'", "");
 
     final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
-    final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
+    final isImage =
+        attachmentUrl.toLowerCase().endsWith('.jpg') ||
         attachmentUrl.toLowerCase().endsWith('.jpeg') ||
         attachmentUrl.toLowerCase().endsWith('.png');
 
-    final isLocalFile = attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
+    final isLocalFile =
+        attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
 
     showModalBottomSheet(
       context: context,
@@ -533,60 +554,71 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.85,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("View Attachment",
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: isPdf
-                  ? SfPdfViewer.network(attachmentUrl)
-                  : isImage
-                  ? (isLocalFile
-                  ? Image.file(
-                File(attachmentUrl),
-                fit: BoxFit.contain,
-              )
-                  : CachedNetworkImage(
-                imageUrl: attachmentUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Center(
-                    child: Text("❌ Failed to load image")),
-              ))
-                  : const Center(
-                child: Text(
-                  "⚠️ Unsupported file format",
-                  style:
-                  TextStyle(fontSize: 16, color: Colors.redAccent),
+      builder:
+          (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.85,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "View Attachment",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+
+                Expanded(
+                  child:
+                      isPdf
+                          ? SfPdfViewer.network(attachmentUrl)
+                          : isImage
+                          ? (isLocalFile
+                              ? Image.file(
+                                File(attachmentUrl),
+                                fit: BoxFit.contain,
+                              )
+                              : CachedNetworkImage(
+                                imageUrl: attachmentUrl,
+                                fit: BoxFit.contain,
+                                placeholder:
+                                    (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                errorWidget:
+                                    (context, url, error) => const Center(
+                                      child: Text("âŒ Failed to load image"),
+                                    ),
+                              ))
+                          : const Center(
+                            child: Text(
+                              "âš ï¸ Unsupported file format",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                          ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
-
 
   int pageIndex = 0;
   int currentIndex = 2;
@@ -596,44 +628,58 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     return DismissKeyboard(
       child: Scaffold(
         backgroundColor: Mythemes.whitish,
-        appBar: AppBar(
-          title: titleName.text.make(),
-        ),
-        bottomNavigationBar:
-        BottomNavigationBar (
+        appBar: AppBar(title: titleName.text.make()),
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+                ),
+              );
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GetAttendanceDet(showAppBar: true),
+                ),
+              );
               print('Leave');
             }
-            if(index==3){
-              Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyAllReportsPage(showAppBar: true),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
+            if (index == 4) {
+              Navigator.pushNamed(
+                context,
+                MyRoutings.essDashboardNavigateRoute,
+              );
               /*Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
               );*/
@@ -646,10 +692,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -670,7 +713,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
             ),
           ],
         ),
-
 
         body: SingleChildScrollView(
           child: Form(
@@ -844,49 +886,66 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                         spacing: 3.0,
                         customSeparatorBuilder: (context, local, global) {
                           final opacity =
-                          ((global.position - local.position).abs() - 0.5)
-                              .clamp(0.0, 1.0);
+                              ((global.position - local.position).abs() - 0.5)
+                                  .clamp(0.0, 1.0);
                           return VerticalDivider(
-                              indent: 10.0,
-                              endIndent: 10.0,
-                              color: Colors.white38.withOpacity(opacity));
+                            indent: 10.0,
+                            endIndent: 10.0,
+                            color: Colors.white38.withOpacity(opacity),
+                          );
                         },
                         customIconBuilder: (context, local, global) {
-                          final text = const ['Attendance', 'Leave', 'OD'][local.index];
+                          final text =
+                              const ['Attendance', 'Leave', 'OD'][local.index];
                           return Center(
-                              child: Text(text,
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Color.lerp(Colors.black, Colors.white,
-                                          local.animationValue))));
+                            child: Text(
+                              text,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color.lerp(
+                                  Colors.black,
+                                  Colors.white,
+                                  local.animationValue,
+                                ),
+                              ),
+                            ),
+                          );
                         },
                         borderWidth: 0.0,
                         onChanged: (i) {
                           setState(() {
                             value = i;
                             print(i);
-
                           });
-                          if(value == 0){
-                            Navigator.pushNamed(context, MyRoutings.attendanceReqCalendar);
+                          if (value == 0) {
+                            Navigator.pushNamed(
+                              context,
+                              MyRoutings.attendanceReqCalendar,
+                            );
                             //Navigator.of(context, rootNavigator: true).pop();
-
                           }
-                          if(value == 1) {
-                            Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                          if (value == 1) {
+                            Navigator.pushNamed(
+                              context,
+                              MyRoutings.leaveRequisitionRoute,
+                            );
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
-                          if(value == 2) {
-                            Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                          if (value == 2) {
+                            Navigator.pushNamed(
+                              context,
+                              MyRoutings.odLocationViewRoute,
+                            );
                           }
                           /* if(value == 3) {
                                 Navigator.pushNamed(context, MyRoutings.onDutyTypes);
                               }*/
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
+
                 /*Padding(
                   padding: EdgeInsets.all(8.0),
                   child: TextFormField(
@@ -912,30 +971,37 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     ),
                   ),
                 ),*/
-
                 leaveBalances == null
                     ? const Center(child: CircularProgressIndicator())
                     : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildLeaveCardDynamic(
-                    "Leave Taken (Current Ledger)",
-                    leaveTypes,
-                    leaveBalances!, (type) => leaveBalances?[type]?['leavesTaken']?.toString() ?? "0",
-                    Colors.red,
-                    isBold: true,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildLeaveCardDynamic(
-                    "Net Balance",
-                    leaveTypes,
-                    leaveBalances!,
-                        (type) => leaveBalances?[type]?['totalLeavesPending']?.toString() ?? "0",
-                    Colors.green,
-                    isBold: true,
-                  ),
-                ],
-              ).py8(),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLeaveCardDynamic(
+                          "Leave Taken (Current Ledger)",
+                          leaveTypes,
+                          leaveBalances!,
+                          (type) =>
+                              leaveBalances?[type]?['leavesTaken']
+                                  ?.toString() ??
+                              "0",
+                          Colors.red,
+                          isBold: true,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildLeaveCardDynamic(
+                          "Net Balance",
+                          leaveTypes,
+                          leaveBalances!,
+                          (type) =>
+                              leaveBalances?[type]?['totalLeavesPending']
+                                  ?.toString() ??
+                              "0",
+                          Colors.green,
+                          isBold: true,
+                        ),
+                      ],
+                    ).py8(),
+
                 /*Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -958,80 +1024,85 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     ],
                   ),
                 ),*/
-
                 Padding(
                   padding: EdgeInsets.all(12.0),
                   child: TextFormField(
                     controller: TextEditingController(text: empName),
                     enabled: false,
                     //initialValue: deptName,
-                    decoration:  InputDecoration(
-                      labelStyle: TextStyle(
-                      ),
-                        hintText: empName,
-                        labelText: "Employee Name"
-
+                    decoration: InputDecoration(
+                      labelStyle: TextStyle(),
+                      hintText: empName,
+                      labelText: "Employee Name",
                     ),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: DropdownButtonFormField(
-                    value:  dropdownNewvalue,
-                      decoration: InputDecoration(
-                        enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                          borderSide: BorderSide(
-                              width: 1, color: Mythemes.blackishade),
+                    value: dropdownNewvalue,
+                    decoration: InputDecoration(
+                      enabledBorder: UnderlineInputBorder(
+                        //<-- SEE HERE
+                        borderSide: BorderSide(
+                          width: 1,
+                          color: Mythemes.blackishade,
                         ),
-                        //labelText: "Select Department",
-                        hintText: "Leave Type",
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                        contentPadding: EdgeInsets.all(5),
-                        /*border: OutlineInputBorder(
+                      ),
+                      //labelText: "Select Department",
+                      hintText: "Leave Type",
+                      hintStyle: TextStyle(fontSize: 14),
+                      contentPadding: EdgeInsets.all(5),
+                      /*border: OutlineInputBorder(
                                               borderRadius:
                                               BorderRadius.all(Radius.circular(8))),*/
-                        // labelText: "Location",
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w500,fontSize: 13,
-                            color: Mythemes.blackish),
+                      // labelText: "Location",
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        color: Mythemes.blackish,
                       ),
-                      items: leaveTypeList.map<DropdownMenuItem<String>>((String? value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value!),
-                        );
-
-                      }).toList(),
+                    ),
+                    items:
+                        leaveTypeList.map<DropdownMenuItem<String>>((
+                          String? value,
+                        ) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value!),
+                          );
+                        }).toList(),
                     onChanged: (newVal) {
                       valuenew = newVal.toString();
-                      int i =leaveTypeList.indexOf(valuenew);
-                      print("Leave Type Data List - ${mapResponse['leaveTypeList']}");
+                      int i = leaveTypeList.indexOf(valuenew);
+                      print(
+                        "Leave Type Data List - ${mapResponse['leaveTypeList']}",
+                      );
                       leaveTypeId = mapResponse['leaveTypeList'][i]['leaveId'];
-                      var leaveHalfDay = mapResponse['leaveTypeList'][i]['isHalfday'];
-                      sickLeaveMedicalTypeShow = mapResponse['leaveTypeList'][i]['medCerti'];
-                      sickLeaveMedicalShowValue = mapResponse['leaveTypeList'][i]['medValue'];
+                      var leaveHalfDay =
+                          mapResponse['leaveTypeList'][i]['isHalfday'];
+                      sickLeaveMedicalTypeShow =
+                          mapResponse['leaveTypeList'][i]['medCerti'];
+                      sickLeaveMedicalShowValue =
+                          mapResponse['leaveTypeList'][i]['medValue'];
                       //print("MED CERTI - $sickLeaveMedicalShow");
                       //print("MED VALUE - $sickLeaveMedicalShowValue");
                       //print('Leave Half Day $leaveHalfDay');
-                      var policyidnew= leaveTypeList.elementAt(i);
+                      var policyidnew = leaveTypeList.elementAt(i);
                       leavereqIdGlobel = newVal.toString().split('-');
-                      String idn=leavereqIdGlobel.last;
+                      String idn = leavereqIdGlobel.last;
                       print('leaveTypeId $leaveTypeId');
                       setState(() {
                         //print('value1 $i');
                         //print('value $policyidnew');
 
                         dropdownNewvalue = newVal;
-
                       });
-                      if(leaveHalfDay == true) {
+                      if (leaveHalfDay == true) {
                         setState(() {
                           this.halfDayRadio = true;
                         });
-                      }
-                      else {
+                      } else {
                         setState(() {
                           this.halfDayRadio = false;
                         });
@@ -1047,257 +1118,285 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                         });
                       }*/
                     },
-
                   ),
                 ),
-
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                        child:  Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Radio(
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  value: "1",
-                                  groupValue: dayRadio,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      singleDayShow = true;
-                                      multipleDayShow = false;
-                                      halfDayShow = false;
-                                      print("day show $singleDayShow");
-                                      print("multi show $multipleDayShow");
-                                      /*  _singleDayShow == _singleDayShow;
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Radio(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                value: "1",
+                                groupValue: dayRadio,
+                                onChanged: (value) {
+                                  setState(() {
+                                    singleDayShow = true;
+                                    multipleDayShow = false;
+                                    halfDayShow = false;
+                                    print("day show $singleDayShow");
+                                    print("multi show $multipleDayShow");
+                                    /*  _singleDayShow == _singleDayShow;
                                            _multipleDayShow == _multipleDayShow;*/
-                                    });
-                                    setState(() {
-                                      dayRadio = value.toString();
-                                    });
-                                  },
-                                ),
-                                "Single Day".text.make(),
-                              ],
-                            ).px1(),
-                            Row(
-                              /*mainAxisAlignment: MainAxisAlignment.start,
+                                  });
+                                  setState(() {
+                                    dayRadio = value.toString();
+                                  });
+                                },
+                              ),
+                              "Single Day".text.make(),
+                            ],
+                          ).px1(),
+                          Row(
+                            /*mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.center,*/
-                              children: [
-                                Radio(
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  value: "2",
-                                  groupValue: dayRadio,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      singleDayShow = true;
-                                      multipleDayShow = true;
-                                      halfDayShow = false;
-                                      print("day show $singleDayShow");
-                                      print("multi show $multipleDayShow");
-                                      /*  _singleDayShow =_singleDayShow;
+                            children: [
+                              Radio(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                value: "2",
+                                groupValue: dayRadio,
+                                onChanged: (value) {
+                                  setState(() {
+                                    singleDayShow = true;
+                                    multipleDayShow = true;
+                                    halfDayShow = false;
+                                    print("day show $singleDayShow");
+                                    print("multi show $multipleDayShow");
+                                    /*  _singleDayShow =_singleDayShow;
                                           _multipleDayShow =! _multipleDayShow;*/
-                                    });
-                                    setState(() {
-                                      dayRadio = value.toString();
-                                    });
-                                  },
-                                ),
-                                "Multiple Day".text.make(),
-                              ],
-                            ).px1(),
-                            Visibility(
-                              visible: halfDayRadio,
-                              child: Row(
-                                /* mainAxisAlignment: MainAxisAlignment.start,
+                                  });
+                                  setState(() {
+                                    dayRadio = value.toString();
+                                  });
+                                },
+                              ),
+                              "Multiple Day".text.make(),
+                            ],
+                          ).px1(),
+                          Visibility(
+                            visible: halfDayRadio,
+                            child:
+                                Row(
+                                  /* mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment: CrossAxisAlignment.center,*/
-                                children: [
-                                  Radio(
-                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    value: "3",
-                                    groupValue: dayRadio,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        singleDayShow = true;
-                                        multipleDayShow = false;
-                                        halfDayShow = true;
-                                        print("day show $singleDayShow");
-                                        print("multi show $multipleDayShow");
-                                        /* _singleDayShow == _singleDayShow;
+                                  children: [
+                                    Radio(
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      value: "3",
+                                      groupValue: dayRadio,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          singleDayShow = true;
+                                          multipleDayShow = false;
+                                          halfDayShow = true;
+                                          print("day show $singleDayShow");
+                                          print("multi show $multipleDayShow");
+                                          /* _singleDayShow == _singleDayShow;
                                             _multipleDayShow = !_multipleDayShow;*/
-                                      });
-                                      setState(() {
-                                        dayRadio = value.toString();
-                                      });
-                                    },
-                                  ),
-                                  "Half Day".text.make(),
-                                ],
-                              ).px1(),
-                            ),
-                          ],
-                        ).pLTRB(0, 0, 5, 5)
-
+                                        });
+                                        setState(() {
+                                          dayRadio = value.toString();
+                                        });
+                                      },
+                                    ),
+                                    "Half Day".text.make(),
+                                  ],
+                                ).px1(),
+                          ),
+                        ],
+                      ).pLTRB(0, 0, 5, 5),
                     ),
                   ],
                 ),
 
                 Row(
                   children: [
-
                     Visibility(
                       visible: singleDayShow,
                       child: Expanded(
-                        child:  TextFormField(
-                          onTap: () async{
-                            DateTime? fromDate = DateTime.now();
-                            FocusScope.of(context).requestFocus(new FocusNode());
+                        child:
+                            TextFormField(
+                              onTap: () async {
+                                DateTime? fromDate = DateTime.now();
+                                FocusScope.of(
+                                  context,
+                                ).requestFocus(new FocusNode());
 
-                            fromDate = await showDatePicker(
-                                context: context,
-                                initialDate: fromDate,
-                                firstDate:DateTime(1947),
-                                lastDate: DateTime(2040)
-                            );
-                            setState(() {
-                              //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                              _fromDateController.text = DateFormat("dd-MM-yyyy").format(fromDate!);
-                            });
+                                fromDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: fromDate,
+                                  firstDate: DateTime(1947),
+                                  lastDate: DateTime(2040),
+                                );
+                                setState(() {
+                                  //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
+                                  _fromDateController.text = DateFormat(
+                                    "dd-MM-yyyy",
+                                  ).format(fromDate!);
+                                });
 
-                            print(fromDate);
-                          },
-                          readOnly: true,
-                          enabled: true,
-                          controller: _fromDateController,
-                          // initialValue: "Head Office",
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                              borderSide: BorderSide(
-                                  width: 1, color: Mythemes.blackishade),
-                            ),
-                            labelText: "From Date",
-                            hintStyle: TextStyle(
-                              fontSize: 12,
-                            ),
-                            contentPadding: EdgeInsets.all(5),
-                            /*border: OutlineInputBorder(
+                                print(fromDate);
+                              },
+                              readOnly: true,
+                              enabled: true,
+                              controller: _fromDateController,
+                              // initialValue: "Head Office",
+                              decoration: InputDecoration(
+                                suffixIcon: Icon(
+                                  Icons.calendar_month,
+                                  size: 18,
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  //<-- SEE HERE
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: Mythemes.blackishade,
+                                  ),
+                                ),
+                                labelText: "From Date",
+                                hintStyle: TextStyle(fontSize: 12),
+                                contentPadding: EdgeInsets.all(5),
+                                /*border: OutlineInputBorder(
                                             borderRadius:
                                             BorderRadius.all(Radius.circular(8))),*/
-                            // labelText: "Location",
-                            labelStyle: TextStyle(
-                                fontWeight: FontWeight.w500,fontSize: 13,
-                                color: Mythemes.blackish),
-                          ),
-                        ).p8(),
+                                // labelText: "Location",
+                                labelStyle: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  color: Mythemes.blackish,
+                                ),
+                              ),
+                            ).p8(),
                       ),
                     ),
 
                     Visibility(
                       visible: multipleDayShow,
                       child: Expanded(
-                        child:  TextFormField(
-                          onTap: () async{
-                            DateTime? toDate = DateTime.now();
-                            FocusScope.of(context).requestFocus(new FocusNode());
+                        child:
+                            TextFormField(
+                              onTap: () async {
+                                DateTime? toDate = DateTime.now();
+                                FocusScope.of(
+                                  context,
+                                ).requestFocus(new FocusNode());
 
-                            toDate = await showDatePicker(
-                                context: context,
-                                initialDate: toDate,
-                                firstDate:DateTime(1947),
-                                lastDate: DateTime(2040)
-                            );
-                            /*setState(() {
+                                toDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: toDate,
+                                  firstDate: DateTime(1947),
+                                  lastDate: DateTime(2040),
+                                );
+                                /*setState(() {
                               //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
                               _toDateController.text = DateFormat("dd-MM-yyyy").format(toDate!);
                             });*/
-                            setState(() {
-                              _toDateController.text = DateFormat("dd-MM-yyyy").format(toDate!);
+                                setState(() {
+                                  _toDateController.text = DateFormat(
+                                    "dd-MM-yyyy",
+                                  ).format(toDate!);
 
-                              // 🧩 Calculate day difference between from and to date
-                              if (_fromDateController.text.isNotEmpty) {
-                                DateTime fromDateParsed =
-                                DateFormat("dd-MM-yyyy").parse(_fromDateController.text);
-                                int dayDifference = toDate.difference(fromDateParsed).inDays + 1;
+                                  // ðŸ§© Calculate day difference between from and to date
+                                  if (_fromDateController.text.isNotEmpty) {
+                                    DateTime fromDateParsed = DateFormat(
+                                      "dd-MM-yyyy",
+                                    ).parse(_fromDateController.text);
+                                    int dayDifference =
+                                        toDate
+                                            .difference(fromDateParsed)
+                                            .inDays +
+                                        1;
 
-                                print("Sick Leave Value - $sickLeaveMedicalShowValue");
-                                print("Day Difference - $dayDifference");
-                                // 🧠 Show medical section if dayDifference > medValue
-                                if (sickLeaveMedicalShowValue != null &&
-                                    dayDifference > sickLeaveMedicalShowValue) {
-                                  sickLeaveMedicalShow = true;
-                                  //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
-                                  //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
+                                    print(
+                                      "Sick Leave Value - $sickLeaveMedicalShowValue",
+                                    );
+                                    print("Day Difference - $dayDifference");
+                                    // ðŸ§  Show medical section if dayDifference > medValue
+                                    if (sickLeaveMedicalShowValue != null &&
+                                        dayDifference >
+                                            sickLeaveMedicalShowValue) {
+                                      sickLeaveMedicalShow = true;
+                                      //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
+                                      //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
+                                    } else {
+                                      sickLeaveMedicalShow = false;
+                                      //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
+                                      //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
+                                    }
+                                  } else {
+                                    sickLeaveMedicalShow = false;
+                                    //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
+                                    //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
+                                  }
+                                });
 
-                                } else {
-                                  sickLeaveMedicalShow = false;
-                                  //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
-                                  //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
-                                }
-                              } else {
-                                sickLeaveMedicalShow = false;
-                                //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
-                                //print("SICK LEAVE VALUE - $sickLeaveMedicalShowValue");
-                              }
-                            });
-
-                            print(toDate);
-                          },
-                          readOnly: true,
-                          enabled: true,
-                          controller: _toDateController,
-                          // initialValue: "Head Office",
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(Icons.calendar_month, size: 18,),
-                            enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                              borderSide: BorderSide(
-                                  width: 1, color: Mythemes.blackishade),
-                            ),
-                            labelText: "To Date",
-                            hintStyle: TextStyle(
-                              fontSize: 12,
-                            ),
-                            contentPadding: EdgeInsets.all(5),
-                            /*border: OutlineInputBorder(
+                                print(toDate);
+                              },
+                              readOnly: true,
+                              enabled: true,
+                              controller: _toDateController,
+                              // initialValue: "Head Office",
+                              decoration: InputDecoration(
+                                suffixIcon: Icon(
+                                  Icons.calendar_month,
+                                  size: 18,
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  //<-- SEE HERE
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: Mythemes.blackishade,
+                                  ),
+                                ),
+                                labelText: "To Date",
+                                hintStyle: TextStyle(fontSize: 12),
+                                contentPadding: EdgeInsets.all(5),
+                                /*border: OutlineInputBorder(
                                             borderRadius:
                                             BorderRadius.all(Radius.circular(8))),*/
-                            // labelText: "Location",
-                            labelStyle: TextStyle(
-                                fontWeight: FontWeight.w500,fontSize: 13,
-                                color: Mythemes.blackish),
-                          ),
-                        ).p8(),
+                                // labelText: "Location",
+                                labelStyle: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  color: Mythemes.blackish,
+                                ),
+                              ),
+                            ).p8(),
                       ),
                     ),
                   ],
                 ).pLTRB(0, 0, 0, 8),
 
-
                 Visibility(
                   visible: halfDayShow,
                   child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                        child:  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
                                 Radio(
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                   value: "1",
                                   groupValue: halfDayNewRadios,
                                   onChanged: (value) {
                                     setState(() {
-
                                       /*  _singleDayShow == _singleDayShow;
                                            _multipleDayShow == _multipleDayShow;*/
                                     });
@@ -1315,12 +1414,12 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                                   crossAxisAlignment: CrossAxisAlignment.center,*/
                               children: [
                                 Radio(
-                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                   value: "2",
                                   groupValue: halfDayNewRadios,
                                   onChanged: (value) {
                                     setState(() {
-
                                       /*  _singleDayShow =_singleDayShow;
                                           _multipleDayShow =! _multipleDayShow;*/
                                     });
@@ -1333,16 +1432,12 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                                 "Second Half".text.make(),
                               ],
                             ).px1(),
-
                           ],
-                        ).pLTRB(0, 0, 5, 5)
-
-                    ),
-                  ],
+                        ).pLTRB(0, 0, 5, 5),
+                      ),
+                    ],
+                  ),
                 ),
-                ),
-
-
 
                 Visibility(
                   visible: orgNewId == 115 || orgNewId == 145 || orgNewId == 3,
@@ -1352,10 +1447,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                       controller: _nomineeController,
                       enabled: true,
                       //initialValue: deptName,
-                      decoration:  InputDecoration(
-                          hintText: "Enter Name",
-                          labelText: "Nominee"
-
+                      decoration: InputDecoration(
+                        hintText: "Enter Name",
+                        labelText: "Nominee",
                       ),
                     ),
                   ),
@@ -1366,19 +1460,28 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                   visible: sickLeaveMedicalTypeShow && sickLeaveMedicalShow,
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), // margin
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ), // margin
                       child: SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.teal,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
                           ),
                           icon: const Icon(Icons.upload_file),
-                          label: const Text("Upload Medical",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: const Text(
+                            "Upload Medical",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           onPressed: openUploadDialog,
                         ),
                       ),
@@ -1389,35 +1492,44 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                 /*if (uploadedFile != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
-                    child: Text("📎 Selected: ${uploadedFile!.path.split('/').last}",
+                    child: Text("ðŸ“Ž Selected: ${uploadedFile!.path.split('/').last}",
                         style: const TextStyle(color: Colors.green)),
                   ),*/
                 if (uploadedFile != null)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    "View Attachment".text.bold.color(Mythemes.lightBluishColor).make().px12(),
-                    IconButton(
-                      onPressed: () {
-                        print("My File - $uploadedFile");
-                        if (uploadedFile != null &&
-                            uploadedFile.toString().isNotEmpty) {
-                          showAttachmentBottomSheet(context, uploadedFile!.path);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("No attachment available")),
-                          );
-                        }
-                      },
-                      icon: Icon(Icons.remove_red_eye,
-                          color: Mythemes.lightBluishColor, size: 24),
-                      tooltip: "View Attachment",
-                    ),
-                  ],
-                ),
-
-
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      "View Attachment".text.bold
+                          .color(Mythemes.lightBluishColor)
+                          .make()
+                          .px12(),
+                      IconButton(
+                        onPressed: () {
+                          print("My File - $uploadedFile");
+                          if (uploadedFile != null &&
+                              uploadedFile.toString().isNotEmpty) {
+                            showAttachmentBottomSheet(
+                              context,
+                              uploadedFile!.path,
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("No attachment available"),
+                              ),
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Icons.remove_red_eye,
+                          color: Mythemes.lightBluishColor,
+                          size: 24,
+                        ),
+                        tooltip: "View Attachment",
+                      ),
+                    ],
+                  ),
 
                 Padding(
                   padding: EdgeInsets.all(8.0),
@@ -1426,14 +1538,12 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                     maxLines: 2,
                     enabled: true,
                     //initialValue: deptName,
-                    decoration:  InputDecoration(
-                        hintText: "Add remarks",
-                        labelText: "Remarks"
-
+                    decoration: InputDecoration(
+                      hintText: "Add remarks",
+                      labelText: "Remarks",
                     ),
                   ),
                 ),
-
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1441,49 +1551,70 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                   children: [
                     ElevatedButton(
                       onPressed: () {
-
-                        if(_fromDateController.text == "" ) {
+                        if (_fromDateController.text == "") {
                           Fluttertoast.showToast(
-                              msg: "Please Select Date range !",
+                            msg: "Please Select Date range !",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          if (_remarkController.text == "") {
+                            Fluttertoast.showToast(
+                              msg: "Please Fill Remarks !",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.BOTTOM,
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.black,
                               textColor: Colors.white,
-                              fontSize: 16.0
-                          );
-                        } else {
-                          if(_remarkController.text == "") {
-                            Fluttertoast.showToast(
-                                msg: "Please Fill Remarks !",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.black,
-                                textColor: Colors.white,
-                                fontSize: 16.0
+                              fontSize: 16.0,
                             );
                           } else {
                             if (dayRadio == '1') {
-                              singleDayRequisition(_remarkController.text, leaveTypeId, _fromDateController.text, empNewId, _nomineeController.text, confirmYes);
-                            }
-                            else if(dayRadio == '2') {
-                              if(_toDateController.text == "") {
+                              singleDayRequisition(
+                                _remarkController.text,
+                                leaveTypeId,
+                                _fromDateController.text,
+                                empNewId,
+                                _nomineeController.text,
+                                confirmYes,
+                              );
+                            } else if (dayRadio == '2') {
+                              if (_toDateController.text == "") {
                                 Fluttertoast.showToast(
-                                    msg: "Please Select Date range !",
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.black,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0
+                                  msg: "Please Select Date range !",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.black,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0,
                                 );
                               } else {
-                                multipleDayRequisition(_remarkController.text, leaveTypeId, _toDateController.text, _fromDateController.text, empNewId, _nomineeController.text, confirmYes);
+                                multipleDayRequisition(
+                                  _remarkController.text,
+                                  leaveTypeId,
+                                  _toDateController.text,
+                                  _fromDateController.text,
+                                  empNewId,
+                                  _nomineeController.text,
+                                  confirmYes,
+                                );
                               }
-                            }
-                            else if (dayRadio == '3') {
-                              halfDayRequisition(fromTimePickerController.text, toTimePickerController.text, _remarkController.text, leaveTypeId, _fromDateController.text, empNewId, _nomineeController.text, confirmYes);
+                            } else if (dayRadio == '3') {
+                              halfDayRequisition(
+                                fromTimePickerController.text,
+                                toTimePickerController.text,
+                                _remarkController.text,
+                                leaveTypeId,
+                                _fromDateController.text,
+                                empNewId,
+                                _nomineeController.text,
+                                confirmYes,
+                              );
                             }
                           }
                         }
@@ -1491,125 +1622,137 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
                         //approveLeaveRequisition(_commentController.text, leaveReqId);
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all(Mythemes.lightBluishColor),
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.lightBluishColor,
+                        ),
                       ),
                       child: "Send".text.make(),
                     ).wh(150, 40).py12(),
                   ],
-                )
-
+                ),
               ],
             ),
           ),
         ),
-
       ),
     );
   }
 
-  showValidatePop(BuildContext buildContext, result,alert) {
+  showValidatePop(BuildContext buildContext, result, alert) {
     String text = "Stop Service";
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Expanded(child: Text( alert, style: TextStyle(
-              fontSize: 20
-          ),)),
+          Expanded(child: Text(alert, style: TextStyle(fontSize: 20))),
         ],
       ),
-      content: Text(result , style: TextStyle(
-          fontSize: 14
-      )),
+      content: Text(result, style: TextStyle(fontSize: 14)),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
         TextButton(
-            onPressed: () async {
-              Navigator.of(buildContext, rootNavigator: true).pop();
-              //Navigator.pop(buildContext);
-            },
-            child: Container(
-              child: Text("No", style: TextStyle(color: Mythemes.dangerColorOne),),
-            )
+          onPressed: () async {
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            //Navigator.pop(buildContext);
+          },
+          child: Container(
+            child: Text("No", style: TextStyle(color: Mythemes.dangerColorOne)),
+          ),
         ),
         TextButton(
-            onPressed: () async {
-              confirmYes = "YES";
-              Navigator.of(buildContext, rootNavigator: true).pop();
-              if(_fromDateController.text == "" ) {
+          onPressed: () async {
+            confirmYes = "YES";
+            Navigator.of(buildContext, rootNavigator: true).pop();
+            if (_fromDateController.text == "") {
+              Fluttertoast.showToast(
+                msg: "Please Select Date range !",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.black,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+            } else {
+              CommonNotificationPage.showLoaderDialog(context);
+              if (_remarkController.text == "") {
                 Fluttertoast.showToast(
-                    msg: "Please Select Date range !",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.black,
-                    textColor: Colors.white,
-                    fontSize: 16.0
+                  msg: "Please Fill Remarks !",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               } else {
-                CommonNotificationPage.showLoaderDialog(context);
-                if(_remarkController.text == "") {
-                  Fluttertoast.showToast(
-                      msg: "Please Fill Remarks !",
+                if (dayRadio == '1') {
+                  singleDayRequisition(
+                    _remarkController.text,
+                    leaveTypeId,
+                    _fromDateController.text,
+                    empNewId,
+                    _nomineeController.text,
+                    confirmYes,
+                  );
+                } else if (dayRadio == '2') {
+                  if (_toDateController.text == "") {
+                    Fluttertoast.showToast(
+                      msg: "Please Select Date range !",
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
                       timeInSecForIosWeb: 1,
                       backgroundColor: Colors.black,
                       textColor: Colors.white,
-                      fontSize: 16.0
+                      fontSize: 16.0,
+                    );
+                  } else {
+                    multipleDayRequisition(
+                      _remarkController.text,
+                      leaveTypeId,
+                      _toDateController.text,
+                      _fromDateController.text,
+                      empNewId,
+                      _nomineeController.text,
+                      confirmYes,
+                    );
+                  }
+                } else if (dayRadio == '3') {
+                  halfDayRequisition(
+                    fromTimePickerController.text,
+                    toTimePickerController.text,
+                    _remarkController.text,
+                    leaveTypeId,
+                    _fromDateController.text,
+                    empNewId,
+                    _nomineeController.text,
+                    confirmYes,
                   );
                 }
-                else {
-                  if (dayRadio == '1') {
-                    singleDayRequisition(_remarkController.text, leaveTypeId, _fromDateController.text, empNewId, _nomineeController.text, confirmYes);
-                  }
-                  else if(dayRadio == '2') {
-                    if(_toDateController.text == "") {
-                      Fluttertoast.showToast(
-                          msg: "Please Select Date range !",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          backgroundColor: Colors.black,
-                          textColor: Colors.white,
-                          fontSize: 16.0
-                      );
-                    } else {
-                      multipleDayRequisition(_remarkController.text, leaveTypeId, _toDateController.text, _fromDateController.text, empNewId, _nomineeController.text, confirmYes);
-                    }
-                  }
-                  else if (dayRadio == '3') {
-                    halfDayRequisition(fromTimePickerController.text, toTimePickerController.text, _remarkController.text, leaveTypeId, _fromDateController.text, empNewId, _nomineeController.text, confirmYes);
-                  }
-                  Navigator.of(buildContext, rootNavigator: true).pop();
-                }
-
+                Navigator.of(buildContext, rootNavigator: true).pop();
               }
+            }
 
-              //Navigator.pop(buildContext);
-            },
-            child: Container(
-              child: Text("Yes", style: TextStyle(color: Mythemes.warningColor),),
-            )
+            //Navigator.pop(buildContext);
+          },
+          child: Container(
+            child: Text("Yes", style: TextStyle(color: Mythemes.warningColor)),
+          ),
         ),
-
-
-
       ],
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   Widget _buildLeaveNewCard(String count, String type, String subtext) {
@@ -1620,19 +1763,29 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         color: const Color(0xFFF8F8F8),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(2, 2),
-          )
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(2, 2)),
         ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(count, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
+          Text(
+            count,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text(type, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.blue)),
+          Text(
+            type,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.blue,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(subtext, style: TextStyle(fontSize: 12, color: Colors.grey)),
         ],
@@ -1641,38 +1794,48 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
   }
 
   Widget _buildLeaveCardDynamic(
-      String title,
-      List<String> types,
-      Map<String, dynamic> data,
-      String Function(String) valueGetter,
-      Color titleColor, {
-        bool isBold = false,
-      }) {
+    String title,
+    List<String> types,
+    Map<String, dynamic> data,
+    String Function(String) valueGetter,
+    Color titleColor, {
+    bool isBold = false,
+  }) {
     return SizedBox(
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.only(left: 10, right: 10),
         child: Card(
           elevation: 3,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-                        color: titleColor)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                    color: titleColor,
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 35,
                   runSpacing: 20,
-                  children: types.map((type) {
-                    final value = valueGetter(type);
-                    return _buildLeaveType(type, value, _getColorForType(type));
-                  }).toList(),
+                  children:
+                      types.map((type) {
+                        final value = valueGetter(type);
+                        return _buildLeaveType(
+                          type,
+                          value,
+                          _getColorForType(type),
+                        );
+                      }).toList(),
                 ),
               ],
             ),
@@ -1681,7 +1844,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       ),
     );
   }
-
 
   Color _getColorForType(String type) {
     switch (type.toUpperCase()) {
@@ -1700,7 +1862,16 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     }
   }
 
-  Widget _buildLeaveCard(String title, String cl, String sl, String el, String pl, String WO, Color titleColor, {bool isBold = false}) {
+  Widget _buildLeaveCard(
+    String title,
+    String cl,
+    String sl,
+    String el,
+    String pl,
+    String WO,
+    Color titleColor, {
+    bool isBold = false,
+  }) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1737,7 +1908,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     );
   }
 
-/*  Widget _buildLeaveType(String type, String count, Color color) {
+  /*  Widget _buildLeaveType(String type, String count, Color color) {
     return Column(
       children: [
         Text(type, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
@@ -1770,15 +1941,20 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     );
   }
 
-
-  Future<void> singleDayRequisition(String getRemark, int? idn, fromDate, empNewId, nominee, String confirmYes) async {
-
-    String idn=leavereqIdGlobel.last;
+  Future<void> singleDayRequisition(
+    String getRemark,
+    int? idn,
+    fromDate,
+    empNewId,
+    nominee,
+    String confirmYes,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "1";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     CommonNotificationPage.showLoaderDialog(context);
-   /* var urlapi = Uri.parse("$conn$apiUrl?"
+    /* var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId&"
         "leaveTypeId=$leaveTypeId&"
         "fromDate=$fromDate&"
@@ -1802,8 +1978,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     request.fields['nominee'] = nominee;
     request.fields['confirmyes'] = confirmYes;
 
-    // ✅ Attach file if available
-  /*  if (uploadedFile != null && uploadedFile!.existsSync()) {
+    // âœ… Attach file if available
+    /*  if (uploadedFile != null && uploadedFile!.existsSync()) {
       String fileName = uploadedFile!.path.split('/').last;
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -1817,15 +1993,18 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       request.fields['document'] = "";
     }*/
 
-    String apiWithParams = urlapi.toString() +
+    String apiWithParams =
+        urlapi.toString() +
         '?' +
         request.fields.entries
-            .map((e) =>
-        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .map(
+              (e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+            )
             .join('&');
     print('API URL with Parameters: $apiWithParams');
 
-    //final response = await http.post(urlapi);
+    //final response = await MobileHttpClient.instance.post(urlapi);
     http.StreamedResponse response = await request.send();
     http.Response httpResponse = await http.Response.fromStream(response);
     print('URL ${httpResponse.request}');
@@ -1837,8 +2016,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
       bool isValidate = true;
-      try{
-       isValidate = mapResponse['result']['isValidation'];
+      try {
+        isValidate = mapResponse['result']['isValidation'];
       } catch (e) {
         //Navigator.of(context, rootNavigator: true).pop();
         isValidate = true;
@@ -1847,43 +2026,49 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       print('result both $result $reason');
       print('result${result}');
       print("IsValidate - $isValidate");
-      if(isValidate == false) {
-        if(result.compareToIgnoringCase("success")==0){
-          showDialgSucess(context,reason.upperCamelCase+" ","Success");
-        }else if(result.compareToIgnoringCase("error")==0){
-          showDialgSucess(context,reason.upperCamelCase, " Error ");
-        }else if(result.compareToIgnoringCase("warning")==0){
-          showValidatePop(context,reason.upperCamelCase, " Warning ");
+      if (isValidate == false) {
+        if (result.compareToIgnoringCase("success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (result.compareToIgnoringCase("error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, " Error ");
+        } else if (result.compareToIgnoringCase("warning") == 0) {
+          showValidatePop(context, reason.upperCamelCase, " Warning ");
         }
-
       } else {
-        if(result.compareToIgnoringCase("success")==0){
-          showDialgSucess(context,reason.upperCamelCase+" ","Success");
-        }else if(result.compareToIgnoringCase("error")==0){
-          showDialgSucess(context,reason.upperCamelCase, " Error ");
-        }else if(result.compareToIgnoringCase("warning")==0){
-          showDialgSucess(context,reason.upperCamelCase, " Warning ");
+        if (result.compareToIgnoringCase("success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (result.compareToIgnoringCase("error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, " Error ");
+        } else if (result.compareToIgnoringCase("warning") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, " Warning ");
         }
       }
-
     }
   }
 
-  Future<void> multipleDayRequisition(String getRemark, int? idn, toDate, fromDate, empNewId,nominee, String confirmyes) async {
-    String idn=leavereqIdGlobel.last;
+  Future<void> multipleDayRequisition(
+    String getRemark,
+    int? idn,
+    toDate,
+    fromDate,
+    empNewId,
+    nominee,
+    String confirmyes,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "2";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
     var urlapi = Uri.parse("$conn$apiUrl");
     var request = http.MultipartRequest("POST", urlapi);
-    if(sickLeaveMedicalShow == true && sickLeaveMedicalTypeShow == true) {
+    if (sickLeaveMedicalShow == true && sickLeaveMedicalTypeShow == true) {
       CommonNotificationPage.showLoaderDialog(context);
       if (uploadedFile != null && uploadedFile!.existsSync()) {
         String fileName = uploadedFile!.path.split('/').last;
         request.files.add(
           await http.MultipartFile.fromPath(
-            'document',               // key name for backend
-            uploadedFile!.path,       // local file path
+            'document', // key name for backend
+            uploadedFile!.path, // local file path
             filename: fileName,
           ),
         );
@@ -1897,16 +2082,18 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         request.fields['halfDayType'] = "0";
         request.fields['confirmyes'] = confirmyes;
 
-
-        String apiWithParams = urlapi.toString() +
+        String apiWithParams =
+            urlapi.toString() +
             '?' +
             request.fields.entries
-                .map((e) =>
-            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                .map(
+                  (e) =>
+                      '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+                )
                 .join('&');
         print('API URL with Parameters: $apiWithParams');
 
-        //final response = await http.post(urlapi);
+        //final response = await MobileHttpClient.instance.post(urlapi);
         http.StreamedResponse response = await request.send();
         http.Response httpResponse = await http.Response.fromStream(response);
         print('URL ${httpResponse.request}');
@@ -1918,7 +2105,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
           String result = mapResponse['result']['result'];
           String reason = mapResponse['result']['reason'];
           bool isValidate = true;
-          try{
+          try {
             isValidate = mapResponse['result']['isValidation'];
           } catch (e) {
             //Navigator.of(context, rootNavigator: true).pop();
@@ -1928,41 +2115,37 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
           print('result both $result $reason');
           print('result${result}');
           print("IsValidate - $isValidate");
-          if(isValidate == false) {
-            if(result.compareToIgnoringCase("success")==0){
-              showDialgSucess(context,reason.upperCamelCase+" ","Success");
-            }else if(result.compareToIgnoringCase("error")==0){
-              showDialgSucess(context,reason.upperCamelCase, " Error ");
-            }else if(result.compareToIgnoringCase("warning")==0){
-              showValidatePop(context,reason.upperCamelCase, " Warning ");
+          if (isValidate == false) {
+            if (result.compareToIgnoringCase("success") == 0) {
+              showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+            } else if (result.compareToIgnoringCase("error") == 0) {
+              showDialgSucess(context, reason.upperCamelCase, " Error ");
+            } else if (result.compareToIgnoringCase("warning") == 0) {
+              showValidatePop(context, reason.upperCamelCase, " Warning ");
             }
-
           } else {
-            if(result.compareToIgnoringCase("success")==0){
-              showDialgSucess(context,reason.upperCamelCase+" ","Success");
-            }else if(result.compareToIgnoringCase("error")==0){
-              showDialgSucess(context,reason.upperCamelCase, " Error ");
-            }else if(result.compareToIgnoringCase("warning")==0){
-              showDialgSucess(context,reason.upperCamelCase, " Warning ");
+            if (result.compareToIgnoringCase("success") == 0) {
+              showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+            } else if (result.compareToIgnoringCase("error") == 0) {
+              showDialgSucess(context, reason.upperCamelCase, " Error ");
+            } else if (result.compareToIgnoringCase("warning") == 0) {
+              showDialgSucess(context, reason.upperCamelCase, " Warning ");
             }
           }
-
         }
-      }
-      else {
+      } else {
         Navigator.of(context, rootNavigator: true).pop();
         Fluttertoast.showToast(
-            msg: "Please Upload Medical Document !!",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 2,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0
+          msg: "Please Upload Medical Document !!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
         // If no file uploaded, send empty field
         //request.fields['document'] = "";
-
       }
     } else {
       CommonNotificationPage.showLoaderDialog(context);
@@ -1989,15 +2172,18 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       request.fields['halfDayType'] = "0";
       request.fields['confirmyes'] = confirmyes;
 
-      String apiWithParams = urlapi.toString() +
+      String apiWithParams =
+          urlapi.toString() +
           '?' +
           request.fields.entries
-              .map((e) =>
-          '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+              .map(
+                (e) =>
+                    '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+              )
               .join('&');
       print('API URL with Parameters: $apiWithParams');
 
-      //final response = await http.post(urlapi);
+      //final response = await MobileHttpClient.instance.post(urlapi);
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
       print('URL ${httpResponse.request}');
@@ -2009,7 +2195,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         String result = mapResponse['result']['result'];
         String reason = mapResponse['result']['reason'];
         bool isValidate = true;
-        try{
+        try {
           isValidate = mapResponse['result']['isValidation'];
         } catch (e) {
           //Navigator.of(context, rootNavigator: true).pop();
@@ -2019,34 +2205,38 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
         print('result both $result $reason');
         print('result${result}');
         print("IsValidate - $isValidate");
-        if(isValidate == false) {
-          if(result.compareToIgnoringCase("success")==0){
-            showDialgSucess(context,reason.upperCamelCase+" ","Success");
-          }else if(result.compareToIgnoringCase("error")==0){
-            showDialgSucess(context,reason.upperCamelCase, " Error ");
-          }else if(result.compareToIgnoringCase("warning")==0){
-            showValidatePop(context,reason.upperCamelCase, " Warning ");
+        if (isValidate == false) {
+          if (result.compareToIgnoringCase("success") == 0) {
+            showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          } else if (result.compareToIgnoringCase("error") == 0) {
+            showDialgSucess(context, reason.upperCamelCase, " Error ");
+          } else if (result.compareToIgnoringCase("warning") == 0) {
+            showValidatePop(context, reason.upperCamelCase, " Warning ");
           }
-
         } else {
-          if(result.compareToIgnoringCase("success")==0){
-            showDialgSucess(context,reason.upperCamelCase+" ","Success");
-          }else if(result.compareToIgnoringCase("error")==0){
-            showDialgSucess(context,reason.upperCamelCase, " Error ");
-          }else if(result.compareToIgnoringCase("warning")==0){
-            showDialgSucess(context,reason.upperCamelCase, " Warning ");
+          if (result.compareToIgnoringCase("success") == 0) {
+            showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          } else if (result.compareToIgnoringCase("error") == 0) {
+            showDialgSucess(context, reason.upperCamelCase, " Error ");
+          } else if (result.compareToIgnoringCase("warning") == 0) {
+            showDialgSucess(context, reason.upperCamelCase, " Warning ");
           }
         }
-
       }
     }
-
-
-
-
   }
-  Future<void> halfDayRequisition(startTime, endTime, String getRemark,  int? idn, fromDate, empNewId,nominee, String confirmyes) async {
-    String idn=leavereqIdGlobel.last;
+
+  Future<void> halfDayRequisition(
+    startTime,
+    endTime,
+    String getRemark,
+    int? idn,
+    fromDate,
+    empNewId,
+    nominee,
+    String confirmyes,
+  ) async {
+    String idn = leavereqIdGlobel.last;
     String dayRadio = "3";
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveRequisitionApi;
@@ -2078,8 +2268,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
     request.fields['nominee'] = nominee;
     request.fields['confirmyes'] = confirmyes;
 
-    // ✅ Attach file if available
-   /* if (uploadedFile != null && uploadedFile!.existsSync()) {
+    // âœ… Attach file if available
+    /* if (uploadedFile != null && uploadedFile!.existsSync()) {
       String fileName = uploadedFile!.path.split('/').last;
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -2092,14 +2282,17 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       // If no file uploaded, send empty field
       request.fields['document'] = "";
     }*/
-    String apiWithParams = urlapi.toString() +
+    String apiWithParams =
+        urlapi.toString() +
         '?' +
         request.fields.entries
-            .map((e) =>
-        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+            .map(
+              (e) =>
+                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+            )
             .join('&');
     print('API URL with Parameters: $apiWithParams');
-    //final response = await http.post(urlapi);
+    //final response = await MobileHttpClient.instance.post(urlapi);
     http.StreamedResponse response = await request.send();
     http.Response httpResponse = await http.Response.fromStream(response);
     print('URL ${httpResponse.request}');
@@ -2111,7 +2304,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
       bool isValidate = true;
-      try{
+      try {
         isValidate = mapResponse['result']['isValidation'];
       } catch (e) {
         //Navigator.of(context, rootNavigator: true).pop();
@@ -2121,31 +2314,33 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
       print('result both $result $reason');
       print('result${result}');
       print("IsValidate - $isValidate");
-      if(isValidate == false) {
-        if(result.compareToIgnoringCase("success")==0){
-          showDialgSucess(context,reason.upperCamelCase+" ","Success");
-        }else if(result.compareToIgnoringCase("error")==0){
-          showDialgSucess(context,reason.upperCamelCase, " Error ");
-        }else if(result.compareToIgnoringCase("warning")==0){
-          showValidatePop(context,reason.upperCamelCase, " Warning ");
+      if (isValidate == false) {
+        if (result.compareToIgnoringCase("success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (result.compareToIgnoringCase("error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, " Error ");
+        } else if (result.compareToIgnoringCase("warning") == 0) {
+          showValidatePop(context, reason.upperCamelCase, " Warning ");
         }
-
       } else {
-        if(result.compareToIgnoringCase("success")==0){
-          showDialgSucess(context,reason.upperCamelCase+" ","Success");
-        }else if(result.compareToIgnoringCase("error")==0){
-          showDialgSucess(context,reason.upperCamelCase, " Error ");
-        }else if(result.compareToIgnoringCase("warning")==0){
-          showDialgSucess(context,reason.upperCamelCase, " Warning ");
+        if (result.compareToIgnoringCase("success") == 0) {
+          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        } else if (result.compareToIgnoringCase("error") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, " Error ");
+        } else if (result.compareToIgnoringCase("warning") == 0) {
+          showDialgSucess(context, reason.upperCamelCase, " Warning ");
         }
       }
-
     }
   }
 
-  static showDialgSucess(BuildContext buildContext, String result, String alert) {
+  static showDialgSucess(
+    BuildContext buildContext,
+    String result,
+    String alert,
+  ) {
     if (buildContext == null) {
-      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
       return;
     }
 
@@ -2157,20 +2352,20 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage> with RouteA
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
-          title: Row(
-            children: [
-              Expanded(child: Text(alert)),
-            ],
-          ),
+          title: Row(children: [Expanded(child: Text(alert))]),
           content: Text(result),
           actions: [
             TextButton(
               onPressed: () {
-                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                if (Navigator.of(context).canPop()) {
+                  // âœ… Using `context` inside the builder
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("⚠️ Warning: No route to close.");
+                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),

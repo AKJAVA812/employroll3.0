@@ -12,6 +12,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../adminPage/modelClass/dashboardModel.dart';
 import '../../adminPage/mssDashboard.dart';
 import '../../commanScreen/allAPIList.dart';
@@ -25,7 +26,6 @@ import '../../ess/essDashboardNavigate.dart';
 import '../../ess/myAllReports.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
-
 
 class HRISDetails extends StatefulWidget {
   const HRISDetails({Key? key}) : super(key: key);
@@ -52,8 +52,12 @@ String? sessionId;
 dynamic orgId;
 
 Future<File> _fileFromImageUrl() async {
-  final response = await http.get(Uri.parse('https://s3.ap-south-1.amazonaws.com/employroll.com/images/1705814809103.jpg'));
-  //final responseNew = await http.get(Uri.parse('https://s3.ap-south-1.amazonaws.com/employroll.com/images/1707640420694.png'));
+  final response = await MobileHttpClient.instance.get(
+    Uri.parse(
+      'https://s3.ap-south-1.amazonaws.com/employroll.com/images/1705814809103.jpg',
+    ),
+  );
+  //final responseNew = await MobileHttpClient.instance.get(Uri.parse('https://s3.ap-south-1.amazonaws.com/employroll.com/images/1707640420694.png'));
 
   final documentDirectory = await getApplicationDocumentsDirectory();
   file = File(join(documentDirectory.path, 'imagetest.png'));
@@ -64,34 +68,32 @@ Future<File> _fileFromImageUrl() async {
   return file!;
 }
 
-
 class _HRISDetailsState extends State<HRISDetails> {
-  late String name=" ",
-      designation="",
-      mobileNo="",
-      emailId="",
-      dept="",
-      branch="",
-      urlImage="",
-      dateOfjoin="";
+  late String name = " ",
+      designation = "",
+      mobileNo = "",
+      emailId = "",
+      dept = "",
+      branch = "",
+      urlImage = "",
+      dateOfjoin = "";
 
   Future getUserDetails() async {
-
-    urlImage= await shared.getProfileImage();
-    name= await shared.getempName();
-    emailId=await shared.getEmailId();
-    dept=await shared.getDept();
-    branch=await shared.getBranch();
-    dateOfBirth.text=await shared.getDob();
-    mobileNo=await shared.getMobileNo();
-    designation=await shared.getDesignation();
-    aadhar.text= await shared.getAadhar();
-    pfNo.text= await shared.getPfNo();
-    esicNo.text= await shared.getEsicNo();
-    bankAcc.text= await shared.getBankAcc();
-    ifscCode.text= await shared.getIfscCode();
-    bankAccName.text= await shared.getBankName();
-    dateOfjoin=await shared.getDoj();
+    urlImage = await shared.getProfileImage();
+    name = await shared.getempName();
+    emailId = await shared.getEmailId();
+    dept = await shared.getDept();
+    branch = await shared.getBranch();
+    dateOfBirth.text = await shared.getDob();
+    mobileNo = await shared.getMobileNo();
+    designation = await shared.getDesignation();
+    aadhar.text = await shared.getAadhar();
+    pfNo.text = await shared.getPfNo();
+    esicNo.text = await shared.getEsicNo();
+    bankAcc.text = await shared.getBankAcc();
+    ifscCode.text = await shared.getIfscCode();
+    bankAccName.text = await shared.getBankName();
+    dateOfjoin = await shared.getDoj();
 
     print('Image: ${urlImage.text}');
     print('Employee Name: ${name.text}');
@@ -108,66 +110,78 @@ class _HRISDetailsState extends State<HRISDetails> {
     print('IFSC Code: ${ifscCode.text}');
     print('Bank Name: ${bankAccName.text}');
     print('Date of Joining: ${dateOfjoin.text}');
-    setState(() {
-
-    });
-
+    setState(() {});
   }
+
   final ImagePicker _picker = ImagePicker();
-  void imagePickerModal(BuildContext context,
-      {VoidCallback? onCameraTap, VoidCallback? onGalleryTap}) {
+  void imagePickerModal(
+    BuildContext context, {
+    VoidCallback? onCameraTap,
+    VoidCallback? onGalleryTap,
+  }) {
     showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Container(
-            padding: const EdgeInsets.all(20),
-            height: 120,
-            child: Column(
-              children: [
-                ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                        onPressed: () async {
-                          try{
-                            //ImagePicker picker = ImagePicker();
-                            imageValue = await _picker.pickImage(source: ImageSource.camera);
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          height: 120,
+          child: Column(
+            children: [
+              ButtonBar(
+                alignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        //ImagePicker picker = ImagePicker();
+                        imageValue = await _picker.pickImage(
+                          source: ImageSource.camera,
+                        );
 
-                            //picker.dispose();
-                            if(imageValue==null) return;
-                            print("Heloo ji ""$imageValue");
-                            /*setState(() {
+                        //picker.dispose();
+                        if (imageValue == null) return;
+                        print(
+                          "Heloo ji "
+                          "$imageValue",
+                        );
+                        /*setState(() {
                               final imagePath= File(imageValue!.path);
                               //this._workDoneImage=imagePath;
                               file= File(imageValue!.path);
                               urlImage = file.toString();
                               print("IMAGE Change - $urlImage");
                             });*/
-                            setState(() {
-                              file = File(imageValue!.path);
-                              urlImage = imageValue!.path; // ✅ keep the actual path, not file.toString()
-                              print("IMAGE Change - $urlImage");
-                            });
-                            imageValue=null;
-                            //imageCache.clear();
+                        setState(() {
+                          file = File(imageValue!.path);
+                          urlImage =
+                              imageValue!
+                                  .path; // âœ… keep the actual path, not file.toString()
+                          print("IMAGE Change - $urlImage");
+                        });
+                        imageValue = null;
+                        //imageCache.clear();
+                      } on Exception catch (e) {
+                        print('failed to upload: $e');
+                      }
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                    child: "Camera".text.make(),
+                  ).px8(),
+                  ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        //ImagePicker picker = ImagePicker();
+                        imageValue = await _picker.pickImage(
+                          source: ImageSource.gallery,
+                        );
 
-                          }on Exception catch (e) {
-                            print('failed to upload: $e');
-                          }
-                          Navigator.of(context, rootNavigator: true).pop();
-                        },
-                        child: "Camera".text.make())
-                        .px8(),
-                    ElevatedButton(
-                        onPressed: () async{
-                          try{
-                            //ImagePicker picker = ImagePicker();
-                            imageValue = await _picker.pickImage(source: ImageSource.gallery);
-
-                            //picker.dispose();
-                            if(imageValue==null) return;
-                            print("Heloo ji ""$imageValue");
-                            /*setState(() {
+                        //picker.dispose();
+                        if (imageValue == null) return;
+                        print(
+                          "Heloo ji "
+                          "$imageValue",
+                        );
+                        /*setState(() {
                               final imagePath= File(imageValue!.path);
                               //this._workDoneImage=imagePath;
                               file= File(imageValue!.path);
@@ -175,32 +189,35 @@ class _HRISDetailsState extends State<HRISDetails> {
                               print("IMAGE Change - $urlImage");
 
                             });*/
-                            setState(() {
-                              file = File(imageValue!.path);
-                              urlImage = imageValue!.path; // ✅ keep the actual path, not file.toString()
-                              print("IMAGE Change - $urlImage");
-                            });
-                            imageValue=null;
-                            //imageCache.clear();
-
-                          }on Exception catch (e) {
-                            print('failed to upload: $e');
-                          }
-                          Navigator.of(context, rootNavigator: true).pop();
-                        },
-                        child: "Gallery".text.make()),
-                  ],
-                )
-              ],
-            ),
-          );
-        });
+                        setState(() {
+                          file = File(imageValue!.path);
+                          urlImage =
+                              imageValue!
+                                  .path; // âœ… keep the actual path, not file.toString()
+                          print("IMAGE Change - $urlImage");
+                        });
+                        imageValue = null;
+                        //imageCache.clear();
+                      } on Exception catch (e) {
+                        print('failed to upload: $e');
+                      }
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                    child: "Gallery".text.make(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   var paycode = "";
 
-  String dateOfBir="";
-  String dateOfJoinn="";
+  String dateOfBir = "";
+  String dateOfJoinn = "";
   final TextEditingController _dateController = TextEditingController();
   @override
   void initState() {
@@ -210,6 +227,7 @@ class _HRISDetailsState extends State<HRISDetails> {
     // TODO: implement initState
     super.initState();
   }
+
   int pageIndex = 0;
   int currentIndex = 1;
   @override
@@ -221,11 +239,14 @@ class _HRISDetailsState extends State<HRISDetails> {
           elevation: 0.5,
           title: "Profile".text.make(),
           leading: IconButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HomePage()));
-              },
-              icon: Icon(Icons.arrow_back_ios)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
+            },
+            icon: Icon(Icons.arrow_back_ios),
+          ),
         ),
         /* body: Container(
           color: context.canvasColor,
@@ -269,21 +290,22 @@ class _HRISDetailsState extends State<HRISDetails> {
             RefreshIndicator(
               onRefresh: () {
                 Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (a, b, c) =>
-                          HRISDetails(),
-                      transitionDuration: Duration(seconds: 1),
-                      maintainState: true,
-                    ));
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (a, b, c) => HRISDetails(),
+                    transitionDuration: Duration(seconds: 1),
+                    maintainState: true,
+                  ),
+                );
                 return Future.value(false);
               },
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Padding(padding: EdgeInsets.all(20),
-                      // child: "Profile".text.make(),
+                    Padding(
+                      padding: EdgeInsets.all(20),
 
+                      // child: "Profile".text.make(),
                     ),
                     /*Container(
                       padding: EdgeInsets.all(10.0),
@@ -300,40 +322,44 @@ class _HRISDetailsState extends State<HRISDetails> {
                       ),
 
                     ),*/
-                   urlImage == null ?
-                    Container(
-                      padding: EdgeInsets.all(10.0),
-                      width: MediaQuery.of(context).size.width/2,
-                      height: MediaQuery.of(context).size.width/2,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Mythemes.lightBluishColor, width: 3),
-                        shape: BoxShape.circle,
-                        color: Mythemes.whitish,
-                        image: DecorationImage(
-                          fit: BoxFit.scaleDown,
-                          image:  NetworkImage("https://s3.ap-south-1.amazonaws.com/employroll.com/images/1705814809103.jpg"),
-
+                    urlImage == null
+                        ? Container(
+                          padding: EdgeInsets.all(10.0),
+                          width: MediaQuery.of(context).size.width / 2,
+                          height: MediaQuery.of(context).size.width / 2,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Mythemes.lightBluishColor,
+                              width: 3,
+                            ),
+                            shape: BoxShape.circle,
+                            color: Mythemes.whitish,
+                            image: DecorationImage(
+                              fit: BoxFit.scaleDown,
+                              image: NetworkImage(
+                                "https://s3.ap-south-1.amazonaws.com/employroll.com/images/1705814809103.jpg",
+                              ),
+                            ),
+                          ),
+                        )
+                        : Container(
+                          padding: EdgeInsets.all(10.0),
+                          width: MediaQuery.of(context).size.width / 2,
+                          height: MediaQuery.of(context).size.width / 2,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Mythemes.lightBluishColor,
+                              width: 3,
+                            ),
+                            shape: BoxShape.circle,
+                            color: Mythemes.whitish,
+                            image: DecorationImage(
+                              fit: BoxFit.scaleDown,
+                              image: NetworkImage(urlImage),
+                              //FileImage(file!)
+                            ),
+                          ),
                         ),
-                      ),
-
-                    )
-                        :
-                    Container(
-                      padding: EdgeInsets.all(10.0),
-                      width: MediaQuery.of(context).size.width/2,
-                      height: MediaQuery.of(context).size.width/2,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Mythemes.lightBluishColor, width: 3),
-                        shape: BoxShape.circle,
-                        color: Mythemes.whitish,
-                        image: DecorationImage(
-                          fit: BoxFit.scaleDown,
-                          image:  NetworkImage(urlImage),
-                          //FileImage(file!)
-                        ),
-                      ),
-
-                    ),
                     /*Stack(
                       alignment: Alignment.center,
                       children: [
@@ -348,8 +374,8 @@ class _HRISDetailsState extends State<HRISDetails> {
                             image: DecorationImage(
                               fit: BoxFit.cover,
                               image: file != null
-                                  ? FileImage(file!) as ImageProvider   // ✅ Local file
-                                  : NetworkImage(urlImage),             // ✅ Fallback to network image
+                                  ? FileImage(file!) as ImageProvider   // âœ… Local file
+                                  : NetworkImage(urlImage),             // âœ… Fallback to network image
                             ),
                           ),
                         ),
@@ -375,20 +401,24 @@ class _HRISDetailsState extends State<HRISDetails> {
                       ],
                     ),*/
                     Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Column(
-                            children: [
-                              name.text.xl2.make(),
-                              designation.text.textStyle(context.captionStyle).make(),
-                              orgId == 190 || orgId == 191 ?
-                              "Paycode: $paycode".text.bold.textStyle(context.captionStyle).make():
-                                  SizedBox(width: 0,)
-                            ],
-                          ),
-                        )
-
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Column(
+                          children: [
+                            name.text.xl2.make(),
+                            designation.text
+                                .textStyle(context.captionStyle)
+                                .make(),
+                            orgId == 190 || orgId == 191
+                                ? "Paycode: $paycode".text.bold
+                                    .textStyle(context.captionStyle)
+                                    .make()
+                                : SizedBox(width: 0),
+                          ],
+                        ),
+                      ),
                     ),
+
                     /*Row(
                       children: [
                         Expanded(
@@ -412,7 +442,6 @@ class _HRISDetailsState extends State<HRISDetails> {
                         ),
                       ],
                     ),*/
-
                     Padding(
                       padding: EdgeInsets.only(top: 20),
                       child: Column(
@@ -423,13 +452,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: TextEditingController(text: emailId),
                               enabled: false,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 prefixIcon: Icon(
                                   Icons.mail,
                                   color: Mythemes.lightBluishColor,
                                 ),
-                                  hintText: "Email Id",
-                                  labelText: "Email Id"
+                                hintText: "Email Id",
+                                labelText: "Email Id",
                               ),
                             ),
                           ),
@@ -440,13 +469,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: TextEditingController(text: mobileNo),
                               enabled: false,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 prefixIcon: Icon(
                                   Icons.phone,
                                   color: Mythemes.lightBluishColor,
                                 ),
-                                  hintText: "Mobile No.",
-                                  labelText: "Mobile No."
+                                hintText: "Mobile No.",
+                                labelText: "Mobile No.",
                               ),
                             ),
                           ),
@@ -456,13 +485,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: TextEditingController(text: dept),
                               enabled: false,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 prefixIcon: Icon(
                                   Icons.work,
                                   color: Mythemes.lightBluishColor,
                                 ),
-                                  hintText: "Department",
-                                  labelText: "Department"
+                                hintText: "Department",
+                                labelText: "Department",
                               ),
                             ),
                           ),
@@ -472,31 +501,40 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: TextEditingController(text: branch),
                               enabled: false,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 prefixIcon: Icon(
                                   Icons.apartment,
                                   color: Mythemes.lightBluishColor,
                                 ),
-                                  hintText: "Branch",
-                                  labelText: "Branch"
+                                hintText: "Branch",
+                                labelText: "Branch",
                               ),
                             ),
                           ),
                           Padding(
                             padding: EdgeInsets.all(8.0),
                             child: TextFormField(
-                              onTap: () async{
+                              onTap: () async {
                                 DateTime? date = DateTime.now();
-                                FocusScope.of(context).requestFocus(new FocusNode());
+                                FocusScope.of(
+                                  context,
+                                ).requestFocus(new FocusNode());
 
                                 date = await showDatePicker(
-                                    context: context,
-                                    initialDate: date,
-                                    firstDate:DateTime(1947),
-                                    lastDate: DateTime.now().add(Duration(days: 0)));
+                                  context: context,
+                                  initialDate: date,
+                                  firstDate: DateTime(1947),
+                                  lastDate: DateTime.now().add(
+                                    Duration(days: 0),
+                                  ),
+                                );
                                 setState(() {
-                                  dateOfBir = DateFormat('dd-MM-yyyy').format(date!);
-                                  dateOfBirth.text = DateFormat("dd-MM-yyyy").format(date!);
+                                  dateOfBir = DateFormat(
+                                    'dd-MM-yyyy',
+                                  ).format(date!);
+                                  dateOfBirth.text = DateFormat(
+                                    "dd-MM-yyyy",
+                                  ).format(date!);
 
                                   //  DateFormat.yMd().format(date!).toString();
                                 });
@@ -506,13 +544,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: dateOfBirth,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 prefixIcon: Icon(
                                   Icons.date_range_rounded,
                                   color: Mythemes.lightBluishColor,
                                 ),
-                                  hintText: "Date of Birth",
-                                  labelText: "Date of Birth"
+                                hintText: "Date of Birth",
+                                labelText: "Date of Birth",
                               ),
                             ),
                           ),
@@ -520,34 +558,45 @@ class _HRISDetailsState extends State<HRISDetails> {
                           Padding(
                             padding: EdgeInsets.all(8.0),
                             child: TextFormField(
-                              onTap: () async{
+                              onTap: () async {
                                 DateTime? date = DateTime.now();
-                                FocusScope.of(context).requestFocus(new FocusNode());
+                                FocusScope.of(
+                                  context,
+                                ).requestFocus(new FocusNode());
 
                                 date = await showDatePicker(
-                                    context: context,
-                                    initialDate: date,
-                                    firstDate:DateTime(1947),
-                                    lastDate: DateTime.now().add(Duration(days: 0)));
+                                  context: context,
+                                  initialDate: date,
+                                  firstDate: DateTime(1947),
+                                  lastDate: DateTime.now().add(
+                                    Duration(days: 0),
+                                  ),
+                                );
                                 setState(() {
-                                  dateOfJoinn = DateFormat('dd-MM-yyyy').format(date!);
-                                  dateOfjoin = DateFormat("dd-MM-yyyy").format(date!);
+                                  dateOfJoinn = DateFormat(
+                                    'dd-MM-yyyy',
+                                  ).format(date!);
+                                  dateOfjoin = DateFormat(
+                                    "dd-MM-yyyy",
+                                  ).format(date!);
 
                                   //  DateFormat.yMd().format(date!).toString();
                                 });
 
                                 print(date);
                               },
-                              controller: TextEditingController(text: dateOfjoin),
+                              controller: TextEditingController(
+                                text: dateOfjoin,
+                              ),
                               enabled: false,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.edit_calendar,
-                                    color: Mythemes.lightBluishColor,
-                                  ),
-                                  hintText: "Date of Joining",
-                                  labelText: "Date of Joining"
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.edit_calendar,
+                                  color: Mythemes.lightBluishColor,
+                                ),
+                                hintText: "Date of Joining",
+                                labelText: "Date of Joining",
                               ),
                             ),
                           ),
@@ -559,13 +608,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: aadhar,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.credit_card_outlined,
-                                    color: Mythemes.lightBluishColor,
-                                  ),
-                                  hintText: "Aadhar No.",
-                                  labelText: "Aadhar No."
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.credit_card_outlined,
+                                  color: Mythemes.lightBluishColor,
+                                ),
+                                hintText: "Aadhar No.",
+                                labelText: "Aadhar No.",
                               ),
                             ),
                           ),
@@ -576,13 +625,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: pfNo,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.person,
-                                    color: Mythemes.lightBluishColor,
-                                  ),
-                                  hintText: "PF No.",
-                                  labelText: "PF No."
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.person,
+                                  color: Mythemes.lightBluishColor,
+                                ),
+                                hintText: "PF No.",
+                                labelText: "PF No.",
                               ),
                             ),
                           ),
@@ -593,13 +642,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: esicNo,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.document_scanner_rounded,
-                                    color: Mythemes.lightBluishColor,
-                                  ),
-                                  hintText: "ESIC No.",
-                                  labelText: "ESIC No."
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.document_scanner_rounded,
+                                  color: Mythemes.lightBluishColor,
+                                ),
+                                hintText: "ESIC No.",
+                                labelText: "ESIC No.",
                               ),
                             ),
                           ),
@@ -610,13 +659,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: bankAcc,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.confirmation_num,
-                                    color: Mythemes.lightBluishColor,
-                                  ),
-                                  hintText: "Bank A/c No.",
-                                  labelText: "Bank A/c No."
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.confirmation_num,
+                                  color: Mythemes.lightBluishColor,
+                                ),
+                                hintText: "Bank A/c No.",
+                                labelText: "Bank A/c No.",
                               ),
                             ),
                           ),
@@ -626,13 +675,13 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: ifscCode,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.code,
-                                    color: Mythemes.lightBluishColor,
-                                  ),
-                                  hintText: "IFSC Code",
-                                  labelText: "IFSC Code"
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.code,
+                                  color: Mythemes.lightBluishColor,
+                                ),
+                                hintText: "IFSC Code",
+                                labelText: "IFSC Code",
                               ),
                             ),
                           ),
@@ -642,17 +691,16 @@ class _HRISDetailsState extends State<HRISDetails> {
                               controller: bankAccName,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.attach_money_sharp,
-                                    color: Mythemes.lightBluishColor,
-                                  ),
-                                  hintText: "Bank Name",
-                                  labelText: "Bank Name"
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.attach_money_sharp,
+                                  color: Mythemes.lightBluishColor,
+                                ),
+                                hintText: "Bank Name",
+                                labelText: "Bank Name",
                               ),
                             ),
                           ),
-
 
                           /*Container(
                             height: 68,
@@ -835,46 +883,45 @@ class _HRISDetailsState extends State<HRISDetails> {
                       height: 90,
                       color: context.cardColor,
                       child: ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                updateHRISDet(
-                                    sessionId!,
-                                    aadhar.text,
-                                    bankAcc.text,
-                                    bankAccName.text,
-                                    esicNo.text,
-                                    ifscCode.text,
-                                    pfNo.text,
-                                    dateOfBirth.text
-                                );
+                        alignment: MainAxisAlignment.center,
+                        buttonPadding: Vx.mOnly(right: 16),
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              updateHRISDet(
+                                sessionId!,
+                                aadhar.text,
+                                bankAcc.text,
+                                bankAccName.text,
+                                esicNo.text,
+                                ifscCode.text,
+                                pfNo.text,
+                                dateOfBirth.text,
+                              );
 
-                                print(aadhar.text);
-                                print(bankAcc.text);
-                                print(bankAccName.text);
-                                print(esicNo.text);
-                                print(ifscCode.text);
-                                print(pfNo.text);
-                                print(dateOfBirth.text);
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                MaterialStateProperty.all(Mythemes.successColor),
+                              print(aadhar.text);
+                              print(bankAcc.text);
+                              print(bankAccName.text);
+                              print(esicNo.text);
+                              print(ifscCode.text);
+                              print(pfNo.text);
+                              print(dateOfBirth.text);
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                Mythemes.successColor,
                               ),
-                              child: "Save".text.make(),
-                            ).wh(150, 40).py12()
-                          ]),
+                            ),
+                            child: "Save".text.make(),
+                          ).wh(150, 40).py12(),
+                        ],
+                      ),
                     ),
-
-
-
-
                   ],
                 ),
               ),
             ),
+
             /*Padding(padding: EdgeInsets.only(bottom: 270, left: 184),
               child: CircleAvatar(
                 backgroundColor: Mythemes.blackish,
@@ -889,47 +936,63 @@ class _HRISDetailsState extends State<HRISDetails> {
               ),
 
             ),*/
-
           ],
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+                ),
+              );
               //Navigator.of(context, rootNavigator: true).pop();
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+            if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GetAttendanceDet(showAppBar: true),
+                ),
+              );
               print('My Requests');
             }
-            if(index==3){
-              Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyAllReportsPage(showAppBar: true),
+                ),
+              );
 
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) => EssAdminDashboardHead(EssDashboarrdModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -940,10 +1003,7 @@ class _HRISDetailsState extends State<HRISDetails> {
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -968,21 +1028,31 @@ class _HRISDetailsState extends State<HRISDetails> {
     );
   }
 
-  Future<void> updateHRISDet(String sessionId, String? aadhar, String? bankAcc, String? bankAccName, String? esicNo, String? ifscCode, String? pfNo, String? dateOfBirth) async {
+  Future<void> updateHRISDet(
+    String sessionId,
+    String? aadhar,
+    String? bankAcc,
+    String? bankAccName,
+    String? esicNo,
+    String? ifscCode,
+    String? pfNo,
+    String? dateOfBirth,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.updateHRISApi;
     CommonNotificationPage.showLoaderDialog(this.context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "aadharNumber=$aadhar&"
-        "accountNo=$bankAcc&"
-        "bankName=$bankAccName&"
-        "esicNumber=$esicNo&"
-        "ifscCode=$ifscCode&"
-        "pfNumber=$pfNo&"
-        "dob=$dateOfBirth"
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "aadharNumber=$aadhar&"
+      "accountNo=$bankAcc&"
+      "bankName=$bankAccName&"
+      "esicNumber=$esicNo&"
+      "ifscCode=$ifscCode&"
+      "pfNumber=$pfNo&"
+      "dob=$dateOfBirth",
     );
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -996,11 +1066,9 @@ class _HRISDetailsState extends State<HRISDetails> {
       print('result both $result $reason');
       print('result${result}');
       if (status.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(
-            this.context, result.upperCamelCase + " ", "Success");
+        showDialgSucess1(this.context, result.upperCamelCase + " ", "Success");
       } else if (status.compareToIgnoringCase("error") == 0) {
-        showDialgSucess1(
-            this.context, result.upperCamelCase, " Error ");
+        showDialgSucess1(this.context, result.upperCamelCase, " Error ");
       }
     }
   }
@@ -1014,9 +1082,8 @@ class _HRISDetailsState extends State<HRISDetails> {
   showDialgSucess1(BuildContext context, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -1030,10 +1097,12 @@ class _HRISDetailsState extends State<HRISDetails> {
       actions: [
         TextButton(
           onPressed: () {
-
             Navigator.of(context, rootNavigator: true).pop();
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,))
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
             );
             //Navigator.pop(context);
           },
@@ -1043,10 +1112,11 @@ class _HRISDetailsState extends State<HRISDetails> {
       elevation: 24.0,
     );
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 }
 
@@ -1069,20 +1139,20 @@ class DismissKeyboard extends StatelessWidget {
   }
 }
 
-class CurvedHeaderContainer extends CustomPainter{
-
+class CurvedHeaderContainer extends CustomPainter {
   @override
-  void paint(Canvas canvas,Size size ){
-    Paint paint=Paint()..color= const Color(0xff00b0ff);
-    Path path=Path()
-      ..relativeLineTo(0, 130)
-      ..quadraticBezierTo(size.width/2, 225, size.width, 130)
-      ..relativeLineTo(0, -150)
-      ..close();
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()..color = const Color(0xff00b0ff);
+    Path path =
+        Path()
+          ..relativeLineTo(0, 130)
+          ..quadraticBezierTo(size.width / 2, 225, size.width, 130)
+          ..relativeLineTo(0, -150)
+          ..close();
     canvas.drawPath(path, paint);
 
     @override
-    bool shouldRepaint(CustomPainter oldDelegate)=>false;
+    bool shouldRepaint(CustomPainter oldDelegate) => false;
   }
 
   @override

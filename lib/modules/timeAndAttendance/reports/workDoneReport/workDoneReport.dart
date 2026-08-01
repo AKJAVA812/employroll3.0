@@ -7,6 +7,7 @@ import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneRep
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../../../adminPage/modelClass/dashboardModel.dart';
@@ -25,28 +26,28 @@ class WorkDoneReport extends StatefulWidget {
   final String forDatePickedString;
   final String toDatePickedString;
 
-  const WorkDoneReport(
-      {Key? key,
-      required this.forDatePickedString,
-      required this.toDatePickedString})
-      : super(key: key);
+  const WorkDoneReport({
+    Key? key,
+    required this.forDatePickedString,
+    required this.toDatePickedString,
+  }) : super(key: key);
 
   @override
-  State<WorkDoneReport> createState() => _WorkDoneReportState(
-        forDatePickedString,
-        toDatePickedString,
-      );
+  State<WorkDoneReport> createState() =>
+      _WorkDoneReportState(forDatePickedString, toDatePickedString);
 }
 
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
-List<DataNew>? allUsernew=[];
-List<DataNew>? foundDataNew=[];
-late WorkdoneReportModel? workDoneReportModelGlobal =
-    WorkdoneReportModel(data: []);
-late WorkdoneReportModel? workDoneReportModelGlobaled =
-    WorkdoneReportModel(data: []);
+List<DataNew>? allUsernew = [];
+List<DataNew>? foundDataNew = [];
+late WorkdoneReportModel? workDoneReportModelGlobal = WorkdoneReportModel(
+  data: [],
+);
+late WorkdoneReportModel? workDoneReportModelGlobaled = WorkdoneReportModel(
+  data: [],
+);
 
 class _WorkDoneReportState extends State<WorkDoneReport> {
   final String forDatePickedString;
@@ -72,18 +73,19 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
     print('ResponseAttendance: ${forDatePickedString}');
     print('ResponseAttendance: ${toDatePickedString}');
     //await Future.delayed(Duration(seconds: 3));
-    Future<WorkdoneReportModel> getEmployeeList11 =
-        getEmployeeList(sessionId!, toDatePickedString, forDatePickedString);
+    Future<WorkdoneReportModel> getEmployeeList11 = getEmployeeList(
+      sessionId!,
+      toDatePickedString,
+      forDatePickedString,
+    );
     if (getEmployeeList11 == null) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
+      return Center(child: CircularProgressIndicator());
     }
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
     getEmployeeList11.then((value) {
@@ -96,11 +98,10 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
     });
   }
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -117,33 +118,36 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   Future<WorkdoneReportModel> getEmployeeList(
-      String sessionId, String fromdate, String toDate) async {
+    String sessionId,
+    String fromdate,
+    String toDate,
+  ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.workDoneReport;
     print('workDoneReport: ${sessionId}');
     WorkdoneReportModel workdoneReportModel;
     //http://www.employroll.com/restful/service/get/self/mobile/task/list?sessionId=49a180fd3893b71baf3b030f39e0782d51d02cbe51a&fromdate=01-10-2022&todate=31-10-2022
     var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-        "sessionId=$sessionId&todate=$fromdate&fromdate=$toDate");
-    final response = await http.post(urlapi);
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&todate=$fromdate&fromdate=$toDate",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
     print('responseemployeeList ${response.body}');
@@ -151,7 +155,7 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    if (getData.length == 0 )  {
+    if (getData.length == 0) {
       print("getData111 $getData");
       showNodata(context, "Alert", "There is no data available for this date.");
     }
@@ -185,7 +189,7 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<DataNew>?  results = [];
+    List<DataNew>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -198,10 +202,22 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.cName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
-      results = allUsernew?.where((element) =>
-          element.cMailId!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.cName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.cMailId!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -227,73 +243,91 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: titleName,
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GetAttendanceDet(showAppBar: true),
+              ),
+            );
             print('My Requests');
           }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyAllReportsPage(showAppBar: true),
+              ),
+            );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('My Reports');
           }
-          if(index==4){
+          if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
@@ -305,10 +339,7 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -333,14 +364,10 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
         child: Column(
           children: [
             Expanded(
-                child: workDoneReportModelGlobaled!.data!.isEmpty
-                    ? Center(
-                            child:
-                            CircularProgressIndicator(),
-                )
-                        :
-                GetWorkDoneReports(workDoneReportModelGlobaled!)
-
+              child:
+                  workDoneReportModelGlobaled!.data!.isEmpty
+                      ? Center(child: CircularProgressIndicator())
+                      : GetWorkDoneReports(workDoneReportModelGlobaled!),
             ),
           ],
         ),
@@ -389,9 +416,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
@@ -408,9 +433,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
@@ -449,92 +472,78 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
 
   @override
   Widget build(BuildContext context) => Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-      child: ListView.builder(
-          itemCount: foundDataNew!.length,
-          itemBuilder: (context, itemCount) {
-            return Card(
-              child: ExpansionTile(
-                //key: keyTile,
-                initiallyExpanded: isExpanded,
-                childrenPadding: EdgeInsets.all(16).copyWith(top: 0),
-                leading: CircleAvatar(
-                  backgroundColor: Mythemes.greyish,
-                  backgroundImage: NetworkImage(workDoneReportModelGlobal!
-                      .data![itemCount].image
-                      .toString()),
-                ),
-                title: foundDataNew![itemCount].cName
-                    .toString()
-                    .text
-                    .make(),
-                subtitle: foundDataNew![itemCount].date
-                    .toString()
-                    .text
-                    .make(),
+    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+    child: ListView.builder(
+      itemCount: foundDataNew!.length,
+      itemBuilder: (context, itemCount) {
+        return Card(
+          child: ExpansionTile(
+            //key: keyTile,
+            initiallyExpanded: isExpanded,
+            childrenPadding: EdgeInsets.all(16).copyWith(top: 0),
+            leading: CircleAvatar(
+              backgroundColor: Mythemes.greyish,
+              backgroundImage: NetworkImage(
+                workDoneReportModelGlobal!.data![itemCount].image.toString(),
+              ),
+            ),
+            title: foundDataNew![itemCount].cName.toString().text.make(),
+            subtitle: foundDataNew![itemCount].date.toString().text.make(),
+            children: [
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 75,
-                        child: "Mobile No :".text.make(),
-                      ),
-                      foundDataNew![itemCount].cNumber
-                          .toString()
-                          .text
-                          .make()
-                          .px24()
-                          .py4(),
-                    ],
+                  Container(width: 75, child: "Mobile No :".text.make()),
+                  foundDataNew![itemCount].cNumber
+                      .toString()
+                      .text
+                      .make()
+                      .px24()
+                      .py4(),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(width: 75, child: "Email Id :".text.make()),
+                  Expanded(
+                    child:
+                        foundDataNew![itemCount].cMailId
+                            .toString()
+                            .text
+                            .make()
+                            .px24()
+                            .py2(),
                   ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 75,
-                        child: "Email Id :".text.make(),
-                      ),
-                      Expanded(child: foundDataNew![itemCount].cMailId
-                          .toString()
-                          .text
-                          .make()
-                          .px24()
-                          .py2()
-                      ),
-
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 75,
-                        child: "Time :".text.make(),
-                      ),
-                      foundDataNew![itemCount].time
-                          .toString()
-                          .text
-                          .make()
-                          .px24()
-                          .py2()
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 75,
-                        child: "Location :".text.make(),
-                      ),
-                      Expanded(
-                        child: foundDataNew![itemCount].cAddress
+                ],
+              ),
+              Row(
+                children: [
+                  Container(width: 75, child: "Time :".text.make()),
+                  foundDataNew![itemCount].time
+                      .toString()
+                      .text
+                      .make()
+                      .px24()
+                      .py2(),
+                ],
+              ),
+              Row(
+                children: [
+                  Container(width: 75, child: "Location :".text.make()),
+                  Expanded(
+                    child:
+                        foundDataNew![itemCount].cAddress
                             .toString()
                             .text
                             .make()
                             .px24()
                             .py4(),
-                      )
-                    ],
                   ),
                 ],
               ),
-            );
-          }));
+            ],
+          ),
+        );
+      },
+    ),
+  );
 }

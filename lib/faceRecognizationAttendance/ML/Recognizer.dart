@@ -12,6 +12,7 @@ import '../DB/DatabaseHelper.dart';
 import '../FaceRecognitionHome.dart';
 import 'Recognition.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 class Recognizer {
   late Interpreter interpreter;
@@ -22,7 +23,7 @@ class Recognizer {
   static const int WIDTH = 160;
   static const int HEIGHT = 160;
   final dbHelper = DatabaseHelper();
-  Map<String,Recognition> registered = Map();
+  Map<String, Recognition> registered = Map();
   @override
   //String get modelName => 'assets/mobile_face_net.tflite';
   String get modelName => 'assets/facenet.tflite';
@@ -41,50 +42,58 @@ class Recognizer {
     await dbHelper.init();
     //loadRegisteredFaces();
   }
-  void getServerMessage() {
-  }
+
+  void getServerMessage() {}
 
   void loadRegisteredFaces() async {
     final allRows = await dbHelper.queryAllRows();
-   // debugPrint('query all rows:');
+    // debugPrint('query all rows:');
     for (final row in allRows) {
-    //  debugPrint(row.toString());
+      //  debugPrint(row.toString());
       print(row[DatabaseHelper.columnName]);
       String name = row[DatabaseHelper.columnName];
-      List<double> embd = row[DatabaseHelper.columnEmbedding].split(',').map((e) => double.parse(e)).toList().cast<double>();
-      Recognition recognition = Recognition(row[DatabaseHelper.columnName],Rect.zero,embd,0);
-      print("ImageData"+recognition.embeddings.toString());
+      List<double> embd =
+          row[DatabaseHelper.columnEmbedding]
+              .split(',')
+              .map((e) => double.parse(e))
+              .toList()
+              .cast<double>();
+      Recognition recognition = Recognition(
+        row[DatabaseHelper.columnName],
+        Rect.zero,
+        embd,
+        0,
+      );
+      print("ImageData" + recognition.embeddings.toString());
 
       registered.putIfAbsent(name, () => recognition);
-
-
     }
     print("Total Faces- ${allRows.length}");
   }
-
-
 
   void registerFaceInDB(String name, List<double> embedding) async {
     // row to insert
     Map<String, dynamic> row = {
       DatabaseHelper.columnName: name,
-      DatabaseHelper.columnEmbedding: embedding.join(",")
+      DatabaseHelper.columnEmbedding: embedding.join(","),
     };
     final id = await dbHelper.insert(row);
     print('inserted row id: $id');
   }
 
-  getFaceData() async{
+  getFaceData() async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.faceRecognizeOther;
-    Map data = {
-      'image': "",
-    };
+    Map data = {'image': ""};
     var body = json.encode(data);
     //var uri = Uri.parse("$conn$apiUrl");
     var urlapi = Uri.parse("$conn$apiUrl?");
     var request = new http.MultipartRequest("Post", urlapi);
-    var response = await http.post(urlapi,headers: {"Content-Type": "application/json"},body: body);
+    var response = await MobileHttpClient.instance.post(
+      urlapi,
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
     print('URL ${response.request}');
     print('BODY - ${response.body}');
     print("Image - $body");
@@ -146,9 +155,17 @@ class Recognizer {
     }
   }
 
-  List<dynamic> imageToArray(img.Image inputImage){
-    img.Image resizedImage = img.copyResize(inputImage!, width: WIDTH, height: HEIGHT);
-    List<double> flattenedList = resizedImage.data!.expand((channel) => [channel.r, channel.g, channel.b]).map((value) => value.toDouble()).toList();
+  List<dynamic> imageToArray(img.Image inputImage) {
+    img.Image resizedImage = img.copyResize(
+      inputImage!,
+      width: WIDTH,
+      height: HEIGHT,
+    );
+    List<double> flattenedList =
+        resizedImage.data!
+            .expand((channel) => [channel.r, channel.g, channel.b])
+            .map((value) => value.toDouble())
+            .toList();
     Float32List float32Array = Float32List.fromList(flattenedList);
     int channels = 3;
     int height = 160;
@@ -158,23 +175,24 @@ class Recognizer {
       for (int h = 0; h < height; h++) {
         for (int w = 0; w < width; w++) {
           int index = c * height * width + h * width + w;
-          reshapedArray[index] = (float32Array[c * height * width + h * width + w]-127.5)/127.5;
+          reshapedArray[index] =
+              (float32Array[c * height * width + h * width + w] - 127.5) /
+              127.5;
         }
       }
     }
     //return reshapedArray.reshape([1,112,112,3]);
-    return reshapedArray.reshape([1,160,160,3]);
+    return reshapedArray.reshape([1, 160, 160, 3]);
   }
 
-  Recognition recognize(img.Image image,Rect location) {
-
+  Recognition recognize(img.Image image, Rect location) {
     //TODO crop face from image resize it and convert it to float array
     var input = imageToArray(image);
     print(input.shape.toString());
 
     //TODO output array
     //List output = List.filled(1*192, 0).reshape([1,192]);
-    List output = List.filled(1*512, 0).reshape([1,512]);
+    List output = List.filled(1 * 512, 0).reshape([1, 512]);
 
     //TODO performs inference
     final runs = DateTime.now().millisecondsSinceEpoch;
@@ -183,26 +201,25 @@ class Recognizer {
     print('Time to run inference: $run ms$output');
 
     //TODO convert dynamic list to double list
-     List<double> outputArray = output.first.cast<double>();
+    List<double> outputArray = output.first.cast<double>();
 
-     //TODO looks for the nearest embeeding in the database and returns the pair
-     Pair pair = findNearest(outputArray);
-     print("distance= ${pair.distance}");
+    //TODO looks for the nearest embeeding in the database and returns the pair
+    Pair pair = findNearest(outputArray);
+    print("distance= ${pair.distance}");
 
-     return Recognition(pair.name,location,outputArray,pair.distance);
+    return Recognition(pair.name, location, outputArray, pair.distance);
   }
 
   //TODO  looks for the nearest embeeding in the database and returns the pair which contain information of registered face with which face is most similar
-  findNearest(List<double> emb){
+  findNearest(List<double> emb) {
     Pair pair = Pair("Unknown", -5);
     for (MapEntry<String, Recognition> item in registered.entries) {
       final String name = item.key;
       List<double> knownEmb = item.value.embeddings;
       double distance = 0;
       for (int i = 0; i < emb.length; i++) {
-        double diff = emb[i] -
-            knownEmb[i];
-        distance += diff*diff;
+        double diff = emb[i] - knownEmb[i];
+        distance += diff * diff;
       }
       distance = sqrt(distance);
       if (pair.distance == -5 || distance < pair.distance) {
@@ -216,12 +233,10 @@ class Recognizer {
   void close() {
     interpreter.close();
   }
-
-}
-class Pair{
-   String name;
-   double distance;
-   Pair(this.name,this.distance);
 }
 
-
+class Pair {
+  String name;
+  double distance;
+  Pair(this.name, this.distance);
+}

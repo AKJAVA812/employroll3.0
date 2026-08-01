@@ -54,7 +54,6 @@ class SessionManager {
     return appVersion;
   }
 
-
   setName(empName) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -80,6 +79,7 @@ class SessionManager {
     final int? empId = prefs.getInt('empId');
     return empId;
   }
+
   setUserType(userType) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -131,6 +131,7 @@ class SessionManager {
     final bool? showPayroll = prefs.getBool('showPayroll');
     return showPayroll;
   }
+
   setOrgName(orgName) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -143,6 +144,7 @@ class SessionManager {
     final String? orgName = prefs.getString('orgName');
     return orgName;
   }
+
   setDept(department) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -181,198 +183,224 @@ class SessionManager {
     final String? dateOfBirth = prefs.getString('dateOfBirth');
     return dateOfBirth;
   }
-  setEmailid(emailId) async{
+
+  setEmailid(emailId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('emailId', emailId);
   }
 
-  getEmailId() async{
+  getEmailId() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? emailId=prefs.getString('emailId');
+    final String? emailId = prefs.getString('emailId');
     return emailId;
   }
 
-  setEnrollId(enrollId) async{
+  setEnrollId(enrollId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('enrollId', enrollId);
   }
 
-  getEnrollId() async{
+  getEnrollId() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? enrollId=prefs.getString('enrollId');
+    final String? enrollId = prefs.getString('enrollId');
     return enrollId;
   }
 
-  setPayCycleStart(startDate) async{
+  setPayCycleStart(startDate) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('startDate', startDate);
   }
 
-  getPayCycleStart() async{
+  getPayCycleStart() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? startDate=prefs.getString('startDate');
+    final String? startDate = prefs.getString('startDate');
     return startDate;
   }
-  setPayCycleEnd(endDate) async{
+
+  setPayCycleEnd(endDate) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('endDate', endDate);
   }
 
-  getPayCycleEnd() async{
+  getPayCycleEnd() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? endDate=prefs.getString('endDate');
+    final String? endDate = prefs.getString('endDate');
     return endDate;
   }
-  setMobileNo(mobileNo) async{
+
+  setMobileNo(mobileNo) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('mobileNO', mobileNo);
   }
-  getMobileNo() async{
+
+  getMobileNo() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? mobileNo=prefs.getString('mobileNO');
+    final String? mobileNo = prefs.getString('mobileNO');
     return mobileNo;
   }
 
-  setAttAction(attAction) async{
+  setAttAction(attAction) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('attAction', attAction);
   }
-  getAttAction() async{
+
+  getAttAction() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? attAction=prefs.getString('attAction');
+    final String? attAction = prefs.getString('attAction');
     return attAction;
   }
 
-  setMobAttAction(mobAttActions) async{
+  setMobAttAction(mobAttActions) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('mobAction', mobAttActions);
   }
-  getMobAttAction() async{
+
+  getMobAttAction() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? mobAttActions=prefs.getString('mobAction');
+    final String? mobAttActions = prefs.getString('mobAction');
     return mobAttActions;
   }
-  setMobTrackTime(time) async{
+
+  setMobTrackTime(time) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('time', time);
   }
-  getMobTrackTime() async{
+
+  getMobTrackTime() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? time=prefs.getString('time');
+    final String? time = prefs.getString('time');
     return time;
   }
 
-  setGeofenceActive(geofenceActive) async{
+  setGeofenceActive(geofenceActive) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('geofenceActive', geofenceActive);
   }
-  getGeofenceActive() async{
+
+  getGeofenceActive() async {
     final prefs = await SharedPreferences.getInstance();
-    final bool? geofenceActive=prefs.getBool('geofenceActive');
+    final bool? geofenceActive = prefs.getBool('geofenceActive');
     return geofenceActive;
   }
 
-  setDesignation(designation) async{
+  setDesignation(designation) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('designation', designation);
   }
-  getDesignation() async{
+
+  getDesignation() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? designation=prefs.getString('designation');
+    final String? designation = prefs.getString('designation');
     return designation;
   }
-  setBranch(branch) async{
+
+  setBranch(branch) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('branch', branch);
   }
-  getBranch() async{
+
+  getBranch() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? branch=prefs.getString('branch');
+    final String? branch = prefs.getString('branch');
     return branch;
   }
-  setAadhar(aadharNo) async{
+
+  setAadhar(aadharNo) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('aadharNo', aadharNo);
   }
-  getAadhar() async{
+
+  getAadhar() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? aadharNo=prefs.getString('aadharNo');
+    final String? aadharNo = prefs.getString('aadharNo');
     return aadharNo;
   }
-  setPfNo(pfNo) async{
+
+  setPfNo(pfNo) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('pfNo', pfNo);
   }
-  getPfNo() async{
+
+  getPfNo() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? pfNo=prefs.getString('pfNo');
+    final String? pfNo = prefs.getString('pfNo');
     return pfNo;
   }
-  setEsicNo(esicNo) async{
+
+  setEsicNo(esicNo) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('esicNo', esicNo);
   }
-  getEsicNo() async{
+
+  getEsicNo() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? esicNo=prefs.getString('esicNo');
+    final String? esicNo = prefs.getString('esicNo');
     return esicNo;
   }
-  setBankName(bankName) async{
+
+  setBankName(bankName) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('bankName', bankName);
   }
-  getBankName() async{
+
+  getBankName() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? bankName=prefs.getString('bankName');
+    final String? bankName = prefs.getString('bankName');
     return bankName;
   }
-  setBankAcc(bankAccNo) async{
+
+  setBankAcc(bankAccNo) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('bankAccNo', bankAccNo);
   }
-  getBankAcc() async{
+
+  getBankAcc() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? bankAccNo=prefs.getString('bankAccNo');
+    final String? bankAccNo = prefs.getString('bankAccNo');
     return bankAccNo;
   }
-  setIfscCode(ifscCode) async{
+
+  setIfscCode(ifscCode) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('ifscCode', ifscCode);
   }
-  getIfscCode() async{
+
+  getIfscCode() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? ifscCode=prefs.getString('ifscCode');
+    final String? ifscCode = prefs.getString('ifscCode');
     return ifscCode;
   }
-  setLatitude(latitude) async{
+
+  setLatitude(latitude) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('latitude', latitude);
   }
-  getLatitude() async{
+
+  getLatitude() async {
     final prefs = await SharedPreferences.getInstance();
-    final double? latitude=prefs.getDouble('latitude');
+    final double? latitude = prefs.getDouble('latitude');
     return latitude;
   }
 
-  setLongitude(Longitude) async{
+  setLongitude(Longitude) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('Longitude', Longitude);
   }
 
-  getLongitude() async{
+  getLongitude() async {
     final prefs = await SharedPreferences.getInstance();
-    final double? Longitude=prefs.getDouble('Longitude');
+    final double? Longitude = prefs.getDouble('Longitude');
     return Longitude;
   }
 
-  setFirebaseTokenId(firebaseTokenId) async{
+  setFirebaseTokenId(firebaseTokenId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('firebaseTokenId', firebaseTokenId);
   }
 
-  getfirebaseTokenId() async{
+  getfirebaseTokenId() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? firebaseTokenId=prefs.getString('firebaseTokenId');
+    final String? firebaseTokenId = prefs.getString('firebaseTokenId');
     return firebaseTokenId;
   }
 
@@ -380,35 +408,39 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
   }
 
-  setEmpRoll(empRole) async{
+  setEmpRoll(empRole) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('empRole', empRole);
   }
-  getEmpRoll() async{
+
+  getEmpRoll() async {
     final prefs = await SharedPreferences.getInstance();
-    final int? empRole=prefs.getInt('empRole');
+    final int? empRole = prefs.getInt('empRole');
     return empRole;
   }
-  setRoRoll(roRole) async{
+
+  setRoRoll(roRole) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('roRole', roRole);
   }
-  getRoRole() async{
+
+  getRoRole() async {
     final prefs = await SharedPreferences.getInstance();
-    final int? roRole=prefs.getInt('roRole');
+    final int? roRole = prefs.getInt('roRole');
     return roRole;
   }
 
-  setAdminRole(adminrole) async{
+  setAdminRole(adminrole) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('adminrole', adminrole);
   }
-  getAdminRole() async{
+
+  getAdminRole() async {
     final prefs = await SharedPreferences.getInstance();
-    final int? adminrole=prefs.getInt('adminrole');
+    final int? adminrole = prefs.getInt('adminrole');
     return adminrole;
   }
-/*
+  /*
   setMobAction(mobAction) async{
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('mobAction', mobAction);
@@ -442,19 +474,20 @@ class SessionManager {
     return null;
   }
 
-  setDoj(doj) async{
+  setDoj(doj) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('doj', doj);
   }
-  getDoj() async{
+
+  getDoj() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? doj=prefs.getString('doj');
+    final String? doj = prefs.getString('doj');
     return doj;
   }
 
-  setUserRoles(userRoles) async{
+  setUserRoles(userRoles) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userRoles',userRoles);
+    await prefs.setString('userRoles', userRoles);
   }
 
   getUserRoles() async {
@@ -484,6 +517,7 @@ class SessionManager {
     final String? levelTwo = prefs.getString('levelTwo');
     return levelTwo;
   }
+
   setRaiseRequisition(raiseDate) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('raisedDeadlineDate', raiseDate);
@@ -494,6 +528,7 @@ class SessionManager {
     final String? raiseDate = prefs.getString('raisedDeadlineDate');
     return raiseDate;
   }
+
   setApprovalRequisition(approvalDate) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('approvelDeadlineDate', approvalDate);
@@ -605,6 +640,7 @@ class SessionManager {
     final String? claimLevelThree = prefs.getString('claimLevelThree');
     return claimLevelThree;
   }
+
   setPendingLeaveReq(pendingLeaveRequisitions) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('pendingLeaveRequisitions', pendingLeaveRequisitions);
@@ -612,7 +648,9 @@ class SessionManager {
 
   getPendingLeaveReq() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? pendingLeaveRequisitions = prefs.getString('pendingLeaveRequisitions');
+    final String? pendingLeaveRequisitions = prefs.getString(
+      'pendingLeaveRequisitions',
+    );
     return pendingLeaveRequisitions;
   }
 
@@ -626,6 +664,7 @@ class SessionManager {
     final String? preOnboardShow = prefs.getString('preOnboardShow');
     return preOnboardShow;
   }
+
   setExitShow(exitShow) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('exitShow', exitShow);
@@ -636,6 +675,7 @@ class SessionManager {
     final String? exitShow = prefs.getString('exitShow');
     return exitShow;
   }
+
   setMyTeamShow(myTeamShow) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('myTeamShow', myTeamShow);
@@ -654,106 +694,156 @@ class SessionManager {
 
   getExitResignationListShow() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationListShow = prefs.getString('exitResignationListShow');
+    final String? exitResignationListShow = prefs.getString(
+      'exitResignationListShow',
+    );
     return exitResignationListShow;
   }
+
   setExitResignationListView(exitResignationListViewCheck) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationListViewCheck', exitResignationListViewCheck);
+    await prefs.setString(
+      'exitResignationListViewCheck',
+      exitResignationListViewCheck,
+    );
   }
 
   getExitResignationListView() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationListViewCheck = prefs.getString('exitResignationListViewCheck');
+    final String? exitResignationListViewCheck = prefs.getString(
+      'exitResignationListViewCheck',
+    );
     return exitResignationListViewCheck;
   }
+
   setExitResignationApproveL1Show(exitResignationApproveL1Show) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationApproveL1Show', exitResignationApproveL1Show);
+    await prefs.setString(
+      'exitResignationApproveL1Show',
+      exitResignationApproveL1Show,
+    );
   }
 
   getExitResignationApproveL1Show() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationApproveL1Show = prefs.getString('exitResignationApproveL1Show');
+    final String? exitResignationApproveL1Show = prefs.getString(
+      'exitResignationApproveL1Show',
+    );
     return exitResignationApproveL1Show;
   }
 
   setExitResignationApproveL1View(exitResignationApproveL1View) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationApproveL1View', exitResignationApproveL1View);
+    await prefs.setString(
+      'exitResignationApproveL1View',
+      exitResignationApproveL1View,
+    );
   }
 
   getExitResignationApproveL1View() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationApproveL1View = prefs.getString('exitResignationApproveL1View');
+    final String? exitResignationApproveL1View = prefs.getString(
+      'exitResignationApproveL1View',
+    );
     return exitResignationApproveL1View;
   }
 
   setExitResignationApproveL2View(exitResignationApproveL2View) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationApproveL2View', exitResignationApproveL2View);
+    await prefs.setString(
+      'exitResignationApproveL2View',
+      exitResignationApproveL2View,
+    );
   }
 
   getExitResignationApproveL2View() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationApproveL2View = prefs.getString('exitResignationApproveL2View');
+    final String? exitResignationApproveL2View = prefs.getString(
+      'exitResignationApproveL2View',
+    );
     return exitResignationApproveL2View;
   }
 
   setExitResignationDisApproveL1View(exitResignationDisApproveL1View) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationDisApproveL1View', exitResignationDisApproveL1View);
+    await prefs.setString(
+      'exitResignationDisApproveL1View',
+      exitResignationDisApproveL1View,
+    );
   }
 
   getExitResignationDisApproveL1View() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationDisApproveL1View = prefs.getString('exitResignationDisApproveL1View');
+    final String? exitResignationDisApproveL1View = prefs.getString(
+      'exitResignationDisApproveL1View',
+    );
     return exitResignationDisApproveL1View;
   }
 
   setExitResignationDisApproveL2View(exitResignationDisApproveL2View) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationDisApproveL2View', exitResignationDisApproveL2View);
+    await prefs.setString(
+      'exitResignationDisApproveL2View',
+      exitResignationDisApproveL2View,
+    );
   }
 
   getExitResignationDisApproveL2View() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationDisApproveL2View = prefs.getString('exitResignationDisApproveL2View');
+    final String? exitResignationDisApproveL2View = prefs.getString(
+      'exitResignationDisApproveL2View',
+    );
     return exitResignationDisApproveL2View;
   }
 
   setExitResignationApproveL2Show(exitResignationApproveL2Show) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationApproveL2Show', exitResignationApproveL2Show);
+    await prefs.setString(
+      'exitResignationApproveL2Show',
+      exitResignationApproveL2Show,
+    );
   }
 
   getExitResignationApproveL2Show() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationApproveL2Show = prefs.getString('exitResignationApproveL2Show');
+    final String? exitResignationApproveL2Show = prefs.getString(
+      'exitResignationApproveL2Show',
+    );
     return exitResignationApproveL2Show;
   }
 
   setExitResignationDisApproveL1Show(exitResignationDisApproveL1Show) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationDisApproveL1Show', exitResignationDisApproveL1Show);
+    await prefs.setString(
+      'exitResignationDisApproveL1Show',
+      exitResignationDisApproveL1Show,
+    );
   }
 
   getExitResignationDisApproveL1Show() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationDisApproveL1Show = prefs.getString('exitResignationDisApproveL1Show');
+    final String? exitResignationDisApproveL1Show = prefs.getString(
+      'exitResignationDisApproveL1Show',
+    );
     return exitResignationDisApproveL1Show;
   }
 
   setExitResignationDisApproveL2Show(exitResignationDisApproveL2Show) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('exitResignationDisApproveL2Show', exitResignationDisApproveL2Show);
+    await prefs.setString(
+      'exitResignationDisApproveL2Show',
+      exitResignationDisApproveL2Show,
+    );
   }
 
   getExitResignationDisApproveL2Show() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? exitResignationDisApproveL2Show = prefs.getString('exitResignationDisApproveL2Show');
+    final String? exitResignationDisApproveL2Show = prefs.getString(
+      'exitResignationDisApproveL2Show',
+    );
     return exitResignationDisApproveL2Show;
   }
+
   setLoanApprovalL1Show(loanApprovalL1Show) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loanApprovalL1Show', loanApprovalL1Show);
@@ -764,6 +854,7 @@ class SessionManager {
     final String? loanApprovalL1Show = prefs.getString('loanApprovalL1Show');
     return loanApprovalL1Show;
   }
+
   setLoanApprovalL2Show(loanApprovalL2Show) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loanApprovalL2Show', loanApprovalL2Show);
@@ -811,6 +902,7 @@ class SessionManager {
     final String? profileNameNew = prefs.getString('profileNameNew');
     return profileNameNew;
   }
+
   setDefaultProfileId(profileIdNew) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -835,6 +927,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_attendance_req_mss_mo_permission');
   }
+
   //Pending Leave Request Permission
   Future<void> setPendingLeaveReqMSSMOPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -845,6 +938,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_leave_req_mss_mo_permission');
   }
+
   //Pending Leave Request L1 Permission
   Future<void> setPendingLeaveReqL1MSSMOPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -866,6 +960,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_leave_req_l2_mss_mo_permission');
   }
+
   //Others Leave Request Permission
   Future<void> setOthersLeaveReqMSSMOPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -887,6 +982,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('od_activate_mo_permission');
   }
+
   //OD Pending List Permission
   Future<void> setODPendingListMO(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -908,6 +1004,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_pending_mo_permission');
   }
+
   Future<void> setLoanApprovalL1MO(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l1_mo_permission', value);
@@ -917,6 +1014,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l1_mo_permission');
   }
+
   Future<void> setLoanApprovalDeleteL1MO(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l1_delete_mo_permission', value);
@@ -926,6 +1024,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l1_delete_mo_permission');
   }
+
   Future<void> setLoanApprovalL2MO(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l2_mo_permission', value);
@@ -935,6 +1034,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l2_mo_permission');
   }
+
   Future<void> setLoanApprovalDeleteL2MO(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l2_delete_mo_permission', value);
@@ -944,6 +1044,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l2_delete_mo_permission');
   }
+
   Future<void> setLoanApprovalL3MO(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l3_mo_permission', value);
@@ -953,6 +1054,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l3_mo_permission');
   }
+
   Future<void> setLoanApprovalDeleteL3MO(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l3_delete_mo_permission', value);
@@ -985,7 +1087,6 @@ class SessionManager {
     return prefs.getString('pending_att_mo_l2_permission');
   }
 
-
   //MSS Permissions
   //Pending Attendance Request Permission & Others Attendance Request Permission
   Future<void> setPendingAttendanceReqMSSPermission(String value) async {
@@ -997,6 +1098,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_attendance_req_mss_permission');
   }
+
   //Pending Leave Request Permission
   Future<void> setPendingLeaveReqMSSPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1007,6 +1109,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_leave_req_mss_permission');
   }
+
   //Pending Leave Request L1 Permission
   Future<void> setPendingLeaveReqL1MSSPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1028,6 +1131,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_leave_req_l2_mss_permission');
   }
+
   //Others Leave Request Permission
   Future<void> setOthersLeaveReqMSSPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1049,6 +1153,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('od_activate_permission');
   }
+
   //OD Pending List Permission
   Future<void> setODPendingList(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1059,6 +1164,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('od_pending_permission');
   }
+
   //OD Pending List Permission
   Future<void> setLoanPendingList(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1079,6 +1185,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l1_mss_permission');
   }
+
   Future<void> setLoanApprovalDeleteL1MSS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l1_delete_mss_permission', value);
@@ -1088,6 +1195,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l1_delete_mss_permission');
   }
+
   Future<void> setLoanApprovalL2MSS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l2_mss_permission', value);
@@ -1097,6 +1205,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l2_mss_permission');
   }
+
   Future<void> setLoanApprovalDeleteL2MSS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l2_delete_mss_permission', value);
@@ -1106,6 +1215,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l2_delete_mss_permission');
   }
+
   Future<void> setLoanApprovalL3MSS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l3_mss_permission', value);
@@ -1115,6 +1225,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l3_mss_permission');
   }
+
   Future<void> setLoanApprovalDeleteL3MSS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l3_delete_mss_permission', value);
@@ -1124,7 +1235,6 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l3_delete_mss_permission');
   }
-
 
   //Pending Attendance L1
   Future<void> setPendingAttendanceReqL1MSS(String value) async {
@@ -1148,8 +1258,6 @@ class SessionManager {
     return prefs.getString('pending_att_mss_l2_permission');
   }
 
-
-
   //UIS Permissions
   //Pending Attendance Request Permission & Others Attendance Request Permission
   Future<void> setPendingAttendanceReqUISPermission(String value) async {
@@ -1161,6 +1269,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_attendance_req_uis_permission');
   }
+
   //Pending Leave Request Permission
   Future<void> setPendingLeaveReqUISPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1171,6 +1280,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_leave_req_uis_permission');
   }
+
   //Pending Leave Request L1 Permission
   Future<void> setPendingLeaveReqL1UISPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1192,6 +1302,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('pending_leave_req_l2_uis_permission');
   }
+
   //Others Leave Request Permission
   Future<void> setOthersLeaveReqUISPermission(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1213,6 +1324,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('od_activate_uis_permission');
   }
+
   //OD Pending List Permission
   Future<void> setODPendingListUIS(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1223,6 +1335,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('od_pending_uis_permission');
   }
+
   //OD Pending List Permission
   Future<void> setLoanPendingListUIS(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -1243,6 +1356,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l1_uis_permission');
   }
+
   Future<void> setLoanApprovalDeleteL1UIS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l1_delete_uis_permission', value);
@@ -1252,6 +1366,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l1_delete_uis_permission');
   }
+
   Future<void> setLoanApprovalL2UIS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l2_uis_permission', value);
@@ -1261,6 +1376,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l2_uis_permission');
   }
+
   Future<void> setLoanApprovalDeleteL2UIS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l2_delete_uis_permission', value);
@@ -1270,6 +1386,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l2_delete_uis_permission');
   }
+
   Future<void> setLoanApprovalL3UIS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l3_uis_permission', value);
@@ -1279,6 +1396,7 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l3_uis_permission');
   }
+
   Future<void> setLoanApprovalDeleteL3UIS(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('loan_approval_l3_delete_uis_permission', value);
@@ -1288,7 +1406,6 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('loan_approval_l3_delete_uis_permission');
   }
-
 
   //Pending Attendance L1
   Future<void> setPendingAttendanceReqL1UIS(String value) async {
@@ -1321,5 +1438,80 @@ class SessionManager {
   Future<String?> getMyTeamPageShow() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('my_team_permission');
+  }
+
+  Future<void> setAccessToken(String? accessToken) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('mobileAccessToken', accessToken ?? '');
+  }
+
+  Future<String?> getAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('mobileAccessToken');
+  }
+
+  Future<void> setTokenType(String? tokenType) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('mobileTokenType', tokenType ?? 'Bearer');
+  }
+
+  Future<String?> getTokenType() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('mobileTokenType');
+  }
+
+  Future<void> setMobileSessionId(String? sessionId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('mobileSessionId', sessionId ?? '');
+  }
+
+  Future<String?> getMobileSessionId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final mobileSessionId = prefs.getString('mobileSessionId');
+    if (mobileSessionId != null && mobileSessionId.isNotEmpty) {
+      return mobileSessionId;
+    }
+    return prefs.getString('sessionId');
+  }
+
+  Future<void> setLoginResponseJson(String? loginResponseJson) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('mobileLoginResponseJson', loginResponseJson ?? '');
+  }
+
+  Future<String?> getLoginResponseJson() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('mobileLoginResponseJson');
+  }
+
+  Future<void> setPermissionsVersion(String? permissionsVersion) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('mobilePermissionsVersion', permissionsVersion ?? '');
+  }
+
+  Future<String?> getPermissionsVersion() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('mobilePermissionsVersion');
+  }
+
+  Future<void> setProfileVersion(String? profileVersion) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('mobileProfileVersion', profileVersion ?? '');
+  }
+
+  Future<String?> getProfileVersion() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('mobileProfileVersion');
+  }
+
+  Future<void> clearMobileAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('mobileAccessToken');
+    await prefs.remove('mobileTokenType');
+    await prefs.remove('mobileLoginResponseJson');
+    await prefs.remove('mobilePermissionsVersion');
+    await prefs.remove('mobileProfileVersion');
+    await prefs.remove('sessionId');
+    await prefs.remove('mobileSessionId');
   }
 }

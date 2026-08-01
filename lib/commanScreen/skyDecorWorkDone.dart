@@ -14,6 +14,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import 'allAPIList.dart';
 import 'modalClass/skyDecClientDataModal.dart';
@@ -125,7 +126,7 @@ class _SkyDecorWorkDoneState extends State<SkyDecorWorkDone> {
     ClientDataListModal clientDataListModal;
     var urlapi = Uri.parse("$conn$apiUrl?"
         "sessionId=$sessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
 
@@ -160,7 +161,7 @@ class _SkyDecorWorkDoneState extends State<SkyDecorWorkDone> {
       */
 /*setState(() {
         this._image = value;
-      });*//*
+      });*/ /*
 
     } on PlatformException catch (e) {
       print('failed to upload: $e');
@@ -208,7 +209,7 @@ class _SkyDecorWorkDoneState extends State<SkyDecorWorkDone> {
     */
 /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+_emailIdController.text),
-    ));*//*
+    ));*/ /*
 
     var multipart = new http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
@@ -218,7 +219,7 @@ class _SkyDecorWorkDoneState extends State<SkyDecorWorkDone> {
     */
 /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+response.body),
-    ));*//*
+    ));*/ /*
 
     String resultSuccess = result['result'];
     if (response.statusCode == 200) {
@@ -239,7 +240,7 @@ class _SkyDecorWorkDoneState extends State<SkyDecorWorkDone> {
     */
 /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run" + result['result']),
-    ));*//*
+    ));*/ /*
 
     print('Response body: ${result}');
   }
@@ -273,7 +274,7 @@ class _SkyDecorWorkDoneState extends State<SkyDecorWorkDone> {
                       */
 /*child: Image.file(value!,
                         height: 150,
-                        fit: BoxFit.fitWidth,),*//*
+                        fit: BoxFit.fitWidth,),*/ /*
 
                     )
                         : Icon(
@@ -501,7 +502,7 @@ class CitiesService {
 
      clientDatalist.retainWhere((s) => s!.toLowerCase().contains(query.toLowerCase()));
     return clientDatalist;
-  }*//*
+  }*/ /*
 
   */
 /*static List<String> getSuggestions(String query) {
@@ -511,7 +512,7 @@ class CitiesService {
 
     matches.retainWhere((s) => s.toLowerCase().contains(query.toLowerCase()));
     return matches;
-  }*//*
+  }*/ /*
 
 }
 

@@ -7,6 +7,7 @@ import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/trav
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/updateRaisedClaim.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
@@ -28,14 +29,12 @@ import '../../ess/loan&Advance/myLoanRequestRaisePage.dart';
 import '../../ess/loan&Advance/myLoanRequestUpdate.dart';
 import 'modalClass/mssLoanListModal.dart';
 
-
-
 class PendingLoanRequestListMO extends StatefulWidget {
   const PendingLoanRequestListMO({Key? key}) : super(key: key);
 
-
   @override
-  State<PendingLoanRequestListMO> createState() => _PendingLoanRequestListMOState();
+  State<PendingLoanRequestListMO> createState() =>
+      _PendingLoanRequestListMOState();
 }
 
 Map<String, dynamic> mapResponse = {};
@@ -47,9 +46,8 @@ dynamic userPanel;
 dynamic getProfileId;
 dynamic loanReqIdSend;
 
-List<LoanRequiDataforOthers>? allUsernew=[];
-List<LoanRequiDataforOthers>? foundDataNew=[];
-
+List<LoanRequiDataforOthers>? allUsernew = [];
+List<LoanRequiDataforOthers>? foundDataNew = [];
 
 String? empName = "";
 String? status = "";
@@ -77,16 +75,16 @@ dynamic loanIdSend;
 
 dynamic statusCheck;
 
-var draftShow=true;
-var pendingShow=false;
-var approveShow=false;
-var disApproveShow=false;
+var draftShow = true;
+var pendingShow = false;
+var approveShow = false;
+var disApproveShow = false;
 
 bool isLoading = true;
 bool isLoadingCount = false;
 
-
-class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> with RouteAware{
+class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
+    with RouteAware {
   late ScrollController _controller;
 
   @override
@@ -127,10 +125,12 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
 
     if (orgListString != null) {
       List<dynamic> decoded = json.decode(orgListString);
-      storedOrgList = decoded.map((item) => Map<String, dynamic>.from(item)).toList();
+      storedOrgList =
+          decoded.map((item) => Map<String, dynamic>.from(item)).toList();
 
       // Populate dropdown list
-      organizations = storedOrgList.map((e) => e['orgName'].toString()).toList();
+      organizations =
+          storedOrgList.map((e) => e['orgName'].toString()).toList();
 
       // Start with "Select" as default (null value)
       //selectedOrg = null;
@@ -139,6 +139,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
       setState(() {});
     }
   }
+
   bool isLoading = false;
   @override
   void initState() {
@@ -161,7 +162,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
     super.didUpdateWidget(oldWidget);
   }
 
-/*  Future getSharedPrfanceList() async {
+  /*  Future getSharedPrfanceList() async {
     if (!_isBottomSheetOpen) {
       await Future.delayed(Duration(milliseconds: 100));
       _showFilterBottomSheet();
@@ -173,12 +174,12 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
     if (showSheetOnFirstLoad && _isFirstLoad) {
       await Future.delayed(Duration(milliseconds: 100));
       _showFilterBottomSheet();
-      _isFirstLoad = false; // ✅ Prevent future automatic opens
+      _isFirstLoad = false; // âœ… Prevent future automatic opens
     }
     loadOrgListFromPrefs();
   }
 
- /* Future getSharedPrfanceList() async {
+  /* Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     userPanel = await shared!.getUserPanel();
     getProfileId = await shared!.getDefaultProfileId();
@@ -208,11 +209,10 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
 
   }*/
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -229,35 +229,35 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
-
 
   Future<MSSLoanListModal> getMSSLoanList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.mssLoanListApi;
     print('employeeList11: ${SessionId}');
     MSSLoanListModal mssLoanListModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "status=$statusChange&"
-        "permission=$userPanel&"
-        "profId=$getProfileId&"
-        "orgId=$getOrgId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "status=$statusChange&"
+      "permission=$userPanel&"
+      "profId=$getProfileId&"
+      "orgId=$getOrgId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.body}');
     setState(() {
@@ -268,7 +268,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
     mapResponse = json.decode(response.body);
     print('responseemployeeList $mapResponse');
     var getData = mapResponse.length;
-    if (getData == 0 )  {
+    if (getData == 0) {
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
@@ -277,21 +277,18 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
     totalApprovedAmt = mssLoanListModal.approvedValue;
     totalPendingAmt = mssLoanListModal.pendingAmount;
 
-      allUsernew = mssLoanListModal.loanRequiDataforOthers;
-
+    allUsernew = mssLoanListModal.loanRequiDataforOthers;
 
     setState(() {
       isLoadingCount = false;
       isLoading = false;
     });
 
-
     return mssLoanListModal;
   }
 
-
   Future<void> deleteLoanRequest(BuildContext context) async {
-    // ✅ Proceed with the API call if both checks pass
+    // âœ… Proceed with the API call if both checks pass
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanRequestDeleteApi;
     CommonNotificationPage.showLoaderDialog(context);
@@ -323,13 +320,13 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
         }
       }
     } catch (e) {
-      print('❌ Exception during API call: $e');
+      print('âŒ Exception during API call: $e');
     }
   }
 
   showDialgSucess(BuildContext buildContext, String result, String alert) {
     if (buildContext == null) {
-      print("⚠️ Warning: buildContext is null, cannot show dialog.");
+      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
       return;
     }
 
@@ -341,21 +338,21 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0)),
           ),
-          title: Row(
-            children: [
-              Expanded(child: Text(alert)),
-            ],
-          ),
+          title: Row(children: [Expanded(child: Text(alert))]),
           content: Text(result),
           actions: [
             TextButton(
               onPressed: () {
-                if (Navigator.of(context).canPop()) { // ✅ Using `context` inside the builder
-                  Navigator.of(context, rootNavigator: true).pop(); // Close the dialog
+                if (Navigator.of(context).canPop()) {
+                  // âœ… Using `context` inside the builder
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pop(); // Close the dialog
                   getSharedPrfanceList();
                   //Navigator.of(buildContext).maybePop();
                 } else {
-                  print("⚠️ Warning: No route to close.");
+                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -375,14 +372,14 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
 
   var statusChange = "LEVEL_ONE_PENDING";
   int valueChange = 0;
-  var titleName="Pending Loan Requisitions";
+  var titleName = "Pending Loan Requisitions";
   TextEditingController searchType = TextEditingController();
   int currentIndex = 2;
   bool _isFirstBuild = true;
   bool _isFirstLoad = true;
   bool _isBottomSheetOpen = false;
   void _showFilterBottomSheet() {
-    if (_isBottomSheetOpen) return; // ✅ Prevent multiple opens
+    if (_isBottomSheetOpen) return; // âœ… Prevent multiple opens
     _isBottomSheetOpen = true;
     showModalBottomSheet(
       context: context,
@@ -419,7 +416,10 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                     ),
                     Text(
                       'Filter',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(height: 16),
 
@@ -436,10 +436,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                           child: Text('Select'),
                         ),
                         ...organizations.map((org) {
-                          return DropdownMenuItem(
-                            value: org,
-                            child: Text(org),
-                          );
+                          return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
                       onChanged: (value) {
@@ -448,7 +445,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
 
                           // Match selected org name to get ID
                           matchedOrg = storedOrgList.firstWhere(
-                                (org) => org['orgName'] == value,
+                            (org) => org['orgName'] == value,
                             orElse: () => {},
                           );
 
@@ -505,12 +502,14 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
 
                             setState(() {
                               foundDataNew = allUsernew;
-                              mssLoanListLabel=value;
-                              mssLoanListLabeled=mssLoanListLabel;
+                              mssLoanListLabel = value;
+                              mssLoanListLabeled = mssLoanListLabel;
                               isLoading = false;
                             });
 
-                            print('employeeList00: ${value.loanRequiDataforOthers?.length}');
+                            print(
+                              'employeeList00: ${value.loanRequiDataforOthers?.length}',
+                            );
                           } catch (e) {
                             setState(() {
                               isLoading = false;
@@ -524,7 +523,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                           backgroundColor: Mythemes.successColor,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 );
               },
@@ -533,7 +532,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
         );
       },
     ).whenComplete(() {
-      _isBottomSheetOpen = false; // ✅ Reset when sheet is dismissed
+      _isBottomSheetOpen = false; // âœ… Reset when sheet is dismissed
     });
   }
 
@@ -544,42 +543,47 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
         preferredSize: const Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  //_runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: titleName,
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                //_runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
 
       floatingActionButton: FloatingActionButton(
         onPressed: _showFilterBottomSheet,
-        child: Icon(Icons.filter_list, color: Mythemes.whitish,),
+        child: Icon(Icons.filter_list, color: Mythemes.whitish),
       ),
 
       /*floatingActionButton: FloatingActionButton(
@@ -593,43 +597,48 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
         backgroundColor: Mythemes.lightBluishColor,
         child: Icon(Icons.add, color: Mythemes.whitish,),
       ),*/
-
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             print('My Requests');
           }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => EssAdminDashboardHead(EssDashboarrdModel()),
+              ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -640,10 +649,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -688,9 +694,15 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Center(
-                            child: isLoadingCount
-                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                :"₹$totalPendingAmt".text.bold.color(Mythemes.whitish).size(16).make(),
+                            child:
+                                isLoadingCount
+                                    ? CircularProgressIndicator(
+                                      color: Mythemes.whitish,
+                                    ) // Loader when fetching data
+                                    : "â‚¹$totalPendingAmt".text.bold
+                                        .color(Mythemes.whitish)
+                                        .size(16)
+                                        .make(),
                           ),
                           Center(
                             child: Container(
@@ -701,12 +713,14 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
-                                style:
-                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  color: Mythemes.whitish,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
-
                         ],
                       ),
                     ),
@@ -725,9 +739,15 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Center(
-                            child: isLoadingCount
-                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                :"₹$totalApprovedAmt".text.bold.color(Mythemes.whitish).size(16).make(),
+                            child:
+                                isLoadingCount
+                                    ? CircularProgressIndicator(
+                                      color: Mythemes.whitish,
+                                    ) // Loader when fetching data
+                                    : "â‚¹$totalApprovedAmt".text.bold
+                                        .color(Mythemes.whitish)
+                                        .size(16)
+                                        .make(),
                           ),
                           Center(
                             child: Container(
@@ -738,12 +758,14 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
-                                style:
-                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  color: Mythemes.whitish,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
-
                         ],
                       ),
                     ),
@@ -761,11 +783,16 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-
                           Center(
-                            child: isLoadingCount
-                                ? CircularProgressIndicator(color: Mythemes.whitish) // Loader when fetching data
-                                :"₹$totalDisapprovedAmt".text.bold.color(Mythemes.whitish).size(16).make(),
+                            child:
+                                isLoadingCount
+                                    ? CircularProgressIndicator(
+                                      color: Mythemes.whitish,
+                                    ) // Loader when fetching data
+                                    : "â‚¹$totalDisapprovedAmt".text.bold
+                                        .color(Mythemes.whitish)
+                                        .size(16)
+                                        .make(),
                           ),
                           Center(
                             child: Container(
@@ -776,20 +803,19 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
-                                style:
-                                TextStyle(color: Mythemes.whitish, fontSize: 14, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  color: Mythemes.whitish,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
-
                         ],
                       ),
                     ),
                   ),
                 ),
-
-
-
               ],
             ),
             Row(
@@ -814,22 +840,32 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                   styleAnimationType: AnimationType.onHover,
                   spacing: 4.0,
                   customSeparatorBuilder: (context, local, global) {
-                    final opacity =
-                    ((global.position - local.position).abs() - 0.5)
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
                         .clamp(0.0, 1.0);
                     return VerticalDivider(
-                        indent: 10.0,
-                        endIndent: 10.0,
-                        color: Colors.white38.withOpacity(opacity));
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
                   },
                   customIconBuilder: (context, local, global) {
-                    final text = const ['L1', 'L2', 'L3', 'Approve', 'Rejected'][local.index];
+                    final text =
+                        const ['L1', 'L2', 'L3', 'Approve', 'Rejected'][local
+                            .index];
                     return Center(
-                        child: Text(text,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(Colors.black, Colors.white,
-                                    local.animationValue))));
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   borderWidth: 0.0,
                   onChanged: (i) async {
@@ -886,16 +922,19 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
                       isLoadingCount = false;
                     });
                   },
-                )
+                ),
               ],
             ).py(4),
 
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : (mssLoanListLabeled == null || foundDataNew == null || foundDataNew!.isEmpty)
-                  ? const Center(child: Text("No Data Available"))
-                  : getLoanSelfReqList(mssLoanListLabeled!),
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : (mssLoanListLabeled == null ||
+                          foundDataNew == null ||
+                          foundDataNew!.isEmpty)
+                      ? const Center(child: Text("No Data Available"))
+                      : getLoanSelfReqList(mssLoanListLabeled!),
             ),
           ],
         ),
@@ -909,13 +948,13 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  PendingLoanRequestListMO(),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder: (a, b, c) => PendingLoanRequestListMO(),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: Column(
@@ -923,173 +962,237 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
           Expanded(
             child: ListView.builder(
               //controller: _controller,
-                itemCount: foundDataNew!.length,
-                itemBuilder: (context , i) {
-                if(foundDataNew![i].statusShow == "APPROVED") {
+              itemCount: foundDataNew!.length,
+              itemBuilder: (context, i) {
+                if (foundDataNew![i].statusShow == "APPROVED") {
                   statusColors = Mythemes.successColor;
+                } else if (foundDataNew![i].statusShow == "DISAPPROVED") {
+                  statusColors = Mythemes.dangerColor;
+                } else {
+                  statusColors = Mythemes.lightBluishColor;
                 }
-                else if(foundDataNew![i].statusShow == "DISAPPROVED") {
-                statusColors = Mythemes.dangerColor;
-              } else {
-                statusColors = Mythemes.lightBluishColor;
-              }
 
-                  foundDataNew![i].status;
-                  print(foundDataNew![i].status);
-          
-                  return InkWell(
-                    onTap: () {
-                      loanReqIdSend = foundDataNew![i].loanReqId;
-                      if(foundDataNew![i].statusShow == "APPROVED" || foundDataNew![i].statusShow == "DISAPPROVED") {
-                        Fluttertoast.showToast(
-                            msg: "This loan is ${foundDataNew![i].statusShow} !!",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.black,
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      } else {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => LoanApprovalPage(
-                                loanReqId:loanReqIdSend
-                            )));
-                      }
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 4,
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Amount and Status
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "₹ ${foundDataNew![i].loanAmount}",
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blueAccent,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: statusColors,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    "${foundDataNew![i].statusShow}",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            //Employee Name
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Employee Name", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                Text("${foundDataNew![i].empName}", style: const TextStyle(fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            // Requested Date
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Requested On", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                Text("${foundDataNew![i].date}", style: const TextStyle(fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
+                foundDataNew![i].status;
+                print(foundDataNew![i].status);
 
-          
-                            // installments
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Requested Installments", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                Text("${foundDataNew![i].installment}", style: const TextStyle(fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-          
-                            // loanType
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Loan Type", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                Text("${foundDataNew![i].loanType}", style: const TextStyle(fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-          
-                            // Total
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Total Amount", style: TextStyle(color: Mythemes.black, fontWeight: FontWeight.w400)),
-                                Text("₹ ${foundDataNew![i].loanAmount}", style: const TextStyle(fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-          
-                            // Note
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text(
-                                "Loan not approved yet",
-                                style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w800),
-                              ),
-                            ),
-          
-                            //const SizedBox(height: 8),
-          
-                            // Loan Installments Link
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton.icon(
-                                onPressed: () {
-                                  loanIdSend= foundDataNew![i].loanReqId;
-                                  deleteLoanRequest(context);
-                                },
-                                icon: const Icon(Icons.delete, size: 18),
-                                label: const Text("Delete Loan"),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Mythemes.dangerColor,
-                                ),
-                              ),
-                            )
-                          ],
+                return InkWell(
+                  onTap: () {
+                    loanReqIdSend = foundDataNew![i].loanReqId;
+                    if (foundDataNew![i].statusShow == "APPROVED" ||
+                        foundDataNew![i].statusShow == "DISAPPROVED") {
+                      Fluttertoast.showToast(
+                        msg: "This loan is ${foundDataNew![i].statusShow} !!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.black,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  LoanApprovalPage(loanReqId: loanReqIdSend),
                         ),
+                      );
+                    }
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Amount and Status
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "â‚¹ ${foundDataNew![i].loanAmount}",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueAccent,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: statusColors,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  "${foundDataNew![i].statusShow}",
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          //Employee Name
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Employee Name",
+                                style: TextStyle(
+                                  color: Mythemes.black,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              Text(
+                                "${foundDataNew![i].empName}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          // Requested Date
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Requested On",
+                                style: TextStyle(
+                                  color: Mythemes.black,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              Text(
+                                "${foundDataNew![i].date}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          // installments
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Requested Installments",
+                                style: TextStyle(
+                                  color: Mythemes.black,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              Text(
+                                "${foundDataNew![i].installment}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          // loanType
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Loan Type",
+                                style: TextStyle(
+                                  color: Mythemes.black,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              Text(
+                                "${foundDataNew![i].loanType}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Total
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Total Amount",
+                                style: TextStyle(
+                                  color: Mythemes.black,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              Text(
+                                "â‚¹ ${foundDataNew![i].loanAmount}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Note
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Text(
+                              "Loan not approved yet",
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+
+                          //const SizedBox(height: 8),
+
+                          // Loan Installments Link
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: () {
+                                loanIdSend = foundDataNew![i].loanReqId;
+                                deleteLoanRequest(context);
+                              },
+                              icon: const Icon(Icons.delete, size: 18),
+                              label: const Text("Delete Loan"),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Mythemes.dangerColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ).pLTRB(10, 10, 10, 5),
-                  );
-                }
+                    ),
+                  ).pLTRB(10, 10, 10, 5),
+                );
+              },
             ),
           ),
-         
         ],
       ),
     );
-
 
     /*if(foundDataNew == []) {
       print("FETCH NEW DATA");
@@ -1097,6 +1200,5 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO> wit
         child: "There is no data availabel right now".text.make(),
       );
     }*/
-
   }
 }

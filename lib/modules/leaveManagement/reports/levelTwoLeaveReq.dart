@@ -15,6 +15,7 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:badges/badges.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
@@ -31,10 +32,11 @@ class LevelTwoPendingLeave extends StatefulWidget {
   final LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
   const LevelTwoPendingLeave(this.pendingLeaveRequisitionModal);
 
-
   @override
-  State<LevelTwoPendingLeave> createState() => _LevelTwoPendingLeaveState(pendingLeaveRequisitionModal);
+  State<LevelTwoPendingLeave> createState() =>
+      _LevelTwoPendingLeaveState(pendingLeaveRequisitionModal);
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
@@ -42,13 +44,14 @@ SessionManager shared = SessionManager();
 String? sessionId;
 dynamic getProfileId;
 dynamic userPanel;
-List<Data>? allUsernew=[];
-List<Data>? foundDataNew=[];
+List<Data>? allUsernew = [];
+List<Data>? foundDataNew = [];
 
 LevelTwoPendingLeaveModal? pendingLeaveReqLabel;
 LevelTwoPendingLeaveModal? pendingLeaveReqLabeled;
 
-class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteAware {
+class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave>
+    with RouteAware {
   final LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
   _LevelTwoPendingLeaveState(this.pendingLeaveRequisitionModal);
 
@@ -66,10 +69,11 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -83,11 +87,10 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
     });
   }
 
-  showNodata(BuildContext buildContext, result,reason) {
+  showNodata(BuildContext buildContext, result, reason) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       title: Row(
         children: [
@@ -104,20 +107,19 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
             Navigator.pop(buildContext);
-            setState(() {
-
-            });
+            setState(() {});
           },
           child: Text("Ok"),
-        )
+        ),
       ],
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 
   Future getSharedPrfanceList() async {
@@ -125,27 +127,27 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
     getProfileId = await shared!.getDefaultProfileId();
     userPanel = await shared!.getUserPanel();
     await Future.delayed(Duration(seconds: 2));
-    Future<LevelTwoPendingLeaveModal> getAppReq11 = getPendingLeaveReq(sessionId!);
+    Future<LevelTwoPendingLeaveModal> getAppReq11 = getPendingLeaveReq(
+      sessionId!,
+    );
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        pendingLeaveReqLabel=value;
-        pendingLeaveReqLabeled=pendingLeaveReqLabel;
-        if(foundDataNew != null) {
+        pendingLeaveReqLabel = value;
+        pendingLeaveReqLabeled = pendingLeaveReqLabel;
+        if (foundDataNew != null) {
           foundDataNew!.length;
           print("Fetch data $foundDataNew");
         } else {
-          Center(
-            child: "There is no data available right now".text.make(),
-          );
+          Center(child: "There is no data available right now".text.make());
           foundDataNew = [];
         }
       });
@@ -158,22 +160,26 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
     String apiUrl = ApiDetails.levelTwoLeaveList;
     print('employeeList11: ${SessionId}');
     LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId&"
-        "profileId=$getProfileId&"
-        "userPermission=$userPanel&"
-        "orgId=0");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?sessionId=$SessionId&"
+      "profileId=$getProfileId&"
+      "userPermission=$userPanel&"
+      "orgId=0",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
     print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
-    if (getData == null )  {
+    if (getData == null) {
       print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     print('responseemployeeList $getData');
-    pendingLeaveRequisitionModal=LevelTwoPendingLeaveModal.fromJson(mapResponse);
+    pendingLeaveRequisitionModal = LevelTwoPendingLeaveModal.fromJson(
+      mapResponse,
+    );
 
     allUsernew = pendingLeaveRequisitionModal.result!.data;
 
@@ -186,7 +192,7 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<Data>?  results = [];
+    List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -199,8 +205,14 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.employeeName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.employeeName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -220,11 +232,13 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
     attachmentUrl = attachmentUrl.replaceAll("File: '", "").replaceAll("'", "");
 
     final isPdf = attachmentUrl.toLowerCase().endsWith('.pdf');
-    final isImage = attachmentUrl.toLowerCase().endsWith('.jpg') ||
+    final isImage =
+        attachmentUrl.toLowerCase().endsWith('.jpg') ||
         attachmentUrl.toLowerCase().endsWith('.jpeg') ||
         attachmentUrl.toLowerCase().endsWith('.png');
 
-    final isLocalFile = attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
+    final isLocalFile =
+        attachmentUrl.startsWith('/') || attachmentUrl.startsWith('file://');
 
     showModalBottomSheet(
       context: context,
@@ -233,57 +247,69 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.85,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("View Attachment",
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: isPdf
-                  ? SfPdfViewer.network(attachmentUrl)
-                  : isImage
-                  ? (isLocalFile
-                  ? Image.file(
-                File(attachmentUrl),
-                fit: BoxFit.contain,
-              )
-                  : CachedNetworkImage(
-                imageUrl: attachmentUrl,
-                fit: BoxFit.contain,
-                placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Center(
-                    child: Text("❌ Failed to load image")),
-              ))
-                  : const Center(
-                child: Text(
-                  "⚠️ Unsupported file format",
-                  style:
-                  TextStyle(fontSize: 16, color: Colors.redAccent),
+      builder:
+          (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.85,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "View Attachment",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+
+                Expanded(
+                  child:
+                      isPdf
+                          ? SfPdfViewer.network(attachmentUrl)
+                          : isImage
+                          ? (isLocalFile
+                              ? Image.file(
+                                File(attachmentUrl),
+                                fit: BoxFit.contain,
+                              )
+                              : CachedNetworkImage(
+                                imageUrl: attachmentUrl,
+                                fit: BoxFit.contain,
+                                placeholder:
+                                    (context, url) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                errorWidget:
+                                    (context, url, error) => const Center(
+                                      child: Text("âŒ Failed to load image"),
+                                    ),
+                              ))
+                          : const Center(
+                            child: Text(
+                              "âš ï¸ Unsupported file format",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                          ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -297,36 +323,40 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                previousScreen:  LeaveManageReports(),
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: titleName,
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType,
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              previousScreen: LeaveManageReports(),
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
             ),
           ),
         ),
@@ -334,117 +364,133 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
 
       body: Container(
         color: context.canvasColor,
-        child:
-            Column(
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedToggleSwitch<int>.size(
-                      height: 30,
-                      current: min(value, 3),
-                      style: ToggleStyle(
-                        backgroundColor: Mythemes.greyishade,
-                        indicatorColor: Mythemes.lightBluishColor,
-                        borderColor: Colors.transparent,
-                        borderRadius: BorderRadius.circular(10.0),
-                        indicatorBorderRadius: BorderRadius.zero,
+                AnimatedToggleSwitch<int>.size(
+                  height: 30,
+                  current: min(value, 3),
+                  style: ToggleStyle(
+                    backgroundColor: Mythemes.greyishade,
+                    indicatorColor: Mythemes.lightBluishColor,
+                    borderColor: Colors.transparent,
+                    borderRadius: BorderRadius.circular(10.0),
+                    indicatorBorderRadius: BorderRadius.zero,
+                  ),
+                  values: const [0, 1, 2],
+                  iconOpacity: 1.0,
+                  selectedIconScale: 1.0,
+                  indicatorSize: const Size.fromWidth(90),
+                  iconAnimationType: AnimationType.onHover,
+                  styleAnimationType: AnimationType.onHover,
+                  spacing: 10.0,
+                  customSeparatorBuilder: (context, local, global) {
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
+                        .clamp(0.0, 1.0);
+                    return VerticalDivider(
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
+                  },
+                  customIconBuilder: (context, local, global) {
+                    final text =
+                        const ['Pending', 'Level One', 'Level Two'][local
+                            .index];
+                    return Center(
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
+                          ),
+                        ),
                       ),
-                      values: const [0, 1, 2],
-                      iconOpacity: 1.0,
-                      selectedIconScale: 1.0,
-                      indicatorSize: const Size.fromWidth(90),
-                      iconAnimationType: AnimationType.onHover,
-                      styleAnimationType: AnimationType.onHover,
-                      spacing: 10.0,
-                      customSeparatorBuilder: (context, local, global) {
-                        final opacity =
-                        ((global.position - local.position).abs() - 0.5)
-                            .clamp(0.0, 1.0);
-                        return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity));
-                      },
-                      customIconBuilder: (context, local, global) {
-                        final text = const ['Pending', 'Level One', 'Level Two'][local.index];
-                        return Center(
-                            child: Text(text,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color.lerp(Colors.black, Colors.white,
-                                        local.animationValue))));
-                      },
-                      borderWidth: 0.0,
-                      onChanged: (i) {
-                        setState(() {
-                          value = i;
-                          print(i);
+                    );
+                  },
+                  borderWidth: 0.0,
+                  onChanged: (i) {
+                    setState(() {
+                      value = i;
+                      print(i);
+                    });
 
-                        });
-
-                        if(value == 0) {
-                          Navigator.pushNamed(context, MyRoutings.pendingLeaveReqListRoute);
-                          //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                        }
-                        if(value == 1) {
-                          Navigator.pushNamed(context, MyRoutings.levelOnePendingRoute);
-                        }
-                        if(value == 2) {
-                          Navigator.pushNamed(context, MyRoutings.levelTwoPendingRoute);
-                        }
-                      },
-                    )
-                  ],
-                ).py(6),
-                Expanded(child:
-                pendingLeaveReqLabeled == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getPendingLeaveReqList(pendingLeaveReqLabeled!),
-                )
-
-              ]
-
-            )
-
+                    if (value == 0) {
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutings.pendingLeaveReqListRoute,
+                      );
+                      //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+                    }
+                    if (value == 1) {
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutings.levelOnePendingRoute,
+                      );
+                    }
+                    if (value == 2) {
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutings.levelTwoPendingRoute,
+                      );
+                    }
+                  },
+                ),
+              ],
+            ).py(6),
+            Expanded(
+              child:
+                  pendingLeaveReqLabeled == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getPendingLeaveReqList(pendingLeaveReqLabeled!),
+            ),
+          ],
+        ),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             //Navigator.of(context, rootNavigator: true).pop();
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
             print('Leave');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
           }
-          if(index==4){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfilePageNew())
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
             print('Profile');
@@ -455,18 +501,12 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group_off),
-            label: 'Leave',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.group_off), label: 'Leave'),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),
             label: 'Dashboard',
@@ -482,17 +522,20 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
     );
   }
 
-  getPendingLeaveReqList(LevelTwoPendingLeaveModal pendingLeaveRequisitionModal) {
+  getPendingLeaveReqList(
+    LevelTwoPendingLeaveModal pendingLeaveRequisitionModal,
+  ) {
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) => LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
@@ -501,10 +544,17 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
         itemBuilder: (context, index) {
           final item = foundDataNew![index];
           return InkWell(
-            onTap: (){
+            onTap: () {
               print(foundDataNew!.length);
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => LevelTwoPendingApproval(
-                  pendingLeaveRequisitionModal, index)));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => LevelTwoPendingApproval(
+                        pendingLeaveRequisitionModal,
+                        index,
+                      ),
+                ),
+              );
               //Navigator.pushNamed(context, MyRoutings.pendingLeaveAppDisRoute);
               //CommonNotificationPage.showDeleteMessage(context, context, context);
             },
@@ -525,7 +575,11 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.person, color: Colors.blueAccent, size: 20),
+                            const Icon(
+                              Icons.person,
+                              color: Colors.blueAccent,
+                              size: 20,
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               item.employeeName.toString(),
@@ -539,19 +593,25 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            color: item.status.toString().toLowerCase() == 'pending'
-                                ? Colors.orange.withOpacity(0.2)
-                                : Colors.green.withOpacity(0.2),
+                            color:
+                                item.status.toString().toLowerCase() ==
+                                        'pending'
+                                    ? Colors.orange.withOpacity(0.2)
+                                    : Colors.green.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           child: Text(
                             item.status.toString(),
                             style: TextStyle(
-                              color: item.status.toString().toLowerCase() == 'pending'
-                                  ? Colors.orange
-                                  : Colors.green,
+                              color:
+                                  item.status.toString().toLowerCase() ==
+                                          'pending'
+                                      ? Colors.orange
+                                      : Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -564,8 +624,11 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
                     /// Leave Type + Length
                     Row(
                       children: [
-                        const Icon(Icons.work_outline,
-                            color: Colors.indigoAccent, size: 18),
+                        const Icon(
+                          Icons.work_outline,
+                          color: Colors.indigoAccent,
+                          size: 18,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -588,12 +651,17 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
                         color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildDateColumn("Start Date", item.startDate.toString()),
+                          _buildDateColumn(
+                            "Start Date",
+                            item.startDate.toString(),
+                          ),
                           _buildDateColumn("End Date", item.endDate.toString()),
                           //_buildDateColumn("In Time", "00:00"),
                           //_buildDateColumn("Out Time", "00:00"),
@@ -605,12 +673,15 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
 
                     /// Attachment Row
                     Visibility(
-                      visible: item.document != null &&
+                      visible:
+                          item.document != null &&
                           item.document.toString().isNotEmpty,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          "View Attachment".text.bold.color(Mythemes.lightBluishColor).make(),
+                          "View Attachment".text.bold
+                              .color(Mythemes.lightBluishColor)
+                              .make(),
                           IconButton(
                             tooltip: "View Attachment",
                             icon: const Icon(
@@ -618,15 +689,20 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
                               color: Colors.blueAccent,
                             ),
                             onPressed: () {
-                              print("Attachment tapped for ${item.employeeName}");
+                              print(
+                                "Attachment tapped for ${item.employeeName}",
+                              );
                               if (item.document != null &&
                                   item.document.toString().isNotEmpty) {
                                 showAttachmentBottomSheet(
-                                    context, item.document.toString());
+                                  context,
+                                  item.document.toString(),
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text("No attachment available")),
+                                    content: Text("No attachment available"),
+                                  ),
                                 );
                               }
                             },
@@ -644,7 +720,7 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
     );
   }
 
-  /// 🔹 Helper method for date columns
+  /// ðŸ”¹ Helper method for date columns
   Widget _buildDateColumn(String title, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -670,6 +746,3 @@ class _LevelTwoPendingLeaveState extends State<LevelTwoPendingLeave> with RouteA
     );
   }
 }
-
-
-

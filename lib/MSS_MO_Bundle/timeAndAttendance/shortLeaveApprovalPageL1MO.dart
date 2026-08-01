@@ -20,6 +20,7 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL1.dart';
 import '../../modules/timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
@@ -32,11 +33,12 @@ class ShortLeaveApprovalPageL1MO extends StatefulWidget {
   ShortLeaveApprovalPageL1MO(this.pendingRequisitionModel, this.itemCount);
 
   @override
-  State<ShortLeaveApprovalPageL1MO> createState() => _ShortLeaveApprovalPageL1MOState(
-      pendingRequisitionModel,itemCount);
+  State<ShortLeaveApprovalPageL1MO> createState() =>
+      _ShortLeaveApprovalPageL1MOState(pendingRequisitionModel, itemCount);
 }
 
-class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO> with RouteAware{
+class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
+    with RouteAware {
   PendingRequisitionModel pendingRequisitionModel;
   int itemCount;
   String? _group1SelectedValue;
@@ -59,8 +61,10 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
   String? actualOutTimeset;
   int? empId;
 
-
-  _ShortLeaveApprovalPageL1MOState(this.pendingRequisitionModel, this.itemCount);
+  _ShortLeaveApprovalPageL1MOState(
+    this.pendingRequisitionModel,
+    this.itemCount,
+  );
 
   @override
   void initState() {
@@ -73,46 +77,46 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
     userPanel = await shared!.getUserPanel();
     print("User Panel - $userPanel");
 
-    setState(() {
-
-    });
-    if(userPanel == "MSS") {
+    setState(() {});
+    if (userPanel == "MSS") {
       _inTimePicker = foundDataNewMO![itemCount].inTime.toString();
       print("Intime - $_inTimePicker");
       _outTimePicker = foundDataNewMO![itemCount].outTime.toString();
-      employeeNameset=foundDataNewMO![itemCount].empName.toString();
-      departmentset=foundDataNewMO![itemCount].department.toString();
-      branchNameset=foundDataNewMO![itemCount].branch.toString();
-      onDateset=foundDataNewMO![itemCount].onDate.toString();
-      updatedWorkHourSet=foundDataNewMO![itemCount].updatedWorkingHour.toString();
-      relaxationHourSet=foundDataNewMO![itemCount].relaxationHour.toString();
-      workingHrsSet=foundDataNewMO![itemCount].shiftWorkingHour.toString();
-      shortLeave= foundDataNewMO![itemCount].shortLeaveRequistionType;
+      employeeNameset = foundDataNewMO![itemCount].empName.toString();
+      departmentset = foundDataNewMO![itemCount].department.toString();
+      branchNameset = foundDataNewMO![itemCount].branch.toString();
+      onDateset = foundDataNewMO![itemCount].onDate.toString();
+      updatedWorkHourSet =
+          foundDataNewMO![itemCount].updatedWorkingHour.toString();
+      relaxationHourSet = foundDataNewMO![itemCount].relaxationHour.toString();
+      workingHrsSet = foundDataNewMO![itemCount].shiftWorkingHour.toString();
+      shortLeave = foundDataNewMO![itemCount].shortLeaveRequistionType;
       print("Short Leave Fields - $shortLeave");
-      actualTimeset= foundDataNewMO![itemCount].actualInTime;
-      inTimeReqset= foundDataNewMO![itemCount].inTime;
+      actualTimeset = foundDataNewMO![itemCount].actualInTime;
+      inTimeReqset = foundDataNewMO![itemCount].inTime;
       //inRemarkset= foundDataNewMO![itemCount].inRemarks;
-      actualOutTimeset= foundDataNewMO![itemCount].actualOutTime;
-      outTimeReqset= foundDataNewMO![itemCount].outTime;
+      actualOutTimeset = foundDataNewMO![itemCount].actualOutTime;
+      outTimeReqset = foundDataNewMO![itemCount].outTime;
       //outRemarkset= foundDataNewMO![itemCount].outRemarks;
       attReqId = foundDataNewMO![itemCount].requestId;
     } else {
       _inTimePicker = foundDataNewMO![itemCount].inTime.toString();
       _outTimePicker = foundDataNewMO![itemCount].outTime.toString();
-      employeeNameset=foundDataNewMO![itemCount].empName.toString();
-      departmentset=foundDataNewMO![itemCount].department.toString();
-      branchNameset=foundDataNewMO![itemCount].branch.toString();
-      onDateset=foundDataNewMO![itemCount].onDate.toString();
-      updatedWorkHourSet=foundDataNewMO![itemCount].updatedWorkingHour.toString();
-      relaxationHourSet=foundDataNewMO![itemCount].relaxationHour.toString();
-      workingHrsSet=foundDataNewMO![itemCount].shiftWorkingHour.toString();
-      shortLeave= foundDataNewMO![itemCount].shortLeaveRequistionType;
+      employeeNameset = foundDataNewMO![itemCount].empName.toString();
+      departmentset = foundDataNewMO![itemCount].department.toString();
+      branchNameset = foundDataNewMO![itemCount].branch.toString();
+      onDateset = foundDataNewMO![itemCount].onDate.toString();
+      updatedWorkHourSet =
+          foundDataNewMO![itemCount].updatedWorkingHour.toString();
+      relaxationHourSet = foundDataNewMO![itemCount].relaxationHour.toString();
+      workingHrsSet = foundDataNewMO![itemCount].shiftWorkingHour.toString();
+      shortLeave = foundDataNewMO![itemCount].shortLeaveRequistionType;
       print("Short Leave Fields - $shortLeave");
-      actualTimeset= foundDataNewMO![itemCount].actualInTime;
-      inTimeReqset= foundDataNewMO![itemCount].inTime;
+      actualTimeset = foundDataNewMO![itemCount].actualInTime;
+      inTimeReqset = foundDataNewMO![itemCount].inTime;
       //inRemarkset= foundDataNewMO![itemCount].inRemarks;
-      actualOutTimeset= foundDataNewMO![itemCount].actualOutTime;
-      outTimeReqset= foundDataNewMO![itemCount].outTime;
+      actualOutTimeset = foundDataNewMO![itemCount].actualOutTime;
+      outTimeReqset = foundDataNewMO![itemCount].outTime;
       //outRemarkset= foundDataNewMO![itemCount].outRemarks;
       attReqId = foundDataNewMO![itemCount].requestId;
     }
@@ -146,14 +150,17 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
   int? attReqId;
   var name = "Name";
 
-  static const WidgetStateProperty<Icon> thumbIcon = WidgetStateProperty<Icon>.fromMap(
-    <WidgetStatesConstraint, Icon>{
-      WidgetState.selected: Icon(Icons.check),
-      WidgetState.any: Icon(Icons.close),
-    },
-  );
+  static const WidgetStateProperty<Icon> thumbIcon =
+      WidgetStateProperty<Icon>.fromMap(<WidgetStatesConstraint, Icon>{
+        WidgetState.selected: Icon(Icons.check),
+        WidgetState.any: Icon(Icons.close),
+      });
 
-  Widget buildVerticalToggle(String title, bool value, ValueChanged<bool> onChanged) {
+  Widget buildVerticalToggle(
+    String title,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -202,42 +209,43 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
               padding: const EdgeInsets.only(top: 10.0),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 7,
-                  ),
+                  SizedBox(height: 7),
                   Row(
                     children: [
                       Expanded(
-                        child:  Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: branchNameset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: branchNameset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: branchNameset,
-                                labelText: "Branch Name",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: branchNameset,
+                              labelText: "Branch Name",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
                       ),
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: departmentset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: departmentset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: departmentset,
-                                labelText: "Department",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: departmentset,
+                              labelText: "Department",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
@@ -247,38 +255,37 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
                   Row(
                     children: [
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
-                            controller: TextEditingController(text: employeeNameset),
+                            style: TextStyle(fontSize: 14),
+                            controller: TextEditingController(
+                              text: employeeNameset,
+                            ),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: employeeNameset,
-                                labelText: "Employee Name",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: employeeNameset,
+                              labelText: "Employee Name",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
-
                       ),
                       Expanded(
-                        child:
-                        Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
-                            style:TextStyle(fontSize:14),
+                            style: TextStyle(fontSize: 14),
                             controller: TextEditingController(text: onDateset),
                             readOnly: true,
                             //initialValue: "${branchName}",
-                            decoration:  InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: onDateset,
-                                labelText: "On Date",
-                                labelStyle: TextStyle(fontSize: 15)
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 8.0),
+                              hintText: onDateset,
+                              labelText: "On Date",
+                              labelStyle: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
@@ -292,81 +299,47 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
-                              style:TextStyle(fontSize:14, color: Mythemes.successColor, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: actualTimeset),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Mythemes.successColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: TextEditingController(
+                                text: actualTimeset,
+                              ),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: actualTimeset,
-                                  labelText: "In Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: actualTimeset,
+                                labelText: "In Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
                         ),
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
-                              style:TextStyle(fontSize:14, color: Mythemes.warningColor, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: actualOutTimeset),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: actualOutTimeset,
-                                  labelText: "Out Time",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Mythemes.warningColor,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Visibility(
-                    visible: shortLeave == true,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: workingHrsSet),
-                              readOnly: true,
-                              //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: workingHrsSet,
-                                  labelText: "Actual Work Hours",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              controller: TextEditingController(
+                                text: actualOutTimeset,
                               ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child:
-                          Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: relaxationHourSet),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: relaxationHourSet,
-                                  labelText: "Short Leave Relaxation Hour",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: actualOutTimeset,
+                                labelText: "Out Time",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
@@ -380,19 +353,45 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
-                              style:TextStyle(fontSize:14, fontWeight: FontWeight.bold),
-                              controller: TextEditingController(text: updatedWorkHourSet),
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: TextEditingController(
+                                text: workingHrsSet,
+                              ),
                               readOnly: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: updatedWorkHourSet,
-                                  labelText: "Updated Work Hour",
-                                  labelStyle: TextStyle(fontSize: 15)
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: workingHrsSet,
+                                labelText: "Actual Work Hours",
+                                labelStyle: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: TextEditingController(
+                                text: relaxationHourSet,
+                              ),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: relaxationHourSet,
+                                labelText: "Short Leave Relaxation Hour",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
@@ -406,28 +405,59 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
                     child: Row(
                       children: [
                         Expanded(
-                          child:
-                          Padding(
+                          child: Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: TextFormField(
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              controller: TextEditingController(
+                                text: updatedWorkHourSet,
+                              ),
+                              readOnly: true,
+                              //initialValue: "${branchName}",
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: updatedWorkHourSet,
+                                labelText: "Updated Work Hour",
+                                labelStyle: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Visibility(
+                    visible: shortLeave == true,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
                               maxLines: 3,
-                              style:TextStyle(fontSize:14),
+                              style: TextStyle(fontSize: 14),
                               controller: inRemarkController,
                               enabled: true,
                               //initialValue: "${branchName}",
-                              decoration:  InputDecoration(
-                                  enabledBorder: UnderlineInputBorder( //<-- SEE HERE
-                                    borderSide: BorderSide(
-                                        width: 1, color: Mythemes.greyishade),
+                              decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                  //<-- SEE HERE
+                                  borderSide: BorderSide(
+                                    width: 1,
+                                    color: Mythemes.greyishade,
                                   ),
-                                  contentPadding: EdgeInsets.only(left: 8.0),
-                                  hintText: "Add Remark",
-                                  labelText: "Remarks",
-                                  labelStyle: TextStyle(fontSize: 15)
+                                ),
+                                contentPadding: EdgeInsets.only(left: 8.0),
+                                hintText: "Add Remark",
+                                labelText: "Remarks",
+                                labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
                           ),
-
                         ),
                       ],
                     ),
@@ -435,36 +465,45 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
 
                   Row(
                     children: [
-                      Expanded(child: ButtonBar(
+                      Expanded(
+                        child: ButtonBar(
                           alignment: MainAxisAlignment.center,
                           buttonPadding: Vx.mOnly(right: 16),
                           children: [
-
-
                             ElevatedButton(
                               onPressed: () {
-                                disapprovedRequisition(inRemarkController.text, attReqId);
+                                disapprovedRequisition(
+                                  inRemarkController.text,
+                                  attReqId,
+                                );
                               },
                               style: ButtonStyle(
-                                backgroundColor:
-                                MaterialStateProperty.all(Mythemes.dangerColorOne),
+                                backgroundColor: MaterialStateProperty.all(
+                                  Mythemes.dangerColorOne,
+                                ),
                               ),
                               child: "Disapprove".text.make(),
                             ).wh(150, 40).py12(),
                             ElevatedButton(
                               onPressed: () {
                                 print(inRemarkController.text);
-                                approvedRequisition(inRemarkController.text, attReqId);
+                                approvedRequisition(
+                                  inRemarkController.text,
+                                  attReqId,
+                                );
                               },
                               style: ButtonStyle(
-                                backgroundColor:
-                                MaterialStateProperty.all(Mythemes.successColor),
+                                backgroundColor: MaterialStateProperty.all(
+                                  Mythemes.successColor,
+                                ),
                               ),
                               child: "Approve".text.make(),
                             ).wh(150, 40).py12(),
-                          ]))
+                          ],
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -473,42 +512,47 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
           ),
         ),
 
-        bottomNavigationBar:
-        BottomNavigationBar (
+        bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: currentIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) {
-
-            if(index==0){
-
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
               //Navigator.pop(context);
               print('home tab');
             }
-            if(index==1){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Workflow');
             }
-            if(index==2){
+            if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               print('Attendance');
             }
-            if(index==3){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
               print('Dashboard');
             }
-            if(index==4){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePageNew())
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
               print('Profile');
@@ -519,10 +563,7 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
             setState(() => currentIndex = index);
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts_outlined),
               label: 'Workflow',
@@ -543,24 +584,22 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
             ),
           ],
         ),
-
       ),
     );
   }
-
-
-
 
   Future<void> approvedRequisition(String text, int? attReqId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListApprove;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "attReqId=$attReqId&"
-        "comment=$text&"
-        "status=LEVEL_ONE_PENDING");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "attReqId=$attReqId&"
+      "comment=$text&"
+      "status=LEVEL_ONE_PENDING",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -575,11 +614,9 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
       print('result both $result $reason');
       print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(
-            context, "$reason" + " ", "Success");
+        showDialgSucess1(context, "$reason" + " ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
-        showDialgSucess1(
-            context, reason.upperCamelCase, " Error ");
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
     }
   }
@@ -588,11 +625,13 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListDisapprove;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "attReqId=$attReqId&"
-        "comment=$text");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "attReqId=$attReqId&"
+      "comment=$text",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('URL ${response.request}');
     if (response.statusCode == 200) {
@@ -600,22 +639,28 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = "";
-      String body ="";
-      if(result.compareToIgnoringCase("success")==0){
-        showDialgSucess1(context, "Attendance Requisition has been Disapproved.", "Success");
-      }else{
-        showDialgSucess1(context, "Attendance Requisition has Not been Disapproved.", "Error");
+      String body = "";
+      if (result.compareToIgnoringCase("success") == 0) {
+        showDialgSucess1(
+          context,
+          "Attendance Requisition has been Disapproved.",
+          "Success",
+        );
+      } else {
+        showDialgSucess1(
+          context,
+          "Attendance Requisition has Not been Disapproved.",
+          "Error",
+        );
       }
     }
   }
 
-
   showDialgSucess1(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10.0),
-          )),
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
       title: Row(
         children: [
           //Icon(Icons.warning),
@@ -646,13 +691,13 @@ class _ShortLeaveApprovalPageL1MOState extends State<ShortLeaveApprovalPageL1MO>
       elevation: 24.0,
     );
     showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
   }
 }
-
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;

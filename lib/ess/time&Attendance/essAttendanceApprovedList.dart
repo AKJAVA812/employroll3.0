@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
@@ -23,11 +24,13 @@ import '../myAllReports.dart';
 
 class ESSAttApprovedRequisiton extends StatefulWidget {
   final ApprovedRequisitionModel approvedRequisitionModel;
-  ESSAttApprovedRequisiton (this.approvedRequisitionModel);
+  ESSAttApprovedRequisiton(this.approvedRequisitionModel);
 
   @override
-  State<ESSAttApprovedRequisiton> createState() => _ESSAttApprovedRequisitonState(approvedRequisitionModel);
+  State<ESSAttApprovedRequisiton> createState() =>
+      _ESSAttApprovedRequisitonState(approvedRequisitionModel);
 }
+
 Map<String, dynamic> mapResponse = {};
 
 SessionManager shared = SessionManager();
@@ -38,7 +41,8 @@ dynamic getProfileId;
 
 ApprovedRequisitionModel? approvedRequisitionLabel;
 
-class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> with RouteAware{
+class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton>
+    with RouteAware {
   final ApprovedRequisitionModel approvedRequisitionModel;
   _ESSAttApprovedRequisitonState(this.approvedRequisitionModel);
   @override
@@ -55,11 +59,10 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
 
   @override
   void didPopNext() {
-    // ✅ Called when coming back from Form Page
+    // âœ… Called when coming back from Form Page
     getSharedPrfanceList();
     super.didPopNext();
   }
-
 
   @override
   void initState() {
@@ -73,18 +76,20 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
     userPanelPerm = await shared!.getUserPanel();
     getProfileId = await shared!.getDefaultProfileId();
     // await Future.delayed(Duration(seconds: 5));
-    Future<ApprovedRequisitionModel> getAppReq11 = getApprovedReqList(sessionId!);
+    Future<ApprovedRequisitionModel> getAppReq11 = getApprovedReqList(
+      sessionId!,
+    );
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Login ... Please wait")
+        Text(" Login ... Please wait"),
       ],
     );
 
     getAppReq11.then((value) {
       setState(() {
-        approvedRequisitionLabel=value;
+        approvedRequisitionLabel = value;
       });
       print('employeeList00${approvedRequisitionLabel!.data!.length}');
     });
@@ -95,9 +100,11 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
     String apiUrl = ApiDetails.essAttendanceApprovedList;
     print('employeeList11: ${SessionId}');
     ApprovedRequisitionModel approvedRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('ESS Attendance Approved APIs - ${response.request}');
 
     print('responseemployeeList ${response.body}');
@@ -105,10 +112,11 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     print('responseemployeeList $getData');
-    approvedRequisitionModel=ApprovedRequisitionModel.fromJson(mapResponse);
+    approvedRequisitionModel = ApprovedRequisitionModel.fromJson(mapResponse);
 
     return approvedRequisitionModel;
   }
+
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 1;
@@ -118,19 +126,19 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
     return Scaffold(
       appBar: AppBar(
         title: "Approved Requisition List".text.make(),
-         leading: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            },
-            icon: Icon(Icons.arrow_back_ios)),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
+          },
+          icon: Icon(Icons.arrow_back_ios),
+        ),
         actions: [
           IconButton(
-              onPressed: () {
-                showSearch(
-                  context: context, delegate: SearchItems(),
-                );
-
-              }, icon: Icon(Icons.search))
+            onPressed: () {
+              showSearch(context: context, delegate: SearchItems());
+            },
+            icon: Icon(Icons.search),
+          ),
         ],
       ),
 
@@ -159,50 +167,61 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
                   styleAnimationType: AnimationType.onHover,
                   spacing: 10.0,
                   customSeparatorBuilder: (context, local, global) {
-                    final opacity =
-                    ((global.position - local.position).abs() - 0.5)
+                    final opacity = ((global.position - local.position).abs() -
+                            0.5)
                         .clamp(0.0, 1.0);
                     return VerticalDivider(
-                        indent: 10.0,
-                        endIndent: 10.0,
-                        color: Colors.white38.withOpacity(opacity));
+                      indent: 10.0,
+                      endIndent: 10.0,
+                      color: Colors.white38.withOpacity(opacity),
+                    );
                   },
                   customIconBuilder: (context, local, global) {
                     final text = const ['Pending', 'Approved'][local.index];
                     return Center(
-                        child: Text(text,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(Colors.black, Colors.white,
-                                    local.animationValue))));
+                      child: Text(
+                        text,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color.lerp(
+                            Colors.black,
+                            Colors.white,
+                            local.animationValue,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   borderWidth: 0.0,
                   onChanged: (i) {
                     setState(() {
                       value = i;
                       print(i);
-
                     });
 
-                    if(value == 0) {
+                    if (value == 0) {
                       Navigator.pushNamed(context, MyRoutings.pendingReqRoute);
                       //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                     }
-                    if(value == 1) {
-                      Navigator.pushNamed(context, MyRoutings.essAttendanceApprovedReq);
+                    if (value == 1) {
+                      Navigator.pushNamed(
+                        context,
+                        MyRoutings.essAttendanceApprovedReq,
+                      );
                     }
                     /*if(value == 2) {
                       Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
                     }*/
                   },
-                )
+                ),
               ],
             ).py(4),
             Expanded(
-                child: approvedRequisitionLabel == null ?
-                Center(
-                    child: CircularProgressIndicator()):
-                getAppRovedReqList(approvedRequisitionLabel!)),
+              child:
+                  approvedRequisitionLabel == null
+                      ? Center(child: CircularProgressIndicator())
+                      : getAppRovedReqList(approvedRequisitionLabel!),
+            ),
           ],
         ),
       ),
@@ -213,46 +232,63 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
         ),
         mini: false,
         onPressed: () async {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => GetAttendanceDet(showAppBar: true),
+            ),
+          );
         },
         backgroundColor: Mythemes.lightBluishColor,
-        child: Icon(Icons.add, color: Mythemes.whitish,),
+        child: Icon(Icons.add, color: Mythemes.whitish),
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
         unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
+            );
             //Navigator.pop(context);
             print('home tab');
           }
-          if(index==1){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 1),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Workflow');
           }
-          if(index==2){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GetAttendanceDet(showAppBar: true),
+              ),
+            );
             //Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
             print('My Requests');
           }
-          if(index==3){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyAllReportsPage(showAppBar: true),
+              ),
+            );
             print('My Reports');
           }
-          if(index==4){
+          if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
             print('Dashboard');
@@ -263,10 +299,7 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Workflow',
@@ -294,21 +327,22 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
     return RefreshIndicator(
       onRefresh: () {
         Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (a, b, c) =>
-                  ESSAttApprovedRequisiton(ApprovedRequisitionModel()),
-              transitionDuration: Duration(seconds: 1),
-              maintainState: true,
-            ));
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (a, b, c) =>
+                    ESSAttApprovedRequisiton(ApprovedRequisitionModel()),
+            transitionDuration: Duration(seconds: 1),
+            maintainState: true,
+          ),
+        );
         return Future.value(false);
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
         itemCount: approvedRequisitionModel!.data!.length,
         itemBuilder: (context, i) {
-          return
-          Card(
+          return Card(
             elevation: 3,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
@@ -318,7 +352,6 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   // ================= EMPLOYEE NAME + STATUS =================
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -331,17 +364,21 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
                           .make(),
 
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Mythemes.lightBluishColor.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: "Approved"
-                            .toString()
-                            .text
-                            .color(Mythemes.successColor)
-                            .bold
-                            .make(),
+                        child:
+                            "Approved"
+                                .toString()
+                                .text
+                                .color(Mythemes.successColor)
+                                .bold
+                                .make(),
                       ),
                     ],
                   ),
@@ -350,7 +387,11 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
                   // ================= DATE =================
                   Row(
                     children: [
-                      Icon(Icons.calendar_month, size: 18, color: Colors.grey.shade600),
+                      Icon(
+                        Icons.calendar_month,
+                        size: 18,
+                        color: Colors.grey.shade600,
+                      ),
                       const SizedBox(width: 6),
                       approvedRequisitionModel.data![i].onDate
                           .toString()
@@ -384,26 +425,39 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-
                       // ---------------- IN TIME ----------------
                       Column(
                         children: [
-                          Icon(Icons.touch_app,
-                              size: 32, color: Mythemes.lightBluishColor),
+                          Icon(
+                            Icons.touch_app,
+                            size: 32,
+                            color: Mythemes.lightBluishColor,
+                          ),
                           const SizedBox(height: 4),
                           "In Time".text.sm.make(),
-                          approvedRequisitionModel.data![i].inTime.toString().text.semiBold.make(),
+                          approvedRequisitionModel.data![i].inTime
+                              .toString()
+                              .text
+                              .semiBold
+                              .make(),
                         ],
                       ),
 
                       // ---------------- OUT TIME ----------------
                       Column(
                         children: [
-                          Icon(Icons.touch_app,
-                              size: 32, color: Mythemes.dangerColor),
+                          Icon(
+                            Icons.touch_app,
+                            size: 32,
+                            color: Mythemes.dangerColor,
+                          ),
                           const SizedBox(height: 4),
                           "Out Time".text.sm.make(),
-                          approvedRequisitionModel.data![i].outTime.toString().text.semiBold.make(),
+                          approvedRequisitionModel.data![i].outTime
+                              .toString()
+                              .text
+                              .semiBold
+                              .make(),
                         ],
                       ),
 
@@ -426,17 +480,13 @@ class _ESSAttApprovedRequisitonState extends State<ESSAttApprovedRequisiton> wit
             ),
           );
         },
-
       ),
     );
   }
 }
 
 class SearchItems extends SearchDelegate {
-
-  List<String> searchTerms = [
-
-  ];
+  List<String> searchTerms = [];
   // first overwrite to
   // clear the search text
   @override
@@ -461,6 +511,7 @@ class SearchItems extends SearchDelegate {
       icon: Icon(Icons.arrow_back),
     );
   }
+
   @override
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
@@ -473,12 +524,11 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
@@ -491,9 +541,7 @@ class SearchItems extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
+        return ListTile(title: Text(result));
       },
     );
   }

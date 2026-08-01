@@ -8,6 +8,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -41,7 +42,6 @@ var salarySlip;
 SalarySlipDownloadModal? salarySlipDownloadModalGlobal;
 
 class _SalarySlipDownloadState extends State<SalarySlipDownload> {
-
   Dio dio = Dio();
   var progress = 0;
   var timeString = "0.0";
@@ -67,7 +67,6 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
             print('Selected: $date');
             print(date);
           });
-
         },
       );
       salarySlip = "";
@@ -86,7 +85,6 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     // Register the callback for download progress
     FlutterDownloader.registerCallback(downloadCallback);*/
     //startDownloading();
-
   }
 
   void showCustomMonthPicker({
@@ -106,8 +104,18 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
       builder: (context) {
         int selectedYear = selected.year;
         List<String> months = [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
         ];
 
         return StatefulBuilder(
@@ -127,7 +135,10 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
                       ),
                       Text(
                         '$selectedYear',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.arrow_forward_ios),
@@ -148,19 +159,27 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
                     physics: const NeverScrollableScrollPhysics(),
                     childAspectRatio: 2.5,
                     children: List.generate(12, (index) {
-                      final isDisabled = selectedYear == now.year && index > now.month - 1;
+                      final isDisabled =
+                          selectedYear == now.year && index > now.month - 1;
                       return GestureDetector(
-                        onTap: isDisabled
-                            ? null
-                            : () {
-                          final selectedDate = DateTime(selectedYear, index + 1);
-                          Navigator.pop(context);
-                          onMonthSelected(selectedDate);
-                        },
+                        onTap:
+                            isDisabled
+                                ? null
+                                : () {
+                                  final selectedDate = DateTime(
+                                    selectedYear,
+                                    index + 1,
+                                  );
+                                  Navigator.pop(context);
+                                  onMonthSelected(selectedDate);
+                                },
                         child: Container(
                           margin: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: isDisabled ? Colors.grey[300] : Colors.blue[100],
+                            color:
+                                isDisabled
+                                    ? Colors.grey[300]
+                                    : Colors.blue[100],
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.blue),
                           ),
@@ -184,7 +203,6 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
       },
     );
   }
-
 
   ReceivePort receivePort = ReceivePort();
   dateSelection() async {
@@ -255,10 +273,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
               child: Container(
                 padding: const EdgeInsets.all(0), // Remove padding
                 margin: const EdgeInsets.all(0),
-                constraints: const BoxConstraints(
-                  maxWidth: 480,
-                  minWidth: 480,
-                ),
+                constraints: const BoxConstraints(maxWidth: 480, minWidth: 480),
                 child: child!,
               ),
             ),
@@ -275,7 +290,10 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     });
 
     // Register port with isolate for download progress communication
-    IsolateNameServer.registerPortWithName(receivePort.sendPort, "downloadingPdf");
+    IsolateNameServer.registerPortWithName(
+      receivePort.sendPort,
+      "downloadingPdf",
+    );
 
     // Listen to download progress
     receivePort.listen((message) {
@@ -290,30 +308,32 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     print(date);
   }
 
-
-
   @override
   void dispose() {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
-
   }
-  static downloadCallback(id, status, progress){
-    final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
+
+  static downloadCallback(id, status, progress) {
+    final SendPort? send = IsolateNameServer.lookupPortByName(
+      'downloader_send_port',
+    );
     send?.send([id, status, progress]);
-
   }
+
   Future getSharedPrfanceList() async {
     sessionId = await shared!.getSessionId();
     empId = await shared!.getEmpId();
     print('empId $empId');
     _getTime();
     print('TIME - $timeString');
-    Future<SalarySlipDownloadModal> getEmployeeList11 = getSalarySlip(sessionId!);
+    Future<SalarySlipDownloadModal> getEmployeeList11 = getSalarySlip(
+      sessionId!,
+    );
 
     getEmployeeList11.then((value) {
       setState(() {
-        salarySlipDownloadModalGlobal=value;
+        salarySlipDownloadModalGlobal = value;
         salarySlip = salarySlipDownloadModalGlobal!.salarySlip;
         print('salarySlip $salarySlip');
       });
@@ -321,42 +341,38 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
 
     final status = await Permission.storage.request();
     print('Status $status');
-
   }
-
 
   Future<SalarySlipDownloadModal> getSalarySlip(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.salarySlipDownload;
     print('employeeList11: ${SessionId}');
     SalarySlipDownloadModal salarySlipDownloadModal;
-    var urlapi = Uri.parse("$conn$apiUrl?"
-        "sessionId=$SessionId&"
-        "empId=$empId&"
-        "month=$selectedDate"
-
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$SessionId&"
+      "empId=$empId&"
+      "month=$selectedDate",
     );
-    final response = await http.get(urlapi);
+    final response = await MobileHttpClient.instance.get(urlapi);
     print('URL ${response.request}');
 
     setState(() {
       mapResponse = json.decode(response.body);
       var getData = mapResponse;
       print('My Salary Slip $getData');
-
     });
-    salarySlipDownloadModal=SalarySlipDownloadModal.fromJson(mapResponse);
+    salarySlipDownloadModal = SalarySlipDownloadModal.fromJson(mapResponse);
     salarySlip = salarySlipDownloadModal.salarySlip;
     print("Salary Slip Show - $salarySlip");
-    setState(() {
-
-    });
+    setState(() {});
     return salarySlipDownloadModal;
   }
 
   String _formatDateTime(DateTime dateTime) {
     return DateFormat('ss').format(dateTime);
   }
+
   void _getTime() {
     final DateTime now = DateTime.now();
     final String formattedDateTime = _formatDateTime(now);
@@ -365,7 +381,6 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
       timeString = formattedDateTime;
     });
   }
-
 
   /*void startDownloading() async {
      String url =
@@ -397,7 +412,8 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     final dir = await getExternalStorageDirectory();
     return "${dir!.path}/$filename";
   }
-  String singleDateString="";
+
+  String singleDateString = "";
   final TextEditingController _dateController = TextEditingController();
   String? selectedDate;
 
@@ -460,12 +476,12 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     }
 */
 
-
   Future<String> getDownloadDirectory() async {
     final directory = await getApplicationDocumentsDirectory();
     // You can also use getApplicationDocumentsDirectory() for the app's documents directory
     return directory!.path;
   }
+
   void findAndroidDataPath() async {
     final externalStorageDir = await getExternalStorageDirectory();
     final androidDataPath = '${externalStorageDir!.path}/Android/data/';
@@ -534,42 +550,44 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
 
   }*/
 
-
   void _downloadFile() async {
     String fileName = '$selectedDate' + "-" + "$timeString" + '.pdf';
     if (Platform.isAndroid) {
       print("I am Android");
       var storagePath = "/storage/emulated/0/Download/$fileName";
       var file = File(storagePath);
-      var res = await http.get(Uri.parse("$salarySlip"));
+      var res = await MobileHttpClient.instance.get(Uri.parse("$salarySlip"));
       await file.writeAsBytes(res.bodyBytes);
       Fluttertoast.showToast(
+        msg: "Download Completed - $fileName",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      _showNotification(storagePath, fileName);
+    } else if (Platform.isIOS) {
+      print("I am iOS");
+      final status =
+          await Permission.storage
+              .request(); // Use 'photos' permission as 'storage' is not available on iOS
+      if (status.isGranted) {
+        final downloadDir = await getDownloadDirectory();
+        final filePath = '$downloadDir/$fileName';
+        var file = File(filePath);
+        var res = await MobileHttpClient.instance.get(Uri.parse("$salarySlip"));
+        await file.writeAsBytes(res.bodyBytes);
+        Fluttertoast.showToast(
           msg: "Download Completed - $fileName",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.black,
           textColor: Colors.white,
-          fontSize: 16.0
-      );
-      _showNotification(storagePath, fileName);
-    } else if (Platform.isIOS) {
-      print("I am iOS");
-      final status = await Permission.storage.request(); // Use 'photos' permission as 'storage' is not available on iOS
-      if (status.isGranted) {
-        final downloadDir = await getDownloadDirectory();
-        final filePath = '$downloadDir/$fileName';
-        var file = File(filePath);
-        var res = await http.get(Uri.parse("$salarySlip"));
-        await file.writeAsBytes(res.bodyBytes);
-        Fluttertoast.showToast(
-            msg: "Download Completed - $fileName",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0);
+          fontSize: 16.0,
+        );
         _showNotification(filePath, fileName);
       } else {
         print('No permission granted');
@@ -583,7 +601,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
       print("I am Android");
       var storagePath = "/storage/emulated/0/Download/$fileName";
       var file = File(storagePath);
-      var res = await http.get(Uri.parse("$salarySlip"));
+      var res = await MobileHttpClient.instance.get(Uri.parse("$salarySlip"));
       file.writeAsBytes(res.bodyBytes);
       Fluttertoast.showToast(
           msg: "Download Completed - $fileName",
@@ -604,7 +622,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
         final downloadDir = await getApplicationDocumentsDirectory();
         final filePath = '${downloadDir.path}/$fileName';
         var file = File(filePath);
-        var res = await http.get(Uri.parse("$salarySlip"));
+        var res = await MobileHttpClient.instance.get(Uri.parse("$salarySlip"));
         await file.writeAsBytes(res.bodyBytes);
         Fluttertoast.showToast(
             msg: "Download Completed - $fileName",
@@ -619,7 +637,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
         print('No permission granted');
       }
     }
-    *//*else {
+    */ /*else {
       final status = await Permission.storage.request();
       if (status.isGranted) {
         final downloadDir = await getDownloadDirectory();
@@ -645,10 +663,8 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
       } else {
         print('no permission');
       }
-    }*//*
+    }*/ /*
   }*/
-
-
 
   /*void _showNotification(String filePath, String fileName) async {
     print("File Path - $filePath");
@@ -673,24 +689,30 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     );
   }*/
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   Future<void> _initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
-    final InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) async {
+      onDidReceiveNotificationResponse: (
+        NotificationResponse notificationResponse,
+      ) async {
         if (notificationResponse.payload != null) {
           _onNotificationTap(notificationResponse.payload!);
         }
@@ -703,17 +725,19 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
   }
 
   void _showNotification(String filePath, String fileName) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
-      channelDescription: 'your_channel_description',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-      icon: '@mipmap/ic_launcher',
-    );
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+          'your_channel_id',
+          'your_channel_name',
+          channelDescription: 'your_channel_description',
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: false,
+          icon: '@mipmap/ic_launcher',
+        );
 
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails();
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+        DarwinNotificationDetails();
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
@@ -729,7 +753,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
     );
   }
 
-/*  void _showNotification(String filePath, String fileName) async {
+  /*  void _showNotification(String filePath, String fileName) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'your_channel_id',
       'your_channel_name',
@@ -739,11 +763,11 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
       showWhen: false,
       icon: '@mipmap/ic_launcher',  // Specify the correct icon resource here
     );
-   *//* const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails();
+   */ /* const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails();
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
       iOS: iOSPlatformChannelSpecifics,
-    );*//*
+    );*/ /*
     // iOS notification details
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
     DarwinNotificationDetails();
@@ -799,78 +823,86 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
       appBar: AppBar(
         title: titleName.text.make(),
         actions: [
-          selectedDate == null ?
-          IconButton(
-              onPressed: () {
-                //dateSelection();
-                showCustomMonthPicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  onMonthSelected: (date) {
-                    setState(() {
-                      _dateController.text = DateFormat("MMMM-yy").format(date!);
-                      selectedDate = _dateController.text;
-                      print('MonthPicker $selectedDate');
-                      getSharedPrfanceList();
-                      print("New Get Salary - $salarySlip");
-                      print('Selected: $date');
-                      print(date);
-                    });
-
-                  },
-
-                );
-                salarySlip = "";
-              }, icon: Icon(Icons.date_range_rounded)) :
-          InkWell(
-            onTap: () {
-              //dateSelection();
-              showCustomMonthPicker(
-                context: context,
-                initialDate: DateTime.now(),
-                onMonthSelected: (date) {
-                  setState(() {
-                    _dateController.text = DateFormat("MMMM-yy").format(date!);
-                    selectedDate = _dateController.text;
-                    print('MonthPicker $selectedDate');
-                    getSharedPrfanceList();
-                    print("New Get Salary - $salarySlip");
-                    print('Selected: $date');
-                    print(date);
-                  });
+          selectedDate == null
+              ? IconButton(
+                onPressed: () {
+                  //dateSelection();
+                  showCustomMonthPicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    onMonthSelected: (date) {
+                      setState(() {
+                        _dateController.text = DateFormat(
+                          "MMMM-yy",
+                        ).format(date!);
+                        selectedDate = _dateController.text;
+                        print('MonthPicker $selectedDate');
+                        getSharedPrfanceList();
+                        print("New Get Salary - $salarySlip");
+                        print('Selected: $date');
+                        print(date);
+                      });
+                    },
+                  );
+                  salarySlip = "";
                 },
-              );
-              salarySlip = "";
-            },
-            child: "$selectedDate".text.lg.center.color(Mythemes.black).make().px8().py12(),
-          )
+                icon: Icon(Icons.date_range_rounded),
+              )
+              : InkWell(
+                onTap: () {
+                  //dateSelection();
+                  showCustomMonthPicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    onMonthSelected: (date) {
+                      setState(() {
+                        _dateController.text = DateFormat(
+                          "MMMM-yy",
+                        ).format(date!);
+                        selectedDate = _dateController.text;
+                        print('MonthPicker $selectedDate');
+                        getSharedPrfanceList();
+                        print("New Get Salary - $salarySlip");
+                        print('Selected: $date');
+                        print(date);
+                      });
+                    },
+                  );
+                  salarySlip = "";
+                },
+                child:
+                    "$selectedDate".text.lg.center
+                        .color(Mythemes.black)
+                        .make()
+                        .px8()
+                        .py12(),
+              ),
         ],
       ),
 
-      bottomNavigationBar:
-      BottomNavigationBar (
+      bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,
         iconSize: 25,
         selectedFontSize: 12,
-          unselectedFontSize: 10,
+        unselectedFontSize: 10,
         onTap: (index) {
-
-          if(index==0){
-
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomePage()));
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
             print('home tab');
           }
-          if(index==1){
+          if (index == 1) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             print('Dashboard');
           }
-          if(index==2){
+          if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             print('Attendance');
           }
-          if(index==3){
+          if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.documentsAddedRoute);
             print('e-Doc');
           }
@@ -880,10 +912,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
           setState(() => currentIndex = index);
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_customize),
             label: 'Dashboard',
@@ -901,16 +930,14 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
         ],
       ),
 
-      body: salarySlip == "" ? Center(
-        child: "Salary Not Released !!".text.make(),
-      ) :
-      PDF().cachedFromUrl(
-        '$salarySlip',
-        placeholder: (progress) => Center(child: Text('$progress %')),
-        errorWidget: (error) => Center(child: Text(error.toString())),
-      ),
-
-
+      body:
+          salarySlip == ""
+              ? Center(child: "Salary Not Released !!".text.make())
+              : PDF().cachedFromUrl(
+                '$salarySlip',
+                placeholder: (progress) => Center(child: Text('$progress %')),
+                errorWidget: (error) => Center(child: Text(error.toString())),
+              ),
 
       floatingActionButton: Visibility(
         visible: salarySlip != "",
@@ -926,24 +953,17 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const CircularProgressIndicator.adaptive(),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Text(
                     "Downloading: $downloadingprogress%",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 17),
                   ),
                 ],
               ),
             );
           },
           backgroundColor: Mythemes.lightBluishColor,
-          child: Icon(
-            Icons.download, color: Mythemes.whitish, size: 28,
-          ),
+          child: Icon(Icons.download, color: Mythemes.whitish, size: 28),
         ),
       ),
     );

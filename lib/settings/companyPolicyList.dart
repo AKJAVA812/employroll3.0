@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -14,7 +15,6 @@ import '../commanScreen/allAPIList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
 import 'modalClass/companyPolicyModal.dart';
-
 
 class Policy {
   final String uploadedFileName;
@@ -44,9 +44,11 @@ class Policy {
     );
   }
 }
+
 Map<String, dynamic> mapResponse = {};
 SessionManager shared = SessionManager();
 String? sessionId;
+
 class CompanyPoliciesPage extends StatefulWidget {
   const CompanyPoliciesPage({Key? key}) : super(key: key);
 
@@ -57,19 +59,17 @@ class CompanyPoliciesPage extends StatefulWidget {
 class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
   List<Policy> policies = [];
   bool isLoading = true;
-  List<AllPolicyList>? allUsernew=[];
-  List<AllPolicyList>? foundDataNew=[];
+  List<AllPolicyList>? allUsernew = [];
+  List<AllPolicyList>? foundDataNew = [];
   CompanyPolicyModal? companyPolicyGlobal;
   CompanyPolicyModal? companyPolicyGlobaled;
-
 
   @override
   void initState() {
     super.initState();
     //fetchPolicies();
     getSharedPrfanceList();
-    setState(() {
-    });
+    setState(() {});
   }
 
   Future getSharedPrfanceList() async {
@@ -78,8 +78,8 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
     getEmployeeList11.then((value) {
       setState(() {
         foundDataNew = allUsernew;
-        companyPolicyGlobal=value;
-        companyPolicyGlobaled=companyPolicyGlobal;
+        companyPolicyGlobal = value;
+        companyPolicyGlobaled = companyPolicyGlobal;
       });
       print('Policy list - ${companyPolicyGlobal!.allPolicyList!.length}');
     });
@@ -134,9 +134,10 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
 
     final jsonData = json.decode(jsonString);
     setState(() {
-      policies = (jsonData['orgPolicyList'] as List)
-          .map((policyJson) => Policy.fromJson(policyJson))
-          .toList();
+      policies =
+          (jsonData['orgPolicyList'] as List)
+              .map((policyJson) => Policy.fromJson(policyJson))
+              .toList();
       isLoading = false;
     });
   }
@@ -167,14 +168,13 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
     return Colors.teal;
   }
 
-
   Future<CompanyPolicyModal> getPolicies(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.companyPolicyApi;
     print('employeeList11: ${SessionId}');
     CompanyPolicyModal companyPolicyModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await http.post(urlapi);
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('URL ${response.request}');
 
     print('responseemployeeList ${response.body}');
@@ -182,7 +182,7 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
     mapResponse = json.decode(response.body);
     var getData = mapResponse['mappedData'];
     print('responseemployeeList $getData');
-    companyPolicyModal=CompanyPolicyModal.fromJson(mapResponse);
+    companyPolicyModal = CompanyPolicyModal.fromJson(mapResponse);
     allUsernew = companyPolicyModal.allPolicyList;
     isLoading = false;
     return companyPolicyModal;
@@ -190,7 +190,7 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
 
   void _runFilter(String enteredKeyword) {
     print('value$enteredKeyword');
-    List<AllPolicyList>?  results = [];
+    List<AllPolicyList>? results = [];
 
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
@@ -203,8 +203,14 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
         user!.data!.contains(enteredKeyword.toLowerCase()))
           .toList();*/
 
-      results = allUsernew?.where((element) =>
-          element.policyName!.toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+      results =
+          allUsernew
+              ?.where(
+                (element) => element.policyName!.toLowerCase().contains(
+                  enteredKeyword.toLowerCase(),
+                ),
+              )
+              .toList();
       /*for(int i=0; i<inductionListLabel!.data!.length;i++){
         if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
           // Refresh the UI
@@ -228,35 +234,40 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
         preferredSize: Size(double.infinity, 100),
         child: SafeArea(
           child: Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(
-                top: BorderSide.none
-            ), boxShadow: [
-              BoxShadow(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(top: BorderSide.none),
+              boxShadow: [
+                BoxShadow(
                   color: Colors.grey,
                   blurRadius: 0.5,
                   spreadRadius: 0,
-                  offset: Offset(0, 0.2))
-            ]),
-            child: AnimationSearchBar(
-                searchFieldDecoration: BoxDecoration(
-                  color: Mythemes.greyishade,
-                  borderRadius: BorderRadius.circular(20),
+                  offset: Offset(0, 0.2),
                 ),
-                backIcon: Icons.arrow_back_ios,
-                backIconColor: Mythemes.black,
-                textStyle: TextStyle(fontSize: 14),
-                onChanged: (value) {
-                  _runFilter(value);
-                },
-                horizontalPadding: 8,
-                searchIconColor: Mythemes.black,
-                centerTitle: titleName,
-                verticalPadding: 3,
-                centerTitleStyle: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
-                    color: Mythemes.black),
-                searchTextEditingController: searchType),
+              ],
+            ),
+            child: AnimationSearchBar(
+              searchFieldDecoration: BoxDecoration(
+                color: Mythemes.greyishade,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backIcon: Icons.arrow_back_ios,
+              backIconColor: Mythemes.black,
+              textStyle: TextStyle(fontSize: 14),
+              onChanged: (value) {
+                _runFilter(value);
+              },
+              horizontalPadding: 8,
+              searchIconColor: Mythemes.black,
+              centerTitle: titleName,
+              verticalPadding: 3,
+              centerTitleStyle: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w500,
+                color: Mythemes.black,
+              ),
+              searchTextEditingController: searchType,
+            ),
           ),
         ),
       ),
@@ -268,85 +279,104 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
             colors: [Colors.blue.shade50, Colors.white],
           ),
         ),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : foundDataNew!.isEmpty
-            ? const Center(child: Text('No policies available'))
-            : ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: foundDataNew!.length,
-          itemBuilder: (context, index) {
-            final policy = foundDataNew![index];
-            return Card(
-              elevation: 4,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          PdfViewerPage(policy: Policy(uploadedFileName: foundDataNew![index].uploadedFileName, policyName: foundDataNew![index].policyName, policyType: foundDataNew![index].policytype, description: foundDataNew![index].description, id: foundDataNew![index].id, docPath: foundDataNew![index].docPath)),
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Padding(
+        child:
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : foundDataNew!.isEmpty
+                ? const Center(child: Text('No policies available'))
+                : ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: _getPolicyColor(foundDataNew![index].policyName)
-                              .withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          _getPolicyIcon(foundDataNew![index].policyName),
-                          color: _getPolicyColor(foundDataNew![index].policyName),
-                          size: 30,
-                        ),
+                  itemCount: foundDataNew!.length,
+                  itemBuilder: (context, index) {
+                    final policy = foundDataNew![index];
+                    return Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              foundDataNew![index].policyName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => PdfViewerPage(
+                                    policy: Policy(
+                                      uploadedFileName:
+                                          foundDataNew![index].uploadedFileName,
+                                      policyName:
+                                          foundDataNew![index].policyName,
+                                      policyType:
+                                          foundDataNew![index].policytype,
+                                      description:
+                                          foundDataNew![index].description,
+                                      id: foundDataNew![index].id,
+                                      docPath: foundDataNew![index].docPath,
+                                    ),
+                                  ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              foundDataNew![index].policytype.toString(),
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade600,
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: _getPolicyColor(
+                                    foundDataNew![index].policyName,
+                                  ).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  _getPolicyIcon(
+                                    foundDataNew![index].policyName,
+                                  ),
+                                  color: _getPolicyColor(
+                                    foundDataNew![index].policyName,
+                                  ),
+                                  size: 30,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      foundDataNew![index].policyName,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      foundDataNew![index].policytype
+                                          .toString(),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.grey.shade400,
+                                size: 20,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.grey.shade400,
-                        size: 20,
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              ),
-            );
-          },
-        ),
       ),
     );
   }
@@ -368,7 +398,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   bool isDownloading = false;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
@@ -379,18 +409,19 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
   Future<void> _initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const DarwinInitializationSettings initializationSettingsIOS =
-    DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+        DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
-    final InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -413,31 +444,31 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
           );
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File not found')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('File not found')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error opening file: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error opening file: $e')));
     }
   }
 
   Future<void> _showNotification(String filePath, String fileName) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
-      'policy_download_channel',
-      'Policy Downloads',
-      channelDescription: 'Notifications for policy document downloads',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-      icon: '@mipmap/ic_launcher',
-    );
+        AndroidNotificationDetails(
+          'policy_download_channel',
+          'Policy Downloads',
+          channelDescription: 'Notifications for policy document downloads',
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: false,
+          icon: '@mipmap/ic_launcher',
+        );
 
     const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-    DarwinNotificationDetails();
+        DarwinNotificationDetails();
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
@@ -455,7 +486,9 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
   Future<void> _downloadAndSavePdf() async {
     try {
-      final response = await http.get(Uri.parse(widget.policy.docPath));
+      final response = await MobileHttpClient.instance.get(
+        Uri.parse(widget.policy.docPath),
+      );
       final bytes = response.bodyBytes;
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/${widget.policy.uploadedFileName}');
@@ -468,9 +501,9 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error downloading PDF: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error downloading PDF: $e')));
     }
   }
 
@@ -483,7 +516,9 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     });
 
     try {
-      final response = await http.get(Uri.parse(widget.policy.docPath));
+      final response = await MobileHttpClient.instance.get(
+        Uri.parse(widget.policy.docPath),
+      );
       final bytes = response.bodyBytes;
       String filePath;
 
@@ -492,7 +527,8 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
         if (!await downloadsDir.exists()) {
           await downloadsDir.create(recursive: true);
         }
-        filePath = '/storage/emulated/0/Download/${widget.policy.uploadedFileName}';
+        filePath =
+            '/storage/emulated/0/Download/${widget.policy.uploadedFileName}';
       } else if (Platform.isIOS) {
         final status = await Permission.storage.request();
         if (!status.isGranted) {
@@ -535,9 +571,9 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
       await _showNotification(filePath, widget.policy.uploadedFileName);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error downloading file: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error downloading file: $e')));
     } finally {
       setState(() {
         isDownloading = false;
@@ -559,19 +595,19 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               ? const Center(child: CircularProgressIndicator())
               : localPath != null
               ? PDFView(
-            key: ValueKey(widget.policy.id),
-            filePath: localPath!,
-            pageSnap: true,
-            enableSwipe: true,
-            swipeHorizontal: false,
-            autoSpacing: true,
-            pageFling: true,
-            onError: (error) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error loading PDF: $error')),
-              );
-            },
-          )
+                key: ValueKey(widget.policy.id),
+                filePath: localPath!,
+                pageSnap: true,
+                enableSwipe: true,
+                swipeHorizontal: false,
+                autoSpacing: true,
+                pageFling: true,
+                onError: (error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error loading PDF: $error')),
+                  );
+                },
+              )
               : const Center(child: Text('Failed to load PDF')),
           if (isDownloading)
             Center(
@@ -584,10 +620,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                     const SizedBox(height: 20),
                     Text(
                       'Downloading: ${(downloadProgress * 100).toInt()}%',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 17),
                     ),
                   ],
                 ),
@@ -595,17 +628,18 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
             ),
         ],
       ),
-      floatingActionButton: widget.policy.docPath.isNotEmpty
-          ? FloatingActionButton(
-        onPressed: _downloadFile,
-        backgroundColor: Colors.blue.shade700,
-        child: const Icon(
-          Icons.download,
-          color: Colors.white,
-          size: 28,
-        ),
-      )
-          : null,
+      floatingActionButton:
+          widget.policy.docPath.isNotEmpty
+              ? FloatingActionButton(
+                onPressed: _downloadFile,
+                backgroundColor: Colors.blue.shade700,
+                child: const Icon(
+                  Icons.download,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              )
+              : null,
     );
   }
 }
