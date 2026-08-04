@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "653851260783",
+    "project_id": "pushnotificationsnew-27533",
+    "storage_bucket": "pushnotificationsnew-27533.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:653851260783:android:522990c0b37b1319635a9a",
+        "android_client_info": {
+          "package_name": "com.erzone.employroll"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6FdQt15bb8zwfB0ofqeXCxff_RsBkFBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

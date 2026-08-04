@@ -1,0 +1,593 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:velocity_x/velocity_x.dart';
+import '../../../../commanScreen/allAPIList.dart';
+import '../../../../commanScreen/commanNotificationPage.dart';
+import '../../../../sharedPrefancePage/ShardPre.dart';
+import '../../../../themes/empThemes.dart';
+import 'package:er_flutter_project/services/mobile_http_client.dart';
+
+import '../../../MSS_Bundle/leaveManagement/levelOneLeaveReq.dart';
+import '../../../adminPage/modelClass/dashboardModel.dart';
+import '../../../adminPage/mssDashboard.dart';
+import '../../../commanScreen/homePage.dart';
+import '../../../commanScreen/punchInOutScreen.dart';
+import '../../../commanScreen/routes.dart';
+import '../../../profiles/profilePageWithHead.dart';
+import 'modalClass/levelOnePendingLeaveModal.dart';
+
+class LevelOnePendingApproval extends StatefulWidget {
+  LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
+  int itemCount;
+
+  LevelOnePendingApproval(this.pendingLeaveRequisitionModal, this.itemCount);
+
+  @override
+  State<LevelOnePendingApproval> createState() =>
+      _LevelOnePendingApprovalState(pendingLeaveRequisitionModal, itemCount);
+}
+
+var userPanelPermissions;
+
+class _LevelOnePendingApprovalState extends State<LevelOnePendingApproval> {
+  LevelOnePendingLeaveModal? pendingLeaveRequisitionModal;
+  int itemCount;
+  _LevelOnePendingApprovalState(
+    this.pendingLeaveRequisitionModal,
+    this.itemCount,
+  );
+  var titleName = "Level One Approval";
+  int pageIndex = 0;
+  int currentIndex = 2;
+  @override
+  Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    return DismissKeyboard(
+      child: Scaffold(
+        appBar: AppBar(title: titleName.text.make(), elevation: 0.5),
+        body: Container(
+          height: height,
+          color: Mythemes.whitish,
+          child: SingleChildScrollView(
+            child: PendingLeaveApprovalDisapproval(
+              pendingLeaveRequisitionModal!,
+              itemCount,
+            ),
+          ),
+        ),
+
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: currentIndex,
+          iconSize: 25,
+          selectedFontSize: 12,
+          unselectedFontSize: 10,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
+              //Navigator.of(context, rootNavigator: true).pop();
+              print('home tab');
+            }
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              );
+              //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
+              print('Workflow');
+            }
+            if (index == 2) {
+              Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
+              print('Leave');
+            }
+            if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MSSDashboard(DashboardModel()),
+                ),
+              );
+              //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
+              print('Dashboard');
+            }
+            if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePageNew()),
+              );
+              //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
+              print('Profile');
+            }
+            /*if(index==3){
+                title="Notifications";
+              }*/
+            setState(() => currentIndex = index);
+          },
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.manage_accounts_outlined),
+              label: 'Workflow',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.group_off),
+              label: 'Leave',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_customize),
+              label: 'Dashboard',
+              //backgroundColor: Colors.blue,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle),
+              label: 'Profile',
+              //backgroundColor: Colors.blue,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PendingLeaveApprovalDisapproval extends StatefulWidget {
+  LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
+  int itemCount;
+
+  PendingLeaveApprovalDisapproval(
+    this.pendingLeaveRequisitionModal,
+    this.itemCount,
+  );
+
+  @override
+  State<PendingLeaveApprovalDisapproval> createState() =>
+      _PendingLeaveApprovalDisapprovalState(
+        pendingLeaveRequisitionModal,
+        itemCount,
+      );
+}
+
+class _PendingLeaveApprovalDisapprovalState
+    extends State<PendingLeaveApprovalDisapproval> {
+  LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
+  int itemCount;
+  _PendingLeaveApprovalDisapprovalState(
+    this.pendingLeaveRequisitionModal,
+    this.itemCount,
+  );
+  SessionManager shared = SessionManager();
+  Map<String, dynamic> mapResponse = {};
+  String? sessionId;
+  String? leaveType = "Sick Leave";
+  var lBalance;
+  String? branchName;
+  String? department;
+  String? empName;
+  String? applicationDate;
+  String? fromDate;
+  String? toDate;
+  String? reqRemarks;
+  String? approvalRemarks;
+  int? leaveReqId;
+  String? status;
+  var approved = "APPROVED";
+  var key = "";
+  var disapproved = "DISAPPROVED";
+  var comment = "Comments";
+  late var result;
+  final TextEditingController _commentController = TextEditingController();
+
+  var getComment;
+  @override
+  void initState() {
+    leaveType = foundDataNewMSSL1![itemCount].leaveType;
+    branchName = foundDataNewMSSL1![itemCount].branchName;
+    lBalance = foundDataNewMSSL1![itemCount].totalLeave;
+    department = foundDataNewMSSL1![itemCount].department;
+    empName = foundDataNewMSSL1![itemCount].employeeName;
+    applicationDate = foundDataNewMSSL1![itemCount].applicationDate;
+    fromDate = foundDataNewMSSL1![itemCount].startDate;
+    toDate = foundDataNewMSSL1![itemCount].endDate;
+    reqRemarks = foundDataNewMSSL1![itemCount].summary;
+    leaveReqId = foundDataNewMSSL1![itemCount].reqId;
+    status = foundDataNewMSSL1![itemCount].status;
+    getSharedPrfanceList();
+    //getComment = _commentController;
+    super.initState();
+  }
+
+  Future getSharedPrfanceList() async {
+    sessionId = await shared.getSessionId();
+    userPanelPermissions = await shared.getUserPanel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: leaveType),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: leaveType,
+                      labelText: "Leave Type",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: "$lBalance"),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: "$lBalance",
+                      labelText: "Leave Balance",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: branchName),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: branchName,
+                      labelText: "Branch Name",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: department),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: department,
+                      labelText: "Department",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: empName),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: empName,
+                      labelText: "Employee Name",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: applicationDate),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: applicationDate,
+                      labelText: "Application Date",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: fromDate),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: fromDate,
+                      labelText: "From Date",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: toDate),
+                    readOnly: true,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: toDate,
+                      labelText: "To Date",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: TextEditingController(text: reqRemarks),
+                    readOnly: true,
+                    maxLines: 3,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      enabled: false,
+                      hintText: reqRemarks,
+                      labelText: "Requisition Remarks",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    style: TextStyle(fontSize: 14),
+                    controller: _commentController,
+                    maxLines: 3,
+                    //initialValue: "${branchName}",
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 8.0),
+                      hintText: approvalRemarks,
+                      labelText: "Approval Remarks",
+                      labelStyle: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: ButtonBar(
+                  alignment: MainAxisAlignment.center,
+                  buttonPadding: Vx.mOnly(right: 16),
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        key = "DISAPPROVED";
+                        disApproveLeaveRequisition(
+                          _commentController.text,
+                          leaveReqId,
+                        );
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.dangerColorOne,
+                        ),
+                      ),
+                      child: "Disapprove".text.make(),
+                    ).wh(150, 40).py12(),
+                    ElevatedButton(
+                      onPressed: () {
+                        key = "APPROVED";
+                        approveLeaveRequisition(
+                          _commentController.text,
+                          leaveReqId,
+                        );
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          Mythemes.successColor,
+                        ),
+                      ),
+                      child: "Approve".text.make(),
+                    ).wh(150, 40).py12(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> approveLeaveRequisition(
+    String getComment,
+    int? leaveReqId,
+  ) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.leaveApprovalLevel1Api;
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "leavereqid=$leaveReqId&"
+      "status=$key&"
+      "comment=$getComment",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
+    print('URL ${response.request}');
+    if (response.statusCode == 200) {
+      var responseResult = response.body;
+      print('success $responseResult');
+      Navigator.of(context, rootNavigator: true).pop();
+      mapResponse = json.decode(response.body);
+      dynamic result = mapResponse['result']['result'];
+      dynamic reason = mapResponse['result']['reason'];
+      print('result both $result $reason');
+      print('result${result}');
+      if (result.toString().toLowerCase() == "success") {
+        showDialgSucess1(context, reason + " ", "Success");
+      } else if (result.toString().toLowerCase() == "error") {
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
+      } else if (result.toString().toLowerCase() == "null") {
+        showDialgSucess1(context, "Some Error Occurred !", " Error ");
+      }
+    }
+  }
+
+  Future<void> disApproveLeaveRequisition(
+    String getComment,
+    int? leaveReqId,
+  ) async {
+    String conn = ApiDetails.server;
+    String apiUrl = ApiDetails.leaveApprovalLevel1Api;
+    CommonNotificationPage.showLoaderDialog(context);
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?"
+      "sessionId=$sessionId&"
+      "leavereqid=$leaveReqId&"
+      "status=$key&"
+      "comment=$getComment",
+    );
+    final response = await MobileHttpClient.instance.post(urlapi);
+    print('URL ${response.request}');
+    if (response.statusCode == 200) {
+      var responseResult = response.body;
+      print('success $responseResult');
+      Navigator.of(context, rootNavigator: true).pop();
+      mapResponse = json.decode(response.body);
+      String result = mapResponse['result']['result'];
+      String reason = mapResponse['result']['reason'];
+      print('result both $result $reason');
+      print('result${result}');
+      if (result.compareToIgnoringCase("success") == 0) {
+        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+      } else if (result.compareToIgnoringCase("error") == 0) {
+        showDialgSucess1(context, reason.upperCamelCase, " Error ");
+      }
+    }
+  }
+
+  showDialgSucess1(BuildContext buildContext, result, alert) {
+    var alertDialog = AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
+      title: Row(
+        children: [
+          //Icon(Icons.warning),
+          Expanded(child: Text(alert)),
+        ],
+      ),
+      content: Text(result),
+      titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      actions: [
+        TextButton(
+          onPressed: () {
+            /*Navigator.pop(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (a, b, c) =>
+                      LevelOnePendingLeave(LevelOnePendingLeaveModal()),
+                  transitionDuration: Duration(seconds: 1),
+                  maintainState: true,
+                ));*/
+            Navigator.of(context, rootNavigator: true).pop();
+            Navigator.pushNamed(buildContext, MyRoutings.levelOnePendingRoute);
+          },
+          child: Text("Ok"),
+        ),
+      ],
+      elevation: 24.0,
+    );
+    showDialog(
+      context: buildContext,
+      builder: (BuildContext context) {
+        return alertDialog;
+      },
+    );
+  }
+}
+
+class DismissKeyboard extends StatelessWidget {
+  final Widget child;
+  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus &&
+            currentFocus.focusedChild != null) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        }
+      },
+      child: child,
+    );
+  }
+}
