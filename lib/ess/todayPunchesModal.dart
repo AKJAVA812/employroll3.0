@@ -7,13 +7,13 @@ class TodayPunchesModal {
     if (json['data'] != null) {
       data = <TodayData>[];
       json['data'].forEach((v) {
-        data!.add(new TodayData.fromJson(v));
+        data!.add(TodayData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -59,7 +59,7 @@ class TodayData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['dt'] = this.dt;
     data['punchType'] = this.punchType;
     data['attMode'] = this.attMode;

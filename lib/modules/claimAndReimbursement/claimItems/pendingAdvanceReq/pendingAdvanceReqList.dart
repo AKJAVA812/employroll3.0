@@ -5,11 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/pendingAdvanceReq/pendingAdvReqAppDis.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../commanScreen/routes.dart';
 import '../../../../main.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
@@ -70,7 +67,7 @@ class _PendingAdvanceReqListState extends State<PendingAdvanceReqList>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingAdvReqListModal> getAppReq11 = getPendingAdvReqList(
       sessionId!,

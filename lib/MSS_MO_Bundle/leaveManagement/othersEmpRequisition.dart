@@ -5,17 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:intl/intl.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
-import '../../../../employeePage/employeeListModel.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../main.dart';
@@ -148,7 +142,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
   bool isLoading = false;
 
   Future getSharedPrfanceLists() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(
       sessionId!,
@@ -332,9 +326,9 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
 
                           // Now perform async logic
 
-                          sessionId = await shared!.getSessionId();
-                          userPanel = await shared!.getUserPanel();
-                          getProfileId = await shared!.getDefaultProfileId();
+                          sessionId = await shared.getSessionId();
+                          userPanel = await shared.getUserPanel();
+                          getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           print("ORG ID - $getOrgId");
                           Future<RequistionEmpListModel> getEmployeeList11 =
@@ -620,7 +614,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                 DateTime? fromDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 fromDate = await showDatePicker(
                                   context: context,
@@ -679,7 +673,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                 DateTime? toDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 toDate = await showDatePicker(
                                   context: context,
@@ -740,7 +734,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                               onTap: () async {
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
                                 //_openInTimepicker(context);
                                 final TimeOfDay? n = await showTimePicker(
                                   context: context,
@@ -765,7 +759,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                     now.month,
                                     now.day,
                                     n!.hour,
-                                    n!.minute,
+                                    n.minute,
                                   );
                                   var nT = DateFormat('HH:mm').format(newt);
                                   print(DateFormat('HH:mm').format(newt));
@@ -810,7 +804,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                               onTap: () async {
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
                                 //_openInTimepicker(context);
                                 final TimeOfDay? o = await showTimePicker(
                                   context: context,
@@ -835,7 +829,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                     now.month,
                                     now.day,
                                     o!.hour,
-                                    o!.minute,
+                                    o.minute,
                                   );
                                   var ot = DateFormat('HH:mm').format(newt);
                                   print(DateFormat('HH:mm').format(newt));

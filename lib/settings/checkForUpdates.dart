@@ -33,7 +33,6 @@ class _UpdateCheckerState extends State<UpdateChecker> {
     final storeVersion = upgrader.currentAppStoreVersion;
 
     if (storeVersion != null &&
-        currentVersion != null &&
         storeVersion != currentVersion) {
       setState(() {
         _updateAvailable = true;

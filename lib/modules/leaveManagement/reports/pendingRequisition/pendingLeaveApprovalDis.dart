@@ -1,10 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/modules/leaveManagement/reports/pendingRequisition/pendingRequisitionList.dart';
 import 'package:er_flutter_project/MSS_MO_Bundle/leaveManagement/pendingRequisitionList.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
-import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../MSS_Bundle/leaveManagement/pendingRequisitionList.dart';
 import '../../../../UIS_Bundle/leaveManagement/pendingRequisitionList.dart';
@@ -18,7 +15,6 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../modalClass/pendingLeaveRequisitionModal.dart';
@@ -234,8 +230,8 @@ class _PendingLeaveApprovalDisapprovalState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanelPermissions = await shared!.getUserPanel();
+    sessionId = await shared.getSessionId();
+    userPanelPermissions = await shared.getUserPanel();
     if (userPanelPermissions == "MSS") {
       leaveType = foundDataNewMSS![itemCount].leaveType;
       lBalance = foundDataNewMSS![itemCount].totalLeave;

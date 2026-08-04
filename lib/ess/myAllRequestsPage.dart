@@ -1,35 +1,17 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:math';
 import 'package:er_flutter_project/ess/myAllReports.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'dart:convert' show utf8;
-import '../adminPage/modelClass/dashboardModel.dart';
-import '../adminPage/mssDashboard.dart';
 import '../commanScreen/homePage.dart';
 import '../commanScreen/punchInOutScreen.dart';
-import '../main.dart';
-import '../modules/onDuty/reports/selfRequisition/selfOdRequisitionList.dart';
 import '../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
-import '../profiles/profilePageWithHead.dart';
 import '../sharedPrefancePage/ShardPre.dart';
-import '../singUP/model/loginModel.dart';
-import '../widgets/drawer_file.dart';
 import 'dart:io';
-import 'package:path/path.dart';
-import 'myAllReports.dart';
 import 'EssDashboarrddModel.dart';
 import 'essDashboardNavigate.dart';
 
@@ -86,15 +68,15 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
   }*/
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userType = await shared!.getUserType();
+    sessionId = await shared.getSessionId();
+    userType = await shared.getUserType();
     setState(() {});
     print("User Type - $userType");
-    setShowPayroll = await shared!.getShowPayroll();
-    orgId = await shared!.getOrgId();
-    emailId = await shared!.getEmailId();
-    empIdNew = await shared!.getEmpId();
-    orgName = await shared!.getOrgName();
+    setShowPayroll = await shared.getShowPayroll();
+    orgId = await shared.getOrgId();
+    emailId = await shared.getEmailId();
+    empIdNew = await shared.getEmpId();
+    orgName = await shared.getOrgName();
     empRoles = await shared.getEmpRoll();
     roRoles = await shared.getRoRole();
     adminRoles = await shared.getAdminRole();

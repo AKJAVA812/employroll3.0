@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:er_flutter_project/adminPage/modelClass/eventListModal.dart';
-import 'package:er_flutter_project/commanScreen/homePage.dart';
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:er_flutter_project/ess/EventsListModal.dart';
 import 'package:er_flutter_project/ess/Model/absentEmpList.dart';
@@ -27,22 +26,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import 'dart:developer' as developer;
 
-import '../adminPage/modelClass/dashboardModel.dart';
-import '../adminPage/mssDashboard.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../commanScreen/routes.dart';
 import '../modules/timeAndAttendance/calendarPage/attendanceRequetCalendar.dart';
-import '../modules/timeAndAttendance/reports/attendanceRequisition/attendanceRequisition.dart';
-import '../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
-import '../modules/timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 import '../modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
-import '../profiles/profilePageWithHead.dart';
 import 'Model/calendarModalClass.dart';
 import 'Model/holidaylistEssModal.dart';
 import 'myAllReports.dart';
@@ -86,8 +78,8 @@ var shift = 0;
 var singleDateString;
 var todayDateFetch;
 var eventSingleDateString;
-var day = new DateTime.now();
-var single = new DateFormat('dd');
+var day = DateTime.now();
+var single = DateFormat('dd');
 var singleDay = single.format(day);
 bool isLoading = true;
 bool isLoadingEvent = true;
@@ -1172,13 +1164,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             margin: EdgeInsets.all(8),
             child: CircularProgressIndicator(),
           ),
-          new Text("Please Wait...", style: TextStyle(fontSize: 20)),
+          Text("Please Wait...", style: TextStyle(fontSize: 20)),
         ],
       ),
     );
   }
 
-  static Widget _eventIcon = new Container(
+  static Widget _eventIcon = Container(
     decoration: BoxDecoration(
       //color: Colors.transparent,
       borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -1186,7 +1178,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     ),
   );
 
-  EventList<Event> _markedDateMap = new EventList<Event>(
+  EventList<Event> _markedDateMap = EventList<Event>(
     events: {
       /*new DateTime(2024, 2, 1): [
         new Event(
@@ -3252,7 +3244,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
         print("Cycle Start: $cycleStart");
         print("Cycle End:   $cycleEnd");
-        if (lockDateStr != null && lockDateStr.trim().isNotEmpty) {
+        if (lockDateStr.trim().isNotEmpty) {
           // Convert String â†’ DateTime
           DateTime lockDateTime = DateFormat(
             "dd-MM-yyyy hh:mm",
@@ -3336,7 +3328,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           MaterialPageRoute(
             builder:
                 (context) => AttendanceRequisitionCalendar(
-                  new AttendanceReportModel(),
+                  AttendanceReportModel(),
                   calendarSendData,
                   0,
                   "$formattedDate",
@@ -3481,7 +3473,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               left: 16.0,
               right: 16.0,
             ),
-            child: new Row(
+            child: Row(
               children: <Widget>[
                 Expanded(
                   child: Text(

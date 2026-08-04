@@ -1,4 +1,3 @@
-import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/advanceRequisition/advanceRequisitionList.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,7 +11,6 @@ import '../../../ess/essDashboardNavigate.dart';
 import '../../../main.dart';
 import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
-import 'modalClass/advanceRequisitionListModal.dart';
 
 
 class ClaimItemsList extends StatefulWidget {
@@ -69,15 +67,15 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
-    claimLevelOneMSS = await shared!.getClaimLevelOne();
-    claimLevelTwoMSS = await shared!.getClaimLevelTwo();
-    claimLevelThreeMSS = await shared!.getClaimLevelThree();
-    claimLevelOneMO = await shared!.getClaimLevelOneMO();
-    claimLevelTwoMO = await shared!.getClaimLevelTwoMO();
-    claimLevelThreeMO = await shared!.getClaimLevelThreeMO();
-    claimLevelOneUIS = await shared!.getClaimLevelOneUIS();
-    claimLevelTwoUIS = await shared!.getClaimLevelTwoUIS();
-    claimLevelThreeUIS = await shared!.getClaimLevelThreeUIS();
+    claimLevelOneMSS = await shared.getClaimLevelOne();
+    claimLevelTwoMSS = await shared.getClaimLevelTwo();
+    claimLevelThreeMSS = await shared.getClaimLevelThree();
+    claimLevelOneMO = await shared.getClaimLevelOneMO();
+    claimLevelTwoMO = await shared.getClaimLevelTwoMO();
+    claimLevelThreeMO = await shared.getClaimLevelThreeMO();
+    claimLevelOneUIS = await shared.getClaimLevelOneUIS();
+    claimLevelTwoUIS = await shared.getClaimLevelTwoUIS();
+    claimLevelThreeUIS = await shared.getClaimLevelThreeUIS();
 
     userPanelPermission= await shared.getUserPanel();
     print("User Panel - $userPanelPermission");

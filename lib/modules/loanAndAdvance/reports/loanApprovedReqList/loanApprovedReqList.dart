@@ -1,17 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../main.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import '../modalClass/loanAdvanceReqModal.dart';
 import '../modalClass/loanApprovedListModal.dart';
 
 class LoanApprovedReqList extends StatefulWidget {
@@ -64,7 +59,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<LoanApprovedReqModal> getAppReq11 = getLoanAppReqList(sessionId!);
     final loading = Row(
@@ -144,7 +139,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: loanApprovedReqModal!.loanAppReqDatalist!.length,
+        itemCount: loanApprovedReqModal.loanAppReqDatalist!.length,
         itemBuilder: (context, i) {
           return InkWell(
             onTap: () {},
@@ -155,7 +150,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
                   children: [
                     Row(
                       children: [
-                        loanApprovedReqModal!
+                        loanApprovedReqModal
                             .loanAppReqDatalist![i]
                             .empName!
                             .text
@@ -167,7 +162,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              loanApprovedReqModal!
+                              loanApprovedReqModal
                                   .loanAppReqDatalist![i]
                                   .status!
                                   .text
@@ -182,7 +177,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
                     ),
                     Row(
                       children: [
-                        loanApprovedReqModal!
+                        loanApprovedReqModal
                             .loanAppReqDatalist![i]
                             .loanType!
                             .text
@@ -192,7 +187,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
                     ).py2(),
                     Row(
                       children: [
-                        loanApprovedReqModal!
+                        loanApprovedReqModal
                             .loanAppReqDatalist![i]
                             .loanRaiseDate!
                             .text
@@ -208,7 +203,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              loanApprovedReqModal!
+                              loanApprovedReqModal
                                   .loanAppReqDatalist![i]
                                   .remark!
                                   .text
@@ -227,7 +222,7 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              loanApprovedReqModal!
+                              loanApprovedReqModal
                                   .loanAppReqDatalist![i]
                                   .loanAppAmt!
                                   .text

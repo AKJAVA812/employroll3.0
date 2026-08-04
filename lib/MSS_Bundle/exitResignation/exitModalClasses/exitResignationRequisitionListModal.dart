@@ -9,13 +9,13 @@ class ExitResignationRquisitionListModal {
     if (json['data'] != null) {
       data = <ListData>[];
       json['data'].forEach((v) {
-        data!.add(new ListData.fromJson(v));
+        data!.add(ListData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['orgName'] = this.orgName;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
@@ -95,7 +95,7 @@ class ListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['resignDate'] = this.resignDate;
     data['lastWorkingDate'] = this.lastWorkingDate;

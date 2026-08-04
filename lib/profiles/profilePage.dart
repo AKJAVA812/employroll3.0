@@ -34,8 +34,8 @@ class _ProfilePageState extends State<ProfilePage> {
     dateOfBirth = await shared.getDob();
     mobileNo = await shared.getMobileNo();
     designation = await shared.getDesignation();
-    paycode = await shared!.getEnrollId();
-    orgId = await shared!.getOrgId();
+    paycode = await shared.getEnrollId();
+    orgId = await shared.getOrgId();
     if (dateOfBirth.isNotEmpty) {
       try {
         String formattedDate = DateFormat(

@@ -7,13 +7,13 @@ class OrganisationListModal {
     if (json['list'] != null) {
       list = <OrgList>[];
       json['list'].forEach((v) {
-        list!.add(new OrgList.fromJson(v));
+        list!.add(OrgList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.list != null) {
       data['list'] = this.list!.map((v) => v.toJson()).toList();
     }
@@ -35,7 +35,7 @@ class OrgList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['orgName'] = this.orgName;
     data['displayName'] = this.displayName;
     data['id'] = this.id;

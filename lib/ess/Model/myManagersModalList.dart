@@ -16,37 +16,37 @@ class MyManagersModalList {
     if (json['dottedEmpList'] != null) {
       dottedEmpList = <DottedEmpList>[];
       json['dottedEmpList'].forEach((v) {
-        dottedEmpList!.add(new DottedEmpList.fromJson(v));
+        dottedEmpList!.add(DottedEmpList.fromJson(v));
       });
     }
     if (json['sharedEmpList'] != null) {
       sharedEmpList = <SharedEmpList>[];
       json['sharedEmpList'].forEach((v) {
-        sharedEmpList!.add(new SharedEmpList.fromJson(v));
+        sharedEmpList!.add(SharedEmpList.fromJson(v));
       });
     }
     if (json['listData'] != null) {
       listData = <ListData>[];
       json['listData'].forEach((v) {
-        listData!.add(new ListData.fromJson(v));
+        listData!.add(ListData.fromJson(v));
       });
     }
     if (json['directEmpList'] != null) {
       directEmpList = <DirectEmpList>[];
       json['directEmpList'].forEach((v) {
-        directEmpList!.add(new DirectEmpList.fromJson(v));
+        directEmpList!.add(DirectEmpList.fromJson(v));
       });
     }
     if (json['designatedEmpList'] != null) {
       designatedEmpList = <DesignatedEmpList>[];
       json['designatedEmpList'].forEach((v) {
-        designatedEmpList!.add(new DesignatedEmpList.fromJson(v));
+        designatedEmpList!.add(DesignatedEmpList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.dottedEmpList != null) {
       data['dottedEmpList'] =
           this.dottedEmpList!.map((v) => v.toJson()).toList();
@@ -99,7 +99,7 @@ class SharedEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['profileName'] = this.profileName;
     data['reportingOfficerId'] = this.reportingOfficerId;
     data['reportingOfficerName'] = this.reportingOfficerName;
@@ -140,7 +140,7 @@ class DottedEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['profileName'] = this.profileName;
     data['reportingOfficerId'] = this.reportingOfficerId;
     data['reportingOfficerName'] = this.reportingOfficerName;
@@ -181,7 +181,7 @@ class ListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['profileName'] = this.profileName;
     data['reportingOfficerId'] = this.reportingOfficerId;
     data['reportingOfficerName'] = this.reportingOfficerName;
@@ -222,7 +222,7 @@ class DirectEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['profileName'] = this.profileName;
     data['reportingOfficerId'] = this.reportingOfficerId;
     data['reportingOfficerName'] = this.reportingOfficerName;
@@ -263,7 +263,7 @@ class DesignatedEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['profileName'] = this.profileName;
     data['reportingOfficerId'] = this.reportingOfficerId;
     data['reportingOfficerName'] = this.reportingOfficerName;

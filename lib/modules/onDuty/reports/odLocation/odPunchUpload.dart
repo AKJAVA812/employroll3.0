@@ -7,7 +7,6 @@ import 'package:er_flutter_project/commanScreen/punchInOutScreen.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -40,7 +39,7 @@ int? orgnizationID=0;
 SessionManager shared = SessionManager();
 
 class _ODImageUploadState extends State<ODImageUpload> {
-  TextEditingController _remarkController = new TextEditingController();
+  TextEditingController _remarkController = TextEditingController();
   String? _platformVersion = 'Unknown', _autoTimezone, _autoTime, _daftar = "";
   Map<String, dynamic>? _list;
   final File? value;
@@ -179,10 +178,10 @@ class _ODImageUploadState extends State<ODImageUpload> {
     String currentDateFormatString = currentDateFormat.format(now);
     String currentTimeFormatString = currentTimeFormat.format(now);
     var length = await value!.length();
-    var multipart = new http.MultipartFile('image', stream, length,
+    var multipart = http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
     var uri = Uri.parse("$conn$apiUrl");
-    var request = new http.MultipartRequest("Post", uri);
+    var request = http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.files.add(multipart);
     request.fields['address'] = currentAddress;

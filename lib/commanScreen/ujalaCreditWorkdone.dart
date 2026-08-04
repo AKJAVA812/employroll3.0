@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/commanScreen/commanNotificationPage.dart';
-import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/commanScreen/ujalaWorkDone2.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -64,21 +63,21 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
 
   _UjalaCreditWorkdoneState(this.value, this.currentAddress, this.time);
 
-  TextEditingController _remarkController = new TextEditingController();
-  TextEditingController _clientNameController = new TextEditingController();
-  TextEditingController _clientNameContTwo = new TextEditingController();
-  TextEditingController _clientNameContThree = new TextEditingController();
-  TextEditingController _clientNameContFour = new TextEditingController();
-  TextEditingController _clientNameContFive = new TextEditingController();
-  TextEditingController _orgNameController = new TextEditingController();
-  TextEditingController _emailIdController = new TextEditingController();
-  TextEditingController _contNoController = new TextEditingController();
-  TextEditingController _contNumTwo = new TextEditingController();
-  TextEditingController _contNumThree = new TextEditingController();
-  TextEditingController _contNumFour = new TextEditingController();
-  TextEditingController _contNumFive = new TextEditingController();
-  TextEditingController _noOfNewAdvisor = new TextEditingController();
-  TextEditingController _noOfNewMember = new TextEditingController();
+  TextEditingController _remarkController = TextEditingController();
+  TextEditingController _clientNameController = TextEditingController();
+  TextEditingController _clientNameContTwo = TextEditingController();
+  TextEditingController _clientNameContThree = TextEditingController();
+  TextEditingController _clientNameContFour = TextEditingController();
+  TextEditingController _clientNameContFive = TextEditingController();
+  TextEditingController _orgNameController = TextEditingController();
+  TextEditingController _emailIdController = TextEditingController();
+  TextEditingController _contNoController = TextEditingController();
+  TextEditingController _contNumTwo = TextEditingController();
+  TextEditingController _contNumThree = TextEditingController();
+  TextEditingController _contNumFour = TextEditingController();
+  TextEditingController _contNumFive = TextEditingController();
+  TextEditingController _noOfNewAdvisor = TextEditingController();
+  TextEditingController _noOfNewMember = TextEditingController();
 
   bool _enabled = false;
   File? _image;
@@ -105,10 +104,10 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    latt = await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    latt = await shared.getLatitude();
 
-    lngg = await shared!.getLongitude();
+    lngg = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
     print('Response snapshot: ${sessionId}');
@@ -167,7 +166,7 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     var uri = Uri.parse(
       "http://www.employroll.com/restful/service/task/via/mobile",
     );
-    var request = new http.MultipartRequest("Post", uri);
+    var request = http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.fields['taskTime'] = formattedDate;
     request.fields['address'] = currentAddress;
@@ -183,7 +182,7 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+_emailIdController.text),
     ));*/
-    var multipart = new http.MultipartFile(
+    var multipart = http.MultipartFile(
       'image',
       stream,
       length,

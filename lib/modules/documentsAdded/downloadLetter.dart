@@ -4,15 +4,12 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file_plus/open_file_plus.dart';
@@ -22,7 +19,6 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import '../../../commanScreen/allAPIList.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
-import 'package:download/download.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/routes.dart';
@@ -57,8 +53,8 @@ class _DownloadLettersState extends State<DownloadLetters> {
   var timeString = "0.0";
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empId = await shared!.getEmpId();
+    sessionId = await shared.getSessionId();
+    empId = await shared.getEmpId();
     print('empId $empId');
     Future<DocumentDataModal> getEmployeeList11 = getDocument(sessionId!);
 
@@ -122,7 +118,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
   ReceivePort receivePort = ReceivePort();
   dateSelection() async {
     DateTime? date = DateTime.now();
-    FocusScope.of(context).requestFocus(new FocusNode());
+    FocusScope.of(context).requestFocus(FocusNode());
 
     date = await showMonthYearPicker(
       context: context,
@@ -276,7 +272,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
   Future<String> getDownloadDirectory() async {
     final directory = await getApplicationDocumentsDirectory();
     // You can also use getApplicationDocumentsDirectory() for the app's documents directory
-    return directory!.path;
+    return directory.path;
   }
 
   void findAndroidDataPath() async {
@@ -470,7 +466,7 @@ class _DownloadLettersState extends State<DownloadLetters> {
 
           newPath = newPath + "/MyPdfs";
           directory = Directory(newPath);
-          print(directory!.path);
+          print(directory.path);
         } else {
           return false;
         }

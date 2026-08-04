@@ -2,9 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/onDuty/reports/pendingRequisition/modalClass/pendingOdReqList.dart';
-import 'package:er_flutter_project/modules/onDuty/reports/pendingRequisition/pendingRequisitionList.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
-import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
@@ -16,7 +13,6 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/MSS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
 import 'package:er_flutter_project/MSS_MO_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
@@ -177,9 +173,9 @@ class _RadioGroupsState extends State<RadioGroups> {
 
   Future getSharedPrfanceList() async {
     //await Future.delayed(Duration(seconds: 1));
-    sessionId = await shared!.getSessionId() ?? "N/A";
-    userPanel = await shared!.getUserPanel() ?? "N/A";
-    getProfileId = await shared!.getDefaultProfileId() ?? "N/A";
+    sessionId = await shared.getSessionId() ?? "N/A";
+    userPanel = await shared.getUserPanel() ?? "N/A";
+    getProfileId = await shared.getDefaultProfileId() ?? "N/A";
 
     setState(() {
       if (userPanel == "MSS") {

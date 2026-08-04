@@ -18,27 +18,27 @@ class LiveTrackingModal {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
     distance = json['distance'];
     if (json['taskData'] != null) {
       taskData = <TaskData>[];
       json['taskData'].forEach((v) {
-        taskData!.add(new TaskData.fromJson(v));
+        taskData!.add(TaskData.fromJson(v));
       });
     }
     dist = json['dist'];
     if (json['attData'] != null) {
       attData = <AttData>[];
       json['attData'].forEach((v) {
-        attData!.add(new AttData.fromJson(v));
+        attData!.add(AttData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -73,7 +73,7 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['tdate'] = this.tdate;
     data['lng'] = this.lng;
@@ -115,7 +115,7 @@ class TaskData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['taskendTime'] = this.taskendTime;
     data['taskPhoto'] = this.taskPhoto;
     data['address'] = this.address;
@@ -154,7 +154,7 @@ class AttData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['inTime'] = this.inTime;
     data['inlat'] = this.inlat;
     data['inPhoto'] = this.inPhoto;

@@ -1,15 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/singleDateAttendance.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
-import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../modalClass/advanceTypeModal.dart';
@@ -48,7 +43,7 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
   final TextEditingController remarkController = TextEditingController();
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<LoanTypeListModal?> getLeaveType12 = getLoanTypeList(sessionId!);
     Future<AdvanceTypeListModal?> getLeaveType13 = getAdvanceType(sessionId!);

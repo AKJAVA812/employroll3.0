@@ -281,8 +281,7 @@ class _HDRaisedTicketReplyState extends State<HDRaisedTicketReply> {
                               date: DateTime.now(),
                               isSentByMe: true);
                           setState(() {
-                            if (typedText.text == null ||
-                                typedText.text.isEmpty) {
+                            if (typedText.text.isEmpty) {
                               print("no chat");
                             }
                             typedText.clear();

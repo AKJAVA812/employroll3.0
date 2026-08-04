@@ -19,11 +19,8 @@ import 'ML/Recognizer.dart';
 import 'package:image/image.dart' as img;
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'RecognitionScreen.dart';
-import 'RegistrationScreen.dart';
 import 'attendancMarkAi.dart';
 import 'empListFaceRegistered.dart';
-import 'faceRecognizeEmployeeList.dart';
 
 class FaceRecognitinHome extends StatefulWidget {
   const FaceRecognitinHome({Key? key}) : super(key: key);
@@ -168,7 +165,7 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       print("Ract Position :- " + boundingBox.toString());
 
       final bytes = _image!.readAsBytesSync();
-      img.Image? faceImg = img.decodeImage(bytes!);
+      img.Image? faceImg = img.decodeImage(bytes);
       img.Image croppedFace = img.copyCrop(
         faceImg!,
         x: left.toInt(),
@@ -204,7 +201,7 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     var body = json.encode(data);
     //var uri = Uri.parse("$conn$apiUrl");
     var urlapi = Uri.parse("$conn$apiUrl?");
-    var request = new http.MultipartRequest("Post", urlapi);
+    var request = http.MultipartRequest("Post", urlapi);
     var response = await MobileHttpClient.instance.post(
       urlapi,
       headers: {"Content-Type": "application/json"},
@@ -298,14 +295,12 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       num height = bottom - top;
 
       print("Ract Position :- " + boundingBox.toString());
-      if (boundingBox != null) {
-        var snackBar = SnackBar(
-          content: Text('Face Id :-' + boundingBox.toString()),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      }
-      final bytes = _image!.readAsBytesSync();
-      img.Image? faceImg = img.decodeImage(bytes!);
+      var snackBar = SnackBar(
+        content: Text('Face Id :-' + boundingBox.toString()),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          final bytes = _image!.readAsBytesSync();
+      img.Image? faceImg = img.decodeImage(bytes);
       img.Image croppedFace = img.copyCrop(
         faceImg!,
         x: left.toInt(),
@@ -329,7 +324,7 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
   //TODO remove rotation of camera images
   removeRotation(File inputImage) async {
     final img.Image? capturedImage = img.decodeImage(
-      await File(inputImage!.path).readAsBytes(),
+      await File(inputImage.path).readAsBytes(),
     );
     final img.Image orientedImage = img.bakeOrientation(capturedImage!);
     return await File(_image!.path).writeAsBytes(img.encodeJpg(orientedImage));
@@ -428,7 +423,7 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     var body = json.encode(data);
 
     var urlapi = Uri.parse("$conn$apiUrl?");
-    var request = new http.MultipartRequest("Post", urlapi);
+    var request = http.MultipartRequest("Post", urlapi);
     var response = await MobileHttpClient.instance.post(
       urlapi,
       headers: {"Content-Type": "application/json"},

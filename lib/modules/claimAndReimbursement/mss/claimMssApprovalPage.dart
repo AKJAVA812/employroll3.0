@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/mss/claimMssItems.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,6 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../MSS_Bundle/travelAndExpense/claimMssItems.dart';
 import '../../../MSS_MO_Bundle/travelAndExpense/claimMssItems.dart';
@@ -101,9 +99,9 @@ class _ClaimMssApprovalState extends State<ClaimMssApproval> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empId = await shared!.getEmpId();
-    userPanel = await shared!.getUserPanel();
+    sessionId = await shared.getSessionId();
+    empId = await shared.getEmpId();
+    userPanel = await shared.getUserPanel();
     levelStatusChecked = levelStatusCheck;
     if (userPanel == "MSS") {
       empIdReceived = empIdSendMSS;
@@ -427,10 +425,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     dynamic claimRaiseId,
     dynamic approveAmt,
   ) async {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimApproveApi;
 

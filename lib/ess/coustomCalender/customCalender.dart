@@ -4,7 +4,6 @@ import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart' show CalendarCarousel;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
-import 'package:path/path.dart';
 
 class customCalender extends StatefulWidget {
   const customCalender({super.key});
@@ -25,7 +24,7 @@ class _customCalenderState extends State<customCalender> {
         borderRadius: BorderRadius.all(Radius.circular(20)),
         border: Border.all(color: Colors.blue, width: 4.0)),
        );*/
-  static Widget _eventIcon = new Container(
+  static Widget _eventIcon = Container(
     decoration:  BoxDecoration(
         //color: Colors.transparent,
         borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -33,7 +32,7 @@ class _customCalenderState extends State<customCalender> {
        );
 
 
-  EventList<Event> _markedDateMap = new EventList<Event>(
+  EventList<Event> _markedDateMap = EventList<Event>(
     events: {
       /*new DateTime(2024, 2, 1): [
         new Event(
@@ -232,7 +231,7 @@ class _customCalenderState extends State<customCalender> {
                   left: 16.0,
                   right: 16.0,
                 ),
-                child: new Row(
+                child: Row(
                   children: <Widget>[
                     Expanded(
                         child: Text(

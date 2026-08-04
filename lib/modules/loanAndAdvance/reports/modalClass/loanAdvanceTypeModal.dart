@@ -7,13 +7,13 @@ class LoanTypeListModal {
     if (json['loandata'] != null) {
       loandata = <Loandata>[];
       json['loandata'].forEach((v) {
-        loandata!.add(new Loandata.fromJson(v));
+        loandata!.add(Loandata.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.loandata != null) {
       data['loandata'] = this.loandata!.map((v) => v.toJson()).toList();
     }
@@ -35,7 +35,7 @@ class Loandata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['loanName'] = this.loanName;
     data['loanId'] = this.loanId;
     data['status'] = this.status;

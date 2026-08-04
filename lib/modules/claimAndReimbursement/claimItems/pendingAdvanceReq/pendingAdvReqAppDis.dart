@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/modalClass/pendingAdvanceReqListModal.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/pendingAdvanceReq/pendingAdvanceReqList.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -65,7 +64,7 @@ class _AppDispPendingAdvanceReqState extends State<AppDispPendingAdvanceReq> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
   }
 
   @override

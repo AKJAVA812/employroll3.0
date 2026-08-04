@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
@@ -37,7 +36,7 @@ class _ApproveDisapAdvanceRequisitionListState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<AppDisAdvListModal> getAppReq11 = getAppDisAdvList(sessionId!);
     final loading = Row(
@@ -122,7 +121,7 @@ class _ApproveDisapAdvanceRequisitionListState
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: appDisAdvListModal!.claimAdvDatalist!.length,
+        itemCount: appDisAdvListModal.claimAdvDatalist!.length,
         itemBuilder: (context, i) {
           return Card(
             elevation: 2,
@@ -131,7 +130,7 @@ class _ApproveDisapAdvanceRequisitionListState
                 children: [
                   Row(
                     children: [
-                      appDisAdvListModal!.claimAdvDatalist![i].empName
+                      appDisAdvListModal.claimAdvDatalist![i].empName
                           .toString()
                           .text
                           .make()
@@ -142,7 +141,7 @@ class _ApproveDisapAdvanceRequisitionListState
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            appDisAdvListModal!
+                            appDisAdvListModal
                                 .claimAdvDatalist![i]
                                 .approvedStatus
                                 .toString()
@@ -164,7 +163,7 @@ class _ApproveDisapAdvanceRequisitionListState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            appDisAdvListModal!.claimAdvDatalist![i].placeTour
+                            appDisAdvListModal.claimAdvDatalist![i].placeTour
                                 .toString()
                                 .text
                                 .size(10)
@@ -183,7 +182,7 @@ class _ApproveDisapAdvanceRequisitionListState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            appDisAdvListModal!.claimAdvDatalist![i].purpose
+                            appDisAdvListModal.claimAdvDatalist![i].purpose
                                 .toString()
                                 .text
                                 .size(10)
@@ -202,7 +201,7 @@ class _ApproveDisapAdvanceRequisitionListState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            appDisAdvListModal!.claimAdvDatalist![i].ndays
+                            appDisAdvListModal.claimAdvDatalist![i].ndays
                                 .toString()
                                 .text
                                 .size(10)
@@ -221,7 +220,7 @@ class _ApproveDisapAdvanceRequisitionListState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            appDisAdvListModal!.claimAdvDatalist![i].advanceAmt
+                            appDisAdvListModal.claimAdvDatalist![i].advanceAmt
                                 .toString()
                                 .text
                                 .size(10)
@@ -240,7 +239,7 @@ class _ApproveDisapAdvanceRequisitionListState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            appDisAdvListModal!.claimAdvDatalist![i].remark
+                            appDisAdvListModal.claimAdvDatalist![i].remark
                                 .toString()
                                 .text
                                 .size(10)

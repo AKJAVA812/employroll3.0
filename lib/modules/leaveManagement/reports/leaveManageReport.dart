@@ -4,14 +4,11 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
 import '../../../ess/EssDashboarrddModel.dart';
 import '../../../ess/essDashboardNavigate.dart';
-import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 
 
@@ -56,9 +53,9 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
-    levelOne = await shared!.getLevelOne();
-    levelTwo = await shared!.getLevelTwo();
-    pendingLeaveRequisitions = await shared!.getPendingLeaveReq();
+    levelOne = await shared.getLevelOne();
+    levelTwo = await shared.getLevelTwo();
+    pendingLeaveRequisitions = await shared.getPendingLeaveReq();
     userPanelPermission= await shared.getUserPanel();
     pendingLeaveRequestMOPermission= (await shared.getPendingLeaveReqMSSMOPermission())!;
     pendingLeaveL1RequestMOPermission= (await shared.getPendingLeaveReqL1MSSMOPermission())!;

@@ -5,9 +5,7 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:intl/intl.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../employeePage/employeeListModel.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../../adminPage/modelClass/dashboardModel.dart';
@@ -19,7 +17,6 @@ import '../../leaveManagement/reports/modalClass/leaveBalanceModel.dart';
 import '../../leaveManagement/reports/modalClass/otherReqEmpList.dart';
 import '../../leaveManagement/reports/othersAttendanceList.dart';
 import 'attendanceRequisition/othersSingleDateAttendance.dart';
-import 'attendanceRequisition/singleDateAttendance.dart';
 import 'modelClass/attendanceReportModel.dart';
 
 class OthersAttendanceRequisitionPage extends StatefulWidget {
@@ -82,10 +79,10 @@ class _OthersAttendanceRequisitionPageState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    branchName = await shared!.getBranch() ?? "N/A";
-    deptName = await shared!.getDept() ?? "N/A";
-    empName = await shared!.getempName() ?? "N/A";
+    sessionId = await shared.getSessionId();
+    branchName = await shared.getBranch() ?? "N/A";
+    deptName = await shared.getDept() ?? "N/A";
+    empName = await shared.getempName() ?? "N/A";
     // await Future.delayed(Duration(seconds: 5));
     Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(
       sessionId!,
@@ -351,7 +348,7 @@ class _OthersAttendanceRequisitionPageState
                     child: TextFormField(
                       onTap: () async {
                         DateTime? date = DateTime.now();
-                        FocusScope.of(context).requestFocus(new FocusNode());
+                        FocusScope.of(context).requestFocus(FocusNode());
 
                         date = await showDatePicker(
                           context: context,
@@ -365,7 +362,7 @@ class _OthersAttendanceRequisitionPageState
                           ).format(date!);
                           _dateController.text = DateFormat(
                             "dd-MM-yyyy",
-                          ).format(date!);
+                          ).format(date);
 
                           //  DateFormat.yMd().format(date!).toString();
                         });
@@ -410,7 +407,7 @@ class _OthersAttendanceRequisitionPageState
                               MaterialPageRoute(
                                 builder:
                                     (context) => OthersSingleDateAttendance(
-                                      singleDateString: singleDateString!,
+                                      singleDateString: singleDateString,
                                       empId: empNewId,
                                     ),
                               ),

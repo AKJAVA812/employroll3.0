@@ -15,7 +15,6 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 class ApproveDisapproveReq extends StatefulWidget {
@@ -339,7 +338,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                           now.month,
                           now.day,
                           n!.hour,
-                          n!.minute,
+                          n.minute,
                         );
                         var nT = DateFormat('HH:mm').format(t);
                         print(DateFormat('HH:mm').format(t));
@@ -462,7 +461,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                           newNow.month,
                           newNow.day,
                           o!.hour,
-                          o!.minute,
+                          o.minute,
                         );
                         var oT = DateFormat('HH:mm').format(newt);
                         print(DateFormat('HH:mm').format(newt));
@@ -672,7 +671,7 @@ class _RadioGroupsState extends State<RadioGroups> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
   }
 
   showDialgSucess1(BuildContext buildContext, result, alert) {

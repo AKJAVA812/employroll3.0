@@ -2,14 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../commanScreen/routes.dart';
 import '../../../../main.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
@@ -62,7 +57,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<AppDisReimbListModal> getAppReq11 = getAppDisReimbList(sessionId!);
     final loading = Row(
@@ -146,7 +141,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: appDisReimbListModal!.data!.length,
+        itemCount: appDisReimbListModal.data!.length,
         itemBuilder: (context, i) {
           return InkWell(
             onTap: () {
@@ -159,7 +154,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
                   children: [
                     Row(
                       children: [
-                        appDisReimbListModal!.data![i].empName
+                        appDisReimbListModal.data![i].empName
                             .toString()
                             .text
                             .make()
@@ -170,7 +165,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              appDisReimbListModal!.data![i].status
+                              appDisReimbListModal.data![i].status
                                   .toString()
                                   .text
                                   .color(Mythemes.lightBluishColor)
@@ -184,7 +179,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
                     ),
                     Row(
                       children: [
-                        appDisReimbListModal!.data![i].reimbName
+                        appDisReimbListModal.data![i].reimbName
                             .toString()
                             .text
                             .maxFontSize(12)
@@ -205,7 +200,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
                     ).py1(),
                     Row(
                       children: [
-                        appDisReimbListModal!.data![i].claimNo
+                        appDisReimbListModal.data![i].claimNo
                             .toString()
                             .text
                             .maxFontSize(12)
@@ -226,7 +221,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
                     ).py1(),
                     Row(
                       children: [
-                        appDisReimbListModal!.data![i].reqDate
+                        appDisReimbListModal.data![i].reqDate
                             .toString()
                             .text
                             .maxFontSize(12)
@@ -268,7 +263,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
                           child: Column(
                             children: [
                               "Grade".text.make(),
-                              appDisReimbListModal!.data![i].empGrade
+                              appDisReimbListModal.data![i].empGrade
                                   .toString()
                                   .text
                                   .sm
@@ -297,7 +292,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
                           child: Column(
                             children: [
                               "Category".text.make(),
-                              appDisReimbListModal!.data![i].catName
+                              appDisReimbListModal.data![i].catName
                                   .toString()
                                   .text
                                   .sm
@@ -326,7 +321,7 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
                           child: Column(
                             children: [
                               "Amount".text.make(),
-                              appDisReimbListModal!.data![i].claimedAmt
+                              appDisReimbListModal.data![i].claimedAmt
                                   .toString()
                                   .text
                                   .sm

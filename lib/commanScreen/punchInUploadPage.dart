@@ -4,11 +4,9 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/commanScreen/punchInOutScreen.dart';
-import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
@@ -232,12 +230,12 @@ class _ImageUploadedState extends State<ImageUploaded> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    orgId = await shared!.getOrgId();
-    setGeofenceActive = await shared!.getGeofenceActive();
-    lat = await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    orgId = await shared.getOrgId();
+    setGeofenceActive = await shared.getGeofenceActive();
+    lat = await shared.getLatitude();
     getGeofenceList(sessionId!);
-    lng = await shared!.getLongitude();
+    lng = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
     _getDeviceId();
     /*
@@ -493,7 +491,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/attendance/via/mobile");
     var uri = Uri.parse("$conn$apiUrl");
-    var request = new http.MultipartRequest("Post", uri);
+    var request = http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.fields['currentDate'] = currentDateFormatString;
     request.fields['address'] = currentAddress;
@@ -506,7 +504,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
     request.fields['deviceId'] = deviceId!;
     request.fields['battery'] = sessionId!;
 
-    var multipart = new http.MultipartFile(
+    var multipart = http.MultipartFile(
       'image',
       stream,
       length,
@@ -625,7 +623,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/attendance/via/mobile");
     var uri = Uri.parse("$conn$apiUrl");
-    var request = new http.MultipartRequest("Post", uri);
+    var request = http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.fields['currentDate'] = currentDateFormatString;
     request.fields['address'] = currentAddress;
@@ -642,7 +640,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
     //print("stream.length");
     //print(stream.length.toString());
 
-    var multipart = new http.MultipartFile(
+    var multipart = http.MultipartFile(
       'image',
       stream,
       length,

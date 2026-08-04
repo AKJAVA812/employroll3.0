@@ -7,13 +7,13 @@ class DocumentListModal {
     if (json['mappedData'] != null) {
       mappedData = <MappedData>[];
       json['mappedData'].forEach((v) {
-        mappedData!.add(new MappedData.fromJson(v));
+        mappedData!.add(MappedData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.mappedData != null) {
       data['mappedData'] = this.mappedData!.map((v) => v.toJson()).toList();
     }
@@ -39,7 +39,7 @@ class MappedData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['decp'] = this.decp;
     data['code'] = this.code;
     data['name'] = this.name;

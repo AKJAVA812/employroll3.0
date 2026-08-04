@@ -12,22 +12,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import '../../../commanScreen/allAPIList.dart';
 import '../../../commanScreen/commanNotificationPage.dart';
-import '../../../commanScreen/recognization_page.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 import '../../../themes/empThemes.dart';
 import '../modalClass/departmentListModal.dart';
 import '../modalClass/queryTypeListModal.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'package:image/image.dart' as img;
 import '../modalClass/raisedQueryListModal.dart';
 import '../modalClass/subQueryTypeListModal.dart';
-import 'package:http_parser/http_parser.dart';
 
 class HelpDeskItems extends StatefulWidget {
   const HelpDeskItems({Key? key}) : super(key: key);
@@ -104,8 +100,8 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
   var empIdCheck;
   TextEditingController queryDesc = TextEditingController();
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empIdCheck = await shared!.getEmpId();
+    sessionId = await shared.getSessionId();
+    empIdCheck = await shared.getEmpId();
     print("EMPID - $empIdCheck");
     //empId=await shared!.getEmpId();
     // await Future.delayed(Duration(seconds: 5));
@@ -1305,7 +1301,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                             ),
                                             Row(
                                               children: [
-                                                new LinearPercentIndicator(
+                                                LinearPercentIndicator(
                                                   width: 155.0,
                                                   lineHeight: 5.0,
                                                   percent: 0.75,
@@ -1378,7 +1374,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                             ),
                                             Row(
                                               children: [
-                                                new LinearPercentIndicator(
+                                                LinearPercentIndicator(
                                                   width: 155.0,
                                                   lineHeight: 5.0,
                                                   percent: 0.45,
@@ -1454,7 +1450,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                             ),
                                             Row(
                                               children: [
-                                                new LinearPercentIndicator(
+                                                LinearPercentIndicator(
                                                   width: 155.0,
                                                   lineHeight: 5.0,
                                                   percent: 0.18,
@@ -1527,7 +1523,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                             ),
                                             Row(
                                               children: [
-                                                new LinearPercentIndicator(
+                                                LinearPercentIndicator(
                                                   width: 155.0,
                                                   lineHeight: 5.0,
                                                   percent: 0.55,
@@ -1603,7 +1599,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                             ),
                                             Row(
                                               children: [
-                                                new LinearPercentIndicator(
+                                                LinearPercentIndicator(
                                                   width: 155.0,
                                                   lineHeight: 5.0,
                                                   percent: 0.80,
@@ -1676,7 +1672,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                             ),
                                             Row(
                                               children: [
-                                                new LinearPercentIndicator(
+                                                LinearPercentIndicator(
                                                   width: 155.0,
                                                   lineHeight: 5.0,
                                                   percent: 0.40,
@@ -1755,7 +1751,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                             ),
                                             Row(
                                               children: [
-                                                new LinearPercentIndicator(
+                                                LinearPercentIndicator(
                                                   width: 155.0,
                                                   lineHeight: 5.0,
                                                   percent: 0.45,
@@ -1826,7 +1822,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                             ),
                                             Row(
                                               children: [
-                                                new LinearPercentIndicator(
+                                                LinearPercentIndicator(
                                                   width: 155.0,
                                                   lineHeight: 5.0,
                                                   percent: 0.2,
@@ -1898,8 +1894,8 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     var uri = Uri.parse(
       "http://super.employroll.com:8081/employroll/api/third/party/org/raised/query/details/saved/mobile",
     );
-    var request = new http.MultipartRequest("Post", uri);
-    request.fields['sessionId'] = sessionId!;
+    var request = http.MultipartRequest("Post", uri);
+    request.fields['sessionId'] = sessionId;
     request.fields['queryType'] = "$queryTypeId";
     request.fields['draftid'] = "0";
     request.fields['dept'] = "$deptId";
@@ -1934,7 +1930,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     print('Response body: ${file}');
     print("$stream");
 
-    var multipart = new http.MultipartFile(
+    var multipart = http.MultipartFile(
       'image',
       stream,
       length,

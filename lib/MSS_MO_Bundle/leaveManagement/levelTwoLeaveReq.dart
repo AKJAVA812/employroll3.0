@@ -1,25 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/modules/leaveManagement/reports/pendingRequisition/pendingLeaveApprovalDis.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:badges/badges.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../main.dart';
@@ -227,13 +219,13 @@ class _MSS_MO_LevelTwoPendingLeaveState
                             isLoading = true;
                           });
 
-                          sessionId = await shared!.getSessionId();
-                          levelOne = await shared!.getLevelOne();
-                          levelTwo = await shared!.getLevelTwo();
+                          sessionId = await shared.getSessionId();
+                          levelOne = await shared.getLevelOne();
+                          levelTwo = await shared.getLevelTwo();
                           print("Level 1 - $levelOne");
                           print("Level 2 - $levelTwo");
-                          userPanel = await shared!.getUserPanel();
-                          getProfileId = await shared!.getDefaultProfileId();
+                          userPanel = await shared.getUserPanel();
+                          getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           print("ORG ID - $getOrgId");
                           try {

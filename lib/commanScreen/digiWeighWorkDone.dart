@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/commanScreen/commanNotificationPage.dart';
-import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
@@ -49,11 +48,11 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
 
   _DigiWeighWorkDoneState(this.value, this.currentAddress, this.time);
 
-  TextEditingController _customerNameController = new TextEditingController();
-  TextEditingController _customerLocationController = new TextEditingController();
-  TextEditingController _systemDetController = new TextEditingController();
-  TextEditingController _natureController = new TextEditingController();
-  TextEditingController _contNoController = new TextEditingController();
+  TextEditingController _customerNameController = TextEditingController();
+  TextEditingController _customerLocationController = TextEditingController();
+  TextEditingController _systemDetController = TextEditingController();
+  TextEditingController _natureController = TextEditingController();
+  TextEditingController _contNoController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   bool _enabled = false;
   File? _image;
@@ -75,10 +74,10 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    latt = await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    latt = await shared.getLatitude();
 
-    lngg = await shared!.getLongitude();
+    lngg = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
     print('Response snapshot: ${sessionId}');
@@ -125,7 +124,7 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
     var uri = Uri.parse("http://www.employroll.com/restful/service/task/via/mobile");
-    var request = new http.MultipartRequest("Post", uri);
+    var request = http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.fields['taskTime'] = formattedDate;
     request.fields['address'] = currentAddress;
@@ -141,7 +140,7 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+_emailIdController.text),
     ));*/
-    var multipart = new http.MultipartFile('image', stream, length,
+    var multipart = http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
     request.files.add(multipart);
     http.Response response = await http.Response.fromStream(await request.send());
@@ -323,7 +322,7 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
                           TextFormField(
                             onTap: () async{
                               DateTime? date = DateTime.now();
-                              FocusScope.of(context).requestFocus(new FocusNode());
+                              FocusScope.of(context).requestFocus(FocusNode());
 
                               date = await showDatePicker(
                                   context: context,
@@ -332,7 +331,7 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
                                   lastDate: DateTime(2050));
                               setState(() {
                                 singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-                                _dateController.text = DateFormat("dd-MM-yyyy").format(date!);
+                                _dateController.text = DateFormat("dd-MM-yyyy").format(date);
 
                                 //  DateFormat.yMd().format(date!).toString();
                               });

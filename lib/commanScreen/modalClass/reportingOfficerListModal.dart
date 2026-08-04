@@ -7,13 +7,13 @@ class ReportingOfficerListModal {
     if (json['listData'] != null) {
       listData = <ListData>[];
       json['listData'].forEach((v) {
-        listData!.add(new ListData.fromJson(v));
+        listData!.add(ListData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.listData != null) {
       data['listData'] = this.listData!.map((v) => v.toJson()).toList();
     }
@@ -44,7 +44,7 @@ class ListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['reportingOfficerId'] = this.reportingOfficerId;
     data['reportingOfficerName'] = this.reportingOfficerName;
     data['reportieeType'] = this.reportieeType;

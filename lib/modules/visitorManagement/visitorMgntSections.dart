@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:er_flutter_project/modules/visitorManagement/raiseVisitorRequisition.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:slide_switcher/slide_switcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'dart:io';
@@ -47,7 +45,7 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<EmployeeListModel> getEmployeeList11 = getEmployeeList(sessionId!);
     final loading = Row(
@@ -573,7 +571,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                           child: Column(
                             children: [
                               "In Time".text.size(14).bold.make(),
-                              "11:00" == null || "11:00" == 'Casual Leave'
+                              "11:00" == 'Casual Leave'
                                   ? ''.text.make()
                                   : "11:00".text.sm.make(),
                             ],
@@ -591,7 +589,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                           child: Column(
                             children: [
                               "Out Time".text.size(14).bold.make(),
-                              "-:-" == null || "-:-" == 'Casual Leave'
+                              "-:-" == 'Casual Leave'
                                   ? ''.text.make()
                                   : "-:-".text.sm.make(),
                             ],

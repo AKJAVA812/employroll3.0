@@ -1,21 +1,15 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/claimRequisitionList.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../commanScreen/homePage.dart';
@@ -140,8 +134,8 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empId = await shared!.getEmpId();
+    sessionId = await shared.getSessionId();
+    empId = await shared.getEmpId();
     Future<ReimbursementTypeListModal> getEmployeeList13 =
         getReimbursementTypeList(sessionId!);
     getEmployeeList13.then((value) {
@@ -1188,7 +1182,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                         DateTime? date = DateTime.now();
                                         FocusScope.of(
                                           context,
-                                        ).requestFocus(new FocusNode());
+                                        ).requestFocus(FocusNode());
                                         date =
                                             (await showMonthYearPicker(
                                               context: context,
@@ -1292,7 +1286,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                         DateTime? date = DateTime.now();
                                         FocusScope.of(
                                           context,
-                                        ).requestFocus(new FocusNode());
+                                        ).requestFocus(FocusNode());
 
                                         date = await showDatePicker(
                                           context: context,
@@ -1310,7 +1304,7 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
                                               .dateController
                                               .text = DateFormat(
                                             "dd-MM-yyyy",
-                                          ).format(date!);
+                                          ).format(date);
                                           _dateController.text =
                                               cardData.dateController.text;
                                           print('Date ${_dateController.text}');
@@ -1782,8 +1776,8 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
     String apiUrl = ApiDetails.finalRaiseClaimApi;
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse("$conn$apiUrl");
-    var request = new http.MultipartRequest("Post", urlapi);
-    request.fields['sessionId'] = sessionId!;
+    var request = http.MultipartRequest("Post", urlapi);
+    request.fields['sessionId'] = sessionId;
     request.fields['empId'] = empId!.toString();
     request.fields['claimAmt'] = claimAmt;
     request.fields['claimId'] = claimId;
@@ -1851,11 +1845,6 @@ class _TravelExpenseRequestRaiseState extends State<TravelExpenseRequestRaise> {
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

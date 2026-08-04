@@ -1,25 +1,17 @@
 import 'dart:convert';
 
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/othersOnDateAttendanceModal.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/otherEmpRequisitionAttendance.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceReport.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/attendanceRequisition.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/model/attendanceMonthLog.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import '../../../MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import '../../../UIS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../main.dart';
 import '../../../profiles/profilePageWithHead.dart';
@@ -80,8 +72,8 @@ class _OthersAttendanceListState extends State<OthersAttendanceList>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
     if (userPanel == "MSS") {
       empId = empNewIdMSS;
     }

@@ -10,8 +10,6 @@ import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:hive/hive.dart';
-import 'package:image/image.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
@@ -64,7 +62,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
   }
   //Write Data
   void writeData() async {
-    _myBox!.delete(saveCount);
+    _myBox.delete(saveCount);
     // Increment saveCount and save it to Hive
     saveCount = (saveCount ?? 0) + 1;
     _myBox.put('saveCount', saveCount);
@@ -100,7 +98,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
 
   //Delete Data
   void deleteData() {
-    _myBox!.delete(4);
+    _myBox.delete(4);
   }
 
   int _clickCount = 0;
@@ -175,10 +173,10 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    lat=await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    lat=await shared.getLatitude();
 
-    lng=await shared!.getLongitude();
+    lng=await shared.getLongitude();
     orgnizationID=await shared.getOrgId();
     _getDeviceId();
 
@@ -406,7 +404,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
       ));*/
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/attendance/via/mobile");
     var uri = Uri.parse("$conn$apiUrl");
-    var request = new http.MultipartRequest("Post", uri);
+    var request = http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.fields['currentDate'] = currentDateFormatString;
     request.fields['address'] = currentAddress;
@@ -423,7 +421,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
     /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Sucessfully Run"+orgnizationID.toString()!),
       ));*/
-    var multipart = new http.MultipartFile('image', stream, length,
+    var multipart = http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
     request.files.add(multipart);
 

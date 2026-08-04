@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -537,11 +536,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

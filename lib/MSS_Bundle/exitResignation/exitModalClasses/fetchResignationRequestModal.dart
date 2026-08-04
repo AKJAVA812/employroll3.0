@@ -7,13 +7,13 @@ class FetchSingleResignationRequestModal {
     if (json['data'] != null) {
       data = <DataNew>[];
       json['data'].forEach((v) {
-        data!.add(new DataNew.fromJson(v));
+        data!.add(DataNew.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -74,7 +74,7 @@ class DataNew {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['resignDate'] = this.resignDate;
     data['lastWorkingDate'] = this.lastWorkingDate;
     data['levelOneRemarks'] = this.levelOneRemarks;

@@ -1,40 +1,24 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:detect_fake_location/detect_fake_location.dart';
 import 'package:flutter/services.dart';
-import 'package:er_flutter_project/commanScreen/ProjectListPage.dart';
-import 'package:er_flutter_project/commanScreen/punchInUploadPage.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/commanScreen/workDonePage.dart';
-import 'package:er_flutter_project/singUP/model/loginModel.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/singUP/login_page.dart';
-import 'package:er_flutter_project/widgets/drawer_file.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:http/http.dart' as http;
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../ess/myAllReports.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'odPunchUpload.dart';
 import 'odWorkDonePage.dart';
-import 'package:path/path.dart' as path;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 
@@ -163,7 +147,7 @@ class _ODPageViewState extends State<ODPageView> {
     super.initState();
   }
   Future getUserName() async {
-    UserName = await shared!.getempName();
+    UserName = await shared.getempName();
     print('Response snapshot: ${UserName}');
   }
 

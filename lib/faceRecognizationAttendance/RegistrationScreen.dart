@@ -9,7 +9,6 @@ import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:http/http.dart' as http;
-import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http_parser/http_parser.dart';
 import '../commanScreen/allAPIList.dart';
@@ -169,7 +168,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }*/
       final bytes = _image!.readAsBytesSync();
-      img.Image? faceImg = img.decodeImage(bytes!);
+      img.Image? faceImg = img.decodeImage(bytes);
       img.Image croppedFace = img.copyCrop(
         faceImg!,
         x: left.toInt(),
@@ -195,7 +194,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   //TODO remove rotation of camera images
   removeRotation(File inputImage) async {
     final img.Image? capturedImage = img.decodeImage(
-      await File(inputImage!.path).readAsBytes(),
+      await File(inputImage.path).readAsBytes(),
     );
     final img.Image orientedImage = img.bakeOrientation(capturedImage!);
     return await File(_image!.path).writeAsBytes(img.encodeJpg(orientedImage));

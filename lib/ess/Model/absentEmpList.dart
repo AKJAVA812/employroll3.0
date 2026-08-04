@@ -3,10 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../../themes/empThemes.dart';
-import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
-import '../../commanScreen/routes.dart';
-import '../../profiles/profilePageWithHead.dart';
 import '../essDashboardNavigate.dart';
 import '../myAllReports.dart';
 

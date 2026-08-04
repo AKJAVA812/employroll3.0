@@ -28,7 +28,7 @@ class LoanLedgerModal {
     if (json['empList'] != null) {
       empList = <EmpList>[];
       json['empList'].forEach((v) {
-        empList!.add(new EmpList.fromJson(v));
+        empList!.add(EmpList.fromJson(v));
       });
     }
     openingCreditBal = json['openingCreditBal'];
@@ -41,7 +41,7 @@ class LoanLedgerModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['netDebitBal'] = this.netDebitBal;
     data['period'] = this.period;
     if (this.empList != null) {
@@ -102,7 +102,7 @@ class EmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['eventDesc'] = this.eventDesc;
     data['month'] = this.month;

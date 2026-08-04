@@ -13,15 +13,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:velocity_x/velocity_x.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../ess/myAllReports.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
@@ -1230,7 +1226,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                 DateTime? fromDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 fromDate = await showDatePicker(
                                   context: context,
@@ -1289,7 +1285,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                 DateTime? toDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 toDate = await showDatePicker(
                                   context: context,
@@ -1322,8 +1318,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                     );
                                     print("Day Difference - $dayDifference");
                                     // ðŸ§  Show medical section if dayDifference > medValue
-                                    if (sickLeaveMedicalShowValue != null &&
-                                        dayDifference >
+                                    if (dayDifference >
                                             sickLeaveMedicalShowValue) {
                                       sickLeaveMedicalShow = true;
                                       //print("SICK LEAVE SHOW - $sickLeaveMedicalShow");
@@ -2339,11 +2334,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

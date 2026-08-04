@@ -8,11 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:im_stepper/stepper.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:linear_step_indicator/linear_step_indicator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -25,11 +23,7 @@ import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/commanNotificationPage.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
-import '../inductionOnboarding/modalClass/onboardBranchListModal.dart';
-import '../inductionOnboarding/modalClass/onboardDeptListModal.dart';
-import '../inductionOnboarding/modalClass/onboardDesignationListModal.dart';
 import '../inductionOnboarding/modalClass/onboardDocTypeListModal.dart';
-import '../inductionOnboarding/modalClass/onboardUserTypeListModal.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class ApprovePreOnboarding extends StatefulWidget {
@@ -476,7 +470,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
   }
 
   Map<int, String> uploadedDocuments = {};
@@ -872,7 +866,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                       DateTime? fromDate = DateTime.now();
                                       FocusScope.of(
                                         context,
-                                      ).requestFocus(new FocusNode());
+                                      ).requestFocus(FocusNode());
 
                                       fromDate = await showDatePicker(
                                         context: context,
@@ -933,7 +927,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                       DateTime? fromDate = DateTime.now();
                                       FocusScope.of(
                                         context,
-                                      ).requestFocus(new FocusNode());
+                                      ).requestFocus(FocusNode());
 
                                       fromDate = await showDatePicker(
                                         context: context,
@@ -4768,7 +4762,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                     DateTime? fromDate = DateTime.now();
                                     FocusScope.of(
                                       context,
-                                    ).requestFocus(new FocusNode());
+                                    ).requestFocus(FocusNode());
 
                                     fromDate = await showDatePicker(
                                       context: context,
@@ -5129,11 +5123,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

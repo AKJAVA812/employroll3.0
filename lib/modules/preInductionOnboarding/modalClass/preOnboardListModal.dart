@@ -11,13 +11,13 @@ class PreOnboardListModal {
     if (json['list'] != null) {
       list = <PreOnboardListData>[];
       json['list'].forEach((v) {
-        list!.add(new PreOnboardListData.fromJson(v));
+        list!.add(PreOnboardListData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['result'] = this.result;
     data['reason'] = this.reason;
     if (this.list != null) {
@@ -119,7 +119,7 @@ class PreOnboardListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['nomineeAadhar'] = this.nomineeAadhar;
     data['branchName'] = this.branchName;
     data['ifscCode'] = this.ifscCode;

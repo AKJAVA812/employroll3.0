@@ -8,19 +8,19 @@ class EssEventsListModal {
     if (json['bdayList'] != null) {
       bdayList = <BdayList>[];
       json['bdayList'].forEach((v) {
-        bdayList!.add(new BdayList.fromJson(v));
+        bdayList!.add(BdayList.fromJson(v));
       });
     }
     if (json['joblist'] != null) {
       joblist = <Joblist>[];
       json['joblist'].forEach((v) {
-        joblist!.add(new Joblist.fromJson(v));
+        joblist!.add(Joblist.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.bdayList != null) {
       data['bdayList'] = this.bdayList!.map((v) => v.toJson()).toList();
     }
@@ -63,7 +63,7 @@ class BdayList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['image'] = this.image;
     data['dob'] = this.dob;
     data['contact'] = this.contact;
@@ -108,7 +108,7 @@ class Joblist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['image'] = this.image;
     data['doj'] = this.doj;
     data['contact'] = this.contact;

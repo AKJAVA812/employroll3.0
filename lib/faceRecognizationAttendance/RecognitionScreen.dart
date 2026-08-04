@@ -88,7 +88,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
       print("Ract Position :- " +boundingBox.toString());
 
       final bytes= _image!.readAsBytesSync();
-      img.Image? faceImg = img.decodeImage(bytes!);
+      img.Image? faceImg = img.decodeImage(bytes);
       img.Image croppedFace = img.copyCrop(faceImg!, x: left.toInt(), y: top.toInt(), width: width.toInt(), height: height.toInt());
       Recognition recognition=  recognizer.recognize(croppedFace, boundingBox);
       recognitionList.add(recognition);
@@ -108,7 +108,7 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
 
   //TODO remove rotation of camera images
   removeRotation(File inputImage) async {
-    final img.Image? capturedImage = img.decodeImage(await File(inputImage!.path).readAsBytes());
+    final img.Image? capturedImage = img.decodeImage(await File(inputImage.path).readAsBytes());
     final img.Image orientedImage = img.bakeOrientation(capturedImage!);
     return await File(_image!.path).writeAsBytes(img.encodeJpg(orientedImage));
   }

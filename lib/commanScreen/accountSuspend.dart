@@ -1,53 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
-import 'package:datetime_setting/datetime_setting.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:er_flutter_project/commanScreen/ProjectListPage.dart';
-import 'package:er_flutter_project/commanScreen/punchInUploadPage.dart';
-import 'package:er_flutter_project/commanScreen/recognization_page.dart';
-import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/commanScreen/skyDecorWorkDone.dart';
-import 'package:er_flutter_project/commanScreen/workDonePage.dart';
-import 'package:er_flutter_project/commanScreen/ujalaCreditWorkdone.dart';
-import 'package:er_flutter_project/modules/helpDesk/helpdeskItem/helpdeskItem.dart';
-import 'package:er_flutter_project/profiles/profilePage.dart';
 import 'package:er_flutter_project/singUP/model/loginModel.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:ntp/ntp.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:camera/camera.dart';
-import 'package:permission_handler/permission_handler.dart';
 //import 'package:safe_device/safe_device.dart';
 //import 'package:trust_location/trust_location.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/singUP/login_page.dart';
-import 'package:er_flutter_project/widgets/drawer_file.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
-import '../adminPage/modelClass/dashboardModel.dart';
 import '../sharedPrefancePage/ShardPre.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'allAPIList.dart';
-import 'commanNotificationPage.dart';
-import 'digiWeighWorkDone.dart';
 
 class AccountSuspendPage extends StatefulWidget {
   @override
@@ -66,7 +33,7 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
   var type = "0";
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     //print('Response snapshot: ${sessionId}');
   }
 

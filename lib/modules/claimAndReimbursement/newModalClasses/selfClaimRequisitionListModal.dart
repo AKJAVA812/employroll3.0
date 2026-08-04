@@ -29,20 +29,20 @@ class ClaimRequisitionModal {
       claimRequisitionPendinglist = <ClaimRequisitionPendinglist>[];
       json['claimRequisitionPendinglist'].forEach((v) {
         claimRequisitionPendinglist!
-            .add(new ClaimRequisitionPendinglist.fromJson(v));
+            .add(ClaimRequisitionPendinglist.fromJson(v));
       });
     }
     if (json['claimRequisitionApprovedlist'] != null) {
       claimRequisitionApprovedlist = <ClaimRequisitionApprovedlist>[];
       json['claimRequisitionApprovedlist'].forEach((v) {
         claimRequisitionApprovedlist!
-            .add(new ClaimRequisitionApprovedlist.fromJson(v));
+            .add(ClaimRequisitionApprovedlist.fromJson(v));
       });
     }
     if (json['data'] != null) {
       data = <DataNew>[];
       json['data'].forEach((v) {
-        data!.add(new DataNew.fromJson(v));
+        data!.add(DataNew.fromJson(v));
       });
     }
     submittedValue = json['submittedValue'];
@@ -51,21 +51,21 @@ class ClaimRequisitionModal {
       claimRequisitionDisapprovelist = <ClaimRequisitionDisapprovelist>[];
       json['claimRequisitionDisapprovelist'].forEach((v) {
         claimRequisitionDisapprovelist!
-            .add(new ClaimRequisitionDisapprovelist.fromJson(v));
+            .add(ClaimRequisitionDisapprovelist.fromJson(v));
       });
     }
     if (json['claimRequisitionDraftlist'] != null) {
       claimRequisitionDraftlist = <ClaimRequisitionDraftlist>[];
       json['claimRequisitionDraftlist'].forEach((v) {
         claimRequisitionDraftlist!
-            .add(new ClaimRequisitionDraftlist.fromJson(v));
+            .add(ClaimRequisitionDraftlist.fromJson(v));
       });
     }
     pendingAmount = json['pendingAmount'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['totaDraftAmount'] = this.totaDraftAmount;
     data['approvedValue'] = this.approvedValue;
     if (this.claimRequisitionPendinglist != null) {
@@ -225,7 +225,7 @@ class DataNew {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['claimNo'] = this.claimNo;
     data['subSubCatId'] = this.subSubCatId;
@@ -402,7 +402,7 @@ class ClaimRequisitionPendinglist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['claimNo'] = this.claimNo;
     data['subSubCatId'] = this.subSubCatId;
@@ -579,7 +579,7 @@ class ClaimRequisitionApprovedlist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['claimNo'] = this.claimNo;
     data['subSubCatId'] = this.subSubCatId;
@@ -756,7 +756,7 @@ class ClaimRequisitionDisapprovelist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['claimNo'] = this.claimNo;
     data['subSubCatId'] = this.subSubCatId;
@@ -933,7 +933,7 @@ class ClaimRequisitionDraftlist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['claimNo'] = this.claimNo;
     data['subSubCatId'] = this.subSubCatId;

@@ -4,7 +4,6 @@ import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneReport/roWorkDoneReportModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -82,9 +81,9 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
-    getProfileId = await shared!.getDefaultProfileId();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
     print('ResponseAttendance: ${sessionId}');
     print('ResponseAttendance: ${fromDatePickedString}');
     print('ResponseAttendance: ${toDatePickedStringRo}');
@@ -96,9 +95,6 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
       filterType,
       empNewId,
     );
-    if (getEmployeeList11 == null) {
-      return Center(child: CircularProgressIndicator());
-    }
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -189,7 +185,7 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
 
     roWorkdoneReportModel = ROWorkdoneReportModel.fromJson(mapResponse);
 
-    allUsernew = roWorkdoneReportModel!.data;
+    allUsernew = roWorkdoneReportModel.data;
 
     return roWorkdoneReportModel;
   }

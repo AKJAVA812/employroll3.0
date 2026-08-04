@@ -13,7 +13,6 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 class ODRequisitionSelection extends StatefulWidget {
@@ -55,17 +54,17 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
   Future getSharedPrfanceList() async {
     //await Future.delayed(Duration(seconds: 1));
 
-    sessionId = await shared!.getSessionId() ?? "N/A";
-    branchName = await shared!.getBranch() ?? "N/A";
-    deptName = await shared!.getDept() ?? "N/A";
-    empName = await shared!.getempName() ?? "N/A";
+    sessionId = await shared.getSessionId() ?? "N/A";
+    branchName = await shared.getBranch() ?? "N/A";
+    deptName = await shared.getDept() ?? "N/A";
+    empName = await shared.getempName() ?? "N/A";
     setState(() {
       print('ResponseAttendance: ${sessionId}');
     });
   }
 
   Future getEmpId() async {
-    empNewId = await shared!.getEmpId();
+    empNewId = await shared.getEmpId();
     print('Response snapshot: ${empNewId}');
   }
 
@@ -279,7 +278,7 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                               DateTime? fromDate = DateTime.now();
                               FocusScope.of(
                                 context,
-                              ).requestFocus(new FocusNode());
+                              ).requestFocus(FocusNode());
 
                               fromDate = await showDatePicker(
                                 context: context,
@@ -335,7 +334,7 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                               DateTime? toDate = DateTime.now();
                               FocusScope.of(
                                 context,
-                              ).requestFocus(new FocusNode());
+                              ).requestFocus(FocusNode());
 
                               toDate = await showDatePicker(
                                 context: context,

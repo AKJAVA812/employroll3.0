@@ -8,19 +8,19 @@ class CalendarModalClass {
     if (json['legends'] != null) {
       legends = <Legends>[];
       json['legends'].forEach((v) {
-        legends!.add(new Legends.fromJson(v));
+        legends!.add(Legends.fromJson(v));
       });
     }
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.legends != null) {
       data['legends'] = this.legends!.map((v) => v.toJson()).toList();
     }
@@ -45,7 +45,7 @@ class Legends {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['mobColor'] = this.mobColor;
     data['status'] = this.status;
     data['statusName'] = this.statusName;
@@ -106,7 +106,7 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;

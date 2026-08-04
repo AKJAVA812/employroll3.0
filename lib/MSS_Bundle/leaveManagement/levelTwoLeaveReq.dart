@@ -1,24 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/modules/leaveManagement/reports/pendingRequisition/pendingLeaveApprovalDis.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:badges/badges.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../main.dart';
@@ -122,9 +114,9 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
-    getProfileId = await shared!.getDefaultProfileId();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
     await Future.delayed(Duration(seconds: 2));
     Future<LevelTwoPendingLeaveModal> getAppReq11 = getPendingLeaveReq(
       sessionId!,

@@ -1,19 +1,14 @@
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../ess/EssDashboarrddModel.dart';
 import '../../../ess/essDashboardNavigate.dart';
-import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 import '../../../themes/empThemes.dart';
-import 'attendanceRequisition/getAttendanceDetails.dart';
 
 
 class TimeAndAttendanceReports extends StatefulWidget {

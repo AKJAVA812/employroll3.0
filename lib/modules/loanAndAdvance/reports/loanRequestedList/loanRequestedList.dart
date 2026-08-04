@@ -2,10 +2,7 @@ import 'dart:convert';
 
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
@@ -72,7 +69,7 @@ class _PendingLoanRequestedListState extends State<PendingLoanRequestedList>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<LoanAdvanceReqModal> getAppReq11 = getLoanAdvReqList(sessionId!);
     final loading = Row(

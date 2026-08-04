@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
@@ -18,10 +16,8 @@ import 'dart:convert' show utf8;
 import '../main.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../singUP/model/loginModel.dart';
-import '../widgets/drawer_file.dart';
 import 'dart:io';
 import 'package:path/path.dart';
-import 'package:er_flutter_project/main.dart';
 import '../mss_profiles/global_profile.dart';
 import 'allAPIList.dart';
 
@@ -272,7 +268,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
   }
 
   Future<void> uploadImage() async {
-    var stream = new http.ByteStream(image!.openRead());
+    var stream = http.ByteStream(image!.openRead());
     stream.cast();
 
     var length = await image!.length();
@@ -283,7 +279,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
     var uri = Uri.parse(
       "http://www.employroll.com//restful/service/attendance/via/mobile",
     );
-    var request = new http.MultipartRequest("Post", uri);
+    var request = http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = "53eb75da8f2f2eb7171c4dd55e343e3c405eda9d5e9";
     request.fields['currentDate'] = "2022-06-13 9:35:14";
     request.fields['address'] =
@@ -292,7 +288,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
     request.fields['lat'] = "28.5367794";
     request.fields['lng'] = "77.2714404";
 
-    var multipart = new http.MultipartFile(
+    var multipart = http.MultipartFile(
       'image',
       stream,
       length,
@@ -322,7 +318,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
     String filename = basename(filePath.path);
     //print("File base name $filename");
     try {
-      FormData fromData = new FormData.fromMap({
+      FormData fromData = FormData.fromMap({
         'sessionId': "1116a07f94bbd789c25280a8a480ced5d87a8811714",
         'currentDate': "2022-06-11 19:35:14",
         'address': "F-35/1,Okhla Industrial Area,NewDelhi,Delhi,110020",
@@ -346,7 +342,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
   }
 
   void uploadImage1(File _image) async {
-    var stream = new http.ByteStream(_image.openRead());
+    var stream = http.ByteStream(_image.openRead());
     stream.cast();
     // get file length
     var length = await _image.length();
@@ -355,13 +351,13 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
     var uri = Uri.parse("enter here upload URL");
 
     // create multipart request
-    var request = new http.MultipartRequest("POST", uri);
+    var request = http.MultipartRequest("POST", uri);
 
     // if you need more parameters to parse, add those like this. i added "user_id". here this "user_id" is a key of the API request
     request.fields["user_id"] = "text";
 
     // multipart that takes file.. here this "image_file" is a key of the API request
-    var multipartFile = new http.MultipartFile(
+    var multipartFile = http.MultipartFile(
       'image_file',
       stream,
       length,

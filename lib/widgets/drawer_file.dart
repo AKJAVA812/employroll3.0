@@ -473,9 +473,9 @@ class MyModule {
 List<MyModule> sideList = <MyModule>[
   MyModule('Attendance', <MyModule>[
     MyModule("Sub Contract", <MyModule>[
-      new MyModule("title"),
-      new MyModule("title"),
-      new MyModule("title"),
+      MyModule("title"),
+      MyModule("title"),
+      MyModule("title"),
     ]),
   ]),
 ];
@@ -493,20 +493,20 @@ class MyListReturn extends StatelessWidget {
 
 Widget _buildTill(MyModule myModule1) {
   if (myModule1.myModule.isEmpty) {
-    return new ListTile(
+    return ListTile(
       dense: true,
       enabled: true,
       isThreeLine: false,
       onLongPress: () => print("long press"),
       onTap: () => print("tap"),
       selected: true,
-      title: new Text(myModule1.title),
+      title: Text(myModule1.title),
     );
   }
 
-  return new ExpansionTile(
-    key: new PageStorageKey<int>(3),
-    title: new Text(myModule1.title),
+  return ExpansionTile(
+    key: PageStorageKey<int>(3),
+    title: Text(myModule1.title),
     children: myModule1.myModule.map(_buildTill).toList(),
   );
 }

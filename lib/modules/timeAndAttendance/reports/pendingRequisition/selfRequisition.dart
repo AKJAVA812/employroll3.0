@@ -8,25 +8,18 @@ import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_app/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../ess/myAllReports.dart';
 import '../../../../main.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import '../attendanceRequisition/getAttendanceDetails.dart';
-import '../timeAndAttReports.dart';
 
 class PendingRequisition extends StatefulWidget {
   final SelfRequisitionModel selfRequisitionModel;
@@ -93,7 +86,7 @@ class _PendingRequisitionState extends State<PendingRequisition>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<SelfRequisitionModel> getEmployeeList11 = getSelfReqList(sessionId!);
     final loading = Row(

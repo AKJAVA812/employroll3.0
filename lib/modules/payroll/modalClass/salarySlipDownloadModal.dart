@@ -17,7 +17,7 @@ class SalarySlipDownloadModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['result'] = this.result;
     data['empId'] = this.empId;
     data['month'] = this.month;

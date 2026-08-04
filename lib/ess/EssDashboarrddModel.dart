@@ -6,12 +6,12 @@ class EssDashboarrdModel {
 
   EssDashboarrdModel.fromJson(Map<String, dynamic> json) {
     countData = json['countData'] != null
-        ? new CountData.fromJson(json['countData'])
+        ? CountData.fromJson(json['countData'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.countData != null) {
       data['countData'] = this.countData!.toJson();
     }
@@ -63,38 +63,38 @@ class CountData {
     if (json['presentList'] != null) {
       presentList = <PresentList>[];
       json['presentList'].forEach((v) {
-        presentList!.add(new PresentList.fromJson(v));
+        presentList!.add(PresentList.fromJson(v));
       });
     }
     if (json['lateList'] != null) {
       lateList = <LateList>[];
       json['lateList'].forEach((v) {
-        lateList!.add(new LateList.fromJson(v));
+        lateList!.add(LateList.fromJson(v));
       });
     }
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
     halfday = json['halfday'];
     if (json['earlyGoList'] != null) {
       earlyGoList = <EarlyGoList>[];
       json['earlyGoList'].forEach((v) {
-        earlyGoList!.add(new EarlyGoList.fromJson(v));
+        earlyGoList!.add(EarlyGoList.fromJson(v));
       });
     }
     if (json['absentList'] != null) {
       absentList = <AbsentList>[];
       json['absentList'].forEach((v) {
-        absentList!.add(new AbsentList.fromJson(v));
+        absentList!.add(AbsentList.fromJson(v));
       });
     }
     if (json['halfDayList'] != null) {
       halfDayList = <HalfDayList>[];
       json['halfDayList'].forEach((v) {
-        halfDayList!.add(new HalfDayList.fromJson(v));
+        halfDayList!.add(HalfDayList.fromJson(v));
       });
     }
     totalAtt = json['totalAtt'];
@@ -102,13 +102,13 @@ class CountData {
     if (json['shortLeaveList'] != null) {
       shortLeaveList = <ShortLeaveList>[];
       json['shortLeaveList'].forEach((v) {
-        shortLeaveList!.add(new ShortLeaveList.fromJson(v));
+        shortLeaveList!.add(ShortLeaveList.fromJson(v));
       });
     }
     if (json['totalList'] != null) {
       totalList = <TotalList>[];
       json['totalList'].forEach((v) {
-        totalList!.add(new TotalList.fromJson(v));
+        totalList!.add(TotalList.fromJson(v));
       });
     }
     late = json['late'];
@@ -117,7 +117,7 @@ class CountData {
     if (json['mispunchList'] != null) {
       mispunchList = <MispunchList>[];
       json['mispunchList'].forEach((v) {
-        mispunchList!.add(new MispunchList.fromJson(v));
+        mispunchList!.add(MispunchList.fromJson(v));
       });
     }
     mispunch = json['mispunch'];
@@ -126,7 +126,7 @@ class CountData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.presentList != null) {
       data['presentList'] = this.presentList!.map((v) => v.toJson()).toList();
     }
@@ -184,7 +184,7 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['empName'] = this.empName;
     data['dept'] = this.dept;
@@ -249,7 +249,7 @@ class AbsentList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;
@@ -326,7 +326,7 @@ class PresentList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;
@@ -403,7 +403,7 @@ class LateList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;
@@ -480,7 +480,7 @@ class MispunchList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;
@@ -557,7 +557,7 @@ class EarlyGoList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;
@@ -634,7 +634,7 @@ class HalfDayList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;
@@ -711,7 +711,7 @@ class ShortLeaveList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;
@@ -788,7 +788,7 @@ class TotalList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['outPunchType'] = this.outPunchType;
     data['logDate'] = this.logDate;

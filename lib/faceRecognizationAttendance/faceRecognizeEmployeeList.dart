@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../commanScreen/allAPIList.dart';
-import '../commanScreen/commanNotificationPage.dart';
 import '../commanScreen/homePage.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../commanScreen/routes.dart';
@@ -17,8 +15,6 @@ import '../employeePage/mapView.dart';
 import '../profiles/profilePageWithHead.dart';
 import '../themes/empThemes.dart';
 import 'FaceRecognitionHome.dart';
-import 'RegistrationScreen.dart';
-import 'attendancMarkAi.dart';
 import 'attendancMarkAiMSS.dart';
 import 'faceEmpListModalClass.dart';
 
@@ -56,7 +52,7 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<EmployeeListFaceModel> getEmployeeList11 = getEmployeeList(
       sessionId!,

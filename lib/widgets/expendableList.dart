@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 class TileApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Center(
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Center(
             child: Text('ExpansionTile App'),
           ),
         ),
-        body: new ListView.builder(
+        body: ListView.builder(
           itemBuilder: (BuildContext context, int index) {
             return Card(
-                child: new StuffInTiles(listOfTiles[index])
+                child: StuffInTiles(listOfTiles[index])
             );
           },
           itemCount: listOfTiles.length,
@@ -36,7 +36,7 @@ class StuffInTiles extends StatelessWidget {
 
   Widget _buildTiles(MyTile t) {
     if (t.children.isEmpty)
-      return new ListTile(
+      return ListTile(
           dense: true,
           enabled: true,
           isThreeLine: false,
@@ -46,11 +46,11 @@ class StuffInTiles extends StatelessWidget {
           //leading: new Text("Leading"),
           selected: true,
           //trailing: new Text("trailing"),
-          title: new Text(t.title));
+          title: Text(t.title));
 
-    return new ExpansionTile(
-      key: new PageStorageKey<int>(3),
-      title: new Text(t.title),
+    return ExpansionTile(
+      key: PageStorageKey<int>(3),
+      title: Text(t.title),
       children: t.children.map(_buildTiles).toList(),
     );
   }
@@ -69,42 +69,42 @@ List<MyTile> listOfTiles = <MyTile>[
       MyTile(
         'OD',
         <MyTile>[
-          new MyTile('OD Requistion'),
-          new MyTile('OD Approval'),
-          new MyTile('OD Approved '),
+          MyTile('OD Requistion'),
+          MyTile('OD Approval'),
+          MyTile('OD Approved '),
         ],
       ),
-      new MyTile('Cats'),
-      new MyTile('Birds'),
+      MyTile('Cats'),
+      MyTile('Birds'),
     ],
   ),
-  new MyTile(
+  MyTile(
     'Cars',
     <MyTile>[
-      new MyTile('Tesla'),
-      new MyTile('Toyota'),
+      MyTile('Tesla'),
+      MyTile('Toyota'),
     ],
   ),
-  new MyTile(
+  MyTile(
     'Phones',
     <MyTile>[
-      new MyTile('Google'),
-      new MyTile('Samsung'),
-      new MyTile(
+      MyTile('Google'),
+      MyTile('Samsung'),
+      MyTile(
         'OnePlus',
         <MyTile>[
-          new MyTile('1'),
-          new MyTile('2'),
-          new MyTile('3'),
-          new MyTile('4'),
-          new MyTile('5'),
-          new MyTile('6'),
-          new MyTile('7'),
-          new MyTile('8'),
-          new MyTile('9'),
-          new MyTile('10'),
-          new MyTile('11'),
-          new MyTile('12'),
+           MyTile('1'),
+           MyTile('2'),
+          MyTile('3'),
+          MyTile('4'),
+          MyTile('5'),
+          MyTile('6'),
+          MyTile('7'),
+          MyTile('8'),
+          MyTile('9'),
+          MyTile('10'),
+          MyTile('11'),
+          MyTile('12'),
         ],
       ),
     ],

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'dart:convert';
@@ -73,7 +72,7 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     Future<CompanyPolicyModal> getEmployeeList11 = getPolicies(sessionId!);
     getEmployeeList11.then((value) {
       setState(() {

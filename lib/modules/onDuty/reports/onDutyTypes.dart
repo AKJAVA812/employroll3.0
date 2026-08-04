@@ -1,26 +1,12 @@
-import 'dart:convert';
-import 'dart:convert' show utf8;
-import 'dart:developer';
-import 'dart:io';
 
-import 'package:dio/dio.dart';
-import 'package:er_flutter_project/commanScreen/homePage.dart';
-import 'package:er_flutter_project/modules/onDuty/reports/selfRequisition/selfOdRequisitionList.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:path/path.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
-import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 
 class OnDutyTypes extends StatefulWidget {

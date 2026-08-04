@@ -7,16 +7,11 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:intl/intl.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../employeePage/employeeListModel.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
-import '../../../profiles/profilePageWithHead.dart';
 import '../../main.dart';
 import '../../modules/leaveManagement/reports/modalClass/leaveBalanceModel.dart';
 import '../../modules/leaveManagement/reports/modalClass/otherReqEmpList.dart';
@@ -125,9 +120,9 @@ class _MSS_MO_OthersAttendanceRequisitionPageState
       _showFilterBottomSheet();
     }
     loadOrgListFromPrefs();
-    branchName = await shared!.getBranch() ?? "N/A";
-    deptName = await shared!.getDept() ?? "N/A";
-    empName = await shared!.getempName() ?? "N/A";
+    branchName = await shared.getBranch() ?? "N/A";
+    deptName = await shared.getDept() ?? "N/A";
+    empName = await shared.getempName() ?? "N/A";
 
     /* getLeaveType12.then((value) {
       setState(() {
@@ -344,12 +339,12 @@ class _MSS_MO_OthersAttendanceRequisitionPageState
 
                           // Now perform async logic
 
-                          sessionId = await shared!.getSessionId();
-                          userPanel = await shared!.getUserPanel();
-                          getProfileId = await shared!.getDefaultProfileId();
-                          branchName = await shared!.getBranch() ?? "N/A";
-                          deptName = await shared!.getDept() ?? "N/A";
-                          empName = await shared!.getempName() ?? "N/A";
+                          sessionId = await shared.getSessionId();
+                          userPanel = await shared.getUserPanel();
+                          getProfileId = await shared.getDefaultProfileId();
+                          branchName = await shared.getBranch() ?? "N/A";
+                          deptName = await shared.getDept() ?? "N/A";
+                          empName = await shared.getempName() ?? "N/A";
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           print("ORG ID - $getOrgId");
                           // await Future.delayed(Duration(seconds: 5));
@@ -446,7 +441,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState
                           MaterialPageRoute(
                             builder:
                                 (context) => OthersSingleDateAttendance(
-                                  singleDateString: singleDateString!,
+                                  singleDateString: singleDateString,
                                   empId: empNewIdMO,
                                 ),
                           ),
@@ -615,7 +610,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState
                     child: TextFormField(
                       onTap: () async {
                         DateTime? date = DateTime.now();
-                        FocusScope.of(context).requestFocus(new FocusNode());
+                        FocusScope.of(context).requestFocus(FocusNode());
 
                         date = await showDatePicker(
                           context: context,
@@ -629,7 +624,7 @@ class _MSS_MO_OthersAttendanceRequisitionPageState
                           ).format(date!);
                           _dateController.text = DateFormat(
                             "dd-MM-yyyy",
-                          ).format(date!);
+                          ).format(date);
 
                           //  DateFormat.yMd().format(date!).toString();
                         });

@@ -9,13 +9,13 @@ class PendingOdReqList {
     if (json['listdata'] != null) {
       listdata = <Listdata>[];
       json['listdata'].forEach((v) {
-        listdata!.add(new Listdata.fromJson(v));
+        listdata!.add(Listdata.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['result'] = this.result;
     if (this.listdata != null) {
       data['listdata'] = this.listdata!.map((v) => v.toJson()).toList();
@@ -68,7 +68,7 @@ class Listdata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['approvaldate'] = this.approvaldate;
     data['image'] = this.image;

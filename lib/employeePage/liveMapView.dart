@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/employeePage/employeeListPage.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -15,7 +14,6 @@ import '../commanScreen/allAPIList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
 import 'empTimeLinePage.dart';
-import 'modalClasses/historyTrackModal.dart';
 import 'modalClasses/liveTrackModal.dart';
 import 'dart:ui' as ui;
 
@@ -72,8 +70,8 @@ class _LiveMapViewState extends State<LiveMapView> {
     super.initState();
     _determinePosition();
     _getUserLocation();
-    var now = new DateTime.now();
-    var formatter = new DateFormat('yyyy-MM-dd');
+    var now = DateTime.now();
+    var formatter = DateFormat('yyyy-MM-dd');
     todayDate = formatter.format(now);
     print('todayDate $todayDate');
     //selectedDate = _dateController;
@@ -83,7 +81,7 @@ class _LiveMapViewState extends State<LiveMapView> {
 
   dateSelection() async {
     DateTime? date = DateTime.now();
-    FocusScope.of(context).requestFocus(new FocusNode());
+    FocusScope.of(context).requestFocus(FocusNode());
 
     date = await showDatePicker(
       context: context,
@@ -93,7 +91,7 @@ class _LiveMapViewState extends State<LiveMapView> {
     );
     setState(() {
       singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-      _dateController.text = DateFormat("yyyy-MM-dd").format(date!);
+      _dateController.text = DateFormat("yyyy-MM-dd").format(date);
       selectedDate = _dateController.text;
       getSharedPrfanceList();
 
@@ -123,13 +121,13 @@ class _LiveMapViewState extends State<LiveMapView> {
     print('responseemployeeList $getData');
     liveTrackingModal = LiveTrackingModal.fromJson(mapResponse);
 
-    for (int i = 0; i < liveTrackingModal!.attData!.length; i++) {
-      inImage = liveTrackingModal!.attData![i].inPhoto;
+    for (int i = 0; i < liveTrackingModal.attData!.length; i++) {
+      inImage = liveTrackingModal.attData![i].inPhoto;
 
       print('inImage $inImage');
       print('outImage $outImage');
     }
-    distanceLength = liveTrackingModal!.distance;
+    distanceLength = liveTrackingModal.distance;
 
     return liveTrackingModal;
   }
@@ -414,7 +412,7 @@ class _LiveMapViewState extends State<LiveMapView> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<LiveTrackingModal> getEmployeeList11 = getTracking(sessionId!);
     final loading = Row(

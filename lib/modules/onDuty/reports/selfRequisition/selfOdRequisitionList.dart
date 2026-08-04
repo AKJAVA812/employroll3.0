@@ -1,22 +1,17 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/modules/onDuty/reports/selfRequisition/selfOdReqDateSelect.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../ess/myAllReports.dart';
 import '../../../../main.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'modalClass/selfOdReqListModal.dart';
@@ -86,7 +81,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
   }*/
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     print('ResponseAttendance: ${sessionId}');
     print('ResponseAttendance: ${startDate}');
     print('ResponseAttendance: ${endDate}');
@@ -96,12 +91,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
       startDate,
       endDate,
     );
-    if (getEmployeeList11 == null) {
-      return Center(
-        child: "HIi".text.make(),
-        //CircularProgressIndicator()
-      );
-    }
     getEmployeeList11.then((value) {
       setState(() {
         selfOdReqListLabel = value;
@@ -136,7 +125,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
         print('dateTime${formattedDate}');
         setState(() {
           //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-          _fromDateController.text = DateFormat("dd-MM-yyyy").format(_date!);
+          _fromDateController.text = DateFormat("dd-MM-yyyy").format(_date);
         });
       });
     }
@@ -160,7 +149,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
         startDate = DateFormat('yyyy-MM-dd').format(_newdate);
         setState(() {
           //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-          _toDateController.text = DateFormat("dd-MM-yyyy").format(_newdate!);
+          _toDateController.text = DateFormat("dd-MM-yyyy").format(_newdate);
         });
       });
     }
@@ -379,7 +368,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                           });
                         } else {
                           isLoading = true;
-                          sessionId = await shared!.getSessionId();
+                          sessionId = await shared.getSessionId();
                           print('ResponseAttendance: ${sessionId}');
                           print('ResponseAttendance: ${startDate}');
                           print('ResponseAttendance: ${endDate}');

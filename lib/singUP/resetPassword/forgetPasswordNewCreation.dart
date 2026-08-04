@@ -2,12 +2,8 @@ import 'dart:convert';
 
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordOtp.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
-import '../../themes/empThemes.dart';
 import '../login_page.dart';
 
 class ForgotPasswordResetPage extends StatefulWidget {

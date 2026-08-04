@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
 const String backgroundTask = "backgroundLocationTask";

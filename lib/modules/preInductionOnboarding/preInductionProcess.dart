@@ -5,11 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:im_stepper/stepper.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:linear_step_indicator/linear_step_indicator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -277,7 +275,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     Future<OnboardBranchListModal> getEmployeeList13 = getBranchList(
       sessionId!,
     );
@@ -888,7 +886,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                       DateTime? fromDate = DateTime.now();
                                       FocusScope.of(
                                         context,
-                                      ).requestFocus(new FocusNode());
+                                      ).requestFocus(FocusNode());
 
                                       fromDate = await showDatePicker(
                                         context: context,
@@ -949,7 +947,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                       DateTime? fromDate = DateTime.now();
                                       FocusScope.of(
                                         context,
-                                      ).requestFocus(new FocusNode());
+                                      ).requestFocus(FocusNode());
 
                                       fromDate = await showDatePicker(
                                         context: context,
@@ -4475,7 +4473,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                     DateTime? fromDate = DateTime.now();
                                     FocusScope.of(
                                       context,
-                                    ).requestFocus(new FocusNode());
+                                    ).requestFocus(FocusNode());
 
                                     fromDate = await showDatePicker(
                                       context: context,
@@ -4950,11 +4948,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

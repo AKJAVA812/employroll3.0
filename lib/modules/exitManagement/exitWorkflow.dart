@@ -6,11 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:im_stepper/stepper.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:linear_step_indicator/linear_step_indicator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -21,7 +19,6 @@ import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/commanNotificationPage.dart';
-import '../../commanScreen/routes.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import 'exitEmployeeList.dart';
 import 'modalClasses/separationListModal.dart';
@@ -298,7 +295,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
 
     Future<SeparationListModal?> getLeaveType12 = getSeparationList(sessionId!);
     getLeaveType12.then((value) {
@@ -3979,7 +3976,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                     DateTime? fromDate = DateTime.now();
                                     FocusScope.of(
                                       context,
-                                    ).requestFocus(new FocusNode());
+                                    ).requestFocus(FocusNode());
 
                                     fromDate = await showDatePicker(
                                       context: context,
@@ -4228,11 +4225,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

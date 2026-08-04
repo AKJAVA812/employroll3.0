@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/modalClass/addExpDropPolicyModal.dart';
@@ -12,7 +11,6 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:file_picker/file_picker.dart';
@@ -91,7 +89,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   var billAllow = false;
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<AddExpDropPolicyModal> getAppReq11 = getReimbursementTypeList(
       sessionId!,
@@ -390,7 +388,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 DateTime? fromDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 fromDate = await showDatePicker(
                                   context: context,
@@ -447,7 +445,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 DateTime? toDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 toDate = await showDatePicker(
                                   context: context,
@@ -1278,8 +1276,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
     var uri = Uri.parse(
       "http://www.employroll.com/restful/service/claim/requisition/form/details/save",
     );
-    var request = new http.MultipartRequest("Post", uri);
-    request.fields['sessionId'] = sessionId!;
+    var request = http.MultipartRequest("Post", uri);
+    request.fields['sessionId'] = sessionId;
     request.fields['fromDate'] = _fromDateController.text;
     request.fields['toDate'] = _toDateController.text;
     request.fields['fromPlace'] = _fromPlaceController.text;

@@ -3,12 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../commanScreen/allAPIList.dart';
-import '../../commanScreen/routes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../themes/empThemes.dart';
-import '../login_page.dart';
 import 'forgetPasswordOtp.dart';
 
 class ForgotPasswordEmailPage extends StatefulWidget {
@@ -19,7 +16,7 @@ class ForgotPasswordEmailPage extends StatefulWidget {
       _ForgotPasswordEmailPageState();
 }
 
-TextEditingController emailController = new TextEditingController();
+TextEditingController emailController = TextEditingController();
 
 class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
   Future<void> sendOtp(BuildContext context) async {

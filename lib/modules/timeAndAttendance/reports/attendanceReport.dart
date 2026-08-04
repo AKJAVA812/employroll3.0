@@ -1,23 +1,17 @@
 import 'dart:convert';
 
-import 'package:data_table_2/data_table_2.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/allAPIList.dart';
-import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
 import '../../../ess/myAllReports.dart';
 import '../../../main.dart';
-import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 import 'attendanceRequisition/getAttendanceDetails.dart';
 import 'modelClass/attendanceShiftDetModal.dart';
@@ -93,7 +87,7 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     print('ResponseAttendance: ${sessionId}');
     print('ResponseAttendance: ${forDateString}');
     print('ResponseAttendance: ${toDateString}');
@@ -103,15 +97,6 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
       toDateString,
       forDateString,
     );
-    //Shift Check
-    /*  Future<AttendanceShiftDetailsModal> getEmployeeList12 =
-      getStatus(sessionId!);*/
-    if (getEmployeeList11 == null) {
-      return Center(
-        child: "HIi".text.make(),
-        //CircularProgressIndicator()
-      );
-    }
     getEmployeeList11.then((value) {
       setState(() {
         employeeListModelglobel = value;

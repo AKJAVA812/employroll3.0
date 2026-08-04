@@ -7,13 +7,13 @@ class ReasonForLeavingModal {
     if (json['list'] != null) {
       list = <ListData>[];
       json['list'].forEach((v) {
-        list!.add(new ListData.fromJson(v));
+        list!.add(ListData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.list != null) {
       data['list'] = this.list!.map((v) => v.toJson()).toList();
     }
@@ -37,7 +37,7 @@ class ListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['code'] = this.code;
     data['name'] = this.name;
     data['description'] = this.description;

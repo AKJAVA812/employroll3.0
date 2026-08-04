@@ -5,11 +5,9 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
-import 'package:path/path.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../DB/DatabaseHelper.dart';
-import '../FaceRecognitionHome.dart';
 import 'Recognition.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
@@ -88,7 +86,7 @@ class Recognizer {
     var body = json.encode(data);
     //var uri = Uri.parse("$conn$apiUrl");
     var urlapi = Uri.parse("$conn$apiUrl?");
-    var request = new http.MultipartRequest("Post", urlapi);
+    var request = http.MultipartRequest("Post", urlapi);
     var response = await MobileHttpClient.instance.post(
       urlapi,
       headers: {"Content-Type": "application/json"},
@@ -157,7 +155,7 @@ class Recognizer {
 
   List<dynamic> imageToArray(img.Image inputImage) {
     img.Image resizedImage = img.copyResize(
-      inputImage!,
+      inputImage,
       width: WIDTH,
       height: HEIGHT,
     );

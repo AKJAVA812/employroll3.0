@@ -10,10 +10,8 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
-import '../../../../employeePage/employeeListModel.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../modalClass/leaveBalanceModel.dart';
@@ -73,7 +71,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(
       sessionId!,
@@ -386,7 +384,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                 DateTime? fromDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 fromDate = await showDatePicker(
                                   context: context,
@@ -445,7 +443,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                 DateTime? toDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 toDate = await showDatePicker(
                                   context: context,
@@ -506,7 +504,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                               onTap: () async {
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
                                 //_openInTimepicker(context);
                                 final TimeOfDay? n = await showTimePicker(
                                   context: context,
@@ -531,7 +529,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                     now.month,
                                     now.day,
                                     n!.hour,
-                                    n!.minute,
+                                    n.minute,
                                   );
                                   var nT = DateFormat('HH:mm').format(newt);
                                   print(DateFormat('HH:mm').format(newt));
@@ -576,7 +574,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                               onTap: () async {
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
                                 //_openInTimepicker(context);
                                 final TimeOfDay? o = await showTimePicker(
                                   context: context,
@@ -601,7 +599,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                     now.month,
                                     now.day,
                                     o!.hour,
-                                    o!.minute,
+                                    o.minute,
                                   );
                                   var ot = DateFormat('HH:mm').format(newt);
                                   print(DateFormat('HH:mm').format(newt));

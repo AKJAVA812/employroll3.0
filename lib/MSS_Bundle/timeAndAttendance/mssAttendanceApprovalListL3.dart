@@ -8,10 +8,7 @@ import 'package:er_flutter_project/modules/timeAndAttendance/reports/pendingRequ
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
@@ -83,11 +80,11 @@ class _MSS_Att_PendingRequisitionL3State
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
-    getProfileId = await shared!.getDefaultProfileId();
-    levelOne = await shared!.getLevelOne();
-    levelTwo = await shared!.getLevelTwo();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
+    levelOne = await shared.getLevelOne();
+    levelTwo = await shared.getLevelTwo();
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));
@@ -134,7 +131,7 @@ class _MSS_Att_PendingRequisitionL3State
     print('responseemployeeList $getData');
     pendingRequisitionModel = PendingRequisitionModel.fromJson(mapResponse);
 
-    allUsernew = pendingRequisitionModel!.data;
+    allUsernew = pendingRequisitionModel.data;
 
     return pendingRequisitionModel;
   }

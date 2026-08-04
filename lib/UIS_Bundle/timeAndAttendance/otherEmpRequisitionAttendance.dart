@@ -6,17 +6,11 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:intl/intl.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../employeePage/employeeListModel.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
-import '../../../profiles/profilePageWithHead.dart';
-import '../../commanScreen/homePage.dart';
 import '../../modules/leaveManagement/reports/modalClass/leaveBalanceModel.dart';
 import '../../modules/leaveManagement/reports/modalClass/otherReqEmpList.dart';
 import '../../modules/leaveManagement/reports/othersAttendanceList.dart';
@@ -86,12 +80,12 @@ class _UIS_OthersAttendanceRequisitionPageState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanel = await shared!.getUserPanel();
-    getProfileId = await shared!.getDefaultProfileId();
-    branchName = await shared!.getBranch() ?? "N/A";
-    deptName = await shared!.getDept() ?? "N/A";
-    empName = await shared!.getempName() ?? "N/A";
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
+    branchName = await shared.getBranch() ?? "N/A";
+    deptName = await shared.getDept() ?? "N/A";
+    empName = await shared.getempName() ?? "N/A";
     // await Future.delayed(Duration(seconds: 5));
     Future<RequistionEmpListModel> getEmployeeList11 = getEmployeeList(
       sessionId!,
@@ -363,7 +357,7 @@ class _UIS_OthersAttendanceRequisitionPageState
                     child: TextFormField(
                       onTap: () async {
                         DateTime? date = DateTime.now();
-                        FocusScope.of(context).requestFocus(new FocusNode());
+                        FocusScope.of(context).requestFocus(FocusNode());
 
                         date = await showDatePicker(
                           context: context,
@@ -377,7 +371,7 @@ class _UIS_OthersAttendanceRequisitionPageState
                           ).format(date!);
                           _dateController.text = DateFormat(
                             "dd-MM-yyyy",
-                          ).format(date!);
+                          ).format(date);
 
                           //  DateFormat.yMd().format(date!).toString();
                         });
@@ -422,7 +416,7 @@ class _UIS_OthersAttendanceRequisitionPageState
                               MaterialPageRoute(
                                 builder:
                                     (context) => OthersSingleDateAttendance(
-                                      singleDateString: singleDateString!,
+                                      singleDateString: singleDateString,
                                       empId: empNewIdUSER,
                                     ),
                               ),

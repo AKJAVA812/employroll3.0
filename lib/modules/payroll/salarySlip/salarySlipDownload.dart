@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -21,11 +20,9 @@ import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import '../../../commanScreen/allAPIList.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/routes.dart';
-import '../../../main.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 import '../modalClass/salarySlipDownloadModal.dart';
 import 'package:month_year_picker/month_year_picker.dart';
-import 'package:download/download.dart';
 
 class SalarySlipDownload extends StatefulWidget {
   const SalarySlipDownload({Key? key}) : super(key: key);
@@ -59,7 +56,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
         initialDate: DateTime.now(),
         onMonthSelected: (date) {
           setState(() {
-            _dateController.text = DateFormat("MMMM-yy").format(date!);
+            _dateController.text = DateFormat("MMMM-yy").format(date);
             selectedDate = _dateController.text;
             print('MonthPicker $selectedDate');
             getSharedPrfanceList();
@@ -207,7 +204,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
   ReceivePort receivePort = ReceivePort();
   dateSelection() async {
     DateTime? date = DateTime.now();
-    FocusScope.of(context).requestFocus(new FocusNode());
+    FocusScope.of(context).requestFocus(FocusNode());
 
     // Show the month-year picker
     /*date = await showMonthYearPicker(
@@ -322,8 +319,8 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empId = await shared!.getEmpId();
+    sessionId = await shared.getSessionId();
+    empId = await shared.getEmpId();
     print('empId $empId');
     _getTime();
     print('TIME - $timeString');
@@ -479,7 +476,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
   Future<String> getDownloadDirectory() async {
     final directory = await getApplicationDocumentsDirectory();
     // You can also use getApplicationDocumentsDirectory() for the app's documents directory
-    return directory!.path;
+    return directory.path;
   }
 
   void findAndroidDataPath() async {
@@ -834,7 +831,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
                       setState(() {
                         _dateController.text = DateFormat(
                           "MMMM-yy",
-                        ).format(date!);
+                        ).format(date);
                         selectedDate = _dateController.text;
                         print('MonthPicker $selectedDate');
                         getSharedPrfanceList();
@@ -858,7 +855,7 @@ class _SalarySlipDownloadState extends State<SalarySlipDownload> {
                       setState(() {
                         _dateController.text = DateFormat(
                           "MMMM-yy",
-                        ).format(date!);
+                        ).format(date);
                         selectedDate = _dateController.text;
                         print('MonthPicker $selectedDate');
                         getSharedPrfanceList();

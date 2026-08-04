@@ -1,30 +1,22 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import '../../adminPage/modelClass/dashboardModel.dart';
-import '../../adminPage/mssDashboard.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/commanNotificationPage.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
-import '../../commanScreen/routes.dart';
-import '../../commanScreen/ujalaCreditWorkdone.dart';
 import '../../ess/EssDashboarrddModel.dart';
 import '../../ess/essDashboardNavigate.dart';
 import '../../ess/myAllReports.dart';
-import '../../profiles/profilePageWithHead.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
 class HRISDetails extends StatefulWidget {
@@ -518,7 +510,7 @@ class _HRISDetailsState extends State<HRISDetails> {
                                 DateTime? date = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 date = await showDatePicker(
                                   context: context,
@@ -534,7 +526,7 @@ class _HRISDetailsState extends State<HRISDetails> {
                                   ).format(date!);
                                   dateOfBirth.text = DateFormat(
                                     "dd-MM-yyyy",
-                                  ).format(date!);
+                                  ).format(date);
 
                                   //  DateFormat.yMd().format(date!).toString();
                                 });
@@ -562,7 +554,7 @@ class _HRISDetailsState extends State<HRISDetails> {
                                 DateTime? date = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 date = await showDatePicker(
                                   context: context,
@@ -578,7 +570,7 @@ class _HRISDetailsState extends State<HRISDetails> {
                                   ).format(date!);
                                   dateOfjoin = DateFormat(
                                     "dd-MM-yyyy",
-                                  ).format(date!);
+                                  ).format(date);
 
                                   //  DateFormat.yMd().format(date!).toString();
                                 });
@@ -1074,9 +1066,9 @@ class _HRISDetailsState extends State<HRISDetails> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    paycode = await shared!.getEnrollId();
-    orgId = await shared!.getOrgId();
+    sessionId = await shared.getSessionId();
+    paycode = await shared.getEnrollId();
+    orgId = await shared.getOrgId();
   }
 
   showDialgSucess1(BuildContext context, result, alert) {

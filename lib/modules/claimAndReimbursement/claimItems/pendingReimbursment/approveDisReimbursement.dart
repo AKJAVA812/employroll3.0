@@ -6,11 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../commanScreen/routes.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import '../modalClass/pendingReimbListModal.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 class ApproveDisappReimbursement extends StatefulWidget {
@@ -84,7 +82,7 @@ class _ApproveDisappReimbursementState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
   }
 
   @override
@@ -113,7 +111,7 @@ class _ApproveDisappReimbursementState
                                 DateTime? fromDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 fromDate = await showDatePicker(
                                   context: context,
@@ -170,7 +168,7 @@ class _ApproveDisappReimbursementState
                                 DateTime? toDate = DateTime.now();
                                 FocusScope.of(
                                   context,
-                                ).requestFocus(new FocusNode());
+                                ).requestFocus(FocusNode());
 
                                 toDate = await showDatePicker(
                                   context: context,

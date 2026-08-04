@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
@@ -145,18 +144,18 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
   }*/
 
   Future getSharedPrfanceList({bool fromUser = false}) async {
-    sessionId = await shared!.getSessionId();
-    getOrgId = await shared!.getOrgId();
-    userPermissions = await shared!.getUserPanel();
-    getDefaultProfileId = await shared!.getDefaultProfileId();
+    sessionId = await shared.getSessionId();
+    getOrgId = await shared.getOrgId();
+    userPermissions = await shared.getUserPanel();
+    getDefaultProfileId = await shared.getDefaultProfileId();
     exitResignationL1ApprovalShow =
-        await shared!.getExitResignationApproveL1Show();
+        await shared.getExitResignationApproveL1Show();
     exitResignationL1ApprovalView =
-        await shared!.getExitResignationApproveL1View();
+        await shared.getExitResignationApproveL1View();
     exitResignationL2ApprovalShow =
-        await shared!.getExitResignationApproveL2Show();
+        await shared.getExitResignationApproveL2Show();
     exitResignationL2ApprovalView =
-        await shared!.getExitResignationApproveL2View();
+        await shared.getExitResignationApproveL2View();
 
     // ðŸ‘‡ Skip resetting selectedFilter if triggered from user selection
     if (!fromUser) {

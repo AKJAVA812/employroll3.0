@@ -14,16 +14,12 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../commanScreen/allAPIList.dart';
 import '../commanScreen/commanNotificationPage.dart';
-import '../commanScreen/homePage.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../commanScreen/routes.dart';
-import '../main.dart';
-import '../profiles/profilePageWithHead.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
 import 'Model/employeeResignationListModal.dart';
 import 'Model/reasonForLeavingModal.dart';
-import 'dart:developer' as developer;
 import 'myAllReports.dart';
 
 class ResignationRequisitionPage extends StatefulWidget {
@@ -65,7 +61,7 @@ class _ResignationRequisitionPageState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     Future<ReasonForLeavingModal> getEmployeeList13 = getReasonforLeavingList(
       sessionId!,
     );
@@ -352,11 +348,6 @@ class _ResignationRequisitionPageState
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

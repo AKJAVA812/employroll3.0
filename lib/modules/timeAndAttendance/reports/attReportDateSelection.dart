@@ -7,13 +7,9 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
-import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
 import '../../../ess/myAllReports.dart';
-import '../../../profiles/profilePageWithHead.dart';
 
 class AttReport extends StatefulWidget {
   const AttReport({Key? key}) : super(key: key);

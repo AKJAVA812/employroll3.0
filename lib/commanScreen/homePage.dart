@@ -1,34 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:datetime_setting/datetime_setting.dart';
 import 'package:detect_fake_location/detect_fake_location.dart';
-import 'package:er_flutter_project/employeePage/mapView.dart';
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:er_flutter_project/ess/essDashboard.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/commanScreen/ProjectListPage.dart';
 import 'package:er_flutter_project/commanScreen/punchInUploadPage.dart';
-import 'package:er_flutter_project/commanScreen/recognization_page.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/commanScreen/skyDecorWorkDone.dart';
 import 'package:er_flutter_project/commanScreen/workDonePage.dart';
 import 'package:er_flutter_project/commanScreen/ujalaCreditWorkdone.dart';
-import 'package:er_flutter_project/modules/helpDesk/helpdeskItem/helpdeskItem.dart';
 import 'package:er_flutter_project/profiles/profilePage.dart';
 import 'package:er_flutter_project/singUP/model/loginModel.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:ntp/ntp.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:camera/camera.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../UIS_Bundle/dashboard/adminDashboard.dart' as mss;
 import '../ess/essDashboard.dart' as ess;
@@ -38,7 +27,6 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/singUP/login_page.dart';
-import 'package:er_flutter_project/widgets/drawer_file.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
@@ -48,13 +36,10 @@ import 'package:er_flutter_project/services/mobile_http_client.dart';
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import '../adminPage/modelClass/dashboardModel.dart';
 import '../ess/myAllReports.dart';
-import '../ess/myAllRequestsPage.dart';
-import '../ess/myAllRequestsPageNoHead.dart';
 import '../modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../mss_profiles/global_profile.dart';
 import '../mss_profiles/organisationListModal.dart';
 import '../mss_profiles/profileListModal.dart';
-import '../reports/reportPage.dart';
 import '../settings/checkForUpdates.dart';
 import '../settings/companyPolicyList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
@@ -186,12 +171,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     // TODO: implement initState
-    _loginModel = new LoginModel();
+    _loginModel = LoginModel();
     getSharedPrfanceList();
     loadRequisitionCountsFromPrefs();
     currentIndex = widget.selectedIndex;
-    var now = new DateTime.now();
-    var newFormat = new DateFormat('dd-MM-yyyy');
+    var now = DateTime.now();
+    var newFormat = DateFormat('dd-MM-yyyy');
     todayDateShowNew = newFormat.format(now);
     getUserNameImage();
     MobileAuthService.instance.syncOnAppOpen();
@@ -599,7 +584,7 @@ class _HomePageState extends State<HomePage> {
 
   showLoaderDialog(BuildContext context) {
     AlertDialog alert = AlertDialog(
-      content: new Row(
+      content: Row(
         children: [
           CircularProgressIndicator(),
           Container(
@@ -1218,7 +1203,7 @@ class _DefaultPageState extends State<DefaultPage> {
 
   Future<void> getAddress(Position positionCheck) async {
     List<Placemark> pleaceMark = await placemarkFromCoordinates(
-      positionCheck!.latitude,
+      positionCheck.latitude,
       positionCheck.longitude,
     );
     Placemark placemarkee = pleaceMark[0];
@@ -1354,7 +1339,7 @@ class _DefaultPageState extends State<DefaultPage> {
         final imageValue = await ImagePicker()
             .pickImage(source: ImageSource.camera)
             .then((value) {
-              if (value != null) this._workDoneImage = File(value!.path);
+              if (value != null) this._workDoneImage = File(value.path);
               if (value == null) {
                 Navigator.pushNamed(context, MyRoutings.punchInRoute);
                 //Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
@@ -2230,8 +2215,8 @@ class _DefaultPageState extends State<DefaultPage> {
 
   getTimeUpdate() {
     setState(() {
-      var now = new DateTime.now();
-      var formatter = new DateFormat('yyyy-MM-dd HH:mm:ss');
+      var now = DateTime.now();
+      var formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
       todayDate = formatter.format(now);
     });
   }
@@ -2268,7 +2253,7 @@ class _DefaultPageState extends State<DefaultPage> {
       "deviceId=$sessionId&"
       "battery=$sessionId",
     );
-    var request = new http.MultipartRequest("Post", urlapi);
+    var request = http.MultipartRequest("Post", urlapi);
     http.Response response = await http.Response.fromStream(
       await request.send(),
     );
@@ -2420,7 +2405,7 @@ class _DefaultPageState extends State<DefaultPage> {
       "deviceId=$sessionId&"
       "battery=$sessionId",
     );
-    var request = new http.MultipartRequest("Post", urlapi);
+    var request = http.MultipartRequest("Post", urlapi);
     http.Response response = await http.Response.fromStream(
       await request.send(),
     );
@@ -2496,7 +2481,7 @@ class _DefaultPageState extends State<DefaultPage> {
       "battery=$sessionId&"
       "geofenceId=$selectedGeofenceId",
     );
-    var request = new http.MultipartRequest("Post", urlapi);
+    var request = http.MultipartRequest("Post", urlapi);
     http.Response response = await http.Response.fromStream(
       await request.send(),
     );

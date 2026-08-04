@@ -5,13 +5,10 @@ import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 import '../../commanScreen/allAPIList.dart';
-import '../../commanScreen/homePage.dart';
 import '../../themes/empThemes.dart';
 import '../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'downloadLetter.dart';
@@ -46,8 +43,8 @@ class _DocumentsAddedState extends State<DocumentsAdded> {
 
   var empIdCheck;
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empIdCheck = await shared!.getEmpId();
+    sessionId = await shared.getSessionId();
+    empIdCheck = await shared.getEmpId();
     print("EMPID - $empIdCheck");
     Future<DocumentListModal> getEmployeeList11 = getDocuments(sessionId!);
     getEmployeeList11.then((value) {

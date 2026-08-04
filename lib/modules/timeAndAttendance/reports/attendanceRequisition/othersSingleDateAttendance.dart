@@ -1,29 +1,20 @@
-import 'dart:collection';
 import 'dart:convert';
 
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/otherEmpRequisitionAttendance.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/attendanceRequisition.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import '../../../../MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import '../../../../UIS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import 'attendanceList.dart';
-import 'model/onDateReportModel.dart';
 import 'othersAttendanceRequisitionPage.dart';
 import 'othersOnDateAttendanceModal.dart';
 
@@ -87,8 +78,8 @@ class _OthersSingleDateAttendanceState
   }*/
   Future<void> getSharedPrfanceList() async {
     try {
-      sessionId = await shared!.getSessionId();
-      userPanel = await shared!.getUserPanel();
+      sessionId = await shared.getSessionId();
+      userPanel = await shared.getUserPanel();
 
       if (userPanel == "MSS") {
         empId = empNewIdMSS;

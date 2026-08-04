@@ -22,20 +22,20 @@ class SelfLoanRequestModal {
       loanRequisitionApprovedlist = <LoanRequisitionApprovedlist>[];
       json['loanRequisitionApprovedlist'].forEach((v) {
         loanRequisitionApprovedlist!
-            .add(new LoanRequisitionApprovedlist.fromJson(v));
+            .add(LoanRequisitionApprovedlist.fromJson(v));
       });
     }
     if (json['loanRequisitionDisapprovelist'] != null) {
       loanRequisitionDisapprovelist = <LoanRequisitionDisapprovelist>[];
       json['loanRequisitionDisapprovelist'].forEach((v) {
         loanRequisitionDisapprovelist!
-            .add(new LoanRequisitionDisapprovelist.fromJson(v));
+            .add(LoanRequisitionDisapprovelist.fromJson(v));
       });
     }
     if (json['loanRequiDataforOthers'] != null) {
       loanRequiDataforOthers = <LoanRequiDataforOthers>[];
       json['loanRequiDataforOthers'].forEach((v) {
-        loanRequiDataforOthers!.add(new LoanRequiDataforOthers.fromJson(v));
+        loanRequiDataforOthers!.add(LoanRequiDataforOthers.fromJson(v));
       });
     }
     disApprovedValue = json['disApprovedValue'];
@@ -43,14 +43,14 @@ class SelfLoanRequestModal {
       loanRequisitionPendinglist = <LoanRequisitionPendinglist>[];
       json['loanRequisitionPendinglist'].forEach((v) {
         loanRequisitionPendinglist!
-            .add(new LoanRequisitionPendinglist.fromJson(v));
+            .add(LoanRequisitionPendinglist.fromJson(v));
       });
     }
     pendingAmount = json['pendingAmount'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['approvedValue'] = this.approvedValue;
     if (this.loanRequisitionApprovedlist != null) {
       data['loanRequisitionApprovedlist'] =
@@ -160,7 +160,7 @@ class LoanRequisitionApprovedlist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['desig'] = this.desig;
     data['LoanType'] = this.loanType;
@@ -277,7 +277,7 @@ class LoanRequisitionDisapprovelist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['desig'] = this.desig;
     data['LoanType'] = this.loanType;
@@ -394,7 +394,7 @@ class LoanRequiDataforOthers {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['desig'] = this.desig;
     data['LoanType'] = this.loanType;
@@ -511,7 +511,7 @@ class LoanRequisitionPendinglist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['desig'] = this.desig;
     data['LoanType'] = this.loanType;

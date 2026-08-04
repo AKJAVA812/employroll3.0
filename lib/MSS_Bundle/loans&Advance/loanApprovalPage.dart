@@ -194,10 +194,10 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    loanApprovalL1Perm = await shared!.getLoanApprovalL1MSS();
-    loanApprovalL2Perm = await shared!.getLoanApprovalL2MSS();
-    loanApprovalL3Perm = await shared!.getLoanApprovalL3MSS();
+    sessionId = await shared.getSessionId();
+    loanApprovalL1Perm = await shared.getLoanApprovalL1MSS();
+    loanApprovalL2Perm = await shared.getLoanApprovalL2MSS();
+    loanApprovalL3Perm = await shared.getLoanApprovalL3MSS();
 
     print("Loan Approval L1 - $loanApprovalL1Perm");
     print("Loan Approval L2 - $loanApprovalL2Perm");
@@ -1146,11 +1146,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

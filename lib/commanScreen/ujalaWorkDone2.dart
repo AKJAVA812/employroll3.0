@@ -7,7 +7,6 @@ import 'package:er_flutter_project/commanScreen/commanNotificationPage.dart';
 import 'package:er_flutter_project/commanScreen/punchInOutScreen.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/commanScreen/ujalaCreditWorkdone.dart';
-import 'package:er_flutter_project/commanScreen/ujalaWorkDone2.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,9 +15,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
-import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import '../adminPage/adminDashboard/adminDashboard.dart';
 import 'allAPIList.dart';
 
 class UjalaCreditWDSubmit extends StatefulWidget {
@@ -100,10 +97,10 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
   );
 
   var titleName = "Workdone Report";
-  TextEditingController _ussNoController = new TextEditingController();
-  TextEditingController _ujalaJyoti = new TextEditingController();
-  TextEditingController _todayBusiness = new TextEditingController();
-  TextEditingController _remarksController = new TextEditingController();
+  TextEditingController _ussNoController = TextEditingController();
+  TextEditingController _ujalaJyoti = TextEditingController();
+  TextEditingController _todayBusiness = TextEditingController();
+  TextEditingController _remarksController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   String singleDateString = "";
 
@@ -165,10 +162,10 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    latt = await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    latt = await shared.getLatitude();
 
-    lngg = await shared!.getLongitude();
+    lngg = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
     print('Response snapshot: ${sessionId}');
@@ -244,8 +241,8 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
       "ujalaRemarks=${_remarksController.text}",
     );
     //final response = await MobileHttpClient.instance.post(urlapi);
-    var request = new http.MultipartRequest("Post", urlapi);
-    var multipart = new http.MultipartFile(
+    var request = http.MultipartRequest("Post", urlapi);
+    var multipart = http.MultipartFile(
       'image',
       stream,
       length,
@@ -457,7 +454,7 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                       child: TextFormField(
                         onTap: () async {
                           DateTime? date = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
+                          FocusScope.of(context).requestFocus(FocusNode());
 
                           date = await showDatePicker(
                             context: context,
@@ -471,7 +468,7 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                             ).format(date!);
                             _dateController.text = DateFormat(
                               "dd-MM-yyyy",
-                            ).format(date!);
+                            ).format(date);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });

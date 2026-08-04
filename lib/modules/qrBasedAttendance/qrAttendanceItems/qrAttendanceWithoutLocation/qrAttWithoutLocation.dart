@@ -1,19 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/services.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
-import 'package:http/http.dart' as http;
 
 class QRAttWithoutLocation extends StatefulWidget {
   const QRAttWithoutLocation({Key? key}) : super(key: key);
@@ -112,10 +106,10 @@ class _QRPageViewState extends State<QRPageView> {
     super.initState();
   }
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    lat=await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    lat=await shared.getLatitude();
     //empCode = await shared!.getEmpCode()??"N/A";
-    lng=await shared!.getLongitude();
+    lng=await shared.getLongitude();
     orgnizationID=await shared.getOrgId();
 
     print('Response snapshot: ${sessionId}');
@@ -245,7 +239,7 @@ class _QRPageViewState extends State<QRPageView> {
   File? _workDoneImage;
 
   Future getUserName() async {
-    UserName = await shared!.getempName();
+    UserName = await shared.getempName();
     print('Response snapshot: ${UserName}');
   }
 

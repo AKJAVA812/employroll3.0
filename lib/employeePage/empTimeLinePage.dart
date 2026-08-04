@@ -7,7 +7,6 @@ import 'package:er_flutter_project/employeePage/mapView.dart';
 import 'package:timelines/timelines.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../commanScreen/allAPIList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
@@ -53,7 +52,7 @@ class _TimeLineEmpState extends State<TimeLineEmp> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<TimeLineModal> getEmployeeList11 = getTimeLine(sessionId!);
     futureTimeline = getTimeLine(sessionId!);

@@ -9,13 +9,13 @@ class RaisedQueryListModal {
     if (json['dataList'] != null) {
       dataList = <DataList>[];
       json['dataList'].forEach((v) {
-        dataList!.add(new DataList.fromJson(v));
+        dataList!.add(DataList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['status'] = this.status;
     if (this.dataList != null) {
       data['dataList'] = this.dataList!.map((v) => v.toJson()).toList();
@@ -73,7 +73,7 @@ class DataList {
     if (json['queryStatusList'] != null) {
       queryStatusList = <QueryStatusList>[];
       json['queryStatusList'].forEach((v) {
-        queryStatusList!.add(new QueryStatusList.fromJson(v));
+        queryStatusList!.add(QueryStatusList.fromJson(v));
       });
     }
     reOpenId = json['reOpenId'];
@@ -87,7 +87,7 @@ class DataList {
     if (json['priorityList'] != null) {
       priorityList = <PriorityList>[];
       json['priorityList'].forEach((v) {
-        priorityList!.add(new PriorityList.fromJson(v));
+        priorityList!.add(PriorityList.fromJson(v));
       });
     }
     imagePath = json['imagePath'];
@@ -99,7 +99,7 @@ class DataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['level'] = this.level;
     data['queryStatus'] = this.queryStatus;
     data['empId'] = this.empId;
@@ -140,7 +140,7 @@ class PriorityList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['name'] = this.name;
     data['id'] = this.id;
     return data;
@@ -159,7 +159,7 @@ class QueryStatusList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['name'] = this.name;
     data['id'] = this.id;
     return data;

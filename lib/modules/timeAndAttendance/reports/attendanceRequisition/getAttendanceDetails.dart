@@ -1,35 +1,25 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/singleDateAttendance.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../ess/EssDashboarrddModel.dart';
 import '../../../../ess/Model/calendarModalClass.dart';
 import '../../../../ess/essDashboardNavigate.dart';
 import '../../../../ess/myAllReports.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'dart:developer' as developer;
 import '../../calendarPage/attendanceRequetCalendar.dart';
 import '../modelClass/attendanceReportModel.dart';
-import 'model/onDateReportModel.dart';
 
 class GetAttendanceDet extends StatefulWidget {
   final bool showAppBar;
@@ -85,10 +75,10 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
   Future getSharedPrfanceList() async {
     //await Future.delayed(Duration(seconds: 1));
 
-    sessionId = await shared!.getSessionId() ?? "N/A";
-    branchName = await shared!.getBranch() ?? "N/A";
-    deptName = await shared!.getDept() ?? "N/A";
-    empName = await shared!.getempName() ?? "N/A";
+    sessionId = await shared.getSessionId() ?? "N/A";
+    branchName = await shared.getBranch() ?? "N/A";
+    deptName = await shared.getDept() ?? "N/A";
+    empName = await shared.getempName() ?? "N/A";
 
     deadlineStartDate = await shared.getPayCycleStart() ?? "0";
     deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
@@ -176,7 +166,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     return calendarModalClass;
   }
 
-  EventList<Event> _markedDateMap = new EventList<Event>(
+  EventList<Event> _markedDateMap = EventList<Event>(
     events: {
       /*new DateTime(2024, 2, 1): [
         new Event(
@@ -862,7 +852,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
         print("Cycle Start: $cycleStart");
         print("Cycle End:   $cycleEnd");
-        if (lockDateStr != null && lockDateStr.trim().isNotEmpty) {
+        if (lockDateStr.trim().isNotEmpty) {
           // Convert String â†’ DateTime
           DateTime lockDateTime = DateFormat(
             "dd-MM-yyyy hh:mm",
@@ -947,7 +937,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           MaterialPageRoute(
             builder:
                 (context) => AttendanceRequisitionCalendar(
-                  new AttendanceReportModel(),
+                  AttendanceReportModel(),
                   calendarSendData,
                   0,
                   "$formattedDate",
@@ -1092,7 +1082,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
               left: 16.0,
               right: 16.0,
             ),
-            child: new Row(
+            child: Row(
               children: <Widget>[
                 Expanded(
                   child: Text(

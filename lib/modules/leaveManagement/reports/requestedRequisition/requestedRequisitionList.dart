@@ -1,25 +1,17 @@
 import 'dart:convert';
-import 'dart:math';
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../ess/myAllReports.dart';
 import '../../../../main.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:badges/badges.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../leaveRequisition/leaveRequisitionPage.dart';
@@ -77,7 +69,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
 
     Future<SelfLeaveRequisitionListModal> getAppReq11 = getSelfLeaveReqList(
@@ -410,9 +402,9 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(8.0),
-        itemCount: selfLeaveRequisitionListModal!.data!.length,
+        itemCount: selfLeaveRequisitionListModal.data!.length,
         itemBuilder: (context, index) {
-          final leaveData = selfLeaveRequisitionListModal!.data![index];
+          final leaveData = selfLeaveRequisitionListModal.data![index];
           final statusCheck = leaveData.status.toString();
 
           return InkWell(

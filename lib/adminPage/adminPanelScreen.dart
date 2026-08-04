@@ -15,7 +15,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:http/http.dart' as http;
 import '../adminPage/modelClass/dashboardModel.dart';
 import '../commanScreen/commanNotificationPage.dart';
 import '../sharedPrefancePage/ShardPre.dart';
@@ -255,7 +254,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
   showLoaderDialog(BuildContext context) {
     AlertDialog alert = AlertDialog(
-      content: new Row(
+      content: Row(
         children: [
           CircularProgressIndicator(),
           Container(
@@ -292,7 +291,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
   Future<void> getAddress(Position position) async {
     List<Placemark> pleaceMark =
-    await placemarkFromCoordinates(position!.latitude, position.longitude);
+    await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark placemarkee = pleaceMark[0];
     //print('Response1111css $position');
     var contryName = placemarkee.country;
@@ -314,8 +313,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    imageString= await shared!.getProfileImage();
+    sessionId = await shared.getSessionId();
+    imageString= await shared.getProfileImage();
     print('Response snapshot: ${sessionId}');
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
@@ -328,13 +327,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    _loginModel=new LoginModel();
+    _loginModel=LoginModel();
     _determinePosition();
     _getUserLocation();
     getSharedPrfanceList();
     currentAddresses;
-    var now = new DateTime.now();
-    var formatter = new DateFormat('dd/MM/yyyy');
+    var now = DateTime.now();
+    var formatter = DateFormat('dd/MM/yyyy');
     todayDate = formatter.format(now);
     super.initState();
     /*controller = CameraController(

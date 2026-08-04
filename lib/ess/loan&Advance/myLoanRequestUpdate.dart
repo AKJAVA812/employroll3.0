@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:er_flutter_project/ess/loan&Advance/myLoanRequestList.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/material.dart';
@@ -693,11 +692,6 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

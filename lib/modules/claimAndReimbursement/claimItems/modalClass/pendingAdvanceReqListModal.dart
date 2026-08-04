@@ -7,13 +7,13 @@ class PendingAdvReqListModal {
     if (json['claimAdvDatalist'] != null) {
       claimAdvDatalist = <ClaimAdvDatalist>[];
       json['claimAdvDatalist'].forEach((v) {
-        claimAdvDatalist!.add(new ClaimAdvDatalist.fromJson(v));
+        claimAdvDatalist!.add(ClaimAdvDatalist.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.claimAdvDatalist != null) {
       data['claimAdvDatalist'] =
           this.claimAdvDatalist!.map((v) => v.toJson()).toList();
@@ -72,7 +72,7 @@ class ClaimAdvDatalist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['empId'] = this.empId;
     data['purpose'] = this.purpose;

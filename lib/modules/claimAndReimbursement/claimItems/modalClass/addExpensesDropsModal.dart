@@ -17,26 +17,26 @@ class AddExpensesDrops {
     if (json['subExpDataList'] != null) {
       subExpDataList = <SubExpDataList>[];
       json['subExpDataList'].forEach((v) {
-        subExpDataList!.add(new SubExpDataList.fromJson(v));
+        subExpDataList!.add(SubExpDataList.fromJson(v));
       });
     }
     isOtherAllowed = json['isOtherAllowed'];
     if (json['expenseDataList'] != null) {
       expenseDataList = <ExpenseDataList>[];
       json['expenseDataList'].forEach((v) {
-        expenseDataList!.add(new ExpenseDataList.fromJson(v));
+        expenseDataList!.add(ExpenseDataList.fromJson(v));
       });
     }
     if (json['catDataList'] != null) {
       catDataList = <CatDataList>[];
       json['catDataList'].forEach((v) {
-        catDataList!.add(new CatDataList.fromJson(v));
+        catDataList!.add(CatDataList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['billAllow'] = this.billAllow;
     if (this.subExpDataList != null) {
       data['subExpDataList'] =
@@ -71,7 +71,7 @@ class SubExpDataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['subExpName'] = this.subExpName;
     data['isPerkmAllowed'] = this.isPerkmAllowed;
     data['subExpId'] = this.subExpId;
@@ -97,7 +97,7 @@ class ExpenseDataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['expenseId'] = this.expenseId;
     data['isOtherAllowed'] = this.isOtherAllowed;
     data['claimId'] = this.claimId;
@@ -122,7 +122,7 @@ class CatDataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['catId'] = this.catId;
     data['isPerkmAllowed'] = this.isPerkmAllowed;
     data['catName'] = this.catName;

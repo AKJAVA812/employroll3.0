@@ -7,8 +7,6 @@ import 'package:er_flutter_project/MSS_Bundle/incidentReporting/incidentReportin
 import 'package:er_flutter_project/adminPage/adminPanelScreen.dart';
 import 'package:er_flutter_project/commanScreen/modalClass/attendance_punch.dart';
 import 'package:er_flutter_project/ess/loan&Advance/myLoanRequestList.dart';
-import 'package:er_flutter_project/firebasePushNotification/firebase_api.dart';
-import 'package:er_flutter_project/firebase_options.dart';
 import 'package:er_flutter_project/settings/checkForUpdates.dart';
 import 'package:er_flutter_project/settings/companyPolicyList.dart';
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordEmail.dart';
@@ -16,7 +14,6 @@ import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordNewCreatio
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordOtp.dart';
 import 'package:er_flutter_project/singUP/resetPassword/resetPasswordPage.dart';
 import 'package:er_flutter_project/tracking/geolocator/GeolocatorTracking.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:er_flutter_project/adminPage/modelClass/dashboardModel.dart';
@@ -44,17 +41,14 @@ import 'package:er_flutter_project/reports/reportPageHead.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:er_flutter_project/singUP/login_page.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:er_flutter_project/tracking/trackingMain.dart';
 import 'package:er_flutter_project/widgets/expendableList.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:location/location.dart';
 import 'package:month_year_picker/month_year_picker.dart';
-import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:upgrader/upgrader.dart';
 /*import 'ESS_Bundle/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
@@ -704,7 +698,7 @@ class _MyHomePageState extends State<MyHomePage> {
               (context) => AttendanceList(AttendanceReportModel()),
           MyRoutings.attendanceRequisitionRoute:
               (context) => AttendanceRequisition(
-                new AttendanceReportModel(),
+                AttendanceReportModel(),
                 OnDateAttModel(),
                 0,
               ),
@@ -726,7 +720,7 @@ class _MyHomePageState extends State<MyHomePage> {
               (context) => PendingRequisitionRo(PendingRequisitionModel()),
           MyRoutings.approveDisapproveReqRoute:
               (context) =>
-                  ApproveDisapproveReq(new PendingRequisitionModel(), 0),
+                  ApproveDisapproveReq(PendingRequisitionModel(), 0),
           MyRoutings.adminDashboardRoute:
               (context) => AdminDashboard(DashboardModel()),
           MyRoutings.singleDateAttendanceRoute:
@@ -754,17 +748,17 @@ class _MyHomePageState extends State<MyHomePage> {
               (context) => PendingAdvanceReqList(PendingAdvReqListModal()),
           MyRoutings.approveDisAdvanceReqRoute:
               (context) =>
-                  AppDispPendingAdvanceReq(new PendingAdvReqListModal(), 0),
+                  AppDispPendingAdvanceReq(PendingAdvReqListModal(), 0),
           MyRoutings.expenseListRoute:
               (context) => ExpenseList(ExpensesListModal()),
           MyRoutings.addExpenseRoute: (context) => AddExpensePage(),
           MyRoutings.deleteExpenseListRoute:
-              (context) => DeleteExpenseList(new ExpensesListModal(), 0),
+              (context) => DeleteExpenseList(ExpensesListModal(), 0),
           MyRoutings.pendingReimbursementRoute:
               (context) => PendingListReimbursement(PendingReimbListModal()),
           MyRoutings.approveDisReimbursementRoute:
               (context) =>
-                  ApproveDisappReimbursement(new PendingReimbListModal(), 0),
+                  ApproveDisappReimbursement(PendingReimbListModal(), 0),
           MyRoutings.approveDisReimbursementListRoute:
               (context) => ApprovalListReimbursement(AppDisReimbListModal()),
           MyRoutings.approveDisAdvanceListRoute:
@@ -776,14 +770,14 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.odAttendanceListRoute: (context) => ODAttendanceList(),
           MyRoutings.odRequisitionPageRoute:
               (context) => ODRequisitionPage(
-                new AttendanceReportModel(),
+                AttendanceReportModel(),
                 OnDateAttModel(),
                 0,
               ),
           MyRoutings.pendingRequisitionListRoute:
               (context) => PendingOdRequisition(PendingOdReqList()),
           MyRoutings.odApproveDisapproveReqRoute:
-              (context) => OdApproveDisapproveReq(new PendingOdReqList(), 0),
+              (context) => OdApproveDisapproveReq(PendingOdReqList(), 0),
           MyRoutings.selfOdRequisitionRoute:
               (context) => SelfODRequisitionList(startDate: "", endDate: ""),
           MyRoutings.odLocationViewRoute: (context) => ODLocationView(),
@@ -809,12 +803,12 @@ class _MyHomePageState extends State<MyHomePage> {
               (context) => LevelTwoPendingLeave(LevelTwoPendingLeaveModal()),
           MyRoutings.pendingLeaveAppDisRoute:
               (context) => PendingLeaveApproveDisapprove(
-                new PendingLeaveRequisitionModal(),
+                PendingLeaveRequisitionModal(),
                 0,
               ),
           MyRoutings.levelOneApprovalRoute:
               (context) =>
-                  LevelOnePendingApproval(new LevelOnePendingLeaveModal(), 0),
+                  LevelOnePendingApproval(LevelOnePendingLeaveModal(), 0),
           MyRoutings.projectManageItemsRoute: (context) => ProjectManageItems(),
           MyRoutings.othersEmpReqRoute: (context) => OthersLeaveReqPage(),
           MyRoutings.odSelfReqDateSelectRoute: (context) => OdSelfReqDate(),
@@ -896,7 +890,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   OthersSingleDateAttendance(singleDateString: "", empId: 0),
           MyRoutings.otherAttendanceReq:
               (context) => OthersAttendanceRequisition(
-                new AttendanceReportModel(),
+                AttendanceReportModel(),
                 OthersOnDateAttendanceModal(),
                 0,
               ),

@@ -4,8 +4,6 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
@@ -52,9 +50,9 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
     userPanelPermission= await shared.getUserPanel();
     print("User Panel - $userPanelPermission");
     emailId= await shared.getEmailId();
-    levelOne = await shared!.getLevelOne();
-    levelTwo = await shared!.getLevelTwo();
-    pendingLeaveRequisitions = await shared!.getPendingLeaveReq();
+    levelOne = await shared.getLevelOne();
+    levelTwo = await shared.getLevelTwo();
+    pendingLeaveRequisitions = await shared.getPendingLeaveReq();
     print("Level 1 - $levelOne");
     print("Level 2 - $levelTwo");
     print("Pending Leave Requisitions - $pendingLeaveRequisitions");

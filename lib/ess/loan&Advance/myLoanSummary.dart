@@ -136,7 +136,7 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<LoanSummaryModal> getEmployeeList11 = getLoanSummary(sessionId!);
     final loading = Row(
@@ -377,11 +377,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

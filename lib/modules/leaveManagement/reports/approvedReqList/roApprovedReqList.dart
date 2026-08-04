@@ -3,12 +3,8 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
@@ -16,7 +12,6 @@ import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:badges/badges.dart';
 import 'approvedLeaveReqModal.dart';
 
 class ApprovedLeaveRequisitionList extends StatefulWidget {
@@ -72,10 +67,10 @@ class _ApprovedLeaveRequisitionListState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    getProfileId = await shared!.getDefaultProfileId();
-    getOrgId = await shared!.getOrgId();
-    userPanelPerm = await shared!.getUserPanel();
+    sessionId = await shared.getSessionId();
+    getProfileId = await shared.getDefaultProfileId();
+    getOrgId = await shared.getOrgId();
+    userPanelPerm = await shared.getUserPanel();
     // await Future.delayed(Duration(seconds: 5));
     Future<ApprovedLeaveReqModal> getAppReq11 = getApprovedLeaveReqList(
       sessionId!,
@@ -320,7 +315,7 @@ class _ApprovedLeaveRequisitionListState
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
-        itemCount: approvedLeaveReqModal!.result!.data!.length,
+        itemCount: approvedLeaveReqModal.result!.data!.length,
         itemBuilder: (context, i) {
           return InkWell(
             onTap: () {

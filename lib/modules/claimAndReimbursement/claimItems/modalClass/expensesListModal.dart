@@ -7,13 +7,13 @@ class ExpensesListModal {
     if (json['claimRequiDatalist'] != null) {
       claimRequiDatalist = <ClaimRequiDatalist>[];
       json['claimRequiDatalist'].forEach((v) {
-        claimRequiDatalist!.add(new ClaimRequiDatalist.fromJson(v));
+        claimRequiDatalist!.add(ClaimRequiDatalist.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.claimRequiDatalist != null) {
       data['claimRequiDatalist'] =
           this.claimRequiDatalist!.map((v) => v.toJson()).toList();
@@ -114,7 +114,7 @@ class ClaimRequiDatalist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['claimNo'] = this.claimNo;
     data['distance'] = this.distance;

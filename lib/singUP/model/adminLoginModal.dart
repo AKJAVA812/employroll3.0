@@ -4,11 +4,11 @@ class AdminLoginModal {
   AdminLoginModal({this.data});
 
   AdminLoginModal.fromJson(Map<String, dynamic> json) {
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -54,7 +54,7 @@ class Data {
     branchId = json['branchId'];
     odReq = json['odReq'];
     userLoginned = json['userLoginned'] != null
-        ? new UserLoginned.fromJson(json['userLoginned'])
+        ? UserLoginned.fromJson(json['userLoginned'])
         : null;
 
     userPermissions = json['userPermissions'].cast<String>();
@@ -71,7 +71,7 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['branchId'] = this.branchId;
     data['odReq'] = this.odReq;
     if (this.userLoginned != null) {
@@ -141,7 +141,7 @@ class UserLoginned {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['userId'] = this.userId;
     data['otp'] = this.otp;
     data['userType'] = this.userType;

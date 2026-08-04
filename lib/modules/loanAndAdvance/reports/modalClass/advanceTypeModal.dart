@@ -7,13 +7,13 @@ class AdvanceTypeListModal {
     if (json['advancedata'] != null) {
       advancedata = <Advancedata>[];
       json['advancedata'].forEach((v) {
-        advancedata!.add(new Advancedata.fromJson(v));
+        advancedata!.add(Advancedata.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.advancedata != null) {
       data['advancedata'] = this.advancedata!.map((v) => v.toJson()).toList();
     }
@@ -35,7 +35,7 @@ class Advancedata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['advanceId'] = this.advanceId;
     data['advanceName'] = this.advanceName;
     data['status'] = this.status;

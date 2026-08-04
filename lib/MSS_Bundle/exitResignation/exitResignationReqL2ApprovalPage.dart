@@ -75,11 +75,11 @@ class _ExitResignationL2ApprovalPageState
   ];
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    approveButtonL2Show = await shared!.getExitResignationApproveL2Show();
-    approveButtonL2View = await shared!.getExitResignationApproveL2View();
-    disApproveButtonL2Show = await shared!.getExitResignationDisApproveL2Show();
-    disApproveButtonL2View = await shared!.getExitResignationDisApproveL2View();
+    sessionId = await shared.getSessionId();
+    approveButtonL2Show = await shared.getExitResignationApproveL2Show();
+    approveButtonL2View = await shared.getExitResignationApproveL2View();
+    disApproveButtonL2Show = await shared.getExitResignationDisApproveL2Show();
+    disApproveButtonL2View = await shared.getExitResignationDisApproveL2View();
 
     print("Approve L2 Show - $approveButtonL2Show");
     print("Approve L2 View - $approveButtonL2View");
@@ -715,11 +715,6 @@ class _ExitResignationL2ApprovalPageState
     String result,
     String alert,
   ) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

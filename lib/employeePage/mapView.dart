@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/employeePage/employeeListPage.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -85,7 +84,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
 
   dateSelection() async {
     DateTime? date = DateTime.now();
-    FocusScope.of(context).requestFocus(new FocusNode());
+    FocusScope.of(context).requestFocus(FocusNode());
 
     date = await showDatePicker(
       context: context,
@@ -95,7 +94,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     );
     setState(() {
       singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-      _dateController.text = DateFormat("yyyy-MM-dd").format(date!);
+      _dateController.text = DateFormat("yyyy-MM-dd").format(date);
       selectedDate = _dateController.text;
       getSharedPrfanceList();
 
@@ -762,7 +761,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<HistoryTrackingModal> getEmployeeList11 = getTracking(sessionId!);
     final loading = Row(

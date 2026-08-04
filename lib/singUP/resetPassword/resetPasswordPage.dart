@@ -3,10 +3,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
-import '../../commanScreen/punchInOutScreen.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import '../../themes/empThemes.dart';
 import '../login_page.dart';
@@ -414,8 +412,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   Future getSharedPreferenceList() async {
-    sessionId = await shared!.getSessionId();
-    getEmailId = await shared!.getEmailId();
+    sessionId = await shared.getSessionId();
+    getEmailId = await shared.getEmailId();
     setState(() {});
   }
 

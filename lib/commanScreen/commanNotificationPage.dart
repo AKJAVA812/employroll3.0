@@ -2,8 +2,6 @@
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:path/path.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../employeePage/employeeListPage.dart';
@@ -13,7 +11,7 @@ class CommonNotificationPage{
 
   static showLoaderDialog(BuildContext context){
     AlertDialog alert=AlertDialog(
-      content: new Row(
+      content: Row(
         children: [
           CircularProgressIndicator(),
           Container(margin: EdgeInsets.only(left: 7),child:Text("Please Wait..." )),

@@ -11,13 +11,13 @@ class HolidayESSModal {
     if (json['viewHolidayList'] != null) {
       viewHolidayList = <ViewHolidayList>[];
       json['viewHolidayList'].forEach((v) {
-        viewHolidayList!.add(new ViewHolidayList.fromJson(v));
+        viewHolidayList!.add(ViewHolidayList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['result'] = this.result;
     data['reason'] = this.reason;
     if (this.viewHolidayList != null) {
@@ -63,7 +63,7 @@ class ViewHolidayList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['gradeName'] = this.gradeName;
     data['holidayType'] = this.holidayType;
     data['holidaystatus'] = this.holidaystatus;

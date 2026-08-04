@@ -42,32 +42,32 @@ class DashboardModel {
     if (json['mispunchEmpSEt'] != null) {
       mispunchEmpSEt = <MispunchEmpSEt>[];
       json['mispunchEmpSEt'].forEach((v) {
-        mispunchEmpSEt!.add(new MispunchEmpSEt.fromJson(v));
+        mispunchEmpSEt!.add(MispunchEmpSEt.fromJson(v));
       });
     }
     if (json['earlyOutList'] != null) {
       earlyOutList = <EarlyOutList>[];
       json['earlyOutList'].forEach((v) {
-        earlyOutList!.add(new EarlyOutList.fromJson(v));
+        earlyOutList!.add(EarlyOutList.fromJson(v));
       });
     }
     if (json['presentEmp'] != null) {
       presentEmp = <PresentEmp>[];
       json['presentEmp'].forEach((v) {
-        presentEmp!.add(new PresentEmp.fromJson(v));
+        presentEmp!.add(PresentEmp.fromJson(v));
       });
     }
     if (json['lateInList'] != null) {
       lateInList = <LateInList>[];
       json['lateInList'].forEach((v) {
-        lateInList!.add(new LateInList.fromJson(v));
+        lateInList!.add(LateInList.fromJson(v));
       });
     }
     mispunchEmp = json['mispunchEmp'];
     if (json['absentEmp'] != null) {
       absentEmp = <AbsentEmp>[];
       json['absentEmp'].forEach((v) {
-        absentEmp!.add(new AbsentEmp.fromJson(v));
+        absentEmp!.add(AbsentEmp.fromJson(v));
       });
     }
     totalAbsentEmp = json['totalAbsentEmp'];
@@ -76,13 +76,13 @@ class DashboardModel {
     if (json['halfDayEmpSet'] != null) {
       halfDayEmpSet = <HalfDayEmpSet>[];
       json['halfDayEmpSet'].forEach((v) {
-        halfDayEmpSet!.add(new HalfDayEmpSet.fromJson(v));
+        halfDayEmpSet!.add(HalfDayEmpSet.fromJson(v));
       });
     }
     if (json['otEmpList'] != null) {
       otEmpList = <OtEmpList>[];
       json['otEmpList'].forEach((v) {
-        otEmpList!.add(new OtEmpList.fromJson(v));
+        otEmpList!.add(OtEmpList.fromJson(v));
       });
     }
     result = json['result'];
@@ -93,14 +93,14 @@ class DashboardModel {
     if (json['workingList'] != null) {
       workingList = <WorkingList>[];
       json['workingList'].forEach((v) {
-        workingList!.add(new WorkingList.fromJson(v));
+        workingList!.add(WorkingList.fromJson(v));
       });
     }
     totalPresentEmp = json['totalPresentEmp'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.mispunchEmpSEt != null) {
       data['mispunchEmpSEt'] =
           this.mispunchEmpSEt!.map((v) => v.toJson()).toList();
@@ -227,7 +227,7 @@ class MispunchEmpSEt {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['date'] = this.date;
     data['deptName'] = this.deptName;
@@ -347,7 +347,7 @@ class EarlyOutList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['date'] = this.date;
     data['deptName'] = this.deptName;
@@ -464,7 +464,7 @@ class WorkingList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['date'] = this.date;
     data['deptName'] = this.deptName;
@@ -584,7 +584,7 @@ class LateInList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['date'] = this.date;
     data['deptName'] = this.deptName;
@@ -705,7 +705,7 @@ class PresentEmp {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['date'] = this.date;
     data['deptName'] = this.deptName;
@@ -799,7 +799,7 @@ class AbsentEmp {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['Status'] = this.status;
     data['date'] = this.date;
     data['reason'] = this.reason;
@@ -908,7 +908,7 @@ class OtEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['date'] = this.date;
     data['deptName'] = this.deptName;
@@ -1028,7 +1028,7 @@ class HalfDayEmpSet {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['empId'] = this.empId;
     data['date'] = this.date;
     data['deptName'] = this.deptName;

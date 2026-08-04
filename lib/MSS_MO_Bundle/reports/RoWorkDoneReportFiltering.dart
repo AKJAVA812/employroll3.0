@@ -5,12 +5,9 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneReport/roWorkDoneReport.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_segment/flutter_advanced_segment.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
-import 'package:slide_switcher/slide_switcher.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
@@ -117,7 +114,7 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
@@ -768,8 +765,8 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                                 MaterialPageRoute(
                                   builder:
                                       (context) => RoWorkDoneReport(
-                                        toDatePickedStringRo!,
-                                        fromDatePickedStringRo!,
+                                        toDatePickedStringRo,
+                                        fromDatePickedStringRo,
                                         filterType,
                                         empNewIdRo,
                                       ),

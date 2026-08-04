@@ -7,7 +7,6 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
@@ -48,8 +47,8 @@ var branchId = 0;
 var shift = 0;
 var singleDateString;
 var eventSingleDateString;
-var day = new DateTime.now();
-var single = new DateFormat('dd');
+var day = DateTime.now();
+var single = DateFormat('dd');
 var singleDay = single.format(day);
 late List<String?> list = [];
 late List<String?> branchList = [];
@@ -82,7 +81,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
   var dropdownNewvalueShift;
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     userPanelPermission = await shared.getUserPanel();
     defaultProfileName = await shared.getDefaultProfileName();
     defaultProfileId = await shared.getDefaultProfileId();
@@ -184,9 +183,9 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     var getData = mapResponse;
     print('Body Data $getData');
     branchListModal = BranchListModal.fromJson(mapResponse);
-    for (int i = 0; i < branchListModal!.data!.length; i++) {
-      var branchName = branchListModal!.data![i].branchName;
-      branchList?.add(branchListModal!.data![i].branchName);
+    for (int i = 0; i < branchListModal.data!.length; i++) {
+      var branchName = branchListModal.data![i].branchName;
+      branchList.add(branchListModal.data![i].branchName);
       print('branchNameNew $branchName');
     }
     return branchListModal;
@@ -214,9 +213,9 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     var getData = mapResponse;
     print('Body Data $getData');
     shiftListModal = ShiftListModal.fromJson(mapResponse);
-    for (int i = 0; i < shiftListModal!.data!.length; i++) {
-      var shiftName = shiftListModal!.data![i].shiftName;
-      shiftList?.add(shiftListModal!.data![i].shiftName);
+    for (int i = 0; i < shiftListModal.data!.length; i++) {
+      var shiftName = shiftListModal.data![i].shiftName;
+      shiftList?.add(shiftListModal.data![i].shiftName);
       print('shiftNames $shiftName');
     }
     return shiftListModal;
@@ -255,7 +254,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
             margin: EdgeInsets.all(8),
             child: CircularProgressIndicator(),
           ),
-          new Text("Please Wait...", style: TextStyle(fontSize: 20)),
+          Text("Please Wait...", style: TextStyle(fontSize: 20)),
         ],
       ),
     );
@@ -264,8 +263,8 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
   @override
   void initState() {
     super.initState();
-    var now = new DateTime.now();
-    var formatter = new DateFormat('dd/MM/yyyy');
+    var now = DateTime.now();
+    var formatter = DateFormat('dd/MM/yyyy');
     todayDate = formatter.format(now);
     getSharedPrfanceList();
     setState(() {});
@@ -293,8 +292,8 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
           setState(() {
             loader();
             getSharedPrfanceList();
-            singleDateString = DateFormat('dd-MM-yyyy').format(date!);
-            singleDay = DateFormat('dd').format(date!);
+            singleDateString = DateFormat('dd-MM-yyyy').format(date);
+            singleDay = DateFormat('dd').format(date);
             print("SingleDateNew $singleDateString");
             print("singleDay $singleDay");
             //dateController.text = DateFormat("dd").format(date!);
@@ -369,17 +368,17 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 contentPadding: EdgeInsets.all(5),
                               ),
                               items:
-                                  branchList?.map<DropdownMenuItem<String>>((
+                                  branchList.map<DropdownMenuItem<String>>((
                                     String? value,
                                   ) {
                                     return DropdownMenuItem<String>(
                                       value: value,
-                                      child: Text('$value'!),
+                                      child: Text('$value'),
                                     );
                                   }).toList(),
                               onChanged: (newVal) {
                                 valuenew = newVal.toString();
-                                var i = branchList!.indexOf(valuenew);
+                                var i = branchList.indexOf(valuenew);
                                 branchId =
                                     branchListModalGloabal!.data![i].branchId!;
                                 print("Branch ID $branchId");
@@ -433,7 +432,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Text(
-                                    '$value'!,
+                                    '$value',
                                     style: TextStyle(
                                       overflow: TextOverflow.ellipsis,
                                       fontSize: 13,

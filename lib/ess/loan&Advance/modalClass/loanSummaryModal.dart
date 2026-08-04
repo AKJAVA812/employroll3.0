@@ -8,14 +8,14 @@ class LoanSummaryModal {
     if (json['loanSummary'] != null) {
       loanSummary = <LoanSummary>[];
       json['loanSummary'].forEach((v) {
-        loanSummary!.add(new LoanSummary.fromJson(v));
+        loanSummary!.add(LoanSummary.fromJson(v));
       });
     }
     pendingValue = json['pendingValue'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.loanSummary != null) {
       data['loanSummary'] = this.loanSummary!.map((v) => v.toJson()).toList();
     }
@@ -107,7 +107,7 @@ class LoanSummary {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['desig'] = this.desig;
     data['loanType'] = this.loanType;

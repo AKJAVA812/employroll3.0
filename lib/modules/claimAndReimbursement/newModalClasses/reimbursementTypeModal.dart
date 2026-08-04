@@ -7,13 +7,13 @@ class ReimbursementTypeListModal {
     if (json['claimDataList'] != null) {
       claimDataList = <ClaimDataList>[];
       json['claimDataList'].forEach((v) {
-        claimDataList!.add(new ClaimDataList.fromJson(v));
+        claimDataList!.add(ClaimDataList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.claimDataList != null) {
       data['claimDataList'] =
           this.claimDataList!.map((v) => v.toJson()).toList();
@@ -45,7 +45,7 @@ class ClaimDataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['policyId'] = this.policyId;
     data['policyName'] = this.policyName;
     data['claimId'] = this.claimId;

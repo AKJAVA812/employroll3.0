@@ -1,11 +1,9 @@
 
 class ApiDetails{
    //Base Server Address
-   //static var server="http://www.employroll.com/";
-   //static var server="http://mobile.employroll.com/";
-   //static var server="https://ermobile.employroll.com";
+   static var server="https://ermobile.employroll.com";
 
-   static var server="https://fang-sizing-enrage.ngrok-free.dev";
+   //static var server="https://fang-sizing-enrage.ngrok-free.dev";
    //Attendance Punch in and Punch out
    //static String login="restful/service/login";
 
@@ -14,6 +12,7 @@ class ApiDetails{
    static String refreshTokenId="/ermobile/api/auth/refresh";
    static String bootStrap="/ermobile/api/mobile/bootstrap";
    static String bootStrapVersion="/ermobile/api/mobile/bootstrap/version";
+   static String mobileInfo="/ermobile/api/mobile/device-info";
 
    static String punchIn="restful/service/attendance/via/mobile";
    static var getAttendance = "restful/service/current/month/log/list/for/mobile/requisation";

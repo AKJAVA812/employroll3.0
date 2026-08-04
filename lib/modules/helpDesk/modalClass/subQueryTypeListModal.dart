@@ -7,13 +7,13 @@ class SubQueryTypeListModal {
     if (json['statusdata'] != null) {
       statusdata = <Statusdata>[];
       json['statusdata'].forEach((v) {
-        statusdata!.add(new Statusdata.fromJson(v));
+        statusdata!.add(Statusdata.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.statusdata != null) {
       data['statusdata'] = this.statusdata!.map((v) => v.toJson()).toList();
     }
@@ -53,7 +53,7 @@ class Statusdata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['code'] = this.code;
     data['subQueryname'] = this.subQueryname;
     data['queryName'] = this.queryName;

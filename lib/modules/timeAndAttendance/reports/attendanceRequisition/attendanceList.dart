@@ -2,22 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceReport.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/attendanceRequisition.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/model/attendanceMonthLog.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:velocity_x/velocity_x.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'attendanceRequisitionCurrentMonth.dart';
 import 'model/onDateReportModel.dart';
@@ -72,8 +65,8 @@ class _AttendanceListState extends State<AttendanceList> with RouteAware {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    empId = await shared!.getEmpId();
+    sessionId = await shared.getSessionId();
+    empId = await shared.getEmpId();
     // await Future.delayed(Duration(seconds: 5));
     Future<AttendanceReportModel> getEmployeeList11 = getEmployeeList(
       sessionId!,

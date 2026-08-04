@@ -1,31 +1,22 @@
 import 'dart:convert';
-import 'dart:math';
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import '../../adminPage/modelClass/dashboardModel.dart';
-import '../../adminPage/mssDashboard.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
 import '../../commanScreen/routes.dart';
-import '../../employeePage/employeeListModel.dart';
 import '../../employeePage/liveMapView.dart';
 import '../../employeePage/mapView.dart';
 import '../../employeePage/myTeamListModal.dart';
 import '../../ess/EssDashboarrddModel.dart';
 import '../../ess/essDashboardNavigate.dart';
 import '../../main.dart';
-import '../../profiles/profilePageWithHead.dart';
 import '../../themes/empThemes.dart';
 
 class EmpListViewMO extends StatefulWidget {
@@ -450,9 +441,9 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                             isLoading = true;
                           });
 
-                          sessionId = await shared!.getSessionId();
-                          userPanel = await shared!.getUserPanel();
-                          getProfileId = await shared!.getDefaultProfileId();
+                          sessionId = await shared.getSessionId();
+                          userPanel = await shared.getUserPanel();
+                          getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           print("ORG ID - $getOrgId");
                           try {

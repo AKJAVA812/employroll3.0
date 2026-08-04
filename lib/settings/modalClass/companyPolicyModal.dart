@@ -18,43 +18,43 @@ class CompanyPolicyModal {
     if (json['payrollPolicyList'] != null) {
       payrollPolicyList = <PayrollPolicyList>[];
       json['payrollPolicyList'].forEach((v) {
-        payrollPolicyList!.add(new PayrollPolicyList.fromJson(v));
+        payrollPolicyList!.add(PayrollPolicyList.fromJson(v));
       });
     }
     if (json['timeAttPolicyList'] != null) {
       timeAttPolicyList = <TimeAttPolicyList>[];
       json['timeAttPolicyList'].forEach((v) {
-        timeAttPolicyList!.add(new TimeAttPolicyList.fromJson(v));
+        timeAttPolicyList!.add(TimeAttPolicyList.fromJson(v));
       });
     }
     if (json['leavePolicyList'] != null) {
       leavePolicyList = <LeavePolicyList>[];
       json['leavePolicyList'].forEach((v) {
-        leavePolicyList!.add(new LeavePolicyList.fromJson(v));
+        leavePolicyList!.add(LeavePolicyList.fromJson(v));
       });
     }
     if (json['allPolicyList'] != null) {
       allPolicyList = <AllPolicyList>[];
       json['allPolicyList'].forEach((v) {
-        allPolicyList!.add(new AllPolicyList.fromJson(v));
+        allPolicyList!.add(AllPolicyList.fromJson(v));
       });
     }
     if (json['orgPolicyList'] != null) {
       orgPolicyList = <OrgPolicyList>[];
       json['orgPolicyList'].forEach((v) {
-        orgPolicyList!.add(new OrgPolicyList.fromJson(v));
+        orgPolicyList!.add(OrgPolicyList.fromJson(v));
       });
     }
     if (json['claimsPolicyList'] != null) {
       claimsPolicyList = <ClaimsPolicyList>[];
       json['claimsPolicyList'].forEach((v) {
-        claimsPolicyList!.add(new ClaimsPolicyList.fromJson(v));
+        claimsPolicyList!.add(ClaimsPolicyList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.payrollPolicyList != null) {
       data['payrollPolicyList'] =
           this.payrollPolicyList!.map((v) => v.toJson()).toList();
@@ -109,7 +109,7 @@ class PayrollPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['uploadedFileName'] = this.uploadedFileName;
     data['policyName'] = this.policyName;
     data['policytype'] = this.policytype;
@@ -146,7 +146,7 @@ class TimeAttPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['uploadedFileName'] = this.uploadedFileName;
     data['policyName'] = this.policyName;
     data['policytype'] = this.policytype;
@@ -183,7 +183,7 @@ class LeavePolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['uploadedFileName'] = this.uploadedFileName;
     data['policyName'] = this.policyName;
     data['policytype'] = this.policytype;
@@ -220,7 +220,7 @@ class AllPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['uploadedFileName'] = this.uploadedFileName;
     data['policyName'] = this.policyName;
     data['policytype'] = this.policytype;
@@ -257,7 +257,7 @@ class OrgPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['uploadedFileName'] = this.uploadedFileName;
     data['policyName'] = this.policyName;
     data['policytype'] = this.policytype;
@@ -294,7 +294,7 @@ class ClaimsPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['uploadedFileName'] = this.uploadedFileName;
     data['policyName'] = this.policyName;
     data['policytype'] = this.policytype;

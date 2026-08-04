@@ -9,10 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
@@ -245,9 +242,9 @@ class _MSS_MO_PendingOdRequisitionState
                             //isLoading = true;
                           });
 
-                          sessionId = await shared!.getSessionId();
-                          userPanel = await shared!.getUserPanel();
-                          getProfileId = await shared!.getDefaultProfileId();
+                          sessionId = await shared.getSessionId();
+                          userPanel = await shared.getUserPanel();
+                          getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           // await Future.delayed(Duration(seconds: 5));
                           Future<PendingOdReqList> getEmployeeList11 =
@@ -303,7 +300,7 @@ class _MSS_MO_PendingOdRequisitionState
   }
 
   Future getSharedPrfanceLists() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingOdReqList> getEmployeeList11 = getPendingOdReqList(
       sessionId!,

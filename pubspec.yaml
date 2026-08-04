@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 #ios
 //version: 3.1.56
 #android
-version: 4.0.59+83
+version: 1.0.0+3
 environment:
   sdk: ^3.7.2
 
@@ -115,6 +115,13 @@ dependencies:
   dropdown_search: ^6.0.1
   syncfusion_flutter_pdfviewer: ^27.2.5
   cached_network_image: ^3.3.1
+  uuid: any
+  http_parser: any
+  sqflite: any
+  flutter_localizations:
+    sdk: flutter
+  flutter_pdfview: any
+  google_fonts: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -125,7 +132,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  google_fonts: ^6.2.1
   build_runner: ^2.4.12
   hive_generator: ^2.0.1
 
@@ -171,3 +177,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+
+

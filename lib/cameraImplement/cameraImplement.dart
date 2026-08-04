@@ -1,17 +1,10 @@
-import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../commanScreen/punchInUploadPage.dart';
-import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 class CameraApp extends StatefulWidget {
   const CameraApp({Key? key}) : super(key: key);
 

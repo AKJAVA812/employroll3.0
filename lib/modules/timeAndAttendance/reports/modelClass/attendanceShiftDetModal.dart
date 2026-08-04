@@ -42,7 +42,7 @@ class AttendanceShiftDetailsModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['halfdayMaxWorkHour'] = this.halfdayMaxWorkHour;
     data['result'] = this.result;
     data['halfdayMinWorkHour'] = this.halfdayMinWorkHour;

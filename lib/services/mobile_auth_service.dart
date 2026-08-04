@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../commanScreen/allAPIList.dart';
@@ -32,6 +35,7 @@ class MobileAuthService {
         tokenType: tokenType ?? 'Bearer',
       );
       await _callBootstrapVersion(auth: auth, forceBootstrap: true);
+      await sendMobileDeviceInfo(auth: auth);
       print('[MOBILE-AUTH] syncAfterLogin -> end');
     } finally {
       _syncRunning = false;
@@ -63,10 +67,12 @@ class MobileAuthService {
         }
       }
 
+      final latestAuth = await _readAuthFromPrefs();
       await _callBootstrapVersion(
-        auth: await _readAuthFromPrefs(),
+        auth: latestAuth,
         forceBootstrap: forceBootstrap,
       );
+      await sendMobileDeviceInfo(auth: latestAuth);
       print('[MOBILE-AUTH] syncOnAppOpen -> end');
     } finally {
       _syncRunning = false;
@@ -190,6 +196,78 @@ class MobileAuthService {
       await _sessionManager.setProfileVersion(profileVersion);
     print('[MOBILE-AUTH] BOOTSTRAP -> cache saved');
     return true;
+  }
+
+  Future<bool> sendMobileDeviceInfo({MobileAuthData? auth}) async {
+    try {
+      final authData = auth ?? await _readAuthFromPrefs();
+      if (!authData.hasAuth) {
+        print('[MOBILE-AUTH] DEVICE_INFO -> skipped, token/session missing');
+        return false;
+      }
+
+      final uri = _uri(ApiDetails.mobileInfo);
+      final payload = await _deviceInfoPayload();
+      print('[MOBILE-AUTH] DEVICE_INFO -> POST $uri');
+      print('[MOBILE-AUTH] DEVICE_INFO payload -> $payload');
+      final response = await MobileHttpClient.instance.post(
+        uri,
+        headers: <String, String>{
+          ..._headers(authData),
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(payload),
+      );
+      _logResponse('DEVICE_INFO', response);
+      return _isSuccess(response);
+    } catch (error) {
+      print('[MOBILE-AUTH] DEVICE_INFO -> error=$error');
+      return false;
+    }
+  }
+
+  Future<Map<String, String>> _deviceInfoPayload() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final applicationVersion =
+        '${packageInfo.version}+${packageInfo.buildNumber}';
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      return <String, String>{
+        'applicationVersion': applicationVersion,
+        'manufacturer': androidInfo.manufacturer,
+        'brand': androidInfo.brand,
+        'model': androidInfo.model,
+        'deviceName': androidInfo.device,
+        'androidVersion': androidInfo.version.release,
+        'sdkVersion': androidInfo.version.sdkInt.toString(),
+        'product': androidInfo.product,
+      };
+    }
+
+    if (Platform.isIOS) {
+      final iosInfo = await DeviceInfoPlugin().iosInfo;
+      return <String, String>{
+        'applicationVersion': applicationVersion,
+        'manufacturer': 'Apple',
+        'brand': 'Apple',
+        'model': iosInfo.model,
+        'deviceName': iosInfo.name,
+        'androidVersion': iosInfo.systemVersion,
+        'sdkVersion': iosInfo.utsname.version,
+        'product': iosInfo.utsname.machine,
+      };
+    }
+
+    return <String, String>{
+      'applicationVersion': applicationVersion,
+      'manufacturer': Platform.operatingSystem,
+      'brand': Platform.operatingSystem,
+      'model': Platform.operatingSystemVersion,
+      'deviceName': Platform.localHostname,
+      'androidVersion': Platform.operatingSystemVersion,
+      'sdkVersion': '',
+      'product': Platform.operatingSystem,
+    };
   }
 
   Future<MobileAuthData> _readAuthFromPrefs() async {

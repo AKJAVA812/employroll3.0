@@ -5,21 +5,15 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:er_flutter_project/MSS_MO_Bundle/timeAndAttendance/shortLeaveApprovalPageL1MO.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/pendingRequisitionModel.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/pendingRequisition/pendingReqAppDiss.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../main.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import '../../modules/timeAndAttendance/reports/timeAndAttReports.dart';
@@ -239,11 +233,11 @@ class _MSS_MO_Att_PendingRequisitionL1State
                             isLoading = true;
                           });
 
-                          sessionId = await shared!.getSessionId();
-                          userPanel = await shared!.getUserPanel();
-                          getProfileId = await shared!.getDefaultProfileId();
-                          levelOne = await shared!.getLevelOne();
-                          levelTwo = await shared!.getLevelTwo();
+                          sessionId = await shared.getSessionId();
+                          userPanel = await shared.getUserPanel();
+                          getProfileId = await shared.getDefaultProfileId();
+                          levelOne = await shared.getLevelOne();
+                          levelTwo = await shared.getLevelTwo();
                           print("Level 1 - $levelOne");
                           print("Level 2 - $levelTwo");
                           getOrgId = matchedOrg['id']?.toString() ?? '';
@@ -336,7 +330,7 @@ class _MSS_MO_Att_PendingRequisitionL1State
     }
     pendingRequisitionModel = PendingRequisitionModel.fromJson(mapResponse);
 
-    allUsernew = pendingRequisitionModel!.data;
+    allUsernew = pendingRequisitionModel.data;
 
     return pendingRequisitionModel;
   }

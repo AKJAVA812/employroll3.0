@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
-import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/singleDateAttendance.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
 import 'package:intl/intl.dart';
@@ -17,10 +15,8 @@ import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import '../../../timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 import 'othersOnDateAttendanceModal.dart';
 
 class OthersAttendanceRequisition extends StatefulWidget {
@@ -345,7 +341,7 @@ class _OthersAttendanceRequisitionState
                                   now.month,
                                   now.day,
                                   n!.hour,
-                                  n!.minute,
+                                  n.minute,
                                 );
                                 var nT = DateFormat('HH:mm').format(newt);
                                 print(DateFormat('HH:mm').format(newt));
@@ -450,7 +446,7 @@ class _OthersAttendanceRequisitionState
                                   newNow.month,
                                   newNow.day,
                                   o!.hour,
-                                  o!.minute,
+                                  o.minute,
                                 );
                                 var oT = DateFormat('HH:mm').format(newt);
                                 print(DateFormat('HH:mm').format(newt));
@@ -526,7 +522,7 @@ class _OthersAttendanceRequisitionState
                               ).format(DateTime.parse(onDateset!));
                               var dateformat = onDate;
 
-                              if (_outTimePicker!.compareToIgnoringCase(
+                              if (_outTimePicker.compareToIgnoringCase(
                                     "00:00",
                                   ) ==
                                   0) {
@@ -727,7 +723,7 @@ class _OthersAttendanceRequisitionState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
   }
 
   String conn = ApiDetails.server;

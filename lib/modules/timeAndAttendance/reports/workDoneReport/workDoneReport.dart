@@ -1,23 +1,16 @@
 import 'dart:convert';
 
 import 'package:animation_search_bar/animation_search_bar.dart';
-import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
-import 'package:er_flutter_project/ess/essDashboardNavigate.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneReport/workDoneReportModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/allAPIList.dart';
-import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../ess/myAllReports.dart';
-import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import '../attendanceRequisition/getAttendanceDetails.dart';
@@ -68,7 +61,7 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     print('ResponseAttendance: ${sessionId}');
     print('ResponseAttendance: ${forDatePickedString}');
     print('ResponseAttendance: ${toDatePickedString}');
@@ -78,9 +71,6 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
       toDatePickedString,
       forDatePickedString,
     );
-    if (getEmployeeList11 == null) {
-      return Center(child: CircularProgressIndicator());
-    }
     final loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -161,7 +151,7 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
     }
     workdoneReportModel = WorkdoneReportModel.fromJson(mapResponse);
 
-    allUsernew = workdoneReportModel!.data;
+    allUsernew = workdoneReportModel.data;
 
     return workdoneReportModel;
   }

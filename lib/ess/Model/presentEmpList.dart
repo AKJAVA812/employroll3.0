@@ -1,13 +1,9 @@
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/adminPage/modelClass/dashboardModel.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../../themes/empThemes.dart';
-import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
-import '../../commanScreen/routes.dart';
-import '../../profiles/profilePageWithHead.dart';
 import '../essDashboardNavigate.dart';
 import '../myAllReports.dart';
 

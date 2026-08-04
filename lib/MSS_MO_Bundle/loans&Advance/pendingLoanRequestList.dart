@@ -3,8 +3,6 @@ import 'dart:math';
 import 'package:er_flutter_project/MSS_MO_Bundle/loans&Advance/loanApprovalPage.dart';
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:er_flutter_project/ess/essDashboardNavigate.dart';
-import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/travelExpenseRequestRaise.dart';
-import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/updateRaisedClaim.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
@@ -15,8 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/allAPIList.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
@@ -25,8 +21,6 @@ import '../../../main.dart';
 import '../../../profiles/profilePageWithHead.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 import '../../commanScreen/commanNotificationPage.dart';
-import '../../ess/loan&Advance/myLoanRequestRaisePage.dart';
-import '../../ess/loan&Advance/myLoanRequestUpdate.dart';
 import 'modalClass/mssLoanListModal.dart';
 
 class PendingLoanRequestListMO extends StatefulWidget {
@@ -325,11 +319,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
   }
 
   showDialgSucess(BuildContext buildContext, String result, String alert) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss
@@ -492,9 +481,9 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                               break;
                           }
 
-                          sessionId = await shared!.getSessionId();
-                          userPanel = await shared!.getUserPanel();
-                          getProfileId = await shared!.getDefaultProfileId();
+                          sessionId = await shared.getSessionId();
+                          userPanel = await shared.getUserPanel();
+                          getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
                           print("ORG ID - $getOrgId");
                           try {
@@ -895,9 +884,9 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                     }
 
                     // Call API directly
-                    sessionId = await shared!.getSessionId();
-                    userPanel = await shared!.getUserPanel();
-                    getProfileId = await shared!.getDefaultProfileId();
+                    sessionId = await shared.getSessionId();
+                    userPanel = await shared.getUserPanel();
+                    getProfileId = await shared.getDefaultProfileId();
 
                     try {
                       final value = await getMSSLoanList(sessionId!);

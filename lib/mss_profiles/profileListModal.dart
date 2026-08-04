@@ -18,7 +18,7 @@ class ProfileListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -66,7 +66,7 @@ class ProfileData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['profileName'] = this.profileName;
     data['profilePermission'] = this.profilePermission ?? <String>[];
     data['roMapId'] = this.roMapId;

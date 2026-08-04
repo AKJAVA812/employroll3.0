@@ -6,32 +6,17 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:camera/camera.dart';
 import 'package:er_flutter_project/faceRecognizationAttendance/faceRecognizeEmployeeList.dart';
 import 'package:flutter/services.dart';
-import 'package:er_flutter_project/commanScreen/ProjectListPage.dart';
-import 'package:er_flutter_project/commanScreen/punchInUploadPage.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:er_flutter_project/commanScreen/workDonePage.dart';
-import 'package:er_flutter_project/singUP/model/loginModel.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/singUP/login_page.dart';
-import 'package:er_flutter_project/widgets/drawer_file.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
-import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../profiles/profilePageWithHead.dart';
@@ -253,8 +238,8 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
-    lat = await shared!.getLatitude();
-    lng = await shared!.getLongitude();
+    lat = await shared.getLatitude();
+    lng = await shared.getLongitude();
 
     setState(() {
       if (empRole == 1) {
@@ -288,7 +273,7 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
   }
 
   Future getUserName() async {
-    UserName = await shared!.getempName();
+    UserName = await shared.getempName();
     print('Response snapshot: ${UserName}');
   }
 
@@ -369,7 +354,7 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
       print("Ract Position :- " + boundingBox.toString());
 
       final bytes = _image!.readAsBytesSync();
-      img.Image? faceImg = img.decodeImage(bytes!);
+      img.Image? faceImg = img.decodeImage(bytes);
       img.Image croppedFace = img.copyCrop(
         faceImg!,
         x: left.toInt(),

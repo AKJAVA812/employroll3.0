@@ -588,7 +588,7 @@ class ProfileList {
   dynamic profileName;
   dynamic roMapId;
   dynamic defaultProfile;
-  List<String>? profilePermission;
+  List<String> profilePermission = <String>[];
   dynamic profileId;
   dynamic profileCode;
   dynamic mappedID;
@@ -599,7 +599,7 @@ class ProfileList {
     this.profileName,
     this.roMapId,
     this.defaultProfile,
-    this.profilePermission,
+    this.profilePermission = const <String>[],
     this.profileId,
     this.profileCode,
     this.mappedID,
@@ -625,7 +625,7 @@ class ProfileList {
     'profileName': profileName,
     'roMapId': roMapId,
     'defaultProfile': defaultProfile,
-    'profilePermission': profilePermission ?? <String>[],
+    'profilePermission': profilePermission,
     'profileId': profileId,
     'profileCode': profileCode,
     'mappedID': mappedID,

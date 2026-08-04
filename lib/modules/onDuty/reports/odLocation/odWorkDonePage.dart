@@ -13,8 +13,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 
-import '../../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../../adminPage/mssDashboard.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
@@ -47,11 +45,11 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
 
   _OdWorkDonePageState(this.value, this.currentAddress, this.time);
 
-  TextEditingController _remarkController = new TextEditingController();
-  TextEditingController _clientNameController = new TextEditingController();
-  TextEditingController _orgNameController = new TextEditingController();
-  TextEditingController _emailIdController = new TextEditingController();
-  TextEditingController _contNoController = new TextEditingController();
+  TextEditingController _remarkController = TextEditingController();
+  TextEditingController _clientNameController = TextEditingController();
+  TextEditingController _orgNameController = TextEditingController();
+  TextEditingController _emailIdController = TextEditingController();
+  TextEditingController _contNoController = TextEditingController();
 
   bool _enabled = false;
   File? _image;
@@ -72,10 +70,10 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    lat = await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    lat = await shared.getLatitude();
 
-    lng = await shared!.getLongitude();
+    lng = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
     print('Response snapshot: ${sessionId}');
@@ -122,7 +120,7 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
     var uri = Uri.parse("http://www.employroll.com/restful/service/task/via/mobile");
-    var request = new http.MultipartRequest("Post", uri);
+    var request = http.MultipartRequest("Post", uri);
     request.fields['sessionId'] = sessionId!;
     request.fields['taskTime'] = formattedDate;
     request.fields['address'] = currentAddress;
@@ -138,7 +136,7 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+_emailIdController.text),
     ));*/
-    var multipart = new http.MultipartFile('image', stream, length,
+    var multipart = http.MultipartFile('image', stream, length,
         filename: basename('image.jpg'));
     request.files.add(multipart);
     http.Response response = await http.Response.fromStream(await request.send());

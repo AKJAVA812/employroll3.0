@@ -7,13 +7,13 @@ class TodayEventListModal {
     if (json['todayEventList'] != null) {
       todayEventList = <TodayEventList>[];
       json['todayEventList'].forEach((v) {
-        todayEventList!.add(new TodayEventList.fromJson(v));
+        todayEventList!.add(TodayEventList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.todayEventList != null) {
       data['todayEventList'] =
           this.todayEventList!.map((v) => v.toJson()).toList();
@@ -57,7 +57,7 @@ class TodayEventList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['image'] = this.image;
     data['dob'] = this.dob;
     data['contact'] = this.contact;

@@ -51,7 +51,7 @@ class OnDateAttModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['empId'] = this.empId;
     data['workingHrs'] = this.workingHrs;

@@ -3,14 +3,10 @@ import 'dart:convert';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import '../commanScreen/allAPIList.dart';
-import '../commanScreen/homePage.dart';
 import '../commanScreen/punchInOutScreen.dart';
-import '../commanScreen/routes.dart';
 import '../main.dart';
-import '../profiles/profilePageWithHead.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
 import 'EssDashboarrddModel.dart';
@@ -91,7 +87,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<MyManagersModalList> getEmployeeList11 = getMyReportingOfficersList(
       sessionId!,

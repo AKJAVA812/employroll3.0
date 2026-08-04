@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:er_flutter_project/ess/essDashboardNavigate.dart';
-import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/travelExpenseRequestRaise.dart';
-import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/travelExpenseAdd/updateRaisedClaim.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
@@ -13,8 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 
-import '../../../adminPage/modelClass/dashboardModel.dart';
-import '../../../adminPage/mssDashboard.dart';
 import '../../../commanScreen/allAPIList.dart';
 import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
@@ -147,7 +143,7 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     Future<SelfLoanRequestModal> getEmployeeList11 = getSelfLoanReqList(
       sessionId!,
@@ -317,11 +313,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
   }
 
   showDialgSucess(BuildContext buildContext, String result, String alert) {
-    if (buildContext == null) {
-      print("âš ï¸ Warning: buildContext is null, cannot show dialog.");
-      return;
-    }
-
     showDialog(
       context: buildContext,
       barrierDismissible: false, // Prevents accidental dismiss

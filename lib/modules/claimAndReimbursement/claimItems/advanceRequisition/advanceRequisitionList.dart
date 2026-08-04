@@ -5,7 +5,6 @@ import 'package:animation_search_bar/animation_search_bar.dart'
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -56,7 +55,7 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
       print('listLength $listLength');
     });
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -77,7 +76,7 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     await Future.delayed(Duration(seconds: 2));
     Future<AdvanceRequestedListModal> getAppReq11 = getAdvanceReqList(
       sessionId!,

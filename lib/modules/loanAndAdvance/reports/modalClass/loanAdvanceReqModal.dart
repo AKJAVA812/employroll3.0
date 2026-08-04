@@ -7,13 +7,13 @@ class LoanAdvanceReqModal {
     if (json['loanRequiDatalist'] != null) {
       loanRequiDatalist = <LoanRequiDatalist>[];
       json['loanRequiDatalist'].forEach((v) {
-        loanRequiDatalist!.add(new LoanRequiDatalist.fromJson(v));
+        loanRequiDatalist!.add(LoanRequiDatalist.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.loanRequiDatalist != null) {
       data['loanRequiDatalist'] =
           this.loanRequiDatalist!.map((v) => v.toJson()).toList();
@@ -69,7 +69,7 @@ class LoanRequiDatalist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['date'] = this.date;
     data['loanType'] = this.loanType;
     data['advanceActive'] = this.advanceActive;

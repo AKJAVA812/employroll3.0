@@ -1,25 +1,15 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
-import 'package:er_flutter_project/modules/preInductionOnboarding/preInductionProcess.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
-import 'package:steps_indicator/steps_indicator.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import '../../adminPage/modelClass/dashboardModel.dart';
-import '../../adminPage/mssDashboard.dart';
 import '../../commanScreen/allAPIList.dart';
-import '../../commanScreen/commanNotificationPage.dart';
 import '../../commanScreen/homePage.dart';
 import '../../commanScreen/punchInOutScreen.dart';
 import '../../commanScreen/routes.dart';
-import '../../employeePage/liveMapView.dart';
-import '../../employeePage/mapView.dart';
 import '../../main.dart';
 import '../../profiles/profilePageWithHead.dart';
 import '../../themes/empThemes.dart';
@@ -81,7 +71,7 @@ class _PreOnboardListViewState extends State<PreOnboardListView>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
+    sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
     print("Status $statusUpdate");
     Future<PreOnboardListModal> getEmployeeList11 = getEmployeeList(sessionId!);

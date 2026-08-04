@@ -1,15 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import '../../../MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import '../../../MSS_MO_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import '../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../adminPage/mssDashboard.dart';
@@ -17,7 +14,6 @@ import '../../../commanScreen/homePage.dart';
 import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
 import '../../../profiles/profilePageWithHead.dart';
-import 'levelTwoLeaveReq.dart';
 import 'modalClass/levelTwoPendingLeaveModal.dart';
 
 class LevelTwoPendingApproval extends StatefulWidget {
@@ -204,8 +200,8 @@ class _PendingLeaveApprovalDisapprovalState
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    userPanelPermissions = await shared!.getUserPanel();
+    sessionId = await shared.getSessionId();
+    userPanelPermissions = await shared.getUserPanel();
   }
 
   @override

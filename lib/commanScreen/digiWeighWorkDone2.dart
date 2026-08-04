@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/commanScreen/commanNotificationPage.dart';
 import 'package:er_flutter_project/commanScreen/punchInOutScreen.dart';
-import 'package:er_flutter_project/commanScreen/ujalaCreditWorkdone.dart';
-import 'package:er_flutter_project/commanScreen/ujalaWorkDone2.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -14,9 +12,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
-import 'package:er_flutter_project/services/mobile_http_client.dart';
 
-import '../adminPage/adminDashboard/adminDashboard.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'allAPIList.dart';
 import 'digiWeighWorkDone.dart';
@@ -66,7 +62,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
   );
 
   var titleName = "Workdone Report";
-  TextEditingController _rectificationController = new TextEditingController();
+  TextEditingController _rectificationController = TextEditingController();
   final TextEditingController _attendingDate = TextEditingController();
   final TextEditingController _rectificationDate = TextEditingController();
   final TextEditingController _stampingDate = TextEditingController();
@@ -127,10 +123,10 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared!.getSessionId();
-    latt = await shared!.getLatitude();
+    sessionId = await shared.getSessionId();
+    latt = await shared.getLatitude();
 
-    lngg = await shared!.getLongitude();
+    lngg = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
     print('Response snapshot: ${sessionId}');
@@ -210,8 +206,8 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
       "remarkUser=$remarks",
     );
     //final response = await MobileHttpClient.instance.post(urlapi);
-    var request = new http.MultipartRequest("Post", urlapi);
-    var multipart = new http.MultipartFile(
+    var request = http.MultipartRequest("Post", urlapi);
+    var multipart = http.MultipartFile(
       'image',
       stream,
       length,
@@ -279,7 +275,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       child: TextFormField(
                         onTap: () async {
                           DateTime? date = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
+                          FocusScope.of(context).requestFocus(FocusNode());
 
                           date = await showDatePicker(
                             context: context,
@@ -293,7 +289,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                             ).format(date!);
                             _attendingDate.text = DateFormat(
                               "dd-MM-yyyy",
-                            ).format(date!);
+                            ).format(date);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
@@ -330,7 +326,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       child: TextFormField(
                         onTap: () async {
                           DateTime? date = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
+                          FocusScope.of(context).requestFocus(FocusNode());
 
                           date = await showDatePicker(
                             context: context,
@@ -344,7 +340,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                             ).format(date!);
                             _rectificationDate.text = DateFormat(
                               "dd-MM-yyyy",
-                            ).format(date!);
+                            ).format(date);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
@@ -367,7 +363,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       child: TextFormField(
                         onTap: () async {
                           DateTime? date = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
+                          FocusScope.of(context).requestFocus(FocusNode());
 
                           date = await showDatePicker(
                             context: context,
@@ -381,7 +377,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                             ).format(date!);
                             _stampingDate.text = DateFormat(
                               "dd-MM-yyyy",
-                            ).format(date!);
+                            ).format(date);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
@@ -404,7 +400,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       child: TextFormField(
                         onTap: () async {
                           DateTime? date = DateTime.now();
-                          FocusScope.of(context).requestFocus(new FocusNode());
+                          FocusScope.of(context).requestFocus(FocusNode());
 
                           date = await showDatePicker(
                             context: context,
@@ -418,7 +414,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                             ).format(date!);
                             _amcVisit.text = DateFormat(
                               "dd-MM-yyyy",
-                            ).format(date!);
+                            ).format(date);
 
                             //  DateFormat.yMd().format(date!).toString();
                           });
