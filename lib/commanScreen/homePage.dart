@@ -33,6 +33,7 @@ import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/attendance_punch_api.dart';
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import '../adminPage/modelClass/dashboardModel.dart';
 import '../ess/myAllReports.dart';
@@ -788,26 +789,9 @@ class _DefaultPageState extends State<DefaultPage> {
   // âœ… Main method to get Geofence list
   Future<GeofenceListModal> getGeofenceList(String sessionId) async {
     try {
-      String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.geofenceListApi;
-      var urlapi = Uri.parse(
-        "$conn$apiUrl?sessionId=$sessionId&empId=$empIdGet&orgId=$orgId",
-      );
-
-      print("ðŸ”— Fetching geofence list from: $urlapi");
-
-      final response = await MobileHttpClient.instance.post(urlapi);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        // âœ… Parse into GeofenceListModal directly
-        return GeofenceListModal.fromJson(data);
-      } else {
-        throw Exception(
-          "Failed to fetch geofence list: ${response.statusCode}",
-        );
-      }
+      final context = await AttendancePunchApi().getPunchContext();
+      if (mounted) setState(() => setGeofenceActive = context.geofenceRequired);
+      return context.toLegacyGeofenceList();
     } catch (e) {
       print("ðŸš¨ Error fetching geofence list: $e");
       // âœ… Return empty model in case of failure
@@ -1763,12 +1747,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                   clockingType = "In";
                                   if (attAction == '0') {
                                     print("ORGID - $orgId");
-                                    if ((orgId == 201 ||
-                                            orgId == 200 ||
-                                            orgId == 199 ||
-                                            orgId == 202 ||
-                                            orgId == 145) &&
-                                        setGeofenceActive == true) {
+                                    if (setGeofenceActive == true) {
                                       showGeofenceDialog(
                                         context,
                                         sessionId: sessionId!,
@@ -2044,12 +2023,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                       clockingType = "Out";
                                       if (attAction == '0') {
                                         print("ORGID - $orgId");
-                                        if ((orgId == 201 ||
-                                                orgId == 200 ||
-                                                orgId == 199 ||
-                                                orgId == 202 ||
-                                                orgId == 145) &&
-                                            setGeofenceActive == true) {
+                                        if (setGeofenceActive == true) {
                                           showGeofenceDialogPunchOut(
                                             context,
                                             sessionId: sessionId!,
@@ -2068,12 +2042,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                   clockingType = "Out";
                                   if (attAction == '0') {
                                     print("ORGID - $orgId");
-                                    if ((orgId == 201 ||
-                                            orgId == 200 ||
-                                            orgId == 199 ||
-                                            orgId == 202 ||
-                                            orgId == 145) &&
-                                        setGeofenceActive == true) {
+                                    if (setGeofenceActive == true) {
                                       showGeofenceDialogPunchOut(
                                         context,
                                         sessionId: sessionId!,
@@ -2149,12 +2118,7 @@ class _DefaultPageState extends State<DefaultPage> {
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
             print("ORGID - $orgId");
-            if ((orgId == 201 ||
-                    orgId == 200 ||
-                    orgId == 199 ||
-                    orgId == 202 ||
-                    orgId == 145) &&
-                setGeofenceActive == true) {
+            if (setGeofenceActive == true) {
               showGeofenceDialog(
                 buildContext,
                 sessionId: sessionId!,
@@ -2238,24 +2202,9 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "address=$currentAddressNew&"
-      "clocking=$sessionId&"
-      "clockingType=$clockingType&"
-      "lat=$lat&"
-      "lng=$lng&"
-      "currentDate=$todayDate&"
-      "firstImei=$sessionId&"
-      "secondImei=$sessionId&"
-      "macAddress=$sessionId&"
-      "deviceId=$sessionId&"
-      "battery=$sessionId",
-    );
-    var request = http.MultipartRequest("Post", urlapi);
-    http.Response response = await http.Response.fromStream(
-      await request.send(),
+    http.Response response = await AttendancePunchApi().punchWithoutSelfie(
+      action: clockingType!, latitude: lat, longitude: lng,
+      accuracyMeters: positionCheck?.accuracy ?? 50, address: currentAddressNew,
     );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
@@ -2315,26 +2264,10 @@ class _DefaultPageState extends State<DefaultPage> {
 
     getTimeUpdate();
 
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "address=$currentAddressNew&"
-      "clocking=$sessionId&"
-      "clockingType=$clockingType&"
-      "lat=$lat&"
-      "lng=$lng&"
-      "currentDate=$todayDate&"
-      "firstImei=$sessionId&"
-      "secondImei=$sessionId&"
-      "macAddress=$sessionId&"
-      "deviceId=$sessionId&"
-      "battery=$sessionId&"
-      "geofenceId=$selectedGeofenceId",
-    );
-
-    var request = http.MultipartRequest("POST", urlapi);
-    http.Response response = await http.Response.fromStream(
-      await request.send(),
+    http.Response response = await AttendancePunchApi().punchWithoutSelfie(
+      action: clockingType!, latitude: lat, longitude: lng,
+      accuracyMeters: positionCheck?.accuracy ?? 50, address: currentAddressNew,
+      geofenceId: int.tryParse(selectedGeofenceId.toString()),
     );
 
     result = json.decode(response.body.toString());
@@ -2390,24 +2323,9 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "address=$currentAddressNew&"
-      "clocking=$sessionId&"
-      "clockingType=$clockingType&"
-      "lat=$lat&"
-      "lng=$lng&"
-      "currentDate=$todayDate&"
-      "firstImei=$sessionId&"
-      "secondImei=$sessionId&"
-      "macAddress=$sessionId&"
-      "deviceId=$sessionId&"
-      "battery=$sessionId",
-    );
-    var request = http.MultipartRequest("Post", urlapi);
-    http.Response response = await http.Response.fromStream(
-      await request.send(),
+    http.Response response = await AttendancePunchApi().punchWithoutSelfie(
+      action: clockingType!, latitude: lat, longitude: lng,
+      accuracyMeters: positionCheck?.accuracy ?? 50, address: currentAddressNew,
     );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
@@ -2465,25 +2383,10 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "address=$currentAddressNew&"
-      "clocking=$sessionId&"
-      "clockingType=$clockingType&"
-      "lat=$lat&"
-      "lng=$lng&"
-      "currentDate=$todayDate&"
-      "firstImei=$sessionId&"
-      "secondImei=$sessionId&"
-      "macAddress=$sessionId&"
-      "deviceId=$sessionId&"
-      "battery=$sessionId&"
-      "geofenceId=$selectedGeofenceId",
-    );
-    var request = http.MultipartRequest("Post", urlapi);
-    http.Response response = await http.Response.fromStream(
-      await request.send(),
+    http.Response response = await AttendancePunchApi().punchWithoutSelfie(
+      action: clockingType!, latitude: lat, longitude: lng,
+      accuracyMeters: positionCheck?.accuracy ?? 50, address: currentAddressNew,
+      geofenceId: int.tryParse(selectedGeofenceId.toString()),
     );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];

@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/attendance_punch_api.dart';
 
 import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
@@ -262,12 +263,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
             print("ORGID - $orgId");
-            if ((orgId == 201 ||
-                    orgId == 200 ||
-                    orgId == 199 ||
-                    orgId == 202 ||
-                    orgId == 145) &&
-                setGeofenceActive == true) {
+            if (setGeofenceActive == true) {
               showGeofenceDialog(
                 context,
                 sessionId: sessionId!,
@@ -337,12 +333,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
               //readData();
             } else {
               print("ORGID - $orgId");
-              if ((orgId == 201 ||
-                      orgId == 200 ||
-                      orgId == 199 ||
-                      orgId == 202 ||
-                      orgId == 145) &&
-                  setGeofenceActive == true) {
+              if (setGeofenceActive == true) {
                 showGeofenceDialog(
                   context,
                   sessionId: sessionId!,
@@ -527,13 +518,10 @@ class _ImageUploadedState extends State<ImageUploaded> {
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
-      // Send request once
-      final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 30),
+      final response = await AttendancePunchApi().punchWithSelfie(
+        selfie: value!, action: clockingType!, latitude: lat, longitude: lng,
+        address: currentAddress,
       );
-
-      // Convert to Response
-      final response = await http.Response.fromStream(streamedResponse);
 
       print('Response received: ${response.body}');
 
@@ -663,8 +651,10 @@ class _ImageUploadedState extends State<ImageUploaded> {
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
-      http.Response response = await http.Response.fromStream(
-        await request.send().timeout(const Duration(seconds: 30)),
+      http.Response response = await AttendancePunchApi().punchWithSelfie(
+        selfie: value!, action: clockingType!, latitude: lat, longitude: lng,
+        address: currentAddress,
+        geofenceId: int.tryParse(selectedGeofenceId.toString()),
       );
       // Process the response here
 
@@ -943,26 +933,9 @@ class _ImageUploadedState extends State<ImageUploaded> {
   // âœ… Main method to get Geofence list
   Future<GeofenceListModal> getGeofenceList(String sessionId) async {
     try {
-      String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.geofenceListApi;
-      var urlapi = Uri.parse(
-        "$conn$apiUrl?sessionId=$sessionId&empId=$empIdGet&orgId=$orgId",
-      );
-
-      print("ðŸ”— Fetching geofence list from: $urlapi");
-
-      final response = await MobileHttpClient.instance.post(urlapi);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        // âœ… Parse into GeofenceListModal directly
-        return GeofenceListModal.fromJson(data);
-      } else {
-        throw Exception(
-          "Failed to fetch geofence list: ${response.statusCode}",
-        );
-      }
+      final context = await AttendancePunchApi().getPunchContext();
+      if (mounted) setState(() => setGeofenceActive = context.geofenceRequired);
+      return context.toLegacyGeofenceList();
     } catch (e) {
       print("ðŸš¨ Error fetching geofence list: $e");
       // âœ… Return empty model in case of failure
@@ -1276,12 +1249,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
                 //getUploadImage();
 
                 print("ORGID - $orgId");
-                if ((orgId == 201 ||
-                        orgId == 200 ||
-                        orgId == 199 ||
-                        orgId == 202 ||
-                        orgId == 145) &&
-                    setGeofenceActive == true) {
+                if (setGeofenceActive == true) {
                   showGeofenceDialog(
                     context,
                     sessionId: sessionId!,

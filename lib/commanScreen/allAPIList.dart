@@ -13,6 +13,9 @@ class ApiDetails{
    static String bootStrap="/ermobile/api/mobile/bootstrap";
    static String bootStrapVersion="/ermobile/api/mobile/bootstrap/version";
    static String mobileInfo="/ermobile/api/mobile/device-info";
+   static String mobilePunch="/ermobile/api/attendance/v1/punch";
+   static String mobilePunchSelfie="/ermobile/api/attendance/v1/punch/selfie";
+   static String mobilePunchContext="/ermobile/api/attendance/v1/punch-context";
 
    static String punchIn="restful/service/attendance/via/mobile";
    static var getAttendance = "restful/service/current/month/log/list/for/mobile/requisation";

@@ -31,6 +31,7 @@ import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/attendance_punch_api.dart';
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 //import '../adminPage/adminDashboard/adminDashboard.dart';
 import '../UIS_Bundle/dashboard/adminDashboard.dart' as mss;
@@ -81,6 +82,7 @@ int currentIndex = 0;
 String title = "Home";
 var orgId;
 var setGeofenceActive;
+bool attendanceSelfieRequired = false;
 var myTeamShow = "0";
 var exitResignationListView = "0";
 var exitResignationApproveL1View = "0";
@@ -1107,10 +1109,18 @@ class _DefaultPageState extends State<DefaultPage> {
 
   Future<void> _loadMobileEssPermissions() async {
     final state = await MobilePermissionService.loadEssState();
+    AttendancePunchContext? context;
+    try {
+      context = await AttendancePunchApi().getPunchContext();
+    } catch (error) {
+      print('[ATTENDANCE] Unable to load R3 punch context: $error');
+    }
     if (!mounted) return;
     setState(() {
       _mobileEssPermissions = state;
-      attAction = state.requiresSelfie ? '1' : '0';
+      attendanceSelfieRequired = context?.selfieRequired ?? state.requiresSelfie;
+      setGeofenceActive = context?.geofenceRequired ?? setGeofenceActive;
+      attAction = attendanceSelfieRequired ? '1' : '0';
     });
     if (state.shouldRunBackgroundTracking) {
       _startLocationTracking();
@@ -1119,28 +1129,13 @@ class _DefaultPageState extends State<DefaultPage> {
 
   Future<GeofenceListModal> getGeofenceList(String sessionId) async {
     try {
-      String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.geofenceListApi;
-      var urlapi = Uri.parse(
-        "$conn$apiUrl?sessionId=$sessionId&empId=$empIdGet&orgId=$orgId",
-      );
-
-      print(
-        "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Fetching geofence list from: $urlapi",
-      );
-
-      final response = await MobileHttpClient.instance.post(urlapi);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        // ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Parse into GeofenceListModal directly
-        return GeofenceListModal.fromJson(data);
-      } else {
-        throw Exception(
-          "Failed to fetch geofence list: ${response.statusCode}",
-        );
-      }
+      final context = await AttendancePunchApi().getPunchContext();
+      if (mounted) setState(() {
+        setGeofenceActive = context.geofenceRequired;
+        attendanceSelfieRequired = context.selfieRequired;
+        attAction = context.selfieRequired ? '1' : '0';
+      });
+      return context.toLegacyGeofenceList();
     } catch (e) {
       print(
         "ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â¡Ãƒâ€šÃ‚Â¨ Error fetching geofence list: $e",
@@ -2374,15 +2369,9 @@ class _DefaultPageState extends State<DefaultPage> {
                                       } else {
                                         clockingType = "In";
                                         //print("ATTACTIONCHECK - $attAction");
-                                        if (!_mobileEssPermissions
-                                            .requiresSelfie) {
+                                        if (!attendanceSelfieRequired) {
                                           print("ORGID - $orgId");
-                                          if ((orgId == 201 ||
-                                                  orgId == 200 ||
-                                                  orgId == 199 ||
-                                                  orgId == 202 ||
-                                                  orgId == 145) &&
-                                              setGeofenceActive == true) {
+                                          if (setGeofenceActive == true) {
                                             showGeofenceDialog(
                                               context,
                                               sessionId: sessionId!,
@@ -2392,8 +2381,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                           } else {
                                             getPunchIn(context);
                                           }
-                                        } else if (_mobileEssPermissions
-                                            .requiresSelfie) {
+                                        } else if (attendanceSelfieRequired) {
                                           //getImagePunchIn();
                                           try {
                                             //ImagePicker picker = ImagePicker();
@@ -2462,14 +2450,9 @@ class _DefaultPageState extends State<DefaultPage> {
                                     }
                                   } else {
                                     clockingType = "In";
-                                    if (!_mobileEssPermissions.requiresSelfie) {
+                                    if (!attendanceSelfieRequired) {
                                       print("ORGID - $orgId");
-                                      if ((orgId == 201 ||
-                                              orgId == 200 ||
-                                              orgId == 199 ||
-                                              orgId == 202 ||
-                                              orgId == 145) &&
-                                          setGeofenceActive == true) {
+                                      if (setGeofenceActive == true) {
                                         showGeofenceDialog(
                                           context,
                                           sessionId: sessionId!,
@@ -2479,8 +2462,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                       } else {
                                         getPunchIn(context);
                                       }
-                                    } else if (_mobileEssPermissions
-                                        .requiresSelfie) {
+                                    } else if (attendanceSelfieRequired) {
                                       //getImagePunchIn();
                                       try {
                                         //ImagePicker picker = ImagePicker();
@@ -2773,15 +2755,9 @@ class _DefaultPageState extends State<DefaultPage> {
                                       } else {
                                         print("ATTACTIONCHECK - $attAction");
                                         clockingType = "Out";
-                                        if (!_mobileEssPermissions
-                                            .requiresSelfie) {
+                                        if (!attendanceSelfieRequired) {
                                           print("ORGID - $orgId");
-                                          if ((orgId == 201 ||
-                                                  orgId == 200 ||
-                                                  orgId == 199 ||
-                                                  orgId == 202 ||
-                                                  orgId == 145) &&
-                                              setGeofenceActive == true) {
+                                          if (setGeofenceActive == true) {
                                             showGeofenceDialogPunchOut(
                                               context,
                                               sessionId: sessionId!,
@@ -2791,8 +2767,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                           } else {
                                             getPunchOut(context);
                                           }
-                                        } else if (_mobileEssPermissions
-                                            .requiresSelfie) {
+                                        } else if (attendanceSelfieRequired) {
                                           getImagePunchOut();
                                         }
                                       }
@@ -2800,14 +2775,9 @@ class _DefaultPageState extends State<DefaultPage> {
                                   } else {
                                     print("ATTACTIONCHECK - $attAction");
                                     clockingType = "Out";
-                                    if (!_mobileEssPermissions.requiresSelfie) {
+                                    if (!attendanceSelfieRequired) {
                                       print("ORGID - $orgId");
-                                      if ((orgId == 201 ||
-                                              orgId == 200 ||
-                                              orgId == 199 ||
-                                              orgId == 202 ||
-                                              orgId == 145) &&
-                                          setGeofenceActive == true) {
+                                      if (setGeofenceActive == true) {
                                         showGeofenceDialogPunchOut(
                                           context,
                                           sessionId: sessionId!,
@@ -2817,8 +2787,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                       } else {
                                         getPunchOut(context);
                                       }
-                                    } else if (_mobileEssPermissions
-                                        .requiresSelfie) {
+                                    } else if (attendanceSelfieRequired) {
                                       getImagePunchOut();
                                     }
                                   }
@@ -3082,25 +3051,9 @@ class _DefaultPageState extends State<DefaultPage> {
 
     getTimeUpdate();
 
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "address=$currentAddress&"
-      "clocking=$sessionId&"
-      "clockingType=$clockingType&"
-      "lat=$lat&"
-      "lng=$lng&"
-      "currentDate=$todayDate&"
-      "firstImei=$sessionId&"
-      "secondImei=$sessionId&"
-      "macAddress=$sessionId&"
-      "deviceId=$sessionId&"
-      "battery=$sessionId",
-    );
-
-    var request = http.MultipartRequest("POST", urlapi);
-    http.Response response = await http.Response.fromStream(
-      await request.send(),
+    http.Response response = await AttendancePunchApi().punchWithoutSelfie(
+      action: clockingType!, latitude: lat, longitude: lng,
+      accuracyMeters: position?.accuracy ?? 50, address: currentAddress,
     );
 
     result = json.decode(response.body.toString());
@@ -3165,26 +3118,10 @@ class _DefaultPageState extends State<DefaultPage> {
 
     getTimeUpdate();
 
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "address=$currentAddress&"
-      "clocking=$sessionId&"
-      "clockingType=$clockingType&"
-      "lat=$lat&"
-      "lng=$lng&"
-      "currentDate=$todayDate&"
-      "firstImei=$sessionId&"
-      "secondImei=$sessionId&"
-      "macAddress=$sessionId&"
-      "deviceId=$sessionId&"
-      "battery=$sessionId&"
-      "geofenceId=$selectedGeofenceId",
-    );
-
-    var request = http.MultipartRequest("POST", urlapi);
-    http.Response response = await http.Response.fromStream(
-      await request.send(),
+    http.Response response = await AttendancePunchApi().punchWithoutSelfie(
+      action: clockingType!, latitude: lat, longitude: lng,
+      accuracyMeters: position?.accuracy ?? 50, address: currentAddress,
+      geofenceId: int.tryParse(selectedGeofenceId.toString()),
     );
 
     result = json.decode(response.body.toString());
@@ -3240,24 +3177,9 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "address=$currentAddress&"
-      "clocking=$sessionId&"
-      "clockingType=$clockingType&"
-      "lat=$lat&"
-      "lng=$lng&"
-      "currentDate=$todayDate&"
-      "firstImei=$sessionId&"
-      "secondImei=$sessionId&"
-      "macAddress=$sessionId&"
-      "deviceId=$sessionId&"
-      "battery=$sessionId",
-    );
-    var request = http.MultipartRequest("Post", urlapi);
-    http.Response response = await http.Response.fromStream(
-      await request.send(),
+    http.Response response = await AttendancePunchApi().punchWithoutSelfie(
+      action: clockingType!, latitude: lat, longitude: lng,
+      accuracyMeters: position?.accuracy ?? 50, address: currentAddress,
     );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
@@ -3316,25 +3238,10 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "address=$currentAddress&"
-      "clocking=$sessionId&"
-      "clockingType=$clockingType&"
-      "lat=$lat&"
-      "lng=$lng&"
-      "currentDate=$todayDate&"
-      "firstImei=$sessionId&"
-      "secondImei=$sessionId&"
-      "macAddress=$sessionId&"
-      "deviceId=$sessionId&"
-      "battery=$sessionId&"
-      "geofenceId=$selectedGeofenceId",
-    );
-    var request = http.MultipartRequest("Post", urlapi);
-    http.Response response = await http.Response.fromStream(
-      await request.send(),
+    http.Response response = await AttendancePunchApi().punchWithoutSelfie(
+      action: clockingType!, latitude: lat, longitude: lng,
+      accuracyMeters: position?.accuracy ?? 50, address: currentAddress,
+      geofenceId: int.tryParse(selectedGeofenceId.toString()),
     );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
