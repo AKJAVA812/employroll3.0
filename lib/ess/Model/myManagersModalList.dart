@@ -1,3 +1,50 @@
+String? _text(Object? value) => value == null ? null : value.toString();
+
+int? _integer(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  return int.tryParse(value?.toString() ?? '');
+}
+
+List<Map<String, dynamic>> _rows(Object? value) {
+  if (value is! List) return const <Map<String, dynamic>>[];
+  return value
+      .whereType<Map>()
+      .map(
+        (row) => row.map<String, dynamic>(
+          (key, itemValue) => MapEntry(key.toString(), itemValue),
+        ),
+      )
+      .toList();
+}
+
+String _relationshipType(Map<String, dynamic> row) {
+  final value = (row['relationshipType'] ??
+          row['reportieeType'] ??
+          row['reportieType'] ??
+          row['reportingType'] ??
+          '')
+      .toString()
+      .trim()
+      .toUpperCase()
+      .replaceAll(RegExp(r'[\s-]+'), '_');
+  if (value == 'SHARED' || value == 'SHARED_SERVICE') {
+    return 'SHARED_SERVICES';
+  }
+  return value;
+}
+
+List<Map<String, dynamic>> _rowsForType(
+  List<Map<String, dynamic>> allRows,
+  List<Map<String, dynamic>> responseRows,
+  String type,
+) {
+  final matches = allRows
+      .where((row) => _relationshipType(row) == type)
+      .toList();
+  return matches.isNotEmpty ? matches : responseRows;
+}
+
 class MyManagersModalList {
   List<DottedEmpList>? dottedEmpList;
   List<SharedEmpList>? sharedEmpList;
@@ -13,36 +60,29 @@ class MyManagersModalList {
         this.designatedEmpList});
 
   MyManagersModalList.fromJson(Map<String, dynamic> json) {
-    if (json['dottedEmpList'] != null) {
-      dottedEmpList = <DottedEmpList>[];
-      json['dottedEmpList'].forEach((v) {
-        dottedEmpList!.add(DottedEmpList.fromJson(v));
-      });
-    }
-    if (json['sharedEmpList'] != null) {
-      sharedEmpList = <SharedEmpList>[];
-      json['sharedEmpList'].forEach((v) {
-        sharedEmpList!.add(SharedEmpList.fromJson(v));
-      });
-    }
-    if (json['listData'] != null) {
-      listData = <ListData>[];
-      json['listData'].forEach((v) {
-        listData!.add(ListData.fromJson(v));
-      });
-    }
-    if (json['directEmpList'] != null) {
-      directEmpList = <DirectEmpList>[];
-      json['directEmpList'].forEach((v) {
-        directEmpList!.add(DirectEmpList.fromJson(v));
-      });
-    }
-    if (json['designatedEmpList'] != null) {
-      designatedEmpList = <DesignatedEmpList>[];
-      json['designatedEmpList'].forEach((v) {
-        designatedEmpList!.add(DesignatedEmpList.fromJson(v));
-      });
-    }
+    final allRows = _rows(json['listData'] ?? json['data']);
+    final dottedRows = _rows(json['dottedEmpList']);
+    final sharedRows = _rows(json['sharedEmpList']);
+    final directRows = _rows(json['directEmpList']);
+    final designatedRows = _rows(json['designatedEmpList']);
+
+    listData = allRows.map((row) => ListData.fromJson(row)).toList();
+    dottedEmpList = _rowsForType(allRows, dottedRows, 'DOTTED')
+        .map((row) => DottedEmpList.fromJson(row))
+        .toList();
+    sharedEmpList = _rowsForType(allRows, sharedRows, 'SHARED_SERVICES')
+        .map((row) => SharedEmpList.fromJson(row))
+        .toList();
+    directEmpList = _rowsForType(allRows, directRows, 'DIRECT')
+        .map((row) => DirectEmpList.fromJson(row))
+        .toList();
+    designatedEmpList = _rowsForType(
+      allRows,
+      designatedRows,
+      'DESIGNATED',
+    )
+        .map((row) => DesignatedEmpList.fromJson(row))
+        .toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -89,13 +129,15 @@ class SharedEmpList {
         this.empDetId});
 
   SharedEmpList.fromJson(Map<String, dynamic> json) {
-    profileName = json['profileName'];
-    reportingOfficerId = json['reportingOfficerId'];
-    reportingOfficerName = json['reportingOfficerName'];
-    reportieeStatus = json['reportieeStatus'];
-    reportieeType = json['reportieeType'];
-    emailId = json['emailId'];
-    empDetId = json['empDetId'];
+    profileName = _text(json['profileName']);
+    reportingOfficerId = _integer(json['reportingOfficerId']);
+    reportingOfficerName = _text(json['reportingOfficerName']);
+    reportieeStatus = _text(json['reportieeStatus']);
+    reportieeType = _text(
+      json['reportieeType'] ?? json['relationshipType'] ?? json['reportieType'],
+    );
+    emailId = _text(json['emailId']);
+    empDetId = _integer(json['empDetId']);
   }
 
   Map<String, dynamic> toJson() {
@@ -130,13 +172,15 @@ class DottedEmpList {
         this.empDetId});
 
   DottedEmpList.fromJson(Map<String, dynamic> json) {
-    profileName = json['profileName'];
-    reportingOfficerId = json['reportingOfficerId'];
-    reportingOfficerName = json['reportingOfficerName'];
-    reportieeStatus = json['reportieeStatus'];
-    reportieeType = json['reportieeType'];
-    emailId = json['emailId'];
-    empDetId = json['empDetId'];
+    profileName = _text(json['profileName']);
+    reportingOfficerId = _integer(json['reportingOfficerId']);
+    reportingOfficerName = _text(json['reportingOfficerName']);
+    reportieeStatus = _text(json['reportieeStatus']);
+    reportieeType = _text(
+      json['reportieeType'] ?? json['relationshipType'] ?? json['reportieType'],
+    );
+    emailId = _text(json['emailId']);
+    empDetId = _integer(json['empDetId']);
   }
 
   Map<String, dynamic> toJson() {
@@ -171,13 +215,15 @@ class ListData {
         this.empDetId});
 
   ListData.fromJson(Map<String, dynamic> json) {
-    profileName = json['profileName'];
-    reportingOfficerId = json['reportingOfficerId'];
-    reportingOfficerName = json['reportingOfficerName'];
-    reportieeStatus = json['reportieeStatus'];
-    reportieeType = json['reportieeType'];
-    emailId = json['emailId'];
-    empDetId = json['empDetId'];
+    profileName = _text(json['profileName']);
+    reportingOfficerId = _integer(json['reportingOfficerId']);
+    reportingOfficerName = _text(json['reportingOfficerName']);
+    reportieeStatus = _text(json['reportieeStatus']);
+    reportieeType = _text(
+      json['reportieeType'] ?? json['relationshipType'] ?? json['reportieType'],
+    );
+    emailId = _text(json['emailId']);
+    empDetId = _integer(json['empDetId']);
   }
 
   Map<String, dynamic> toJson() {
@@ -212,13 +258,15 @@ class DirectEmpList {
         this.empDetId});
 
   DirectEmpList.fromJson(Map<String, dynamic> json) {
-    profileName = json['profileName'];
-    reportingOfficerId = json['reportingOfficerId'];
-    reportingOfficerName = json['reportingOfficerName'];
-    reportieeStatus = json['reportieeStatus'];
-    reportieeType = json['reportieeType'];
-    emailId = json['emailId'];
-    empDetId = json['empDetId'];
+    profileName = _text(json['profileName']);
+    reportingOfficerId = _integer(json['reportingOfficerId']);
+    reportingOfficerName = _text(json['reportingOfficerName']);
+    reportieeStatus = _text(json['reportieeStatus']);
+    reportieeType = _text(
+      json['reportieeType'] ?? json['relationshipType'] ?? json['reportieType'],
+    );
+    emailId = _text(json['emailId']);
+    empDetId = _integer(json['empDetId']);
   }
 
   Map<String, dynamic> toJson() {
@@ -253,13 +301,15 @@ class DesignatedEmpList {
         this.empDetId});
 
   DesignatedEmpList.fromJson(Map<String, dynamic> json) {
-    profileName = json['profileName'];
-    reportingOfficerId = json['reportingOfficerId'];
-    reportingOfficerName = json['reportingOfficerName'];
-    reportieeStatus = json['reportieeStatus'];
-    reportieeType = json['reportieeType'];
-    emailId = json['emailId'];
-    empDetId = json['empDetId'];
+    profileName = _text(json['profileName']);
+    reportingOfficerId = _integer(json['reportingOfficerId']);
+    reportingOfficerName = _text(json['reportingOfficerName']);
+    reportieeStatus = _text(json['reportieeStatus']);
+    reportieeType = _text(
+      json['reportieeType'] ?? json['relationshipType'] ?? json['reportieType'],
+    );
+    emailId = _text(json['emailId']);
+    empDetId = _integer(json['empDetId']);
   }
 
   Map<String, dynamic> toJson() {

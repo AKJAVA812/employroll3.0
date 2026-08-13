@@ -247,18 +247,27 @@ class _ImageUploadedState extends State<ImageUploaded> {
   }
 
   showDialgError(BuildContext context, result, reason) {
+    final message = reason?.toString().trim().isNotEmpty == true
+        ? reason.toString()
+        : "Your Punch Not Submitted, Please Try Again";
     var alertDialog = AlertDialog(
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Text(result),
+          Text("Attendance Error"),
         ],
       ),
-      content: Text(reason),
+      content: Text(message),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+          child: Text("Cancel"),
+        ),
         TextButton(
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
@@ -273,14 +282,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
             } else {
               uploadImage(context);
             }
-          },
-          child: Text("Cancel"),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop();
-            Navigator.pop(context);
-            //uploadImage(context);
           },
           child: Text("Retry"),
         ),
@@ -303,7 +304,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
           Text(result, style: TextStyle(fontSize: 14)),
         ],
       ),
-      content: Text(reason),
+      content: Text(reason.toString()),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
@@ -323,7 +324,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
             Navigator.of(context, rootNavigator: true).pop();
             if (_clickCount > 2) {
               //print("I am touched 2 times");
-              //Navigator.of(context, rootNavigator: true).pop();
+              //await _closeRootDialog(context);
               savedDataLocally(
                 context,
                 "Data Saved Offline !" + "",
@@ -345,7 +346,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
               }
             }
 
-            //Navigator.of(context, rootNavigator: true).pop();
+            //await _closeRootDialog(context);
             //uploadImage(context);
           },
           child: Text("Retry"),
@@ -366,10 +367,10 @@ class _ImageUploadedState extends State<ImageUploaded> {
       title: Row(
         children: [
           //Icon(Icons.warning),
-          Text(result),
+          Text("Attendance Error"),
         ],
       ),
-      content: Text(reason),
+      content: Text(reason.toString()),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
@@ -377,7 +378,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
         TextButton(
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
-            //Navigator.of(context, rootNavigator: true).pop();
           },
           child: Text("Ok"),
         ),
@@ -391,13 +391,13 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
             if (_clickCount > 2) {
               print("I am touched 2 times");
-              Navigator.of(context, rootNavigator: true).pop();
+              await _closeRootDialog(context);
               savedDataLocally(context,"Data Saved Offline !"+"","Your punch is saved offline, Please sync the punch once you are in network area.");
               writeData();
             }
 
             uploadImage(context);
-            //Navigator.of(context, rootNavigator: true).pop();
+            //await _closeRootDialog(context);
             //uploadImage(context);
           },
           child: Text("Retry"),
@@ -452,21 +452,64 @@ class _ImageUploadedState extends State<ImageUploaded> {
     }
   }
 
+  bool _isPunchLoaderOpen = false;
+  BuildContext? _punchLoaderDialogContext;
+
+  void _showPunchLoaderDialog(BuildContext context) {
+    if (!context.mounted) return;
+    _isPunchLoaderOpen = true;
+    _punchLoaderDialogContext = null;
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext dialogContext) {
+        _punchLoaderDialogContext = dialogContext;
+        return AlertDialog(
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              Container(
+                margin: const EdgeInsets.only(left: 7),
+                child: const Text("Please Wait..."),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _closeRootDialog(BuildContext context) async {
+    if (!_isPunchLoaderOpen) return;
+
+    for (int attempt = 0; attempt < 6; attempt++) {
+      final dialogContext = _punchLoaderDialogContext;
+      if (dialogContext != null && dialogContext.mounted) {
+        Navigator.of(dialogContext, rootNavigator: true).pop();
+        break;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+    }
+
+    _punchLoaderDialogContext = null;
+    _isPunchLoaderOpen = false;
+    await Future<void>.delayed(const Duration(milliseconds: 120));
+  }
+
   Future<void> uploadImage(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchIn;
-    CommonNotificationPage.showLoaderDialog(context);
+    _showPunchLoaderDialog(context);
 
     bool internetCheck = await InternetConnectionChecker().hasConnection;
     if (internetCheck == false) {
-      setState(() {
-        Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(
-          context,
-          "Slow Internet Connection !" + "",
-          "Your Punch in not submitted, Please try again.",
-        );
-      });
+      await _closeRootDialog(context);
+      slowInternetPop(
+        context,
+        "Slow Internet Connection !" + "",
+        "Your Punch in not submitted, Please try again.",
+      );
+      return;
     }
 
     var stream = http.ByteStream(value!.openRead());
@@ -526,7 +569,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       print('Response received: ${response.body}');
 
       if (response.statusCode == 500) {
-        Navigator.of(context, rootNavigator: true).pop();
+        await _closeRootDialog(context);
         slowInternetPop(
           context,
           "Slow Internet Connection !",
@@ -545,7 +588,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       print("Result: $resultSuccess");
 
       if (response.statusCode == 200) {
-        Navigator.of(context, rootNavigator: true).pop();
+        await _closeRootDialog(context);
         if (resultSuccess.compareToIgnoringCase("success") == 0) {
           showSuccessGo(
             context,
@@ -564,14 +607,25 @@ class _ImageUploadedState extends State<ImageUploaded> {
           }
         }
       } else {
+        await _closeRootDialog(context);
         showDialgError(
           context,
           result,
-          "Your Punch Not Submitted, Please Try Again",
+          reasonSuccess.isNotEmpty
+              ? reasonSuccess
+              : "Your Punch Not Submitted, Please Try Again",
         );
       }
     } on TimeoutException catch (_) {
+      await _closeRootDialog(context);
       showDialgError(context, result, "Your Punch Submitted offline");
+    } catch (error) {
+      await _closeRootDialog(context);
+      showDialgError(
+        context,
+        result,
+        "Your Punch response could not be processed. $error",
+      );
     }
   }
 
@@ -584,18 +638,17 @@ class _ImageUploadedState extends State<ImageUploaded> {
     // âœ… Use root context to show dialogs safely
     final rootContext = Navigator.of(context, rootNavigator: true).context;
 
-    CommonNotificationPage.showLoaderDialog(rootContext);
+    _showPunchLoaderDialog(rootContext);
 
     bool internetCheck = await InternetConnectionChecker().hasConnection;
     if (internetCheck == false) {
-      setState(() {
-        Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(
-          context,
-          "Slow Internet Connection !" + "",
-          "Your Punch in not submitted, Please try again.",
-        );
-      });
+      await _closeRootDialog(rootContext);
+      slowInternetPop(
+        rootContext,
+        "Slow Internet Connection !" + "",
+        "Your Punch in not submitted, Please try again.",
+      );
+      return;
     }
 
     var stream = http.ByteStream(value!.openRead());
@@ -662,12 +715,13 @@ class _ImageUploadedState extends State<ImageUploaded> {
       //print('URL ${response.request}');
 
       if (response.statusCode == 500) {
-        Navigator.of(context, rootNavigator: true).pop();
+        await _closeRootDialog(rootContext);
         slowInternetPop(
-          context,
+          rootContext,
           "Slow Internet Connection !" + "",
           "Your Punch in not submitted, Please try again.",
         );
+        return;
       }
       result = json.decode(response.body.toString());
       String resultSuccess = result['result'];
@@ -690,10 +744,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
       if (response.statusCode == 200) {
         print("I am hit 2 times");
-        // âœ… Always pop loader safely
-        if (rootContext.mounted) {
-          Navigator.of(rootContext, rootNavigator: true).pop();
-        }
+        await _closeRootDialog(rootContext);
         if (resultSuccess.compareToIgnoringCase("success") == 0) {
           showSuccessGo(
             rootContext,
@@ -713,27 +764,37 @@ class _ImageUploadedState extends State<ImageUploaded> {
         }
       } else {
         //Navigator.pop(context);
+        await _closeRootDialog(rootContext);
         showDialgError(
           rootContext,
           result,
-          "Your Punch Not Submitted, Please Try Again",
+          reasonSuccess.isNotEmpty
+              ? reasonSuccess
+              : "Your Punch Not Submitted, Please Try Again",
         );
       }
     } on TimeoutException catch (_) {
-      // Show retry popup if the request times out
-      //showDialgError(context, "Alert", "Please Try again !");
+      await _closeRootDialog(rootContext);
+      showDialgError(rootContext, result, "Your Punch Submitted offline");
+    } catch (error) {
+      await _closeRootDialog(rootContext);
+      showDialgError(
+        rootContext,
+        result,
+        "Your Punch response could not be processed. $error",
+      );
     }
   }
 
   /*Future<void> uploadImage(BuildContext context) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.punchIn;
-    CommonNotificationPage.showLoaderDialog(context);
+    _showPunchLoaderDialog(context);
 
     bool internetCheck = await InternetConnectionChecker().hasConnection;
     if (internetCheck == false) {
       setState(() {
-        Navigator.of(context, rootNavigator: true).pop();
+        await _closeRootDialog(context);
         slowInternetPop(
             context,
             "Slow Internet Connection !" + "",
@@ -793,7 +854,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       print('Response received: ${response.body}');
 
       if (response.statusCode == 500) {
-        Navigator.of(context, rootNavigator: true).pop();
+        await _closeRootDialog(context);
         slowInternetPop(
             context,
             "Slow Internet Connection !" + "",
@@ -810,7 +871,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       print("Result: ${result['result']}, Type: ${result['result'].runtimeType}");
 
       if (response.statusCode == 200) {
-        Navigator.of(context, rootNavigator: true).pop();
+        await _closeRootDialog(context);
         if (resultSuccess.compareToIgnoringCase("success") == 0) {
           showSuccessGo(
               context,
@@ -825,7 +886,14 @@ class _ImageUploadedState extends State<ImageUploaded> {
           }
         }
       } else {
-        showDialgError(context, result, "Your Punch Not Submitted, Please Try Again");
+        await _closeRootDialog(context);
+        showDialgError(
+          context,
+          result,
+          reasonSuccess.isNotEmpty
+              ? reasonSuccess
+              : "Your Punch Not Submitted, Please Try Again",
+        );
       }
     } on TimeoutException catch (_) {
       // Timeout

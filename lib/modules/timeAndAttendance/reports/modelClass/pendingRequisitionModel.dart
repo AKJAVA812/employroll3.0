@@ -44,6 +44,9 @@ class Data {
   dynamic status;
   dynamic shortLeaveRequistionType;
   dynamic odRequistionType;
+  dynamic requestType;
+  int? currentLevel;
+  int? totalLevels;
 
   Data(
       {this.empId,
@@ -67,7 +70,10 @@ class Data {
         this.outTime,
         this.status,
         this.shortLeaveRequistionType,
-        this.odRequistionType,
+      this.odRequistionType,
+        this.requestType,
+        this.currentLevel,
+        this.totalLevels,
       });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -93,6 +99,12 @@ class Data {
     status = json['status'];
     shortLeaveRequistionType = json['shortLeaveRequistionType'];
     odRequistionType = json['odRequistionType'];
+    requestType = json['requestType'];
+    currentLevel = int.tryParse(
+      (json['currentLevel'] ?? json['approvalLevel'] ?? json['levelNo'] ?? '')
+          .toString(),
+    );
+    totalLevels = int.tryParse((json['totalLevels'] ?? '').toString());
   }
 
   Map<String, dynamic> toJson() {
@@ -119,6 +131,9 @@ class Data {
     data['status'] = this.status;
     data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;
     data['odRequistionType'] = this.odRequistionType;
+    data['requestType'] = this.requestType;
+    data['currentLevel'] = this.currentLevel;
+    data['totalLevels'] = this.totalLevels;
     return data;
   }
 }

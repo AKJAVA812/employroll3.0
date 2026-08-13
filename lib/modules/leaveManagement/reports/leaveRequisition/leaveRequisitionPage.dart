@@ -20,11 +20,14 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../ess/myAllReports.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../../../timeAndAttendance/calendarPage/workFromHomeRequisitionPage.dart';
+import '../../../timeAndAttendance/calendarPage/requisitionTypeTabs.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../modalClass/leaveBalModal.dart';
 import '../modalClass/leaveBalanceModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 
 class LeaveRequisitionPage extends StatefulWidget {
   final bool showShortcuts;
@@ -76,6 +79,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
   var fromDate;
   var getRemark;
   var leaveTypeId;
+  List<Map<String, dynamic>> _leaveLedgerTypes = <Map<String, dynamic>>[];
+  bool _isSubmitting = false;
   var nominee;
   final _formKey = GlobalKey<FormState>();
 
@@ -114,15 +119,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
     sessionId = await shared.getSessionId();
     doj = await shared.getDoj();
 
-    getLeaveTypeList(sessionId!).then((data) {
-      if (data != null) {
-        setState(() {
-          leaveBalanceLabel = data.leaveBalanceModel; // full model
-          leaveBalLabel = data.leaveBalModal; // only leaveData part
-        });
-      }
-    });
-    // fetchLeaveBalance(sessionId!);
+    await getLeaveTypeList(sessionId ?? '');
   }
 
   showNodata(BuildContext buildContext, result, reason) {
@@ -226,7 +223,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
   Map<String, dynamic>? leaveBalances;
   List<String> leaveTypes = [];
 
-  Future<LeaveCombinedResponse?> getLeaveTypeList(String sessionId) async {
+  Future<LeaveCombinedResponse?> _getLegacyLeaveTypeList(
+    String sessionId,
+  ) async {
     leaveTypeList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBalanceApi;
@@ -287,6 +286,74 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
       leaveBalanceModel: modelFull,
       leaveBalModal: modelLeaveData,
     );
+  }
+
+  Future<void> getLeaveTypeList(String _) async {
+    final foundation = MobileApiFoundation.instance;
+    try {
+      final response = await foundation.get(
+        ApiDetails.mobileLeaveLedger,
+        headers: await foundation.authHeaders(),
+        tag: 'LEAVE_LEDGER',
+      );
+      final body = foundation.decodeMap(response.body);
+      if (!foundation.isSuccess(response)) {
+        throw MobileApiException(
+          'LEAVE_LEDGER_FAILED',
+          message: _apiMessage(body, 'Unable to load leave ledger.'),
+          statusCode: response.statusCode,
+        );
+      }
+
+      final rawTypes = body['leaveTypes'];
+      final parsedTypes = rawTypes is List
+          ? rawTypes
+              .whereType<Map>()
+              .map((item) => Map<String, dynamic>.from(item))
+              .toList()
+          : <Map<String, dynamic>>[];
+      parsedTypes.removeWhere(
+        (item) => item['leaveTypeCode']?.toString().trim().isEmpty != false,
+      );
+      final balances = <String, dynamic>{};
+      final typeCodes = <String>[];
+      final dropdownLabels = <String?>[];
+      for (final item in parsedTypes) {
+        final code = item['leaveTypeCode']?.toString().trim() ?? '';
+        if (code.isEmpty) continue;
+        final name = item['leaveTypeName']?.toString().trim();
+        typeCodes.add(code);
+        dropdownLabels.add(name == null || name.isEmpty ? code : name);
+        balances[code] = <String, dynamic>{
+          'leavesTaken': 0,
+          'totalLeavesPending': (item['balance'] as num?)?.toDouble() ?? 0.0,
+        };
+      }
+
+      if (!mounted) return;
+      setState(() {
+        mapResponse = body;
+        _leaveLedgerTypes = parsedTypes;
+        leaveTypeList = dropdownLabels;
+        leaveTypes = typeCodes;
+        leaveBalances = balances;
+        dropdownNewvalue = null;
+        leaveTypeId = null;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _leaveLedgerTypes = <Map<String, dynamic>>[];
+        leaveTypeList = <String?>[];
+        leaveTypes = <String>[];
+        leaveBalances = <String, dynamic>{};
+      });
+      Fluttertoast.showToast(
+        msg: error is MobileApiException
+            ? (error.message ?? 'Unable to load leave ledger.')
+            : 'Unable to load leave ledger.',
+      );
+    }
   }
 
   /*Future<void> fetchLeaveBalance(String sessionId) async {
@@ -731,10 +798,10 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                           borderRadius: BorderRadius.circular(10.0),
                           indicatorBorderRadius: BorderRadius.zero,
                         ),
-                        values: const [0, 1, 2],
+                        values: const [0, 1, 2, 3],
                         iconOpacity: 1.0,
                         selectedIconScale: 1.0,
-                        indicatorSize: const Size.fromWidth(85),
+                        indicatorSize: const Size.fromWidth(70),
                         iconAnimationType: AnimationType.onHover,
                         styleAnimationType: AnimationType.onHover,
                         spacing: 3.0,
@@ -859,86 +926,23 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                 ),*/
                 Visibility(
                   visible: widget.showShortcuts,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedToggleSwitch<int>.size(
-                        height: 30,
-                        current: min(value, 3),
-                        style: ToggleStyle(
-                          backgroundColor: Mythemes.greyishade,
-                          indicatorColor: Mythemes.lightBluishColor,
-                          borderColor: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.0),
-                          indicatorBorderRadius: BorderRadius.zero,
-                        ),
-                        values: const [0, 1, 2],
-                        iconOpacity: 1.0,
-                        selectedIconScale: 1.0,
-                        indicatorSize: const Size.fromWidth(85),
-                        iconAnimationType: AnimationType.onHover,
-                        styleAnimationType: AnimationType.onHover,
-                        spacing: 3.0,
-                        customSeparatorBuilder: (context, local, global) {
-                          final opacity =
-                              ((global.position - local.position).abs() - 0.5)
-                                  .clamp(0.0, 1.0);
-                          return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity),
-                          );
-                        },
-                        customIconBuilder: (context, local, global) {
-                          final text =
-                              const ['Attendance', 'Leave', 'OD'][local.index];
-                          return Center(
-                            child: Text(
-                              text,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(
-                                  Colors.black,
-                                  Colors.white,
-                                  local.animationValue,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        borderWidth: 0.0,
-                        onChanged: (i) {
-                          setState(() {
-                            value = i;
-                            print(i);
-                          });
-                          if (value == 0) {
-                            Navigator.pushNamed(
-                              context,
-                              MyRoutings.attendanceReqCalendar,
-                            );
-                            //Navigator.of(context, rootNavigator: true).pop();
-                          }
-                          if (value == 1) {
-                            Navigator.pushNamed(
-                              context,
-                              MyRoutings.leaveRequisitionRoute,
-                            );
-                            //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                          }
-                          if (value == 2) {
-                            Navigator.pushNamed(
-                              context,
-                              MyRoutings.odLocationViewRoute,
-                            );
-                          }
-                          /* if(value == 3) {
-                                Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                              }*/
-                        },
-                      ),
-                    ],
+                  child: RequisitionTypeTabs(
+                    currentIndex: min(value, 3),
+                    onChanged: (i) {
+                      setState(() => value = i);
+                      if (value == 0) {
+                        Navigator.pushNamed(context, MyRoutings.attendanceReqCalendar);
+                      } else if (value == 2) {
+                        Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                      } else if (value == 3) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WorkFromHomeRequisitionPage(),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ),
 
@@ -972,18 +976,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                     : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLeaveCardDynamic(
-                          "Leave Taken (Current Ledger)",
-                          leaveTypes,
-                          leaveBalances!,
-                          (type) =>
-                              leaveBalances?[type]?['leavesTaken']
-                                  ?.toString() ??
-                              "0",
-                          Colors.red,
-                          isBold: true,
-                        ),
-                        const SizedBox(height: 12),
                         _buildLeaveCardDynamic(
                           "Net Balance",
                           leaveTypes,
@@ -1071,22 +1063,18 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                     onChanged: (newVal) {
                       valuenew = newVal.toString();
                       int i = leaveTypeList.indexOf(valuenew);
-                      print(
-                        "Leave Type Data List - ${mapResponse['leaveTypeList']}",
-                      );
-                      leaveTypeId = mapResponse['leaveTypeList'][i]['leaveId'];
-                      var leaveHalfDay =
-                          mapResponse['leaveTypeList'][i]['isHalfday'];
+                      if (i < 0 || i >= _leaveLedgerTypes.length) return;
+                      final selectedType = _leaveLedgerTypes[i];
+                      leaveTypeId = selectedType['leaveTypeCode']?.toString();
+                      final leaveHalfDay = selectedType['allowHalfDay'] == true;
                       sickLeaveMedicalTypeShow =
-                          mapResponse['leaveTypeList'][i]['medCerti'];
-                      sickLeaveMedicalShowValue =
-                          mapResponse['leaveTypeList'][i]['medValue'];
+                          selectedType['proofRequired'] == true;
+                      sickLeaveMedicalShowValue = 0;
                       //print("MED CERTI - $sickLeaveMedicalShow");
                       //print("MED VALUE - $sickLeaveMedicalShowValue");
                       //print('Leave Half Day $leaveHalfDay');
                       var policyidnew = leaveTypeList.elementAt(i);
-                      leavereqIdGlobel = newVal.toString().split('-');
-                      String idn = leavereqIdGlobel.last;
+                      leavereqIdGlobel = <String>[leaveTypeId?.toString() ?? ''];
                       print('leaveTypeId $leaveTypeId');
                       setState(() {
                         //print('value1 $i');
@@ -1938,6 +1926,201 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
 
   Future<void> singleDayRequisition(
     String getRemark,
+    Object? _,
+    dynamic fromDate,
+    dynamic __,
+    dynamic ___,
+    String ____,
+  ) {
+    return _submitLeaveRequest(
+      reason: getRemark,
+      fromDate: fromDate.toString(),
+      toDate: fromDate.toString(),
+      leaveLength: 'full',
+    );
+  }
+
+  Future<void> multipleDayRequisition(
+    String getRemark,
+    Object? _,
+    dynamic toDate,
+    dynamic fromDate,
+    dynamic __,
+    dynamic ___,
+    String ____,
+  ) {
+    return _submitLeaveRequest(
+      reason: getRemark,
+      fromDate: fromDate.toString(),
+      toDate: toDate.toString(),
+      leaveLength: 'full',
+    );
+  }
+
+  Future<void> halfDayRequisition(
+    dynamic _,
+    dynamic __,
+    String getRemark,
+    Object? ___,
+    dynamic fromDate,
+    dynamic ____,
+    dynamic _____,
+    String ______,
+  ) {
+    return _submitLeaveRequest(
+      reason: getRemark,
+      fromDate: fromDate.toString(),
+      toDate: fromDate.toString(),
+      leaveLength: 'half',
+      sessionName: halfDayNewRadios == '1' ? 'first-half' : 'second-half',
+    );
+  }
+
+  Future<void> _submitLeaveRequest({
+    required String reason,
+    required String fromDate,
+    required String toDate,
+    required String leaveLength,
+    String? sessionName,
+  }) async {
+    if (_isSubmitting) return;
+    final selectedCode = leaveTypeId?.toString().trim() ?? '';
+    if (selectedCode.isEmpty) {
+      Fluttertoast.showToast(msg: 'Please select Leave Type.');
+      return;
+    }
+    if (leaveLength == 'half' && halfDayNewRadios.isEmpty) {
+      Fluttertoast.showToast(msg: 'Please select First Half or Second Half.');
+      return;
+    }
+
+    final normalizedFromDate = _toApiDate(fromDate);
+    final normalizedToDate = _toApiDate(toDate);
+    if (normalizedFromDate == null || normalizedToDate == null) {
+      Fluttertoast.showToast(msg: 'Please select a valid leave date.');
+      return;
+    }
+
+    Map<String, dynamic>? selectedType;
+    for (final item in _leaveLedgerTypes) {
+      if (item['leaveTypeCode']?.toString() == selectedCode) {
+        selectedType = item;
+        break;
+      }
+    }
+    final foundation = MobileApiFoundation.instance;
+    final requestId = foundation.newRequestId();
+    setState(() => _isSubmitting = true);
+    CommonNotificationPage.showLoaderDialog(context);
+    try {
+      final response = await foundation.postJson(
+        ApiDetails.mobileLeaveRequisition,
+        body: <String, Object?>{
+          'leaveTypeCode': selectedCode,
+          'leaveTypeName': selectedType?['leaveTypeName']?.toString(),
+          'leaveLength': leaveLength,
+          'fromDate': normalizedFromDate,
+          'toDate': normalizedToDate,
+          if (sessionName != null) 'sessionName': sessionName,
+          'reason': reason.trim(),
+        },
+        headers: await foundation.authHeaders(
+          requestId: requestId,
+          json: true,
+        ),
+        tag: 'LEAVE_REQUISITION',
+      );
+      final body = foundation.decodeMap(response.body);
+      final success = foundation.isSuccess(response);
+      final message = _apiMessage(
+        body,
+        success
+            ? 'Leave requisition submitted successfully.'
+            : 'Unable to submit leave requisition.',
+      );
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      if (success) {
+        _fromDateController.clear();
+        _toDateController.clear();
+        _remarkController.clear();
+        setState(() {
+          dayRadio = '1';
+          halfDayNewRadios = '';
+        });
+        await getLeaveTypeList(sessionId ?? '');
+      }
+      await _showLeaveResult(success ? 'Success' : 'Unable to Submit', message);
+    } on MobileApiException catch (error) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      await _showLeaveResult(
+        'Unable to Submit',
+        error.message ?? 'Unable to submit leave requisition.',
+      );
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      await _showLeaveResult(
+        'Unable to Submit',
+        'Unable to submit leave requisition.',
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  String? _toApiDate(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return null;
+    for (final format in <DateFormat>[
+      DateFormat('dd-MM-yyyy'),
+      DateFormat('yyyy-MM-dd'),
+    ]) {
+      try {
+        return DateFormat('yyyy-MM-dd').format(format.parseStrict(trimmed));
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  String _apiMessage(Map<String, dynamic> body, String fallback) {
+    for (final key in <String>['message', 'reason', 'detail']) {
+      final value = body[key];
+      if (value != null && value.toString().trim().isNotEmpty) {
+        return value.toString();
+      }
+    }
+    final error = body['error'];
+    if (error is Map) {
+      for (final key in <String>['message', 'reason', 'detail']) {
+        final value = error[key];
+        if (value != null && value.toString().trim().isNotEmpty) {
+          return value.toString();
+        }
+      }
+    }
+    return fallback;
+  }
+
+  Future<void> _showLeaveResult(String title, String message) {
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _legacySingleDayRequisition(
+    String getRemark,
     int? idn,
     fromDate,
     empNewId,
@@ -2041,7 +2224,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
     }
   }
 
-  Future<void> multipleDayRequisition(
+  Future<void> _legacyMultipleDayRequisition(
     String getRemark,
     int? idn,
     toDate,
@@ -2221,7 +2404,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
     }
   }
 
-  Future<void> halfDayRequisition(
+  Future<void> _legacyHalfDayRequisition(
     startTime,
     endTime,
     String getRemark,

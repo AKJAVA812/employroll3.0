@@ -1,266 +1,383 @@
+class ApiDetails {
+  //Base Server Address
+  //static var server="https://ermobile.employroll.com";
 
-class ApiDetails{
-   //Base Server Address
-   static var server="https://ermobile.employroll.com";
+  static var server = "https://fang-sizing-enrage.ngrok-free.dev";
+  //Attendance Punch in and Punch out
+  //static String login="restful/service/login";
 
-   //static var server="https://fang-sizing-enrage.ngrok-free.dev";
-   //Attendance Punch in and Punch out
-   //static String login="restful/service/login";
+  static String login = "/ermobile/api/auth/login";
+  static String sessionIdAuth = "/ermobile/api/auth/session";
+  static String refreshTokenId = "/ermobile/api/auth/refresh";
+  static String bootStrap = "/ermobile/api/mobile/bootstrap";
+  static String bootStrapVersion = "/ermobile/api/mobile/bootstrap/version";
+  static String mobileInfo = "/ermobile/api/mobile/device-info";
+  static String mobilePunch = "/ermobile/api/attendance/v1/punch";
+  static String mobilePunchSelfie = "/ermobile/api/attendance/v1/punch/selfie";
+  static String mobilePunchContext = "/ermobile/api/attendance/v1/punch-context";
+  static String mobileTodayPunches =
+      "/ermobile/api/attendance/v1/today-punches";
+  static String mobileWorkDone = "/ermobile/api/workdone/v1/tasks";
+  static String mobileWorkDoneReport = "/ermobile/api/workdone/v1/reports";
+  static String mobileOdPunch = "/ermobile/api/od/v1/punch";
+  static String mobileOdPunchSelfie = "/ermobile/api/od/v1/punch/selfie";
+  static String mobileOdPunchContext = "/ermobile/api/od/v1/punch-context";
+  static String mobileOdReport = "/ermobile/api/od/v1/reports";
+  static String mobileCalendar = "/ermobile/api/attendance/v1/calendar";
+  static String mobileAttendanceReport = "/ermobile/api/attendance/v1/reports";
+  static String mobileMyManagers = "/ermobile/api/employee/v1/managers";
+  static String mobileAttendanceRequisition =
+      "/ermobile/api/attendance/v1/requisition";
+  static String mobileAttendanceRequisitionList =
+      "/ermobile/api/attendance/v1/requisitions";
+  static String mobileWorkFromHomeRequisition =
+      "/ermobile/api/wfh/v1/requisition";
+  static String mobileLeaveLedger = "/ermobile/api/leave/v1/ledger";
+  static String mobileLeaveRequisition =
+      "/ermobile/api/leave/v1/requisition";
+  static String mobileLeaveRequisitionList =
+      "/ermobile/api/leave/v1/requisitions";
+  static String mobileEmployeeDocuments =
+      "/ermobile/api/documents/v1/employee";
+  static String mobileSalarySlips = "/ermobile/api/payroll/v1/salary-slips";
+  static String mobileProfileDetails = "/ermobile/api/profile/v1/details";
+  static String mobileProfileUpdateRequests =
+      "/ermobile/api/profile/v1/update-requests";
+  static String mobileMssMoOrganisations =
+      "/ermobile/api/mss/v1/organisations";
+  static String mobileMssApprovalFilters =
+      "/ermobile/api/mss/v1/approval-filters";
 
-   static String login="/ermobile/api/auth/login";
-   static String sessionIdAuth="/ermobile/api/auth/session";
-   static String refreshTokenId="/ermobile/api/auth/refresh";
-   static String bootStrap="/ermobile/api/mobile/bootstrap";
-   static String bootStrapVersion="/ermobile/api/mobile/bootstrap/version";
-   static String mobileInfo="/ermobile/api/mobile/device-info";
-   static String mobilePunch="/ermobile/api/attendance/v1/punch";
-   static String mobilePunchSelfie="/ermobile/api/attendance/v1/punch/selfie";
-   static String mobilePunchContext="/ermobile/api/attendance/v1/punch-context";
+    //ESS Dashboard
+  static var essDashboardAPi = "/ermobile/api/ess/v1/dashboard";
+  static var eventListModalESSApi = "/ermobile/api/ess/v1/events";
 
-   static String punchIn="restful/service/attendance/via/mobile";
-   static var getAttendance = "restful/service/current/month/log/list/for/mobile/requisation";
-   static var getOtherAttendance = "restful/service/current/month/log/list/for/mobile/requisation";
-   static var sendAttendanceReq = "restful/service/att/requisiton/for/non/ess/employees";
-   static var sendOthersAttendanceReq = "restful/service/att/requisiton/for/non/ess/employees";
-   static var selfAttRequisitionList = "restful/service/own/attandace/request/list";
-   static var getAttDetails = "restful/service/ondate/log/for/attendance/req";
-   static var getOtherAttDetails = "restful/service/ondate/log/for/attendance/req/for/non/ess/employees";
-   static var pendingReqListRo = "restful/service/att/requisation/list/for/mobile";
-   static var pendingReqListApprove = "restful/service/att/requisation/list/approval";
-   static var essAttendanceApprovedList = "restful/service/att/requisation/approved/list/for/mobile/ess";
-   static var pendingReqListDisapprove = "restful/service/att/requisiton/disapprove/one/leave/req";
-   static var approvedAttReqList = "restful/service/att/requisation/approved/list/for/mobile";
-   static var disApprovedAttReqList = "restful/service/attendance/requisition/cancel/disapproved";
-   static var workDoneReport = "restful/service/get/self/mobile/task/list";
-   static var roWorkDoneReport = "restful/service/get/self/mobile/task/list/ro/wise";
-   static var attendanceReport = "restful/service/get/attendance/logs/multiple";
-   //static var punchWithoutSelfie = "/restful/service/attendance/via/mobile/without/image";
-   static var punchWithoutSelfie = "restful/service/attendance/via/mobile/without/image/with/status";
-   static var cancelSelfAttReqList = "restful/service/own/attandace/request/cancellation";
-   //OD Attendance
-   static var odAttendanceReq = "restful/service/att/requisiton/for/non/ess/employees";
-   static var odInOtApi = "restful/service/od/via/mobile";
-   static var odPendingReqList = "restful/service/odlist/ro/via/mobile";
-   static var odPendingReqListNew = "restful/service/odlist/ro/via/mobile/new";
-   static var odReqApproveDisAp = "restful/service/od/approval/mobile";
-   static var selfOdReqList = "restful/service/odlist/via/mobile";
-   //HRIS employee list
-   static var getEmpList = "restful/service/employeelist";
-   static var myTeamListApi = "restful/service/employeelist/for/my/team";
-   //QR based attendance
-   static var qrBasedAttendance = "restful/service/attendance/via/mobile/qr/code/scanner";
-   //Leave management
-   static var leaveApprovalApi = "restful/service/requested/leave/approval";
-   static var leaveApprovalLevel1Api = "restful/service/requested/leave/approval/level/one";
-   static var leaveApprovalLevel2Api = "restful/service/requested/leave/approval/level/two";
-   static var leaveBalanceApi = "restful/service/leave/type/list";
-   static var leaveBal = "restful/service/get/leave/ledger/yearly";
-   static var roApprovedReqList = "restful/service/approved/leave/requisition/list";
-   static var pendingLeaveReqList = "restful/service/pending/leave/requisition/list";
-   static var levelOneLeaveList = "restful/service/level/one/pending/leave/requisition/list";
-   static var levelTwoLeaveList = "restful/service/level/two/pending/leave/requisition/list";
-   static var requestedReqList = "restful/service/employee/leave/requested/list";
-   static var cancelReqRequisition = "restful/service/cancel/requested/leave/with/policy";
-   static var leaveRequisitionApi = "restful/service/requisition/leave/policy/defines";
-   static var othersReqEmpList = "restful/service/att/requisation/non/ess/employees";
-   //Claim n Advance
-   static var advanceRequisitionList = "restful/service/org/employee/advance/details/view";
-   static var pendingAdvReqList = "restful/service/org/employee/pending/advance/details/view";
-   static var expensesList = "restful/service/org/claim/requisition/list";
-   static var pendingReimList = "restful/service/org/claim/pending/requisition/list";
-   static var appDisReimbList = "restful/service/org/claim/approve/disapprove/list";
-   static var appDisAdvList = "restful/service/org/employee/pending/and/processed/advance/details/view";
-   static var saveAdvRequisition = "restful/service/org/employee/advance/amount/detail/save";
-   static var saveExpenses = "restful/service/claim/requisition/form/details/save";
-   static var appDisAdvRequisition = "restful/service/org/employee/approve/disapprove/status";
-   static var deleteClaimRequisition = "restful/service/self/claim/request/cancel";
-   static var addExpenseDrops = "restful/service/expense/list";
-   static var addExpDropPolicy = "restful/service/get/claim/list";
-   static var approveDisapproveReimbReq = "restful/service/claim/Requisition/approved";
-   static var cancelAdvRequisition = "restful/service/employee/self/advance/cancel";
-   static var claimApprovalListDataApi = "restful/service/employee/self/advance/cancel";
+  static String punchIn = "restful/service/attendance/via/mobile";
+  static var getAttendance =
+      "restful/service/current/month/log/list/for/mobile/requisation";
+  static var getOtherAttendance =
+      "restful/service/current/month/log/list/for/mobile/requisation";
+  static var sendAttendanceReq = mobileAttendanceRequisition;
+  static var sendOthersAttendanceReq = mobileAttendanceRequisition;
+  static var selfAttRequisitionList =
+      "restful/service/own/attandace/request/list";
+  static var getAttDetails = "restful/service/ondate/log/for/attendance/req";
+  static var getOtherAttDetails =
+      "restful/service/ondate/log/for/attendance/req/for/non/ess/employees";
+  static var pendingReqListRo =
+      "restful/service/att/requisation/list/for/mobile";
+  static var pendingReqListApprove =
+      "restful/service/att/requisation/list/approval";
+  static var essAttendanceApprovedList =
+      "restful/service/att/requisation/approved/list/for/mobile/ess";
+  static var pendingReqListDisapprove =
+      "restful/service/att/requisiton/disapprove/one/leave/req";
+  static var approvedAttReqList =
+      "restful/service/att/requisation/approved/list/for/mobile";
+  static var disApprovedAttReqList =
+      "restful/service/attendance/requisition/cancel/disapproved";
+  static var workDoneReport = "restful/service/get/self/mobile/task/list";
+  static var roWorkDoneReport =
+      "restful/service/get/self/mobile/task/list/ro/wise";
+  static var attendanceReport = mobileAttendanceReport;
+  //static var punchWithoutSelfie = "/restful/service/attendance/via/mobile/without/image";
+  static var punchWithoutSelfie =
+      "restful/service/attendance/via/mobile/without/image/with/status";
+  static var cancelSelfAttReqList =
+      "restful/service/own/attandace/request/cancellation";
+  //OD Attendance
+  static var odAttendanceReq = mobileAttendanceRequisition;
+  static var odInOtApi = "restful/service/od/via/mobile";
+  static var odPendingReqList = "restful/service/odlist/ro/via/mobile";
+  static var odPendingReqListNew = "restful/service/odlist/ro/via/mobile/new";
+  static var odReqApproveDisAp = "restful/service/od/approval/mobile";
+  static var selfOdReqList = mobileOdReport;
+  //HRIS employee list
+  static var getEmpList = "restful/service/employeelist";
+  static var myTeamListApi = "restful/service/employeelist/for/my/team";
+  //QR based attendance
+  static var qrBasedAttendance =
+      "restful/service/attendance/via/mobile/qr/code/scanner";
+  //Leave management
+  static var leaveApprovalApi = "restful/service/requested/leave/approval";
+  static var leaveApprovalLevel1Api =
+      "restful/service/requested/leave/approval/level/one";
+  static var leaveApprovalLevel2Api =
+      "restful/service/requested/leave/approval/level/two";
+  static var leaveBalanceApi = mobileLeaveLedger;
+  static var leaveBal = mobileLeaveLedger;
+  static var roApprovedReqList =
+      "restful/service/approved/leave/requisition/list";
+  static var pendingLeaveReqList =
+      "restful/service/pending/leave/requisition/list";
+  static var levelOneLeaveList =
+      "restful/service/level/one/pending/leave/requisition/list";
+  static var levelTwoLeaveList =
+      "restful/service/level/two/pending/leave/requisition/list";
+  static var requestedReqList = "restful/service/employee/leave/requested/list";
+  static var cancelReqRequisition =
+      "restful/service/cancel/requested/leave/with/policy";
+  static var leaveRequisitionApi = mobileLeaveRequisition;
+  static var othersReqEmpList =
+      "restful/service/att/requisation/non/ess/employees";
+  //Claim n Advance
+  static var advanceRequisitionList =
+      "restful/service/org/employee/advance/details/view";
+  static var pendingAdvReqList =
+      "restful/service/org/employee/pending/advance/details/view";
+  static var expensesList = "restful/service/org/claim/requisition/list";
+  static var pendingReimList =
+      "restful/service/org/claim/pending/requisition/list";
+  static var appDisReimbList =
+      "restful/service/org/claim/approve/disapprove/list";
+  static var appDisAdvList =
+      "restful/service/org/employee/pending/and/processed/advance/details/view";
+  static var saveAdvRequisition =
+      "restful/service/org/employee/advance/amount/detail/save";
+  static var saveExpenses =
+      "restful/service/claim/requisition/form/details/save";
+  static var appDisAdvRequisition =
+      "restful/service/org/employee/approve/disapprove/status";
+  static var deleteClaimRequisition =
+      "restful/service/self/claim/request/cancel";
+  static var addExpenseDrops = "restful/service/expense/list";
+  static var addExpDropPolicy = "restful/service/get/claim/list";
+  static var approveDisapproveReimbReq =
+      "restful/service/claim/Requisition/approved";
+  static var cancelAdvRequisition =
+      "restful/service/employee/self/advance/cancel";
+  static var claimApprovalListDataApi =
+      "restful/service/employee/self/advance/cancel";
 
-   //Admin dashboard API
-   static var adminDashboardAPi = "restful/service/dashboard/present/absent/count";
-   static var adminDashboardNewAPi = "restful/service/dashboard/present/absent/count/new";
-   static var eventListModalApi = "restful/service/get/emp/event";
-   static var eventListModalNewApi = "restful/service/get/emp/event/new";
-   static var branchListApi = "restful/service/dashboard/branchlist";
-   static var shiftListApi = "restful/service/dashboard/shiftlist";
-
-   //ESS Dashboard
-   static var essDashboardAPi = "restful/service/dashboard/present/absent/count/ess";
-   static var eventListModalESSApi = "restful/service/get/emp/event/ess/new";
-
-   //Customer workDone API
-   static var skyWorkDoneClientApi = "restful/service/get/mobile/task/client/details";
-   static var customWorkDoneApi = "restful/service/task/via/mobile";
-
-   //Employee Tracking API
-   static var historyTracking = "restful/service/return/mobile/tracking/new";
-   static var timeLineApi = "restful/service/return/mobile/tracking/timeline";
-
-   //Payroll
-   //static var salarySlipDownload = "restful/service/get/employee/salary/slip";
-   static var salarySlipDownload = "restful/service/get/employee/salary/slip";
-
-   //Loan Advance
-   static var loanAdvanceReqList = "restful/service/org/loan/and/advance/requested/list";
-   static var cancelLoanAdvReqList = "restful/service/org/loan/and/advance/pending/request/delete";
-   static var loanApprovedReq = "restful/service/org/loan/approved/list/detail";
-   static var loanRequest = "restful/service/get/loan/master/list";
-   static var advanceRequest = "restful/service/get/advance/master/list";
-   static var loanAdvReqSend = "restful/service/org/loan/and/advance/request/data/save";
+  //Admin dashboard API
+  static var adminDashboardAPi =
+      "restful/service/dashboard/present/absent/count";
+  static var adminDashboardNewAPi =
+      "restful/service/dashboard/present/absent/count/new";
+  static var eventListModalApi = "restful/service/get/emp/event";
+  static var eventListModalNewApi = "restful/service/get/emp/event/new";
+  static var branchListApi = "restful/service/dashboard/branchlist";
+  static var shiftListApi = "restful/service/dashboard/shiftlist";
 
 
-   //Helpdesk API's
-   static var departmentListApi = "employroll/api/third/party/query/policy/all/mobile/departments";
-   static var queryTypeListApi = "employroll/api/third/party/get/ticket/type/list/new/mobile";
-   static var subQueryTypeListApi = "employroll/api/third/party/get/sub/query/type/list/new/mobile";
-   static var querySendApi = "employroll/api/third/party/org/raised/query/details/saved/mobile";
-   static var queryRaisedList = "employroll/api/third/party/mobile/org/emp/raised/ticket/list";
 
-   //Documents
-   static var documentListApi = "restful/service/get/org/Doc/type/master/list";
-   static var documentDetApi = "restful/service/org/get/employee/on/filter/base/document/list";
+  //Customer workDone API
+  static var skyWorkDoneClientApi =
+      "restful/service/get/mobile/task/client/details";
+  static var customWorkDoneApi = "restful/service/task/via/mobile";
 
-   static var logoutAPi = "/ermobile/api/auth/logout";
+  //Employee Tracking API
+  static var historyTracking = "restful/service/return/mobile/tracking/new";
+  static var timeLineApi = "restful/service/return/mobile/tracking/timeline";
 
-   static var tourRequisitionApi = "/restful/service/requisition/tour";
-   //HR_IS Update API
-   static var updateHRISApi = "restful/service/hris/detail/update/request";
+  //Payroll
+  //static var salarySlipDownload = "restful/service/get/employee/salary/slip";
+  static var salarySlipDownload = mobileSalarySlips;
 
-   //Saved Offline Attendance
-   static var savedOfflineAtt = "restful/service/attendance/via/mobile/offline";
+  //Loan Advance
+  static var loanAdvanceReqList =
+      "restful/service/org/loan/and/advance/requested/list";
+  static var cancelLoanAdvReqList =
+      "restful/service/org/loan/and/advance/pending/request/delete";
+  static var loanApprovedReq = "restful/service/org/loan/approved/list/detail";
+  static var loanRequest = "restful/service/get/loan/master/list";
+  static var advanceRequest = "restful/service/get/advance/master/list";
+  static var loanAdvReqSend =
+      "restful/service/org/loan/and/advance/request/data/save";
 
-   //ESS Calendar API
-   //static var calendarApi = "restful/service/get/emp/calendar/ess";
-   static var calendarApi = "restful/service/get/emp/calendar/new";
+  //Helpdesk API's
+  static var departmentListApi =
+      "employroll/api/third/party/query/policy/all/mobile/departments";
+  static var queryTypeListApi =
+      "employroll/api/third/party/get/ticket/type/list/new/mobile";
+  static var subQueryTypeListApi =
+      "employroll/api/third/party/get/sub/query/type/list/new/mobile";
+  static var querySendApi =
+      "employroll/api/third/party/org/raised/query/details/saved/mobile";
+  static var queryRaisedList =
+      "employroll/api/third/party/mobile/org/emp/raised/ticket/list";
 
-   //Travel & Expense
-   static var selfClaimRequestListApi = "restful/service/get/employee/self/claim/policy/list";
-   static var reimbursementTypeListApi = "restful/service/employee/get/claim/policy/map/list";
-   static var reimburseDefaultApiCheck = "restful/service/claim/policy/policy/check";
-   static var categoriesApi = "restful/service/party/get/expense/list";
-   static var finalRaiseClaimApi = "restful/service/self/claim/raise/save";
-   static var claimApproveListApi = "restful/service/get/claims/approval/list";
-   static var claimApproveDataApi = "restful/service/get/employee/self/claim/policy/list/level/one";
-   static var claimApproveApi = "restful/service/claim/approver/level/wise/claim/approved";
-   static var claimDisApproveApi = "restful/service/claim/approver/level/wise/claim/delete";
-   static var claimUpdateApi = "restful/service/self/claim/raise/update";
+  //Documents
+  static var documentListApi = "restful/service/get/org/Doc/type/master/list";
+  static var documentDetApi =
+      "restful/service/org/get/employee/on/filter/base/document/list";
 
-   //Induction APIs
-   static var onboardingList = "restful/service/onboard/details/list";
-   static var onboardingSave = "restful/service/onboard/details/save";
-   static var onboardBranchList = "restful/service/get/org/mapped/branch/list";
-   static var onboardDeptList = "restful/service/fetch/department/list";
-   static var onboardDesignationList = "restful/service/fetch/designation/list";
-   static var onboardUserTypeList = "restful/service/fetch/userType/list";
-   static var onboardDocTypeList = "restful/service/get/doc/type/list";
+  static var logoutAPi = "/ermobile/api/auth/logout";
 
-   //Holiday ESS
-   static var holidayListEss = "restful/service/get/emp/holiday/ess";
+  static var tourRequisitionApi = "/restful/service/requisition/tour";
+  //HR_IS Update API
+  static var updateHRISApi = "restful/service/hris/detail/update/request";
 
-   //Out Punch Check API
-   static var outPunchStatusCheck = "restful/service/first/shift/det";
+  //Saved Offline Attendance
+  static var savedOfflineAtt = "restful/service/attendance/via/mobile/offline";
 
-   //Face Registered
-   static var faceRegistered = "restful/service/face/recognize/data/save";
-   static var faceRecognizeOther = "restful/service/attendance/via/face/recognize/mobile/other";
-   static var faceRecognizeOtherMss = "restful/service/attendance/via/face/recognize/mobile/other/emp/wise";
-   static var faceRecognizeSelf = "restful/service/attendance/via/face/recognize/mobile/self";
-   static var getEmpFaceList = "restful/service/employeelist/face/reco/det";
+  //ESS Calendar API
+  //static var calendarApi = "restful/service/get/emp/calendar/ess";
+  static var calendarApi = "restful/service/get/emp/calendar/new";
 
-   //Tracking
-   static var saveTrackingData = "restful/service/new/mobile/tracking/new";
+  //Travel & Expense
+  static var selfClaimRequestListApi =
+      "restful/service/get/employee/self/claim/policy/list";
+  static var reimbursementTypeListApi =
+      "restful/service/employee/get/claim/policy/map/list";
+  static var reimburseDefaultApiCheck =
+      "restful/service/claim/policy/policy/check";
+  static var categoriesApi = "restful/service/party/get/expense/list";
+  static var finalRaiseClaimApi = "restful/service/self/claim/raise/save";
+  static var claimApproveListApi = "restful/service/get/claims/approval/list";
+  static var claimApproveDataApi =
+      "restful/service/get/employee/self/claim/policy/list/level/one";
+  static var claimApproveApi =
+      "restful/service/claim/approver/level/wise/claim/approved";
+  static var claimDisApproveApi =
+      "restful/service/claim/approver/level/wise/claim/delete";
+  static var claimUpdateApi = "restful/service/self/claim/raise/update";
 
-   //Reporting Officer List
-   static var reportingOfficerList = "restful/service/get/ro/list/of/an/emp";
+  //Induction APIs
+  static var onboardingList = "restful/service/onboard/details/list";
+  static var onboardingSave = "restful/service/onboard/details/save";
+  static var onboardBranchList = "restful/service/get/org/mapped/branch/list";
+  static var onboardDeptList = "restful/service/fetch/department/list";
+  static var onboardDesignationList = "restful/service/fetch/designation/list";
+  static var onboardUserTypeList = "restful/service/fetch/userType/list";
+  static var onboardDocTypeList = "restful/service/get/doc/type/list";
 
-   //Forget Password OTP Send API
-   //static var otpSendApi = "restful/service/password/forget";
-   static var otpSendApi = "restful/service/send/password/forget/otp";
-   static var verifyOtpApi = "restful/service/forgot/password/verify/otp";
-   static var resetPasswordApi = "restful/service/forgot/password/update";
+  //Holiday ESS
+  static var holidayListEss = "restful/service/get/emp/holiday/ess";
 
-   //Reset Password APIs
-   static var resetPasswordOtpSendApi = "restful/service/change/password/send/otp";
-   static var changePasswordApi = "restful/service/change/password/update";
+  //Out Punch Check API
+  static var outPunchStatusCheck = "restful/service/first/shift/det";
 
-   //Exit Process APIs
-   static var exitSeparationListApi = "restful/service/workflow/base/sepration/mode/list";
-   static var exitFormalitySaveApi = "restful/service/exit/formality/save";
-   static var initiateExitApi = "restful/service/exit/initiate/details/save";
-   static var exitEmpListApi = "restful/service/exit/employeelist";
+  //Face Registered
+  static var faceRegistered = "restful/service/face/recognize/data/save";
+  static var faceRecognizeOther =
+      "restful/service/attendance/via/face/recognize/mobile/other";
+  static var faceRecognizeOtherMss =
+      "restful/service/attendance/via/face/recognize/mobile/other/emp/wise";
+  static var faceRecognizeSelf =
+      "restful/service/attendance/via/face/recognize/mobile/self";
+  static var getEmpFaceList = "restful/service/employeelist/face/reco/det";
 
-   //Pre-Onboarding APIs
-   static var preOnboardListApi = "restful/service/get/pre/onboard/mobile/list";
-   static var preOnboardSaveApi = "restful/service/pre/onboard/mobile/details/save";
-   static var preOnboardApproveApi = "restful/service/pre/onboard/mobile/details/approve";
-   static var preOnboardAadharVerifyApi = "restful/service/pre/onboard/mobile/aadhar/verification";
+  //Tracking
+  static var saveTrackingData = "restful/service/new/mobile/tracking/new";
 
-   //profile list
-   static var profileListApi = "restful/service/get/user/all/mapped/profile/list";
+  //Reporting Officer List
+  static var reportingOfficerList = "restful/service/get/ro/list/of/an/emp";
 
-   //Organisation List
-   static var orgListApi = "restful/service/org/details/master/list";
+  //Forget Password OTP Send API
+  //static var otpSendApi = "restful/service/password/forget";
+  static var otpSendApi = "restful/service/send/password/forget/otp";
+  static var verifyOtpApi = "restful/service/forgot/password/verify/otp";
+  static var resetPasswordApi = "restful/service/forgot/password/update";
 
-   //Loan APIs
-   static var essLoanListApi = "restful/service/self/org/loans/list";
-   static var loanTypeMasterApi = "restful/service/loan/and/advance/master/list";
-   static var loanRequestRaiseApi = "restful/service/org/loan/and/advance/request/data/request/save";
-   static var loanSummaryApi = "restful/service/get/self/loan/summary";
-   static var loanLedgerApi = "restful/service/get/employee/updated/loan/ledger/debit/credit/list";
-   static var loanSkipListApi = "restful/service/get/employee/loan/ledger/details";
-   static var requestSkipInstalmentApi = "restful/service/employee/loan/skip/emp/request";
-   static var loanRequestUpdateApi = "restful/service/org/loan/and/advance/request/data/update";
-   static var loanRequestDeleteApi = "restful/service/org/loan/and/advance/pending/request/self/delete";
-   static var loanApproveL1Api = "restful/service/org/loan/approval/details/for/anEmp/level/one";
-   static var loanDisApproveL1Api = "restful/service/api/org/loan/disapproved/details/for/anEmp/level/one";
-   static var loanApproveL2Api = "restful/service/org/loan/approval/details/for/anEmp/level/two";
-   static var loanDisApproveL2Api = "restful/service/org/loan/disapproved/details/for/anEmp/level/two";
-   static var loanApproveL3Api = "restful/service/org/loan/approval/details/for/anEmp/level/three";
-   static var loanDisApproveL3Api = "restful/service/org/loan/disapproved/details/for/anEmp/level/three";
-   static var loanDataViewToApproveApi = "restful/service/loan/and/advance/details/ofEmployee/raise/list";
+  //Reset Password APIs
+  static var resetPasswordOtpSendApi =
+      "restful/service/change/password/send/otp";
+  static var changePasswordApi = "restful/service/change/password/update";
 
-   //MSS Loan APIs
-   static var mssLoanListApi = "restful/service/get/org/loans/and/advance/list/for/mss";
+  //Exit Process APIs
+  static var exitSeparationListApi =
+      "restful/service/workflow/base/sepration/mode/list";
+  static var exitFormalitySaveApi = "restful/service/exit/formality/save";
+  static var initiateExitApi = "restful/service/exit/initiate/details/save";
+  static var exitEmpListApi = "restful/service/exit/employeelist";
 
-   //Company Policy API
-   static var companyPolicyApi = "restful/service/policy/details/list";
+  //Pre-Onboarding APIs
+  static var preOnboardListApi = "restful/service/get/pre/onboard/mobile/list";
+  static var preOnboardSaveApi =
+      "restful/service/pre/onboard/mobile/details/save";
+  static var preOnboardApproveApi =
+      "restful/service/pre/onboard/mobile/details/approve";
+  static var preOnboardAadharVerifyApi =
+      "restful/service/pre/onboard/mobile/aadhar/verification";
 
-   //My Managers List
-   static var myManagersApi = "restful/service/get/ro/list/of/an/all/ro/emp/list";
+  //profile list
+  static var profileListApi =
+      "restful/service/get/user/all/mapped/profile/list";
 
-   //Requisition Count API
-   static var reqCountApi = "restful/service/get/pending/requisition/count";
+  //Organisation List
+  static var orgListApi = "";
 
-   //Firebase Token Send API
-   static var firebaseApiSend = "restful/service/get/user/firebase/id";
+  //Loan APIs
+  static var essLoanListApi = "restful/service/self/org/loans/list";
+  static var loanTypeMasterApi = "restful/service/loan/and/advance/master/list";
+  static var loanRequestRaiseApi =
+      "restful/service/org/loan/and/advance/request/data/request/save";
+  static var loanSummaryApi = "restful/service/get/self/loan/summary";
+  static var loanLedgerApi =
+      "restful/service/get/employee/updated/loan/ledger/debit/credit/list";
+  static var loanSkipListApi =
+      "restful/service/get/employee/loan/ledger/details";
+  static var requestSkipInstalmentApi =
+      "restful/service/employee/loan/skip/emp/request";
+  static var loanRequestUpdateApi =
+      "restful/service/org/loan/and/advance/request/data/update";
+  static var loanRequestDeleteApi =
+      "restful/service/org/loan/and/advance/pending/request/self/delete";
+  static var loanApproveL1Api =
+      "restful/service/org/loan/approval/details/for/anEmp/level/one";
+  static var loanDisApproveL1Api =
+      "restful/service/api/org/loan/disapproved/details/for/anEmp/level/one";
+  static var loanApproveL2Api =
+      "restful/service/org/loan/approval/details/for/anEmp/level/two";
+  static var loanDisApproveL2Api =
+      "restful/service/org/loan/disapproved/details/for/anEmp/level/two";
+  static var loanApproveL3Api =
+      "restful/service/org/loan/approval/details/for/anEmp/level/three";
+  static var loanDisApproveL3Api =
+      "restful/service/org/loan/disapproved/details/for/anEmp/level/three";
+  static var loanDataViewToApproveApi =
+      "restful/service/loan/and/advance/details/ofEmployee/raise/list";
 
-   //Today Events ESS API
-   static var todayEventApi = "restful/service/get/emp/todays/events";
+  //MSS Loan APIs
+  static var mssLoanListApi =
+      "restful/service/get/org/loans/and/advance/list/for/mss";
 
-   static var todayPunchesApiESS = "restful/service/get/realtime/punches";
+  //Company Policy API
+  static var companyPolicyApi = "restful/service/policy/details/list";
 
-   //Geofence List API
-   static var geofenceListApi = "restful/service/get/tracking/employeemappedgeo/list";
-   //Punch Without Selfie With Geofence
-   static var punchWithGeofence = "restful/service/attendance/via/mobile/without/image/with/status/with/geofence";
+  //My Managers List
+  static var myManagersApi = mobileMyManagers;
 
-   //Punch With Selfie With Geofence
-   static var punchWithGeofenceSelfie = "restful/service/attendance/via/mobile/with/geofence";
+  //Requisition Count API
 
-   //Resignation Requisition APIs
-   static var reasonForLeavingListApi = "restful/service/ess/reason/for/leaving/list";
-   static var resignationRequisitionSaveApi = "restful/service/save/self/ess/employee";
-   static var employeeResignationList = "restful/service/get/self/resignation/list";
-   //MSS Resignation Requisition List API
-   static var employeeResignationMSSList = "restful/service/get/org/ess/resignation/list/for/mss";
-   static var fetchSingleEmployeeExitData = "restful/service/get/fetch/ess/exit/details";
-   static var approveResignationRequestL1 = "restful/service/org/ess/approval/level/one";
-   static var disApproveResignationRequestL1 = "restful/service/org/ess/disapproval/level/one";
-   static var approveResignationRequestL2 = "restful/service/org/ess/approval/level/two";
-   static var disApproveResignationRequestL2 = "restful/service/org/ess/disapproval/level/two";
+  //Firebase Token Send API
+  static var firebaseApiSend = "restful/service/get/user/firebase/id";
 
+  //Today Events ESS API
+  static var todayEventApi = "restful/service/get/emp/todays/events";
+
+  static var todayPunchesApiESS = mobileTodayPunches;
+
+  //Geofence List API
+  static var geofenceListApi =
+      "restful/service/get/tracking/employeemappedgeo/list";
+  //Punch Without Selfie With Geofence
+  static var punchWithGeofence =
+      "restful/service/attendance/via/mobile/without/image/with/status/with/geofence";
+
+  //Punch With Selfie With Geofence
+  static var punchWithGeofenceSelfie =
+      "restful/service/attendance/via/mobile/with/geofence";
+
+  //Resignation Requisition APIs
+  static var reasonForLeavingListApi =
+      "restful/service/ess/reason/for/leaving/list";
+  static var resignationRequisitionSaveApi =
+      "restful/service/save/self/ess/employee";
+  static var employeeResignationList =
+      "restful/service/get/self/resignation/list";
+  //MSS Resignation Requisition List API
+  static var employeeResignationMSSList =
+      "restful/service/get/org/ess/resignation/list/for/mss";
+  static var fetchSingleEmployeeExitData =
+      "restful/service/get/fetch/ess/exit/details";
+  static var approveResignationRequestL1 =
+      "restful/service/org/ess/approval/level/one";
+  static var disApproveResignationRequestL1 =
+      "restful/service/org/ess/disapproval/level/one";
+  static var approveResignationRequestL2 =
+      "restful/service/org/ess/approval/level/two";
+  static var disApproveResignationRequestL2 =
+      "restful/service/org/ess/disapproval/level/two";
 }

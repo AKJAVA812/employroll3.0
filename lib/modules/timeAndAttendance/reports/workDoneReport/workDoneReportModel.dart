@@ -4,11 +4,14 @@ class WorkdoneReportModel {
   WorkdoneReportModel({this.data});
 
   WorkdoneReportModel.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
+    final source = json['content'] ?? json['data'];
+    if (source is List) {
       data = <DataNew>[];
-      json['data'].forEach((v) {
-        data!.add(DataNew.fromJson(v));
+      source.forEach((v) {
+        if (v is Map) data!.add(DataNew.fromJson(Map<String, dynamic>.from(v)));
       });
+    } else {
+      data = <DataNew>[];
     }
   }
 
@@ -42,14 +45,26 @@ class DataNew {
         this.time});
 
   DataNew.fromJson(Map<String, dynamic> json) {
-    date = json['date'];
-    image = json['image'];
-    cMailId = json['cMailId'];
-    cAddress = json['cAddress'];
-    cName = json['cName'];
-    cNumber = json['cNumber'];
-    remark = json['remark'];
-    time = json['time'];
+    final parsedTaskTime = DateTime.tryParse(json['taskTime']?.toString() ?? '');
+    final taskTime = parsedTaskTime?.toLocal();
+    date = json['date']?.toString() ??
+        (taskTime == null
+            ? ''
+            : '${taskTime.day.toString().padLeft(2, '0')}-${taskTime.month.toString().padLeft(2, '0')}-${taskTime.year}');
+    time = json['time']?.toString() ??
+        (taskTime == null
+            ? ''
+            : '${taskTime.hour.toString().padLeft(2, '0')}:${taskTime.minute.toString().padLeft(2, '0')}');
+    image = json['imageUrl']?.toString() ?? json['image']?.toString() ?? '';
+    cMailId = json['customerEmailId']?.toString() ?? json['cMailId']?.toString() ?? '';
+    cAddress = json['address']?.toString() ?? json['cAddress']?.toString() ?? '';
+    cName = json['customerName']?.toString() ?? json['cName']?.toString() ?? 'Work Done';
+    cNumber = json['customerContactNumber']?.toString() ?? json['cNumber']?.toString() ?? '';
+    remark = json['taskDetails']?.toString() ??
+        json['remark']?.toString() ??
+        json['remarks']?.toString() ??
+        json['description']?.toString() ??
+        '';
   }
 
   Map<String, dynamic> toJson() {

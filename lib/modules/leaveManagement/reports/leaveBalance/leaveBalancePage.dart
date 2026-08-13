@@ -12,6 +12,7 @@ import '../../../../themes/empThemes.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../modalClass/leaveBalModal.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 
 class LeaveBalancePage extends StatefulWidget {
   const LeaveBalancePage({Key? key}) : super(key: key);
@@ -28,55 +29,75 @@ var doj;
 LeaveBalModal? leaveBalLabel;
 
 class _LeaveBalancePageState extends State<LeaveBalancePage> {
+  List<Map<String, dynamic>> _leaveTypes = <Map<String, dynamic>>[];
+  bool _isLoading = true;
+  String? _loadError;
+
   @override
   void initState() {
-    //print(leaveBalanceLabel!.leaveTypeListDetails.toString().length);
-    // TODO: implement initState
-    setState(() {
-      getSharedPrfanceList();
-    });
     super.initState();
+    getSharedPrfanceList();
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
-    // await Future.delayed(Duration(seconds: 5));
-    Future<LeaveBalModal> getAppReq11 = getLeaveBalance(sessionId!);
     doj = await shared.getDoj();
-    //doj = DateFormat('dd-MM-yyyy').format(DateTime.parse(doj));
-    final loading = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        CircularProgressIndicator(),
-        Text(" Login ... Please wait"),
-      ],
-    );
+    await _loadLeaveLedger();
+  }
 
-    getAppReq11.then((value) {
+  Future<void> _loadLeaveLedger() async {
+    final foundation = MobileApiFoundation.instance;
+    if (mounted) {
       setState(() {
-        leaveBalLabel = value;
-        /* if( leaveBalLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length != null) {
-          leaveBalLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;
-          print("Fetch data ${ leaveBalLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length}");
-        } else {
-          Center(
-            child: "There is no data available right now".text.make(),
-          );
-          leaveBalLabel!.leaveData!.leaveTypeList!.leaveTypelist = [];
-        }
-*/
+        _isLoading = true;
+        _loadError = null;
       });
-      /*if(leaveBalLabel!.leaveData!.leaveTypeList == Null){
-        showNodata(context, "Oops", "There is no any requisition.");
-      }else
-        {
-          var conditioncheck = leaveBalLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;
-          if(conditioncheck==0 ){
-            showNodata(context, "Oops", "There is no any requisition.");
-          }
-        }*/
-      //print('employeeList00${leaveBalLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length}');
-    });
+    }
+    try {
+      final response = await foundation.get(
+        ApiDetails.mobileLeaveLedger,
+        headers: await foundation.authHeaders(),
+        tag: 'LEAVE_LEDGER_REPORT',
+      );
+      final body = foundation.decodeMap(response.body);
+      if (!foundation.isSuccess(response)) {
+        throw MobileApiException(
+          'LEAVE_LEDGER_FAILED',
+          message: _ledgerMessage(body),
+          statusCode: response.statusCode,
+        );
+      }
+      final rawTypes = body['leaveTypes'];
+      final items = rawTypes is List
+          ? rawTypes
+              .whereType<Map>()
+              .map((item) => Map<String, dynamic>.from(item))
+              .toList()
+          : <Map<String, dynamic>>[];
+      items.removeWhere(
+        (item) => item['leaveTypeCode']?.toString().trim().isEmpty != false,
+      );
+      if (!mounted) return;
+      setState(() {
+        mapResponse = body;
+        _leaveTypes = items;
+        _isLoading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _leaveTypes = <Map<String, dynamic>>[];
+        _loadError = error is MobileApiException
+            ? (error.message ?? 'Unable to load leave ledger.')
+            : 'Unable to load leave ledger.';
+        _isLoading = false;
+      });
+    }
+  }
+
+  String _ledgerMessage(Map<String, dynamic> body) {
+    final message = body['message'] ?? body['reason'] ?? body['detail'];
+    return message?.toString() ?? 'Unable to load leave ledger.';
   }
 
   showNodata(BuildContext buildContext, result, reason) {
@@ -154,6 +175,90 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
     return leaveBalModal;
   }
 
+  Widget _buildLedgerList() {
+    if (_leaveTypes.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _loadLeaveLedger,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const <Widget>[
+            SizedBox(height: 180),
+            Center(child: Text('No leave policy or balance is available.')),
+          ],
+        ),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _loadLeaveLedger,
+      child: ListView.separated(
+        padding: const EdgeInsets.all(12),
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: _leaveTypes.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          final item = _leaveTypes[index];
+          final code = item['shortCode']?.toString().trim().isNotEmpty == true
+              ? item['shortCode'].toString()
+              : item['leaveTypeCode']?.toString() ?? '';
+          final name = item['leaveTypeName']?.toString() ?? code;
+          final balance = (item['balance'] as num?)?.toDouble() ?? 0.0;
+          final balanceText = balance == balance.roundToDouble()
+              ? balance.toInt().toString()
+              : balance.toStringAsFixed(1);
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundColor: Mythemes.lightBluishColor.withOpacity(0.12),
+                    child: Text(
+                      code,
+                      style: TextStyle(
+                        color: Mythemes.lightBluishColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 4),
+                        Text(
+                          item['allowHalfDay'] == true
+                              ? 'Full day and half day'
+                              : 'Full day',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Text(
+                        balanceText,
+                        style: TextStyle(
+                          color: Mythemes.successColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Text('Balance', style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   var titleName = "My Leave Balance";
   int pageIndex = 0;
   int currentIndex = 3;
@@ -163,9 +268,23 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
       appBar: AppBar(title: titleName.text.make()),
 
       body:
-          leaveBalLabel == null
-              ? Center(child: CircularProgressIndicator())
-              : GetLeaveBal(leaveBalLabel!),
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _loadError != null
+              ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(_loadError!, textAlign: TextAlign.center),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: _loadLeaveLedger,
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              )
+              : _buildLedgerList(),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: currentIndex,

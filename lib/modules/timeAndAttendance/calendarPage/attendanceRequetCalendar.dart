@@ -14,11 +14,15 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../themes/empThemes.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_permission_service.dart';
 
 import '../../../ess/myAllReports.dart';
 import '../reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../reports/attendanceRequisition/model/onDateReportModel.dart';
+import 'requisitionTypeTabs.dart';
+import 'workFromHomeRequisitionPage.dart';
 
 class AttendanceRequisitionCalendar extends StatefulWidget {
   AttendanceReportModel? attendanceModelGlobel;
@@ -126,8 +130,14 @@ class _AttendanceRequisitionCalendarState
       departmentset = getData['dept'] ?? '';
       employeeNameset = getData['empName'] ?? '';
       onDateset = getData['date'] ?? '';
-      actualTimeset = getData['inTime'] ?? '';
-      actualOutTimeset = getData['outTime'] ?? '';
+      actualTimeset = _timeText(
+        getData,
+        ['inTime', 'actualInTime', 'firstInTime', 'punchInTime', 'punchIn'],
+      );
+      actualOutTimeset = _timeText(
+        getData,
+        ['outTime', 'actualOutTime', 'lastOutTime', 'punchOutTime', 'punchOut'],
+      );
       empId = getData['empId'] ?? 0;
       isShortLeave = getData['isShortLeave'] ?? isShortLeave;
       isOutDuty = getData['isOdReq'] ?? isOutDuty;
@@ -161,7 +171,12 @@ class _AttendanceRequisitionCalendarState
     sessionId = await shared.getSessionId();
     //orgId = await shared!.getOrgId();
 
-    empId = await shared.getEmpId();
+    final sharedEmployeeDetailsId = await shared.getEmployeeDetailsId();
+    final sharedEmpId = await shared.getEmpId();
+    final sharedBranch = await shared.getBranch();
+    final sharedDept = await shared.getDept();
+    final sharedEmpName = await shared.getempName();
+    empId = _firstInt(sharedEmployeeDetailsId, sharedEmpId);
     // await Future.delayed(Duration(seconds: 5));
     /*Future<OnDateAttModel> getEmployeeList11 = getSingleAttList(sessionId!,singleDateString);
     getEmployeeList11.then((value) {
@@ -185,17 +200,23 @@ class _AttendanceRequisitionCalendarState
 
     }*/
     //print('onModelrun');
-    branchNameset = calendarSendData['branch'] ?? '';
+    branchNameset = _firstText(calendarSendData['branch'], sharedBranch);
     updatedWorkHourSet = calendarSendData['updatedWorkingHour'] ?? '';
     relaxationHourSet = calendarSendData['relaxationHour'] ?? '';
     workingHrsSet = calendarSendData['workingHrs'] ?? '';
     shiftWorkingHourSet = calendarSendData['shiftWorkingHour'] ?? '';
-    departmentset = calendarSendData['dept'] ?? '';
-    employeeNameset = calendarSendData['empName'] ?? '';
+    departmentset = _firstText(calendarSendData['dept'], sharedDept);
+    employeeNameset = _firstText(calendarSendData['empName'], sharedEmpName);
     onDateset = calendarSendData['logDate'] ?? '';
-    actualTimeset = calendarSendData['inTime'] ?? '';
-    actualOutTimeset = calendarSendData['outTime'] ?? '';
-    //empId = calendarSendData['empId'] ?? 0;
+    actualTimeset = _timeText(
+      calendarSendData,
+      ['inTime', 'actualInTime', 'firstInTime', 'punchInTime', 'punchIn'],
+    );
+    actualOutTimeset = _timeText(
+      calendarSendData,
+      ['outTime', 'actualOutTime', 'lastOutTime', 'punchOutTime', 'punchOut'],
+    );
+    empId = _firstInt(calendarSendData['empId'], empId);
     isShortLeave = calendarSendData['isShortLeave'] ?? isShortLeave;
     isOutDuty = calendarSendData['isOdReq'] ?? isOutDuty;
     isCompOff = calendarSendData['isNormalCoff'] ?? isCompOff;
@@ -229,6 +250,43 @@ class _AttendanceRequisitionCalendarState
     //print(branchNameset);
     //print(departmentset);
     //print(employeeNameset);
+  }
+
+  String _firstText(dynamic primary, dynamic fallback) {
+    final primaryText = primary?.toString().trim() ?? '';
+    if (_isUsableText(primaryText)) {
+      return primaryText;
+    }
+    return fallback?.toString().trim() ?? '';
+  }
+
+  String _timeText(dynamic source, List<String> keys) {
+    if (source is! Map) return '';
+    for (final key in keys) {
+      final value = source[key]?.toString().trim() ?? '';
+      if (_isUsableText(value)) return value;
+    }
+    return '';
+  }
+
+  bool _isUsableText(String value) {
+    final upper = value.toUpperCase();
+    return value.isNotEmpty &&
+        upper != 'N/A' &&
+        upper != 'NULL' &&
+        value != '--:--';
+  }
+
+  int? _firstInt(dynamic primary, dynamic fallback) {
+    final primaryValue = _toInt(primary);
+    if (primaryValue != null && primaryValue > 0) return primaryValue;
+    return _toInt(fallback);
+  }
+
+  int? _toInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    return int.tryParse(value.toString());
   }
 
   //String radios = "onDate";
@@ -434,71 +492,23 @@ class _AttendanceRequisitionCalendarState
                       ),
                     ],
                   ),*/
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedToggleSwitch<int>.size(
-                        height: 30,
-                        current: min(value, 3),
-                        style: ToggleStyle(
-                          backgroundColor: Mythemes.greyishade,
-                          indicatorColor: Mythemes.lightBluishColor,
-                          borderColor: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.0),
-                          indicatorBorderRadius: BorderRadius.zero,
-                        ),
-                        values: const [0, 1, 2],
-                        iconOpacity: 1.0,
-                        selectedIconScale: 1.0,
-                        indicatorSize: const Size.fromWidth(85),
-                        iconAnimationType: AnimationType.onHover,
-                        styleAnimationType: AnimationType.onHover,
-                        spacing: 3.0,
-                        customSeparatorBuilder: (context, local, global) {
-                          final opacity =
-                              ((global.position - local.position).abs() - 0.5)
-                                  .clamp(0.0, 1.0);
-                          return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity),
-                          );
-                        },
-                        customIconBuilder: (context, local, global) {
-                          final text =
-                              const ['Attendance', 'Leave', 'OD'][local.index];
-                          return Center(
-                            child: Text(
-                              text,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(
-                                  Colors.black,
-                                  Colors.white,
-                                  local.animationValue,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        borderWidth: 0.0,
-                        onChanged: (i) {
-                          setState(() => value = i);
-                          if (value == 1) {
-                            Navigator.pushNamed(
-                              context,
-                              MyRoutings.leaveRequisitionRoute,
-                            );
-                          } else if (value == 2) {
-                            Navigator.pushNamed(
-                              context,
-                              MyRoutings.odLocationViewRoute,
-                            );
-                          }
-                        },
-                      ),
-                    ],
+                  RequisitionTypeTabs(
+                    currentIndex: min(value, 3),
+                    onChanged: (i) {
+                      setState(() => value = i);
+                      if (value == 1) {
+                        Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                      } else if (value == 2) {
+                        Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                      } else if (value == 3) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WorkFromHomeRequisitionPage(),
+                          ),
+                        );
+                      }
+                    },
                   ),
                   /*Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -596,18 +606,13 @@ class _AttendanceRequisitionCalendarState
                           outDuty = false;
                           print("Night Shift - $nightShift");
                         }),
-                        Visibility(
-                          visible: isCompOff,
-                          child: buildVerticalToggle("Comp. Off", compOff, (
-                            val,
-                          ) {
-                            setState(() => compOff = val);
-                            nightShift = false;
-                            shortLeave = false;
-                            outDuty = false;
-                            print("Comp Off - $compOff");
-                          }),
-                        ),
+                        buildVerticalToggle("Comp. Off", compOff, (val) {
+                          setState(() => compOff = val);
+                          nightShift = false;
+                          shortLeave = false;
+                          outDuty = false;
+                          print("Comp Off - $compOff");
+                        }),
 
                         Visibility(
                           visible: isShortLeave,
@@ -733,6 +738,7 @@ class _AttendanceRequisitionCalendarState
                               controller: TextEditingController(
                                 text: actualTimeset,
                               ),
+                              enabled: false,
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
@@ -842,6 +848,7 @@ class _AttendanceRequisitionCalendarState
                               controller: TextEditingController(
                                 text: actualOutTimeset,
                               ),
+                              enabled: false,
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
@@ -1652,6 +1659,71 @@ class _AttendanceRequisitionCalendarState
 
   String conn = ApiDetails.server;
   String apiUrl = ApiDetails.sendAttendanceReq;
+  Future<void> _submitMobileAttendanceRequisition(
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate, {
+    bool nextday = false,
+    bool isOdReq = false,
+    bool compOff = false,
+    bool shortLeave = false,
+  }) async {
+    final permissionState = await MobilePermissionService.loadEssState();
+    if (!permissionState.canAddAttendanceRequisition) {
+      showDialgSucess1(
+        context,
+        "Attendance requisition permission is not assigned. Please contact your administrator.",
+        "Permission Not Provided",
+      );
+      return;
+    }
+    CommonNotificationPage.showLoaderDialog(context);
+    final foundation = MobileApiFoundation.instance;
+    final requestId = foundation.newRequestId();
+    final body = <String, Object?>{
+      'id': empId,
+      'onDate': onDate,
+      'inTimeRemarks': inRemarkString,
+      'outTimeRemarks': outRemarkString,
+      'inTime': inTimeReq,
+      'outTime': outTimeReq,
+      'logid': logid,
+      if (nextday) 'nextday': true,
+      if (isOdReq) 'isOdReq': 1,
+      if (compOff) 'compOff': true,
+      if (shortLeave) 'shortLeave': 1,
+    };
+    print('[ATT_REQ_MOBILE] -> ${ApiDetails.mobileAttendanceRequisition} body=$body requestId=$requestId');
+    final response = await foundation.postJson(
+      ApiDetails.mobileAttendanceRequisition,
+      body: body,
+      headers: await foundation.authHeaders(requestId: requestId, json: true),
+      tag: 'ATT_REQ_MOBILE',
+    );
+    print('[ATT_REQ_MOBILE] request ${response.request}');
+    print('[ATT_REQ_MOBILE] <- status=${response.statusCode} body=${response.body}');
+    Navigator.of(context, rootNavigator: true).pop();
+
+    mapResponse = response.body.isNotEmpty ? json.decode(response.body) : {};
+    String result = (mapResponse['result'] ?? mapResponse['status'] ?? '').toString();
+    String reason = (mapResponse['reason'] ?? mapResponse['message'] ?? '').toString();
+    if (reason.isEmpty && mapResponse['error'] is Map) {
+      reason = (mapResponse['error']['message'] ?? mapResponse['error']['code'] ?? '').toString();
+    }
+    if (response.statusCode == 200 && result.compareToIgnoringCase("success") == 0) {
+      reason = reason.isEmpty ? "you have submit Requisition for $onDate" : reason;
+      showDialgSucess1(context, reason, "Success");
+    } else {
+      showDialgSucess1(context, reason.isEmpty ? result : reason, "Warning");
+    }
+    print('[ATT_REQ_MOBILE] result=$result reason=$reason');
+  }
+
   Future<void> sendRequsitionToServer(
     BuildContext context,
     int empId,
@@ -1662,6 +1734,7 @@ class _AttendanceRequisitionCalendarState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -1711,6 +1784,7 @@ class _AttendanceRequisitionCalendarState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, nextday: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -1758,6 +1832,7 @@ class _AttendanceRequisitionCalendarState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, isOdReq: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -1805,6 +1880,7 @@ class _AttendanceRequisitionCalendarState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, compOff: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -1852,6 +1928,7 @@ class _AttendanceRequisitionCalendarState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, shortLeave: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"

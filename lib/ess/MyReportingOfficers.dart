@@ -1,13 +1,10 @@
-import 'dart:convert';
-
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import '../commanScreen/allAPIList.dart';
 import '../commanScreen/punchInOutScreen.dart';
 import '../main.dart';
-import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
 import 'EssDashboarrddModel.dart';
 import 'Model/myManagersModalList.dart';
@@ -23,13 +20,9 @@ class ReportingOfficersPage extends StatefulWidget {
 
 Map<String, dynamic> mapResponse = {};
 
-SessionManager shared = SessionManager();
-
-String? sessionId;
 List<ListData>? allUsernew = [];
 List<ListData>? foundDataNew = [];
 List<DottedEmpList>? allUsernewDotted = [];
-List pendingData = [];
 List<SharedEmpList>? allUsernewShared = [];
 List<DirectEmpList>? allUsernewDirect = [];
 List<DesignatedEmpList>? allUsernewDesignated = [];
@@ -40,7 +33,6 @@ List<DesignatedEmpList>? foundDataNewDesignated = [];
 
 MyManagersModalList? myManagersModalListLabel;
 MyManagersModalList? myManagersModalListLabeled;
-int valueChange = 0;
 
 class _ReportingOfficersPageState extends State<ReportingOfficersPage>
     with RouteAware {
@@ -67,16 +59,8 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => getSharedPrfanceList());
-
-    setState(() {
-      getSharedPrfanceList();
-      var listLength;
-      listLength = foundDataNew!.length;
-      print('listLength $listLength');
-    });
   }
 
   @override
@@ -87,48 +71,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
   }
 
   Future getSharedPrfanceList() async {
-    sessionId = await shared.getSessionId();
-    // await Future.delayed(Duration(seconds: 5));
-    Future<MyManagersModalList> getEmployeeList11 = getMyReportingOfficersList(
-      sessionId!,
-    );
-    final loading = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        CircularProgressIndicator(),
-        Text(" Login ... Please wait"),
-      ],
-    );
-
-    getEmployeeList11.then((value) {
-      setState(() {
-        if (selectedFilter == "All") {
-          foundDataNew = allUsernew;
-        }
-        if (selectedFilter == "Dotted") {
-          foundDataNewDotted = allUsernewDotted;
-        }
-        if (selectedFilter == "Shared") {
-          foundDataNewShared = allUsernewShared;
-        }
-        if (selectedFilter == "Direct") {
-          foundDataNewDirect = allUsernewDirect;
-        }
-        if (selectedFilter == "Designated") {
-          foundDataNewDesignated = allUsernewDesignated;
-        }
-
-        myManagersModalListLabel = value;
-        myManagersModalListLabeled = myManagersModalListLabel;
-      });
-      print('All LIST - ${myManagersModalListLabel!.listData!.length}');
-      print('Dotted LIST - ${myManagersModalListLabel!.dottedEmpList!.length}');
-      print('Shared LIST - ${myManagersModalListLabel!.sharedEmpList!.length}');
-      print('Direct LIST - ${myManagersModalListLabel!.directEmpList!.length}');
-      print(
-        'Designated LIST - ${myManagersModalListLabel!.designatedEmpList!.length}',
-      );
-    });
+    await getMyReportingOfficersList();
   }
 
   showNodata(BuildContext buildContext, result, reason) {
@@ -166,60 +109,82 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
     );
   }
 
-  bool isLoading = false;
   bool isLoadingCount = true;
 
-  Future<MyManagersModalList> getMyReportingOfficersList(
-    String sessionId,
-  ) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.myManagersApi;
+  Future<MyManagersModalList> getMyReportingOfficersList() async {
 
-    print('employeeList11: $sessionId');
-
-    setState(() {
+    if (mounted) setState(() {
       isLoadingCount = true; // âœ… Start loader before API
     });
 
     try {
-      var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
-      final response = await MobileHttpClient.instance.post(urlapi);
-
-      print('responseemployeeList ${response.body}');
-      print('URL ${response.request}');
-
-      mapResponse = json.decode(response.body);
-      print('responseemployeeList $mapResponse');
-
-      var getData = mapResponse.length;
-      if (getData == 0) {
-        print("getData111 $getData");
-        showNodata(context, "Oops", "There is no any requisition.");
+      final api = MobileApiFoundation.instance;
+      final headers = await api.authHeaders(requestId: api.newRequestId());
+      final response = await api.get(
+        ApiDetails.mobileMyManagers,
+        headers: headers,
+        tag: 'MY_MANAGERS',
+      );
+      mapResponse = api.decodeMap(response.body);
+      if (!api.isSuccess(response)) {
+        throw MobileApiException(
+          'MY_MANAGERS_FAILED',
+          message:
+              mapResponse['message']?.toString() ?? 'Unable to load managers',
+        );
       }
 
       MyManagersModalList myManagersModalList = MyManagersModalList.fromJson(
         mapResponse,
       );
-      print("mymanger ${myManagersModalList.listData}");
-      // Assign data based on selected filter
-      if (selectedFilter == "All") {
-        allUsernew = myManagersModalList.listData!;
-      } else if (selectedFilter == "Dotted") {
-        allUsernewDotted = myManagersModalList.dottedEmpList!;
-      } else if (selectedFilter == "Shared") {
-        allUsernewShared = myManagersModalList.sharedEmpList!;
-      } else if (selectedFilter == "Direct") {
-        allUsernewDirect = myManagersModalList.directEmpList!;
-      } else if (selectedFilter == "Designated") {
-        allUsernewDesignated = myManagersModalList.designatedEmpList!;
+      if (mounted) {
+        setState(() {
+          allUsernew = myManagersModalList.listData ?? [];
+          allUsernewDotted = myManagersModalList.dottedEmpList ?? [];
+          allUsernewShared = myManagersModalList.sharedEmpList ?? [];
+          allUsernewDirect = myManagersModalList.directEmpList ?? [];
+          allUsernewDesignated = myManagersModalList.designatedEmpList ?? [];
+          foundDataNew = allUsernew;
+          foundDataNewDotted = allUsernewDotted;
+          foundDataNewShared = allUsernewShared;
+          foundDataNewDirect = allUsernewDirect;
+          foundDataNewDesignated = allUsernewDesignated;
+          myManagersModalListLabel = myManagersModalList;
+          myManagersModalListLabeled = myManagersModalList;
+        });
       }
 
       return myManagersModalList;
     } catch (e) {
       print("Error fetching reporting officers: $e");
-      rethrow;
+      final errorMessage =
+          e is MobileApiException
+              ? (e.message ?? e.code)
+              : 'Unable to load managers';
+      final empty = MyManagersModalList(
+        listData: [],
+        directEmpList: [],
+        dottedEmpList: [],
+        sharedEmpList: [],
+        designatedEmpList: [],
+      );
+      if (mounted) {
+        setState(() {
+          foundDataNew = [];
+          foundDataNewDirect = [];
+          foundDataNewDotted = [];
+          foundDataNewShared = [];
+          foundDataNewDesignated = [];
+          myManagersModalListLabel = empty;
+          myManagersModalListLabeled = empty;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+      return empty;
     } finally {
-      setState(() {
+      if (mounted) setState(() {
         isLoadingCount = false; // âœ… Always stop loader
       });
     }
@@ -243,7 +208,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Reporting Officers",
+          "My Managers",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         //backgroundColor: Colors.deepPurple,
@@ -425,7 +390,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                   color: Mythemes.alertColor,
                   child: InkWell(
                     onTap: () {
-                      //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      setState(() => selectedFilter = "All");
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -437,7 +402,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                                   ? CircularProgressIndicator(
                                     color: Mythemes.whitish,
                                   ) // Loader when fetching data
-                                  : "${myManagersModalListLabel!.listData!.length}"
+                                  : "${myManagersModalListLabel?.listData?.length ?? 0}"
                                       .text
                                       .bold
                                       .color(Mythemes.whitish)
@@ -472,7 +437,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                   color: Mythemes.lightBluishColor,
                   child: InkWell(
                     onTap: () {
-                      //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      setState(() => selectedFilter = "Direct");
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -484,7 +449,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                                   ? CircularProgressIndicator(
                                     color: Mythemes.whitish,
                                   ) // Loader when fetching data
-                                  : "${myManagersModalListLabel!.directEmpList!.length}"
+                                  : "${myManagersModalListLabel?.directEmpList?.length ?? 0}"
                                       .text
                                       .bold
                                       .color(Mythemes.whitish)
@@ -519,7 +484,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                   color: Mythemes.warningColor,
                   child: InkWell(
                     onTap: () {
-                      //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      setState(() => selectedFilter = "Shared");
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -531,7 +496,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                                   ? CircularProgressIndicator(
                                     color: Mythemes.whitish,
                                   ) // Loader when fetching data
-                                  : "${myManagersModalListLabel!.sharedEmpList!.length}"
+                                  : "${myManagersModalListLabel?.sharedEmpList?.length ?? 0}"
                                       .text
                                       .bold
                                       .color(Mythemes.whitish)
@@ -566,7 +531,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                   color: Mythemes.successColor,
                   child: InkWell(
                     onTap: () {
-                      //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      setState(() => selectedFilter = "Dotted");
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -578,7 +543,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                                   ? CircularProgressIndicator(
                                     color: Mythemes.whitish,
                                   ) // Loader when fetching data
-                                  : "${myManagersModalListLabel!.dottedEmpList!.length}"
+                                  : "${myManagersModalListLabel?.dottedEmpList?.length ?? 0}"
                                       .text
                                       .bold
                                       .color(Mythemes.whitish)
@@ -614,7 +579,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                   color: Mythemes.lightBluishColor,
                   child: InkWell(
                     onTap: () {
-                      //Navigator.pushNamed(context, MyRoutings.inductionListRoute);
+                      setState(() => selectedFilter = "Designated");
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -626,7 +591,7 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                                   ? CircularProgressIndicator(
                                     color: Mythemes.whitish,
                                   ) // Loader when fetching data
-                                  : "${myManagersModalListLabel!.designatedEmpList!.length}"
+                                  : "${myManagersModalListLabel?.designatedEmpList?.length ?? 0}"
                                       .text
                                       .bold
                                       .color(Mythemes.whitish)
@@ -664,11 +629,175 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                     ? Center(child: CircularProgressIndicator()) // Show loader
                     : myManagersModalListLabeled == null
                     ? Center(child: Text("No Data Available"))
-                    : getMyReportings(myManagersModalListLabeled!),
+                    : getManagersContent(),
           ),
         ],
       ),
     );
+  }
+
+  Widget getManagersContent() {
+    final managers = _selectedManagers();
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                filterChip("All"),
+                filterChip("Direct"),
+                filterChip("Shared"),
+                filterChip("Dotted"),
+                filterChip("Designated"),
+              ],
+            ),
+          ),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () async {
+              await getSharedPrfanceList();
+            },
+            child:
+                managers.isEmpty
+                    ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        return ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            SizedBox(
+                              height: constraints.maxHeight,
+                              child: const Center(
+                                child: Text("No managers mapped"),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    )
+                    : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      itemCount: managers.length,
+                      itemBuilder: (context, index) {
+                        final dynamic manager = managers[index];
+                        final name = _managerText(
+                          manager.reportingOfficerName,
+                          "Manager",
+                        );
+                        final type = _managerType(manager.reportieeType);
+                        final profile = _managerText(
+                          manager.profileName,
+                          "Profile not assigned",
+                        );
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 2,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.deepPurple.shade100,
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.deepPurple,
+                              ),
+                            ),
+                            title: Text(
+                              name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    type,
+                                    style: const TextStyle(
+                                      color: Colors.deepPurple,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    profile,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<dynamic> _selectedManagers() {
+    switch (selectedFilter) {
+      case "All":
+        return List<dynamic>.from(foundDataNew ?? const <ListData>[]);
+      case "Shared":
+        return List<dynamic>.from(
+          foundDataNewShared ?? const <SharedEmpList>[],
+        );
+      case "Dotted":
+        return List<dynamic>.from(
+          foundDataNewDotted ?? const <DottedEmpList>[],
+        );
+      case "Designated":
+        return List<dynamic>.from(
+          foundDataNewDesignated ?? const <DesignatedEmpList>[],
+        );
+      case "Direct":
+      default:
+        return List<dynamic>.from(
+          foundDataNewDirect ?? const <DirectEmpList>[],
+        );
+    }
+  }
+
+  String _managerText(Object? value, String fallback) {
+    final text = value?.toString().trim() ?? "";
+    return text.isEmpty || text.toLowerCase() == "null" ? fallback : text;
+  }
+
+  String _managerType(Object? value) {
+    final type = _managerText(value, "Manager").toUpperCase();
+    switch (type) {
+      case "SHARED_SERVICES":
+        return "Shared Manager";
+      case "DIRECT":
+        return "Direct Manager";
+      case "DOTTED":
+        return "Dotted Manager";
+      case "DESIGNATED":
+        return "Designated Manager";
+      default:
+        return type;
+    }
   }
 
   getMyReportings(MyManagersModalList myManagersModalList) {
@@ -1016,7 +1145,6 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
         onSelected: (val) {
           setState(() {
             selectedFilter = label;
-            getSharedPrfanceList();
             print("Selected Filter - $selectedFilter");
           });
         },

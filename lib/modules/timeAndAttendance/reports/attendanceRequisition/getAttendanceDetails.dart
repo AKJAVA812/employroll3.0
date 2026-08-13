@@ -4,7 +4,7 @@ import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/attendance_calendar_api.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -92,16 +92,9 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
   Future<CalendarModalClass> getCalendarData(String sessionId) async {
     String _currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.calendarApi;
     print("Current Month - $_currentMonth $_currentMonthc");
 
     CalendarModalClass calendarModalClass;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "month=$_currentMonth",
-    );
     setState(() {
       isLoading = true;
     });
@@ -130,30 +123,26 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       }
     }
 
-    // âœ… STEP 2: Now call API (refresh data and overwrite cache)
+    // STEP 2: Now call API (refresh data and overwrite cache)
     try {
-      final response = await MobileHttpClient.instance.post(urlapi);
-      if (response.statusCode == 200) {
-        print("Calendar URL - ${response.request}");
-        mapResponse = json.decode(response.body);
+      final result = await AttendanceCalendarApi().fetchMonth(_currentMonth);
+      mapResponse = result.data;
+      print(
+        result.cached
+            ? "Calendar loaded from mobile cache ${result.cachedAt}"
+            : "Calendar loaded from mobile API",
+      );
 
-        // Save to SharedPreferences
-        if (_currentMonthc == _currentMonth) {
-          await prefs.setString(
-            'calendarDataMyRequest',
-            json.encode(mapResponse),
-          );
-          await prefs.setString('calendarMonthMyRequest', _currentMonth);
-        }
-        //Need to un comment this for deadline requisition restriction
-        /*String raiseDate = mapResponse['raisedDeadlineDate'];
-        shared.setRaiseRequisition(raiseDate);
-        print('object raised $raiseDate');*/
-        // âœ… Rebuild UI from fresh API data
-        _buildCalendarFromMap(mapResponse);
-      } else {
-        print('Failed to load calendar data: ${response.statusCode}');
+      // Save to SharedPreferences
+      if (_currentMonthc == _currentMonth) {
+        await prefs.setString(
+          'calendarDataMyRequest',
+          json.encode(mapResponse),
+        );
+        await prefs.setString('calendarMonthMyRequest', _currentMonth);
       }
+      // Rebuild UI from fresh API data
+      _buildCalendarFromMap(mapResponse);
     } catch (e) {
       print("Error calling calendar API: $e");
     } finally {
@@ -197,8 +186,10 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
   // ðŸ”§ Helper method to rebuild UI from any map data (API or cache)
   void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
-      data = mapResponse['data'] ?? [];
-      List<dynamic> legends = mapResponse['legends'] ?? [];
+      final calendarRows = mapResponse['data'] ?? mapResponse['calendar'];
+      data = calendarRows is List ? calendarRows : [];
+      final rawLegends = mapResponse['legends'];
+      List<dynamic> legends = rawLegends is List ? rawLegends : [];
 
       // Build legends
       _legends =
@@ -220,9 +211,19 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       //print("Calendar Mark Date - $_markedDateMap");
 
       for (var event in data) {
-        DateTime eventDate = DateTime.parse(event['logDate']);
-        String title = event['status'] ?? "Event";
-        String logDate = event['logDate'];
+        if (event is! Map) {
+          continue;
+        }
+        final eventDate = _parseCalendarDate(
+          event['logDate'] ?? event['date'] ?? event['attendanceDate'],
+        );
+        if (eventDate == null) {
+          continue;
+        }
+        String title =
+            (event['status'] ?? event['attendanceStatus'] ?? "Event")
+                .toString();
+        String logDate = DateFormat('yyyy-MM-dd').format(eventDate);
         String mobColor =
             (event["mobColor"] != null &&
                     event["mobColor"].toString().trim().isNotEmpty)
@@ -244,6 +245,50 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     }
 
     setState(() {}); // Refresh UI
+  }
+
+  DateTime? _parseCalendarDate(Object? value) {
+    if (value == null) {
+      return null;
+    }
+    final text = value.toString().trim();
+    if (text.isEmpty) {
+      return null;
+    }
+    final isoDate = DateTime.tryParse(text);
+    if (isoDate != null) {
+      return isoDate;
+    }
+    for (final pattern in ['dd-MM-yyyy', 'MM-dd-yyyy']) {
+      try {
+        return DateFormat(pattern).parseStrict(text);
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  Map<String, dynamic> _calendarRowForDate(DateTime date) {
+    for (final item in data) {
+      if (item is! Map) {
+        continue;
+      }
+      final itemDate = _parseCalendarDate(
+        item['logDate'] ?? item['date'] ?? item['attendanceDate'],
+      );
+      if (itemDate != null && DateUtils.isSameDay(itemDate, date)) {
+        return Map<String, dynamic>.from(item);
+      }
+    }
+    final selectedDate = DateFormat('yyyy-MM-dd').format(date);
+    return <String, dynamic>{
+      'logDate': selectedDate,
+      'date': selectedDate,
+      'branch': branchName ?? '',
+      'dept': deptName ?? '',
+      'empName': empName ?? '',
+      'firstInTime': '',
+      'lastOutTime': '',
+    };
   }
 
   // Helper function to build event icon
@@ -919,25 +964,20 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           }
         }
 
-        setState(() => _currentDate = date);
-        setState(() => _currentDate2 = date);
-        //events.forEach((event) => print('event list ${event.getDescription()}'));
-        //print(date);
+        final selectedCalendarRow = _calendarRowForDate(date);
         setState(() {
-          formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
-          int dayOnly = int.parse(DateFormat('dd').format(_currentDate));
+          _currentDate = date;
+          _currentDate2 = date;
+          formattedDate = DateFormat('dd-MM-yyyy').format(date);
           print("Formatted Date - $formattedDate");
-          print(data[dayOnly - 1]);
-          calendarSendData = data[dayOnly - 1];
-
-          //print("Formatted Date - $date");
+          calendarSendData = selectedCalendarRow;
         });
 
         Navigator.of(context).push(
           MaterialPageRoute(
             builder:
                 (context) => AttendanceRequisitionCalendar(
-                  AttendanceReportModel(),
+                  null,
                   calendarSendData,
                   0,
                   "$formattedDate",

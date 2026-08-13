@@ -26,7 +26,7 @@ class TodayData {
   String? punchType;
   String? attMode;
   String? deviceSerial;
-  int? empCode;
+  String? empCode;
   String? createdDateTime;
   String? enrollId;
   String? time;
@@ -50,7 +50,7 @@ class TodayData {
     punchType = json['punchType'];
     attMode = json['attMode'];
     deviceSerial = json['deviceSerial'];
-    empCode = json['empCode'];
+    empCode = json['empCode']?.toString();
     createdDateTime = json['createdDateTime'];
     enrollId = json['enrollId'];
     time = json['time'];

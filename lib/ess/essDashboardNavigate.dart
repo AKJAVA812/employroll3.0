@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
-import 'package:er_flutter_project/adminPage/modelClass/eventListModal.dart';
+import 'package:er_flutter_project/adminPage/modelClass/eventListModal.dart'
+    hide BdayList, Joblist;
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
 import 'package:er_flutter_project/ess/EventsListModal.dart';
 import 'package:er_flutter_project/ess/Model/absentEmpList.dart';
@@ -26,7 +27,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:er_flutter_project/services/attendance_calendar_api.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_permission_service.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import 'dart:developer' as developer;
@@ -141,6 +145,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     deadlineStartDate = await shared.getPayCycleStart() ?? "0";
     deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
     lockDateStr = await shared.getRaiseRequisition() ?? "0";
+    print(
+      '[MOBILE-DASHBOARD] ESS navigate shared loaded sessionId=${sessionId == null ? "null" : "present"} orgId=$orgId userPanel=$userPanel empRole=$empRole roRole=$roRole adminRole=$adminRole',
+    );
 
     print("Start Pay $deadlineStartDate");
     print("End Pay $deadlineEndDate");
@@ -250,32 +257,103 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
   Future<EssDashboarrdModel> getDashboardData(String sessionId) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.essDashboardAPi;
-
-    //print('employeeList11: ${SessionId}');
-    EssDashboarrdModel dashboardModel;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "branch=$branchId&"
-      "shift=$shift&"
-      "date=$singleDateString",
+    print(
+      '[ESS_DASHBOARD_FETCH_START] date=$singleDateString branch=$branchId shift=$shift',
     );
-    final response = await MobileHttpClient.instance.post(urlapi);
+    EssDashboarrdModel dashboardModel;
+    final foundation = MobileApiFoundation.instance;
+    final requestId = foundation.newRequestId();
+    final dashboardOrgId = await shared.getOrgId();
+    final dashboardEmployeeDetailsId = await shared.getEmployeeDetailsId();
+    final storedEmpCode = await shared.getEmpCode();
+    final storedEmployeeId = await shared.getEmployeeId();
+    final dashboardEmployeeCode =
+        storedEmpCode?.toString().trim().isNotEmpty == true
+            ? storedEmpCode
+            : storedEmployeeId;
+    final dashboardMonth = DateFormat('yyyy-MM').format(date);
+    print(
+      '[ESS_DASHBOARD_PARAMS] orgId=$dashboardOrgId employeeDetailsId=$dashboardEmployeeDetailsId employeeCode=$dashboardEmployeeCode month=$dashboardMonth',
+    );
+    final response = await foundation.postForm(
+      ApiDetails.essDashboardAPi,
+      queryParameters: <String, Object?>{
+        'date': singleDateString,
+        'month': dashboardMonth,
+        'branch': branchId,
+        'shift': shift,
+        'userPermission': userPanelPermission,
+        'organisationId': dashboardOrgId,
+        'employeeDetailsId': dashboardEmployeeDetailsId,
+        'employeeCode': dashboardEmployeeCode,
+      },
+      headers: await foundation.authHeaders(requestId: requestId),
+      tag: 'ESS_DASHBOARD',
+    );
     setState(() {
       isLoading = true; // Start loading
     });
     print('URL ${response.request}');
+    _logLong('ESS_DASHBOARD_RAW_RESPONSE', response.body);
     print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('dashboardData');
+      throw Exception(
+        'Dashboard API failed with status ${response.statusCode}: ${response.body}',
+      );
+    }
 
     mapResponse = json.decode(response.body);
+    _logDashboardSummary(mapResponse);
+    holidayListModalGlobal = HolidayESSModal.fromJson(mapResponse);
+    final dashboardCalendarMap = _calendarMapFromDashboard(mapResponse);
+    calendarModalGlobal = CalendarModalClass.fromJson(dashboardCalendarMap);
+    _buildCalendarFromMap(dashboardCalendarMap);
+    await _attachEssProfileToDashboardRows(mapResponse);
     dashboardModel = EssDashboarrdModel.fromJson(mapResponse);
     // âœ… Save to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('dashboardData', jsonEncode(mapResponse));
     return dashboardModel;
+  }
+
+  void _logDashboardSummary(Map<String, dynamic> body) {
+    final countData = body['countData'];
+    if (countData is! Map) {
+      print('[ESS_DASHBOARD_COUNT_SUMMARY] countData missing');
+      return;
+    }
+    final summary = <String, Object?>{
+      'totalAtt': countData['totalAtt'],
+      'presentList': _listLength(countData['presentList']),
+      'absentCount': countData['absentCount'],
+      'absentList': _listLength(countData['absentList']),
+      'mispunch': countData['mispunch'],
+      'mispunchList': _listLength(countData['mispunchList']),
+      'earlygo': countData['earlygo'],
+      'earlyGoList': _listLength(countData['earlyGoList']),
+      'late': countData['late'],
+      'lateList': _listLength(countData['lateList']),
+      'shortlev': countData['shortlev'],
+      'shortLeaveList': _listLength(countData['shortLeaveList']),
+      'halfday': countData['halfday'],
+      'halfDayList': _listLength(countData['halfDayList']),
+    };
+    print('[ESS_DASHBOARD_COUNT_SUMMARY] $summary');
+  }
+
+  int _listLength(Object? value) => value is List ? value.length : 0;
+
+  void _logLong(String tag, String value) {
+    const chunkSize = 700;
+    print('[$tag] length=${value.length}');
+    for (var start = 0; start < value.length; start += chunkSize) {
+      final end =
+          start + chunkSize > value.length ? value.length : start + chunkSize;
+      print('[$tag][$start-$end] ${value.substring(start, end)}');
+    }
   }
 
   /*Future<HolidayESSModal> getHolidayData(String sessionId) async {
@@ -442,65 +520,47 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }*/
   Future<CalendarModalClass> getCalendarData(String sessionId) async {
     String _currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.calendarApi;
     print("Current Month - $_currentMonth $_currentMonthc");
 
     CalendarModalClass calendarModalClass;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "month=$_currentMonth",
-    );
     setState(() {
       isLoading = true;
     });
 
     Map<String, dynamic> mapResponse = {};
-
     final prefs = await SharedPreferences.getInstance();
 
-    // âœ… STEP 1: Try loading from SharedPreferences first
     if (_currentMonthc == _currentMonth) {
       final cachedData = prefs.getString('calendarData');
       final cachedMonth = prefs.getString('calendarMonth');
-
-      print("Calendar Data - $cachedData");
       print("Calendar Month - $cachedMonth");
-
       if (cachedData != null) {
         print("Cachded Month $cachedMonth");
         try {
-          //print("Loaded calendar data from cache âœ…");
           mapResponse = json.decode(cachedData);
           _buildCalendarFromMap(mapResponse);
-        } catch (e) {
-          //print("Error loading cached calendar: $e");
-        }
+        } catch (e) {}
       }
     }
 
-    // âœ… STEP 2: Now call API (refresh data and overwrite cache)
     try {
-      final response = await MobileHttpClient.instance.post(urlapi);
-      if (response.statusCode == 200) {
-        print('Calendar URL - ${response.request}');
-        print('Response body - ${response.body}');
-        mapResponse = json.decode(response.body);
+      final result = await AttendanceCalendarApi().fetchMonth(_currentMonth);
+      mapResponse = result.data;
+      print(
+        result.cached
+            ? "Calendar loaded from mobile cache ${result.cachedAt}"
+            : "Calendar loaded from mobile API",
+      );
 
-        // Save to SharedPreferences
-        if (_currentMonthc == _currentMonth) {
-          await prefs.setString('calendarData', json.encode(mapResponse));
-          await prefs.setString('calendarMonth', _currentMonth);
-        }
-        String raiseDate = mapResponse['raisedDeadlineDate'];
-        shared.setRaiseRequisition(raiseDate);
-        print('object raised $raiseDate');
-        // âœ… Rebuild UI from fresh API data
-        _buildCalendarFromMap(mapResponse);
-      } else {
-        print('Failed to load calendar data: ${response.statusCode}');
+      if (_currentMonthc == _currentMonth) {
+        await prefs.setString('calendarData', json.encode(mapResponse));
+        await prefs.setString('calendarMonth', _currentMonth);
       }
+      final raiseDate = mapResponse['raisedDeadlineDate'];
+      if (raiseDate != null) {
+        shared.setRaiseRequisition(raiseDate.toString());
+      }
+      _buildCalendarFromMap(mapResponse);
     } catch (e) {
       print("Error calling calendar API: $e");
     } finally {
@@ -513,7 +573,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     return calendarModalClass;
   }
 
-  // ðŸ”§ Helper method to rebuild UI from any map data (API or cache)
+  // Helper method to rebuild UI from any map data (API or cache)
   void _buildCalendarFromMap(Map<String, dynamic> mapResponse) {
     try {
       data = mapResponse['data'] ?? [];
@@ -761,7 +821,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 */
   void checkAndRunApi() async {
+    print('[ESS_DASHBOARD_FLOW] checkAndRunApi started');
+    final permissionState = await MobilePermissionService.loadEssState();
+    print(
+      '[ESS_DASHBOARD_FLOW] canViewDashboard=${permissionState.canViewDashboard}',
+    );
+    if (!permissionState.canViewDashboard) {
+      _showDashboardPermissionDialog();
+      setState(() {
+        isLoading = false;
+        isLoadingEvent = false;
+        isLoadingTodayEvent = false;
+        isLoadingTodayPunch = false;
+      });
+      return;
+    }
+
     bool runApi = await shouldRunApi();
+    runApi = true;
 
     if (!runApi) {
       print("â¸ Skipping API. Loading from cache...");
@@ -772,33 +849,25 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     print("ðŸ”„ Running API for today...");
 
     try {
-      // Parallel API calls
-      final results = await Future.wait([
-        getDashboardData(sessionId!), // 0
-        getCalendarData(sessionId!), // 1
-        getHolidayData(sessionId!), // 2
-        getEventData(sessionId!), // 3
-        getTodayEventData(sessionId!), // 4
-      ]);
-
-      // Assign results
-      final dashboardData = results[0] as EssDashboarrdModel;
-      final calendarData = results[1] as CalendarModalClass;
-      final holidayData = results[2] as HolidayESSModal?;
-      final eventList = results[3] as EssEventsListModal?;
-      final todayEventList = results[4] as TodayEventListModal;
-
-      // Update UI state only once
+      final dashboardData = await getDashboardData(sessionId!);
       setState(() {
         essDashboardModelGlobal = dashboardData;
-        calendarModalGlobal = calendarData;
-        holidayListModalGlobal = holidayData;
-        eventsListModalGlobal = eventList;
-        todayEventModalGlobal = todayEventList;
-
+        eventsListModalGlobal ??= EssEventsListModal(
+          bdayList: <BdayList>[],
+          joblist: <Joblist>[],
+        );
+        todayEventModalGlobal ??= TodayEventListModal(
+          todayEventList: <TodayEventList>[],
+        );
+        holidayListModalGlobal ??= HolidayESSModal(
+          viewHolidayList: <ViewHolidayList>[],
+        );
         isLoading = false;
+        isLoadingEvent = false;
         isLoadingTodayEvent = false;
+        isLoadingTodayPunch = false;
       });
+      _loadDashboardSupportData(sessionId!);
 
       print("âœ… All APIs loaded successfully.");
     } catch (e, st) {
@@ -815,6 +884,103 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   // ===============================================================
   // âœ… Helper - Check if API should run today
   // ===============================================================
+  Future<void> _loadDashboardSupportData(String sessionId) async {
+    try {
+      final eventList = await getEventData(sessionId);
+      if (mounted) {
+        setState(() {
+          eventsListModalGlobal = eventList;
+        });
+      }
+    } catch (e) {
+      print("Error loading dashboard event data: $e");
+    }
+  }
+
+  Map<String, dynamic> _calendarMapFromDashboard(Map<String, dynamic> body) {
+    final calendarBody = body['calendarBody'];
+    if (calendarBody is Map) {
+      return Map<String, dynamic>.from(calendarBody);
+    }
+    final r3Calendar = body['r3Calendar'];
+    if (r3Calendar is Map) {
+      return Map<String, dynamic>.from(r3Calendar);
+    }
+    return <String, dynamic>{
+      'data': body['calendar'] is List ? body['calendar'] : <dynamic>[],
+      'legends':
+          body['legends'] is List
+              ? body['legends']
+              : body['calendarLegends'] is List
+              ? body['calendarLegends']
+              : <dynamic>[],
+    };
+  }
+
+  Future<void> _attachEssProfileToDashboardRows(
+    Map<String, dynamic> body,
+  ) async {
+    final employee =
+        body['employee'] is Map
+            ? Map<String, dynamic>.from(body['employee'])
+            : <String, dynamic>{};
+    final empName =
+        _fallbackText(employee['employeeName'], await shared.getempName()) ??
+        'Self';
+    final department =
+        _fallbackText(employee['department'], await shared.getDept()) ?? '';
+    final designation =
+        _fallbackText(employee['designation'], await shared.getDesignation()) ??
+        '';
+    final branch =
+        _fallbackText(employee['branch'], await shared.getBranch()) ?? '';
+    final deptText =
+        [department, designation]
+            .where((value) => value.trim().isNotEmpty)
+            .join(' - ');
+    final countData = body['countData'];
+    if (countData is! Map) return;
+    const listKeys = <String>[
+      'presentList',
+      'absentList',
+      'lateList',
+      'mispunchList',
+      'earlyGoList',
+      'shortLeaveList',
+      'halfDayList',
+      'totalList',
+    ];
+    for (final key in listKeys) {
+      final rows = countData[key];
+      if (rows is! List) continue;
+      for (final row in rows) {
+        if (row is! Map) continue;
+        row['empName'] = _fallbackText(row['empName'], empName);
+        row['dept'] = _fallbackText(row['dept'], deptText);
+        row['branch'] = _fallbackText(row['branch'], branch);
+        row['inTime'] = _timeFallback(row['inTime']);
+        row['outTime'] = _timeFallback(row['outTime']);
+        row['workingHours'] = _timeFallback(row['workingHours']);
+      }
+    }
+  }
+
+  String? _fallbackText(Object? value, Object? fallback) {
+    final text = value?.toString().trim() ?? '';
+    if (text.isNotEmpty && text.toLowerCase() != 'null') {
+      return text;
+    }
+    final fallbackText = fallback?.toString().trim() ?? '';
+    return fallbackText.isEmpty || fallbackText.toLowerCase() == 'null'
+        ? null
+        : fallbackText;
+  }
+
+  String _timeFallback(Object? value) {
+    final text = value?.toString().trim() ?? '';
+    return text.isEmpty || text.toLowerCase() == 'null' ? '--:--' : text;
+  }
+
   Future<bool> shouldRunApi() async {
     final prefs = await SharedPreferences.getInstance();
     final String? lastCallDate = prefs.getString('lastApiCallDate');
@@ -827,6 +993,28 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       await prefs.setString('lastApiCallDate', currentDate);
       return true;
     }
+  }
+
+  void _showDashboardPermissionDialog() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text("Permission Required"),
+              content: const Text(
+                "You do not have permission to view the attendance dashboard. Please contact your administrator.",
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+      );
+    });
   }
 
   /*Future<EssEventsListModal?> getEventData(String sessionId) async {
@@ -895,20 +1083,25 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     });
 
     try {
-      String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.eventListModalESSApi;
-
-      var urlapi = Uri.parse(
-        "$conn$apiUrl?sessionId=$sessionId&"
-        "branch=$branchId&shift=$shift&date=$singleDateString&"
-        "userPermission=COMPANY_EMPLOYEE",
+      final foundation = MobileApiFoundation.instance;
+      final requestId = foundation.newRequestId();
+      final response = await foundation.postForm(
+        ApiDetails.eventListModalESSApi,
+        queryParameters: <String, Object?>{
+          'date': singleDateString,
+          'branch': branchId,
+          'shift': shift,
+          'userPermission': 'COMPANY_EMPLOYEE',
+        },
+        headers: await foundation.authHeaders(requestId: requestId),
+        tag: 'ESS_EVENTS',
       );
-
-      final response = await MobileHttpClient.instance.post(urlapi);
       final mapResponse = json.decode(response.body);
 
       print("Event API -${response.request}");
       final eventsListModal = EssEventsListModal.fromJson(mapResponse);
+      eventsListModal.bdayList ??= <BdayList>[];
+      eventsListModal.joblist ??= <Joblist>[];
       eventsListModalGlobal = eventsListModal;
 
       // âœ… Save modal data to SharedPreferences
@@ -950,6 +1143,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       print("Today Event - ${response.request}");
 
       final todayEventListModal = TodayEventListModal.fromJson(mapResponse);
+      todayEventListModal.todayEventList ??= <TodayEventList>[];
       todayEventModalGlobal = todayEventListModal;
 
       // âœ… Save modal data to SharedPreferences
@@ -1093,24 +1287,25 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     return todayEventListModal;
   }*/
 
-  Future<TodayPunchesModal> getTodayPunchData(String sessionId) async {
+  Future<TodayPunchesModal> getTodayPunchData() async {
     setState(() {
       isLoadingTodayPunch = true; // Show loader before fetching
     });
 
-    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.todayPunchesApiESS;
-
-    print('employeeList11: $sessionId');
 
     TodayPunchesModal todayPunchesModal;
 
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?sessionId=$sessionId&"
-      "date=$todayDateFetch",
+    final foundation = MobileApiFoundation.instance;
+    final requestId = foundation.newRequestId();
+    final response = await foundation.get(
+      apiUrl,
+      headers: await foundation.authHeaders(requestId: requestId),
+      tag: 'TODAY_PUNCHES',
     );
-
-    final response = await MobileHttpClient.instance.post(urlapi);
+    if (!foundation.isSuccess(response)) {
+      throw MobileApiException('Unable to load today punches');
+    }
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
@@ -1133,7 +1328,10 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   List<Map<String, dynamic>> todayPunches = [];
 
   void setPunchData(List<TodayData>? apiData) {
-    if (apiData == null) return; // in case it's null
+    if (apiData == null) {
+      todayPunches = [];
+      return;
+    }
 
     todayPunches =
         apiData.asMap().entries.map((entry) {
@@ -1208,6 +1406,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   @override
   void initState() {
+    print('[MOBILE-DASHBOARD] EssAdminDashboardHead initState');
     /*_markedDateMap.add(
         DateTime(2024, 12, 10),
         Event(
@@ -1435,17 +1634,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   late Future<List<Map<String, dynamic>>> punchesFuture;
 
   DashboardWidgets(EssDashboarrdModel dashboardModel) {
-    paidDaysCount = essDashboardModelGlobal!.countData!.paidDaysCount;
-    totalAttendance = essDashboardModelGlobal!.countData!.totalAtt;
-    totalDays = essDashboardModelGlobal!.countData!.totalDays;
-    totalAbsentEmp = essDashboardModelGlobal!.countData!.absentCount;
-    misPunchEmp = essDashboardModelGlobal!.countData!.mispunch;
-    lateIn = essDashboardModelGlobal!.countData!.late;
-    earlyOutEmp = essDashboardModelGlobal!.countData!.earlygo;
-    halfEmp = essDashboardModelGlobal!.countData!.halfday;
-    shortLeaveCount = essDashboardModelGlobal!.countData!.shortlev;
+    final countData = dashboardModel.countData;
+    if (countData == null) {
+      return Center(
+        child: "No dashboard data available.".text.center.make().py16(),
+      );
+    }
 
-    presentCount = (totalDays ?? 0) - (totalAbsentEmp ?? 0);
+    paidDaysCount = countData.paidDaysCount;
+    totalAttendance = countData.totalAtt;
+    totalDays = countData.totalDays;
+    totalAbsentEmp = countData.absentCount;
+    misPunchEmp = countData.mispunch;
+    lateIn = countData.late;
+    earlyOutEmp = countData.earlygo;
+    halfEmp = countData.halfday;
+    shortLeaveCount = countData.shortlev;
+
+    presentCount = attendanceCardCount(countData);
     print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
@@ -1667,19 +1873,30 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                   child: SizedBox(
                     width: double.infinity, // ðŸ‘ˆ full width
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        getRealTimeAttButtonShow = false;
-                        getRealTimeAttShow = true;
-                        Future<TodayPunchesModal> getTodayPunch =
-                            getTodayPunchData(sessionId!);
-                        getTodayPunch.then((value) {
+                      onPressed: () async {
+                        setState(() {
+                          getRealTimeAttButtonShow = false;
+                          getRealTimeAttShow = true;
+                        });
+                        try {
+                          final value = await getTodayPunchData();
+                          if (!mounted) return;
                           setState(() {
                             todayPunchesModalGlobal = value;
                             isLoadingTodayPunch = false;
                           });
-                        });
-                        // ðŸ‘‡ Your action here
-                        print("Get Real-Time Attendance clicked");
+                        } catch (error) {
+                          if (!mounted) return;
+                          setState(() {
+                            isLoadingTodayPunch = false;
+                            getRealTimeAttButtonShow = true;
+                            getRealTimeAttShow = false;
+                          });
+                          Fluttertoast.showToast(
+                            msg: 'Unable to load real-time attendance: $error',
+                            toastLength: Toast.LENGTH_LONG,
+                          );
+                        }
                       },
                       icon: const Icon(
                         Icons.access_time,
@@ -2327,7 +2544,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                   Expanded(
                     child: InkWell(
                       onTap: () {
-                        if (overTime == 0 || overTime == null) {
+                        if (shortLeaveCount == 0 || shortLeaveCount == null) {
                           Fluttertoast.showToast(
                             msg: "There is no data available for this month.",
                             toastLength: Toast.LENGTH_SHORT,
@@ -2371,13 +2588,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                               .centered()
                                               .py8()
                                               .px8()
-                                          : overTime == null
+                                          : shortLeaveCount == null
                                           ? "0".text.xl2.bold
                                               .color(Mythemes.dangerColor)
                                               .make()
                                               .py8()
                                               .px8()
-                                          : "$overTime".text.xl2.bold
+                                          : "$shortLeaveCount".text.xl2.bold
                                               .color(Mythemes.dangerColor)
                                               .make()
                                               .py8()
@@ -2497,7 +2714,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                   height: 50,
                   width: double.infinity, // ðŸ‘ˆ full width
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       _currentMonth = DateFormat(
                         'MM-yyyy',
                       ).format(DateTime.now());
@@ -2511,6 +2728,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                           'MM-yyyy',
                         ).format(_targetDateTime);
                       });
+                      final dashboardData = await getDashboardData(sessionId!);
+                      if (!mounted) return;
+                      setState(() {
+                        essDashboardModelGlobal = dashboardData;
+                        isLoading = false;
+                      });
+                      /*
                       Future<EssDashboarrdModel> getEmployeeList11 =
                           getDashboardData(sessionId!);
                       getEmployeeList11.then((value) {
@@ -2528,6 +2752,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                           isLoading = false;
                         });
                       });
+                      */
                       // ðŸ‘‡ Your action here
                       print("Update your dashboard clicked");
                     },
@@ -2916,7 +3141,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                               buildHolidayList(
                                 isLoading: isLoadingEvent,
                                 items:
-                                    holidayListModalGlobal!.viewHolidayList ??
+                                    holidayListModalGlobal?.viewHolidayList ??
                                     [],
                                 emptyText: "No Holidays",
                                 holidayName: (item) => item.holidayName,
@@ -3032,6 +3257,12 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
+        final imageUrl = imageBuilder(item).trim();
+        final imageUri = Uri.tryParse(imageUrl);
+        final hasImage =
+            imageUri != null &&
+            (imageUri.scheme == 'http' || imageUri.scheme == 'https') &&
+            imageUri.host.isNotEmpty;
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           elevation: 4,
@@ -3042,8 +3273,12 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             contentPadding: const EdgeInsets.all(12),
             leading: CircleAvatar(
               radius: 28,
-              backgroundImage: NetworkImage(imageBuilder(item)),
+              backgroundImage: hasImage ? NetworkImage(imageUrl) : null,
               backgroundColor: Colors.grey[200],
+              child:
+                  hasImage
+                      ? null
+                      : const Icon(Icons.person, color: Colors.grey),
             ),
             title: Text(
               titleBuilder(item),
@@ -3438,16 +3673,16 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         singleDateString = DateFormat('dd-MM-yyyy').format(date);
         print("Updated Date Change - $singleDateString");
 
-        print("âœ… Calling Calendar API for: $_currentMonth");
+        print("Calling Dashboard API for calendar month: $_currentMonth");
 
-        // 5. Call API â€” only ONE time now
-        CalendarModalClass result = await getCalendarData(sessionId!);
+        // 5. Call dashboard API. Calendar is rebuilt from dashboard response.
+        final dashboardData = await getDashboardData(sessionId!);
 
         setState(() {
-          calendarModalGlobal = result;
+          essDashboardModelGlobal = dashboardData;
         });
 
-        print("âœ” Calendar API Updated");
+        print("Dashboard calendar data updated");
       },
       onDayLongPressed: (DateTime date) {
         //print('long pressed date $date');

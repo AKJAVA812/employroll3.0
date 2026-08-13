@@ -9,25 +9,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../commanScreen/allAPIList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'mobile_http_client.dart';
+import 'mobile_permission_service.dart';
 
 class MobileAuthService {
   MobileAuthService._();
 
   static final MobileAuthService instance = MobileAuthService._();
   static final SessionManager _sessionManager = SessionManager();
-  bool _syncRunning = false;
+  Future<void>? _activeSync;
 
   Future<void> syncAfterLogin({
     required String? accessToken,
     required String? sessionId,
     String? tokenType,
   }) async {
-    if (_syncRunning) {
-      print('[MOBILE-AUTH] syncAfterLogin -> skipped, sync already running');
-      return;
+    final running = _activeSync;
+    if (running != null) {
+      await running;
     }
-    _syncRunning = true;
-    try {
+    MobilePermissionService.clearLastKnownState();
+    await _runSync(() async {
       print('[MOBILE-AUTH] syncAfterLogin -> start');
       final auth = MobileAuthData(
         accessToken: accessToken,
@@ -37,18 +38,11 @@ class MobileAuthService {
       await _callBootstrapVersion(auth: auth, forceBootstrap: true);
       await sendMobileDeviceInfo(auth: auth);
       print('[MOBILE-AUTH] syncAfterLogin -> end');
-    } finally {
-      _syncRunning = false;
-    }
+    });
   }
 
-  Future<void> syncOnAppOpen({bool forceBootstrap = false}) async {
-    if (_syncRunning) {
-      print('[MOBILE-AUTH] syncOnAppOpen -> skipped, sync already running');
-      return;
-    }
-    _syncRunning = true;
-    try {
+  Future<void> syncOnAppOpen({bool forceBootstrap = false}) {
+    return _runSync(() async {
       print('[MOBILE-AUTH] syncOnAppOpen -> start');
       final auth = await _readAuthFromPrefs();
       if (!auth.hasAuth) {
@@ -63,6 +57,7 @@ class MobileAuthService {
           print(
             '[MOBILE-AUTH] syncOnAppOpen -> refresh failed, login required',
           );
+          await MobileHttpClient.instance.expireSession();
           return;
         }
       }
@@ -74,9 +69,23 @@ class MobileAuthService {
       );
       await sendMobileDeviceInfo(auth: latestAuth);
       print('[MOBILE-AUTH] syncOnAppOpen -> end');
-    } finally {
-      _syncRunning = false;
+    });
+  }
+
+  Future<void> _runSync(Future<void> Function() operation) {
+    final running = _activeSync;
+    if (running != null) {
+      print('[MOBILE-AUTH] sync -> waiting for active sync');
+      return running;
     }
+
+    final future = operation();
+    _activeSync = future;
+    return future.whenComplete(() {
+      if (identical(_activeSync, future)) {
+        _activeSync = null;
+      }
+    });
   }
 
   Future<bool> validateSession({MobileAuthData? auth}) async {

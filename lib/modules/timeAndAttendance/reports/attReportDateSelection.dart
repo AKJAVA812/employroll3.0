@@ -53,7 +53,7 @@ class _AttReportState extends State<AttReport> {
       setState(() {
         changeDates = false;
         _date = _datePicker;
-        todateString = DateFormat('dd-MM-yyyy').format(_date);
+        fromeDateString = DateFormat('yyyy-MM-dd').format(_date);
         print('dateTime${formattedDate}');
       });
     }
@@ -74,7 +74,7 @@ class _AttReportState extends State<AttReport> {
       setState(() {
         changeNewDate = false;
         _newdate = _newDatePicker;
-        fromeDateString = DateFormat('dd-MM-yyyy').format(_newdate);
+        todateString = DateFormat('yyyy-MM-dd').format(_newdate);
       });
     }
   }

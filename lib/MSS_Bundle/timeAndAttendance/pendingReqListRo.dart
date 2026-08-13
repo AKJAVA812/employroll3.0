@@ -13,6 +13,7 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../main.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../common/mss_approval_filter_panel.dart';
 
 class MSS_Att_PendingRequisitionRo extends StatefulWidget {
   final PendingRequisitionModel pendingRequisitionModel;
@@ -177,6 +178,26 @@ class _MSS_Att_PendingRequisitionRoState
     });
   }
 
+  void _applyApprovalFilters(MssApprovalFilterValue filters) {
+    final query = filters.search.toLowerCase();
+    final type = filters.requestType?.label.toLowerCase();
+    final typeCode = filters.requestType?.code.toLowerCase().replaceAll('_', ' ');
+    final branch = filters.branch?.label.toLowerCase();
+    final stage = int.tryParse(filters.stage?.id?.toString() ?? '');
+    final rows = allUsernew ?? <Data>[];
+    final hasStageData = rows.any((item) => item.currentLevel != null);
+    final results = rows.where((item) {
+      final searchable = '${item.empName ?? ''} ${item.empId ?? ''} ${item.department ?? ''}'.toLowerCase();
+      final requestType = '${item.requestType ?? ''} ${item.attendanceRequisionType ?? ''} ${item.compOffRequistionType ?? ''} '
+          '${item.shortLeaveRequistionType ?? ''} ${item.odRequistionType ?? ''} ${item.nightRequistionType ?? ''}'.toLowerCase();
+      return (query.isEmpty || searchable.contains(query)) &&
+          (type == null || requestType.contains(type) || requestType.contains(typeCode!)) &&
+          (!hasStageData || stage == null || item.currentLevel == stage) &&
+          (branch == null || (item.branch ?? '').toString().toLowerCase() == branch);
+    }).toList();
+    setState(() => foundDataNewMSS = results);
+  }
+
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
@@ -229,6 +250,11 @@ class _MSS_Att_PendingRequisitionRoState
         padding: EdgeInsets.all(8.0),
         child: Column(
           children: [
+            MssApprovalFilterPanel(
+              total: allUsernew?.length ?? 0,
+              requestFamilyCode: 'ATTENDANCE',
+              onChanged: _applyApprovalFilters,
+            ),
             Expanded(
               child:
                   pendingRequisitionLabeled == null

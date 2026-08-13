@@ -64,6 +64,10 @@ class LoginModel {
     } else {
       data = Data.fromMobileJson(json);
     }
+    if (user != null) {
+      data ??= Data.fromMobileJson(json);
+      data!.mergeMobileUser(user!, json);
+    }
   }
 
   bool get isSuccess =>
@@ -93,10 +97,13 @@ class LoginModel {
 
 class Data {
   int? empId;
+  int? employeeDetailsId;
+  String? employeeId;
   String? odReq;
   String? compOff;
   var bankName;
   var bankAccNo;
+  var accountHolderName;
   String? branch;
   int? orgId;
   String? result;
@@ -137,10 +144,13 @@ class Data {
 
   Data({
     this.empId,
+    this.employeeDetailsId,
+    this.employeeId,
     this.odReq,
     this.compOff,
     this.bankName,
     this.bankAccNo,
+    this.accountHolderName,
     this.branch,
     this.orgId,
     this.result,
@@ -182,10 +192,19 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     empId = _intValue(json['empId']);
+    employeeDetailsId = _intValue(json['employeeDetailsId']);
+    employeeId = json['employeeId']?.toString();
     odReq = json['odReq']?.toString();
     compOff = json['compOff']?.toString();
-    bankName = json['bankName'];
-    bankAccNo = json['bankAccNo'];
+    bankName = _firstJsonValue(json, const ['bankName', 'Bank Name']);
+    bankAccNo = _firstJsonValue(
+      json,
+      const ['bankAccount', 'bankAccNo', 'Bank Account'],
+    );
+    accountHolderName = _firstJsonValue(
+      json,
+      const ['accountHolderName', 'Account Holder Name'],
+    );
     branch = json['branch']?.toString();
     orgId = _intValue(json['orgId']);
     result = json['result']?.toString();
@@ -196,7 +215,10 @@ class Data {
     roRole = _stringList(json['roRole']);
     department = json['department']?.toString();
     userPanel = json['userPanel']?.toString();
-    ifscCode = json['ifscCode'];
+    ifscCode = _firstJsonValue(
+      json,
+      const ['bankIfsc', 'ifscCode', 'Bank Ifsc'],
+    );
     adminrole = _stringList(json['adminrole']);
     branchId = _intValue(json['branchId']);
     orgName = json['orgName']?.toString();
@@ -228,6 +250,50 @@ class Data {
     profileVersion = json['profileVersion']?.toString();
   }
 
+  void mergeMobileUser(MobileUser user, Map<String, dynamic> loginJson) {
+    employeeDetailsId ??= user.employeeDetailsId;
+    employeeId ??= user.employeeId;
+    empId = employeeDetailsId ?? empId ?? _intValue(user.employeeId);
+    orgId ??= user.orgId;
+    orgName = _firstText(orgName, user.orgName);
+    userImage = _firstText(userImage, user.image);
+    branch = _firstText(branch, user.branch);
+    department = _firstText(department, user.department);
+    designation = _firstText(designation, user.designation);
+    empCode = _firstText(empCode, user.employeeCode ?? user.employeeId);
+    bankName = _firstText(bankName?.toString(), user.bankName);
+    bankAccNo = _firstText(bankAccNo?.toString(), user.bankAccount);
+    ifscCode = _firstText(ifscCode?.toString(), user.bankIfsc);
+    accountHolderName = _firstText(
+      accountHolderName?.toString(),
+      user.accountHolderName,
+    );
+    accessToken ??= loginJson['accessToken']?.toString();
+    tokenType ??= loginJson['tokenType']?.toString();
+    permissionsVersion ??= loginJson['permissionsVersion']?.toString();
+    profileVersion ??= loginJson['profileVersion']?.toString();
+
+    userLoginned ??= UserLoginned();
+    userLoginned!.name = _firstText(
+      userLoginned!.name,
+      user.employeeName ?? user.name,
+    );
+    userLoginned!.userId = _firstText(
+      userLoginned!.userId,
+      loginJson['userId']?.toString(),
+    );
+    userLoginned!.userType = _firstText(
+      userLoginned!.userType,
+      'COMPANY_EMPLOYEE',
+    );
+  }
+
+  static String? _firstText(String? current, String? fallback) {
+    if (current != null && current.trim().isNotEmpty) return current;
+    if (fallback != null && fallback.trim().isNotEmpty) return fallback;
+    return current;
+  }
+
   factory Data.fromMobileJson(Map<String, dynamic> json) {
     final userJson =
         json['user'] is Map<String, dynamic>
@@ -244,9 +310,20 @@ class Data {
     final permissions = _stringList(json['permissions']);
     final essPermissionIds = _stringList(essJson['securityGroupIds']);
     final profileList = _profileList(json['profiles']);
+    final hasMssMoProfile = profileList.any(
+      (profile) => profile.profileType?.toString().toUpperCase() == 'MSS_MO',
+    );
+    final hasMssProfile = profileList.any(
+      (profile) => profile.profileType?.toString().toUpperCase() == 'MSS',
+    );
 
     return Data(
-      empId: _intValue(userJson['employeeId']) ?? 0,
+      empId:
+          _intValue(userJson['employeeDetailsId']) ??
+          _intValue(userJson['employeeId']) ??
+          0,
+      employeeDetailsId: _intValue(userJson['employeeDetailsId']),
+      employeeId: userJson['employeeId']?.toString(),
       orgId: _intValue(userJson['orgId']),
       orgName: userJson['orgName']?.toString() ?? '',
       result:
@@ -260,9 +337,16 @@ class Data {
           permissions.any((p) => p.toUpperCase().contains('ADMIN'))
               ? <String>['ADMIN']
               : <String>[],
-      userPanel: profileList.isNotEmpty ? 'MSS' : 'COMPANY_EMPLOYEE',
+      userPanel:
+          hasMssMoProfile
+              ? 'MSS_MO_ADMIN'
+              : hasMssProfile
+              ? 'MSS'
+              : 'COMPANY_EMPLOYEE',
       userLoginned: UserLoginned(
-        name: userJson['name']?.toString(),
+        name:
+            userJson['employeeName']?.toString() ??
+            userJson['name']?.toString(),
         userId: json['userId']?.toString(),
         status: 'ACTIVE',
         userType: 'COMPANY_EMPLOYEE',
@@ -273,17 +357,33 @@ class Data {
         companySetup: true,
       ),
       mobAction: <MobAction>[],
-      bankName: '',
-      bankAccNo: '',
-      branch: '',
+      bankName: _firstJsonValue(userJson, const ['bankName', 'Bank Name']) ?? '',
+      bankAccNo:
+          _firstJsonValue(
+            userJson,
+            const ['bankAccount', 'bankAccNo', 'Bank Account'],
+          ) ??
+          '',
+      accountHolderName:
+          _firstJsonValue(
+            userJson,
+            const ['accountHolderName', 'Account Holder Name'],
+          ) ??
+          '',
+      branch: userJson['branch']?.toString() ?? '',
       contact: '',
-      department: '',
-      ifscCode: '',
+      department: userJson['department']?.toString() ?? '',
+      ifscCode:
+          _firstJsonValue(
+            userJson,
+            const ['bankIfsc', 'ifscCode', 'Bank Ifsc'],
+          ) ??
+          '',
       pfNo: '',
       aadharNo: '',
       dob: '',
       esicNo: '',
-      designation: '',
+      designation: userJson['designation']?.toString() ?? '',
       doj: '',
       enrollId: '',
       startDate: '0',
@@ -292,7 +392,10 @@ class Data {
       approvedDate: '',
       profileList: profileList,
       sessionId: sessionJson['sessionId']?.toString(),
-      empCode: userJson['employeeId']?.toString() ?? '',
+      empCode:
+          userJson['employeeCode']?.toString() ??
+          userJson['employeeId']?.toString() ??
+          '',
       empRole:
           permissions.contains('COMPANY_EMPLOYEE') ||
                   essPermissionIds.isNotEmpty
@@ -309,10 +412,13 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['empId'] = empId;
+    data['employeeDetailsId'] = employeeDetailsId;
+    data['employeeId'] = employeeId;
     data['odReq'] = odReq;
     data['compOff'] = compOff;
     data['bankName'] = bankName;
     data['bankAccNo'] = bankAccNo;
+    data['accountHolderName'] = accountHolderName;
     data['branch'] = branch;
     data['orgId'] = orgId;
     data['result'] = result;
@@ -364,6 +470,16 @@ class MobileUser {
   String? image;
   String? isOld;
   String? suspend;
+  int? employeeDetailsId;
+  String? employeeCode;
+  String? employeeName;
+  String? branch;
+  String? department;
+  String? designation;
+  String? bankIfsc;
+  String? bankAccount;
+  String? bankName;
+  String? accountHolderName;
 
   MobileUser({
     this.name,
@@ -373,6 +489,16 @@ class MobileUser {
     this.image,
     this.isOld,
     this.suspend,
+    this.employeeDetailsId,
+    this.employeeCode,
+    this.employeeName,
+    this.branch,
+    this.department,
+    this.designation,
+    this.bankIfsc,
+    this.bankAccount,
+    this.bankName,
+    this.accountHolderName,
   });
 
   MobileUser.fromJson(Map<String, dynamic> json) {
@@ -383,6 +509,24 @@ class MobileUser {
     image = json['image']?.toString();
     isOld = json['isOld']?.toString();
     suspend = json['suspend']?.toString();
+    employeeDetailsId = _intValue(json['employeeDetailsId']);
+    employeeCode = json['employeeCode']?.toString();
+    employeeName = json['employeeName']?.toString();
+    branch = json['branch']?.toString();
+    department = json['department']?.toString();
+    designation = json['designation']?.toString();
+    bankIfsc = _firstJsonValue(json, const ['bankIfsc', 'ifscCode', 'Bank Ifsc'])
+        ?.toString();
+    bankAccount =
+        _firstJsonValue(json, const ['bankAccount', 'bankAccNo', 'Bank Account'])
+            ?.toString();
+    bankName =
+        _firstJsonValue(json, const ['bankName', 'Bank Name'])?.toString();
+    accountHolderName =
+        _firstJsonValue(
+          json,
+          const ['accountHolderName', 'Account Holder Name'],
+        )?.toString();
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
@@ -393,6 +537,16 @@ class MobileUser {
     'image': image,
     'isOld': isOld,
     'suspend': suspend,
+    'employeeDetailsId': employeeDetailsId,
+    'employeeCode': employeeCode,
+    'employeeName': employeeName,
+    'branch': branch,
+    'department': department,
+    'designation': designation,
+    'bankIfsc': bankIfsc,
+    'bankAccount': bankAccount,
+    'bankName': bankName,
+    'accountHolderName': accountHolderName,
   };
 }
 
@@ -586,6 +740,8 @@ class MobAction {
 
 class ProfileList {
   dynamic profileName;
+  dynamic profileType;
+  dynamic profileTypeId;
   dynamic roMapId;
   dynamic defaultProfile;
   List<String> profilePermission = <String>[];
@@ -597,6 +753,8 @@ class ProfileList {
 
   ProfileList({
     this.profileName,
+    this.profileType,
+    this.profileTypeId,
     this.roMapId,
     this.defaultProfile,
     this.profilePermission = const <String>[],
@@ -609,6 +767,8 @@ class ProfileList {
 
   ProfileList.fromJson(Map<String, dynamic> json) {
     profileName = json['profileName'] ?? json['displayName'];
+    profileType = json['profileType'];
+    profileTypeId = json['profileTypeId'];
     roMapId = json['roMapId'];
     defaultProfile = json['defaultProfile'];
     profilePermission = _stringList(
@@ -623,6 +783,8 @@ class ProfileList {
 
   Map<String, dynamic> toJson() => <String, dynamic>{
     'profileName': profileName,
+    'profileType': profileType,
+    'profileTypeId': profileTypeId,
     'roMapId': roMapId,
     'defaultProfile': defaultProfile,
     'profilePermission': profilePermission,
@@ -674,5 +836,22 @@ bool? _boolValue(dynamic value) {
     return true;
   if (normalized == 'false' || normalized == '0' || normalized == 'no')
     return false;
+  return null;
+}
+
+dynamic _firstJsonValue(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    if (json.containsKey(key) && json[key] != null) return json[key];
+  }
+
+  for (final entry in json.entries) {
+    final normalizedKey = entry.key.toString().trim().toLowerCase();
+    for (final key in keys) {
+      if (normalizedKey == key.trim().toLowerCase() && entry.value != null) {
+        return entry.value;
+      }
+    }
+  }
+
   return null;
 }

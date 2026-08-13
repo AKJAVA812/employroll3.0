@@ -317,11 +317,47 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
   dynamic getOrgId;
 
   Future getSharedPrfanceList() async {
-    if (!_isBottomSheetOpen) {
-      await Future.delayed(Duration(milliseconds: 100));
-      _showFilterBottomSheet();
+    await loadOrgListFromPrefs();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
+    final activeOrgId = await shared.getActiveOrgId() ?? await shared.getOrgId();
+    final activeOrgName = await shared.getActiveOrgName();
+    getOrgId = activeOrgId?.toString() ?? '';
+    matchedOrg = storedOrgList.firstWhere(
+      (org) => org['id']?.toString() == getOrgId,
+      orElse: () => {
+        'id': getOrgId,
+        'orgName': activeOrgName ?? '',
+      },
+    );
+    final resolvedOrgName = matchedOrg['orgName']?.toString();
+    selectedOrg = organizations.contains(resolvedOrgName) ? resolvedOrgName : null;
+    if ((sessionId ?? '').isEmpty || (getOrgId ?? '').toString().isEmpty) return;
+
+    if (mounted) setState(() => isLoading = true);
+    try {
+      final value = await getEmployeeList(sessionId!);
+      if (!mounted) return;
+      _applyEmployeeResult(value);
+    } catch (_) {
+      if (mounted) setState(() => isLoading = false);
     }
-    loadOrgListFromPrefs();
+  }
+
+  void _applyEmployeeResult(MyTeamsListModal value) {
+    setState(() {
+      if (selectedFilter == "All") foundDataNewMO = allUsernew;
+      if (selectedFilter == "Direct") foundDataNewDirect = allUsernewDirect;
+      if (selectedFilter == "Dotted") foundDataNewDotted = allUsernewDotted;
+      if (selectedFilter == "Shared") foundDataNewShared = allUsernewShared;
+      if (selectedFilter == "Designated") {
+        foundDataNewDesignated = allUsernewDesignated;
+      }
+      employeeListModelglobel = value;
+      employeeListModelglobeled = value;
+      isLoading = false;
+    });
   }
 
   Future<void> loadOrgListFromPrefs() async {
@@ -406,7 +442,7 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                           return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
-                      onChanged: (value) {
+                      onChanged: (value) async {
                         setState(() {
                           selectedOrg = value;
 
@@ -420,6 +456,12 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                           print('Org Name: $selectedOrg');
                           print('Org ID: $getOrgId');
                         });
+
+                        final selectedId = int.tryParse(getOrgId.toString());
+                        if (selectedId != null && selectedId > 0) {
+                          await shared.setActiveOrgId(selectedId);
+                          await shared.setActiveOrgName(value ?? '');
+                        }
 
                         setModalState(() {});
                       },
@@ -448,62 +490,7 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                           print("ORG ID - $getOrgId");
                           try {
                             final value = await getEmployeeList(sessionId!);
-
-                            /*setState(() {
-                              foundDataNewMO = allUsernew;
-                              employeeListModelglobel=value;
-                              employeeListModelglobeled=employeeListModelglobel;
-                              isLoading = false;
-                            });*/
-                            Future<MyTeamsListModal> getEmployeeList11 =
-                                getEmployeeList(sessionId!);
-                            final loading = Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                CircularProgressIndicator(),
-                                Text(" Login ... Please wait"),
-                              ],
-                            );
-                            getEmployeeList11.then((value) {
-                              setState(() {
-                                if (selectedFilter == "All") {
-                                  foundDataNewMO = allUsernew;
-                                }
-                                if (selectedFilter == "Direct") {
-                                  foundDataNewDirect = allUsernewDirect;
-                                }
-                                if (selectedFilter == "Dotted") {
-                                  foundDataNewDotted = allUsernewDotted;
-                                }
-                                if (selectedFilter == "Shared") {
-                                  foundDataNewShared = allUsernewShared;
-                                }
-                                if (selectedFilter == "Designated") {
-                                  foundDataNewDesignated = allUsernewDesignated;
-                                }
-
-                                employeeListModelglobel = value;
-                                employeeListModelglobeled =
-                                    employeeListModelglobel;
-                              });
-                              print(
-                                'All LIST - ${employeeListModelglobel!.listData!.length}',
-                              );
-                              print(
-                                'Direct LIST - ${employeeListModelglobel!.directEmpList!.length}',
-                              );
-                              print(
-                                'Dotted LIST - ${employeeListModelglobel!.dottedEmpList!.length}',
-                              );
-                              print(
-                                'Shared LIST - ${employeeListModelglobel!.sharedEmpList!.length}',
-                              );
-                              print(
-                                'Designated LIST - ${employeeListModelglobel!.designatedEmpList!.length}',
-                              );
-                            });
-
-                            //print('employeeList00: ${value.listData?.length}');
+                            if (mounted) _applyEmployeeResult(value);
                           } catch (e) {
                             setState(() {
                               isLoading = false;

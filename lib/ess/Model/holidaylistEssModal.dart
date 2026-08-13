@@ -8,9 +8,17 @@ class HolidayESSModal {
   HolidayESSModal.fromJson(Map<String, dynamic> json) {
     result = json['result'];
     reason = json['reason'];
-    if (json['viewHolidayList'] != null) {
+    final holidayRows =
+        json['viewHolidayList'] ??
+        json['holidayList'] ??
+        json['holidays'] ??
+        _nestedHolidayRows(json['r3']) ??
+        _nestedHolidayRows(json['r3Body']) ??
+        _nestedHolidayRows(json['r3Calendar']) ??
+        _nestedHolidayRows(json['calendarBody']);
+    if (holidayRows != null) {
       viewHolidayList = <ViewHolidayList>[];
-      json['viewHolidayList'].forEach((v) {
+      holidayRows.forEach((v) {
         viewHolidayList!.add(ViewHolidayList.fromJson(v));
       });
     }
@@ -26,6 +34,11 @@ class HolidayESSModal {
     }
     return data;
   }
+}
+
+dynamic _nestedHolidayRows(dynamic source) {
+  if (source is! Map) return null;
+  return source['viewHolidayList'] ?? source['holidayList'] ?? source['holidays'];
 }
 
 class ViewHolidayList {
@@ -52,14 +65,14 @@ class ViewHolidayList {
 
   ViewHolidayList.fromJson(Map<String, dynamic> json) {
     gradeName = json['gradeName'];
-    holidayType = json['holidayType'];
+    holidayType = json['holidayType'] ?? json['type'] ?? json['applicability'];
     holidaystatus = json['holidaystatus'];
     stateName = json['stateName'];
     branchName = json['branchName'];
     userName = json['userName'];
-    holidayName = json['holidayName'];
-    holidayId = json['holidayId'];
-    dateOfHoliday = json['dateOfHoliday'];
+    holidayName = json['holidayName'] ?? json['name'] ?? json['title'];
+    holidayId = json['holidayId'] ?? json['id'];
+    dateOfHoliday = json['dateOfHoliday'] ?? json['date'] ?? json['holidayDate'];
   }
 
   Map<String, dynamic> toJson() {

@@ -34,6 +34,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/attendance_punch_api.dart';
+import '../MSS_Bundle/mobile_mss/mss_mobile_dashboard.dart';
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 import '../adminPage/modelClass/dashboardModel.dart';
 import '../ess/myAllReports.dart';
@@ -45,6 +46,9 @@ import '../settings/checkForUpdates.dart';
 import '../settings/companyPolicyList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../services/mobile_auth_service.dart';
+import '../services/mobile_mo_organisation_service.dart';
+import '../services/mobile_panel_service.dart';
+import '../services/mobile_permission_service.dart';
 import '../services/mobile_profile_cache.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -107,6 +111,7 @@ dynamic defaultProfileId;
 dynamic profileIdGetter;
 dynamic profileNameGetter;
 String? userPanelPermission;
+String? activePanel;
 
 //MSS MO Permission Variable
 dynamic pendingAttendanceReqMOPermission = "0";
@@ -162,6 +167,7 @@ final screens = [
 class _HomePageState extends State<HomePage> {
   OrganisationListModal? organisationListModal;
   DateTime ntpTime = DateTime.now();
+  MobileEssPermissionState? _essPermissionState;
 
   void _loadNTPTime() async {
     setState(() async {
@@ -176,12 +182,60 @@ class _HomePageState extends State<HomePage> {
     getSharedPrfanceList();
     loadRequisitionCountsFromPrefs();
     currentIndex = widget.selectedIndex;
+    if (currentIndex == 4) {
+      title = "My Dashboard";
+    }
     var now = DateTime.now();
     var newFormat = DateFormat('dd-MM-yyyy');
     todayDateShowNew = newFormat.format(now);
     getUserNameImage();
     MobileAuthService.instance.syncOnAppOpen();
     super.initState();
+    _loadEssPermissionState();
+  }
+
+  Future<void> _loadEssPermissionState() async {
+    final state = await MobilePermissionService.loadEssState();
+    if (!mounted) return;
+    setState(() {
+      _essPermissionState = state;
+      if (!state.hasAnyMobileAccess && activePanel == MobilePanel.ess) {
+        currentIndex = 0;
+        title = 'Home';
+      }
+    });
+  }
+
+  Future<bool> _canOpenEssTab(int index) async {
+    if (index == 0 || activePanel != MobilePanel.ess) return true;
+    final state =
+        _essPermissionState ?? await MobilePermissionService.loadEssState();
+    if (state.hasAnyMobileAccess) {
+      if (mounted && _essPermissionState == null) {
+        setState(() => _essPermissionState = state);
+      }
+      return true;
+    }
+    if (!mounted) return false;
+    setState(() {
+      _essPermissionState = state;
+      currentIndex = 0;
+      title = 'Home';
+    });
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Permission required'),
+        content: const Text('You do not have permission to access this tab.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    return false;
   }
 
   var type = "0";
@@ -352,6 +406,7 @@ class _HomePageState extends State<HomePage> {
     defaultProfileName = await shared.getDefaultProfileName();
     defaultProfileId = await shared.getDefaultProfileId();
     userPanelPermission = await shared.getUserPanel();
+    activePanel = await shared.getActivePanel() ?? MobilePanel.ess;
 
     Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
     getOrgList.then((value) {
@@ -370,23 +425,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<OrganisationListModal> getOrganisationList(String sessionId) async {
     try {
-      String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.orgListApi;
+      organisationListModal =
+          await MobileMoOrganisationService.loadForActivePanel();
 
-      var urlapi = Uri.parse(
-        "$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermission",
-      );
-      final response = await MobileHttpClient.instance.post(urlapi);
-
-      var mapResponse = json.decode(response.body);
-      organisationListModal = OrganisationListModal.fromJson(mapResponse);
-
-      print("Organisation List -  ${mapResponse}");
-
-      /// Save to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      String orgListString = json.encode(organisationListModal?.list ?? []);
-      await prefs.setString("orgList", orgListString);
+      print("Organisation List - loaded for active panel");
 
       return organisationListModal!;
     } catch (e) {
@@ -446,6 +488,31 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     late CameraController controller;
+    final isManagerPanel =
+        MobilePanel.isManager(activePanel);
+    final activeIndex = isManagerPanel && currentIndex > 3 ? 0 : currentIndex;
+    final managerScreens = [
+      const DefaultPage(),
+      MssTeamDashboardScreen(
+        onViewSelf: () async {
+          await MobilePanelService.activateEss();
+          setState(() {
+            activePanel = MobilePanel.ess;
+            userPanelPermission = 'COMPANY_EMPLOYEE';
+            currentIndex = 4;
+            title = 'My Dashboard';
+          });
+        },
+        onViewRequests: () {
+          setState(() {
+            currentIndex = 2;
+            title = 'Requests';
+          });
+        },
+      ),
+      const MssRequestsScreen(),
+      const MssPeopleScreen(),
+    ];
 
     return PopScope(
       canPop: false,
@@ -455,7 +522,7 @@ class _HomePageState extends State<HomePage> {
         }
         final bool shouldPop = await _showBackDialog() ?? false;
         if (context.mounted && shouldPop) {
-          Navigator.of(context, rootNavigator: true).pop();
+          await SystemNavigator.pop();
         }
       },
       child: Scaffold(
@@ -486,7 +553,7 @@ class _HomePageState extends State<HomePage> {
                         valueListenable: selectedProfileNameNotifier,
                         builder: (context, value, _) {
                           final displayText =
-                              (userPanelPermission == "COMPANY_EMPLOYEE")
+                              (activePanel == MobilePanel.ess)
                                   ? "ESS"
                                   : value;
 
@@ -515,14 +582,31 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: screens[currentIndex],
+        body: isManagerPanel
+            ? managerScreens[activeIndex]
+            : (_essPermissionState != null &&
+                    !_essPermissionState!.hasAnyMobileAccess)
+                ? screens[0]
+                : screens[currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          currentIndex: currentIndex,
+          currentIndex: activeIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
-          onTap: (index) {
+          onTap: (index) async {
+            print(
+              '[MOBILE-DASHBOARD] bottom-nav tap index=$index userType=$userType currentIndex=$currentIndex',
+            );
+            if (isManagerPanel) {
+              final titles = ['Home', 'Team', 'Requests', 'People'];
+              setState(() {
+                currentIndex = index;
+                title = titles[index];
+              });
+              return;
+            }
+            if (!await _canOpenEssTab(index)) return;
             String newTitle = "";
 
             // Adjust index mapping if Profile is hidden
@@ -546,6 +630,10 @@ class _HomePageState extends State<HomePage> {
                 break;
               case 4:
                 newTitle = "My Dashboard";
+                print(
+                  '[MOBILE-DASHBOARD] creating dashboard wrapper from homePage',
+                );
+                screens[4] = Dashboard(key: UniqueKey());
                 break;
             }
 
@@ -554,29 +642,37 @@ class _HomePageState extends State<HomePage> {
               title = newTitle;
             });
           },
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.manage_accounts_outlined),
-              label: 'Workflow',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.app_badge_fill),
-              label: 'My Requests',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
-              label: 'My Reports',
-            ),
-            if (userType != 'COMPANY_ADMIN')
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard),
-                label: 'Dashboard',
-              ),
-          ],
+          items:
+              isManagerPanel
+                  ? const [
+                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                    BottomNavigationBarItem(icon: Icon(Icons.dashboard_customize), label: 'Team'),
+                    BottomNavigationBarItem(icon: Icon(Icons.pending_actions), label: 'Requests'),
+                    BottomNavigationBarItem(icon: Icon(Icons.people_alt), label: 'People'),
+                  ]
+                  : [
+                    const BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: 'Home',
+                    ),
+                    const BottomNavigationBarItem(
+                      icon: Icon(Icons.manage_accounts_outlined),
+                      label: 'Workflow',
+                    ),
+                    const BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.app_badge_fill),
+                      label: 'My Requests',
+                    ),
+                    const BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.doc_chart),
+                      label: 'My Reports',
+                    ),
+                    if (userType != 'COMPANY_ADMIN')
+                      const BottomNavigationBarItem(
+                        icon: Icon(Icons.dashboard),
+                        label: 'Dashboard',
+                      ),
+                  ],
         ),
         drawer: DrawerFile(),
       ),
@@ -618,7 +714,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: const Text('Nevermind'),
               onPressed: () {
-                Navigator.pop(this.context);
+                Navigator.pop(context, false);
               },
             ),
             TextButton(
@@ -627,9 +723,7 @@ class _HomePageState extends State<HomePage> {
               ),
               child: const Text('Yes'),
               onPressed: () {
-                setState(() {
-                  SystemNavigator.pop();
-                });
+                Navigator.pop(context, true);
               },
             ),
           ],
@@ -702,6 +796,37 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) {
         return alertDialog;
       },
+    );
+  }
+}
+
+class _NoEssPermissionHome extends StatelessWidget {
+  const _NoEssPermissionHome();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.lock_outline, size: 44, color: Mythemes.greyish),
+            const SizedBox(height: 12),
+            const Text(
+              'No ESS permission assigned',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Contact your administrator to enable mobile access.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Mythemes.blackish, fontSize: 13),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -2526,8 +2651,20 @@ class _DashboardState extends State<Dashboard> {
   var title = "Dashboard";
 
   @override
+  void initState() {
+    super.initState();
+    print(
+      '[MOBILE-DASHBOARD] homePage Dashboard wrapper init userPanelPermission=$userPanelPermission',
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return userPanelPermission == "USER"
+    final isMss = userPanelPermission == "USER";
+    print(
+      '[MOBILE-DASHBOARD] homePage Dashboard wrapper build target=${isMss ? "MSS" : "ESS"} userPanelPermission=$userPanelPermission',
+    );
+    return isMss
         ? mss.Admin_UIS_Dashboard(DashboardModel())
         : ess.EssAdminDashboard(EssDashboarrdModel());
   }
@@ -2550,6 +2687,7 @@ class _DrawerFileState extends State<DrawerFile> {
   dynamic tourReqCount;
   dynamic attReqCount;
   dynamic leaveReqCount;
+  bool hasEssPanel = false;
   @override
   void initState() {
     getUserRoles();
@@ -2567,6 +2705,8 @@ class _DrawerFileState extends State<DrawerFile> {
     selectedProfileName = prefs.getString('defaultProfileName');
 
     userPanelPermission = await shared.getUserPanel();
+    activePanel = await shared.getActivePanel() ?? MobilePanel.ess;
+    hasEssPanel = await shared.getHasEssPanel() ?? true;
 
     getProfileList(sessionId!).then((value) {
       setState(() {
@@ -2608,14 +2748,22 @@ class _DrawerFileState extends State<DrawerFile> {
       }
 
       if (profileListGetter.isNotEmpty) {
-        final defaultProfile = profileListGetter.firstWhere(
-          (p) => p.isDefaultProfile == true || p.defaultProfile == true,
-          orElse: () => profileListGetter.first,
-        );
-        selectedProfileId = defaultProfile.profileId ?? 0;
-        selectedProfileName = defaultProfile.profileName ?? '';
-        await shared.setDefaultProfileId(selectedProfileId);
-        await shared.setDefaultProfileName(selectedProfileName);
+        if (activePanel == MobilePanel.ess) {
+          selectedProfileId = 0;
+          selectedProfileName = 'ESS';
+        } else {
+          final savedProfileId = await shared.getDefaultProfileId();
+          final selected = profileListGetter.firstWhere(
+            (profile) => profile.profileId == savedProfileId,
+            orElse: () => profileListGetter.first,
+          );
+          selectedProfileId = selected.profileId ?? 0;
+          selectedProfileName = selected.profileName ?? '';
+          if (savedProfileId != selectedProfileId) {
+            await MobilePanelService.activateProfile(selected);
+            activePanel = MobilePanel.fromProfileType(selected.profileType);
+          }
+        }
         selectedProfileIdNotifier.value = selectedProfileId ?? 0;
         selectedProfileNameNotifier.value = selectedProfileName ?? '';
       } else {
@@ -2652,7 +2800,9 @@ class _DrawerFileState extends State<DrawerFile> {
   Future<void> getRequisitionCounts(String sessionId) async {
     try {
       String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.reqCountApi;
+      // Counts are supplied by the new dashboard data.
+      return;
+      String apiUrl = '';
 
       var urlapi = Uri.parse(
         "$conn$apiUrl?"
@@ -2672,6 +2822,16 @@ class _DrawerFileState extends State<DrawerFile> {
       int attReqCount = mapResponse['attReqCount'] ?? 0;
       int leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
       int mobOdCount = mapResponse['mobOdCount'] ?? 0;
+      int wfhReqCount =
+          int.tryParse(
+            '${mapResponse['wfhReqCount'] ?? mapResponse['wfhCount'] ?? 0}',
+          ) ??
+          0;
+      int compOffReqCount =
+          int.tryParse(
+            '${mapResponse['compOffReqCount'] ?? mapResponse['compOffCount'] ?? 0}',
+          ) ??
+          0;
 
       // âœ… Update global notifiers
       attReqCountNotifier.value = attReqCount;
@@ -2683,6 +2843,8 @@ class _DrawerFileState extends State<DrawerFile> {
       await prefs.setInt("attReqCount", attReqCount);
       await prefs.setInt("leaveReqCount", leaveReqCount);
       await prefs.setInt("mobOdCount", mobOdCount);
+      await prefs.setInt("wfhReqCount", wfhReqCount);
+      await prefs.setInt("compOffReqCount", compOffReqCount);
 
       // âœ… Assign values to variables
       mobOdCount = mapResponse['mobOdCount'] ?? 0;
@@ -2779,11 +2941,41 @@ class _DrawerFileState extends State<DrawerFile> {
                   ),
                 ),
               ),
+              if (hasEssPanel)
+                ListTile(
+                  leading: Icon(Icons.person_outline),
+                  title: Text(
+                    "ESS",
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                  ),
+                  subtitle: Text("Self service panel"),
+                  trailing:
+                      activePanel == MobilePanel.ess
+                          ? Icon(Icons.check, color: Colors.green)
+                          : null,
+                  tileColor:
+                      activePanel == MobilePanel.ess
+                          ? Colors.grey.shade200
+                          : null,
+                  onTap: () async {
+                    await MobilePanelService.activateEss();
+                    activePanel = MobilePanel.ess;
+                    userPanelPermission = "COMPANY_EMPLOYEE";
+                    selectedProfileId = 0;
+                    selectedProfileName = 'ESS';
+                    selectedProfileIdNotifier.value = 0;
+                    selectedProfileNameNotifier.value = 'ESS';
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomePage(selectedIndex: 0),
+                      ),
+                    );
+                  },
+                ),
               Visibility(
-                visible:
-                    userPanelPermission == "MSS" ||
-                    userPanelPermission == "MSS_MO_ADMIN" ||
-                    userPanelPermission == "USER",
+                visible: profileListGetter.isNotEmpty,
                 child:
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2827,10 +3019,7 @@ class _DrawerFileState extends State<DrawerFile> {
             ),
           ),*/
               Visibility(
-                visible:
-                    userPanelPermission == "MSS" ||
-                    userPanelPermission == "MSS_MO_ADMIN" ||
-                    userPanelPermission == "USER",
+                visible: profileListGetter.isNotEmpty,
                 child:
                     isLoadingProfiles
                         ? Center(child: CircularProgressIndicator()).p12()
@@ -2841,6 +3030,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               children:
                                   profileListGetter.map((profile) {
                                     bool isSelected =
+                                        MobilePanel.isManager(activePanel) &&
                                         currentSelectedId == profile.profileId;
 
                                     return ListTile(
@@ -4170,13 +4360,22 @@ class _DrawerFileState extends State<DrawerFile> {
                                         await shared.setDefaultProfileName(
                                           selectedProfileName,
                                         );
+                                        await MobilePanelService.activateProfile(
+                                          selected,
+                                        );
+                                        activePanel = MobilePanel.fromProfileType(
+                                          selected.profileType,
+                                        );
+                                        userPanelPermission =
+                                            MobilePanel.userPermissionFor(
+                                              activePanel,
+                                            );
 
                                         selectedProfileIdNotifier.value =
                                             selectedProfileId!;
                                         selectedProfileNameNotifier.value =
                                             selectedProfileName!;
                                         setState(() {});
-                                        getRequisitionCounts(sessionId!);
                                         Navigator.pop(context);
                                         Navigator.push(
                                           context,
@@ -4246,6 +4445,14 @@ class _DrawerFileState extends State<DrawerFile> {
                     ),
                   );
                 },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey.shade300,
+                ),
               ),
             ],
           ).py32(),

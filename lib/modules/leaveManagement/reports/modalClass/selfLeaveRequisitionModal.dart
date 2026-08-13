@@ -4,11 +4,14 @@ class SelfLeaveRequisitionListModal {
   SelfLeaveRequisitionListModal({this.data});
 
   SelfLeaveRequisitionListModal.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
+    final source = json['content'] ?? json['data'];
+    if (source is List) {
       data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
+      source.forEach((v) {
+        if (v is Map) data!.add(Data.fromJson(Map<String, dynamic>.from(v)));
       });
+    } else {
+      data = <Data>[];
     }
   }
 
@@ -68,24 +71,24 @@ class Data {
   Data.fromJson(Map<String, dynamic> json) {
     deptName = json['deptName'];
     branchId = json['branchId'];
-    leavetype = json['leavetype'];
-    noOfDay = json['noOfDay'];
-    endDate = json['endDate'];
+    leavetype = json['leaveTypeName']?.toString() ?? json['leavetype']?.toString() ?? '';
+    noOfDay = (json['days'] as num?)?.toDouble() ?? (json['noOfDay'] as num?)?.toDouble();
+    endDate = json['toDate']?.toString() ?? json['endDate']?.toString() ?? '';
     branchName = json['branchName'];
-    employeeId = json['employeeId'];
-    leaveLength = json['leaveLength'];
-    approvaldate = json['approvaldate'];
-    applicationdate = json['applicationdate'];
-    empName = json['empName'];
+    employeeId = json['employeeCode']?.toString() ?? json['employeeId']?.toString() ?? '';
+    leaveLength = json['leaveLength']?.toString() ?? '';
+    approvaldate = json['actionedAt']?.toString() ?? json['approvaldate']?.toString() ?? '';
+    applicationdate = json['appliedDate']?.toString() ?? json['applicationdate']?.toString() ?? '';
+    empName = json['employeeName']?.toString() ?? json['empName']?.toString() ?? '';
     nominee = json['nominee'];
-    startTime = json['startTime'];
+    startTime = json['sessionName']?.toString() ?? json['startTime']?.toString() ?? '';
     leaveId = json['leaveId'];
-    appliedby = json['appliedby'];
-    endTime = json['endTime'];
-    leavereqId = json['leavereqId'];
-    approvarRemark = json['approvarRemark'];
-    startDate = json['startDate'];
-    status = json['status'];
+    appliedby = json['appliedBy']?.toString() ?? json['appliedby']?.toString() ?? '';
+    endTime = json['endTime']?.toString() ?? '';
+    leavereqId = int.tryParse(json['id']?.toString() ?? json['leavereqId']?.toString() ?? '');
+    approvarRemark = json['approvedRemarks']?.toString() ?? json['approvarRemark']?.toString() ?? '';
+    startDate = json['fromDate']?.toString() ?? json['startDate']?.toString() ?? '';
+    status = (json['status']?.toString() ?? '').toUpperCase();
   }
 
   Map<String, dynamic> toJson() {

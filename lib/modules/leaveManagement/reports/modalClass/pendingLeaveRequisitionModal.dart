@@ -60,6 +60,9 @@ class Data {
   String? approvedBy;
   String? startTime;
   String? endTime;
+  String? requestType;
+  int? currentLevel;
+  int? totalLevels;
 
 
   Data(
@@ -103,6 +106,12 @@ class Data {
     approvedBy = json['approvedBy'];
     startTime = json['startTime'];
     endTime = json['endTime'];
+    requestType = json['requestType'];
+    currentLevel = int.tryParse(
+      (json['currentLevel'] ?? json['approvalLevel'] ?? json['levelNo'] ?? '')
+          .toString(),
+    );
+    totalLevels = int.tryParse((json['totalLevels'] ?? '').toString());
   }
 
   Map<String, dynamic> toJson() {
@@ -126,6 +135,9 @@ class Data {
     data['approvedBy'] = this.approvedBy;
     data['startTime'] = this.startTime;
     data['endTime'] = this.endTime;
+    data['requestType'] = this.requestType;
+    data['currentLevel'] = this.currentLevel;
+    data['totalLevels'] = this.totalLevels;
     return data;
   }
 }

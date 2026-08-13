@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -10,9 +9,8 @@ import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../ess/myAllReports.dart';
 import '../../../../main.dart';
-import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'modalClass/selfOdReqListModal.dart';
 
@@ -31,18 +29,12 @@ class SelfODRequisitionList extends StatefulWidget {
       _SelfODRequisitionListState(startDate, endDate);
 }
 
-Map<String, dynamic> mapResponse = {};
-
-SessionManager shared = SessionManager();
-String? sessionId;
-bool isLoading = false;
-SelfOdReqListModal? selfOdReqListLabel;
-
 class _SelfODRequisitionListState extends State<SelfODRequisitionList>
     with RouteAware {
   String startDate;
   String endDate;
-  var empNewId;
+  SelfOdReqListModal? selfOdReqListLabel;
+  bool isLoading = false;
   var length;
 
   _SelfODRequisitionListState(this.startDate, this.endDate);
@@ -56,47 +48,45 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
   @override
   void dispose() {
     routeObserver.unsubscribe(this);
+    _fromDateController.dispose();
+    _toDateController.dispose();
     super.dispose();
   }
 
   @override
   void didPopNext() {
     // âœ… Called when coming back from Form Page
-    getSharedPrfanceList();
+    _loadReport();
     super.didPopNext();
   }
 
   @override
   void initState() {
-    empNewId = "0";
-    //getSharedPrfanceList();
-    //getEmpId();
-    // TODO: implement initState
     super.initState();
+    final today = DateTime.now();
+    _date = startDate.isEmpty
+        ? DateTime(today.year, today.month, 1)
+        : DateTime.tryParse(startDate) ?? DateTime(today.year, today.month, 1);
+    _newdate = endDate.isEmpty
+        ? today
+        : DateTime.tryParse(endDate) ?? today;
+    startDate = DateFormat('yyyy-MM-dd').format(_date);
+    endDate = DateFormat('yyyy-MM-dd').format(_newdate);
+    _fromDateController.text = DateFormat('dd-MM-yyyy').format(_date);
+    _toDateController.text = DateFormat('dd-MM-yyyy').format(_newdate);
+    changeDates = false;
+    changeNewDate = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadReport());
   }
 
-  /*  Future getEmpId() async {
-    empNewId = await shared!.getEmpId();
-    print('Response snapshot: ${empNewId}');
-  }*/
-
-  Future getSharedPrfanceList() async {
-    sessionId = await shared.getSessionId();
-    print('ResponseAttendance: ${sessionId}');
-    print('ResponseAttendance: ${startDate}');
-    print('ResponseAttendance: ${endDate}');
-    //await Future.delayed(Duration(seconds: 3));
-    Future<SelfOdReqListModal> getEmployeeList11 = getSelfOdReqList(
-      sessionId!,
-      startDate,
-      endDate,
-    );
-    getEmployeeList11.then((value) {
-      setState(() {
-        selfOdReqListLabel = value;
-        isLoading = false;
-      });
-      //print('employeeList00${selfOdReqListModal!.listdata!.length}');
+  Future<void> _loadReport() async {
+    if (!mounted) return;
+    setState(() => isLoading = true);
+    final value = await getSelfOdReqList(startDate, endDate);
+    if (!mounted) return;
+    setState(() {
+      selfOdReqListLabel = value;
+      isLoading = false;
     });
   }
 
@@ -104,7 +94,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
   final TextEditingController _toDateController = TextEditingController();
 
   DateTime _date = DateTime.now();
-  String formattedDate = DateFormat.ABBR_MONTH;
 
   bool changeDates = true;
   bool changeNewDate = true;
@@ -121,8 +110,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
       setState(() {
         changeDates = false;
         _date = _datePicker;
-        endDate = DateFormat('yyyy-MM-dd').format(_date);
-        print('dateTime${formattedDate}');
+        startDate = DateFormat('yyyy-MM-dd').format(_date);
         setState(() {
           //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
           _fromDateController.text = DateFormat("dd-MM-yyyy").format(_date);
@@ -132,8 +120,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
   }
 
   DateTime _newdate = (DateTime.now());
-  String formatDate = DateFormat.ABBR_MONTH;
-
   Future<Null> _selectToDate(BuildContext context) async {
     DateTime? _newDatePicker = await showDatePicker(
       context: context,
@@ -146,7 +132,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
       setState(() {
         changeNewDate = false;
         _newdate = _newDatePicker;
-        startDate = DateFormat('yyyy-MM-dd').format(_newdate);
+        endDate = DateFormat('yyyy-MM-dd').format(_newdate);
         setState(() {
           //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
           _toDateController.text = DateFormat("dd-MM-yyyy").format(_newdate);
@@ -156,58 +142,45 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
   }
 
   Future<SelfOdReqListModal> getSelfOdReqList(
-    String sessionId,
-    String startDate,
-    String endDate,
+    String fromDate,
+    String toDate,
   ) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.selfOdReqList;
-    print('employeeList11: ${sessionId}');
-    SelfOdReqListModal selfOdReqListModal;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "empid=$empNewId&"
-      "startdate=$endDate&"
-      "enddate=$startDate",
-    );
-    final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
-    if (response.statusCode == 200) {
-      mapResponse = json.decode(response.body);
-      String result = mapResponse['result'];
-
-      if (mapResponse.containsKey("error")) {
-        //Navigator.of(context, rootNavigator: true).pop();
-        String reason = mapResponse['reason'];
-        showNullDialog(context, reason.upperCamelCase + " ", result);
-        //CommonNotificationPage.showDialgSucess(context, reason, result);
-      } else {
-        //String reason = mapResponse['reason'];
-        if (result.compareToIgnoringCase("error") == 0) {
-          //Navigator.of(context, rootNavigator: true).pop();
-          showNullDialog(
-            context,
-            "There is no any requisition.".upperCamelCase + " ",
-            "Error",
-          );
-          // showDialgSucess(context, reason, "Success");
-        }
+    final foundation = MobileApiFoundation.instance;
+    try {
+      final response = await foundation.get(
+        ApiDetails.mobileOdReport,
+        queryParameters: <String, Object?>{
+          'fromDate': fromDate,
+          'toDate': toDate,
+          'page': 0,
+          'size': 100,
+        },
+        headers: await foundation.authHeaders(),
+        tag: 'OD_REQUISITION_REPORT',
+      );
+      final body = foundation.decodeMap(response.body);
+      if (!foundation.isSuccess(response)) {
+        throw MobileApiException(
+          'OD_REQUISITION_REPORT_FAILED',
+          message: body['message']?.toString(),
+          statusCode: response.statusCode,
+        );
       }
-      //print('result ${result} reason ${reason}');
+      return SelfOdReqListModal.fromJson(body);
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error is MobileApiException
+                  ? (error.message ?? 'Unable to load OD requests.')
+                  : 'Unable to load OD requests.',
+            ),
+          ),
+        );
+      }
+      return SelfOdReqListModal(result: 'error', listdata: <Listdata>[]);
     }
-    /*var getData = mapResponse['result'];
-    if (getData == "Error" )  {
-      print("getData111 $getData");
-      showNodata(context, "Oops", "There is no any requisition.");
-    } */
-    /*mapResponse = json.decode(response.body);*/
-    var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
-    selfOdReqListModal = SelfOdReqListModal.fromJson(mapResponse);
-
-    return selfOdReqListModal;
   }
 
   showNodata(BuildContext buildContext, result, reason) {
@@ -367,21 +340,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                             );
                           });
                         } else {
-                          isLoading = true;
-                          sessionId = await shared.getSessionId();
-                          print('ResponseAttendance: ${sessionId}');
-                          print('ResponseAttendance: ${startDate}');
-                          print('ResponseAttendance: ${endDate}');
-                          //await Future.delayed(Duration(seconds: 3));
-                          Future<SelfOdReqListModal> getEmployeeList11 =
-                              getSelfOdReqList(sessionId!, startDate, endDate);
-                          getEmployeeList11.then((value) {
-                            setState(() {
-                              selfOdReqListLabel = value;
-                              isLoading = false;
-                            });
-                            //print('employeeList00${selfOdReqListModal!.listdata!.length}');
-                          });
+                          await _loadReport();
                         }
                       } else {
                         print("Please select date");
@@ -406,7 +365,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
               Expanded(
                 child:
                     isLoading
-                        ? CircularProgressIndicator()
+                        ? const Center(child: CircularProgressIndicator())
                         : selfOdReqListLabel == null
                         ? Center(child: "Please select date range.".text.make())
                         : getSelfOdRequisitionList(selfOdReqListLabel!),
@@ -538,6 +497,10 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
   }
 
   getSelfOdRequisitionList(SelfOdReqListModal selfOdReqListModal) {
+    if (selfOdReqListModal.listdata == null ||
+        selfOdReqListModal.listdata!.isEmpty) {
+      return const Center(child: Text('No OD requests found.'));
+    }
     return ListView.builder(
       padding: EdgeInsets.all(5.0),
       itemCount:

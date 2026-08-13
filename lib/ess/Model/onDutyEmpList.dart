@@ -16,7 +16,6 @@ class OnDutyEmpList extends StatefulWidget {
   @override
   State<OnDutyEmpList> createState() => _OnDutyEmpListState(dashboardModelGlobal);
 }
-dynamic itemCount = "";
 class _OnDutyEmpListState extends State<OnDutyEmpList> {
   EssDashboarrdModel? dashboardModelGlobal;
 
@@ -129,9 +128,7 @@ class _OnDutyEmpListState extends State<OnDutyEmpList> {
   }
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
-    for(int i = 0; i < dashboardModelGlobal!.countData!.data!.length; i++) {
-      itemCount = dashboardModelGlobal!.countData!.presentList!.length;
-    }
+    final int itemCount = dashboardModel.countData?.presentList?.length ?? 0;
     print("ItemCount - $itemCount");
     return ListView.builder(
       itemCount: itemCount,

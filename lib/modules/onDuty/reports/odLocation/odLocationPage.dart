@@ -138,17 +138,66 @@ class _ODPageViewState extends State<ODPageView> {
   LatLng? currentPostion;
   GoogleMapController? _mapController;
   late GoogleMapController googleMapController;
+  Timer? _clockTimer;
+  String? _locationError;
+  bool _isLocating = true;
+
+  @override
   void initState() {
-    // TODO: implement initState
+    super.initState();
     getUserName();
     timeString = _formatDateTime(DateTime.now());
-    Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
-    _startLocationTracking();
-    super.initState();
+    _clockTimer = Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    _initializeLocation();
   }
   Future getUserName() async {
     UserName = await shared.getempName();
     print('Response snapshot: ${UserName}');
+  }
+
+  Future<void> _initializeLocation() async {
+    if (mounted) {
+      setState(() {
+        _isLocating = true;
+        _locationError = null;
+      });
+    }
+    try {
+      final savedLat = await shared.getLatitude();
+      final savedLng = await shared.getLongitude();
+      if (savedLat != 0 && savedLng != 0 && mounted) {
+        setState(() => currentPostion = LatLng(savedLat, savedLng));
+      }
+
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        throw 'Please enable location service.';
+      }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        throw 'Location permission is required for OD punch.';
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      ).timeout(const Duration(seconds: 15));
+      if (!mounted) return;
+      setState(() {
+        currentPostion = LatLng(position.latitude, position.longitude);
+        _locationError = null;
+      });
+      await shared.setLatitude(position.latitude);
+      await shared.setLongitude(position.longitude);
+      await getAddress(position);
+      _startLocationTracking();
+    } catch (error) {
+      if (mounted) setState(() => _locationError = error.toString());
+    } finally {
+      if (mounted) setState(() => _isLocating = false);
+    }
   }
 
 
@@ -160,6 +209,7 @@ class _ODPageViewState extends State<ODPageView> {
 
     positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
         .listen((Position pos) {
+      if (!mounted) return;
       setState(() {
         currentPostion = LatLng(pos.latitude, pos.longitude);
       });
@@ -215,6 +265,7 @@ class _ODPageViewState extends State<ODPageView> {
           .where((part) => part.trim().isNotEmpty)
           .join(", ");
 
+      if (!mounted) return;
       setState(() {
         currentAddress = formattedAddress;
       });
@@ -238,6 +289,26 @@ class _ODPageViewState extends State<ODPageView> {
   }
   String _formatDateTime(DateTime dateTime) {
     return DateFormat('hh:mm:ss').format(dateTime);
+  }
+
+  @override
+  void dispose() {
+    _clockTimer?.cancel();
+    positionStream?.cancel();
+    _mapController?.dispose();
+    super.dispose();
+  }
+
+  Future<bool> _ensureLocationReady() async {
+    if (currentPostion != null) return true;
+    await _initializeLocation();
+    if (currentPostion != null) return true;
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_locationError ?? 'Current location unavailable.')),
+      );
+    }
+    return false;
   }
   @override
   Widget build(BuildContext context) {
@@ -358,7 +429,27 @@ class _ODPageViewState extends State<ODPageView> {
             child: Container(
               child: Card(
                 child: currentPostion == null
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_isLocating) const CircularProgressIndicator(),
+                          if (!_isLocating)
+                            const Icon(Icons.location_off_outlined, size: 40),
+                          const SizedBox(height: 12),
+                          Text(
+                            _locationError ?? 'Getting current location...',
+                            textAlign: TextAlign.center,
+                          ),
+                          if (!_isLocating)
+                            TextButton.icon(
+                              onPressed: _initializeLocation,
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Retry'),
+                            ),
+                        ],
+                      ),
+                    )
                     : GoogleMap(
                   onMapCreated: (controller) {
                     _mapController = controller;
@@ -389,13 +480,15 @@ class _ODPageViewState extends State<ODPageView> {
                     //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
                     title: Text(UserName),
                     subtitle: Text('$currentAddress'),
-                    leading: Container(
-                      child:imageString==null ? Center(child : CircularProgressIndicator()) :CircleAvatar(
-                        radius: 30,
-                        backgroundImage: NetworkImage(imageString!),
-                        backgroundColor: Colors.grey,
-                        // child: Image.network(imageString!),
-                      ),
+                    leading: CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.grey.shade300,
+                      backgroundImage: imageString?.trim().isNotEmpty == true
+                          ? NetworkImage(imageString!)
+                          : null,
+                      child: imageString?.trim().isNotEmpty == true
+                          ? null
+                          : const Icon(Icons.person, color: Colors.white),
                     ),
                   ),
                 ),
@@ -476,6 +569,7 @@ class _ODPageViewState extends State<ODPageView> {
                           margin: EdgeInsets.all(5),
                           child: InkWell(
                             onTap: () async{
+                              if (!await _ensureLocationReady()) return;
                               bool internetCheck = await InternetConnectionChecker().hasConnection;
                               if(internetCheck == false) {
                                 setState(() {
@@ -564,6 +658,7 @@ class _ODPageViewState extends State<ODPageView> {
                           margin: EdgeInsets.all(5),
                           child: InkWell(
                             onTap: () async{
+                              if (!await _ensureLocationReady()) return;
                               bool internetCheck = await InternetConnectionChecker().hasConnection;
                               if(internetCheck == false) {
                                 setState(() {
@@ -643,6 +738,7 @@ class _ODPageViewState extends State<ODPageView> {
                           margin: EdgeInsets.all(5),
                           child: InkWell(
                             onTap: () async{
+                              if (!await _ensureLocationReady()) return;
                               bool internetCheck = await InternetConnectionChecker().hasConnection;
                               if(internetCheck == false) {
                                 setState(() {

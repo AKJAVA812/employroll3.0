@@ -16,6 +16,7 @@ import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../../common/mss_approval_filter_panel.dart';
 import '../../../modules/onDuty/reports/onDutyTypes.dart';
 import '../../../modules/onDuty/reports/pendingRequisition/modalClass/pendingOdReqList.dart';
 import '../../../modules/onDuty/reports/pendingRequisition/odAttendanceApproval.dart';
@@ -234,6 +235,25 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition>
     });
   }
 
+  void _applyApprovalFilters(MssApprovalFilterValue filters) {
+    final query = filters.search.toLowerCase();
+    final type = filters.requestType?.label.toLowerCase();
+    final typeCode = filters.requestType?.code.toLowerCase().replaceAll('_', ' ');
+    final branch = filters.branch?.label.toLowerCase();
+    final stage = int.tryParse(filters.stage?.id?.toString() ?? '');
+    final rows = allUsernew ?? <Listdata>[];
+    final hasStageData = rows.any((item) => item.currentLevel != null);
+    final results = rows.where((item) {
+      final searchable = '${item.name ?? ''} ${item.id ?? ''} ${item.odaddress ?? ''}'.toLowerCase();
+      return (query.isEmpty || searchable.contains(query)) &&
+          (type == null || '${item.requestType ?? ''} ${item.odtype ?? ''}'.toLowerCase().contains(type) ||
+              '${item.requestType ?? ''} ${item.odtype ?? ''}'.toLowerCase().contains(typeCode!)) &&
+          (!hasStageData || stage == null || item.currentLevel == stage) &&
+          (branch == null || (item.branch ?? '').toLowerCase() == branch);
+    }).toList();
+    setState(() => foundDataNewMSS = results);
+  }
+
   TextEditingController searchType = TextEditingController();
   int pageIndex = 0;
   int currentIndex = 2;
@@ -287,6 +307,11 @@ class _MSS_PendingOdRequisitionState extends State<MSS_PendingOdRequisition>
         padding: EdgeInsets.all(8.0),
         child: Column(
           children: [
+            MssApprovalFilterPanel(
+              total: allUsernew?.length ?? 0,
+              requestFamilyCode: 'OD',
+              onChanged: _applyApprovalFilters,
+            ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,

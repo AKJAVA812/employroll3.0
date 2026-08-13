@@ -20,6 +20,7 @@ import '../commanScreen/punchInOutScreen.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../services/mobile_auth_service.dart';
 import '../services/mobile_http_client.dart';
+import '../services/mobile_panel_service.dart';
 import '../sharedPrefancePage/sharedPreferenceCalendarMyRequest.dart';
 import '../sharedPrefancePage/shared_preference_helper.dart';
 import '../themes/empThemes.dart';
@@ -208,28 +209,8 @@ class _LoginPageState extends State<LoginPage> {
           accountExpired = loginData.expired ?? false;
           print("Account Expired - $accountExpired");
 
-          if (accountExpired == true) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AccountSuspendPage()),
-            );
-          } else {
-            getSharedPrfanceList();
-            SharedPrefHelper.clearApiCacheOnLogin();
-            SharedPrefHelperMyRequest.clearApiCacheOnLogin();
-
-            if ((empLength ?? 0) >= 1 || (roLength ?? 0) >= 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
-              );
-            } else if ((adminlength ?? 0) >= 1) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AdminPanelScreen()),
-              );
-            }
-          }
+          SharedPrefHelper.clearApiCacheOnLogin();
+          SharedPrefHelperMyRequest.clearApiCacheOnLogin();
         });
       } else {
         Fluttertoast.showToast(
@@ -373,7 +354,9 @@ class _LoginPageState extends State<LoginPage> {
           if (empLength == 1 || roLength == 1) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
+              MaterialPageRoute(
+                builder: (context) => PunchInOUtActivity(selectedIndex: 0),
+              ),
             );
           } else if (adminlength == 1) {
             Navigator.push(
@@ -653,53 +636,56 @@ class _LoginPageState extends State<LoginPage> {
                                         //FlutterBackgroundService().startService();
                                         setState(() {});
                                         changeButton = true;
-                                        moveToHome();
+                                        await moveToHome();
                                         saveLoginCredentials();
 
-                                        setState(() {
-                                          changeButton = true;
-                                          Future<LoginModel> logaa =
-                                              monthAttendance(
-                                                _username.text.toString(),
-                                                _password.text.toString(),
-                                              );
-                                          logaa.then((value) async {
-                                            //print('loginbuttonclick$value');
-                                            loginModelglobal = value;
-                                            value.data!.sessionId;
-                                            print(
-                                              'session id ${value.data!.sessionId}',
-                                            );
-                                            shared.setAdminRole(
-                                              value.data!.adminrole!.length,
-                                            );
-                                            shared.setMobAction(
-                                              value.data!.mobAction!.length,
-                                            );
-                                            shared.setEmpRoll(
-                                              value.data!.empRole!.length,
-                                            );
-                                            shared.setRoRoll(
-                                              value.data!.roRole!.length,
-                                            );
-                                            shared.setShowPayroll(
-                                              value
-                                                  .data!
-                                                  .userLoginned!
-                                                  .showPayroll,
-                                            );
-                                            //sendGeoFenceId(value.data!.sessionId!, fcmToken!);
-                                            if (adminRole == 1) {
-                                              await setAdminSharedPrefValue(
-                                                value,
-                                              );
-                                            } else {
-                                              await setSharedPrefanceValue(
-                                                value,
-                                              );
-                                            }
-                                          });
-                                        });
+                                        final value = await monthAttendance(
+                                          _username.text.toString(),
+                                          _password.text.toString(),
+                                        );
+                                        if (!value.isSuccess) return;
+                                        loginModelglobal = value;
+                                        if (value.data?.expired == true) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) =>
+                                                      AccountSuspendPage(),
+                                            ),
+                                          );
+                                          return;
+                                        }
+                                        value.data!.sessionId;
+                                        print(
+                                          'session id ${value.data!.sessionId}',
+                                        );
+                                        shared.setAdminRole(
+                                          value.data!.adminrole!.length,
+                                        );
+                                        shared.setMobAction(
+                                          value.data!.mobAction!.length,
+                                        );
+                                        shared.setEmpRoll(
+                                          value.data!.empRole!.length,
+                                        );
+                                        shared.setRoRoll(
+                                          value.data!.roRole!.length,
+                                        );
+                                        shared.setShowPayroll(
+                                          value
+                                              .data!
+                                              .userLoginned!
+                                              .showPayroll,
+                                        );
+                                        //sendGeoFenceId(value.data!.sessionId!, fcmToken!);
+                                        if (value.data!.adminrole!.isNotEmpty &&
+                                            value.data!.empRole!.isEmpty &&
+                                            value.data!.roRole!.isEmpty) {
+                                          await setAdminSharedPrefValue(value);
+                                        } else {
+                                          await setSharedPrefanceValue(value);
+                                        }
                                       }
                                     },
                                     child: AnimatedContainer(
@@ -776,6 +762,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> saveMobileAuth(LoginModel? loginModelglobal) async {
     if (loginModelglobal == null) return;
+    await shared.clearMobileAuth();
     final mobileSessionId =
         loginModelglobal.data?.sessionId ?? loginModelglobal.session?.sessionId;
     await shared.setAccessToken(
@@ -796,6 +783,7 @@ class _LoginPageState extends State<LoginPage> {
     await shared.setSessionId(mobileSessionId ?? '');
     await shared.setMobileSessionId(mobileSessionId ?? '');
     await shared.setLoginResponseJson(json.encode(loginModelglobal.toJson()));
+    MobileHttpClient.instance.markAuthenticated();
     print(
       '[MOBILE-AUTH] LOGIN session saved -> sessionPresent=${mobileSessionId != null && mobileSessionId.isNotEmpty}',
     );
@@ -812,6 +800,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> setSharedPrefanceValue(LoginModel loginModelglobal) async {
     await saveMobileAuth(loginModelglobal);
+    await MobilePanelService.bootstrapFromLogin(loginModelglobal);
     final mobileSessionId =
         loginModelglobal.data?.sessionId ?? loginModelglobal.session?.sessionId;
     setState(() {
@@ -821,6 +810,7 @@ class _LoginPageState extends State<LoginPage> {
       shared.setName(loginModelglobal.data!.userLoginned!.name);
       shared.setProfileImage(loginModelglobal.data!.userImage);
       shared.setOrgId(loginModelglobal.data!.orgId);
+      shared.setOrgName(loginModelglobal.data!.orgName ?? '');
       shared.setEmailid(loginModelglobal.data!.userLoginned!.userId);
       shared.setDob(loginModelglobal.data!.dob);
       shared.setMobileNo(loginModelglobal.data!.contact);
@@ -830,9 +820,14 @@ class _LoginPageState extends State<LoginPage> {
       shared.setPfNo(loginModelglobal.data!.pfNo);
       shared.setEsicNo(loginModelglobal.data!.esicNo);
       shared.setBankName(loginModelglobal.data!.bankName);
-      shared.setBankAcc(loginModelglobal.data!.bankAccNo);
-      shared.setIfscCode(loginModelglobal.data!.ifscCode);
+      shared.setBankAccount(loginModelglobal.data!.bankAccNo);
+      shared.setAccountHolderName(loginModelglobal.data!.accountHolderName);
+      shared.setBankIfsc(loginModelglobal.data!.ifscCode);
       shared.setEmpId(loginModelglobal.data!.empId);
+      shared.setEmployeeDetailsId(
+        loginModelglobal.data!.employeeDetailsId ?? loginModelglobal.data!.empId,
+      );
+      shared.setEmployeeId(loginModelglobal.data!.employeeId);
       shared.setRaiseRequisition(loginModelglobal.data!.raisedDate);
       shared.setApprovalRequisition(loginModelglobal.data!.approvedDate);
       shared.setUserType(loginModelglobal.data!.userLoginned!.userType);
@@ -869,6 +864,10 @@ class _LoginPageState extends State<LoginPage> {
     shared.setDoj(loginModelglobal.data!.doj);
     shared.setShowPayroll(loginModelglobal.data!.userLoginned!.showPayroll);
     shared.setEmpCode(loginModelglobal.data!.empCode);
+    shared.setEmployeeDetailsId(
+      loginModelglobal.data!.employeeDetailsId ?? loginModelglobal.data!.empId,
+    );
+    shared.setEmployeeId(loginModelglobal.data!.employeeId);
     shared.setRoRoll(loginModelglobal.data!.roRole!.length);
     roRole = loginModelglobal.data!.roRole!.length;
     shared.setAdminRole(loginModelglobal.data!.adminrole!.length);
@@ -1569,6 +1568,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> setAdminSharedPrefValue(LoginModel loginModelglobal) async {
     await saveMobileAuth(loginModelglobal);
+    await MobilePanelService.bootstrapFromLogin(loginModelglobal);
     final mobileSessionId =
         loginModelglobal.data?.sessionId ?? loginModelglobal.session?.sessionId;
     setState(() {
@@ -1578,6 +1578,7 @@ class _LoginPageState extends State<LoginPage> {
       shared.setName(loginModelglobal.data!.userLoginned!.name);
       shared.setProfileImage(loginModelglobal.data!.userImage);
       shared.setOrgId(loginModelglobal.data!.orgId);
+      shared.setOrgName(loginModelglobal.data!.orgName ?? '');
       shared.setEmailid(loginModelglobal.data!.userLoginned!.userId);
       shared.setDob(loginModelglobal.data!.dob);
       shared.setMobileNo(loginModelglobal.data!.contact);
@@ -1587,9 +1588,14 @@ class _LoginPageState extends State<LoginPage> {
       shared.setPfNo(loginModelglobal.data!.pfNo);
       shared.setEsicNo(loginModelglobal.data!.esicNo);
       shared.setBankName(loginModelglobal.data!.bankName);
-      shared.setBankAcc(loginModelglobal.data!.bankAccNo);
-      shared.setIfscCode(loginModelglobal.data!.ifscCode);
+      shared.setBankAccount(loginModelglobal.data!.bankAccNo);
+      shared.setAccountHolderName(loginModelglobal.data!.accountHolderName);
+      shared.setBankIfsc(loginModelglobal.data!.ifscCode);
       shared.setEmpId(loginModelglobal.data!.empId);
+      shared.setEmployeeDetailsId(
+        loginModelglobal.data!.employeeDetailsId ?? loginModelglobal.data!.empId,
+      );
+      shared.setEmployeeId(loginModelglobal.data!.employeeId);
       shared.setUserType(loginModelglobal.data!.userLoginned!.userType);
       shared.setRaiseRequisition(loginModelglobal.data!.raisedDate);
       shared.setApprovalRequisition(loginModelglobal.data!.approvedDate);
@@ -1623,6 +1629,10 @@ class _LoginPageState extends State<LoginPage> {
     shared.setShowPayroll(loginModelglobal.data!.userLoginned!.showPayroll);
     shared.setEmpCode(loginModelglobal.data!.empCode);
     shared.setEmpCode(loginModelglobal.data!.empCode);
+    shared.setEmployeeDetailsId(
+      loginModelglobal.data!.employeeDetailsId ?? loginModelglobal.data!.empId,
+    );
+    shared.setEmployeeId(loginModelglobal.data!.employeeId);
     /*shared.setUserRoles(loginModelglobal.data!.userRoles![0]);
     print(loginModelglobal.data!.userRoles![0]);*/
 

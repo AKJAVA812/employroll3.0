@@ -223,7 +223,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
       }
 
       // My Documents
-      if(setShowPayroll == true) {
+      if (userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN") {
         items.add(
           InkWell(
             onTap: () {

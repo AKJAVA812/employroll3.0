@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../../commanScreen/allAPIList.dart';
@@ -12,11 +10,7 @@ import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../commanScreen/routes.dart';
 import '../../../ess/myAllReports.dart';
 import '../../../main.dart';
-import '../../../sharedPrefancePage/ShardPre.dart';
 import 'attendanceRequisition/getAttendanceDetails.dart';
-import 'modelClass/attendanceShiftDetModal.dart';
-
-Map<String, dynamic> mapResponse = {};
 
 class AttendanceReport extends StatefulWidget {
   final String forDateString;
@@ -33,14 +27,10 @@ class AttendanceReport extends StatefulWidget {
       _AttendanceReportState(forDateString, toDateString);
 }
 
-SessionManager shared = SessionManager();
-String? sessionId;
 late AttendanceReportModel? employeeListModelglobel = AttendanceReportModel(
   data: List.empty(),
 );
 var status = "Present";
-AttendanceShiftDetailsModal? attendanceShiftDetailsModalGlobal;
-AttendanceShiftDetailsModal? attendanceShiftDetailsModalGlobaled;
 
 dynamic isAbsent;
 dynamic isHalfDay;
@@ -74,94 +64,65 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
   @override
   void didPopNext() {
     // âœ… Called when coming back from Form Page
-    getSharedPrfanceList();
+    _loadAttendanceReport();
     super.didPopNext();
   }
 
   @override
   void initState() {
-    getSharedPrfanceList();
-
-    // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadAttendanceReport());
   }
 
-  Future getSharedPrfanceList() async {
-    sessionId = await shared.getSessionId();
-    print('ResponseAttendance: ${sessionId}');
-    print('ResponseAttendance: ${forDateString}');
-    print('ResponseAttendance: ${toDateString}');
-    //await Future.delayed(Duration(seconds: 3));
-    Future<AttendanceReportModel> getEmployeeList11 = getEmployeeList(
-      sessionId!,
-      toDateString,
-      forDateString,
-    );
-    getEmployeeList11.then((value) {
-      setState(() {
-        employeeListModelglobel = value;
-      });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
-    });
-
-    /*getEmployeeList12.then((value) {
-      setState(() {
-        attendanceShiftDetailsModalGlobaled = value;
-      });
-    });*/
+  Future<void> _loadAttendanceReport() async {
+    if (!mounted) return;
+    setState(() => isLoading = true);
+    final foundation = MobileApiFoundation.instance;
+    try {
+      final fromDate = _validDate(forDateString);
+      final toDate = _validDate(toDateString);
+      final response = await foundation.get(
+        ApiDetails.mobileAttendanceReport,
+        queryParameters: <String, Object?>{
+          if (fromDate != null) 'fromDate': fromDate,
+          if (toDate != null) 'toDate': toDate,
+          'page': 0,
+          'size': 100,
+        },
+        headers: await foundation.authHeaders(),
+        tag: 'ATTENDANCE_REPORT',
+      );
+      final body = foundation.decodeMap(response.body);
+      if (!foundation.isSuccess(response)) {
+        throw MobileApiException(
+          'ATTENDANCE_REPORT_FAILED',
+          message: body['message']?.toString(),
+          statusCode: response.statusCode,
+        );
+      }
+      final model = AttendanceReportModel.fromJson(body);
+      if (!mounted) return;
+      setState(() => employeeListModelglobel = model);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => employeeListModelglobel = AttendanceReportModel(data: <Data>[]));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error is MobileApiException
+                ? (error.message ?? 'Unable to load attendance report.')
+                : 'Unable to load attendance report.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
-  Future<AttendanceShiftDetailsModal> getStatus(String sessionId) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.outPunchStatusCheck;
-
-    print('employeeList11: ${sessionId}');
-    AttendanceShiftDetailsModal employeeListModel;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId",
-    );
-    final response = await MobileHttpClient.instance.post(urlapi);
-
-    print('responseemployeeList ${response.body}');
-
-    print("Shift API - ${response.request}");
-
-    mapResponse = json.decode(response.body);
-    employeeListModel = AttendanceShiftDetailsModal.fromJson(mapResponse);
-
-    return employeeListModel;
-  }
-
-  Future<AttendanceReportModel> getEmployeeList(
-    String sessionId,
-    String fromdate,
-    String toDate,
-  ) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.attendanceReport;
-    setState(() {
-      isLoading = true;
-    });
-    print('employeeList11: ${sessionId}');
-    AttendanceReportModel employeeListModel;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&toDate=$fromdate&fromDate=$toDate",
-    );
-    final response = await MobileHttpClient.instance.post(urlapi);
-
-    print('responseemployeeList ${response.body}');
-    print('API - ${response.request}');
-
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
-    employeeListModel = AttendanceReportModel.fromJson(mapResponse);
-    setState(() {
-      isLoading = false;
-    });
-    return employeeListModel;
+  String? _validDate(String value) {
+    final normalized = value.trim();
+    return DateTime.tryParse(normalized) == null ? null : normalized;
   }
 
   int pageIndex = 0;
@@ -190,7 +151,9 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
           child:
               isLoading
                   ? const CircularProgressIndicator()
-                  : (employeeListModelglobel == null
+                  : (employeeListModelglobel == null ||
+                          employeeListModelglobel!.data == null ||
+                          employeeListModelglobel!.data!.isEmpty
                       ? const Text("No data available")
                       : AttList(employeeListModelglobel!)),
         ),

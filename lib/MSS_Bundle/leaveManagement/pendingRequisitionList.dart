@@ -14,6 +14,7 @@ import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../main.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../common/mss_approval_filter_panel.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../modules/leaveManagement/reports/leaveManageReport.dart';
@@ -227,6 +228,25 @@ class _MSS_PendingLeaveRequisitionListState
     });
   }
 
+  void _applyApprovalFilters(MssApprovalFilterValue filters) {
+    final query = filters.search.toLowerCase();
+    final type = filters.requestType?.label.toLowerCase();
+    final typeCode = filters.requestType?.code.toLowerCase().replaceAll('_', ' ');
+    final branch = filters.branch?.label.toLowerCase();
+    final stage = int.tryParse(filters.stage?.id?.toString() ?? '');
+    final rows = allUsernew ?? <Data>[];
+    final hasStageData = rows.any((item) => item.currentLevel != null);
+    final results = rows.where((item) {
+      final searchable = '${item.employeeName ?? ''} ${item.empId ?? ''} ${item.department ?? ''}'.toLowerCase();
+      return (query.isEmpty || searchable.contains(query)) &&
+          (type == null || '${item.requestType ?? ''} ${item.leaveType ?? ''}'.toLowerCase().contains(type) ||
+              '${item.requestType ?? ''} ${item.leaveType ?? ''}'.toLowerCase().contains(typeCode!)) &&
+          (!hasStageData || stage == null || item.currentLevel == stage) &&
+          (branch == null || (item.branchName ?? '').toLowerCase() == branch);
+    }).toList();
+    setState(() => foundDataNewMSS = results);
+  }
+
   void showAttachmentBottomSheet(BuildContext context, String attachmentUrl) {
     // Clean up any "File:" prefix accidentally passed
     attachmentUrl = attachmentUrl.replaceAll("File: '", "").replaceAll("'", "");
@@ -366,6 +386,11 @@ class _MSS_PendingLeaveRequisitionListState
         color: context.canvasColor,
         child: Column(
           children: [
+            MssApprovalFilterPanel(
+              total: allUsernew?.length ?? 0,
+              requestFamilyCode: 'LEAVE',
+              onChanged: _applyApprovalFilters,
+            ),
             /* Visibility(
                   visible: levelOne == "true",
                   child: Row(

@@ -202,7 +202,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
     }
     profileName = await shared.getDefaultProfileName();
     profileId = await shared.getDefaultProfileId();
-    getRequisitionCounts(sessionId!);
     //print("Default Profile Name - $profileName");
     //print("Default Profile Id - $profileId");
     //print("User Panel - $userPanel");
@@ -387,7 +386,9 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
   Future<void> getRequisitionCounts(String sessionId) async {
     try {
       String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.reqCountApi;
+      // Counts are supplied by the new dashboard data.
+      return;
+      String apiUrl = '';
 
       var urlapi = Uri.parse(
         "$conn$apiUrl?"
@@ -648,7 +649,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
                       textColor: Colors.white,
                       fontSize: 16.0
                   );*/
-                Navigator.pushNamed(context, MyRoutings.hrDetailsRoute);
+                Navigator.pushNamed(
+                  context,
+                  MyRoutings.profilePageHeadRoute,
+                );
               },
               child: Card(
                 color: Mythemes.whitish,
@@ -2288,7 +2292,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
                             print(i);
                           });
                           if (value == 1) {
-                            getRequisitionCounts(sessionId!);
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
                           }
                         },
@@ -2351,7 +2354,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
                             print(i);
                           });
                           if (value == 1) {
-                            getRequisitionCounts(sessionId!);
                             //Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);
                           }
                         },

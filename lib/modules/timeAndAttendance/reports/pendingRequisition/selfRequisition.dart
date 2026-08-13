@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_app/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../../../commanScreen/allAPIList.dart';
@@ -99,9 +100,9 @@ class _PendingRequisitionState extends State<PendingRequisition>
 
     getEmployeeList11.then((value) {
       setState(() {
-        foundDataNew = allUsernew;
         selfRequisitionLabel = value;
         selfRequisitionLabeled = selfRequisitionLabel;
+        foundDataNew = _filteredRequests(allUsernew ?? <Data>[]);
 
         if (foundDataNew != null) {
           foundDataNew!.length;
@@ -155,75 +156,83 @@ class _PendingRequisitionState extends State<PendingRequisition>
   var reqType;
 
   Future<SelfRequisitionModel> getSelfReqList(String SessionId) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.selfAttRequisitionList;
-    print('employeeList11: ${SessionId}');
     setState(() {
       _isLoading = true;
     });
-    SelfRequisitionModel selfRequisitionModel;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await MobileHttpClient.instance.post(urlapi);
-
-    print('responseemployeeList ${response.body}');
-    print('URL ${response.request}');
-    mapResponse = json.decode(response.body);
-    print('responseemployeeList $mapResponse');
-    var getData = mapResponse.length;
-    if (getData == 0) {
-      print("getData111 $getData");
-      showNodata(context, "Oops", "There is no any requisition.");
+    final foundation = MobileApiFoundation.instance;
+    try {
+      final response = await foundation.get(
+        ApiDetails.mobileAttendanceRequisitionList,
+        queryParameters: const <String, Object?>{'page': 0, 'size': 100},
+        headers: await foundation.authHeaders(),
+        tag: 'ATTENDANCE_REQUISITION_LIST',
+      );
+      final body = foundation.decodeMap(response.body);
+      if (!foundation.isSuccess(response)) {
+        throw MobileApiException(
+          'ATTENDANCE_REQUISITION_LIST_FAILED',
+          message: body['message']?.toString(),
+          statusCode: response.statusCode,
+        );
+      }
+      mapResponse = body;
+      final model = SelfRequisitionModel.fromJson(body);
+      allUsernew = model.data ?? <Data>[];
+      if (mounted) setState(() => _isLoading = false);
+      return model;
+    } catch (error) {
+      allUsernew = <Data>[];
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error is MobileApiException
+                  ? (error.message ?? 'Unable to load attendance requests.')
+                  : 'Unable to load attendance requests.',
+            ),
+          ),
+        );
+      }
+      return SelfRequisitionModel(data: <Data>[]);
     }
-
-    selfRequisitionModel = SelfRequisitionModel.fromJson(mapResponse);
-    if (selfRequisitionModel.data != null) {
-      allUsernew = selfRequisitionModel.data!;
-    } else {
-      allUsernew = []; // or handle accordingly
-    }
-    setState(() {
-      _isLoading = false;
-    });
-    return selfRequisitionModel;
   }
 
   TextEditingController searchType = TextEditingController();
+  String _searchQuery = '';
+
+  bool _isApproved(Data request) =>
+      (request.status ?? '').trim().toUpperCase().startsWith('APPROVED');
+
+  bool _isPending(Data request) {
+    final status = (request.status ?? '').trim().toUpperCase();
+    return status.contains('PENDING') ||
+        status == 'PENDING_APPROVAL' ||
+        status == 'SUBMITTED' ||
+        status == 'APPLIED' ||
+        status == 'IN_PROGRESS' ||
+        status == 'UNDER_REVIEW';
+  }
+
+  List<Data> _filteredRequests(List<Data> requests) {
+    final query = _searchQuery.trim().toLowerCase();
+    return requests.where((request) {
+      final matchesStatus =
+          value == 1 ? _isApproved(request) : _isPending(request);
+      if (!matchesStatus) return false;
+      if (query.isEmpty) return true;
+      return (request.employeeName ?? '').toLowerCase().contains(query) ||
+          (request.empId ?? '').toLowerCase().contains(query) ||
+          (request.reqDate ?? '').toLowerCase().contains(query) ||
+          (request.status ?? '').toLowerCase().contains(query);
+    }).toList();
+  }
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
-    List<Data>? results = [];
-
-    if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
-      //results = _allUsers;
-      setState(() {
-        results = allUsernew;
-      });
-    } else {
-      /*results = allUsernew.where((user) =>
-        user!.data!.contains(enteredKeyword.toLowerCase()))
-          .toList();*/
-
-      results =
-          allUsernew
-              ?.where(
-                (element) => element.employeeName!.toLowerCase().contains(
-                  enteredKeyword.toLowerCase(),
-                ),
-              )
-              .toList();
-      /*for(int i=0; i<inductionListLabel!.data!.length;i++){
-        if(inductionListLabel!.data![i].empName!.toLowerCase().contains(enteredKeyword.toLowerCase())){
-          // Refresh the UI
-          setState(() {
-            inductionListLabeldd=inductionResult;
-          });
-        }*/
-    }
-    // we use the toLowerCase() method to make it case-insensitive
     setState(() {
-      foundDataNew = results;
+      _searchQuery = enteredKeyword;
+      foundDataNew = _filteredRequests(allUsernew ?? <Data>[]);
     });
   }
 
@@ -331,22 +340,8 @@ class _PendingRequisitionState extends State<PendingRequisition>
                   onChanged: (i) {
                     setState(() {
                       value = i;
-                      print(i);
+                      foundDataNew = _filteredRequests(allUsernew ?? <Data>[]);
                     });
-
-                    if (value == 0) {
-                      Navigator.pushNamed(context, MyRoutings.pendingReqRoute);
-                      //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                    }
-                    if (value == 1) {
-                      Navigator.pushNamed(
-                        context,
-                        MyRoutings.essAttendanceApprovedReq,
-                      );
-                    }
-                    /* if(value == 2) {
-                      Navigator.pushNamed(context, MyRoutings.disApprovedReqRoute);
-                    }*/
                   },
                 ),
               ],
@@ -355,10 +350,12 @@ class _PendingRequisitionState extends State<PendingRequisition>
               child:
                   _isLoading
                       ? Center(child: CircularProgressIndicator())
-                      : selfRequisitionLabeled == null
+                      : foundDataNew == null || foundDataNew!.isEmpty
                       ? Center(
                         child: Text(
-                          'Click on + icon to raise the attendance request.',
+                          value == 1
+                              ? 'No approved attendance requisitions available.'
+                              : 'No pending attendance requisitions available.',
                         ),
                       )
                       : getEmpReqList(selfRequisitionLabeled!),
@@ -469,18 +466,7 @@ class _PendingRequisitionState extends State<PendingRequisition>
 
   getEmpReqList(SelfRequisitionModel selfRequisitionModel) {
     return RefreshIndicator(
-      onRefresh: () {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder:
-                (a, b, c) => PendingRequisition(SelfRequisitionModel()),
-            transitionDuration: Duration(seconds: 1),
-            maintainState: true,
-          ),
-        );
-        return Future.value(false);
-      },
+      onRefresh: () async => getSharedPrfanceList(),
       child: ListView.builder(
         padding: const EdgeInsets.all(4.0),
         itemCount: foundDataNew!.length,
@@ -501,14 +487,14 @@ class _PendingRequisitionState extends State<PendingRequisition>
             reqType = "Out Duty Request";
           }
           return InkWell(
-            onTap: () {
+            onTap: _isPending(foundDataNew![i]) ? () {
               reqId = foundDataNew![i].reqId;
 
               print("Req ID - $reqId");
 
               showDialgCancel(context, context, context);
               //CommonNotificationPage.showDeleteMessage(context, context, context);
-            },
+            } : null,
             child: Card(
               elevation: 3,
               shape: RoundedRectangleBorder(
@@ -564,7 +550,7 @@ class _PendingRequisitionState extends State<PendingRequisition>
                           color: Colors.grey.shade600,
                         ),
                         const SizedBox(width: 6),
-                        selfRequisitionModel.data![i].reqDate
+                        foundDataNew![i].reqDate
                             .toString()
                             .text
                             .textStyle(context.captionStyle)

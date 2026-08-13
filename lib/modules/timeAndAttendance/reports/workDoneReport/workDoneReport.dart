@@ -5,6 +5,8 @@ import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneRep
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../../../commanScreen/allAPIList.dart';
@@ -47,6 +49,8 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
   final String toDatePickedString;
 
   _WorkDoneReportState(this.forDatePickedString, this.toDatePickedString);
+  bool _isLoading = true;
+  String? _loadError;
 
   @override
   void initState() {
@@ -128,32 +132,66 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
     String fromdate,
     String toDate,
   ) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.workDoneReport;
-    print('workDoneReport: ${sessionId}');
-    WorkdoneReportModel workdoneReportModel;
-    //http://www.employroll.com/restful/service/get/self/mobile/task/list?sessionId=49a180fd3893b71baf3b030f39e0782d51d02cbe51a&fromdate=01-10-2022&todate=31-10-2022
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&todate=$fromdate&fromdate=$toDate",
-    );
-    final response = await MobileHttpClient.instance.post(urlapi);
-
-    print('responseemployeeList ${response.request}');
-    print('responseemployeeList ${response.body}');
-
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
-    if (getData.length == 0) {
-      print("getData111 $getData");
-      showNodata(context, "Alert", "There is no data available for this date.");
+    final foundation = MobileApiFoundation.instance;
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _loadError = null;
+      });
     }
-    workdoneReportModel = WorkdoneReportModel.fromJson(mapResponse);
+    try {
+      final firstDate = _apiDate(fromdate);
+      final secondDate = _apiDate(toDate);
+      final orderedDates = <String>[firstDate, secondDate]..sort();
+      final response = await foundation.get(
+        ApiDetails.mobileWorkDoneReport,
+        queryParameters: <String, Object?>{
+          'fromDate': orderedDates.first,
+          'toDate': orderedDates.last,
+          'page': 0,
+          'size': 100,
+        },
+        headers: await foundation.authHeaders(),
+        tag: 'WORK_DONE_REPORT',
+      );
+      final body = foundation.decodeMap(response.body);
+      if (!foundation.isSuccess(response)) {
+        throw MobileApiException(
+          'WORK_DONE_REPORT_FAILED',
+          message: body['message']?.toString(),
+          statusCode: response.statusCode,
+        );
+      }
+      final model = WorkdoneReportModel.fromJson(body);
+      allUsernew = model.data ?? <DataNew>[];
+      if (mounted) setState(() => _isLoading = false);
+      return model;
+    } catch (error) {
+      allUsernew = <DataNew>[];
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _loadError = error is MobileApiException
+              ? (error.message ?? 'Unable to load work done report.')
+              : 'Unable to load work done report.';
+        });
+      }
+      return WorkdoneReportModel(data: <DataNew>[]);
+    }
+  }
 
-    allUsernew = workdoneReportModel.data;
-
-    return workdoneReportModel;
+  String _apiDate(String value) {
+    final text = value.trim();
+    for (final format in <DateFormat>[
+      DateFormat('dd-MM-yyyy'),
+      DateFormat('yyyy-MM-dd'),
+      DateFormat('dd/MM/yyyy'),
+    ]) {
+      try {
+        return DateFormat('yyyy-MM-dd').format(format.parseStrict(text));
+      } catch (_) {}
+    }
+    return DateFormat('yyyy-MM-dd').format(DateTime.now());
   }
 
   //late UniqueKey keyTile;
@@ -355,8 +393,12 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
           children: [
             Expanded(
               child:
-                  workDoneReportModelGlobaled!.data!.isEmpty
-                      ? Center(child: CircularProgressIndicator())
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _loadError != null
+                      ? Center(child: Text(_loadError!))
+                      : workDoneReportModelGlobaled!.data!.isEmpty
+                      ? const Center(child: Text('No work done data available.'))
                       : GetWorkDoneReports(workDoneReportModelGlobaled!),
             ),
           ],
@@ -466,6 +508,10 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
     child: ListView.builder(
       itemCount: foundDataNew!.length,
       itemBuilder: (context, itemCount) {
+        final imageUrl = foundDataNew![itemCount].image?.trim() ?? '';
+        final imageUri = Uri.tryParse(imageUrl);
+        final hasImage = imageUri != null &&
+            (imageUri.scheme == 'http' || imageUri.scheme == 'https');
         return Card(
           child: ExpansionTile(
             //key: keyTile,
@@ -473,9 +519,8 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
             childrenPadding: EdgeInsets.all(16).copyWith(top: 0),
             leading: CircleAvatar(
               backgroundColor: Mythemes.greyish,
-              backgroundImage: NetworkImage(
-                workDoneReportModelGlobal!.data![itemCount].image.toString(),
-              ),
+              backgroundImage: hasImage ? NetworkImage(imageUrl) : null,
+              child: hasImage ? null : const Icon(Icons.work_outline),
             ),
             title: foundDataNew![itemCount].cName.toString().text.make(),
             subtitle: foundDataNew![itemCount].date.toString().text.make(),
@@ -527,6 +572,20 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
                             .make()
                             .px24()
                             .py4(),
+                  ),
+                ],
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: 75, child: "Remarks :".text.make()),
+                  Expanded(
+                    child: Text(
+                      (foundDataNew![itemCount].remark?.trim().isNotEmpty ??
+                              false)
+                          ? foundDataNew![itemCount].remark!.trim()
+                          : '-',
+                    ).px24().py4(),
                   ),
                 ],
               ),

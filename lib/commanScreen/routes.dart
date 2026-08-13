@@ -197,6 +197,7 @@ class MyRoutings {
 
   //Calendar Pages
   static String attendanceReqCalendar = "/attendanceReqCalendar";
+  static String workFromHomeRequisitionRoute = "/workFromHomeRequisition";
 
   //Exit Management
   static String exitListRoute = "/exitListRoute";

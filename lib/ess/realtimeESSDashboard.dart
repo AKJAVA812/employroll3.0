@@ -22,8 +22,11 @@ import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_permission_service.dart';
 import '../../commanScreen/allAPIList.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import 'dart:developer' as developer;
@@ -108,6 +111,14 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     roRole = await shared.getRoRole();
     userPanelPermission = await shared.getUserPanel();
     adminRole = await shared.getAdminRole();
+    final permissionState = await MobilePermissionService.loadEssState();
+    if (!permissionState.canViewDashboard) {
+      _showDashboardPermissionDialog();
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
     print('empRole $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');
@@ -185,6 +196,28 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     });
   }
 
+  void _showDashboardPermissionDialog() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: const Text("Permission Required"),
+              content: const Text(
+                "You do not have permission to view the attendance dashboard. Please contact your administrator.",
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
+      );
+    });
+  }
+
   var showNoData;
   dynamic cardLoader = false;
 
@@ -198,29 +231,95 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
   }
 
   Future<EssDashboarrdModel> getDashboardData(String sessionId) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.essDashboardAPi;
-
-    //print('employeeList11: ${SessionId}');
-    EssDashboarrdModel dashboardModel;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "branch=$branchId&"
-      "shift=$shift&"
-      "date=$singleDateString",
+    print(
+      '[ESS_DASHBOARD_FETCH_START] date=$singleDateString branch=$branchId shift=$shift',
     );
-    final response = await MobileHttpClient.instance.post(urlapi);
+    EssDashboarrdModel dashboardModel;
+    final foundation = MobileApiFoundation.instance;
+    final requestId = foundation.newRequestId();
+    final dashboardOrgId = await shared.getOrgId();
+    final dashboardEmployeeDetailsId = await shared.getEmployeeDetailsId();
+    final storedEmpCode = await shared.getEmpCode();
+    final storedEmployeeId = await shared.getEmployeeId();
+    final dashboardEmployeeCode =
+        storedEmpCode?.toString().trim().isNotEmpty == true
+            ? storedEmpCode
+            : storedEmployeeId;
+    final dashboardMonth = DateFormat('yyyy-MM').format(date);
+    print(
+      '[ESS_DASHBOARD_PARAMS] orgId=$dashboardOrgId employeeDetailsId=$dashboardEmployeeDetailsId employeeCode=$dashboardEmployeeCode month=$dashboardMonth',
+    );
+    final response = await foundation.postForm(
+      ApiDetails.essDashboardAPi,
+      queryParameters: <String, Object?>{
+        'date': singleDateString,
+        'month': dashboardMonth,
+        'branch': branchId,
+        'shift': shift,
+        'userPermission': userPanelPermission,
+        'organisationId': dashboardOrgId,
+        'employeeDetailsId': dashboardEmployeeDetailsId,
+        'employeeCode': dashboardEmployeeCode,
+      },
+      headers: await foundation.authHeaders(requestId: requestId),
+      tag: 'ESS_DASHBOARD',
+    );
     setState(() {
       isLoading = true; // Start loading
     });
     print('URL ${response.request}');
+    _logLong('ESS_DASHBOARD_RAW_RESPONSE', response.body);
     print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('dashboardData');
+      throw Exception(
+        'Dashboard API failed with status ${response.statusCode}: ${response.body}',
+      );
+    }
 
     mapResponse = json.decode(response.body);
+    _logDashboardSummary(mapResponse);
     dashboardModel = EssDashboarrdModel.fromJson(mapResponse);
     return dashboardModel;
+  }
+
+  void _logDashboardSummary(Map<String, dynamic> body) {
+    final countData = body['countData'];
+    if (countData is! Map) {
+      print('[ESS_DASHBOARD_COUNT_SUMMARY] countData missing');
+      return;
+    }
+    final summary = <String, Object?>{
+      'totalAtt': countData['totalAtt'],
+      'presentList': _listLength(countData['presentList']),
+      'absentCount': countData['absentCount'],
+      'absentList': _listLength(countData['absentList']),
+      'mispunch': countData['mispunch'],
+      'mispunchList': _listLength(countData['mispunchList']),
+      'earlygo': countData['earlygo'],
+      'earlyGoList': _listLength(countData['earlyGoList']),
+      'late': countData['late'],
+      'lateList': _listLength(countData['lateList']),
+      'shortlev': countData['shortlev'],
+      'shortLeaveList': _listLength(countData['shortLeaveList']),
+      'halfday': countData['halfday'],
+      'halfDayList': _listLength(countData['halfDayList']),
+    };
+    print('[ESS_DASHBOARD_COUNT_SUMMARY] $summary');
+  }
+
+  int _listLength(Object? value) => value is List ? value.length : 0;
+
+  void _logLong(String tag, String value) {
+    const chunkSize = 700;
+    print('[$tag] length=${value.length}');
+    for (var start = 0; start < value.length; start += chunkSize) {
+      final end =
+          start + chunkSize > value.length ? value.length : start + chunkSize;
+      print('[$tag][$start-$end] ${value.substring(start, end)}');
+    }
   }
 
   Future<HolidayESSModal> getHolidayData(String sessionId) async {
@@ -367,19 +466,21 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
   }
 
   Future<EssEventsListModal> getEventData(String SessionId) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.eventListModalESSApi;
-
     print('employeeList11: ${SessionId}');
     EssEventsListModal eventsListModal;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "branch=$branchId&"
-      "shift=$shift&"
-      "date=$singleDateString",
+    final foundation = MobileApiFoundation.instance;
+    final requestId = foundation.newRequestId();
+    final response = await foundation.postForm(
+      ApiDetails.eventListModalESSApi,
+      queryParameters: <String, Object?>{
+        'date': singleDateString,
+        'branch': branchId,
+        'shift': shift,
+        'userPermission': 'COMPANY_EMPLOYEE',
+      },
+      headers: await foundation.authHeaders(requestId: requestId),
+      tag: 'ESS_EVENTS',
     );
-    final response = await MobileHttpClient.instance.post(urlapi);
 
     print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
@@ -675,7 +776,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     halfEmp = essDashboardModelGlobal!.countData!.halfday;
     shortLeaveCount = essDashboardModelGlobal!.countData!.shortlev;
 
-    presentCount = (totalDays ?? 0) - (totalAbsentEmp ?? 0);
+    presentCount = attendanceCardCount(essDashboardModelGlobal!.countData);
     print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;

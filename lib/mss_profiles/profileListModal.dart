@@ -28,6 +28,8 @@ class ProfileListModal {
 
 class ProfileData {
   String? profileName;
+  String? profileType;
+  int? profileTypeId;
   List<String>? profilePermission;
   int? roMapId;
   int? profileId;
@@ -39,6 +41,8 @@ class ProfileData {
 
   ProfileData({
     this.profileName,
+    this.profileType,
+    this.profileTypeId,
     this.profilePermission,
     this.roMapId,
     this.profileId,
@@ -51,6 +55,8 @@ class ProfileData {
 
   ProfileData.fromJson(Map<String, dynamic> json) {
     profileName = (json['profileName'] ?? json['displayName'])?.toString();
+    profileType = json['profileType']?.toString();
+    profileTypeId = _intValue(json['profileTypeId']);
     profilePermission = _stringList(
       json['profilePermission'] ?? json['permissions'],
     );
@@ -68,6 +74,8 @@ class ProfileData {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['profileName'] = this.profileName;
+    data['profileType'] = this.profileType;
+    data['profileTypeId'] = this.profileTypeId;
     data['profilePermission'] = this.profilePermission ?? <String>[];
     data['roMapId'] = this.roMapId;
     data['profileId'] = this.profileId;

@@ -130,9 +130,7 @@ class _MissPunchEmpListState extends State<MissPunchEmpList> {
   }
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
-    for(int i = 0; i < dashboardModelGlobal!.countData!.data!.length; i++) {
-      itemCount = dashboardModelGlobal!.countData!.mispunchList!.length;
-    }
+    itemCount = dashboardModelGlobal?.countData?.mispunchList?.length ?? 0;
     print("ItemCount - $itemCount");
     return ListView.builder(
       itemCount: itemCount,

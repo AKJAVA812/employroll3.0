@@ -15,7 +15,9 @@ import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_permission_service.dart';
 
 import 'othersOnDateAttendanceModal.dart';
 
@@ -728,6 +730,67 @@ class _OthersAttendanceRequisitionState
 
   String conn = ApiDetails.server;
   String apiUrl = ApiDetails.sendOthersAttendanceReq;
+  Future<void> _submitMobileAttendanceRequisition(
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate, {
+    bool nextday = false,
+    bool compOff = false,
+  }) async {
+    final permissionState = await MobilePermissionService.loadEssState();
+    if (!permissionState.canAddAttendanceRequisition) {
+      showDialgSucess1(
+        context,
+        "Attendance requisition permission is not assigned. Please contact your administrator.",
+        "Permission Not Provided",
+      );
+      return;
+    }
+    CommonNotificationPage.showLoaderDialog(context);
+    final foundation = MobileApiFoundation.instance;
+    final requestId = foundation.newRequestId();
+    final body = <String, Object?>{
+      'id': empId,
+      'onDate': onDate,
+      'inTimeRemarks': inRemarkString,
+      'outTimeRemarks': outRemarkString,
+      'inTime': inTimeReq,
+      'outTime': outTimeReq,
+      'logid': logid,
+      if (nextday) 'nextday': true,
+      if (compOff) 'compOff': true,
+    };
+    print('[ATT_REQ_MOBILE] -> ${ApiDetails.mobileAttendanceRequisition} body=$body requestId=$requestId');
+    final response = await foundation.postJson(
+      ApiDetails.mobileAttendanceRequisition,
+      body: body,
+      headers: await foundation.authHeaders(requestId: requestId, json: true),
+      tag: 'ATT_REQ_MOBILE',
+    );
+    print('[ATT_REQ_MOBILE] request ${response.request}');
+    print('[ATT_REQ_MOBILE] <- status=${response.statusCode} body=${response.body}');
+    Navigator.of(context, rootNavigator: true).pop();
+
+    mapResponse = response.body.isNotEmpty ? json.decode(response.body) : {};
+    String result = (mapResponse['result'] ?? mapResponse['status'] ?? '').toString();
+    String reason = (mapResponse['reason'] ?? mapResponse['message'] ?? '').toString();
+    if (reason.isEmpty && mapResponse['error'] is Map) {
+      reason = (mapResponse['error']['message'] ?? mapResponse['error']['code'] ?? '').toString();
+    }
+    if (response.statusCode == 200 && result.compareToIgnoringCase("success") == 0) {
+      reason = reason.isEmpty ? "you have submit Requisition for $onDate" : reason;
+      showDialgSucess1(context, reason, "Success");
+    } else {
+      showDialgSucess1(context, reason.isEmpty ? result : reason, "Warning");
+    }
+    print('[ATT_REQ_MOBILE] result=$result reason=$reason');
+  }
+
   Future<void> sendRequsitionToServer(
     BuildContext context,
     int empId,
@@ -738,6 +801,7 @@ class _OthersAttendanceRequisitionState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -787,9 +851,10 @@ class _OthersAttendanceRequisitionState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, nextday: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-      "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+      "$conn$apiUrl?"
       "sessionId=$sessionId&"
       "id=$empId&"
       "onDate=$onDate&"
@@ -834,9 +899,10 @@ class _OthersAttendanceRequisitionState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, compOff: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
-      "http://www.employroll.com/restful/service/att/requisiton/for/non/ess/employees?"
+      "$conn$apiUrl?"
       "sessionId=$sessionId&"
       "id=$empId&"
       "onDate=$onDate&"

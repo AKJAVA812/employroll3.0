@@ -6,6 +6,9 @@ class MobileEssPermissionState {
   final Set<String> securityGroupIds;
   final bool canPunchAttendance;
   final bool canWorkDone;
+  final bool canViewCalendar;
+  final bool canViewDashboard;
+  final bool canAddAttendanceRequisition;
   final bool canTrackOnly;
   final bool canTrackWithAttendance;
   final bool requiresSelfie;
@@ -16,6 +19,9 @@ class MobileEssPermissionState {
     required this.securityGroupIds,
     required this.canPunchAttendance,
     required this.canWorkDone,
+    required this.canViewCalendar,
+    required this.canViewDashboard,
+    required this.canAddAttendanceRequisition,
     required this.canTrackOnly,
     required this.canTrackWithAttendance,
     required this.requiresSelfie,
@@ -26,6 +32,9 @@ class MobileEssPermissionState {
   bool get hasAnyMobileAccess =>
       canPunchAttendance ||
       canWorkDone ||
+      canViewCalendar ||
+      canViewDashboard ||
+      canAddAttendanceRequisition ||
       canTrackOnly ||
       canTrackWithAttendance;
 
@@ -36,6 +45,9 @@ class MobileEssPermissionState {
     'securityGroupIds': securityGroupIds.toList()..sort(),
     'canPunchAttendance': canPunchAttendance,
     'canWorkDone': canWorkDone,
+    'canViewCalendar': canViewCalendar,
+    'canViewDashboard': canViewDashboard,
+    'canAddAttendanceRequisition': canAddAttendanceRequisition,
     'canTrackOnly': canTrackOnly,
     'canTrackWithAttendance': canTrackWithAttendance,
     'requiresSelfie': requiresSelfie,
@@ -47,9 +59,23 @@ class MobileEssPermissionState {
 class MobilePermissionService {
   MobilePermissionService._();
 
+  static MobileEssPermissionState? _lastKnownState;
+
+  static MobileEssPermissionState? get lastKnownState => _lastKnownState;
+
+  static void clearLastKnownState() {
+    _lastKnownState = null;
+  }
+
   static const essMobileAttendance = 'ESS_MOBILE_ATTENDACE_VIEW';
-  static const essMobileAttendanceCorrectSpelling = 'ESS_MOBILE_ATTENDANCE_VIEW';
+  static const essMobileAttendanceCorrectSpelling =
+      'ESS_MOBILE_ATTENDANCE_VIEW';
   static const essMobileWorkDone = 'ESS_MOBILE_WORK_DONE_VIEW';
+  static const essMobileCalendar = 'ESS_MOBILE_CALENDAR_VIEW';
+  static const essAttendanceDashboard = 'ESS_ATTENDANCE_DASHBOARD_VIEW';
+  static const essMyDashboard = 'ESS_MY_DASHBOARD_VIEW';
+  static const essMobileAttendanceRequisitionAdd =
+      'ESS_MOBILE_ATT_REQUISITION_ADD';
   static const essMobileTracking = 'ESS_MOBILE_TRACKING_VIEW';
   static const essMobileAttSelfie = 'ESS_MOBILE_ATT_SELFIE_VIEW';
   static const essMobileAttWithoutSelfie = 'ESS_MOBILE_ATT_WITHOUT_SELFIE_VIEW';
@@ -61,6 +87,12 @@ class MobilePermissionService {
         ids.contains(essMobileAttendance) ||
         ids.contains(essMobileAttendanceCorrectSpelling);
     final hasWorkDone = ids.contains(essMobileWorkDone);
+    final hasCalendar = ids.contains(essMobileCalendar);
+    final hasDashboard =
+        ids.contains(essAttendanceDashboard) || ids.contains(essMyDashboard);
+    final hasAttendanceRequisitionAdd = ids.contains(
+      essMobileAttendanceRequisitionAdd,
+    );
     final hasTrackingOnly = ids.contains(essMobileTracking);
     final hasAttendanceTracking = ids.contains(essMobileAttTracking);
     final hasSelfie = ids.contains(essMobileAttSelfie);
@@ -71,6 +103,9 @@ class MobilePermissionService {
       securityGroupIds: ids,
       canPunchAttendance: hasAttendance || hasAttendanceTracking,
       canWorkDone: hasWorkDone,
+      canViewCalendar: hasCalendar,
+      canViewDashboard: hasDashboard,
+      canAddAttendanceRequisition: hasAttendanceRequisitionAdd,
       canTrackOnly: hasTrackingOnly && !hasAttendance && !hasWorkDone,
       canTrackWithAttendance: hasAttendanceTracking,
       requiresSelfie: hasSelfie || hasSelfieConflict,
@@ -84,26 +119,34 @@ class MobilePermissionService {
         '[MOBILE-PERMISSION] Conflict: SELFIE and WITHOUT_SELFIE both present. SELFIE will be used.',
       );
     }
+    _lastKnownState = state;
     return state;
   }
 
   static Future<Set<String>> loadSecurityGroupIds() async {
     final prefs = await SharedPreferences.getInstance();
     final ids = <String>{};
-    _readIdsFromJson(prefs.getString('mobileBootstrapJson'), ids);
-    _readIdsFromJson(prefs.getString('mobileLoginResponseJson'), ids);
+    final hasBootstrap = _readIdsFromJson(
+      prefs.getString('mobileBootstrapJson'),
+      ids,
+    );
+    if (!hasBootstrap) {
+      _readIdsFromJson(prefs.getString('mobileLoginResponseJson'), ids);
+    }
     print(
       '[MOBILE-PERMISSION] securityGroupIds loaded -> ${ids.toList()..sort()}',
     );
     return ids;
   }
 
-  static void _readIdsFromJson(String? rawJson, Set<String> ids) {
-    if (rawJson == null || rawJson.trim().isEmpty) return;
+  static bool _readIdsFromJson(String? rawJson, Set<String> ids) {
+    if (rawJson == null || rawJson.trim().isEmpty) return false;
     try {
       _collectSecurityGroupIds(json.decode(rawJson), ids);
+      return true;
     } catch (error) {
       print('[MOBILE-PERMISSION] unable to parse cached auth JSON -> $error');
+      return false;
     }
   }
 

@@ -1,0 +1,78 @@
+{
+  "info": {
+    "name": "Employroll Mobile - MSS MO Organisations",
+    "description": "Login and fetch child organisations for an MSS_MO profile.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://ermobile.employroll.com" },
+    { "key": "username", "value": "" },
+    { "key": "password", "value": "" },
+    { "key": "accessToken", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "organisationId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Mobile Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();",
+              "const session = body.session || {};",
+              "const user = body.user || {};",
+              "pm.collectionVariables.set('accessToken', body.accessToken || '');",
+              "pm.collectionVariables.set('sessionId', body.sessionId || session.sessionId || '');",
+              "pm.collectionVariables.set('organisationId', user.orgId || session.orgId || body.orgId || '');"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\",\n  \"deviceId\": \"postman-mss-mo\",\n  \"platform\": \"POSTMAN\",\n  \"appVersion\": \"1.0.0\"\n}"
+        },
+        "url": "{{baseUrl}}/ermobile/api/auth/login"
+      }
+    },
+    {
+      "name": "2. MSS MO Organisation List",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Success response', () => pm.expect(pm.response.json().status).to.eql('SUCCESS'));",
+              "pm.test('Organisation list is not empty', () => pm.expect(pm.response.json().data).to.be.an('array').that.is.not.empty);",
+              "pm.test('Parent organisation is resolved', () => pm.expect(pm.response.json().parentOrgId).to.exist);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}", "type": "text" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}", "type": "text" },
+          { "key": "X-Request-ID", "value": "postman-mss-mo-organisations", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"activePanel\": \"MSS_MO\",\n  \"profileType\": \"MSS_MO\",\n  \"userPermission\": \"MSS_MO_ADMIN\",\n  \"organisationId\": {{organisationId}}\n}"
+        },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/organisations"
+      }
+    }
+  ]
+}

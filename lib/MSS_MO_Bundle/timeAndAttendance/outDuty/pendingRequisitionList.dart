@@ -17,6 +17,7 @@ import '../../../../main.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../../../MSS_Bundle/common/mss_approval_filter_panel.dart';
 import '../../../modules/onDuty/reports/onDutyTypes.dart';
 import '../../../modules/onDuty/reports/pendingRequisition/modalClass/pendingOdReqList.dart';
 import '../../../modules/onDuty/reports/pendingRequisition/odAttendanceApproval.dart';
@@ -79,7 +80,6 @@ class _MSS_MO_PendingOdRequisitionState
 
       // Defer execution until after build frame
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        getSharedPrfanceList(); // Safe to call here
         DateTime now = DateTime.now();
         odStatus = "Pending";
         startDate = "2015-01-01";
@@ -88,6 +88,7 @@ class _MSS_MO_PendingOdRequisitionState
         String currentDateFormatString = currentDateFormat.format(now);
         print("current date $currentDateFormatString");
         endDate = currentDateFormatString;
+        getSharedPrfanceList();
 
         setState(() {
           int listLength = foundDataNewMO?.length ?? 0;
@@ -139,11 +140,42 @@ class _MSS_MO_PendingOdRequisitionState
   bool isLoading = false;
 
   Future getSharedPrfanceList() async {
-    if (!_isBottomSheetOpen) {
-      await Future.delayed(Duration(milliseconds: 100));
-      _showFilterBottomSheet();
+    await loadOrgListFromPrefs();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
+    final activeOrgId = await shared.getActiveOrgId() ?? await shared.getOrgId();
+    final activeOrgName = await shared.getActiveOrgName();
+    getOrgId = activeOrgId?.toString() ?? '';
+    matchedOrg = storedOrgList.firstWhere(
+      (org) => org['id']?.toString() == getOrgId,
+      orElse: () => {
+        'id': getOrgId,
+        'orgName': activeOrgName ?? '',
+      },
+    );
+    final resolvedOrgName = matchedOrg['orgName']?.toString();
+    selectedOrg = organizations.contains(resolvedOrgName) ? resolvedOrgName : null;
+    if ((sessionId ?? '').isEmpty || (getOrgId ?? '').toString().isEmpty) return;
+
+    if (mounted) {
+      setState(() {
+        pendingOdReqListLabeled = null;
+        isLoading = true;
+      });
     }
-    loadOrgListFromPrefs();
+    try {
+      final value = await getPendingOdReqList(sessionId!);
+      if (!mounted) return;
+      setState(() {
+        foundDataNewMO = allUsernew ?? [];
+        pendingOdReqListLabel = value;
+        pendingOdReqListLabeled = value;
+        isLoading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
   void _showFilterBottomSheet() {
@@ -207,7 +239,7 @@ class _MSS_MO_PendingOdRequisitionState
                           return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
-                      onChanged: (value) {
+                      onChanged: (value) async {
                         setState(() {
                           selectedOrg = value;
 
@@ -221,6 +253,12 @@ class _MSS_MO_PendingOdRequisitionState
                           print('Org Name: $selectedOrg');
                           print('Org ID: $getOrgId');
                         });
+
+                        final selectedId = int.tryParse(getOrgId.toString());
+                        if (selectedId != null && selectedId > 0) {
+                          await shared.setActiveOrgId(selectedId);
+                          await shared.setActiveOrgName(value ?? '');
+                        }
 
                         setModalState(() {});
                       },
@@ -438,6 +476,25 @@ class _MSS_MO_PendingOdRequisitionState
     });
   }
 
+  void _applyApprovalFilters(MssApprovalFilterValue filters) {
+    final query = filters.search.toLowerCase();
+    final type = filters.requestType?.label.toLowerCase();
+    final typeCode = filters.requestType?.code.toLowerCase().replaceAll('_', ' ');
+    final branch = filters.branch?.label.toLowerCase();
+    final stage = int.tryParse(filters.stage?.id?.toString() ?? '');
+    final rows = allUsernew ?? <Listdata>[];
+    final hasStageData = rows.any((item) => item.currentLevel != null);
+    final results = rows.where((item) {
+      final searchable = '${item.name ?? ''} ${item.id ?? ''} ${item.odaddress ?? ''}'.toLowerCase();
+      return (query.isEmpty || searchable.contains(query)) &&
+          (type == null || '${item.requestType ?? ''} ${item.odtype ?? ''}'.toLowerCase().contains(type) ||
+              '${item.requestType ?? ''} ${item.odtype ?? ''}'.toLowerCase().contains(typeCode!)) &&
+          (!hasStageData || stage == null || item.currentLevel == stage) &&
+          (branch == null || (item.branch ?? '').toLowerCase() == branch);
+    }).toList();
+    setState(() => foundDataNewMO = results);
+  }
+
   TextEditingController searchType = TextEditingController();
   int pageIndex = 0;
   int currentIndex = 2;
@@ -487,10 +544,20 @@ class _MSS_MO_PendingOdRequisitionState
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showFilterBottomSheet,
+        child: Icon(Icons.filter_list, color: Mythemes.whitish),
+      ),
       body: Container(
         padding: EdgeInsets.all(8.0),
         child: Column(
           children: [
+            MssApprovalFilterPanel(
+              organisationId: int.tryParse(getOrgId.toString()),
+              total: allUsernew?.length ?? 0,
+              requestFamilyCode: 'OD',
+              onChanged: _applyApprovalFilters,
+            ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,

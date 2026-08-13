@@ -4,11 +4,14 @@ class SelfRequisitionModel {
   SelfRequisitionModel({this.data});
 
   SelfRequisitionModel.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
+    final source = json['content'] ?? json['data'];
+    if (source is List) {
       data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
+      source.forEach((v) {
+        if (v is Map) data!.add(Data.fromJson(Map<String, dynamic>.from(v)));
       });
+    } else {
+      data = <Data>[];
     }
   }
 
@@ -58,22 +61,27 @@ class Data {
         this.status});
 
   Data.fromJson(Map<String, dynamic> json) {
-    empId = json['empId'];
-    employeeName = json['employeeName'];
-    inTimeRemark = json['inTimeRemark'];
-    attendanceRequisionType = json['attendanceRequisionType'];
-    compOffRequistionType = json['compOffRequistionType'];
-    outTimeRemark = json['outTimeRemark'];
-    creationDate = json['creationDate'];
-    reqId = json['reqId'];
-    inTime = json['inTime'];
-    reqDate = json['reqDate'];
-    nightRequistionType = json['nightRequistionType'];
-    empDetailsId = json['empDetailsId'];
-    outTime = json['outTime'];
-    shortLeaveRequistionType = json['shortLeaveRequistionType'];
-    odRequistionType = json['odRequistionType'];
-    status = json['status'];
+    final requestType = json['requestType']?.toString().toLowerCase() ?? '';
+    empId = json['employeeCode']?.toString() ?? json['empId']?.toString();
+    employeeName = json['employeeName']?.toString() ?? '';
+    inTimeRemark = json['reason']?.toString() ?? json['inTimeRemark']?.toString() ?? '';
+    attendanceRequisionType = requestType == 'regularization';
+    compOffRequistionType = requestType == 'overtime';
+    outTimeRemark = json['detail']?.toString() ?? json['outTimeRemark']?.toString() ?? '';
+    creationDate = json['appliedDate']?.toString() ?? json['creationDate']?.toString() ?? '';
+    reqId = int.tryParse(json['id']?.toString() ?? json['reqId']?.toString() ?? '');
+    inTime = json['requestedIn']?.toString() ?? json['inTime']?.toString() ?? '';
+    reqDate = json['fromDate']?.toString() ?? json['reqDate']?.toString() ?? '';
+    nightRequistionType = json['nightRequistionType'] == true;
+    empDetailsId = int.tryParse(json['employeeId']?.toString() ?? json['empDetailsId']?.toString() ?? '');
+    outTime = json['requestedOut']?.toString() ?? json['outTime']?.toString() ?? '';
+    shortLeaveRequistionType = requestType == 'short_leave';
+    odRequistionType = requestType == 'od';
+    status = (json['status']?.toString() ??
+            json['approvalStatus']?.toString() ??
+            json['requestStatus']?.toString() ??
+            '')
+        .toUpperCase();
   }
 
   Map<String, dynamic> toJson() {

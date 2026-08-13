@@ -79,6 +79,28 @@ class SessionManager {
     return empId;
   }
 
+  setEmployeeDetailsId(employeeDetailsId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('employeeDetailsId', employeeDetailsId ?? 0);
+  }
+
+  getEmployeeDetailsId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? employeeDetailsId = prefs.getInt('employeeDetailsId');
+    return employeeDetailsId;
+  }
+
+  setEmployeeId(employeeId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('employeeId', employeeId?.toString() ?? '');
+  }
+
+  getEmployeeId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? employeeId = prefs.getString('employeeId');
+    return employeeId;
+  }
+
   setUserType(userType) async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -339,7 +361,7 @@ class SessionManager {
 
   setBankName(bankName) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('bankName', bankName);
+    await prefs.setString('bankName', bankName?.toString() ?? '');
   }
 
   getBankName() async {
@@ -348,26 +370,58 @@ class SessionManager {
     return bankName;
   }
 
-  setBankAcc(bankAccNo) async {
+  setBankAccount(bankAccount) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('bankAccNo', bankAccNo);
+    await prefs.setString('bankAccount', bankAccount?.toString() ?? '');
+  }
+
+  getBankAccount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? bankAccount =
+        prefs.getString('bankAccount') ?? prefs.getString('bankAccNo');
+    return bankAccount;
+  }
+
+  setBankAcc(bankAccNo) async {
+    await setBankAccount(bankAccNo);
   }
 
   getBankAcc() async {
+    return getBankAccount();
+  }
+
+  setAccountHolderName(accountHolderName) async {
     final prefs = await SharedPreferences.getInstance();
-    final String? bankAccNo = prefs.getString('bankAccNo');
-    return bankAccNo;
+    await prefs.setString(
+      'accountHolderName',
+      accountHolderName?.toString() ?? '',
+    );
+  }
+
+  getAccountHolderName() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? accountHolderName = prefs.getString('accountHolderName');
+    return accountHolderName;
+  }
+
+  setBankIfsc(bankIfsc) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('bankIfsc', bankIfsc?.toString() ?? '');
+  }
+
+  getBankIfsc() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? bankIfsc =
+        prefs.getString('bankIfsc') ?? prefs.getString('ifscCode');
+    return bankIfsc;
   }
 
   setIfscCode(ifscCode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('ifscCode', ifscCode);
+    await setBankIfsc(ifscCode);
   }
 
   getIfscCode() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? ifscCode = prefs.getString('ifscCode');
-    return ifscCode;
+    return getBankIfsc();
   }
 
   setLatitude(latitude) async {
@@ -913,6 +967,86 @@ class SessionManager {
     final prefs = await SharedPreferences.getInstance();
     final int? profileIdNew = prefs.getInt('profileIdNew');
     return profileIdNew;
+  }
+
+  Future<void> setActivePanel(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('activePanel', value);
+  }
+
+  Future<String?> getActivePanel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('activePanel');
+  }
+
+  Future<void> setHasEssPanel(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasEssPanel', value);
+  }
+
+  Future<bool?> getHasEssPanel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('hasEssPanel');
+  }
+
+  Future<void> setHasMssPanel(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasMssPanel', value);
+  }
+
+  Future<bool?> getHasMssPanel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('hasMssPanel');
+  }
+
+  Future<void> setHasMssMoPanel(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasMssMoPanel', value);
+  }
+
+  Future<bool?> getHasMssMoPanel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('hasMssMoPanel');
+  }
+
+  Future<void> setDefaultProfileType(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('defaultProfileType', value);
+  }
+
+  Future<String?> getDefaultProfileType() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('defaultProfileType');
+  }
+
+  Future<void> setActiveOrgId(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('activeOrgId', value);
+  }
+
+  Future<int?> getActiveOrgId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('activeOrgId');
+  }
+
+  Future<void> setActiveOrgName(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('activeOrgName', value);
+  }
+
+  Future<String?> getActiveOrgName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('activeOrgName');
+  }
+
+  Future<void> setMssMoParentOrgId(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('mssMoParentOrgId', value);
+  }
+
+  Future<int?> getMssMoParentOrgId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('mssMoParentOrgId');
   }
 
   //MSS MO Permissions
@@ -1508,9 +1642,26 @@ class SessionManager {
     await prefs.remove('mobileAccessToken');
     await prefs.remove('mobileTokenType');
     await prefs.remove('mobileLoginResponseJson');
+    await prefs.remove('mobileBootstrapJson');
     await prefs.remove('mobilePermissionsVersion');
     await prefs.remove('mobileProfileVersion');
+    await prefs.remove('activePanel');
+    await prefs.remove('hasEssPanel');
+    await prefs.remove('hasMssPanel');
+    await prefs.remove('hasMssMoPanel');
+    await prefs.remove('defaultProfileType');
+    await prefs.remove('activeOrgId');
+    await prefs.remove('activeOrgName');
+    await prefs.remove('mssMoParentOrgId');
     await prefs.remove('sessionId');
     await prefs.remove('mobileSessionId');
+    await prefs.remove('orgList');
+    await prefs.remove('employeeDetailsId');
+    await prefs.remove('employeeId');
+    await prefs.remove('bankAccount');
+    await prefs.remove('bankIfsc');
+    await prefs.remove('bankAccNo');
+    await prefs.remove('ifscCode');
+    await prefs.remove('accountHolderName');
   }
 }

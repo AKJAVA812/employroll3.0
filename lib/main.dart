@@ -51,6 +51,9 @@ import 'package:location/location.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:upgrader/upgrader.dart';
+import 'services/mobile_auth_service.dart';
+import 'services/mobile_http_client.dart';
+import 'services/mobile_permission_service.dart';
 /*import 'ESS_Bundle/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
 import 'ESS_Bundle/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';*/
 import 'EZNew/landingPage.dart';
@@ -212,6 +215,7 @@ import 'modules/qrBasedAttendance/qrAttendanceItems/qrAttItems.dart';
 import 'modules/qrBasedAttendance/qrAttendanceItems/qrAttendanceWithLocation/qrAttWithLocation.dart';
 import 'modules/qrBasedAttendance/qrAttendanceItems/qrAttendanceWithoutLocation/qrAttWithoutLocation.dart';
 import 'modules/timeAndAttendance/calendarPage/attendanceRequetCalendar.dart';
+import 'modules/timeAndAttendance/calendarPage/workFromHomeRequisitionPage.dart';
 import 'modules/timeAndAttendance/reports/approvedRequisition/approvedRequisitionList.dart';
 import 'modules/timeAndAttendance/reports/approvedRequisition/approvedRequisitionModel.dart';
 import 'modules/timeAndAttendance/reports/attendanceRequisition/attendanceRequisition.dart';
@@ -292,6 +296,10 @@ void main() {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+      MobileHttpClient.instance.configureUnauthorizedRecovery(
+        refreshAccessToken: () => MobileAuthService.instance.refreshToken(),
+        onSessionExpired: _handleExpiredMobileSession,
+      );
       //Need to comment this
       /*  await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform
@@ -428,8 +436,24 @@ SessionManager shared = SessionManager();
 String? sessionId;
 LatLng? currentPostion;
 
+Future<void> _handleExpiredMobileSession() async {
+  await shared.clearMobileAuth();
+  MobilePermissionService.clearLastKnownState();
+  debugPrint('[MOBILE-AUTH] session expired -> local auth cleared');
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final navigator = MyApp.navigatorKey.currentState;
+    if (navigator == null) return;
+    navigator.pushNamedAndRemoveUntil(
+      MyRoutings.loginRoute,
+      (route) => false,
+    );
+  });
+}
+
 class MyApp extends StatelessWidget {
-  static var navigatorKey;
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   const MyApp({super.key});
 
@@ -640,6 +664,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return UpgradeAlert(
       barrierDismissible: true,
       child: MaterialApp(
+        navigatorKey: MyApp.navigatorKey,
         navigatorObservers: [routeObserver],
         title: "Employroll",
         localizationsDelegates: [
@@ -727,6 +752,8 @@ class _MyHomePageState extends State<MyHomePage> {
               (context) => SingleDateAttendance(singleDateString: ""),
           MyRoutings.leaveBalanceRoute: (context) => LeaveBalancePage(),
           MyRoutings.leaveRequisitionRoute: (context) => LeaveRequisitionPage(),
+          MyRoutings.workFromHomeRequisitionRoute:
+              (context) => const WorkFromHomeRequisitionPage(),
           MyRoutings.requestedRequisitionRoute:
               (context) =>
                   RequestedRequisitionList(SelfLeaveRequisitionListModal()),

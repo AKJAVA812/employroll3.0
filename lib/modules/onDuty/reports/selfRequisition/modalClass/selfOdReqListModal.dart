@@ -5,23 +5,22 @@ class SelfOdReqListModal {
   SelfOdReqListModal({this.result, required this.listdata});
 
   SelfOdReqListModal.fromJson(Map<String, dynamic> json) {
-    result = json['result'];
-    if (json['listdata'] != null) {
-      listdata = <Listdata>[];
-      json['listdata'].forEach((v) {
-        listdata!.add(Listdata.fromJson(v));
-      });
+    result = json['result']?.toString();
+    final rawList = json['content'] ?? json['listdata'];
+    listdata = <Listdata>[];
+    if (rawList is List) {
+      for (final item in rawList) {
+        if (item is Map) {
+          listdata!.add(Listdata.fromJson(Map<String, dynamic>.from(item)));
+        }
+      }
     }
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['result'] = this.result;
-    if (this.listdata != null) {
-      data['listdata'] = this.listdata!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'result': result,
+    'listdata': listdata?.map((item) => item.toJson()).toList(),
+  };
 }
 
 class Listdata {
@@ -39,68 +38,85 @@ class Listdata {
   String? id;
   double? lat;
 
-  Listdata(
-      {this.date,
-        this.image,
-        this.odtime,
-        this.odStatus,
-        this.lng,
-        this.approvalstatus,
-        this.odaddress,
-        this.odtype,
-        this.remark,
-        this.approvaldate,
-        this.name,
-        this.id,
-        this.lat});
+  Listdata({
+    this.date,
+    this.image,
+    this.odtime,
+    this.odStatus,
+    this.lng,
+    this.approvalstatus,
+    this.odaddress,
+    this.odtype,
+    this.remark,
+    this.approvaldate,
+    this.name,
+    this.id,
+    this.lat,
+  });
 
-   Listdata.fromJson(Map<String, dynamic> json) {
-
-     /* date: json['date'] == null ? null: json['date'],
-        image: json['image'] == null ? null: json['image'],
-        odtime: json['odtime'] == null ? null: json['odtime'],
-        odStatus: json['odStatus'] == null ? null: json['odStatus'],
-        lng: json['lng'] == null ? null: json['lng'],
-        approvalstatus: json['approvalstatus'] == null ? null: json['approvalstatus'],
-        odaddress: json['odaddress'] == null ? null: json['odaddress'],
-        odtype: json['odtype'] == null ? null: json['odtype'],
-        remark: json['remark'] == null ? null: json['remark'],
-        approvaldate: json['approvaldate'] == null ? null: json['approvaldate'],
-        name: json['name'] == null ? null: json['name'],
-        id: json['id'] == null ? null: json['id'],
-        lat: json['lat'] == null ? null: json['lat'],*/
-        date = json['date'];
-        image = json['image'];
-        odtime = json['odtime'];
-        odStatus = json['odStatus'];
-        lng = json['lng'];
-        approvalstatus = json['approvalstatus'];
-        odaddress = json['odaddress'];
-        odtype = json['odtype'];
-        remark = json['Remark'];
-        approvaldate = json['approvaldate'];
-        name = json['name'] ;
-        id = json['id'];
-        lat = json['lat'];
-
-
+  Listdata.fromJson(Map<String, dynamic> json) {
+    final punchTime = _text(json['punchTime']);
+    final parsedPunchTime = DateTime.tryParse(punchTime)?.toLocal();
+    date = _text(json['date'], parsedPunchTime?.toIso8601String() ?? punchTime);
+    image = _text(json['imageUrl'], _text(json['image']));
+    odtime = _text(
+      json['odtime'],
+      parsedPunchTime == null
+          ? ''
+          : '${parsedPunchTime.hour.toString().padLeft(2, '0')}:'
+              '${parsedPunchTime.minute.toString().padLeft(2, '0')}',
+    );
+    odStatus = _text(json['status'], _text(json['odStatus']));
+    lng = _number(json['longitude'] ?? json['lng']);
+    approvalstatus = _approvalLabel(
+      _text(json['approvalStatus'], _text(json['approvalstatus'])),
+    );
+    odaddress = _text(json['address'], _text(json['odaddress']));
+    odtype = _text(json['punchAction'], _text(json['odtype']));
+    remark = _text(json['remark'], _text(json['Remark']));
+    approvaldate = _text(json['receivedAt'], _text(json['approvaldate']));
+    name = _text(json['employeeName'], _text(json['name']));
+    id = _text(json['id']);
+    lat = _number(json['latitude'] ?? json['lat']);
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['image'] = this.image;
-    data['odtime'] = this.odtime;
-    data['odStatus'] = this.odStatus;
-    data['lng'] = this.lng;
-    data['approvalstatus'] = this.approvalstatus;
-    data['odaddress'] = this.odaddress;
-    data['odtype'] = this.odtype;
-    data['Remark'] = this.remark;
-    data['approvaldate'] = this.approvaldate;
-    data['name'] = this.name;
-    data['id'] = this.id;
-    data['lat'] = this.lat;
-    return data;
+  static String _text(Object? value, [String fallback = '']) {
+    final text = value?.toString().trim() ?? '';
+    return text.isEmpty || text.toLowerCase() == 'null' ? fallback : text;
   }
+
+  static double? _number(Object? value) {
+    if (value is num) return value.toDouble();
+    return double.tryParse(_text(value));
+  }
+
+  static String _approvalLabel(String value) {
+    switch (value.trim().toUpperCase()) {
+      case 'APPROVED':
+        return 'Approved';
+      case 'REJECTED':
+      case 'DISAPPROVED':
+        return 'DisApproved';
+      case 'CANCELLED':
+        return 'Cancelled';
+      default:
+        return 'Pending';
+    }
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'date': date,
+    'image': image,
+    'odtime': odtime,
+    'odStatus': odStatus,
+    'lng': lng,
+    'approvalstatus': approvalstatus,
+    'odaddress': odaddress,
+    'odtype': odtype,
+    'Remark': remark,
+    'approvaldate': approvaldate,
+    'name': name,
+    'id': id,
+    'lat': lat,
+  };
 }

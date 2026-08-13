@@ -5,9 +5,14 @@ class EssDashboarrdModel {
   EssDashboarrdModel({this.countData});
 
   EssDashboarrdModel.fromJson(Map<String, dynamic> json) {
-    countData = json['countData'] != null
-        ? CountData.fromJson(json['countData'])
-        : null;
+    final derivedCountData = _countDataFromCalendarSource(json);
+    countData =
+        json['countData'] != null
+            ? CountData.fromJson(json['countData'])
+            : derivedCountData;
+    if (_shouldUseCalendarCountData(countData, derivedCountData)) {
+      countData = derivedCountData;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -17,6 +22,215 @@ class EssDashboarrdModel {
     }
     return data;
   }
+}
+
+bool _shouldUseCalendarCountData(CountData? parsed, CountData? derived) {
+  if (derived == null) return false;
+  if (parsed == null) return true;
+  return (parsed.totalList?.isEmpty ?? true) &&
+      (derived.totalList?.isNotEmpty ?? false);
+}
+
+CountData? _countDataFromCalendarSource(Map<String, dynamic> json) {
+  final rows = _calendarRows(json);
+  if (rows.isEmpty) return null;
+  final employee = _asMap(json['employee']);
+
+  final presentRows = _rowsFor(rows, 'present', employee);
+  final absentRows = _rowsFor(rows, 'absent', employee);
+  final lateRows = _rowsFor(rows, 'late in', employee);
+  final mispunchRows = _rowsFor(rows, 'mispunch', employee);
+  final earlyGoRows = _rowsFor(rows, 'early go', employee);
+  final shortLeaveRows = _rowsFor(rows, 'short leave', employee);
+  final halfDayRows = _rowsFor(rows, 'half day', employee);
+  final totalRows = rows.map((row) => _legacyAttendanceRow(row, employee)).toList();
+
+  return CountData.fromJson(<String, dynamic>{
+    'presentList': presentRows,
+    'absentList': absentRows,
+    'lateList': lateRows,
+    'mispunchList': mispunchRows,
+    'earlyGoList': earlyGoRows,
+    'shortLeaveList': shortLeaveRows,
+    'halfDayList': halfDayRows,
+    'totalList': totalRows,
+    'data': <Map<String, dynamic>>[],
+    'totalAtt': presentRows.length,
+    'absentCount': absentRows.length,
+    'late': lateRows.length,
+    'mispunch': mispunchRows.length,
+    'earlygo': earlyGoRows.length,
+    'shortlev': shortLeaveRows.length,
+    'halfday': halfDayRows.length,
+    'totalDays': rows.length,
+    'paidDaysCount': presentRows.length,
+  });
+}
+
+List<Map<String, dynamic>> _calendarRows(Map<String, dynamic> json) {
+  final direct = _asMapList(json['calendar']);
+  if (direct.isNotEmpty) return direct;
+  final data = _asMapList(json['data']);
+  if (data.isNotEmpty) return data;
+  final calendarBody = json['calendarBody'];
+  if (calendarBody is Map) {
+    final calendarBodyData = _asMapList(calendarBody['data']);
+    if (calendarBodyData.isNotEmpty) return calendarBodyData;
+    final calendarBodyCalendar = _asMapList(calendarBody['calendar']);
+    if (calendarBodyCalendar.isNotEmpty) return calendarBodyCalendar;
+  }
+  final r3Calendar = json['r3Calendar'];
+  if (r3Calendar is Map) {
+    final r3Data = _asMapList(r3Calendar['data']);
+    if (r3Data.isNotEmpty) return r3Data;
+    final r3CalendarRows = _asMapList(r3Calendar['calendar']);
+    if (r3CalendarRows.isNotEmpty) return r3CalendarRows;
+  }
+  return <Map<String, dynamic>>[];
+}
+
+List<Map<String, dynamic>> _asMapList(Object? value) {
+  if (value is! List) return <Map<String, dynamic>>[];
+  return value
+      .whereType<Map>()
+      .map((item) => Map<String, dynamic>.from(item))
+      .toList();
+}
+
+Map<String, dynamic> _asMap(Object? value) {
+  return value is Map ? Map<String, dynamic>.from(value) : <String, dynamic>{};
+}
+
+List<Map<String, dynamic>> _rowsFor(
+  List<Map<String, dynamic>> rows,
+  String status,
+  Map<String, dynamic> employee,
+) {
+  return rows
+      .where((row) => _canonicalStatus(row) == status)
+      .map((row) => _legacyAttendanceRow(row, employee))
+      .toList();
+}
+
+Map<String, dynamic> _legacyAttendanceRow(
+  Map<String, dynamic> row,
+  Map<String, dynamic> employee,
+) {
+  final status = _text(row['attendanceStatus'] ?? row['status']);
+  final displayStatus = _text(row['status'] ?? row['attendanceStatus']);
+  final workHours = row['workHours'];
+  final workingMinutes = row['workingMinutes'];
+  final department = _text(employee['department']);
+  final designation = _text(employee['designation']);
+  final deptText =
+      [department, designation].where((value) => value.trim().isNotEmpty).join(' - ');
+  return <String, dynamic>{
+    'empId': _text(row['employeeId'] ?? row['employeeDetailsId']),
+    'logDate': _text(row['logDate'] ?? row['date'] ?? row['attendanceDate']),
+    'inTime': _timeText(row['firstInTime']),
+    'outTime': _timeText(row['lastOutTime']),
+    'workingHours':
+        workHours == null || _text(workHours).isEmpty
+            ? _timeText(workingMinutes)
+            : _timeText(workHours),
+    'status': displayStatus.isEmpty ? status : displayStatus,
+    'statusCode': status,
+    'lateTime': _text(row['lateMinutes']),
+    'earlyTime': '',
+    'shortStatus': '',
+    'dept': _text(row['dept'] ?? row['department']).isEmpty
+        ? deptText
+        : _text(row['dept'] ?? row['department']),
+    'branch': _text(row['branch']).isEmpty
+        ? _text(employee['branch'])
+        : _text(row['branch']),
+    'empName': _text(row['empName'] ?? row['employeeName']).isEmpty
+        ? _text(employee['employeeName'])
+        : _text(row['empName'] ?? row['employeeName']),
+  };
+}
+
+String _canonicalStatus(Map<String, dynamic> row) {
+  final status = _text(row['attendanceStatus'] ?? row['status'] ?? row['statusCode'])
+      .trim()
+      .toLowerCase()
+      .replaceAll('-', ' ')
+      .replaceAll('_', ' ')
+      .replaceAll(RegExp(r'\s+'), ' ');
+  switch (status) {
+    case 'late':
+      return 'late in';
+    case 'early':
+      return 'early go';
+    case 'missing':
+      return 'mispunch';
+    case 'half':
+      return 'half day';
+    case 'short':
+      return 'short leave';
+    default:
+      return status;
+  }
+}
+
+String _text(Object? value) => value == null ? '' : value.toString();
+
+String _timeText(Object? value) {
+  final text = _text(value).trim();
+  if (text.isEmpty || text.toLowerCase() == 'null') return '--:--';
+  return text;
+}
+
+String _normaliseAttendanceStatus(String? value) {
+  return (value ?? '')
+      .trim()
+      .toLowerCase()
+      .replaceAll('-', ' ')
+      .replaceAll('_', ' ')
+      .replaceAll(RegExp(r'\s+'), ' ');
+}
+
+bool isAttendanceCardStatus(String? status, String? statusCode) {
+  final displayStatus = _normaliseAttendanceStatus(status);
+  if (displayStatus.contains('present') ||
+      displayStatus.contains('week off') ||
+      displayStatus.contains('weekly off') ||
+      displayStatus.contains('leave') ||
+      displayStatus.contains('holiday')) {
+    return true;
+  }
+
+  // Keeps older dashboard payloads working when only a status code is present.
+  final code = _normaliseAttendanceStatus(statusCode);
+  return const {'p', 'pp', 'wo', 'w/o', 'l', 'h'}.contains(code);
+}
+
+int attendanceCardCount(CountData? countData) {
+  if (countData == null) return 0;
+
+  final datedRows = <String>{};
+  var undatedRows = 0;
+
+  void addRow(String? employeeId, String? logDate) {
+    final date = (logDate ?? '').trim();
+    if (date.isEmpty) {
+      undatedRows++;
+      return;
+    }
+    datedRows.add('${employeeId ?? ''}|$date');
+  }
+
+  for (final row in countData.presentList ?? <PresentList>[]) {
+    addRow(row.empId, row.logDate);
+  }
+  for (final row in countData.totalList ?? <TotalList>[]) {
+    if (isAttendanceCardStatus(row.status, row.statusCode)) {
+      addRow(row.empId, row.logDate);
+    }
+  }
+
+  final count = datedRows.length + undatedRows;
+  return count == 0 ? (countData.totalAtt ?? 0) : count;
 }
 
 class CountData {

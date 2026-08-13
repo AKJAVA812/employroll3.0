@@ -130,9 +130,7 @@ class _OverTimeEmpListState extends State<OverTimeEmpList> {
   }
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
-    for(int i = 0; i < dashboardModelGlobal!.countData!.data!.length; i++) {
-      itemCount = dashboardModelGlobal!.countData!.lateList!.length;
-    }
+    itemCount = dashboardModelGlobal?.countData?.shortLeaveList?.length ?? 0;
     print("ItemCount - $itemCount");
     return ListView.builder(
       padding: const EdgeInsets.all(4.0),

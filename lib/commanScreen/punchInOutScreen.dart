@@ -32,6 +32,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/attendance_punch_api.dart';
+import '../MSS_Bundle/mobile_mss/mss_mobile_dashboard.dart';
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 //import '../adminPage/adminDashboard/adminDashboard.dart';
 import '../UIS_Bundle/dashboard/adminDashboard.dart' as mss;
@@ -49,7 +50,9 @@ import '../settings/checkForUpdates.dart';
 import '../settings/companyPolicyList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../services/mobile_auth_service.dart';
+import '../services/mobile_mo_organisation_service.dart';
 import '../services/mobile_profile_cache.dart';
+import '../services/mobile_panel_service.dart';
 import '../services/mobile_permission_service.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -67,7 +70,7 @@ import 'package:er_flutter_project/tracking/DB/SaveLatlng.dart';
 import 'package:er_flutter_project/tracking/LocationClient.dart';
 import 'dart:math' show asin, cos, sqrt;
 
-import 'modalClass/geofenceListModal.dart';
+import 'package:er_flutter_project/commanScreen/modalClass/geofenceListModal.dart';
 
 class PunchInOUtActivity extends StatefulWidget {
   final int selectedIndex;
@@ -124,6 +127,7 @@ dynamic defaultProfileId;
 dynamic profileIdGetter;
 dynamic profileNameGetter;
 String? userPanelPermissions;
+String? activePanel;
 //MSS MO Permission Variable
 dynamic pendingAttendanceReqMOPermission = "0";
 dynamic othersAttendanceReqMOPermission = "0";
@@ -179,6 +183,7 @@ late List<String?> organisationList = [];
 
 class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
   OrganisationListModal? organisationListModal;
+  MobileEssPermissionState? _essPermissionState;
   //Tracking start variables
   final _locationClient = LocationClient();
   final _points = <LatLng>[];
@@ -212,6 +217,9 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     _loginModel = LoginModel();
     getSharedPrfanceList();
     currentIndex = widget.selectedIndex;
+    if (currentIndex == 4) {
+      title = "My Dashboard";
+    }
     loadProfileFromPrefs();
     loadRequisitionCountsFromPrefs();
     var now = DateTime.now();
@@ -224,6 +232,51 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     getUserNameImage();
     MobileAuthService.instance.syncOnAppOpen();
     super.initState();
+    _loadEssPermissionState();
+  }
+
+  Future<void> _loadEssPermissionState() async {
+    final state = await MobilePermissionService.loadEssState();
+    if (!mounted) return;
+    setState(() {
+      _essPermissionState = state;
+      if (!state.hasAnyMobileAccess && activePanel == MobilePanel.ess) {
+        currentIndex = 0;
+        title = 'Home';
+      }
+    });
+  }
+
+  Future<bool> _canOpenEssTab(int index) async {
+    if (index == 0 || activePanel != MobilePanel.ess) return true;
+    final state =
+        _essPermissionState ?? await MobilePermissionService.loadEssState();
+    if (state.hasAnyMobileAccess) {
+      if (mounted && _essPermissionState == null) {
+        setState(() => _essPermissionState = state);
+      }
+      return true;
+    }
+    if (!mounted) return false;
+    setState(() {
+      _essPermissionState = state;
+      currentIndex = 0;
+      title = 'Home';
+    });
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Permission required'),
+        content: const Text('You do not have permission to access this tab.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    return false;
   }
 
   void loadProfileFromPrefs() async {
@@ -395,6 +448,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     print("Default Profile Name - $defaultProfileName");
     print("Default Profile Id - $defaultProfileId");
     userPanelPermissions = await shared.getUserPanel();
+    activePanel = await shared.getActivePanel() ?? MobilePanel.ess;
     print("User Type - $userType");
 
     Future<OrganisationListModal> getOrgList = getOrganisationList(sessionId!);
@@ -421,23 +475,10 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   Future<OrganisationListModal> getOrganisationList(String sessionId) async {
     try {
-      String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.orgListApi;
+      organisationListModal =
+          await MobileMoOrganisationService.loadForActivePanel();
 
-      var urlapi = Uri.parse(
-        "$conn$apiUrl?sessionId=$sessionId&userPermission=$userPanelPermissions",
-      );
-      final response = await MobileHttpClient.instance.post(urlapi);
-
-      var mapResponse = json.decode(response.body);
-      organisationListModal = OrganisationListModal.fromJson(mapResponse);
-
-      print("Organisation List -  ${mapResponse}");
-
-      /// Save to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      String orgListString = json.encode(organisationListModal?.list ?? []);
-      await prefs.setString("orgList", orgListString);
+      print("Organisation List - loaded for active panel");
 
       return organisationListModal!;
     } catch (e) {
@@ -804,6 +845,32 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   @override
   Widget build(BuildContext context) {
+    final isManagerPanel =
+        MobilePanel.isManager(activePanel);
+    final activeIndex = isManagerPanel && currentIndex > 3 ? 0 : currentIndex;
+    final managerScreens = [
+      const DefaultPage(),
+      MssTeamDashboardScreen(
+        onViewSelf: () async {
+          await MobilePanelService.activateEss();
+          setState(() {
+            activePanel = MobilePanel.ess;
+            userPanelPermissions = 'COMPANY_EMPLOYEE';
+            currentIndex = 4;
+            title = 'My Dashboard';
+          });
+        },
+        onViewRequests: () {
+          setState(() {
+            currentIndex = 2;
+            title = 'Requests';
+          });
+        },
+      ),
+      const MssRequestsScreen(),
+      const MssPeopleScreen(),
+    ];
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, Object? result) async {
@@ -812,7 +879,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
         }
         final bool shouldPop = await _showBackDialog(context) ?? false;
         if (context.mounted && shouldPop) {
-          Navigator.of(context, rootNavigator: true).pop();
+          await SystemNavigator.pop();
         }
       },
       child: Scaffold(
@@ -843,7 +910,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
                         valueListenable: selectedProfileNameNotifier,
                         builder: (context, value, _) {
                           final displayText =
-                              (userPanelPermissions == "COMPANY_EMPLOYEE")
+                              (activePanel == MobilePanel.ess)
                                   ? "ESS"
                                   : value;
 
@@ -872,14 +939,31 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
             ),
           ],
         ),
-        body: screensNew[currentIndex],
+        body: isManagerPanel
+            ? managerScreens[activeIndex]
+            : (_essPermissionState != null &&
+                    !_essPermissionState!.hasAnyMobileAccess)
+                ? screensNew[0]
+                : screensNew[currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          currentIndex: currentIndex,
+          currentIndex: activeIndex,
           iconSize: 25,
           selectedFontSize: 12,
           unselectedFontSize: 10,
-          onTap: (index) {
+          onTap: (index) async {
+            print(
+              '[MOBILE-DASHBOARD] bottom-nav tap index=$index userType=$userType currentIndex=$currentIndex',
+            );
+            if (isManagerPanel) {
+              final titles = ['Home', 'Team', 'Requests', 'People'];
+              setState(() {
+                currentIndex = index;
+                title = titles[index];
+              });
+              return;
+            }
+            if (!await _canOpenEssTab(index)) return;
             String newTitle = "";
 
             // Adjust index mapping if Profile is hidden
@@ -903,6 +987,10 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
                 break;
               case 4:
                 newTitle = "My Dashboard";
+                print(
+                  '[MOBILE-DASHBOARD] creating dashboard wrapper from punchInOutScreen',
+                );
+                screensNew[4] = Dashboard(key: UniqueKey());
                 break;
             }
 
@@ -911,29 +999,37 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
               title = newTitle;
             });
           },
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.manage_accounts_outlined),
-              label: 'Workflow',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.app_badge_fill),
-              label: 'My Requests',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.doc_chart),
-              label: 'My Reports',
-            ),
-            if (userType != 'COMPANY_ADMIN')
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard),
-                label: 'Dashboard',
-              ),
-          ],
+          items:
+              isManagerPanel
+                  ? const [
+                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                    BottomNavigationBarItem(icon: Icon(Icons.dashboard_customize), label: 'Team'),
+                    BottomNavigationBarItem(icon: Icon(Icons.pending_actions), label: 'Requests'),
+                    BottomNavigationBarItem(icon: Icon(Icons.people_alt), label: 'People'),
+                  ]
+                  : [
+                    const BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: 'Home',
+                    ),
+                    const BottomNavigationBarItem(
+                      icon: Icon(Icons.manage_accounts_outlined),
+                      label: 'Workflow',
+                    ),
+                    const BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.app_badge_fill),
+                      label: 'My Requests',
+                    ),
+                    const BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.doc_chart),
+                      label: 'My Reports',
+                    ),
+                    if (userType != 'COMPANY_ADMIN')
+                      const BottomNavigationBarItem(
+                        icon: Icon(Icons.dashboard),
+                        label: 'Dashboard',
+                      ),
+                  ],
         ),
         drawer: DrawerFile(),
       ),
@@ -975,7 +1071,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
               ),
               child: const Text('Nevermind'),
               onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop();
+                Navigator.pop(context, false);
               },
             ),
             TextButton(
@@ -984,12 +1080,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
               ),
               child: const Text('Yes'),
               onPressed: () {
-                setState(() {
-                  // SystemNavigator.pop();
-                  //Navigator.of(context, rootNavigator: true).pop();
-                  Navigator.pop(context);
-                  //SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-                });
+                Navigator.pop(context, true);
               },
             ),
           ],
@@ -1066,6 +1157,37 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
   }
 }
 
+class _NoEssPermissionHome extends StatelessWidget {
+  const _NoEssPermissionHome();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.lock_outline, size: 44, color: Mythemes.greyish),
+            const SizedBox(height: 12),
+            const Text(
+              'No ESS permission assigned',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Contact your administrator to enable mobile access.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Mythemes.blackish, fontSize: 13),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class DefaultPage extends StatefulWidget {
   const DefaultPage({Key? key}) : super(key: key);
 
@@ -1090,12 +1212,13 @@ class _DefaultPageState extends State<DefaultPage> {
   String? mockLat;
   String? mockLong;
   bool? isMock = false;
+  Timer? _clockTimer;
 
   @override
   void initState() {
     //print('initState');
     // TODO: implement initState
-    _determinePosition();
+    _loadCurrentLocation();
     //_getUserLocation();
     timeString = _formatDateTime(DateTime.now());
     getSharedPrfanceList();
@@ -1105,10 +1228,46 @@ class _DefaultPageState extends State<DefaultPage> {
     super.initState();
   }
 
+  Future<void> _loadCurrentLocation() async {
+    try {
+      final current = await _determinePosition();
+      if (!mounted) return;
+      position = current;
+      currentPostion = LatLng(current.latitude, current.longitude);
+      await shared.setLatitude(current.latitude);
+      await shared.setLongitude(current.longitude);
+      await getAddress(current);
+    } catch (error) {
+      print('[ATTENDANCE] Unable to reload current location: $error');
+    }
+  }
+
   // ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Main method to get Geofence list
 
   Future<void> _loadMobileEssPermissions() async {
-    final state = await MobilePermissionService.loadEssState();
+    var state = await MobilePermissionService.loadEssState();
+    if (mounted) {
+      setState(() {
+        _mobileEssPermissions = state;
+        attendanceSelfieRequired = state.requiresSelfie;
+        attAction = attendanceSelfieRequired ? '1' : '0';
+      });
+    }
+
+    try {
+      await MobileAuthService.instance.syncOnAppOpen();
+    } catch (error) {
+      print('[MOBILE-PERMISSION] bootstrap sync failed, using cache: $error');
+    }
+    state = await MobilePermissionService.loadEssState();
+    if (mounted) {
+      setState(() {
+        _mobileEssPermissions = state;
+        attendanceSelfieRequired = state.requiresSelfie;
+        attAction = attendanceSelfieRequired ? '1' : '0';
+      });
+    }
+
     AttendancePunchContext? context;
     try {
       context = await AttendancePunchApi().getPunchContext();
@@ -1118,7 +1277,7 @@ class _DefaultPageState extends State<DefaultPage> {
     if (!mounted) return;
     setState(() {
       _mobileEssPermissions = state;
-      attendanceSelfieRequired = context?.selfieRequired ?? state.requiresSelfie;
+      attendanceSelfieRequired = state.requiresSelfie;
       setGeofenceActive = context?.geofenceRequired ?? setGeofenceActive;
       attAction = attendanceSelfieRequired ? '1' : '0';
     });
@@ -1130,11 +1289,12 @@ class _DefaultPageState extends State<DefaultPage> {
   Future<GeofenceListModal> getGeofenceList(String sessionId) async {
     try {
       final context = await AttendancePunchApi().getPunchContext();
-      if (mounted) setState(() {
-        setGeofenceActive = context.geofenceRequired;
-        attendanceSelfieRequired = context.selfieRequired;
-        attAction = context.selfieRequired ? '1' : '0';
-      });
+      if (mounted)
+        setState(() {
+          setGeofenceActive = context.geofenceRequired;
+          attendanceSelfieRequired = _mobileEssPermissions.requiresSelfie;
+          attAction = attendanceSelfieRequired ? '1' : '0';
+        });
       return context.toLegacyGeofenceList();
     } catch (e) {
       print(
@@ -1814,6 +1974,7 @@ class _DefaultPageState extends State<DefaultPage> {
 
   @override
   void dispose() {
+    _clockTimer?.cancel();
     positionStream?.cancel();
     super.dispose();
   }
@@ -1872,6 +2033,7 @@ class _DefaultPageState extends State<DefaultPage> {
           .where((part) => part.trim().isNotEmpty)
           .join(", ");
 
+      if (!mounted) return;
       setState(() {
         currentAddress = formattedAddress;
       });
@@ -1881,7 +2043,11 @@ class _DefaultPageState extends State<DefaultPage> {
       );
     } catch (e) {
       print("ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€¦Ã¢â‚¬â„¢ Error getting address: $e");
-      currentAddress = "Address Not Find";
+      if (mounted) {
+        setState(() {
+          currentAddress = "Address Not Found";
+        });
+      }
     }
   }
 
@@ -1904,10 +2070,14 @@ class _DefaultPageState extends State<DefaultPage> {
 
   var attAction;
   MobileEssPermissionState _mobileEssPermissions =
+      MobilePermissionService.lastKnownState ??
       const MobileEssPermissionState(
         securityGroupIds: <String>{},
         canPunchAttendance: false,
         canWorkDone: false,
+        canViewCalendar: false,
+        canViewDashboard: false,
+        canAddAttendanceRequisition: false,
         canTrackOnly: false,
         canTrackWithAttendance: false,
         requiresSelfie: false,
@@ -1931,20 +2101,26 @@ class _DefaultPageState extends State<DefaultPage> {
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
     timeString = _formatDateTime(DateTime.now());
-    Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    _clockTimer?.cancel();
+    _clockTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) => _getTime(),
+    );
     lat = await shared.getLatitude();
     lng = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
     attAction = await shared.getAttAction();
-    print("LatLong - ${LatLng(position!.latitude, position!.longitude)}");
-    //print("Long - $lng");
-    currentPostion = LatLng(position!.latitude, position!.longitude);
+    if (position != null) {
+      print("LatLong - ${LatLng(position!.latitude, position!.longitude)}");
+      currentPostion = LatLng(position!.latitude, position!.longitude);
+    }
 
     mobAction = await shared.getMobAction();
     print('mobActions $mobAction');
 
     print('ATTACTION- $attAction');
 
+    if (!mounted) return;
     setState(() {
       if (empRole == 1) {
         showHide = true;
@@ -2831,15 +3007,17 @@ class _DefaultPageState extends State<DefaultPage> {
     );
   }
 
-  showDialgError(BuildContext buildContext, result, reason) {
+  showDialgError(
+    BuildContext buildContext,
+    result,
+    reason, {
+    Future<void> Function()? onRetry,
+    bool allowRetry = true,
+  }) {
+    final message = _attendanceErrorMessage(result, reason);
     var alertDialog = AlertDialog(
-      title: Row(
-        children: [
-          //Icon(Icons.warning),
-          Text(result),
-        ],
-      ),
-      content: Text(reason),
+      title: const Text("Attendance Error"),
+      content: Text(message),
       titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
       buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
@@ -2848,15 +3026,16 @@ class _DefaultPageState extends State<DefaultPage> {
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
           },
-          child: Text("Cancel"),
+          child: Text(allowRetry ? "Cancel" : "OK"),
         ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(buildContext, rootNavigator: true).pop();
-            getPunchIn(buildContext);
-          },
-          child: Text("Retry"),
-        ),
+        if (allowRetry && onRetry != null)
+          TextButton(
+            onPressed: () async {
+              Navigator.of(buildContext, rootNavigator: true).pop();
+              await onRetry.call();
+            },
+            child: Text("Retry"),
+          ),
       ],
       elevation: 24.0,
     );
@@ -2866,6 +3045,31 @@ class _DefaultPageState extends State<DefaultPage> {
         return alertDialog;
       },
     );
+  }
+
+  String _attendanceErrorMessage(dynamic result, dynamic fallback) {
+    if (result is Map) {
+      for (final key in const ['reason', 'message']) {
+        final value = result[key]?.toString().trim();
+        if (value != null && value.isNotEmpty) return value;
+      }
+
+      final error = result['error'];
+      if (error is Map) {
+        for (final key in const ['message', 'reason', 'code']) {
+          final value = error[key]?.toString().trim();
+          if (value != null && value.isNotEmpty) return value;
+        }
+      } else {
+        final value = error?.toString().trim();
+        if (value != null && value.isNotEmpty) return value;
+      }
+    }
+
+    final fallbackMessage = fallback?.toString().trim();
+    return fallbackMessage != null && fallbackMessage.isNotEmpty
+        ? fallbackMessage
+        : "Your Punch Not Submitted, Please Try Again";
   }
 
   showAutoTimeZone(BuildContext buildContext, result, alert) {
@@ -3052,8 +3256,11 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
 
     http.Response response = await AttendancePunchApi().punchWithoutSelfie(
-      action: clockingType!, latitude: lat, longitude: lng,
-      accuracyMeters: position?.accuracy ?? 50, address: currentAddress,
+      action: clockingType!,
+      latitude: lat,
+      longitude: lng,
+      accuracyMeters: position?.accuracy ?? 50,
+      address: currentAddress,
     );
 
     result = json.decode(response.body.toString());
@@ -3090,7 +3297,11 @@ class _DefaultPageState extends State<DefaultPage> {
       showDialgError(
         rootContext,
         result,
-        "Your Punch Not Submitted, Please Try Again",
+        response.statusCode == 409
+            ? "Attendance punch is already recorded or conflicts with the current punch state."
+            : "Your Punch Not Submitted, Please Try Again",
+        onRetry: () => getPunchIn(rootContext),
+        allowRetry: response.statusCode != 409,
       );
     }
   }
@@ -3119,8 +3330,11 @@ class _DefaultPageState extends State<DefaultPage> {
     getTimeUpdate();
 
     http.Response response = await AttendancePunchApi().punchWithoutSelfie(
-      action: clockingType!, latitude: lat, longitude: lng,
-      accuracyMeters: position?.accuracy ?? 50, address: currentAddress,
+      action: clockingType!,
+      latitude: lat,
+      longitude: lng,
+      accuracyMeters: position?.accuracy ?? 50,
+      address: currentAddress,
       geofenceId: int.tryParse(selectedGeofenceId.toString()),
     );
 
@@ -3158,7 +3372,14 @@ class _DefaultPageState extends State<DefaultPage> {
       showDialgError(
         rootContext,
         result,
-        "Your Punch Not Submitted, Please Try Again",
+        response.statusCode == 409
+            ? "Attendance punch is already recorded or conflicts with the current punch state."
+            : "Your Punch Not Submitted, Please Try Again",
+        onRetry: () => getPunchInWithGeofence(
+          rootContext,
+          selectedGeofenceId,
+        ),
+        allowRetry: response.statusCode != 409,
       );
     }
   }
@@ -3178,8 +3399,11 @@ class _DefaultPageState extends State<DefaultPage> {
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
     http.Response response = await AttendancePunchApi().punchWithoutSelfie(
-      action: clockingType!, latitude: lat, longitude: lng,
-      accuracyMeters: position?.accuracy ?? 50, address: currentAddress,
+      action: clockingType!,
+      latitude: lat,
+      longitude: lng,
+      accuracyMeters: position?.accuracy ?? 50,
+      address: currentAddress,
     );
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
@@ -3212,7 +3436,11 @@ class _DefaultPageState extends State<DefaultPage> {
       showDialgError(
         context,
         result,
-        "Your Punch Not Submitted, Please Try Again",
+        response.statusCode == 409
+            ? "Attendance punch is already recorded or conflicts with the current punch state."
+            : "Your Punch Not Submitted, Please Try Again",
+        onRetry: () => getPunchOut(context),
+        allowRetry: response.statusCode != 409,
       );
     }
   }
@@ -3239,8 +3467,11 @@ class _DefaultPageState extends State<DefaultPage> {
     /*var stream = http.ByteStream(value!.openRead());
     stream.cast();*/
     http.Response response = await AttendancePunchApi().punchWithoutSelfie(
-      action: clockingType!, latitude: lat, longitude: lng,
-      accuracyMeters: position?.accuracy ?? 50, address: currentAddress,
+      action: clockingType!,
+      latitude: lat,
+      longitude: lng,
+      accuracyMeters: position?.accuracy ?? 50,
+      address: currentAddress,
       geofenceId: int.tryParse(selectedGeofenceId.toString()),
     );
     result = json.decode(response.body.toString());
@@ -3277,7 +3508,14 @@ class _DefaultPageState extends State<DefaultPage> {
       showDialgError(
         rootContext,
         result,
-        "Your Punch Not Submitted, Please Try Again",
+        response.statusCode == 409
+            ? "Attendance punch is already recorded or conflicts with the current punch state."
+            : "Your Punch Not Submitted, Please Try Again",
+        onRetry: () => getPunchOutWithGeofence(
+          rootContext,
+          selectedGeofenceId,
+        ),
+        allowRetry: response.statusCode != 409,
       );
     }
   }
@@ -3381,8 +3619,20 @@ class _DashboardState extends State<Dashboard> {
   var title = "My Dashboard";
 
   @override
+  void initState() {
+    super.initState();
+    print(
+      '[MOBILE-DASHBOARD] punchInOut Dashboard wrapper init userPanelPermissions=$userPanelPermissions',
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return userPanelPermissions == "USER"
+    final isMss = userPanelPermissions == "USER";
+    print(
+      '[MOBILE-DASHBOARD] punchInOut Dashboard wrapper build target=${isMss ? "MSS" : "ESS"} userPanelPermissions=$userPanelPermissions',
+    );
+    return isMss
         ? mss.Admin_UIS_Dashboard(DashboardModel())
         : ess.EssAdminDashboard(EssDashboarrdModel());
   }
@@ -3405,6 +3655,7 @@ class _DrawerFileState extends State<DrawerFile> {
   dynamic tourReqCount;
   dynamic attReqCount;
   dynamic leaveReqCount;
+  bool hasEssPanel = false;
   @override
   void initState() {
     getUserRoles();
@@ -3419,6 +3670,8 @@ class _DrawerFileState extends State<DrawerFile> {
     selectedProfileId = prefs.getInt('defaultProfileId');
     selectedProfileName = prefs.getString('defaultProfileName');
     userPanelPermissions = await shared.getUserPanel();
+    activePanel = await shared.getActivePanel() ?? MobilePanel.ess;
+    hasEssPanel = await shared.getHasEssPanel() ?? true;
     print("Loaded ID: $selectedProfileId, Name: $selectedProfileName");
 
     getProfileList(sessionId!).then((value) {
@@ -3463,14 +3716,22 @@ class _DrawerFileState extends State<DrawerFile> {
       }
 
       if (profileListGetter.isNotEmpty) {
-        final defaultProfile = profileListGetter.firstWhere(
-          (p) => p.isDefaultProfile == true || p.defaultProfile == true,
-          orElse: () => profileListGetter.first,
-        );
-        selectedProfileId = defaultProfile.profileId ?? 0;
-        selectedProfileName = defaultProfile.profileName ?? '';
-        await shared.setDefaultProfileId(selectedProfileId);
-        await shared.setDefaultProfileName(selectedProfileName);
+        if (activePanel == MobilePanel.ess) {
+          selectedProfileId = 0;
+          selectedProfileName = 'ESS';
+        } else {
+          final savedProfileId = await shared.getDefaultProfileId();
+          final selected = profileListGetter.firstWhere(
+            (profile) => profile.profileId == savedProfileId,
+            orElse: () => profileListGetter.first,
+          );
+          selectedProfileId = selected.profileId ?? 0;
+          selectedProfileName = selected.profileName ?? '';
+          if (savedProfileId != selectedProfileId) {
+            await MobilePanelService.activateProfile(selected);
+            activePanel = MobilePanel.fromProfileType(selected.profileType);
+          }
+        }
         selectedProfileIdNotifier.value = selectedProfileId ?? 0;
         selectedProfileNameNotifier.value = selectedProfileName ?? '';
       } else {
@@ -3507,7 +3768,9 @@ class _DrawerFileState extends State<DrawerFile> {
   Future<void> getRequisitionCounts(String sessionId) async {
     try {
       String conn = ApiDetails.server;
-      String apiUrl = ApiDetails.reqCountApi;
+      // Counts are supplied by the new dashboard data.
+      return;
+      String apiUrl = '';
 
       var urlapi = Uri.parse(
         "$conn$apiUrl?"
@@ -3527,6 +3790,16 @@ class _DrawerFileState extends State<DrawerFile> {
       int attReqCount = mapResponse['attReqCount'] ?? 0;
       int leaveReqCount = mapResponse['leaveReqCount'] ?? 0;
       int mobOdCount = mapResponse['mobOdCount'] ?? 0;
+      int wfhReqCount =
+          int.tryParse(
+            '${mapResponse['wfhReqCount'] ?? mapResponse['wfhCount'] ?? 0}',
+          ) ??
+          0;
+      int compOffReqCount =
+          int.tryParse(
+            '${mapResponse['compOffReqCount'] ?? mapResponse['compOffCount'] ?? 0}',
+          ) ??
+          0;
 
       // ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Update global notifiers
       attReqCountNotifier.value = attReqCount;
@@ -3538,6 +3811,8 @@ class _DrawerFileState extends State<DrawerFile> {
       await prefs.setInt("attReqCount", attReqCount);
       await prefs.setInt("leaveReqCount", leaveReqCount);
       await prefs.setInt("mobOdCount", mobOdCount);
+      await prefs.setInt("wfhReqCount", wfhReqCount);
+      await prefs.setInt("compOffReqCount", compOffReqCount);
 
       // ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Assign values to variables
       mobOdCount = mapResponse['mobOdCount'] ?? 0;
@@ -3637,11 +3912,43 @@ class _DrawerFileState extends State<DrawerFile> {
                   ),
                 ),
               ),
+              if (hasEssPanel)
+                ListTile(
+                  leading: Icon(Icons.person_outline),
+                  title: Text(
+                    "ESS",
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                  ),
+                  subtitle: Text("Self service panel"),
+                  trailing:
+                      activePanel == MobilePanel.ess
+                          ? Icon(Icons.check, color: Colors.green)
+                          : null,
+                  tileColor:
+                      activePanel == MobilePanel.ess
+                          ? Colors.grey.shade200
+                          : null,
+                  onTap: () async {
+                    await MobilePanelService.activateEss();
+                    activePanel = MobilePanel.ess;
+                    userPanelPermissions = "COMPANY_EMPLOYEE";
+                    selectedProfileId = 0;
+                    selectedProfileName = 'ESS';
+                    selectedProfileIdNotifier.value = 0;
+                    selectedProfileNameNotifier.value = 'ESS';
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                const PunchInOUtActivity(selectedIndex: 0),
+                      ),
+                    );
+                  },
+                ),
               Visibility(
-                visible:
-                    userPanelPermissions == "MSS" ||
-                    userPanelPermissions == "MSS_MO_ADMIN" ||
-                    userPanelPermissions == "USER",
+                visible: profileListGetter.isNotEmpty,
                 child:
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -3685,10 +3992,7 @@ class _DrawerFileState extends State<DrawerFile> {
             ),
           ),*/
               Visibility(
-                visible:
-                    userPanelPermissions == "MSS" ||
-                    userPanelPermissions == "MSS_MO_ADMIN" ||
-                    userPanelPermissions == "USER",
+                visible: profileListGetter.isNotEmpty,
                 child:
                     isLoadingProfiles
                         ? Center(child: CircularProgressIndicator()).p12()
@@ -3699,6 +4003,7 @@ class _DrawerFileState extends State<DrawerFile> {
                               children:
                                   profileListGetter.map((profile) {
                                     bool isSelected =
+                                        MobilePanel.isManager(activePanel) &&
                                         currentSelectedId == profile.profileId;
 
                                     return ListTile(
@@ -5028,13 +5333,22 @@ class _DrawerFileState extends State<DrawerFile> {
                                         await shared.setDefaultProfileName(
                                           selectedProfileName,
                                         );
+                                        await MobilePanelService.activateProfile(
+                                          selected,
+                                        );
+                                        activePanel = MobilePanel.fromProfileType(
+                                          selected.profileType,
+                                        );
+                                        userPanelPermissions =
+                                            MobilePanel.userPermissionFor(
+                                              activePanel,
+                                            );
 
                                         selectedProfileIdNotifier.value =
                                             selectedProfileId!;
                                         selectedProfileNameNotifier.value =
                                             selectedProfileName!;
                                         setState(() {});
-                                        getRequisitionCounts(sessionId!);
                                         Navigator.pop(context);
                                         Navigator.push(
                                           context,
@@ -5106,6 +5420,14 @@ class _DrawerFileState extends State<DrawerFile> {
                     ),
                   );
                 },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey.shade300,
+                ),
               ),
             ],
           ).py32(),

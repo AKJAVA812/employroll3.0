@@ -13,6 +13,7 @@ import '../../../../main.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../leaveRequisition/leaveRequisitionPage.dart';
 import '../modalClass/selfLeaveRequisitionModal.dart';
@@ -135,32 +136,44 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
   Future<SelfLeaveRequisitionListModal> getSelfLeaveReqList(
     String SessionId,
   ) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.requestedReqList;
-    print('employeeList11: ${SessionId}');
     setState(() {
       _isLoading = true;
     });
-    SelfLeaveRequisitionListModal approvedLeaveReqModal;
-    var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
-    final response = await MobileHttpClient.instance.post(urlapi);
-
-    print('responseemployeeList ${response.body}');
-    print('API ${response.request}');
-
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse.length;
-    if (getData == 0) {
-      print("getData111 $getData");
-      showNodata(context, "Oops", "There is no any requisition.");
+    final foundation = MobileApiFoundation.instance;
+    try {
+      final response = await foundation.get(
+        ApiDetails.mobileLeaveRequisitionList,
+        queryParameters: const <String, Object?>{'page': 0, 'size': 100},
+        headers: await foundation.authHeaders(),
+        tag: 'LEAVE_REQUISITION_LIST',
+      );
+      final body = foundation.decodeMap(response.body);
+      if (!foundation.isSuccess(response)) {
+        throw MobileApiException(
+          'LEAVE_REQUISITION_LIST_FAILED',
+          message: body['message']?.toString(),
+          statusCode: response.statusCode,
+        );
+      }
+      mapResponse = body;
+      final model = SelfLeaveRequisitionListModal.fromJson(body);
+      if (mounted) setState(() => _isLoading = false);
+      return model;
+    } catch (error) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error is MobileApiException
+                  ? (error.message ?? 'Unable to load leave requests.')
+                  : 'Unable to load leave requests.',
+            ),
+          ),
+        );
+      }
+      return SelfLeaveRequisitionListModal(data: <Data>[]);
     }
-    print('responseemployeeList $getData');
-    approvedLeaveReqModal = SelfLeaveRequisitionListModal.fromJson(mapResponse);
-
-    setState(() {
-      _isLoading = false;
-    });
-    return approvedLeaveReqModal;
   }
 
   var titleName = "My Leave Requests";
@@ -286,10 +299,11 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
                   _isLoading
                       ? Center(child: CircularProgressIndicator())
                       : (selfLeaveRequisitionLabel == null ||
-                          selfLeaveRequisitionLabel!.data == null)
+                          selfLeaveRequisitionLabel!.data == null ||
+                          selfLeaveRequisitionLabel!.data!.isEmpty)
                       ? Center(
                         child: Text(
-                          'Click on + icon to raise the leave request.',
+                          'No leave requisitions available.',
                         ),
                       )
                       : getSelfReqRequisitionList(selfLeaveRequisitionLabel!),

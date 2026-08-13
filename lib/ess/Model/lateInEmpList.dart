@@ -130,9 +130,7 @@ class _LateInEmpListState extends State<LateInEmpList> {
   }
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
-    for(int i = 0; i < dashboardModelGlobal!.countData!.data!.length; i++) {
-      itemCount = dashboardModelGlobal!.countData!.lateList!.length;
-    }
+    itemCount = dashboardModelGlobal?.countData?.lateList?.length ?? 0;
     print("ItemCount - $itemCount");
     return ListView.builder(
       padding: const EdgeInsets.all(4.0),

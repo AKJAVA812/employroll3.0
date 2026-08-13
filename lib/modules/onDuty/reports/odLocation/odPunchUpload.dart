@@ -11,10 +11,9 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
+import 'package:er_flutter_project/services/od_punch_api.dart';
 import '../../../../adminPage/modelClass/dashboardModel.dart';
 import '../../../../adminPage/mssDashboard.dart';
-import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/commanNotificationPage.dart';
 
 
@@ -46,12 +45,12 @@ class _ODImageUploadState extends State<ODImageUpload> {
   final String time;
   final String address;
   final String? clockingType;
-  late var result;
   double lat=0;
   double lng=0;
   var firstImei;
   var secondImei;
   var macAddress;
+  bool _isSubmitting = false;
   _ODImageUploadState(this.value,this.time,this.address,this.clockingType);
 
 /*  Future getUploadImage() async {
@@ -127,92 +126,89 @@ class _ODImageUploadState extends State<ODImageUpload> {
     orgnizationID=await shared.getOrgId();
 
   }
-  showDialgError(BuildContext buildContext, result,reason) {
-    var alertDialog = AlertDialog(
-      title: Row(
-        children: [
-          //Icon(Icons.warning),
-          Text(result),
+  Future<void> showDialgError(
+    BuildContext buildContext,
+    result,
+    reason,
+  ) async {
+    final retry = await showDialog<bool>(
+      context: buildContext,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(result.toString()),
+        content: Text(reason.toString()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text("Retry"),
+          ),
         ],
       ),
-      content: Text(reason),
-      titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(buildContext, rootNavigator: true).pop();
-          },
-          child: Text("Cancel"),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(buildContext, rootNavigator: true).pop();
-            odUploadImage(buildContext);
-          },
-          child: Text("Retry"),
-        )
-      ],
-      elevation: 24.0,
     );
-    showDialog(
-        context:buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
-  }
-
-  Future<void> odUploadImage(BuildContext context) async {
-    print("Od API Hit");
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.odInOtApi;
-    CommonNotificationPage.showLoaderDialog(context);
-    var stream = http.ByteStream(value!.openRead());
-    stream.cast();
-    DateTime now = DateTime.now();
-    DateFormat dateFormat=DateFormat("dd-MM-yyyy HH:mm:ss");
-    String formattedDate = dateFormat.format(now);
-    DateFormat currentDateFormat=DateFormat("yyyy-MM-dd HH:mm:ss");
-    DateFormat currentTimeFormat=DateFormat("HH:mm:ss");
-    String currentDateFormatString = currentDateFormat.format(now);
-    String currentTimeFormatString = currentTimeFormat.format(now);
-    var length = await value!.length();
-    var multipart = http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
-    var uri = Uri.parse("$conn$apiUrl");
-    var request = http.MultipartRequest("Post", uri);
-    request.fields['sessionId'] = sessionId!;
-    request.files.add(multipart);
-    request.fields['address'] = currentAddress;
-    request.fields['clocking'] = currentTimeFormatString;
-    request.fields['clockingType'] = clockingType!;
-    request.fields['lat'] = lat.toString();
-    request.fields['lng'] = lng.toString();
-    request.fields['currentDate'] = currentDateFormatString;
-    request.fields['firstImei'] = firstImei;
-    request.fields['secondImei'] = secondImei;
-    request.fields['macAddress'] = macAddress;
-    request.fields['remark'] = _remarkController.text;
-
-    http.Response response = await http.Response.fromStream(await request.send());
-    result= json.decode(response.body.toString());
-    String resultSuccess=result['result'];
-    String reasonSuccess=result['reason'];
-
-    if(response.statusCode==200){
-      Navigator.of(context, rootNavigator: true).pop();
-      if(resultSuccess.compareToIgnoringCase("success")==0){
-        showSuccessGo(context,reasonSuccess.upperCamelCase+" "+formattedDate,"Successfully OD Punch $clockingType");
-      }else if(resultSuccess.compareToIgnoringCase("Error")==0){
-        showSuccessGo(context,reasonSuccess.upperCamelCase, " Failed ");
-      }
-    }else {
-      Navigator.of(context, rootNavigator: true).pop();
-      showDialgError(context, result,"Your OD Punch Not Submitted, Please Try Again");
+    if (retry == true && mounted) {
+      await odUploadImage(buildContext);
     }
   }
 
+  Future<void> odUploadImage(BuildContext context) async {
+    if (_isSubmitting || !(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+    if (value == null) {
+      showDialgError(context, "Image Required", "Please capture OD requisition evidence first.");
+      return;
+    }
+
+    final formattedDate = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now());
+    final action = (clockingType ?? '').trim().toUpperCase();
+    print('[MOBILE-OD] screen submit -> action=$action image=${value!.path} lat=$lat lng=$lng address=$address');
+    setState(() => _isSubmitting = true);
+    CommonNotificationPage.showLoaderDialog(context);
+    try {
+      final response = await OdPunchApi().punchWithImage(
+        image: value!,
+        punchAction: action,
+        latitude: lat,
+        longitude: lng,
+        address: address,
+        remark: _remarkController.text,
+        firstImei: firstImei?.toString(),
+        secondImei: secondImei?.toString(),
+        macAddress: macAddress?.toString(),
+      );
+      final decoded = _decodeOdResponse(response.body);
+      final resultSuccess = decoded['result']?.toString() ?? 'failed';
+      final reason = decoded['reason']?.toString() ?? 'OD requisition submission failed';
+
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      if (response.statusCode == 200 && resultSuccess.compareToIgnoringCase("success") == 0) {
+        showSuccessGo(context, "$reason $formattedDate", "OD Requisition Submitted");
+      } else {
+        showDialgError(context, "Failed", reason);
+      }
+      print('[MOBILE-OD] screen response status=${response.statusCode} body=$decoded');
+    } catch (error) {
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      print('[MOBILE-OD] screen submit error -> $error');
+      showDialgError(context, "Failed", error.toString());
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  Map<String, dynamic> _decodeOdResponse(String body) {
+    try {
+      final decoded = json.decode(body);
+      if (decoded is Map<String, dynamic>) return decoded;
+    } catch (_) {}
+    return <String, dynamic>{
+      'result': 'failed',
+      'reason': body.isEmpty ? 'OD requisition submission failed' : body,
+    };
+  }
   void navigatePage(BuildContext context) {
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ODLocationView(),));
   }
@@ -456,14 +452,17 @@ class _ODImageUploadState extends State<ODImageUpload> {
                               buttonPadding: Vx.mOnly(right: 16),
                               children: [
                                 ElevatedButton(
-                                  onPressed: (){
-                                    //getUploadImage();
-                                    odUploadImage(context);
-                                  },
+                                  onPressed: _isSubmitting
+                                      ? null
+                                      : () => odUploadImage(context),
                                   style: ButtonStyle(
                                     backgroundColor: MaterialStateProperty.all(Mythemes.lightBluishColor),
                                   ),
-                                  child: "OD $clockingType".text.make(),
+                                  child: Text(
+                                    _isSubmitting
+                                        ? "Submitting..."
+                                        : "OD $clockingType",
+                                  ),
                                 ).wh(150, 40).py64()
                               ]
                           ),
@@ -552,7 +551,6 @@ class _ODImageUploadState extends State<ODImageUpload> {
     );
   }
 }
-
 
 
 /*@override

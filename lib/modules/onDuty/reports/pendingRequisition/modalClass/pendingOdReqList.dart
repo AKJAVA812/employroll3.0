@@ -37,6 +37,10 @@ class Listdata {
   String? odtype;
   double? lat;
   String? remark;
+  String? branch;
+  String? requestType;
+  int? currentLevel;
+  int? totalLevels;
 
   Listdata(
       {this.date,
@@ -65,6 +69,13 @@ class Listdata {
     odtype = json['odtype'];
     lat = json['lat'];
     remark = json['Remark'];
+    branch = json['branch'];
+    requestType = json['requestType'];
+    currentLevel = int.tryParse(
+      (json['currentLevel'] ?? json['approvalLevel'] ?? json['levelNo'] ?? '')
+          .toString(),
+    );
+    totalLevels = int.tryParse((json['totalLevels'] ?? '').toString());
   }
 
   Map<String, dynamic> toJson() {
@@ -81,6 +92,10 @@ class Listdata {
     data['odtype'] = this.odtype;
     data['lat'] = this.lat;
     data['Remark'] = this.remark;
+    data['branch'] = this.branch;
+    data['requestType'] = this.requestType;
+    data['currentLevel'] = this.currentLevel;
+    data['totalLevels'] = this.totalLevels;
     return data;
   }
 }

@@ -17,7 +17,6 @@ class PresentEmpList extends StatefulWidget {
   @override
   State<PresentEmpList> createState() => _PresentEmpListState(dashboardModelGlobal);
 }
-dynamic itemCount = "";
 class _PresentEmpListState extends State<PresentEmpList> {
   EssDashboarrdModel? dashboardModelGlobal;
 
@@ -37,7 +36,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: "Present Employees".text.make(),
+        title: "Attendance".text.make(),
         elevation: 0.5,
         actions: [
           IconButton(
@@ -131,14 +130,12 @@ class _PresentEmpListState extends State<PresentEmpList> {
   }
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
-    for(int i = 0; i < dashboardModelGlobal!.countData!.data!.length; i++) {
-      itemCount = dashboardModelGlobal!.countData!.totalList!.length;
-    }
-    print("ItemCount - $itemCount");
+    final attendanceRows = _attendanceRows(dashboardModel);
     return ListView.builder(
       padding: const EdgeInsets.all(4.0),
-      itemCount: itemCount,
+      itemCount: attendanceRows.length,
       itemBuilder: (context, itemCount) {
+        final attendance = attendanceRows[itemCount];
         //var distance =dashboardModelGlobal!.presentEmp![itemCount].distance;
 
 
@@ -155,14 +152,14 @@ class _PresentEmpListState extends State<PresentEmpList> {
                   children: [
                     Row(
                       children: [
-                        dashboardModelGlobal!.countData!.totalList![itemCount].empName!.text.make().px8().py4(),
+                        (attendance.empName ?? '').text.make().px8().py4(),
                         Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                dashboardModelGlobal!.countData!.totalList![itemCount].status!.text.bold.size(16).color(dashboardModelGlobal!.countData!.totalList![itemCount].status == "Present" ? Mythemes.successColor : Mythemes.dangerColor).make().px8(),
-                                dashboardModelGlobal!.countData!.totalList![itemCount].logDate!.text.make().px8(),
+                                (attendance.status ?? '').text.bold.size(16).color(Mythemes.successColor).make().px8(),
+                                (attendance.logDate ?? '').text.make().px8(),
                               ],
                             )
                         )
@@ -170,17 +167,17 @@ class _PresentEmpListState extends State<PresentEmpList> {
                     ),
                     Row(
                       children: [
-                        dashboardModelGlobal!.countData!.totalList![itemCount].branch!.text.textStyle(context.captionStyle).make().px8(),
+                        (attendance.branch ?? '').text.textStyle(context.captionStyle).make().px8(),
 
                       ],
                     ),
                     Row(
                       children: [
-                        dashboardModelGlobal!.countData!.totalList![itemCount].dept!.text.textStyle(context.captionStyle).make().px8(),
+                        (attendance.dept ?? '').text.textStyle(context.captionStyle).make().px8(),
 
                       ],
                     ),
-                    dashboardModelGlobal!.countData!.totalList![itemCount].status! != "Week-Off" ?
+                    _isPresent(attendance.status, attendance.statusCode) ?
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,7 +193,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
                         Column(
                           children: [
                             "In Time".text.sm.make(),
-                            dashboardModelGlobal!.countData!.totalList![itemCount].inTime!.text.sm.make()
+                            (attendance.inTime ?? '--:--').text.sm.make()
                           ],
                         ),
                         Padding(
@@ -214,7 +211,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
                           child: Column(
                             children: [
                               "Out Time".text.sm.make(),
-                              dashboardModelGlobal!.countData!.totalList![itemCount].outTime!.text.sm.make()
+                              (attendance.outTime ?? '--:--').text.sm.make()
                             ],
                           ),
                         ),
@@ -247,7 +244,7 @@ class _PresentEmpListState extends State<PresentEmpList> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Card(
                                   color: Mythemes.lightBluishColor,
-                                  child: dashboardModelGlobal!.countData!.totalList![itemCount].status!.toString().text.bold.center.color(Mythemes.whitish).make(),
+                                  child: (attendance.status ?? '').text.bold.center.color(Mythemes.whitish).make(),
                                 ),
                               ),
                             )
@@ -260,6 +257,32 @@ class _PresentEmpListState extends State<PresentEmpList> {
         );
       },
     );
+  }
+
+  List<PresentList> _attendanceRows(EssDashboarrdModel dashboardModel) {
+    final rows = <PresentList>[...?dashboardModel.countData?.presentList];
+    final existingDates = rows
+        .map((row) => '${row.empId ?? ''}|${row.logDate ?? ''}')
+        .toSet();
+    for (final row in dashboardModel.countData?.totalList ?? <TotalList>[]) {
+      final rowKey = '${row.empId ?? ''}|${row.logDate ?? ''}';
+      if (isAttendanceCardStatus(row.status, row.statusCode) &&
+          !existingDates.contains(rowKey)) {
+        rows.add(PresentList.fromJson(row.toJson()));
+        existingDates.add(rowKey);
+      }
+    }
+    rows.sort((left, right) => (left.logDate ?? '').compareTo(right.logDate ?? ''));
+    return rows;
+  }
+
+  bool _isPresent(String? status, String? statusCode) {
+    final value = '${status ?? ''} ${statusCode ?? ''}'
+        .toLowerCase()
+        .replaceAll('-', ' ')
+        .replaceAll('_', ' ');
+    return value.contains('present') ||
+        const {'p', 'pp'}.contains((statusCode ?? '').trim().toLowerCase());
   }
 }
 

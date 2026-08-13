@@ -15,6 +15,7 @@ import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../main.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
+import '../../MSS_Bundle/common/mss_approval_filter_panel.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 import '../../modules/leaveManagement/reports/leaveManageReport.dart';
@@ -116,11 +117,44 @@ class _MSS_MO_PendingLeaveRequisitionListState
   bool isLoading = false;
 
   Future getSharedPrfanceList() async {
-    if (!_isBottomSheetOpen) {
-      await Future.delayed(Duration(milliseconds: 100));
-      _showFilterBottomSheet();
+    await loadOrgListFromPrefs();
+    sessionId = await shared.getSessionId();
+    userPanel = await shared.getUserPanel();
+    getProfileId = await shared.getDefaultProfileId();
+    levelOne = await shared.getLevelOne();
+    levelTwo = await shared.getLevelTwo();
+    final activeOrgId = await shared.getActiveOrgId() ?? await shared.getOrgId();
+    final activeOrgName = await shared.getActiveOrgName();
+    getOrgId = activeOrgId?.toString() ?? '';
+    matchedOrg = storedOrgList.firstWhere(
+      (org) => org['id']?.toString() == getOrgId,
+      orElse: () => {
+        'id': getOrgId,
+        'orgName': activeOrgName ?? '',
+      },
+    );
+    final resolvedOrgName = matchedOrg['orgName']?.toString();
+    selectedOrg = organizations.contains(resolvedOrgName) ? resolvedOrgName : null;
+    if ((sessionId ?? '').isEmpty || (getOrgId ?? '').toString().isEmpty) return;
+
+    if (mounted) {
+      setState(() {
+        pendingLeaveReqLabeled = null;
+        isLoading = true;
+      });
     }
-    loadOrgListFromPrefs();
+    try {
+      final value = await getPendingLeaveReq(sessionId!);
+      if (!mounted) return;
+      setState(() {
+        foundDataNewMO = allUsernew ?? [];
+        pendingLeaveReqLabel = value;
+        pendingLeaveReqLabeled = value;
+        isLoading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
   showNodata(BuildContext buildContext, result, reason) {
@@ -269,6 +303,25 @@ class _MSS_MO_PendingLeaveRequisitionListState
     });
   }
 
+  void _applyApprovalFilters(MssApprovalFilterValue filters) {
+    final query = filters.search.toLowerCase();
+    final type = filters.requestType?.label.toLowerCase();
+    final typeCode = filters.requestType?.code.toLowerCase().replaceAll('_', ' ');
+    final branch = filters.branch?.label.toLowerCase();
+    final stage = int.tryParse(filters.stage?.id?.toString() ?? '');
+    final rows = allUsernew ?? <Data>[];
+    final hasStageData = rows.any((item) => item.currentLevel != null);
+    final results = rows.where((item) {
+      final searchable = '${item.employeeName ?? ''} ${item.empId ?? ''} ${item.department ?? ''}'.toLowerCase();
+      return (query.isEmpty || searchable.contains(query)) &&
+          (type == null || '${item.requestType ?? ''} ${item.leaveType ?? ''}'.toLowerCase().contains(type) ||
+              '${item.requestType ?? ''} ${item.leaveType ?? ''}'.toLowerCase().contains(typeCode!)) &&
+          (!hasStageData || stage == null || item.currentLevel == stage) &&
+          (branch == null || (item.branchName ?? '').toLowerCase() == branch);
+    }).toList();
+    setState(() => foundDataNewMO = results);
+  }
+
   void _showFilterBottomSheet() {
     if (_isBottomSheetOpen) return; // âœ… Prevent multiple opens
     _isBottomSheetOpen = true;
@@ -330,7 +383,7 @@ class _MSS_MO_PendingLeaveRequisitionListState
                           return DropdownMenuItem(value: org, child: Text(org));
                         }).toList(),
                       ],
-                      onChanged: (value) {
+                      onChanged: (value) async {
                         setState(() {
                           selectedOrg = value;
 
@@ -344,6 +397,12 @@ class _MSS_MO_PendingLeaveRequisitionListState
                           print('Org Name: $selectedOrg');
                           print('Org ID: $getOrgId');
                         });
+
+                        final selectedId = int.tryParse(getOrgId.toString());
+                        if (selectedId != null && selectedId > 0) {
+                          await shared.setActiveOrgId(selectedId);
+                          await shared.setActiveOrgName(value ?? '');
+                        }
 
                         setModalState(() {});
                       },
@@ -568,6 +627,12 @@ class _MSS_MO_PendingLeaveRequisitionListState
                 ? Center(child: CircularProgressIndicator())
                 : Column(
                   children: [
+                    MssApprovalFilterPanel(
+                      organisationId: int.tryParse(getOrgId.toString()),
+                      total: allUsernew?.length ?? 0,
+                      requestFamilyCode: 'LEAVE',
+                      onChanged: _applyApprovalFilters,
+                    ),
                     /*Visibility(
                   visible: levelOne == "true",
                   child: Row(

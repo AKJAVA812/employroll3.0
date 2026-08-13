@@ -17,8 +17,12 @@ import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../themes/empThemes.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_permission_service.dart';
 
+import '../../calendarPage/workFromHomeRequisitionPage.dart';
+import '../../calendarPage/requisitionTypeTabs.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/model/onDateReportModel.dart';
 
 class AttendanceRequestCurrentMonth extends StatefulWidget {
@@ -366,71 +370,23 @@ class _AttendanceRequestCurrentMonthState
                       ),
                     ],
                   ),*/
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedToggleSwitch<int>.size(
-                        height: 30,
-                        current: min(value, 3),
-                        style: ToggleStyle(
-                          backgroundColor: Mythemes.greyishade,
-                          indicatorColor: Mythemes.lightBluishColor,
-                          borderColor: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.0),
-                          indicatorBorderRadius: BorderRadius.zero,
-                        ),
-                        values: const [0, 1, 2],
-                        iconOpacity: 1.0,
-                        selectedIconScale: 1.0,
-                        indicatorSize: const Size.fromWidth(85),
-                        iconAnimationType: AnimationType.onHover,
-                        styleAnimationType: AnimationType.onHover,
-                        spacing: 3.0,
-                        customSeparatorBuilder: (context, local, global) {
-                          final opacity =
-                              ((global.position - local.position).abs() - 0.5)
-                                  .clamp(0.0, 1.0);
-                          return VerticalDivider(
-                            indent: 10.0,
-                            endIndent: 10.0,
-                            color: Colors.white38.withOpacity(opacity),
-                          );
-                        },
-                        customIconBuilder: (context, local, global) {
-                          final text =
-                              const ['Attendance', 'Leave', 'OD'][local.index];
-                          return Center(
-                            child: Text(
-                              text,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color.lerp(
-                                  Colors.black,
-                                  Colors.white,
-                                  local.animationValue,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        borderWidth: 0.0,
-                        onChanged: (i) {
-                          setState(() => value = i);
-                          if (value == 1) {
-                            Navigator.pushNamed(
-                              context,
-                              MyRoutings.leaveRequisitionRoute,
-                            );
-                          } else if (value == 2) {
-                            Navigator.pushNamed(
-                              context,
-                              MyRoutings.odLocationViewRoute,
-                            );
-                          }
-                        },
-                      ),
-                    ],
+                  RequisitionTypeTabs(
+                    currentIndex: min(value, 3),
+                    onChanged: (i) {
+                      setState(() => value = i);
+                      if (value == 1) {
+                        Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                      } else if (value == 2) {
+                        Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
+                      } else if (value == 3) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WorkFromHomeRequisitionPage(),
+                          ),
+                        );
+                      }
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.all(12.0),
@@ -660,6 +616,7 @@ class _AttendanceRequestCurrentMonthState
                               controller: TextEditingController(
                                 text: actualTimeset,
                               ),
+                              enabled: false,
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
@@ -772,6 +729,7 @@ class _AttendanceRequestCurrentMonthState
                               controller: TextEditingController(
                                 text: actualOutTimeset,
                               ),
+                              enabled: false,
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
@@ -1526,6 +1484,71 @@ class _AttendanceRequestCurrentMonthState
 
   String conn = ApiDetails.server;
   String apiUrl = ApiDetails.sendAttendanceReq;
+  Future<void> _submitMobileAttendanceRequisition(
+    BuildContext context,
+    int empId,
+    String inRemarkString,
+    String outRemarkString,
+    String inTimeReq,
+    String outTimeReq,
+    String logid,
+    var onDate, {
+    bool nextday = false,
+    bool isOdReq = false,
+    bool compOff = false,
+    bool shortLeave = false,
+  }) async {
+    final permissionState = await MobilePermissionService.loadEssState();
+    if (!permissionState.canAddAttendanceRequisition) {
+      showDialgSucess1(
+        context,
+        "Attendance requisition permission is not assigned. Please contact your administrator.",
+        "Permission Not Provided",
+      );
+      return;
+    }
+    CommonNotificationPage.showLoaderDialog(context);
+    final foundation = MobileApiFoundation.instance;
+    final requestId = foundation.newRequestId();
+    final body = <String, Object?>{
+      'id': empId,
+      'onDate': onDate,
+      'inTimeRemarks': inRemarkString,
+      'outTimeRemarks': outRemarkString,
+      'inTime': inTimeReq,
+      'outTime': outTimeReq,
+      'logid': logid,
+      if (nextday) 'nextday': true,
+      if (isOdReq) 'isOdReq': 1,
+      if (compOff) 'compOff': true,
+      if (shortLeave) 'shortLeave': 1,
+    };
+    print('[ATT_REQ_MOBILE] -> ${ApiDetails.mobileAttendanceRequisition} body=$body requestId=$requestId');
+    final response = await foundation.postJson(
+      ApiDetails.mobileAttendanceRequisition,
+      body: body,
+      headers: await foundation.authHeaders(requestId: requestId, json: true),
+      tag: 'ATT_REQ_MOBILE',
+    );
+    print('[ATT_REQ_MOBILE] request ${response.request}');
+    print('[ATT_REQ_MOBILE] <- status=${response.statusCode} body=${response.body}');
+    Navigator.of(context, rootNavigator: true).pop();
+
+    mapResponse = response.body.isNotEmpty ? json.decode(response.body) : {};
+    String result = (mapResponse['result'] ?? mapResponse['status'] ?? '').toString();
+    String reason = (mapResponse['reason'] ?? mapResponse['message'] ?? '').toString();
+    if (reason.isEmpty && mapResponse['error'] is Map) {
+      reason = (mapResponse['error']['message'] ?? mapResponse['error']['code'] ?? '').toString();
+    }
+    if (response.statusCode == 200 && result.compareToIgnoringCase("success") == 0) {
+      reason = reason.isEmpty ? "you have submit Requisition for $onDate" : reason;
+      showDialgSucess1(context, reason, "Success");
+    } else {
+      showDialgSucess1(context, reason.isEmpty ? result : reason, "Warning");
+    }
+    print('[ATT_REQ_MOBILE] result=$result reason=$reason');
+  }
+
   Future<void> sendRequsitionToServer(
     BuildContext context,
     int empId,
@@ -1536,6 +1559,7 @@ class _AttendanceRequestCurrentMonthState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -1585,6 +1609,7 @@ class _AttendanceRequestCurrentMonthState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, nextday: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -1632,6 +1657,7 @@ class _AttendanceRequestCurrentMonthState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, isOdReq: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -1679,6 +1705,7 @@ class _AttendanceRequestCurrentMonthState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, compOff: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -1726,6 +1753,7 @@ class _AttendanceRequestCurrentMonthState
     String logid,
     var onDate,
   ) async {
+    return _submitMobileAttendanceRequisition(context, empId, inRemarkString, outRemarkString, inTimeReq, outTimeReq, logid, onDate, shortLeave: true);
     CommonNotificationPage.showLoaderDialog(context);
     var urlapi = Uri.parse(
       "$conn$apiUrl?"

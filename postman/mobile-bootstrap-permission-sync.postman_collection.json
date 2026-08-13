@@ -1,0 +1,174 @@
+{
+  "info": {
+    "name": "Employroll Mobile Bootstrap Permission Sync",
+    "description": "Login, validate the mobile session, refresh the permission version, and inspect the effective bootstrap permissions.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://fang-sizing-enrage.ngrok-free.dev"
+    },
+    {
+      "key": "username",
+      "value": "bharatrajora5678@gmail.com"
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/ermobile/api/auth/login?username={{username}}&password={{password}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ermobile",
+            "api",
+            "auth",
+            "login"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "password",
+              "value": "{{password}}"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login successful', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('accessToken', body.accessToken || '');",
+              "pm.collectionVariables.set('sessionId', body.session?.sessionId || body.sessionId || '');",
+              "pm.collectionVariables.set('loginPermissionsVersion', body.permissionsVersion || '');",
+              "console.log('LOGIN permissions', body.essPermissions?.securityGroupIds || []);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Validate Session",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "X-Mobile-Session-Id",
+            "value": "{{sessionId}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/auth/session"
+      }
+    },
+    {
+      "name": "3. Bootstrap Version and R2 Permission Refresh",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "X-Mobile-Session-Id",
+            "value": "{{sessionId}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mobile/bootstrap/version"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Version loaded', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('bootstrapPermissionsVersion', body.permissionsVersion || '');",
+              "console.log('BOOTSTRAP VERSION', body.permissionsVersion);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Bootstrap Effective Permissions",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          },
+          {
+            "key": "X-Mobile-Session-Id",
+            "value": "{{sessionId}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mobile/bootstrap"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Bootstrap loaded', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "const ids = body.essPermissions?.securityGroupIds || [];",
+              "const withSelfie = ids.includes('ESS_MOBILE_ATT_SELFIE_VIEW');",
+              "const withoutSelfie = ids.includes('ESS_MOBILE_ATT_WITHOUT_SELFIE_VIEW');",
+              "pm.collectionVariables.set('effectiveAttendanceMode', withSelfie ? 'WITH_SELFIE' : (withoutSelfie ? 'WITHOUT_SELFIE' : 'NOT_ASSIGNED'));",
+              "console.log('BOOTSTRAP permissions', ids);",
+              "console.log('ATTENDANCE MODE', pm.collectionVariables.get('effectiveAttendanceMode'));",
+              "pm.test('Selfie permissions are not conflicting', function () { pm.expect(withSelfie && withoutSelfie).to.eql(false); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -12,9 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:http/http.dart' as http;
-
-import 'allAPIList.dart';
+import 'package:er_flutter_project/services/work_done_api.dart';
 
 class WorkDonePage extends StatefulWidget {
   final File? value;
@@ -51,7 +49,6 @@ class _WorkDonePageState extends State<WorkDonePage> {
 
   bool _enabled = false;
   File? _image;
-  late var result;
 
   @override
   void initState() {
@@ -104,77 +101,57 @@ class _WorkDonePageState extends State<WorkDonePage> {
   }
 
   Future<void> uploadImage(BuildContext context) async {
-    CommonNotificationPage.showLoaderDialog(context);
-    var stream = http.ByteStream(value!.openRead());
-    stream.cast();
-
-    DateTime now = DateTime.now();
-    DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
-    String formattedDate = dateFormat.format(now);
-    var length = await value!.length();
-    print('Response status: ${length}');
-    print('Response body: ${stream}');
-    print('Response body: ${value}');
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.customWorkDoneApi;
-
-    //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
-    var uri = Uri.parse("$conn$apiUrl");
-    //var uri = Uri.parse("http://www.employroll.com/restful/service/task/via/mobile");
-    var request = http.MultipartRequest("Post", uri);
-    request.fields['sessionId'] = sessionId!;
-    request.fields['taskTime'] = formattedDate;
-    request.fields['address'] = currentAddress;
-    request.fields['taskDone'] = "DONE";
-    request.fields['lat'] = lat.toString();
-    request.fields['lng'] = lng.toString();
-    request.fields['cname'] = _clientNameController.text;
-    request.fields['contactnumber'] = _contNoController.text;
-    request.fields['emailid'] = _emailIdController.text;
-    request.fields['orgname'] = _orgNameController.text;
-    request.fields['taskDetails'] = _remarkController.text;
-
-   /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Sucessfully Run"+_emailIdController.text),
-    ));*/
-    var multipart = http.MultipartFile('image', stream, length,
-        filename: basename('image.jpg'));
-    request.files.add(multipart);
-    // Construct API URL with parameters
-    String apiWithParams = uri.toString() + '?' + request.fields.entries.map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}').join('&');
-
-    // Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
-    http.Response response = await http.Response.fromStream(await request.send());
-    result = json.decode(response.body.toString());
-    /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Sucessfully Run"+response.body),
-    ));*/
-    String resultSuccess = result['result'];
-
-    if (response.statusCode == 200) {
-      //print(response.request);
-      Navigator.of(context, rootNavigator: true).pop();
-      if (resultSuccess.compareToIgnoringCase("success") == 0) {
-        showSuccessGo(
-            context, "You have successfully submitted task details on server at".toString() + " " + formattedDate, "Task Submitted");
-      } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
-        showSuccessGo(
-            context, resultSuccess, " Failed ");
-      }
-    } else {
-      Navigator.of(context, rootNavigator: true).pop();
-      showDialgError(context, result, "reason");
+    if (value == null) {
+      showDialgError(context, "Image Required", "Please capture work done image first.");
+      return;
     }
-    //String reasonSuccess = result['reason'];
 
-    print('result${result}');
-   /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Sucessfully Run" + result['result']),
-    ));*/
-    print('Response body: ${result}');
+    final formattedDate = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now());
+    CommonNotificationPage.showLoaderDialog(context);
+    try {
+      final response = await WorkDoneApi().submit(
+        image: value!,
+        latitude: double.tryParse(lat?.toString() ?? '') ?? 0,
+        longitude: double.tryParse(lng?.toString() ?? '') ?? 0,
+        address: currentAddress,
+        taskDetails: _remarkController.text,
+        clientName: _clientNameController.text,
+        contactNumber: _contNoController.text,
+        emailId: _emailIdController.text,
+        organisationName: _orgNameController.text,
+      );
+      final decoded = _decodeWorkDoneResponse(response.body);
+      final resultSuccess = decoded['result']?.toString() ?? 'failed';
+      final reason = decoded['reason']?.toString() ?? 'Work done request failed';
+
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      if (response.statusCode == 200 && resultSuccess.compareToIgnoringCase("success") == 0) {
+        showSuccessGo(
+          context,
+          "You have successfully submitted task details on server at $formattedDate",
+          "Task Submitted",
+        );
+      } else {
+        showDialgError(context, "Failed", reason);
+      }
+      print('[MOBILE-WORKDONE] response status=${response.statusCode} body=$decoded');
+    } catch (error) {
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      print('[MOBILE-WORKDONE] submit error -> $error');
+      showDialgError(context, "Failed", error.toString());
+    }
   }
 
+  Map<String, dynamic> _decodeWorkDoneResponse(String body) {
+    try {
+      final decoded = json.decode(body);
+      if (decoded is Map<String, dynamic>) return decoded;
+    } catch (_) {}
+    return <String, dynamic>{
+      'result': 'failed',
+      'reason': body.isEmpty ? 'Work done request failed' : body,
+    };
+  }
   showSuccessGo(BuildContext buildContext, result,alert) {
     var alertDialog = AlertDialog(
       shape: RoundedRectangleBorder(
@@ -443,13 +420,7 @@ class _WorkDonePageState extends State<WorkDonePage> {
                               ElevatedButton(
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
-                                    return
-                                      setState(() {
-                                        AlertDialog(
-                                          content: "Please add remarks".text.make(),
-                                        );
-                                        uploadImage(context);
-                                      });
+                                    await uploadImage(context);
                                   }
 
                                 },
