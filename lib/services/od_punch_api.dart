@@ -95,6 +95,64 @@ class OdPunchApi {
     return _legacyCompatible(response);
   }
 
+  Future<http.Response> punchFieldVisit({
+    required File selfie,
+    required File supportingDocument,
+    required String punchAction,
+    required double latitude,
+    required double longitude,
+    required String address,
+    required String remark,
+    String? clientName,
+    String? clientContact,
+    double accuracyMeters = 50,
+    String? clientEventId,
+  }) async {
+    final eventId = clientEventId ?? _foundation.newRequestId();
+    final uri = Uri.parse(
+      '${ApiDetails.server}${ApiDetails.mobileOdFieldVisitPunch}',
+    );
+    final request = http.MultipartRequest('POST', uri);
+    request.headers.addAll(await _headers(eventId));
+    request.fields['metadata'] = jsonEncode(
+      _metadata(
+        eventId: eventId,
+        punchAction: punchAction,
+        latitude: latitude,
+        longitude: longitude,
+        accuracyMeters: accuracyMeters,
+        address: address,
+        remark: remark,
+        deviceInstallationId: await _foundation.installationId(),
+        extraPayload: <String, Object?>{
+          'source': 'OD',
+          'workflowVariant': 'FIELD_VISIT',
+          'clientName': clientName?.trim(),
+          'clientContact': clientContact?.trim(),
+        },
+      ),
+    );
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'image',
+        selfie.path,
+        contentType: _imageContentType(selfie),
+      ),
+    );
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'supportingDocument',
+        supportingDocument.path,
+        contentType: _documentContentType(supportingDocument),
+      ),
+    );
+
+    final streamed = await MobileHttpClient.instance
+        .send(request)
+        .timeout(const Duration(seconds: 120));
+    return _legacyCompatible(await http.Response.fromStream(streamed));
+  }
+
   Map<String, Object?> _metadata({
     required String eventId,
     required String punchAction,
@@ -107,6 +165,7 @@ class OdPunchApi {
     String? firstImei,
     String? secondImei,
     String? macAddress,
+    Map<String, Object?>? extraPayload,
   }) => <String, Object?>{
     'clientEventId': eventId,
     'punchAction': punchAction.trim().toUpperCase(),
@@ -125,7 +184,7 @@ class OdPunchApi {
     'firstImei': firstImei,
     'secondImei': secondImei,
     'macAddress': macAddress,
-    'extraPayload': <String, Object?>{'source': 'OD'},
+    'extraPayload': extraPayload ?? <String, Object?>{'source': 'OD'},
   };
 
   Future<Map<String, String>> _headers(String eventId) async {
@@ -152,6 +211,13 @@ class OdPunchApi {
 
   MediaType _imageContentType(File image) {
     final path = image.path.toLowerCase();
+    if (path.endsWith('.png')) return MediaType('image', 'png');
+    return MediaType('image', 'jpeg');
+  }
+
+  MediaType _documentContentType(File document) {
+    final path = document.path.toLowerCase();
+    if (path.endsWith('.pdf')) return MediaType('application', 'pdf');
     if (path.endsWith('.png')) return MediaType('image', 'png');
     return MediaType('image', 'jpeg');
   }

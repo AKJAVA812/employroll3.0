@@ -20,6 +20,7 @@ import '../../../../commanScreen/commanNotificationPage.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 import 'odLocationPage.dart';
+import 'fieldVisitOdPunchPage.dart';
 
 class ODImageUpload extends StatefulWidget {
   final File? value;
@@ -38,6 +39,7 @@ int? orgnizationID=0;
 SessionManager shared = SessionManager();
 
 class _ODImageUploadState extends State<ODImageUpload> {
+  static const Set<int> _fieldVisitOrganisationIds = {23, 24, 44};
   TextEditingController _remarkController = TextEditingController();
   String? _platformVersion = 'Unknown', _autoTimezone, _autoTime, _daftar = "";
   Map<String, dynamic>? _list;
@@ -51,6 +53,7 @@ class _ODImageUploadState extends State<ODImageUpload> {
   var secondImei;
   var macAddress;
   bool _isSubmitting = false;
+  bool _organisationLoaded = false;
   _ODImageUploadState(this.value,this.time,this.address,this.clockingType);
 
 /*  Future getUploadImage() async {
@@ -124,7 +127,7 @@ class _ODImageUploadState extends State<ODImageUpload> {
 
     lng=await shared.getLongitude();
     orgnizationID=await shared.getOrgId();
-
+    if (mounted) setState(() => _organisationLoaded = true);
   }
   Future<void> showDialgError(
     BuildContext buildContext,
@@ -279,6 +282,21 @@ class _ODImageUploadState extends State<ODImageUpload> {
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    if (!_organisationLoaded) {
+      return const Scaffold(
+        backgroundColor: Color(0xfff6f7fb),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_fieldVisitOrganisationIds.contains(orgnizationID) && value != null) {
+      return FieldVisitOdPunchPage(
+        selfie: value!,
+        punchAction: clockingType ?? '',
+        initialAddress: address,
+        initialLatitude: lat,
+        initialLongitude: lng,
+      );
+    }
     return WillPopScope(
       onWillPop: () async {
         return navigatePage(context) as bool;

@@ -241,6 +241,11 @@ class MyRoutings {
   static String mssAttPendingRequestL2Route= "/mssAttPendingRequestL2Route";
   static String mssAttPendingRequestL3Route= "/mssAttPendingRequestL3Route";
   static String mssPendingOdRequisitionRoute= "/mssPendingOdRequisitionRoute";
+  static String mssWfhApprovalRoute= "/mssWfhApprovalRoute";
+  static String mssCompOffApprovalRoute= "/mssCompOffApprovalRoute";
+  static String mssTeamRoute= "/mssTeamRoute";
+  static String mssInductionRoute= "/mssInductionRoute";
+  static String mssExitRoute= "/mssExitRoute";
   static String mssOthersAttRequestPageRoute= "/mssOthersAttRequestPageRoute";
 
   //Leave

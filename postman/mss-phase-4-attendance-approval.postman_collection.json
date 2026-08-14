@@ -1,0 +1,128 @@
+{
+  "info": {
+    "name": "MSS Phase 4 - Attendance Approval",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://fang-sizing-enrage.ngrok-free.dev" },
+    { "key": "accessToken", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "profileId", "value": "10" },
+    { "key": "profileType", "value": "MSS_MO" },
+    { "key": "organisationId", "value": "15" },
+    { "key": "requisitionId", "value": "1" },
+    { "key": "requestType", "value": "" },
+    { "key": "stage", "value": "" },
+    { "key": "branch", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Pending attendance approvals",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/attendance-approvals?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&tab=pending&page=0&size=20&sortBy=submittedAt&direction=DESC&search=&requestType={{requestType}}&stage={{stage}}&branch={{branch}}"
+      }
+    },
+    {
+      "name": "2. Actioned by me",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/attendance-approvals?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&tab=actioned&page=0&size=20&sortBy=submittedAt&direction=DESC"
+      }
+    },
+    {
+      "name": "3. Attendance approval details and history",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/attendance-approvals/{{requisitionId}}?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "4. Download supporting attachment",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/attendance-approvals/{{requisitionId}}/attachment?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "5. Approve request",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "Idempotency-Key", "value": "{{$guid}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"action\": \"APPROVE\",\n  \"remarks\": \"Approved from mobile\"\n}" },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/attendance-approvals/{{requisitionId}}/actions?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "6. Reject request",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "Idempotency-Key", "value": "{{$guid}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"action\": \"REJECT\",\n  \"remarks\": \"Rejected from mobile\"\n}" },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/attendance-approvals/{{requisitionId}}/actions?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "7. Send request back",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "Idempotency-Key", "value": "{{$guid}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"action\": \"SEND_BACK\",\n  \"remarks\": \"Please review the request\"\n}" },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/attendance-approvals/{{requisitionId}}/actions?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "8. Forward request to next stage",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "Idempotency-Key", "value": "{{$guid}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"action\": \"FORWARD\",\n  \"remarks\": \"Forwarded to next configured stage\"\n}" },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/attendance-approvals/{{requisitionId}}/actions?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    }
+  ]
+}

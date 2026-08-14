@@ -1,0 +1,95 @@
+{
+  "info": {
+    "name": "MSS Phase 2 - Context and Navigation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://fang-sizing-enrage.ngrok-free.dev" },
+    { "key": "accessToken", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "profileId", "value": "10" },
+    { "key": "profileType", "value": "MSS_MO" },
+    { "key": "rootOrganisationId", "value": "15" },
+    { "key": "organisationId", "value": "15" },
+    { "key": "moduleCode", "value": "TIME_ATTENDANCE" }
+  ],
+  "item": [
+    {
+      "name": "1. Get or initialise active context",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/context"
+      }
+    },
+    {
+      "name": "2. Select ESS context",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"activePanel\": \"ESS\"\n}" },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/context"
+      }
+    },
+    {
+      "name": "3. Select MSS or MSS MO profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"activePanel\": \"{{profileType}}\",\n  \"profileId\": {{profileId}},\n  \"profileType\": \"{{profileType}}\",\n  \"organisationId\": {{organisationId}}\n}"
+        },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/context"
+      }
+    },
+    {
+      "name": "4. MSS MO organisation list",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "X-MSS-Profile-Id", "value": "{{profileId}}" },
+          { "key": "X-MSS-Profile-Type", "value": "{{profileType}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"activePanel\": \"MSS_MO\",\n  \"profileId\": {{profileId}},\n  \"profileType\": \"MSS_MO\"\n}"
+        },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/organisations"
+      }
+    },
+    {
+      "name": "5. Approval filters for active context",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "X-MSS-Profile-Id", "value": "{{profileId}}" },
+          { "key": "X-MSS-Profile-Type", "value": "{{profileType}}" },
+          { "key": "X-MSS-Organisation-Id", "value": "{{organisationId}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/approval-filters?organisationId={{organisationId}}&moduleCode={{moduleCode}}"
+      }
+    }
+  ]
+}

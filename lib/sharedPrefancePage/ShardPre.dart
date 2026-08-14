@@ -1,4 +1,3 @@
-
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -1642,6 +1641,7 @@ class SessionManager {
     await prefs.remove('mobileAccessToken');
     await prefs.remove('mobileTokenType');
     await prefs.remove('mobileLoginResponseJson');
+    await prefs.remove('firebaseTokenId');
     await prefs.remove('mobileBootstrapJson');
     await prefs.remove('mobilePermissionsVersion');
     await prefs.remove('mobileProfileVersion');
@@ -1653,6 +1653,13 @@ class SessionManager {
     await prefs.remove('activeOrgId');
     await prefs.remove('activeOrgName');
     await prefs.remove('mssMoParentOrgId');
+    await prefs.remove('mobileMssContextVersion');
+    await prefs.remove('mobileMssActivePermissionsJson');
+    for (final key in prefs.getKeys()) {
+      if (key.startsWith('mssApprovalFilters:')) {
+        await prefs.remove(key);
+      }
+    }
     await prefs.remove('sessionId');
     await prefs.remove('mobileSessionId');
     await prefs.remove('orgList');

@@ -115,7 +115,7 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
   }
 
   void _setControllers(EmployeeProfileDetails details) {
-    _dateOfBirthController.text = details.dateOfBirth;
+    _dateOfBirthController.text = _displayDate(details.dateOfBirth);
     _accountHolderController.text = details.accountHolderName;
     _bankAccountController.text = details.bankAccountNo;
     _bankIfscController.text = details.bankIfsc;
@@ -146,7 +146,9 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
   Future<void> _selectDateOfBirth() async {
     if (!_editing) return;
     final now = DateTime.now();
-    final parsed = DateTime.tryParse(_dateOfBirthController.text.trim());
+    final value = _dateOfBirthController.text.trim();
+    final parsed = DateFormat('dd-MM-yyyy').tryParseStrict(value) ??
+        DateTime.tryParse(value);
     final selected = await showDatePicker(
       context: context,
       initialDate: parsed ?? DateTime(now.year - 18, now.month, now.day),
@@ -154,7 +156,7 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
       lastDate: now,
     );
     if (selected != null) {
-      _dateOfBirthController.text = DateFormat('yyyy-MM-dd').format(selected);
+      _dateOfBirthController.text = DateFormat('dd-MM-yyyy').format(selected);
     }
   }
 
@@ -165,7 +167,7 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
     if (current == null) return;
 
     final update = EmployeeProfileUpdate(
-      dateOfBirth: _dateOfBirthController.text.trim(),
+      dateOfBirth: _apiDate(_dateOfBirthController.text),
       accountHolderName: _accountHolderController.text.trim(),
       bankAccountNo: _bankAccountController.text.trim(),
       bankIfsc: _bankIfscController.text.trim(),
@@ -551,8 +553,8 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
             children: [
               _requestValue(
                 'Date Of Birth',
-                request.current.dateOfBirth,
-                request.proposed.dateOfBirth,
+                _displayDate(request.current.dateOfBirth),
+                _displayDate(request.proposed.dateOfBirth),
               ),
               _requestValue(
                 'Account Holder Name',
@@ -756,8 +758,17 @@ class _ProfilePageNewState extends State<ProfilePageNew> {
   }
 
   String _displayDate(String value) {
-    final date = DateTime.tryParse(value);
+    final trimmed = value.trim();
+    final date = DateTime.tryParse(trimmed) ??
+        DateFormat('dd-MM-yyyy').tryParseStrict(trimmed);
     return date == null ? value : DateFormat('dd-MM-yyyy').format(date);
+  }
+
+  String _apiDate(String value) {
+    final trimmed = value.trim();
+    final date = DateFormat('dd-MM-yyyy').tryParseStrict(trimmed) ??
+        DateTime.tryParse(trimmed);
+    return date == null ? trimmed : DateFormat('yyyy-MM-dd').format(date);
   }
 
   String _value(String value) => value.trim().isEmpty ? '-' : value.trim();

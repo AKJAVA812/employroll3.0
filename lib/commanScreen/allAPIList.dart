@@ -12,15 +12,20 @@ class ApiDetails {
   static String bootStrap = "/ermobile/api/mobile/bootstrap";
   static String bootStrapVersion = "/ermobile/api/mobile/bootstrap/version";
   static String mobileInfo = "/ermobile/api/mobile/device-info";
+  static String mobilePushToken = "/ermobile/api/mobile/push-token";
+  static String mobilePushTokenDeactivate =
+      "/ermobile/api/mobile/push-token/deactivate";
   static String mobilePunch = "/ermobile/api/attendance/v1/punch";
   static String mobilePunchSelfie = "/ermobile/api/attendance/v1/punch/selfie";
-  static String mobilePunchContext = "/ermobile/api/attendance/v1/punch-context";
+  static String mobilePunchContext =
+      "/ermobile/api/attendance/v1/punch-context";
   static String mobileTodayPunches =
       "/ermobile/api/attendance/v1/today-punches";
   static String mobileWorkDone = "/ermobile/api/workdone/v1/tasks";
   static String mobileWorkDoneReport = "/ermobile/api/workdone/v1/reports";
   static String mobileOdPunch = "/ermobile/api/od/v1/punch";
   static String mobileOdPunchSelfie = "/ermobile/api/od/v1/punch/selfie";
+  static String mobileOdFieldVisitPunch = "/ermobile/api/od/v1/punch/field-visit";
   static String mobileOdPunchContext = "/ermobile/api/od/v1/punch-context";
   static String mobileOdReport = "/ermobile/api/od/v1/reports";
   static String mobileCalendar = "/ermobile/api/attendance/v1/calendar";
@@ -33,22 +38,26 @@ class ApiDetails {
   static String mobileWorkFromHomeRequisition =
       "/ermobile/api/wfh/v1/requisition";
   static String mobileLeaveLedger = "/ermobile/api/leave/v1/ledger";
-  static String mobileLeaveRequisition =
-      "/ermobile/api/leave/v1/requisition";
+  static String mobileLeaveRequisition = "/ermobile/api/leave/v1/requisition";
   static String mobileLeaveRequisitionList =
       "/ermobile/api/leave/v1/requisitions";
-  static String mobileEmployeeDocuments =
-      "/ermobile/api/documents/v1/employee";
+  static String mobileEmployeeDocuments = "/ermobile/api/documents/v1/employee";
   static String mobileSalarySlips = "/ermobile/api/payroll/v1/salary-slips";
   static String mobileProfileDetails = "/ermobile/api/profile/v1/details";
   static String mobileProfileUpdateRequests =
       "/ermobile/api/profile/v1/update-requests";
-  static String mobileMssMoOrganisations =
-      "/ermobile/api/mss/v1/organisations";
+  static String mobileMssMoOrganisations = "/ermobile/api/mss/v1/organisations";
+  static String mobileMssContext = "/ermobile/api/mss/v1/context";
+  static String mobileMssDashboard = "/ermobile/api/mss/v1/dashboard";
+  static String mobileMssAttendanceApprovals =
+      "/ermobile/api/mss/v1/attendance-approvals";
+  static String mobileMssRequisitions = "/ermobile/api/mss/v1/requisitions";
+  static String mobileMssTeam = "/ermobile/api/mss/v1/team";
+  static String mobileMssLifecycle = "/ermobile/api/mss/v1/lifecycle";
   static String mobileMssApprovalFilters =
       "/ermobile/api/mss/v1/approval-filters";
 
-    //ESS Dashboard
+  //ESS Dashboard
   static var essDashboardAPi = "/ermobile/api/ess/v1/dashboard";
   static var eventListModalESSApi = "/ermobile/api/ess/v1/events";
 
@@ -158,8 +167,6 @@ class ApiDetails {
   static var eventListModalNewApi = "restful/service/get/emp/event/new";
   static var branchListApi = "restful/service/dashboard/branchlist";
   static var shiftListApi = "restful/service/dashboard/shiftlist";
-
-
 
   //Customer workDone API
   static var skyWorkDoneClientApi =

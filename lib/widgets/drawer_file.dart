@@ -35,6 +35,7 @@ class _DrawerFileState extends State<DrawerFile> {
 
     print('drawer: ');
     await getProfileList();
+    if (!mounted) return;
     setState(() {});
   }
 
@@ -75,6 +76,8 @@ class _DrawerFileState extends State<DrawerFile> {
 
   @override
   void initState() {
+    super.initState();
+    MobileProfileCache.revision.addListener(_reloadProfiles);
     getUserNameImage();
 
     print('drawer: initState');
@@ -83,7 +86,16 @@ class _DrawerFileState extends State<DrawerFile> {
     print('drawer: ${urlImage}');
     print('drawer: ${name}');
 
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    MobileProfileCache.revision.removeListener(_reloadProfiles);
+    super.dispose();
+  }
+
+  void _reloadProfiles() {
+    getUserNameImage();
   }
 
   @override

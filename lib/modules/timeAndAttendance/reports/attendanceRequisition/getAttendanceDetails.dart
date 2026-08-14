@@ -295,8 +295,8 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
   Widget _buildEventIcon(String colorHex, String logDate) {
     //print('_buildEventIcon $colorHex');
     return Container(
-      width: 36, // Adjust size to fit the text
-      height: 36,
+      width: 42,
+      height: 42,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Color(int.parse(colorHex)), // Parse color from string
@@ -1015,7 +1015,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
       //customGridViewPhysics: NeverScrollableScrollPhysics(),
       markedDateCustomShapeBorder: CircleBorder(
-        side: BorderSide(color: Colors.grey),
+        side: BorderSide(color: Colors.transparent, width: 0),
       ),
       markedDateCustomTextStyle: TextStyle(
         fontSize: 18,
@@ -1024,11 +1024,13 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       showHeader: false,
       todayTextStyle: TextStyle(color: Colors.white),
       markedDateShowIcon: true,
-      markedDateIconMaxShown: 2,
+      markedDateIconMargin: 0,
+      markedDateIconOffset: 0,
+      markedDateIconMaxShown: 1,
       markedDateIconBuilder: (event) {
         return event.icon;
       },
-      markedDateMoreShowTotal: true,
+      markedDateMoreShowTotal: false,
       todayButtonColor: Mythemes.lightBluishColor,
       selectedDayTextStyle: TextStyle(color: Mythemes.black),
 

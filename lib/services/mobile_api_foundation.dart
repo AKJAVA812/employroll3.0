@@ -49,6 +49,12 @@ class MobileApiFoundation {
     final token = await _sessionManager.getAccessToken();
     final tokenType = await _sessionManager.getTokenType() ?? 'Bearer';
     final sessionId = await _sessionManager.getMobileSessionId();
+    final activePanel = (await _sessionManager.getActivePanel())?.toUpperCase();
+    final isMssPanel = activePanel == 'MSS' || activePanel == 'MSS_MO';
+    final mssProfileId =
+        isMssPanel ? await _sessionManager.getDefaultProfileId() : null;
+    final mssOrganisationId =
+        isMssPanel ? await _sessionManager.getActiveOrgId() : null;
     if (token == null || token.isEmpty) {
       throw const MobileApiException('AUTHENTICATION_REQUIRED');
     }
@@ -56,6 +62,11 @@ class MobileApiFoundation {
       'Authorization': '$tokenType $token',
       if (sessionId != null && sessionId.isNotEmpty)
         'X-Mobile-Session-Id': sessionId,
+      if (isMssPanel && (mssProfileId ?? 0) > 0)
+        'X-MSS-Profile-Id': mssProfileId.toString(),
+      if (isMssPanel) 'X-MSS-Profile-Type': activePanel!,
+      if (isMssPanel && (mssOrganisationId ?? 0) > 0)
+        'X-MSS-Organisation-Id': mssOrganisationId.toString(),
       if (requestId != null && requestId.isNotEmpty) ...<String, String>{
         'X-Request-ID': requestId,
         'Idempotency-Key': requestId,
@@ -67,6 +78,8 @@ class MobileApiFoundation {
     print(
       '[MOBILE-API] headers -> tokenPresent=${token.isNotEmpty} '
       'sessionPresent=${sessionId != null && sessionId.isNotEmpty} '
+      'mssProfileId=${isMssPanel ? mssProfileId : null} '
+      'mssOrganisationId=${isMssPanel ? mssOrganisationId : null} '
       'requestId=$requestId',
     );
     return headers;
@@ -101,6 +114,24 @@ class MobileApiFoundation {
     return _guard(
       () => MobileHttpClient.instance
           .post(requestUri, headers: headers, body: jsonEncode(body))
+          .timeout(timeout),
+      tag: tag,
+      uri: requestUri,
+    );
+  }
+
+  Future<http.Response> putJson(
+    String path, {
+    required Map<String, Object?> body,
+    Map<String, Object?>? queryParameters,
+    Map<String, String>? headers,
+    Duration timeout = writeTimeout,
+    String tag = 'PUT_JSON',
+  }) {
+    final requestUri = uri(path, queryParameters: queryParameters);
+    return _guard(
+      () => MobileHttpClient.instance
+          .put(requestUri, headers: headers, body: jsonEncode(body))
           .timeout(timeout),
       tag: tag,
       uri: requestUri,

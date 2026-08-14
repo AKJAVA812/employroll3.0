@@ -1,0 +1,43 @@
+{
+  "info": {
+    "name": "MSS Phase 7 - Induction and Exit",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "https://fang-sizing-enrage.ngrok-free.dev"},
+    {"key": "accessToken", "value": ""},
+    {"key": "sessionId", "value": ""},
+    {"key": "profileId", "value": ""},
+    {"key": "profileType", "value": "MSS"},
+    {"key": "organisationId", "value": ""},
+    {"key": "inductionRequestId", "value": ""},
+    {"key": "exitRequestId", "value": ""}
+    ,{"key": "exitCaseId", "value": ""}
+  ],
+  "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{accessToken}}", "type": "string"}]},
+  "item": [
+    {
+      "name": "Induction",
+      "item": [
+        {"name": "Pending list", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/induction?tab=PENDING&page=0&size=20"}},
+        {"name": "Actioned list", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/induction?tab=ACTIONED&page=0&size=20"}},
+        {"name": "Detail", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/induction/{{inductionRequestId}}"}},
+        {"name": "History", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/induction/{{inductionRequestId}}/history"}},
+        {"name": "Approve", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Idempotency-Key", "value": "{{$guid}}"}, {"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "body": {"mode": "raw", "raw": "{\n  \"decision\": \"APPROVE\",\n  \"remarks\": \"Approved from mobile\"\n}"}, "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/induction/{{inductionRequestId}}/decision"}}
+      ]
+    },
+    {
+      "name": "Exit",
+      "item": [
+        {"name": "Pending list", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/exit?tab=PENDING&page=0&size=20"}},
+        {"name": "Actioned list", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/exit?tab=ACTIONED&page=0&size=20"}},
+        {"name": "Detail and history", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/exit/{{exitRequestId}}"}},
+        {"name": "Approve", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Idempotency-Key", "value": "{{$guid}}"}, {"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "body": {"mode": "raw", "raw": "{\n  \"decision\": \"APPROVE\",\n  \"remarks\": \"Approved from mobile\"\n}"}, "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/exit/{{exitRequestId}}/decision"}},
+        {"name": "Reject", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Idempotency-Key", "value": "{{$guid}}"}, {"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "body": {"mode": "raw", "raw": "{\n  \"decision\": \"REJECT\",\n  \"remarks\": \"Reason is mandatory\"\n}"}, "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/exit/{{exitRequestId}}/decision"}}
+      ]
+    },
+    {"name": "Exit employee cases", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/exit-employees?page=0&size=20"}},
+    {"name": "Exit employee case detail", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/lifecycle/exit-employees/{{exitCaseId}}"}},
+    {"name": "Dashboard counts", "request": {"method": "GET", "header": [{"key": "X-Mobile-Session-Id", "value": "{{sessionId}}"}, {"key": "X-MSS-Profile-Id", "value": "{{profileId}}"}, {"key": "X-MSS-Profile-Type", "value": "{{profileType}}"}, {"key": "X-MSS-Organisation-Id", "value": "{{organisationId}}"}], "url": "{{baseUrl}}/ermobile/api/mss/v1/dashboard?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"}}
+  ]
+}

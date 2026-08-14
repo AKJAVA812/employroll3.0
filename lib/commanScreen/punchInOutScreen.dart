@@ -32,6 +32,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/attendance_punch_api.dart';
+import 'package:er_flutter_project/services/notification_service.dart';
 import '../MSS_Bundle/mobile_mss/mss_mobile_dashboard.dart';
 //import 'package:er_flutter_project/adminPage/adminDashboard/adminDashboard.dart';
 //import '../adminPage/adminDashboard/adminDashboard.dart';
@@ -265,16 +266,19 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     });
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Permission required'),
-        content: const Text('You do not have permission to access this tab.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('OK'),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('Permission required'),
+            content: const Text(
+              'You do not have permission to access this tab.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
     return false;
   }
@@ -398,6 +402,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
     if (response.statusCode == 200 &&
         result.compareToIgnoringCase('success') == 0) {
+      await NotificationService.instance.deactivateCurrentToken();
       await shared.clearMobileAuth();
       print('[MOBILE-AUTH] LOGOUT -> success');
       Fluttertoast.showToast(
@@ -845,8 +850,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   @override
   Widget build(BuildContext context) {
-    final isManagerPanel =
-        MobilePanel.isManager(activePanel);
+    final isManagerPanel = MobilePanel.isManager(activePanel);
     final activeIndex = isManagerPanel && currentIndex > 3 ? 0 : currentIndex;
     final managerScreens = [
       const DefaultPage(),
@@ -910,9 +914,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
                         valueListenable: selectedProfileNameNotifier,
                         builder: (context, value, _) {
                           final displayText =
-                              (activePanel == MobilePanel.ess)
-                                  ? "ESS"
-                                  : value;
+                              (activePanel == MobilePanel.ess) ? "ESS" : value;
 
                           return Text(
                             displayText,
@@ -939,9 +941,10 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
             ),
           ],
         ),
-        body: isManagerPanel
-            ? managerScreens[activeIndex]
-            : (_essPermissionState != null &&
+        body:
+            isManagerPanel
+                ? managerScreens[activeIndex]
+                : (_essPermissionState != null &&
                     !_essPermissionState!.hasAnyMobileAccess)
                 ? screensNew[0]
                 : screensNew[currentIndex],
@@ -1002,10 +1005,22 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
           items:
               isManagerPanel
                   ? const [
-                    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                    BottomNavigationBarItem(icon: Icon(Icons.dashboard_customize), label: 'Team'),
-                    BottomNavigationBarItem(icon: Icon(Icons.pending_actions), label: 'Requests'),
-                    BottomNavigationBarItem(icon: Icon(Icons.people_alt), label: 'People'),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: 'Home',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.dashboard_customize),
+                      label: 'Team',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.pending_actions),
+                      label: 'Requests',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.people_alt),
+                      label: 'People',
+                    ),
                   ]
                   : [
                     const BottomNavigationBarItem(
@@ -3375,10 +3390,7 @@ class _DefaultPageState extends State<DefaultPage> {
         response.statusCode == 409
             ? "Attendance punch is already recorded or conflicts with the current punch state."
             : "Your Punch Not Submitted, Please Try Again",
-        onRetry: () => getPunchInWithGeofence(
-          rootContext,
-          selectedGeofenceId,
-        ),
+        onRetry: () => getPunchInWithGeofence(rootContext, selectedGeofenceId),
         allowRetry: response.statusCode != 409,
       );
     }
@@ -3511,10 +3523,7 @@ class _DefaultPageState extends State<DefaultPage> {
         response.statusCode == 409
             ? "Attendance punch is already recorded or conflicts with the current punch state."
             : "Your Punch Not Submitted, Please Try Again",
-        onRetry: () => getPunchOutWithGeofence(
-          rootContext,
-          selectedGeofenceId,
-        ),
+        onRetry: () => getPunchOutWithGeofence(rootContext, selectedGeofenceId),
         allowRetry: response.statusCode != 409,
       );
     }
@@ -3658,29 +3667,42 @@ class _DrawerFileState extends State<DrawerFile> {
   bool hasEssPanel = false;
   @override
   void initState() {
+    super.initState();
+    MobileProfileCache.revision.addListener(_reloadDrawerFromBootstrap);
     getUserRoles();
     getSharedPreferences();
     loadSelectedProfile();
     //getUserNameImage();
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    MobileProfileCache.revision.removeListener(_reloadDrawerFromBootstrap);
+    super.dispose();
+  }
+
+  void _reloadDrawerFromBootstrap() {
+    getSharedPreferences();
   }
 
   Future<void> getSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    selectedProfileId = prefs.getInt('defaultProfileId');
-    selectedProfileName = prefs.getString('defaultProfileName');
+    selectedProfileId = await shared.getDefaultProfileId();
+    selectedProfileName = await shared.getDefaultProfileName();
     userPanelPermissions = await shared.getUserPanel();
     activePanel = await shared.getActivePanel() ?? MobilePanel.ess;
     hasEssPanel = await shared.getHasEssPanel() ?? true;
     print("Loaded ID: $selectedProfileId, Name: $selectedProfileName");
 
-    getProfileList(sessionId!).then((value) {
-      setState(() {
-        profileListModal = value;
+    final currentSessionId = sessionId;
+    if (currentSessionId != null) {
+      getProfileList(currentSessionId).then((value) {
+        if (!mounted) return;
+        setState(() => profileListModal = value);
       });
-    });
+    }
     orgId = await shared.getOrgId();
     print("Org Id Check - $orgId");
+    if (!mounted) return;
     setState(() {});
   }
 
@@ -5327,18 +5349,27 @@ class _DrawerFileState extends State<DrawerFile> {
                               print("ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Pending Attendance L1 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL1");
                               print("ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ Pending Attendance L2 UIS Permission for profileId $selectedProfileId: $pendingAttendanceRequestUISL2");*/
                                         // ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸Ãƒâ€¦Ã‚Â¸Ãƒâ€šÃ‚Â¢ Save selected profile details
-                                        await shared.setDefaultProfileId(
-                                          selectedProfileId,
-                                        );
-                                        await shared.setDefaultProfileName(
-                                          selectedProfileName,
-                                        );
-                                        await MobilePanelService.activateProfile(
-                                          selected,
-                                        );
-                                        activePanel = MobilePanel.fromProfileType(
-                                          selected.profileType,
-                                        );
+                                        try {
+                                          await MobilePanelService.activateProfile(
+                                            selected,
+                                          );
+                                        } catch (error) {
+                                          if (!mounted) return;
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Unable to change profile.',
+                                              ),
+                                            ),
+                                          );
+                                          return;
+                                        }
+                                        activePanel =
+                                            MobilePanel.fromProfileType(
+                                              selected.profileType,
+                                            );
                                         userPanelPermissions =
                                             MobilePanel.userPermissionFor(
                                               activePanel,

@@ -29,11 +29,13 @@ class MssApprovalFilterPanel extends StatefulWidget {
     this.rejected = 0,
     this.moduleCode = 'TIME_ATTENDANCE',
     this.requestFamilyCode,
+    this.allowedRequestTypeCodes,
   });
 
   final int? organisationId;
   final String moduleCode;
   final String? requestFamilyCode;
+  final Set<String>? allowedRequestTypeCodes;
   final int total;
   final int? pending;
   final int approved;
@@ -121,6 +123,11 @@ class _MssApprovalFilterPanelState extends State<MssApprovalFilterPanel> {
           (item) =>
               widget.requestFamilyCode == null ||
               item.familyCode == widget.requestFamilyCode,
+        )
+        .where(
+          (item) =>
+              widget.allowedRequestTypeCodes == null ||
+              widget.allowedRequestTypeCodes!.contains(item.code.toUpperCase()),
         )
         .toList();
     return Column(

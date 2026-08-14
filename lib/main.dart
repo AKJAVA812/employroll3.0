@@ -54,6 +54,7 @@ import 'package:upgrader/upgrader.dart';
 import 'services/mobile_auth_service.dart';
 import 'services/mobile_http_client.dart';
 import 'services/mobile_permission_service.dart';
+import 'services/notification_service.dart';
 /*import 'ESS_Bundle/timeAndAttendance/reports/attendanceRequisition/attendanceList.dart';
 import 'ESS_Bundle/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';*/
 import 'EZNew/landingPage.dart';
@@ -72,7 +73,10 @@ import 'MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL2.dart';
 import 'MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL3.dart';
 import 'MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import 'MSS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
-import 'MSS_Bundle/timeAndAttendance/pendingReqListRo.dart';
+import 'MSS_Bundle/mobile_mss/mss_attendance_approval_screen.dart';
+import 'MSS_Bundle/mobile_mss/mss_requisition_approval_screen.dart';
+import 'MSS_Bundle/mobile_mss/mss_team_screen.dart';
+import 'MSS_Bundle/mobile_mss/mss_lifecycle_screen.dart';
 import 'MSS_Bundle/travelAndExpense/claimMssItems.dart';
 import 'MSS_MO_Bundle/dashboard/adminDashboard.dart';
 import 'MSS_MO_Bundle/dashboard/mssDashboard.dart';
@@ -88,7 +92,6 @@ import 'MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL1.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL2.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
-import 'MSS_MO_Bundle/timeAndAttendance/pendingReqListRo.dart';
 import 'MSS_MO_Bundle/travelAndExpense/claimMssItems.dart';
 import 'UIS_Bundle/dashboard/adminDashboard.dart';
 import 'UIS_Bundle/dashboard/mssDashboard.dart';
@@ -257,7 +260,9 @@ final ZoneSpecification _mobileAuthLogZone = ZoneSpecification(
 
 bool _shouldPrintAppLog(String line) {
   if (!showOnlyMobileAuthLogs) return true;
-  return line.contains('[MOBILE-AUTH]') || line.contains('[APP-ERROR]');
+  return line.contains('[MOBILE-AUTH]') ||
+      line.contains('[PUSH]') ||
+      line.contains('[APP-ERROR]');
 }
 
 void _handleZoneError(Object error, StackTrace stackTrace) {
@@ -314,6 +319,14 @@ void main() {
       WidgetsFlutterBinding.ensureInitialized();
       Hive.registerAdapter(AttendancePunchAdapter());
       await Hive.openBox<AttendancePunch>('attendanceBox');
+      try {
+        await NotificationService.instance.initialize(
+          navigatorKey: MyApp.navigatorKey,
+        );
+      } catch (error, stackTrace) {
+        debugPrint('[PUSH] initialization failed -> $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       //Need to comment this
       /*  const AndroidInitializationSettings initializationSettingsAndroid =
   AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -444,10 +457,7 @@ Future<void> _handleExpiredMobileSession() async {
   WidgetsBinding.instance.addPostFrameCallback((_) {
     final navigator = MyApp.navigatorKey.currentState;
     if (navigator == null) return;
-    navigator.pushNamedAndRemoveUntil(
-      MyRoutings.loginRoute,
-      (route) => false,
-    );
+    navigator.pushNamedAndRemoveUntil(MyRoutings.loginRoute, (route) => false);
   });
 }
 
@@ -744,8 +754,7 @@ class _MyHomePageState extends State<MyHomePage> {
           MyRoutings.pendingReqRoRoute:
               (context) => PendingRequisitionRo(PendingRequisitionModel()),
           MyRoutings.approveDisapproveReqRoute:
-              (context) =>
-                  ApproveDisapproveReq(PendingRequisitionModel(), 0),
+              (context) => ApproveDisapproveReq(PendingRequisitionModel(), 0),
           MyRoutings.adminDashboardRoute:
               (context) => AdminDashboard(DashboardModel()),
           MyRoutings.singleDateAttendanceRoute:
@@ -996,8 +1005,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //MSS Bundle
           MyRoutings.mssAttPendingRequestRoRoute:
-              (context) =>
-                  MSS_Att_PendingRequisitionRo(PendingRequisitionModel()),
+              (context) => const MssAttendanceApprovalScreen(),
           MyRoutings.mssAttPendingRequestL1Route:
               (context) =>
                   MSS_Att_PendingRequisitionL1(PendingRequisitionModel()),
@@ -1008,15 +1016,23 @@ class _MyHomePageState extends State<MyHomePage> {
               (context) =>
                   MSS_Att_PendingRequisitionL3(PendingRequisitionModel()),
           MyRoutings.mssPendingOdRequisitionRoute:
-              (context) => MSS_PendingOdRequisition(PendingOdReqList()),
+              (context) => const MssRequisitionApprovalScreen(module: 'OD'),
+          MyRoutings.mssWfhApprovalRoute:
+              (context) => const MssRequisitionApprovalScreen(module: 'WFH'),
+          MyRoutings.mssCompOffApprovalRoute:
+              (context) =>
+                  const MssRequisitionApprovalScreen(module: 'COMP_OFF'),
+          MyRoutings.mssTeamRoute: (context) => const MssTeamScreen(),
+          MyRoutings.mssInductionRoute:
+              (context) => const MssLifecycleScreen(module: 'INDUCTION'),
+          MyRoutings.mssExitRoute:
+              (context) => const MssLifecycleScreen(module: 'EXIT'),
           MyRoutings.mssOthersAttRequestPageRoute:
               (context) => MSS_OthersAttendanceRequisitionPage(),
 
           //Leave
           MyRoutings.mssPendingLeaveRequestRoute:
-              (context) => MSS_PendingLeaveRequisitionList(
-                PendingLeaveRequisitionModal(),
-              ),
+              (context) => const MssRequisitionApprovalScreen(module: 'LEAVE'),
           MyRoutings.mssLevelOnePendingReqRoute:
               (context) =>
                   MSS_LevelOnePendingLeave(LevelOnePendingLeaveModal()),
@@ -1041,10 +1057,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
           //MSS MO Bundle
           MyRoutings.mssMoAttPendingRequestRoRoute:
-              (context) =>
-                  MSS_MO_PendingRequisitionRo(PendingRequisitionModel()),
+              (context) => const MssAttendanceApprovalScreen(),
           MyRoutings.mssMoPendingOdRequisitionRoute:
-              (context) => MSS_MO_PendingOdRequisition(PendingOdReqList()),
+              (context) => const MssRequisitionApprovalScreen(module: 'OD'),
           MyRoutings.mssMoOthersAttRequestPageRoute:
               (context) => MSS_MO_OthersAttendanceRequisitionPage(),
           MyRoutings.mssMOPendingAttReqL1:
@@ -1055,9 +1070,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   MSS_MO_Att_PendingRequisitionL2(PendingRequisitionModel()),
           //Leave
           MyRoutings.mssMoPendingLeaveRequestRoute:
-              (context) => MSS_MO_PendingLeaveRequisitionList(
-                PendingLeaveRequisitionModal(),
-              ),
+              (context) => const MssRequisitionApprovalScreen(module: 'LEAVE'),
           MyRoutings.mssMoLevelOnePendingReqRoute:
               (context) =>
                   MSS_MO_LevelOnePendingLeave(LevelOnePendingLeaveModal()),

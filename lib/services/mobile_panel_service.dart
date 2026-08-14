@@ -2,6 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../mss_profiles/profileListModal.dart';
 import '../singUP/model/loginModel.dart';
+import 'mobile_mss_context_service.dart';
+import 'mobile_mss_dashboard_service.dart';
 
 class MobilePanel {
   static const ess = 'ESS';
@@ -48,6 +50,7 @@ class MobilePanelService {
 
     if (hasEss) {
       await _setEssSelection(prefs);
+      await _synchronizeSafely();
       return;
     }
 
@@ -66,16 +69,20 @@ class MobilePanelService {
         firstProfile.profileName?.toString() ?? '',
       );
       await prefs.setString('defaultProfileType', profileType);
+      await _synchronizeSafely();
       return;
     }
 
     await _setEssSelection(prefs);
+    await _synchronizeSafely();
   }
 
   static Future<void> activateEss() async {
+    await MobileMssContextService.selectEss();
     final prefs = await SharedPreferences.getInstance();
     await _setEssSelection(prefs);
     await _resetActiveOrgToLoginOrg(prefs);
+    MobileMssDashboardService.invalidate();
   }
 
   static Future<void> _setEssSelection(SharedPreferences prefs) async {
@@ -89,6 +96,15 @@ class MobilePanelService {
   static Future<void> activateProfile(ProfileData profile) async {
     final prefs = await SharedPreferences.getInstance();
     final panel = MobilePanel.fromProfileType(profile.profileType);
+    final rootOrganisationId = prefs.getInt('orgId') ?? 0;
+    final selectedOrganisationId = panel == MobilePanel.mssMo
+        ? (prefs.getInt('activeOrgId') ?? rootOrganisationId)
+        : rootOrganisationId;
+    await MobileMssContextService.selectProfile(
+      profileId: profile.profileId ?? 0,
+      profileType: panel,
+      organisationId: selectedOrganisationId,
+    );
     await prefs.setString('activePanel', panel);
     await prefs.setString('userPanel', MobilePanel.userPermissionFor(panel));
     await prefs.setInt('profileIdNew', profile.profileId ?? 0);
@@ -97,6 +113,7 @@ class MobilePanelService {
     if (panel != MobilePanel.mssMo) {
       await _resetActiveOrgToLoginOrg(prefs);
     }
+    MobileMssDashboardService.invalidate();
   }
 
   static Future<void> _resetActiveOrgToLoginOrg(SharedPreferences prefs) async {
@@ -109,5 +126,13 @@ class MobilePanelService {
     if (value == null) return null;
     if (value is int) return value;
     return int.tryParse(value.toString());
+  }
+
+  static Future<void> _synchronizeSafely() async {
+    try {
+      await MobileMssContextService.synchronizeCurrent();
+    } catch (error) {
+      print('[MSS-CONTEXT] Initial context sync failed: $error');
+    }
   }
 }

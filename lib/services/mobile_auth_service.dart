@@ -10,6 +10,9 @@ import '../commanScreen/allAPIList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'mobile_http_client.dart';
 import 'mobile_permission_service.dart';
+import 'mobile_mss_context_service.dart';
+import 'mobile_profile_cache.dart';
+import 'notification_service.dart';
 
 class MobileAuthService {
   MobileAuthService._();
@@ -37,6 +40,8 @@ class MobileAuthService {
       );
       await _callBootstrapVersion(auth: auth, forceBootstrap: true);
       await sendMobileDeviceInfo(auth: auth);
+      await NotificationService.instance.registerCurrentToken(force: true);
+      await NotificationService.instance.processPendingNotification();
       print('[MOBILE-AUTH] syncAfterLogin -> end');
     });
   }
@@ -67,7 +72,14 @@ class MobileAuthService {
         auth: latestAuth,
         forceBootstrap: forceBootstrap,
       );
+      try {
+        await MobileMssContextService.synchronizeCurrent();
+      } catch (error) {
+        print('[MSS-CONTEXT] App-open synchronization failed: $error');
+      }
       await sendMobileDeviceInfo(auth: latestAuth);
+      await NotificationService.instance.registerCurrentToken();
+      await NotificationService.instance.processPendingNotification();
       print('[MOBILE-AUTH] syncOnAppOpen -> end');
     });
   }
@@ -194,6 +206,7 @@ class MobileAuthService {
     await prefs.setString('mobileBootstrapJson', response.body);
 
     final body = _decode(response.body);
+    await _applyBootstrapNavigationState(body, prefs);
     final permissionVersion = _firstString(body, const [
       'permissionsVersion',
       'permissionVersion',
@@ -204,7 +217,72 @@ class MobileAuthService {
     if (profileVersion != null)
       await _sessionManager.setProfileVersion(profileVersion);
     print('[MOBILE-AUTH] BOOTSTRAP -> cache saved');
+    MobileProfileCache.notifyChanged();
     return true;
+  }
+
+  Future<void> _applyBootstrapNavigationState(
+    Map<String, dynamic> body,
+    SharedPreferences prefs,
+  ) async {
+    final profiles = (body['profiles'] as List? ?? const <Object>[])
+        .whereType<Map>()
+        .map((value) => Map<String, dynamic>.from(value))
+        .toList();
+    final essPermissions = body['essPermissions'];
+    final essIds = essPermissions is Map
+        ? (essPermissions['securityGroupIds'] as List? ?? const <Object>[])
+        : const <Object>[];
+    final hasEss = essIds.isNotEmpty;
+    final hasMss = profiles.any(
+      (profile) =>
+          (profile['profileType'] ?? '').toString().toUpperCase() == 'MSS',
+    );
+    final hasMssMo = profiles.any(
+      (profile) =>
+          (profile['profileType'] ?? '').toString().toUpperCase() == 'MSS_MO',
+    );
+    await prefs.setBool('hasEssPanel', hasEss);
+    await prefs.setBool('hasMssPanel', hasMss);
+    await prefs.setBool('hasMssMoPanel', hasMssMo);
+
+    final activePanel = (prefs.getString('activePanel') ?? 'ESS').toUpperCase();
+    final activeProfileId = prefs.getInt('profileIdNew') ?? 0;
+    final activeProfileStillExists = profiles.any(
+      (profile) => _intValue(profile['profileId']) == activeProfileId,
+    );
+    final activePanelAvailable = activePanel == 'ESS'
+        ? hasEss
+        : activeProfileStillExists;
+    if (activePanelAvailable) return;
+
+    if (hasEss) {
+      await prefs.setString('activePanel', 'ESS');
+      await prefs.setString('userPanel', 'COMPANY_EMPLOYEE');
+      await prefs.setInt('profileIdNew', 0);
+      await prefs.setString('profileNameNew', 'ESS');
+      await prefs.setString('defaultProfileType', 'ESS');
+      return;
+    }
+    if (profiles.isEmpty) return;
+    final first = profiles.first;
+    final profileType = (first['profileType'] ?? 'MSS').toString().toUpperCase();
+    await prefs.setString('activePanel', profileType);
+    await prefs.setString(
+      'userPanel',
+      profileType == 'MSS_MO' ? 'MSS_MO_ADMIN' : 'MSS',
+    );
+    await prefs.setInt('profileIdNew', _intValue(first['profileId']));
+    await prefs.setString(
+      'profileNameNew',
+      (first['profileName'] ?? '').toString(),
+    );
+    await prefs.setString('defaultProfileType', profileType);
+  }
+
+  int _intValue(dynamic value) {
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   Future<bool> sendMobileDeviceInfo({MobileAuthData? auth}) async {

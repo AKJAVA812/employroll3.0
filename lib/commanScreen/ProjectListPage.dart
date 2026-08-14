@@ -2238,7 +2238,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Visibility(
-                  visible: userPanel == "MSS",
+                  visible: false,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -2300,7 +2300,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
                   ),
                 ),
                 Visibility(
-                  visible: userPanel == "MSS_MO_ADMIN",
+                  visible: false,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -2362,7 +2362,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
                   ),
                 ),
               ],
-            ).pLTRB(0, 8, 0, 8),
+            ),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 3,

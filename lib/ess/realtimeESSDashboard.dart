@@ -860,7 +860,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Visibility(
-                visible: userPanelPermission == "MSS",
+                visible: false,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -931,7 +931,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                 ),
               ),
               Visibility(
-                visible: userPanelPermission == "MSS_MO_ADMIN",
+                visible: false,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,

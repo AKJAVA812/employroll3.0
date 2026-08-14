@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:er_flutter_project/adminPage/modelClass/eventListModal.dart'
     hide BdayList, Joblist;
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
@@ -36,7 +35,6 @@ import '../../sharedPrefancePage/ShardPre.dart';
 import 'dart:developer' as developer;
 
 import '../commanScreen/punchInOutScreen.dart';
-import '../commanScreen/routes.dart';
 import '../modules/timeAndAttendance/calendarPage/attendanceRequetCalendar.dart';
 import '../modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'Model/calendarModalClass.dart';
@@ -257,6 +255,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
   Future<EssDashboarrdModel> getDashboardData(String sessionId) async {
+    final dashboardDate = _dashboardDateForTargetMonth();
+    final dashboardMonth = DateFormat('yyyy-MM').format(dashboardDate);
+    singleDateString = DateFormat('dd-MM-yyyy').format(dashboardDate);
     print(
       '[ESS_DASHBOARD_FETCH_START] date=$singleDateString branch=$branchId shift=$shift',
     );
@@ -271,7 +272,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         storedEmpCode?.toString().trim().isNotEmpty == true
             ? storedEmpCode
             : storedEmployeeId;
-    final dashboardMonth = DateFormat('yyyy-MM').format(date);
     print(
       '[ESS_DASHBOARD_PARAMS] orgId=$dashboardOrgId employeeDetailsId=$dashboardEmployeeDetailsId employeeCode=$dashboardEmployeeCode month=$dashboardMonth',
     );
@@ -317,6 +317,57 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('dashboardData', jsonEncode(mapResponse));
     return dashboardModel;
+  }
+
+  DateTime _dashboardDateForTargetMonth() {
+    final lastDay = DateTime(
+      _targetDateTime.year,
+      _targetDateTime.month + 1,
+      0,
+    ).day;
+    final preferredDay =
+        _targetDateTime.year == DateTime.now().year &&
+                _targetDateTime.month == DateTime.now().month
+            ? DateTime.now().day
+            : 1;
+    return DateTime(
+      _targetDateTime.year,
+      _targetDateTime.month,
+      min(preferredDay, lastDay),
+    );
+  }
+
+  Future<void> _loadDashboardForMonth(DateTime monthDate) async {
+    if (monthDate.isBefore(_minDateAllowed) || monthDate.isAfter(_maxDateAllowed)) {
+      print("[ESS_DASHBOARD_MONTH_CHANGE] blocked month=$monthDate");
+      return;
+    }
+
+    setState(() {
+      _targetDateTime = DateTime(monthDate.year, monthDate.month);
+      _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
+      isLoading = true;
+    });
+
+    _lastApiCallMonth = DateTime(monthDate.year, monthDate.month);
+    print("[ESS_DASHBOARD_MONTH_CHANGE] loading month=$_currentMonth");
+
+    try {
+      final dashboardData = await getDashboardData(sessionId!);
+      if (!mounted) return;
+      setState(() {
+        essDashboardModelGlobal = dashboardData;
+        isLoading = false;
+      });
+      print("[ESS_DASHBOARD_MONTH_CHANGE] loaded month=$_currentMonth");
+    } catch (error, stackTrace) {
+      print("[ESS_DASHBOARD_MONTH_CHANGE] failed month=$_currentMonth error=$error");
+      print(stackTrace);
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _logDashboardSummary(Map<String, dynamic> body) {
@@ -670,8 +721,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   Widget _buildEventIcon(String colorHex, String logDate) {
     //print('_buildEventIcon $colorHex');
     return Container(
-      width: 36, // Adjust size to fit the text
-      height: 36,
+      width: 42,
+      height: 42,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Color(int.parse(colorHex)), // Parse color from string
@@ -1655,7 +1706,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
-    int value = 0;
 
     var todayEvent;
     var oldEvent;
@@ -1720,149 +1770,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Visibility(
-                visible: userPanelPermission == "MSS",
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedToggleSwitch<int>.size(
-                      height: 30,
-                      current: min(value, 2),
-                      style: ToggleStyle(
-                        backgroundColor: Mythemes.greyishade,
-                        indicatorColor: Mythemes.lightBluishColor,
-                        borderColor: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20.0),
-                        indicatorBorderRadius: BorderRadius.zero,
-                      ),
-                      values: const [0, 1],
-                      iconOpacity: 1.0,
-                      selectedIconScale: 1.0,
-                      indicatorSize: const Size.fromWidth(150),
-                      iconAnimationType: AnimationType.onHover,
-                      styleAnimationType: AnimationType.onHover,
-                      spacing: 2.0,
-                      customSeparatorBuilder: (context, local, global) {
-                        final opacity =
-                            ((global.position - local.position).abs() - 0.5)
-                                .clamp(0.0, 1.0);
-                        return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity),
-                        );
-                      },
-                      customIconBuilder: (context, local, global) {
-                        final text = const ['ESS', 'MSS'][local.index];
-                        return Center(
-                          child: Text(
-                            text,
-                            style: TextStyle(
-                              color: Color.lerp(
-                                Colors.black,
-                                Colors.white,
-                                local.animationValue,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      borderWidth: 0.0,
-                      onChanged: (i) {
-                        setState(() {
-                          value = i;
-                          print(i);
-                        });
-                        if (value == 1) {
-                          Navigator.pushNamed(
-                            context,
-                            MyRoutings.mssNewDashboardRoute,
-                          );
-                        }
-                        if (value == 0) {
-                          Navigator.pushNamed(
-                            context,
-                            MyRoutings.essDashboardNavigateRoute,
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Visibility(
-                visible: userPanelPermission == "MSS_MO_ADMIN",
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedToggleSwitch<int>.size(
-                      height: 30,
-                      current: min(value, 2),
-                      style: ToggleStyle(
-                        backgroundColor: Mythemes.greyishade,
-                        indicatorColor: Mythemes.lightBluishColor,
-                        borderColor: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20.0),
-                        indicatorBorderRadius: BorderRadius.zero,
-                      ),
-                      values: const [0, 1],
-                      iconOpacity: 1.0,
-                      selectedIconScale: 1.0,
-                      indicatorSize: const Size.fromWidth(150),
-                      iconAnimationType: AnimationType.onHover,
-                      styleAnimationType: AnimationType.onHover,
-                      spacing: 2.0,
-                      customSeparatorBuilder: (context, local, global) {
-                        final opacity =
-                            ((global.position - local.position).abs() - 0.5)
-                                .clamp(0.0, 1.0);
-                        return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity),
-                        );
-                      },
-                      customIconBuilder: (context, local, global) {
-                        final text = const ['ESS', 'MSS MO'][local.index];
-                        return Center(
-                          child: Text(
-                            text,
-                            style: TextStyle(
-                              color: Color.lerp(
-                                Colors.black,
-                                Colors.white,
-                                local.animationValue,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      borderWidth: 0.0,
-                      onChanged: (i) {
-                        setState(() {
-                          value = i;
-                          print(i);
-                        });
-                        if (value == 1) {
-                          Navigator.pushNamed(
-                            context,
-                            MyRoutings.mssMoNewDashboardRoute,
-                          );
-                        }
-                        if (value == 0) {
-                          Navigator.pushNamed(
-                            context,
-                            MyRoutings.essDashboardNavigateRoute,
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
               Visibility(
                 visible: getRealTimeAttButtonShow,
                 child: Padding(
@@ -3601,7 +3508,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       //customGridViewPhysics: NeverScrollableScrollPhysics(),
       markedDateCustomShapeBorder: CircleBorder(
-        side: BorderSide(color: Colors.grey),
+        side: BorderSide(color: Colors.transparent, width: 0),
       ),
       markedDateCustomTextStyle: TextStyle(
         fontSize: 18,
@@ -3610,11 +3517,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       showHeader: false,
       todayTextStyle: TextStyle(color: Colors.white),
       markedDateShowIcon: true,
-      markedDateIconMaxShown: 2,
+      markedDateIconMargin: 0,
+      markedDateIconOffset: 0,
+      markedDateIconMaxShown: 1,
       markedDateIconBuilder: (event) {
         return event.icon;
       },
-      markedDateMoreShowTotal: true,
+      markedDateMoreShowTotal: false,
       todayButtonColor: Mythemes.lightBluishColor,
       selectedDayTextStyle: TextStyle(color: Mythemes.black),
 
@@ -3648,41 +3557,13 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       });
     },*/
       onCalendarChanged: (DateTime date) async {
-        // 1. Prevent sliding beyond allowed range
-        if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
-          print("â›” Calendar slide limit reached");
-          return;
-        }
-
-        // 2. Stop duplicate API calls
-        // Compare only month & year â€” day changes should NOT trigger new API
         if (_lastApiCallMonth != null &&
             _lastApiCallMonth!.month == date.month &&
             _lastApiCallMonth!.year == date.year) {
-          print("â›” Duplicate onCalendarChanged â€” API blocked");
+          print("[ESS_DASHBOARD_MONTH_CHANGE] duplicate blocked month=$date");
           return;
         }
-
-        // 3. Save month so next duplicate call is blocked
-        _lastApiCallMonth = DateTime(date.year, date.month);
-
-        // 4. Update month, UI & selected date
-        _targetDateTime = date;
-        _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
-
-        singleDateString = DateFormat('dd-MM-yyyy').format(date);
-        print("Updated Date Change - $singleDateString");
-
-        print("Calling Dashboard API for calendar month: $_currentMonth");
-
-        // 5. Call dashboard API. Calendar is rebuilt from dashboard response.
-        final dashboardData = await getDashboardData(sessionId!);
-
-        setState(() {
-          essDashboardModelGlobal = dashboardData;
-        });
-
-        print("Dashboard calendar data updated");
+        await _loadDashboardForMonth(date);
       },
       onDayLongPressed: (DateTime date) {
         //print('long pressed date $date');
@@ -3732,7 +3613,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                 ),*/
                 TextButton(
                   child: Text('PREV'),
-                  onPressed: () {
+                  onPressed: () async {
                     final previousMonth = DateTime(
                       _targetDateTime.year,
                       _targetDateTime.month - 1,
@@ -3750,10 +3631,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       );
                       return;
                     }
-                    setState(() {
-                      _targetDateTime = previousMonth;
-                      _currentMonth = DateFormat.yMMM().format(_targetDateTime);
-                    });
+                    await _loadDashboardForMonth(previousMonth);
                   },
                 ),
                 /*TextButton(
@@ -3769,7 +3647,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                 )*/
                 TextButton(
                   child: Text('NEXT'),
-                  onPressed: () {
+                  onPressed: () async {
                     final nextMonth = DateTime(
                       _targetDateTime.year,
                       _targetDateTime.month + 1,
@@ -3787,10 +3665,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       );
                       return;
                     }
-                    setState(() {
-                      _targetDateTime = nextMonth;
-                      _currentMonth = DateFormat.yMMM().format(_targetDateTime);
-                    });
+                    await _loadDashboardForMonth(nextMonth);
                   },
                 ),
               ],

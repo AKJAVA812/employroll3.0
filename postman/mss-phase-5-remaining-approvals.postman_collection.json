@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "MSS Phase 5 - Remaining Approvals",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://fang-sizing-enrage.ngrok-free.dev" },
+    { "key": "accessToken", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "profileId", "value": "10" },
+    { "key": "profileType", "value": "MSS_MO" },
+    { "key": "organisationId", "value": "15" },
+    { "key": "module", "value": "LEAVE" },
+    { "key": "requestId", "value": "LEAVE:1" },
+    { "key": "decision", "value": "APPROVE" }
+  ],
+  "item": [
+    {
+      "name": "1. Leave requisitions",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/requisitions?module=LEAVE&organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&tab=pending&page=0&size=20&sortBy=submittedAt&direction=DESC"
+      }
+    },
+    {
+      "name": "2. OD requisitions",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/requisitions?module=OD&organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&tab=pending&page=0&size=20&sortBy=submittedAt&direction=DESC"
+      }
+    },
+    {
+      "name": "3. WFH requisitions",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/requisitions?module=WFH&organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&tab=pending&page=0&size=20&sortBy=submittedAt&direction=DESC"
+      }
+    },
+    {
+      "name": "4. Comp Off requisitions",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/requisitions?module=COMP_OFF&organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&tab=pending&page=0&size=20&sortBy=submittedAt&direction=DESC"
+      }
+    },
+    {
+      "name": "5. Actioned requisitions with filters",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/requisitions?module={{module}}&organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&tab=actioned&page=0&size=20&sortBy=submittedAt&direction=DESC&search=&requestType=&stage=&branch="
+      }
+    },
+    {
+      "name": "6. Requisition details",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/requisitions/{{requestId}}?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "7. Requisition history",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/requisitions/{{requestId}}/history?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "8. Requisition decision",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "Idempotency-Key", "value": "{{$guid}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"decision\": \"{{decision}}\",\n  \"remarks\": \"Decision from mobile MSS\"\n}"
+        },
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/requisitions/{{requestId}}/decision?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    }
+  ]
+}

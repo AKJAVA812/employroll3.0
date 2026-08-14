@@ -1,0 +1,79 @@
+{
+  "info": {
+    "name": "MSS Phase 6 - Employee And My Team",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://fang-sizing-enrage.ngrok-free.dev" },
+    { "key": "accessToken", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "profileId", "value": "10" },
+    { "key": "profileType", "value": "MSS_MO" },
+    { "key": "organisationId", "value": "15" },
+    { "key": "employeeDetailsId", "value": "1" },
+    { "key": "fromDate", "value": "2026-08-01" },
+    { "key": "toDate", "value": "2026-08-31" }
+  ],
+  "item": [
+    {
+      "name": "1. Team summary and filter facets",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/team/summary?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "2. Employee list",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/team/employees?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&page=0&size=20&sortBy=employeeName&direction=ASC"
+      }
+    },
+    {
+      "name": "3. Filtered employee list",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/team/employees?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&search=&branchId=&departmentId=&designationId=&relation=DIRECT&page=0&size=20&sortBy=employeeName&direction=ASC"
+      }
+    },
+    {
+      "name": "4. Employee details",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/team/employees/{{employeeDetailsId}}?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    },
+    {
+      "name": "5. Employee attendance summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/team/employees/{{employeeDetailsId}}/attendance-summary?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}&fromDate={{fromDate}}&toDate={{toDate}}"
+      }
+    }
+  ]
+}

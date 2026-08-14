@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/singUP/login_page.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/notification_service.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 
@@ -145,6 +146,7 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
 
     if (response.statusCode == 200 &&
         result.compareToIgnoringCase('success') == 0) {
+      await NotificationService.instance.deactivateCurrentToken();
       await shared.clearMobileAuth();
       print('[MOBILE-AUTH] LOGOUT -> success');
       Fluttertoast.showToast(

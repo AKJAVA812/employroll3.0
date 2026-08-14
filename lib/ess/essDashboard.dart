@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:er_flutter_project/adminPage/modelClass/eventListModal.dart'
     hide BdayList, Joblist;
 import 'package:er_flutter_project/ess/EssDashboarrddModel.dart';
@@ -35,7 +33,6 @@ import '../../commanScreen/allAPIList.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 import 'dart:developer' as developer;
 
-import '../commanScreen/routes.dart';
 import '../modules/timeAndAttendance/calendarPage/attendanceRequetCalendar.dart';
 import '../modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'Model/calendarModalClass.dart';
@@ -262,29 +259,12 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     EssDashboarrdModel dashboardModel;
     final foundation = MobileApiFoundation.instance;
     final requestId = foundation.newRequestId();
-    final dashboardOrgId = await shared.getOrgId();
-    final dashboardEmployeeDetailsId = await shared.getEmployeeDetailsId();
-    final storedEmpCode = await shared.getEmpCode();
-    final storedEmployeeId = await shared.getEmployeeId();
-    final dashboardEmployeeCode =
-        storedEmpCode?.toString().trim().isNotEmpty == true
-            ? storedEmpCode
-            : storedEmployeeId;
-    final dashboardMonth = DateFormat('yyyy-MM').format(date);
-    print(
-      '[ESS_DASHBOARD_PARAMS] orgId=$dashboardOrgId employeeDetailsId=$dashboardEmployeeDetailsId employeeCode=$dashboardEmployeeCode month=$dashboardMonth',
-    );
     final response = await foundation.postForm(
       ApiDetails.essDashboardAPi,
       queryParameters: <String, Object?>{
         'date': singleDateString,
-        'month': dashboardMonth,
         'branch': branchId,
         'shift': shift,
-        'userPermission': userPanelPermission,
-        'organisationId': dashboardOrgId,
-        'employeeDetailsId': dashboardEmployeeDetailsId,
-        'employeeCode': dashboardEmployeeCode,
       },
       headers: await foundation.authHeaders(requestId: requestId),
       tag: 'ESS_DASHBOARD',
@@ -296,21 +276,9 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     _logLong('ESS_DASHBOARD_RAW_RESPONSE', response.body);
     print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('dashboardData');
-      throw Exception(
-        'Dashboard API failed with status ${response.statusCode}: ${response.body}',
-      );
-    }
 
     mapResponse = json.decode(response.body);
     _logDashboardSummary(mapResponse);
-    holidayListModalGlobal = HolidayESSModal.fromJson(mapResponse);
-    final dashboardCalendarMap = _calendarMapFromDashboard(mapResponse);
-    calendarModalGlobal = CalendarModalClass.fromJson(dashboardCalendarMap);
-    _buildCalendarFromMap(dashboardCalendarMap);
-    await _attachEssProfileToDashboardRows(mapResponse);
     dashboardModel = EssDashboarrdModel.fromJson(mapResponse);
     // âœ… Save to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
@@ -628,8 +596,8 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   Widget _buildEventIcon(String colorHex, String logDate) {
     //print('_buildEventIcon $colorHex');
     return Container(
-      width: 36, // Adjust size to fit the text
-      height: 36,
+      width: 42,
+      height: 42,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: Color(int.parse(colorHex)), // Parse color from string
@@ -799,7 +767,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     runApi = true;
 
     if (!runApi) {
-      print("â¸ Skipping API. Loading from cache...");
+      print("Skipping API. Loading from cache...");
       await loadSavedData();
       return;
     }
@@ -840,9 +808,26 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   }
 
   // ===============================================================
-  // âœ… Helper - Check if API should run today
+  //  Helper - Check if API should run today
   // ===============================================================
   Future<void> _loadDashboardSupportData(String sessionId) async {
+    try {
+      final calendarData = await getCalendarData(sessionId);
+      if (mounted) {
+        setState(() {
+          calendarModalGlobal = calendarData;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error loading dashboard calendar data: $e");
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+
     try {
       final eventList = await getEventData(sessionId);
       if (mounted) {
@@ -853,90 +838,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     } catch (e) {
       print("Error loading dashboard event data: $e");
     }
-  }
-
-  Map<String, dynamic> _calendarMapFromDashboard(Map<String, dynamic> body) {
-    final calendarBody = body['calendarBody'];
-    if (calendarBody is Map) {
-      return Map<String, dynamic>.from(calendarBody);
-    }
-    final r3Calendar = body['r3Calendar'];
-    if (r3Calendar is Map) {
-      return Map<String, dynamic>.from(r3Calendar);
-    }
-    return <String, dynamic>{
-      'data': body['calendar'] is List ? body['calendar'] : <dynamic>[],
-      'legends':
-          body['legends'] is List
-              ? body['legends']
-              : body['calendarLegends'] is List
-              ? body['calendarLegends']
-              : <dynamic>[],
-    };
-  }
-
-  Future<void> _attachEssProfileToDashboardRows(
-    Map<String, dynamic> body,
-  ) async {
-    final employee =
-        body['employee'] is Map
-            ? Map<String, dynamic>.from(body['employee'])
-            : <String, dynamic>{};
-    final empName =
-        _fallbackText(employee['employeeName'], await shared.getempName()) ??
-        'Self';
-    final department =
-        _fallbackText(employee['department'], await shared.getDept()) ?? '';
-    final designation =
-        _fallbackText(employee['designation'], await shared.getDesignation()) ??
-        '';
-    final branch =
-        _fallbackText(employee['branch'], await shared.getBranch()) ?? '';
-    final deptText =
-        [department, designation]
-            .where((value) => value.trim().isNotEmpty)
-            .join(' - ');
-    final countData = body['countData'];
-    if (countData is! Map) return;
-    const listKeys = <String>[
-      'presentList',
-      'absentList',
-      'lateList',
-      'mispunchList',
-      'earlyGoList',
-      'shortLeaveList',
-      'halfDayList',
-      'totalList',
-    ];
-    for (final key in listKeys) {
-      final rows = countData[key];
-      if (rows is! List) continue;
-      for (final row in rows) {
-        if (row is! Map) continue;
-        row['empName'] = _fallbackText(row['empName'], empName);
-        row['dept'] = _fallbackText(row['dept'], deptText);
-        row['branch'] = _fallbackText(row['branch'], branch);
-        row['inTime'] = _timeFallback(row['inTime']);
-        row['outTime'] = _timeFallback(row['outTime']);
-        row['workingHours'] = _timeFallback(row['workingHours']);
-      }
-    }
-  }
-
-  String? _fallbackText(Object? value, Object? fallback) {
-    final text = value?.toString().trim() ?? '';
-    if (text.isNotEmpty && text.toLowerCase() != 'null') {
-      return text;
-    }
-    final fallbackText = fallback?.toString().trim() ?? '';
-    return fallbackText.isEmpty || fallbackText.toLowerCase() == 'null'
-        ? null
-        : fallbackText;
-  }
-
-  String _timeFallback(Object? value) {
-    final text = value?.toString().trim() ?? '';
-    return text.isEmpty || text.toLowerCase() == 'null' ? '--:--' : text;
   }
 
   Future<bool> shouldRunApi() async {
@@ -1245,25 +1146,24 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     return todayEventListModal;
   }*/
 
-  Future<TodayPunchesModal> getTodayPunchData() async {
+  Future<TodayPunchesModal> getTodayPunchData(String sessionId) async {
     setState(() {
       isLoadingTodayPunch = true; // Show loader before fetching
     });
 
+    String conn = ApiDetails.server;
     String apiUrl = ApiDetails.todayPunchesApiESS;
+
+    print('employeeList11: $sessionId');
 
     TodayPunchesModal todayPunchesModal;
 
-    final foundation = MobileApiFoundation.instance;
-    final requestId = foundation.newRequestId();
-    final response = await foundation.get(
-      apiUrl,
-      headers: await foundation.authHeaders(requestId: requestId),
-      tag: 'TODAY_PUNCHES',
+    var urlapi = Uri.parse(
+      "$conn$apiUrl?sessionId=$sessionId&"
+      "date=$todayDateFetch",
     );
-    if (!foundation.isSuccess(response)) {
-      throw MobileApiException('Unable to load today punches');
-    }
+
+    final response = await MobileHttpClient.instance.post(urlapi);
     print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
@@ -1286,10 +1186,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   List<Map<String, dynamic>> todayPunches = [];
 
   void setPunchData(List<TodayData>? apiData) {
-    if (apiData == null) {
-      todayPunches = [];
-      return;
-    }
+    if (apiData == null) return; // in case it's null
 
     todayPunches =
         apiData.asMap().entries.map((entry) {
@@ -1523,11 +1420,10 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     halfEmp = countData.halfday;
     shortLeaveCount = countData.shortlev;
 
-    presentCount = attendanceCardCount(countData);
+    presentCount = totalAttendance ?? 0;
     print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
-    int value = 0;
 
     var todayEvent;
     var oldEvent;
@@ -1593,149 +1489,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Visibility(
-                visible: userPanelPermission == "MSS",
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedToggleSwitch<int>.size(
-                      height: 30,
-                      current: min(value, 2),
-                      style: ToggleStyle(
-                        backgroundColor: Mythemes.greyishade,
-                        indicatorColor: Mythemes.lightBluishColor,
-                        borderColor: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20.0),
-                        indicatorBorderRadius: BorderRadius.zero,
-                      ),
-                      values: const [0, 1],
-                      iconOpacity: 1.0,
-                      selectedIconScale: 1.0,
-                      indicatorSize: const Size.fromWidth(150),
-                      iconAnimationType: AnimationType.onHover,
-                      styleAnimationType: AnimationType.onHover,
-                      spacing: 2.0,
-                      customSeparatorBuilder: (context, local, global) {
-                        final opacity =
-                            ((global.position - local.position).abs() - 0.5)
-                                .clamp(0.0, 1.0);
-                        return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity),
-                        );
-                      },
-                      customIconBuilder: (context, local, global) {
-                        final text = const ['ESS', 'MSS'][local.index];
-                        return Center(
-                          child: Text(
-                            text,
-                            style: TextStyle(
-                              color: Color.lerp(
-                                Colors.black,
-                                Colors.white,
-                                local.animationValue,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      borderWidth: 0.0,
-                      onChanged: (i) {
-                        setState(() {
-                          value = i;
-                          print(i);
-                        });
-                        if (value == 1) {
-                          Navigator.pushNamed(
-                            context,
-                            MyRoutings.mssNewDashboardRoute,
-                          );
-                        }
-                        if (value == 0) {
-                          Navigator.pushNamed(
-                            context,
-                            MyRoutings.essDashboardNavigateRoute,
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Visibility(
-                visible: userPanelPermission == "MSS_MO_ADMIN",
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedToggleSwitch<int>.size(
-                      height: 30,
-                      current: min(value, 2),
-                      style: ToggleStyle(
-                        backgroundColor: Mythemes.greyishade,
-                        indicatorColor: Mythemes.lightBluishColor,
-                        borderColor: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20.0),
-                        indicatorBorderRadius: BorderRadius.zero,
-                      ),
-                      values: const [0, 1],
-                      iconOpacity: 1.0,
-                      selectedIconScale: 1.0,
-                      indicatorSize: const Size.fromWidth(150),
-                      iconAnimationType: AnimationType.onHover,
-                      styleAnimationType: AnimationType.onHover,
-                      spacing: 2.0,
-                      customSeparatorBuilder: (context, local, global) {
-                        final opacity =
-                            ((global.position - local.position).abs() - 0.5)
-                                .clamp(0.0, 1.0);
-                        return VerticalDivider(
-                          indent: 10.0,
-                          endIndent: 10.0,
-                          color: Colors.white38.withOpacity(opacity),
-                        );
-                      },
-                      customIconBuilder: (context, local, global) {
-                        final text = const ['ESS', 'MSS MO'][local.index];
-                        return Center(
-                          child: Text(
-                            text,
-                            style: TextStyle(
-                              color: Color.lerp(
-                                Colors.black,
-                                Colors.white,
-                                local.animationValue,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      borderWidth: 0.0,
-                      onChanged: (i) {
-                        setState(() {
-                          value = i;
-                          print(i);
-                        });
-                        if (value == 1) {
-                          Navigator.pushNamed(
-                            context,
-                            MyRoutings.mssMoNewDashboardRoute,
-                          );
-                        }
-                        if (value == 0) {
-                          Navigator.pushNamed(
-                            context,
-                            MyRoutings.essDashboardNavigateRoute,
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-              Visibility(
                 visible: getRealTimeAttButtonShow,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -1745,30 +1498,19 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                   child: SizedBox(
                     width: double.infinity, // ðŸ‘ˆ full width
                     child: ElevatedButton.icon(
-                      onPressed: () async {
-                        setState(() {
-                          getRealTimeAttButtonShow = false;
-                          getRealTimeAttShow = true;
-                        });
-                        try {
-                          final value = await getTodayPunchData();
-                          if (!mounted) return;
+                      onPressed: () {
+                        getRealTimeAttButtonShow = false;
+                        getRealTimeAttShow = true;
+                        Future<TodayPunchesModal> getTodayPunch =
+                            getTodayPunchData(sessionId!);
+                        getTodayPunch.then((value) {
                           setState(() {
                             todayPunchesModalGlobal = value;
                             isLoadingTodayPunch = false;
                           });
-                        } catch (error) {
-                          if (!mounted) return;
-                          setState(() {
-                            isLoadingTodayPunch = false;
-                            getRealTimeAttButtonShow = true;
-                            getRealTimeAttShow = false;
-                          });
-                          Fluttertoast.showToast(
-                            msg: 'Unable to load real-time attendance: $error',
-                            toastLength: Toast.LENGTH_LONG,
-                          );
-                        }
+                        });
+                        // ðŸ‘‡ Your action here
+                        print("Get Real-Time Attendance clicked");
                       },
                       icon: const Icon(
                         Icons.access_time,
@@ -2586,7 +2328,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                   height: 50,
                   width: double.infinity, // ðŸ‘ˆ full width
                   child: ElevatedButton.icon(
-                    onPressed: () async {
+                    onPressed: () {
                       _currentMonth = DateFormat(
                         'MM-yyyy',
                       ).format(DateTime.now());
@@ -2600,13 +2342,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                           'MM-yyyy',
                         ).format(_targetDateTime);
                       });
-                      final dashboardData = await getDashboardData(sessionId!);
-                      if (!mounted) return;
-                      setState(() {
-                        essDashboardModelGlobal = dashboardData;
-                        isLoading = false;
-                      });
-                      /*
                       Future<EssDashboarrdModel> getEmployeeList11 =
                           getDashboardData(sessionId!);
                       getEmployeeList11.then((value) {
@@ -2624,7 +2359,6 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                           isLoading = false;
                         });
                       });
-                      */
                       // ðŸ‘‡ Your action here
                       print("Update your dashboard clicked");
                     },
@@ -3475,7 +3209,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
 
       //customGridViewPhysics: NeverScrollableScrollPhysics(),
       markedDateCustomShapeBorder: CircleBorder(
-        side: BorderSide(color: Colors.grey),
+        side: BorderSide(color: Colors.transparent, width: 0),
       ),
       markedDateCustomTextStyle: TextStyle(
         fontSize: 18,
@@ -3484,11 +3218,13 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       showHeader: false,
       todayTextStyle: TextStyle(color: Colors.white),
       markedDateShowIcon: true,
-      markedDateIconMaxShown: 2,
+      markedDateIconMargin: 0,
+      markedDateIconOffset: 0,
+      markedDateIconMaxShown: 1,
       markedDateIconBuilder: (event) {
         return event.icon;
       },
-      markedDateMoreShowTotal: true,
+      markedDateMoreShowTotal: false,
       todayButtonColor: Mythemes.lightBluishColor,
       selectedDayTextStyle: TextStyle(color: Mythemes.black),
 
@@ -3547,16 +3283,16 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
         singleDateString = DateFormat('dd-MM-yyyy').format(date);
         print("Updated Date Change - $singleDateString");
 
-        print("Calling Dashboard API for calendar month: $_currentMonth");
+        print("âœ… Calling Calendar API for: $_currentMonth");
 
-        // 5. Call dashboard API. Calendar is rebuilt from dashboard response.
-        final dashboardData = await getDashboardData(sessionId!);
+        // 5. Call API â€” only ONE time now
+        CalendarModalClass result = await getCalendarData(sessionId!);
 
         setState(() {
-          essDashboardModelGlobal = dashboardData;
+          calendarModalGlobal = result;
         });
 
-        print("Dashboard calendar data updated");
+        print("âœ” Calendar API Updated");
       },
       onDayLongPressed: (DateTime date) {
         //print('long pressed date $date');

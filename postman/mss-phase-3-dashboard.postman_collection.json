@@ -1,0 +1,31 @@
+{
+  "info": {
+    "name": "MSS Phase 3 - Dashboard",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://fang-sizing-enrage.ngrok-free.dev" },
+    { "key": "accessToken", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "profileId", "value": "10" },
+    { "key": "profileType", "value": "MSS_MO" },
+    { "key": "organisationId", "value": "15" }
+  ],
+  "item": [
+    {
+      "name": "Get dashboard counts for active context",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+          { "key": "X-Mobile-Session-Id", "value": "{{sessionId}}" },
+          { "key": "X-Request-ID", "value": "{{$guid}}" },
+          { "key": "X-MSS-Profile-Id", "value": "{{profileId}}" },
+          { "key": "X-MSS-Profile-Type", "value": "{{profileType}}" },
+          { "key": "X-MSS-Organisation-Id", "value": "{{organisationId}}" }
+        ],
+        "url": "{{baseUrl}}/ermobile/api/mss/v1/dashboard?organisationId={{organisationId}}&profileId={{profileId}}&profileType={{profileType}}"
+      }
+    }
+  ]
+}

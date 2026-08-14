@@ -1,11 +1,18 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../mss_profiles/profileListModal.dart';
 
 class MobileProfileCache {
   MobileProfileCache._();
+
+  static final ValueNotifier<int> revision = ValueNotifier<int>(0);
+
+  static void notifyChanged() {
+    revision.value++;
+  }
 
   static Future<ProfileListModal> loadProfileList() async {
     final prefs = await SharedPreferences.getInstance();
