@@ -107,10 +107,18 @@ class _MssLifecycleScreenState extends State<MssLifecycleScreen> {
         _title,
         style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
       ),
+      actions: [
+        IconButton(
+          tooltip: 'Refresh',
+          onPressed: () => _load(reset: true),
+          icon: const Icon(Icons.refresh_rounded),
+        ),
+      ],
     ),
     body: RefreshIndicator(
       onRefresh: () => _load(reset: true),
       child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
         children: [
           _Summary(summary: _summary),

@@ -140,6 +140,11 @@ class _MssRequisitionApprovalScreenState
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Refresh',
+            onPressed: () => _load(reset: true),
+            icon: const Icon(Icons.refresh_rounded),
+          ),
           PopupMenuButton<String>(
             tooltip: 'Sort requests',
             icon: const Icon(Icons.sort_rounded),
@@ -186,6 +191,7 @@ class _MssRequisitionApprovalScreenState
       body: RefreshIndicator(
         onRefresh: () => _load(reset: true),
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
           children: [
             CupertinoSlidingSegmentedControl<String>(

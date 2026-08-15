@@ -101,7 +101,11 @@ class MobilePermissionService {
 
     final state = MobileEssPermissionState(
       securityGroupIds: ids,
-      canPunchAttendance: hasAttendance || hasAttendanceTracking,
+      canPunchAttendance:
+          hasAttendance ||
+          hasAttendanceTracking ||
+          hasSelfie ||
+          hasWithoutSelfie,
       canWorkDone: hasWorkDone,
       canViewCalendar: hasCalendar,
       canViewDashboard: hasDashboard,
