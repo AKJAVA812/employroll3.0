@@ -2173,10 +2173,9 @@ packages:
   timelines:
     dependency: "direct main"
     description:
-      name: timelines
-      sha256: "40214f5ab772ff45459cb8c15e5f60505a6828af0c0eb1eec6f29ed911a4c1c5"
-      url: "https://pub.dev"
-    source: hosted
+      path: "third_party/timelines"
+      relative: true
+    source: path
     version: "0.1.0"
   timezone:
     dependency: transitive
@@ -2301,10 +2300,9 @@ packages:
   velocity_x:
     dependency: "direct main"
     description:
-      name: velocity_x
-      sha256: "99b910c80cc2010b184ef921f0af6894a8d632e13169cf77e6f6cb5a7f310698"
-      url: "https://pub.dev"
-    source: hosted
+      path: "third_party/velocity_x"
+      relative: true
+    source: path
     version: "4.2.1"
   version:
     dependency: transitive
