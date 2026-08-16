@@ -47,6 +47,7 @@ import '../settings/companyPolicyList.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../services/mobile_auth_service.dart';
 import '../services/mobile_mo_organisation_service.dart';
+import '../services/mobile_mss_dashboard_service.dart';
 import '../services/mobile_panel_service.dart';
 import '../services/mobile_permission_service.dart';
 import '../services/mobile_profile_cache.dart';
@@ -169,6 +170,7 @@ class _HomePageState extends State<HomePage> {
   OrganisationListModal? organisationListModal;
   DateTime ntpTime = DateTime.now();
   MobileEssPermissionState? _essPermissionState;
+  bool _panelContextLoaded = false;
 
   void _loadNTPTime() async {
     setState(() async {
@@ -178,9 +180,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    super.initState();
     // TODO: implement initState
     _loginModel = LoginModel();
-    getSharedPrfanceList();
+    _initializePanelContext();
     loadRequisitionCountsFromPrefs();
     currentIndex = widget.selectedIndex;
     if (currentIndex == 4) {
@@ -191,8 +194,13 @@ class _HomePageState extends State<HomePage> {
     todayDateShowNew = newFormat.format(now);
     getUserNameImage();
     MobileAuthService.instance.syncOnAppOpen();
-    super.initState();
-    _loadEssPermissionState();
+  }
+
+  Future<void> _initializePanelContext() async {
+    await getSharedPrfanceList();
+    await _loadEssPermissionState();
+    if (!mounted) return;
+    setState(() => _panelContextLoaded = true);
   }
 
   Future<void> _loadEssPermissionState() async {
@@ -493,20 +501,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     late CameraController controller;
+    if (!_panelContextLoaded) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     final isManagerPanel = MobilePanel.isManager(activePanel);
     final activeIndex = isManagerPanel && currentIndex > 3 ? 0 : currentIndex;
     final managerScreens = [
       const DefaultPage(),
       MssTeamDashboardScreen(
-        onViewSelf: () async {
-          await MobilePanelService.activateEss();
-          setState(() {
-            activePanel = MobilePanel.ess;
-            userPanelPermission = 'COMPANY_EMPLOYEE';
-            currentIndex = 4;
-            title = 'My Dashboard';
-          });
-        },
         onViewRequests: () {
           setState(() {
             currentIndex = 2;
@@ -576,6 +578,12 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           actions: <Widget>[
+            if (isManagerPanel && activeIndex > 0)
+              IconButton(
+                tooltip: 'Refresh',
+                icon: const Icon(Icons.refresh_rounded),
+                onPressed: MobileMssDashboardService.requestManualRefresh,
+              ),
             IconButton(
               icon: Icon(Icons.power_settings_new_outlined),
               onPressed: () {

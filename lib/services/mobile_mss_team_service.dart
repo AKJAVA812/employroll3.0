@@ -140,10 +140,11 @@ class MobileMssTeamService {
   static final Map<String, Future<int>> _countLoads = {};
   static final ValueNotifier<int> countRefreshSignal = ValueNotifier<int>(0);
 
-  static Future<int> employeeCount() async {
+  static Future<int> employeeCount({bool forceRefresh = false}) async {
     final scope = await _scope();
     final prefs = await SharedPreferences.getInstance();
     final key = 'mobile_mss_team_count_$scope';
+    if (forceRefresh) return _refreshEmployeeCount(scope, key);
     final cached = prefs.getInt(key);
     if (cached != null) {
       _refreshEmployeeCountInBackground(scope, key);

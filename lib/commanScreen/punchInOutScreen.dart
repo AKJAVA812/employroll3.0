@@ -205,6 +205,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
   //Tracking end variables
 
   DateTime ntpTime = DateTime.now();
+  bool _panelContextLoaded = false;
 
   void _loadNTPTime() async {
     setState(() async {
@@ -214,9 +215,10 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   @override
   void initState() {
+    super.initState();
     // TODO: implement initState
     _loginModel = LoginModel();
-    getSharedPrfanceList();
+    _initializePanelContext();
     currentIndex = widget.selectedIndex;
     if (currentIndex == 4) {
       title = "My Dashboard";
@@ -232,8 +234,13 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
     print("todaydate  $todayDateShow");
     getUserNameImage();
     MobileAuthService.instance.syncOnAppOpen();
-    super.initState();
-    _loadEssPermissionState();
+  }
+
+  Future<void> _initializePanelContext() async {
+    await getSharedPrfanceList();
+    await _loadEssPermissionState();
+    if (!mounted) return;
+    setState(() => _panelContextLoaded = true);
   }
 
   Future<void> _loadEssPermissionState() async {
@@ -850,20 +857,14 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_panelContextLoaded) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     final isManagerPanel = MobilePanel.isManager(activePanel);
     final activeIndex = isManagerPanel && currentIndex > 3 ? 0 : currentIndex;
     final managerScreens = [
       const DefaultPage(),
       MssTeamDashboardScreen(
-        onViewSelf: () async {
-          await MobilePanelService.activateEss();
-          setState(() {
-            activePanel = MobilePanel.ess;
-            userPanelPermissions = 'COMPANY_EMPLOYEE';
-            currentIndex = 4;
-            title = 'My Dashboard';
-          });
-        },
         onViewRequests: () {
           setState(() {
             currentIndex = 2;

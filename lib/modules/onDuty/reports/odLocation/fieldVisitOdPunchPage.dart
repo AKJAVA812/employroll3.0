@@ -164,9 +164,7 @@ class _FieldVisitOdPunchPageState extends State<FieldVisitOdPunchPage> {
           body['result']?.toString().toLowerCase() == 'success';
       if (!mounted) return;
       if (!success) {
-        _showMessage(
-          body['reason']?.toString() ?? 'OD punch submission failed.',
-        );
+        await _showSubmissionRejectedDialog(_failureMessage(body));
         return;
       }
       await showDialog<void>(
@@ -384,6 +382,40 @@ class _FieldVisitOdPunchPageState extends State<FieldVisitOdPunchPage> {
       return value is Map ? Map<String, dynamic>.from(value) : const {};
     } catch (_) {
       return const {};
+    }
+  }
+
+  String _failureMessage(Map<String, dynamic> body) {
+    final error = body['error'];
+    final rawMessage =
+        body['reason'] ??
+        body['message'] ??
+        (error is Map ? error['message'] ?? error['code'] : null);
+    final message = rawMessage?.toString().trim() ?? '';
+    if (message.isEmpty) {
+      return 'OD requisition could not be submitted. Please contact your administrator.';
+    }
+    return '${message[0].toUpperCase()}${message.substring(1)}';
+  }
+
+  Future<void> _showSubmissionRejectedDialog(String message) async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('OD requisition not submitted'),
+        content: Text(message),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    if (mounted && Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
     }
   }
 

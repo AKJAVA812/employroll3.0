@@ -58,6 +58,23 @@ class MobileMoOrganisationService {
     });
   }
 
+  static Future<OrganisationListModal> refreshForActivePanel() async {
+    final activePanel = await _shared.getActivePanel();
+    if (activePanel != MobilePanel.mssMo) {
+      return _singleCurrentOrganisation();
+    }
+
+    final running = _activeLoad;
+    if (running != null) return running;
+    final load = _loadMssMoOrganisations();
+    _activeLoad = load;
+    try {
+      return await load;
+    } finally {
+      if (identical(_activeLoad, load)) _activeLoad = null;
+    }
+  }
+
   static Future<OrganisationListModal> _loadMssMoOrganisations() async {
     final organisationId = await _shared.getOrgId() ?? 0;
     final profileId = await _shared.getDefaultProfileId() ?? 0;

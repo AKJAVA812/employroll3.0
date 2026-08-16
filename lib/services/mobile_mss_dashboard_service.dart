@@ -102,9 +102,23 @@ class MobileMssDashboardService {
   static final Map<String, Future<MssDashboardSummary>> _loads = {};
   static final Map<String, MssDashboardSummary> _memoryCache = {};
   static final ValueNotifier<int> refreshSignal = ValueNotifier<int>(0);
+  static final ValueNotifier<int> manualRefreshSignal = ValueNotifier<int>(0);
 
   static void invalidate() {
     refreshSignal.value++;
+  }
+
+  static void requestManualRefresh() {
+    manualRefreshSignal.value++;
+  }
+
+  static Future<MssDashboardSummary> refresh({
+    required int organisationId,
+    required int profileId,
+    required String profileType,
+  }) {
+    final scope = '$profileType:$profileId:$organisationId';
+    return _refresh(scope, organisationId, profileId, profileType);
   }
 
   static Future<MssDashboardSummary> load({

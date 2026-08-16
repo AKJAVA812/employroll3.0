@@ -195,11 +195,10 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
     //print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
     //print("Pending Attendance Request UIS- $pendingLoanRequestUISL1Permission");
 
-    if (userPanel == "COMPANY_EMPLOYEE") {
-      value = 0;
-    } else {
-      value = 1;
-    }
+    // This route is the ESS workflow tab. MSS and MSS-MO actions have their
+    // own dedicated navigation, so profile bootstrap must not switch this
+    // screen into the legacy manager workflow on first load.
+    value = 0;
     profileName = await shared.getDefaultProfileName();
     profileId = await shared.getDefaultProfileId();
     //print("Default Profile Name - $profileName");
@@ -690,7 +689,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
         );
       }
 
-      if (value == 1 || userPanel == "USER") {
+      if (value == 1) {
         //Time & Attendance
         if (orgId != 144 && orgId != 138 || value == 1) {
           items.add(

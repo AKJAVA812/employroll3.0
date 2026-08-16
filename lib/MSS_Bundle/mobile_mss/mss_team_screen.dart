@@ -246,6 +246,11 @@ class _MssTeamScreenState extends State<MssTeamScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Refresh',
+            onPressed: () => _load(reset: true),
+            icon: const Icon(Icons.refresh_rounded),
+          ),
           PopupMenuButton<String>(
             tooltip: 'Sort employees',
             icon: const Icon(Icons.sort_rounded),
@@ -292,6 +297,7 @@ class _MssTeamScreenState extends State<MssTeamScreen> {
       body: RefreshIndicator(
         onRefresh: () => _load(reset: true),
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
           children: [
             _TeamSummary(summary: _summary),

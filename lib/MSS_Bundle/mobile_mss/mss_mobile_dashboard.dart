@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../commanScreen/routes.dart';
 import '../../mss_profiles/organisationListModal.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
+import '../../services/mobile_api_foundation.dart';
 import '../../services/mobile_mo_organisation_service.dart';
 import '../../services/mobile_mss_dashboard_service.dart';
 import '../../services/mobile_mss_team_service.dart';
@@ -12,11 +13,9 @@ import '../../themes/empThemes.dart';
 class MssTeamDashboardScreen extends StatefulWidget {
   const MssTeamDashboardScreen({
     super.key,
-    this.onViewSelf,
     this.onViewRequests,
   });
 
-  final VoidCallback? onViewSelf;
   final VoidCallback? onViewRequests;
 
   @override
@@ -32,7 +31,6 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
   String? _selectedOrgId;
   List<OrgList> _orgList = [];
   bool _isMoPanel = false;
-  bool _hasEssPanel = true;
   bool _loadingOrgs = false;
   bool _loadingDashboard = false;
   String? _dashboardError;
@@ -71,12 +69,18 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
   void initState() {
     super.initState();
     MobileMssDashboardService.refreshSignal.addListener(_refreshDashboard);
+    MobileMssDashboardService.manualRefreshSignal.addListener(
+      _manualRefreshDashboard,
+    );
     _loadData();
   }
 
   @override
   void dispose() {
     MobileMssDashboardService.refreshSignal.removeListener(_refreshDashboard);
+    MobileMssDashboardService.manualRefreshSignal.removeListener(
+      _manualRefreshDashboard,
+    );
     super.dispose();
   }
 
@@ -84,7 +88,11 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
     _loadData();
   }
 
-  Future<void> _loadData() async {
+  void _manualRefreshDashboard() {
+    _loadData(forceRefresh: true);
+  }
+
+  Future<void> _loadData({bool forceRefresh = false}) async {
     if (mounted) {
       setState(() {
         _loadingDashboard = true;
@@ -93,7 +101,6 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
     }
     final employeeName = await _shared.getempName();
     final activePanel = await _shared.getActivePanel();
-    final hasEssPanel = await _shared.getHasEssPanel() ?? false;
     final isMoPanel = activePanel == MobilePanel.mssMo;
     OrganisationListModal? orgModal;
     if (isMoPanel) {
@@ -103,7 +110,9 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
         });
       }
       try {
-        orgModal = await MobileMoOrganisationService.loadForActivePanel();
+        orgModal = forceRefresh
+            ? await MobileMoOrganisationService.refreshForActivePanel()
+            : await MobileMoOrganisationService.loadForActivePanel();
       } catch (_) {
         if (!mounted) return;
         setState(() {
@@ -129,11 +138,17 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
     Object? dashboardError;
     if ((activeOrgId ?? 0) > 0 && profileId > 0) {
       try {
-        dashboard = await MobileMssDashboardService.load(
-          organisationId: activeOrgId!,
-          profileId: profileId,
-          profileType: profileType ?? MobilePanel.mss,
-        );
+        dashboard = forceRefresh
+            ? await MobileMssDashboardService.refresh(
+                organisationId: activeOrgId!,
+                profileId: profileId,
+                profileType: profileType ?? MobilePanel.mss,
+              )
+            : await MobileMssDashboardService.load(
+                organisationId: activeOrgId!,
+                profileId: profileId,
+                profileType: profileType ?? MobilePanel.mss,
+              );
       } catch (error) {
         dashboardError = error;
       }
@@ -148,7 +163,6 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
       _selectedOrgId = activeOrgId?.toString();
       _orgList = orgModal?.list ?? [];
       _isMoPanel = isMoPanel;
-      _hasEssPanel = hasEssPanel;
       _loadingOrgs = false;
       _loadingDashboard = false;
       _dashboardError = dashboardError == null
@@ -189,9 +203,16 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
       if (!mounted) return;
       setState(() => _loadingDashboard = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to change organisation.')),
+        SnackBar(content: Text(_organisationError(error))),
       );
     }
+  }
+
+  String _organisationError(Object error) {
+    if (error is MobileApiException && error.message?.trim().isNotEmpty == true) {
+      return error.message!.trim();
+    }
+    return 'Unable to change organisation.';
   }
 
   @override
@@ -265,10 +286,53 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
       final byCount = second.count.compareTo(first.count);
       return byCount != 0 ? byCount : first.order.compareTo(second.order);
     });
+    final moreFeatures = <_DashboardAction>[
+      _DashboardAction(
+        icon: Icons.face_retouching_natural_rounded,
+        label: 'AI Attendance',
+        color: Mythemes.lightBluishColor,
+        count: -1,
+        route: MyRoutings.markAiAttendanceRoute,
+        order: 0,
+      ),
+      _DashboardAction(
+        icon: Icons.document_scanner_rounded,
+        label: 'OCR Scanning',
+        color: Mythemes.stepColor,
+        count: -1,
+        route: MyRoutings.ocrPageRoute,
+        order: 1,
+      ),
+      _DashboardAction(
+        icon: Icons.report_problem_rounded,
+        label: 'Incident Reporting',
+        color: Mythemes.dangerColorOne,
+        count: -1,
+        route: MyRoutings.incidentReportListRoute,
+        order: 2,
+      ),
+      _DashboardAction(
+        icon: Icons.location_on_rounded,
+        label: 'Location Tracking',
+        color: Mythemes.successColor,
+        count: -1,
+        route: MyRoutings.geoLocationTracking,
+        order: 3,
+      ),
+      _DashboardAction(
+        icon: Icons.how_to_reg_rounded,
+        label: 'Pre-Induction',
+        color: Mythemes.warningColor,
+        count: -1,
+        route: MyRoutings.preOnboardItemRoute,
+        order: 4,
+      ),
+    ];
 
     return RefreshIndicator(
-      onRefresh: _loadData,
+      onRefresh: () => _loadData(forceRefresh: true),
       child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
         children: [
           _IdentityCard(
@@ -281,11 +345,6 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
             isMoPanel: _isMoPanel,
             loadingOrgs: _loadingOrgs,
             onOrgChanged: _selectOrganisation,
-          ),
-          const SizedBox(height: 14),
-          _ScopeSwitch(
-            onViewSelf: widget.onViewSelf,
-            canViewSelf: _hasEssPanel,
           ),
           const SizedBox(height: 14),
           if (_loadingDashboard) ...[
@@ -386,6 +445,29 @@ class _MssTeamDashboardScreenState extends State<MssTeamDashboardScreen> {
               },
             ),
           ),
+          const SizedBox(height: 18),
+          const _SectionTitle(title: 'More features'),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 92,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: moreFeatures.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final feature = moreFeatures[index];
+                return SizedBox(
+                  width: 88,
+                  child: _QuickAction(
+                    icon: feature.icon,
+                    label: feature.label,
+                    color: feature.color,
+                    onTap: () => Navigator.pushNamed(context, feature.route),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -424,16 +506,23 @@ class _MssRequestsScreenState extends State<MssRequestsScreen> {
   void initState() {
     super.initState();
     MobileMssDashboardService.refreshSignal.addListener(_loadData);
+    MobileMssDashboardService.manualRefreshSignal.addListener(_manualRefresh);
     _loadData();
   }
 
   @override
   void dispose() {
     MobileMssDashboardService.refreshSignal.removeListener(_loadData);
+    MobileMssDashboardService.manualRefreshSignal.removeListener(_manualRefresh);
     super.dispose();
   }
 
-  Future<void> _loadData() async {
+  void _manualRefresh() {
+    _loadData(forceRefresh: true);
+  }
+
+  Future<void> _loadData({bool forceRefresh = false}) async {
+    if (mounted) setState(() => _loading = true);
     final activePanel = await _shared.getActivePanel();
     final activeOrgId = await _shared.getActiveOrgId();
     final profileId = await _shared.getDefaultProfileId() ?? 0;
@@ -441,11 +530,19 @@ class _MssRequestsScreenState extends State<MssRequestsScreen> {
     MssDashboardSummary? summary;
     if ((activeOrgId ?? 0) > 0 && profileId > 0) {
       try {
-        summary = await MobileMssDashboardService.load(
-          organisationId: activeOrgId!,
-          profileId: profileId,
-          profileType: activePanel ?? defaultProfileType ?? MobilePanel.mss,
-        );
+        summary = forceRefresh
+            ? await MobileMssDashboardService.refresh(
+                organisationId: activeOrgId!,
+                profileId: profileId,
+                profileType:
+                    activePanel ?? defaultProfileType ?? MobilePanel.mss,
+              )
+            : await MobileMssDashboardService.load(
+                organisationId: activeOrgId!,
+                profileId: profileId,
+                profileType:
+                    activePanel ?? defaultProfileType ?? MobilePanel.mss,
+              );
       } catch (_) {
         summary = null;
       }
@@ -460,9 +557,12 @@ class _MssRequestsScreenState extends State<MssRequestsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
-      children: [
+    return RefreshIndicator(
+      onRefresh: () => _loadData(forceRefresh: true),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
+        children: [
         const _PageHeading(
           eyebrow: 'Approvals centre',
           title: 'Requests',
@@ -486,7 +586,8 @@ class _MssRequestsScreenState extends State<MssRequestsScreen> {
             _ModuleGridCard(icon: Icons.account_balance_wallet, title: 'Loans & Advance', color: Mythemes.stepColor, onTap: () => Navigator.pushNamed(context, MyRoutings.loanApprovalPageRoute)),
           ],
         ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -509,6 +610,7 @@ class _MssPeopleScreenState extends State<MssPeopleScreen> {
   void initState() {
     super.initState();
     MobileMssDashboardService.refreshSignal.addListener(_loadCounts);
+    MobileMssDashboardService.manualRefreshSignal.addListener(_manualRefresh);
     MobileMssTeamService.countRefreshSignal.addListener(_loadCounts);
     _loadCounts();
   }
@@ -516,24 +618,42 @@ class _MssPeopleScreenState extends State<MssPeopleScreen> {
   @override
   void dispose() {
     MobileMssDashboardService.refreshSignal.removeListener(_loadCounts);
+    MobileMssDashboardService.manualRefreshSignal.removeListener(_manualRefresh);
     MobileMssTeamService.countRefreshSignal.removeListener(_loadCounts);
     super.dispose();
   }
 
-  Future<void> _loadCounts() async {
+  void _manualRefresh() {
+    _loadCounts(forceRefresh: true);
+  }
+
+  Future<void> _loadCounts({bool forceRefresh = false}) async {
+    if (mounted) setState(() => _loading = true);
     final activePanel = await _shared.getActivePanel();
     final activeOrgId = await _shared.getActiveOrgId();
     final profileId = await _shared.getDefaultProfileId() ?? 0;
     final defaultProfileType = await _shared.getDefaultProfileType();
     MssDashboardSummary? summary;
     final dashboardFuture = (activeOrgId ?? 0) > 0 && profileId > 0
-        ? MobileMssDashboardService.load(
-            organisationId: activeOrgId!,
-            profileId: profileId,
-            profileType: activePanel ?? defaultProfileType ?? MobilePanel.mss,
-          ).then<MssDashboardSummary?>((value) => value).catchError((_) => null)
+        ? (forceRefresh
+                ? MobileMssDashboardService.refresh(
+                    organisationId: activeOrgId!,
+                    profileId: profileId,
+                    profileType:
+                        activePanel ?? defaultProfileType ?? MobilePanel.mss,
+                  )
+                : MobileMssDashboardService.load(
+                    organisationId: activeOrgId!,
+                    profileId: profileId,
+                    profileType:
+                        activePanel ?? defaultProfileType ?? MobilePanel.mss,
+                  ))
+            .then<MssDashboardSummary?>((value) => value)
+            .catchError((_) => null)
         : Future<MssDashboardSummary?>.value(null);
-    final teamFuture = MobileMssTeamService.employeeCount()
+    final teamFuture = MobileMssTeamService.employeeCount(
+      forceRefresh: forceRefresh,
+    )
         .then<int?>((value) => value)
         .catchError((_) => null);
     final results = await Future.wait<Object?>([dashboardFuture, teamFuture]);
@@ -550,9 +670,12 @@ class _MssPeopleScreenState extends State<MssPeopleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
-      children: [
+    return RefreshIndicator(
+      onRefresh: () => _loadCounts(forceRefresh: true),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
+        children: [
         const _PageHeading(
           eyebrow: 'Workforce',
           title: 'People',
@@ -572,7 +695,8 @@ class _MssPeopleScreenState extends State<MssPeopleScreen> {
             _ModuleGridCard(icon: Icons.exit_to_app, title: 'Exit', color: Mythemes.dangerColorOne, count: _exitCount, loading: _loading, onTap: () => Navigator.pushNamed(context, MyRoutings.mssExitRoute)),
           ],
         ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -764,74 +888,6 @@ class _IdentityCard extends StatelessWidget {
             ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _ScopeSwitch extends StatelessWidget {
-  const _ScopeSwitch({this.onViewSelf, required this.canViewSelf});
-
-  final VoidCallback? onViewSelf;
-  final bool canViewSelf;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: Mythemes.whitish,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Mythemes.greyLight),
-      ),
-      child: Row(
-        children: [
-          if (canViewSelf)
-            Expanded(
-              child: _Pill(
-                label: 'Self',
-                selected: false,
-                onTap:
-                    onViewSelf ??
-                    () => Navigator.pushNamed(
-                      context,
-                      MyRoutings.essDashboardNavigateRoute,
-                    ),
-              ),
-            ),
-          Expanded(child: _Pill(label: 'Team', selected: true, onTap: () {})),
-        ],
-      ),
-    );
-  }
-}
-
-class _Pill extends StatelessWidget {
-  const _Pill({required this.label, required this.selected, required this.onTap});
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(22),
-      onTap: onTap,
-      child: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(vertical: 9),
-        decoration: BoxDecoration(
-          color: selected ? Mythemes.lightBluishColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(22),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? Mythemes.whitish : Mythemes.blackish,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
       ),
     );
   }

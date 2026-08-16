@@ -27,6 +27,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/services/attendance_calendar_api.dart';
+import 'package:er_flutter_project/ess/widgets/attendance_calendar_marker.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/mobile_permission_service.dart';
@@ -652,12 +653,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       for (var event in data) {
         DateTime eventDate = DateTime.parse(event['logDate']);
         String title = event['status'] ?? "Event";
-        String logDate = event['logDate'];
-        String mobColor =
-            (event["mobColor"] != null &&
-                    event["mobColor"].toString().trim().isNotEmpty)
-                ? event["mobColor"].toString()
-                : "0xffaf9f6";
         //print("Calendar event data - $eventDate");
 
         _markedDateMap.add(
@@ -665,7 +660,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           Event(
             date: eventDate,
             title: title,
-            icon: _buildEventIcon(mobColor, logDate),
+            icon: AttendanceCalendarMarker(
+              event: Map<String, dynamic>.from(event),
+            ),
           ),
         );
       }
@@ -3512,9 +3509,10 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       ),
       markedDateCustomTextStyle: TextStyle(
         fontSize: 18,
-        color: Colors.amberAccent,
+        color: Colors.white,
       ),
       showHeader: false,
+      showIconBehindDayText: false,
       todayTextStyle: TextStyle(color: Colors.white),
       markedDateShowIcon: true,
       markedDateIconMargin: 0,
@@ -4158,7 +4156,9 @@ class LegendWidget extends StatelessWidget {
                           height: 16,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color(int.parse(legend['mobColor']!)),
+                            color: attendanceCalendarColor(
+                              legend['mobColor'],
+                            ),
                           ),
                         ),
                         SizedBox(width: 8),
@@ -4208,15 +4208,15 @@ class LegendWidget extends StatelessWidget {
                                     height: 20,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Color(
-                                        int.parse(legend['mobColor']!),
+                                      color: attendanceCalendarColor(
+                                        legend['mobColor'],
                                       ),
                                     ),
                                   ),
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
-                                      legend['statusName']!,
+                                      '${legend['status']} - ${legend['statusName']}',
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: Colors.black,
