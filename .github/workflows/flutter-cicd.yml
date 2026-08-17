@@ -3,11 +3,13 @@ name: Flutter CI
 on:
   push:
     branches:
-      - ankur_ernzone_mobile_fl
+      - ankur_erzone_mobile_fl
 
   pull_request:
     branches:
-      - ankur_ernzone_mobile_fl
+      - ankur_erzone_mobile_fl
+
+  workflow_dispatch:
 
 jobs:
   build:
