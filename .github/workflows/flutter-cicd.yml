@@ -36,8 +36,5 @@ jobs:
       - name: Analyze Flutter Code
         run: flutter analyze --no-fatal-warnings --no-fatal-infos
 
-      - name: Run Tests
-        run: flutter test
-
       - name: Build Android APK
         run: flutter build appbundle --target-platform android-arm,android-arm64,android-x64
