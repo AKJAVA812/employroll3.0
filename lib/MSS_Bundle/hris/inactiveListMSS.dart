@@ -20,7 +20,7 @@ import '../../profiles/profilePageWithHead.dart';
 import '../../themes/empThemes.dart';
 
 class InactiveListMSS extends StatefulWidget {
-  const InactiveListMSS({Key? key}) : super(key: key);
+  const InactiveListMSS({super.key});
 
   static const String _title = 'Employee List';
 
@@ -68,9 +68,8 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -94,7 +93,6 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
         employeeListModelglobel = value;
         employeeListModelglobeled = employeeListModelglobel;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
   }
 
@@ -102,7 +100,6 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getEmpList;
 
-    print('employeeList11: $sessionId');
 
     setState(() {
       isLoading = true; // Show loader
@@ -119,15 +116,12 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
 
       final response = await MobileHttpClient.instance.post(urlapi);
 
-      print('responseemployeeList ${response.body}');
-      print('emp list api - ${response.request}');
 
       mapResponse = json.decode(response.body);
       employeeListModelglobeled = EmployeeListModel.fromJson(mapResponse);
 
       allUsernew = employeeListModelglobeled?.data ?? [];
     } catch (e) {
-      print("Error fetching employee list: $e");
     } finally {
       setState(() {
         isLoading = false; // Hide loader always
@@ -139,7 +133,6 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
 
   bool isLoading = true;
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -242,7 +235,6 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -259,7 +251,6 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
                 builder: (context) => PunchInOUtActivity(selectedIndex: 2),
               ),
             );
-            print('Reports');
           }
           if (index == 3) {
             Navigator.push(
@@ -269,14 +260,12 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -372,7 +361,6 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
           setState(() {
             selectedFilter = label;
             getSharedPrfanceList();
-            print("Selected Filter - $selectedFilter");
           });
         },
       ),
@@ -395,7 +383,7 @@ class _InactiveListMSSState extends State<InactiveListMSS> with RouteAware {
 class MyStatelessWidget extends StatefulWidget {
   final EmployeeListModel employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -444,7 +432,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
               Navigator.pop(context);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -508,8 +495,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             onTap: () {
               empId = foundDataNew![i].empdetailsId;
               empName = foundDataNew![i].empName;
-              print('ID $empId');
-              print('NameCheck $empName');
               //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
             },
             child: Card(

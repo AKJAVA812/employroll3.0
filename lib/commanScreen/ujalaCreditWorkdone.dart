@@ -23,7 +23,7 @@ class UjalaCreditWorkdone extends StatefulWidget {
   final String time;
   final String address;
 
-  const UjalaCreditWorkdone({
+  const UjalaCreditWorkdone({super.key, 
     required this.value,
     required this.address,
     required this.time,
@@ -63,23 +63,23 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
 
   _UjalaCreditWorkdoneState(this.value, this.currentAddress, this.time);
 
-  TextEditingController _remarkController = TextEditingController();
-  TextEditingController _clientNameController = TextEditingController();
-  TextEditingController _clientNameContTwo = TextEditingController();
-  TextEditingController _clientNameContThree = TextEditingController();
-  TextEditingController _clientNameContFour = TextEditingController();
-  TextEditingController _clientNameContFive = TextEditingController();
-  TextEditingController _orgNameController = TextEditingController();
-  TextEditingController _emailIdController = TextEditingController();
-  TextEditingController _contNoController = TextEditingController();
-  TextEditingController _contNumTwo = TextEditingController();
-  TextEditingController _contNumThree = TextEditingController();
-  TextEditingController _contNumFour = TextEditingController();
-  TextEditingController _contNumFive = TextEditingController();
-  TextEditingController _noOfNewAdvisor = TextEditingController();
-  TextEditingController _noOfNewMember = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
+  final TextEditingController _clientNameController = TextEditingController();
+  final TextEditingController _clientNameContTwo = TextEditingController();
+  final TextEditingController _clientNameContThree = TextEditingController();
+  final TextEditingController _clientNameContFour = TextEditingController();
+  final TextEditingController _clientNameContFive = TextEditingController();
+  final TextEditingController _orgNameController = TextEditingController();
+  final TextEditingController _emailIdController = TextEditingController();
+  final TextEditingController _contNoController = TextEditingController();
+  final TextEditingController _contNumTwo = TextEditingController();
+  final TextEditingController _contNumThree = TextEditingController();
+  final TextEditingController _contNumFour = TextEditingController();
+  final TextEditingController _contNumFive = TextEditingController();
+  final TextEditingController _noOfNewAdvisor = TextEditingController();
+  final TextEditingController _noOfNewMember = TextEditingController();
 
-  bool _enabled = false;
+  final bool _enabled = false;
   File? _image;
   late var result;
   ReportingOfficerListModal? reportingOfficerListLabel;
@@ -92,12 +92,8 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
   @override
   void initState() {
     //getUploadImage();
-    print('Workdone${value}');
-    print('Workdone${time}');
-    print('Workdone${currentAddress}');
     getSharedPrfanceList();
     imageValue = value;
-    print('imageName $imageValue');
     setState(() {});
     // TODO: implement initState
     super.initState();
@@ -110,10 +106,6 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     lngg = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
-    print('Response snapshot: ${sessionId}');
-    print('Response snapshot: ${latt}');
-    print('Response snapshot: ${lngg}');
-    print('Response snapshot: ${orgnizationID}');
     Future<ReportingOfficerListModal?> getLeaveType12 = getReportingOfficers(
       sessionId!,
     );
@@ -137,7 +129,6 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
         this._image = value;
       });*/
     } on PlatformException catch (e) {
-      print('failed to upload: $e');
     }
   }
 
@@ -158,9 +149,6 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
     String formattedDate = dateFormat.format(now);
     var length = await value!.length();
-    print('Response status: ${length}');
-    print('Response body: ${stream}');
-    print('Response body: ${value}');
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
     var uri = Uri.parse(
@@ -202,10 +190,7 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessGo(
           context,
-          "You have successfully submitted task details on server at"
-                  .toString() +
-              " " +
-              formattedDate,
+          "You have successfully submitted task details on server at $formattedDate",
           "Task Submitted",
         );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
@@ -220,11 +205,9 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
       CommonNotificationPage.showDialgError(context, result, "reason");
     }
     String reasonSuccess = result['reason'];
-    print('result${result}');
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run" + result['result']),
     ));*/
-    print('Response body: ${result}');
   }
 
   Future<ReportingOfficerListModal?> getReportingOfficers(
@@ -233,20 +216,14 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
     reportingOfficerList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.reportingOfficerList;
-    print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['leaveTypeList'];
-    print("GETDATA $getData");
 
-    print('responseLeaveTypeList $getData');
     reportingOfficerListLabel = ReportingOfficerListModal.fromJson(mapResponse);
     int? length = reportingOfficerListLabel?.listData?.length;
 
-    print('totalleaveLength $length ');
     /*for(int i=0; i<leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;i++){
       String? leaveTypeName = leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i];
         leaveTypeList.add(leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i]);
@@ -392,10 +369,6 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                                 '-',
                               );
                               String idn = reportingOfficerGlobal.last;
-                              print('reportingOfficerId $reportingOfficerId');
-                              print(
-                                'reportingOfficerName $reportingOfficerName',
-                              );
                               setState(() {
                                 //print('value1 $i');
                                 //print('value $policyidnew');
@@ -694,38 +667,24 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ButtonBar(
+                        OverflowBar(
                           alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
                           children: [
                             ElevatedButton(
                               onPressed: () async {
                                 imageValue = value;
-                                print('ImageValue $imageValue');
                                 clientNamesend = _clientNameController.text;
-                                print("clientNameOne $clientNamesend");
                                 clientNamesendTwo = _clientNameContTwo.text;
-                                print("clientNameTwo $clientNamesendTwo");
                                 clientNamesendThree = _clientNameContThree.text;
-                                print("clientNameThree $clientNamesendThree");
                                 clientNamesendFour = _clientNameContFour.text;
-                                print("clientNameFour $clientNamesendFour");
                                 clientNamesendFive = _clientNameContFive.text;
-                                print("clientNameFive $clientNamesendFive");
                                 clientContactSend = _contNoController.text;
-                                print("clientContOne $clientContactSend");
                                 clientContSendTwo = _contNumTwo.text;
-                                print("clientContTwo $clientContSendTwo");
                                 clientContSendThree = _contNumThree.text;
-                                print("clientContThree $clientContSendThree");
                                 clientContSendFour = _contNumFour.text;
-                                print("clientContFour $clientContSendFour");
                                 clientContSendFive = _contNumFive.text;
-                                print("clientContFive $clientContSendFive");
                                 noOfNewMem = _noOfNewMember.text;
-                                print("No of New Member $noOfNewMem");
                                 noOfNewAdvi = _noOfNewAdvisor.text;
-                                print("No of New Advisor $noOfNewAdvi");
                                 DropValueName = reportingOfficerName;
 
                                 /*if(dropdownNewvalue == 1) {
@@ -773,7 +732,7 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
                                 }
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                   Mythemes.lightBluishColor,
                                 ),
                               ),
@@ -797,7 +756,7 @@ class _UjalaCreditWorkdoneState extends State<UjalaCreditWorkdone> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

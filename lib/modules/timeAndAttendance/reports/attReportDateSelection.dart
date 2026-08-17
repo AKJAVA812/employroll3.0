@@ -12,7 +12,7 @@ import '../../../commanScreen/routes.dart';
 import '../../../ess/myAllReports.dart';
 
 class AttReport extends StatefulWidget {
-  const AttReport({Key? key}) : super(key: key);
+  const AttReport({super.key});
 
   @override
   State<AttReport> createState() => _AttReportState();
@@ -27,9 +27,9 @@ class _AttReportState extends State<AttReport> {
 
   @override
   void initState() {
-    this.year;
-    this.date;
-    this.month;
+    year;
+    date;
+    month;
     //formattedDate = DateFormat.yMd() as String;
     // TODO: implement initState
     super.initState();
@@ -42,19 +42,18 @@ class _AttReportState extends State<AttReport> {
   bool changeNewDate = true;
 
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePicker = await showDatePicker(
+    DateTime? datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_datePicker != null && _datePicker != _date) {
+    if (datePicker != null && datePicker != _date) {
       setState(() {
         changeDates = false;
-        _date = _datePicker;
+        _date = datePicker;
         fromeDateString = DateFormat('yyyy-MM-dd').format(_date);
-        print('dateTime${formattedDate}');
       });
     }
   }
@@ -63,17 +62,17 @@ class _AttReportState extends State<AttReport> {
   String formatDate = DateFormat.ABBR_MONTH;
 
   Future<Null> _selectToDate(BuildContext context) async {
-    DateTime? _newDatePicker = await showDatePicker(
+    DateTime? newDatePicker = await showDatePicker(
       context: context,
       initialDate: _newdate,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_newDatePicker != null && _newDatePicker != _newdate) {
+    if (newDatePicker != null && newDatePicker != _newdate) {
       setState(() {
         changeNewDate = false;
-        _newdate = _newDatePicker;
+        _newdate = newDatePicker;
         todateString = DateFormat('yyyy-MM-dd').format(_newdate);
       });
     }
@@ -279,7 +278,6 @@ class _AttReportState extends State<AttReport> {
                       AlertDialog(
                         content: "Please select valid date range".text.make(),
                       );
-                      print("select valid date range");
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text("Please Select Valid Date Range "),
                       ));
@@ -307,7 +305,6 @@ class _AttReportState extends State<AttReport> {
                     }
 
                   } else {
-                    print("Please select date");
                     setState(() {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text("Please Select Date Range "),
@@ -337,31 +334,26 @@ class _AttReportState extends State<AttReport> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
-            print('My Requests');
           }
           if(index==3){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if(index==4){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";

@@ -10,7 +10,7 @@ import 'dart:io';
 import 'package:velocity_x/velocity_x.dart';
 
 class ReportPage extends StatefulWidget {
-  const ReportPage({Key? key}) : super(key: key);
+  const ReportPage({super.key});
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -48,13 +48,6 @@ class _ReportPageState extends State<ReportPage> {
     empRoles= await shared.getEmpRoll();
     roRoles= await shared.getRoRole();
     adminRoles= await shared.getAdminRole();
-    print('empRole $empRoles');
-    print('roRole $roRoles');
-    print('adminRole $adminRoles');
-    print('Response snapshot: ${sessionId}');
-    print('Show Payroll: ${setShowPayroll}');
-    print('OrgId -  ${orgId}');
-    print('OrgName - : ${orgName}');
     userPanel= await shared.getUserPanel();
     profileName= await shared.getDefaultProfileName();
     profileId= await shared.getDefaultProfileId();
@@ -64,32 +57,26 @@ class _ReportPageState extends State<ReportPage> {
     setState(() {
       if(empRoles==1){
         showHide=true;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if(empRoles==0){
         showHide=false;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if (adminRoles == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRoles == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRoles == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRoles == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -117,7 +104,6 @@ class _ReportPageState extends State<ReportPage> {
     double widgetHeight = screenHeight * 0.5; // 50% of the screen height
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
-      print("CheckOrg - $orgId");
       List<Widget> items = [];
 
       if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN"){

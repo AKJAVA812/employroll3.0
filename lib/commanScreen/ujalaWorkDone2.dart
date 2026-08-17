@@ -48,7 +48,7 @@ class UjalaCreditWDSubmit extends StatefulWidget {
     this.clientContSendFour,
     this.clientContSendFive,
     this.noOfNewMem,
-    this.noOfNewAdvi,
+    this.noOfNewAdvi, {super.key}
   );
 
   @override
@@ -97,10 +97,10 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
   );
 
   var titleName = "Workdone Report";
-  TextEditingController _ussNoController = TextEditingController();
-  TextEditingController _ujalaJyoti = TextEditingController();
-  TextEditingController _todayBusiness = TextEditingController();
-  TextEditingController _remarksController = TextEditingController();
+  final TextEditingController _ussNoController = TextEditingController();
+  final TextEditingController _ujalaJyoti = TextEditingController();
+  final TextEditingController _todayBusiness = TextEditingController();
+  final TextEditingController _remarksController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   String singleDateString = "";
 
@@ -111,16 +111,16 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
   ).format(DateTime.parse("2019-09-30"));
 
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePicker = await showDatePicker(
+    DateTime? datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if (_datePicker != null && _datePicker != _date) {
+    if (datePicker != null && datePicker != _date) {
       setState(() {
-        _date = _datePicker;
+        _date = datePicker;
       });
     }
   }
@@ -156,7 +156,6 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
     clientConSendFive = clientContSendFive;
     clientNoOfNewMem = noOfNewMem;
     clientNoOfNewAdv = noOfNewAdvi;
-    print("Drops $dropName");
     getSharedPrfanceList();
     super.initState();
   }
@@ -168,10 +167,6 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
     lngg = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
-    print('Response snapshot: ${sessionId}');
-    print('Response snapshot: ${latt}');
-    print('Response snapshot: ${lngg}');
-    print('Response snapshot: ${orgnizationID}');
   }
 
   Future getUploadImage() async {
@@ -185,7 +180,6 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
         this._image = value;
       });*/
     } on PlatformException catch (e) {
-      print('failed to upload: $e');
     }
   }
 
@@ -206,9 +200,6 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
     String formattedDate = dateFormat.format(now);
     var length = await imageVal!.length();
-    print('Response status: ${length}');
-    print('Response body: ${stream}');
-    print('Response body: ${imageVal}');
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.customWorkDoneApi;
     var urlapi = Uri.parse(
@@ -250,17 +241,14 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
     );
     request.files.add(multipart);
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
     http.Response response = await http.Response.fromStream(
       await request.send(),
     );
@@ -272,10 +260,7 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         showSuccessGo(
           context,
-          "You have successfully submitted task details on server at"
-                  .toString() +
-              " " +
-              formattedDate,
+          "You have successfully submitted task details on server at $formattedDate",
           "Task Submitted",
         );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
@@ -473,7 +458,6 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                             //  DateFormat.yMd().format(date!).toString();
                           });
 
-                          print(date);
                         },
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
@@ -515,9 +499,8 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ButtonBar(
+                        OverflowBar(
                           alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
                           children: [
                             ElevatedButton(
                               onPressed: () {
@@ -531,7 +514,7 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
                                 }
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                   Mythemes.lightBluishColor,
                                 ),
                               ),
@@ -554,7 +537,7 @@ class _UjalaCreditWDSubmitState extends State<UjalaCreditWDSubmit> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

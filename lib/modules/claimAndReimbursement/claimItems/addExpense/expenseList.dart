@@ -16,7 +16,7 @@ import 'expenseListDelete.dart';
 
 class ExpenseList extends StatefulWidget {
   final ExpensesListModal expensesListModal;
-  ExpenseList(this.expensesListModal);
+  const ExpenseList(this.expensesListModal, {super.key});
   @override
   State<ExpenseList> createState() => _ExpenseListState(expensesListModal);
 }
@@ -59,9 +59,8 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware {
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -90,16 +89,13 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware {
   Future<ExpensesListModal> getExpenseList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.expensesList;
-    print('employeeList11: ${SessionId}');
     ExpensesListModal expensesListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     expensesListModal = ExpensesListModal.fromJson(mapResponse);
     allUsernew = expensesListModal.claimRequiDatalist;
 
@@ -108,7 +104,6 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware {
 
   var titleName = "Expense List";
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<ClaimRequiDatalist>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -234,7 +229,6 @@ class _ExpenseListState extends State<ExpenseList> with RouteAware {
           return InkWell(
             onTap: () {
               var statusCheck = foundDataNew![i].status.toString();
-              print("Status list $statusCheck");
 
               if (statusCheck == 'CANCEL') {
                 Fluttertoast.showToast(

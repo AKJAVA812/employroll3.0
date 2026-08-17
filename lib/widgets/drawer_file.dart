@@ -13,6 +13,8 @@ import '../mss_profiles/global_profile.dart';
 import '../mss_profiles/profileListModal.dart';
 
 class DrawerFile extends StatefulWidget {
+  const DrawerFile({super.key});
+
   @override
   State<DrawerFile> createState() => _DrawerFileState();
 }
@@ -30,10 +32,7 @@ class _DrawerFileState extends State<DrawerFile> {
     urlImage = await shared.getProfileImage();
     name = await shared.getempName();
     emailid = await shared.getEmailId();
-    print('drawer: ${urlImage}');
-    print('drawer: ${name}');
 
-    print('drawer: ');
     await getProfileList();
     if (!mounted) return;
     setState(() {});
@@ -46,9 +45,6 @@ class _DrawerFileState extends State<DrawerFile> {
     try {
       final profileListModal = await MobileProfileCache.loadProfileList();
       profileListGetter = profileListModal.data ?? <ProfileData>[];
-      print(
-        '[MOBILE-AUTH] DRAWER_PROFILE_CACHE -> count=${profileListGetter.length}',
-      );
       if (profileListGetter.isNotEmpty) {
         final selectedId = await shared.getDefaultProfileId();
         final selectedName = await shared.getDefaultProfileName();
@@ -56,7 +52,6 @@ class _DrawerFileState extends State<DrawerFile> {
         selectedProfileNameNotifier.value = selectedName ?? '';
       }
     } catch (e) {
-      print('[MOBILE-AUTH] DRAWER_PROFILE_CACHE -> error=$e');
     } finally {
       if (mounted) {
         setState(() {
@@ -69,7 +64,6 @@ class _DrawerFileState extends State<DrawerFile> {
   @override
   void didChangeDependencies() {
     //getUserNameImage();
-    print('drawer: didChangeDependencies');
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
@@ -80,11 +74,8 @@ class _DrawerFileState extends State<DrawerFile> {
     MobileProfileCache.revision.addListener(_reloadProfiles);
     getUserNameImage();
 
-    print('drawer: initState');
     // TODO: implement initState
 
-    print('drawer: ${urlImage}');
-    print('drawer: ${name}');
 
   }
 
@@ -101,7 +92,6 @@ class _DrawerFileState extends State<DrawerFile> {
   @override
   void didUpdateWidget(covariant DrawerFile oldWidget) {
     //getUserNameImage();
-    print('drawer: didUpdateWidget');
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
   }
@@ -109,7 +99,6 @@ class _DrawerFileState extends State<DrawerFile> {
   @override
   void setState(VoidCallback fn) {
     //getUserNameImage();
-    print('drawer: setState');
     // TODO: implement setState
     super.setState(fn);
   }
@@ -154,7 +143,6 @@ class _DrawerFileState extends State<DrawerFile> {
               leading: Icon(CupertinoIcons.profile_circled),
               title: Text("Profile", textScaleFactor: 1.2),
               onTap: () {
-                print("profile click");
                 /*Fluttertoast.showToast(
                     msg: "Profile Click",
                     toastLength: Toast.LENGTH_SHORT,
@@ -495,7 +483,7 @@ List<MyModule> sideList = <MyModule>[
 class MyListReturn extends StatelessWidget {
   final MyModule myModuleReturn;
 
-  const MyListReturn(this.myModuleReturn);
+  const MyListReturn(this.myModuleReturn, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -509,8 +497,6 @@ Widget _buildTill(MyModule myModule1) {
       dense: true,
       enabled: true,
       isThreeLine: false,
-      onLongPress: () => print("long press"),
-      onTap: () => print("tap"),
       selected: true,
       title: Text(myModule1.title),
     );

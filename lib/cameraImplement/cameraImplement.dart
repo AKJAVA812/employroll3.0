@@ -1,12 +1,11 @@
 
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import '../commanScreen/punchInOutScreen.dart';
 import '../commanScreen/punchInUploadPage.dart';
 class CameraApp extends StatefulWidget {
-  const CameraApp({Key? key}) : super(key: key);
+  const CameraApp({super.key});
 
   @override
   State<CameraApp> createState() => _CameraAppState();
@@ -39,7 +38,6 @@ class _CameraAppState extends State<CameraApp> {
       }
       setState(() {}); //To refresh widget
     }).catchError((e) {
-      print(e);
     });
   }
 
@@ -75,7 +73,7 @@ class _CameraAppState extends State<CameraApp> {
 
                     final imagePath= File(file.path);
                     setState(() {
-                      this._workDoneImage=imagePath;
+                      _workDoneImage=imagePath;
                     });
                     Navigator.of(context).push(MaterialPageRoute(builder: (context)
                     =>ImageUploaded(value: _workDoneImage, address: currentAddress, time: timeString,punchType:clockingType )));

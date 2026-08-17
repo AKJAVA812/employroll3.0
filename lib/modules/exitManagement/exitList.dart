@@ -20,7 +20,7 @@ import '../../themes/empThemes.dart';
 import 'exitWorkflow.dart';
 
 class ExitListView extends StatefulWidget {
-  const ExitListView({Key? key}) : super(key: key);
+  const ExitListView({super.key});
 
   static const String _title = 'Employee List';
 
@@ -68,9 +68,8 @@ class _ExitListViewState extends State<ExitListView> with RouteAware {
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -94,14 +93,12 @@ class _ExitListViewState extends State<ExitListView> with RouteAware {
         employeeListModelglobel = value;
         employeeListModelglobeled = employeeListModelglobel;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
   }
 
   Future<EmployeeListModel> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getEmpList;
-    print('employeeList11: ${SessionId}');
     EmployeeListModel employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -112,12 +109,9 @@ class _ExitListViewState extends State<ExitListView> with RouteAware {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
-    print('emp list api - ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = EmployeeListModel.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
 
@@ -125,7 +119,6 @@ class _ExitListViewState extends State<ExitListView> with RouteAware {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -227,7 +220,6 @@ class _ExitListViewState extends State<ExitListView> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -239,7 +231,6 @@ class _ExitListViewState extends State<ExitListView> with RouteAware {
           }
           if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Exit');
           }
           if (index == 3) {
             Navigator.push(
@@ -249,14 +240,12 @@ class _ExitListViewState extends State<ExitListView> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -329,7 +318,7 @@ class _ExitListViewState extends State<ExitListView> with RouteAware {
 class MyStatelessWidget extends StatefulWidget {
   final EmployeeListModel employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -378,7 +367,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
               Navigator.pop(context);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -442,8 +430,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             onTap: () {
               empId = foundDataNew![i].empdetailsId;
               empName = foundDataNew![i].empName;
-              print('ID $empId');
-              print('NameCheck $empName');
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ExitWorkflow(empId, empName),

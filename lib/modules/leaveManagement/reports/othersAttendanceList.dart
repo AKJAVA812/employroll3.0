@@ -22,7 +22,7 @@ class OthersAttendanceList extends StatefulWidget {
   final AttendanceReportModel attendanceReportModel1;
   int empId;
 
-  OthersAttendanceList(this.attendanceReportModel1, this.empId);
+  OthersAttendanceList(this.attendanceReportModel1, this.empId, {super.key});
 
   @override
   State<OthersAttendanceList> createState() =>
@@ -83,7 +83,6 @@ class _OthersAttendanceListState extends State<OthersAttendanceList>
     if (userPanel == "USER") {
       empId = empNewIdUSER;
     }
-    print("EMPID - $empId");
     // await Future.delayed(Duration(seconds: 5));
     Future<AttendanceReportModel> getEmployeeList11 = getEmployeeList(
       sessionId!,
@@ -92,7 +91,6 @@ class _OthersAttendanceListState extends State<OthersAttendanceList>
       setState(() {
         attendanceModelGlobel = value;
       });
-      print('employeeList00${attendanceModelGlobel!.data!.length}');
     });
   }
 
@@ -100,7 +98,6 @@ class _OthersAttendanceListState extends State<OthersAttendanceList>
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getOtherAttendance;
 
-    print('employeeList11: ${SessionId}');
     AttendanceReportModel employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -109,11 +106,9 @@ class _OthersAttendanceListState extends State<OthersAttendanceList>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = AttendanceReportModel.fromJson(mapResponse);
 
     return employeeListModel;
@@ -160,16 +155,13 @@ class _OthersAttendanceListState extends State<OthersAttendanceList>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 3) {
             Navigator.push(
@@ -177,7 +169,6 @@ class _OthersAttendanceListState extends State<OthersAttendanceList>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -226,7 +217,6 @@ class _OthersAttendanceListState extends State<OthersAttendanceList>
         itemBuilder: (context, itemCount) {
           return InkWell(
             onTap: () {
-              print('attendanceReport$attendanceModelGlobel!.data![itemCount]');
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder:

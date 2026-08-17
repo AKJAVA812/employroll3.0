@@ -5,12 +5,10 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:camera/camera.dart';
 import 'package:er_flutter_project/faceRecognizationAttendance/faceRecognizeEmployeeList.dart';
-import 'package:flutter/services.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
@@ -57,39 +55,29 @@ class _MarkAttendanceAIState extends State<MarkAttendanceAI> {
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
     empIdReceived = empId;
     empIdSelfReceive = empIdSelf;
-    print("EMP ID REC -$empId");
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -116,7 +104,6 @@ class _MarkAttendanceAIState extends State<MarkAttendanceAI> {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -124,7 +111,6 @@ class _MarkAttendanceAIState extends State<MarkAttendanceAI> {
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -133,12 +119,10 @@ class _MarkAttendanceAIState extends State<MarkAttendanceAI> {
                 builder: (context) => const FaceRecognitinHome(),
               ),
             );
-            print('Face');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -146,7 +130,6 @@ class _MarkAttendanceAIState extends State<MarkAttendanceAI> {
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -177,7 +160,7 @@ class _MarkAttendanceAIState extends State<MarkAttendanceAI> {
 }
 
 class MarkAIAttendance extends StatefulWidget {
-  const MarkAIAttendance({Key? key}) : super(key: key);
+  const MarkAIAttendance({super.key});
 
   @override
   State<MarkAIAttendance> createState() => _MarkAIAttendanceState();
@@ -235,46 +218,36 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
     lat = await shared.getLatitude();
     lng = await shared.getLongitude();
 
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
 
   Future getUserName() async {
     UserName = await shared.getempName();
-    print('Response snapshot: ${UserName}');
   }
 
   void _getTime() {
@@ -302,7 +275,6 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
     await controller.initialize();
 
     final image = await controller.takePicture();
-    print("Captured Image Path: ${image.path}");
   }
 
   //TODO capture image using camera
@@ -329,12 +301,10 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
     InputImage inputImage = InputImage.fromFile(_image!);
     //image = await _image?.readAsBytes();
     imageRecognize = await decodeImageFromList(_image!.readAsBytesSync());
-    print("Image - ${inputImage}");
     recognitionList.clear();
     //TODO passing input to face detector and getting detected faces
     facesRecognized = await faceDetector.processImage(inputImage);
     faceLoader = true;
-    print("Face Count -  ${facesRecognized.length}");
     for (Face face in facesRecognized) {
       final Rect boundingBox = face.boundingBox;
 
@@ -351,7 +321,6 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
       num width = right - left;
       num height = bottom - top;
 
-      print("Ract Position :- " + boundingBox.toString());
 
       final bytes = _image!.readAsBytesSync();
       img.Image? faceImg = img.decodeImage(bytes);
@@ -364,13 +333,10 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
       );
       Recognition recognition = recognizer.recognize(croppedFace, boundingBox);
       recognitionList.add(recognition);
-      print("Face List Leng - ${recognitionList.length}");
-      print("Image - ${recognition.embeddings.toString()}");
-      getFaceData(this.context, recognition.embeddings.toString(), _image!);
+      getFaceData(context, recognition.embeddings.toString(), _image!);
       if (recognition.distance > 0.6) {
         recognition.name = "Unknown Face $recognition.distance";
       }
-      print("Face Matche Name " + recognition.name);
 
       /* var snackBar = SnackBar(content: Text(" Face Name " + recognition.name));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
@@ -399,7 +365,6 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
           (value == 0)
               ? ApiDetails.faceRecognizeSelf
               : ApiDetails.faceRecognizeOther;
-      print("ðŸ”¹ Selected API: $apiUrl");
 
       var urlapi = Uri.parse("$conn$apiUrl");
       CommonNotificationPage.showLoaderDialog(context);
@@ -429,17 +394,12 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
       );
 
       // **Debugging Logs**
-      print("ðŸ”¹ API URL: $urlapi");
-      print("ðŸ”¹ Request Fields: ${request.fields}");
-      print("ðŸ”¹ Coordinates JSON: $jsonData");
-      print("ðŸ”¹ Image Path: ${image.path}");
 
       // Send Request
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
         String jsonResponse = await response.stream.bytesToString();
-        print("âœ… JSON Upload successful: $jsonResponse");
 
         Map<String, dynamic> responseData = json.decode(jsonResponse);
 
@@ -482,7 +442,7 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text('$reason'),
+                        Text(reason),
                         /*Container(
               child: "Location".text.align(TextAlign.left).color(Mythemes.greyish).make().py12() ,
             ),*/
@@ -521,12 +481,8 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
           },
         );
       } else {
-        print(
-          "âŒ JSON Upload Error: ${response.statusCode}, ${await response.stream.bytesToString()}",
-        );
       }
     } catch (e) {
-      print("âŒ Error uploading file: $e");
     }
   }
 
@@ -730,7 +686,6 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
   var image;
   drawRectangleAroundFaces() async {
     //print("${image.width}   ${image.height}");
-    print("${imageRecognize.width}   ${imageRecognize.height}");
     setState(() {
       image;
       imageRecognize;
@@ -796,7 +751,6 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
                     onChanged: (i) {
                       setState(() {
                         value = i;
-                        print(i);
                       });
                       if (value == 1) {
                         //Navigator.pushNamed(context, MyRoutings.roWorkDoneFilterRoute);
@@ -892,7 +846,7 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
                             height: 25,
                             width: 125,
                             child: Text(
-                              '$todayDateShow',
+                              todayDateShow,
                               textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 18),
                             ),
@@ -919,7 +873,7 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
                             height: 25,
                             width: 125,
                             child: Text(
-                              '$timeString',
+                              timeString,
                               textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 18),
                             ),
@@ -983,13 +937,13 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10),
                                       child: CircleAvatar(
+                                        backgroundColor: Mythemes.successColor,
+                                        radius: 30,
                                         child: Icon(
                                           Icons.tag_faces,
                                           size: 30,
                                           color: Mythemes.creamColor,
                                         ),
-                                        backgroundColor: Mythemes.successColor,
-                                        radius: 30,
                                       ),
                                     ),
                                     Container(height: 5),
@@ -1045,14 +999,14 @@ class _MarkAIAttendanceState extends State<MarkAIAttendance> {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10),
                                       child: CircleAvatar(
+                                        backgroundColor:
+                                            Mythemes.dangerColorOne,
+                                        radius: 30,
                                         child: Icon(
                                           Icons.tag_faces,
                                           size: 30,
                                           color: Mythemes.creamColor,
                                         ),
-                                        backgroundColor:
-                                            Mythemes.dangerColorOne,
-                                        radius: 30,
                                       ),
                                     ),
                                     Container(height: 5),

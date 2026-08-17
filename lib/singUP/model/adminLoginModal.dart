@@ -8,7 +8,7 @@ class AdminLoginModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -71,40 +71,40 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['branchId'] = this.branchId;
-    data['odReq'] = this.odReq;
-    if (this.userLoginned != null) {
-      data['userLoginned'] = this.userLoginned!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['branchId'] = branchId;
+    data['odReq'] = odReq;
+    if (userLoginned != null) {
+      data['userLoginned'] = userLoginned!.toJson();
     }
 
-    data['userPermissions'] = this.userPermissions;
-    data['sessionId'] = this.sessionId;
-    data['orgId'] = this.orgId;
-    data['helpdesk'] = this.helpdesk;
-    data['result'] = this.result;
-    data['userRoles'] = this.userRoles;
-    data['userImage'] = this.userImage;
-    data['expired'] = this.expired;
-    data['adminrole'] = this.adminrole;
+    data['userPermissions'] = userPermissions;
+    data['sessionId'] = sessionId;
+    data['orgId'] = orgId;
+    data['helpdesk'] = helpdesk;
+    data['result'] = result;
+    data['userRoles'] = userRoles;
+    data['userImage'] = userImage;
+    data['expired'] = expired;
+    data['adminrole'] = adminrole;
     return data;
   }
 }
 
 class UserLoginned {
   String? userId;
-  Null? otp;
+  Null otp;
   String? userType;
   bool? accountSuspended;
   bool? loggedIn;
-  Null? otpExpiryDateTime;
-  Null? userProfileImage;
+  Null otpExpiryDateTime;
+  Null userProfileImage;
   String? firstLoginDate;
   bool? companySetup;
   bool? showPayroll;
-  Null? salt;
+  Null salt;
   String? status;
-  Null? password;
+  Null password;
   String? name;
 
   UserLoginned(
@@ -141,21 +141,21 @@ class UserLoginned {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['userId'] = this.userId;
-    data['otp'] = this.otp;
-    data['userType'] = this.userType;
-    data['accountSuspended'] = this.accountSuspended;
-    data['loggedIn'] = this.loggedIn;
-    data['otpExpiryDateTime'] = this.otpExpiryDateTime;
-    data['userProfileImage'] = this.userProfileImage;
-    data['firstLoginDate'] = this.firstLoginDate;
-    data['companySetup'] = this.companySetup;
-    data['showPayroll'] = this.showPayroll;
-    data['salt'] = this.salt;
-    data['status'] = this.status;
-    data['password'] = this.password;
-    data['name'] = this.name;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['userId'] = userId;
+    data['otp'] = otp;
+    data['userType'] = userType;
+    data['accountSuspended'] = accountSuspended;
+    data['loggedIn'] = loggedIn;
+    data['otpExpiryDateTime'] = otpExpiryDateTime;
+    data['userProfileImage'] = userProfileImage;
+    data['firstLoginDate'] = firstLoginDate;
+    data['companySetup'] = companySetup;
+    data['showPayroll'] = showPayroll;
+    data['salt'] = salt;
+    data['status'] = status;
+    data['password'] = password;
+    data['name'] = name;
     return data;
   }
 }

@@ -126,31 +126,26 @@ class _MyLoanLedgerPageState extends State<MyLoanLedgerPage> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
-            print('My Requests');
           }
           if(index==3){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if(index==4){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";

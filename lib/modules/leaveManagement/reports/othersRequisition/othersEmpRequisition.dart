@@ -18,7 +18,7 @@ import '../modalClass/leaveBalanceModel.dart';
 import '../modalClass/otherReqEmpList.dart';
 
 class OthersLeaveReqPage extends StatefulWidget {
-  const OthersLeaveReqPage({Key? key}) : super(key: key);
+  const OthersLeaveReqPage({super.key});
 
   @override
   State<OthersLeaveReqPage> createState() => _OthersLeaveReqPageState();
@@ -32,8 +32,8 @@ String? sessionId;
 RequistionEmpListModel? employeeListModelglobel;
 LeaveBalanceModel? leaveBalanceLabel;
 String valuenew = "listText";
-late List<String?> list = [];
-late List<String?> leaveTypeList = [];
+List<String?> list = [];
+List<String?> leaveTypeList = [];
 
 class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
   var titleName = "Other Employee Requisition";
@@ -89,7 +89,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
       setState(() {
         employeeListModelglobel = value;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
 
     getLeaveType12.then((value) {
@@ -98,7 +97,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
         //var leaveTypeId = value?.leaveData.leaveTypeList;
         //print('object$leaveTypeId');
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
   }
 
@@ -106,22 +104,16 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
     list = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.othersReqEmpList;
-    print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     requistionEmpListModel = RequistionEmpListModel.fromJson(mapResponse);
     int length = requistionEmpListModel.data!.length;
-    print('totallenth $length ');
     for (int i = 0; i < requistionEmpListModel.data!.length; i++) {
       String? empName = requistionEmpListModel.data![i].empName;
       list.add(requistionEmpListModel.data![i].empName);
-      print('dataExpenseType $empName');
     }
     return requistionEmpListModel;
   }
@@ -130,18 +122,13 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
     leaveTypeList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBalanceApi;
-    print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseLeaveTypeList $getData');
     leaveBalanceLabel = LeaveBalanceModel.fromJson(mapResponse);
     int? length =
         leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
-    print('totalleaveLength $length ');
     for (
       int i = 0;
       i < leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;
@@ -152,7 +139,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
       leaveTypeList.add(
         leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i],
       );
-      print('dataLeaveTypeName $leaveTypeName');
     }
     return leaveBalanceLabel;
   }
@@ -207,7 +193,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                       valuenew = newVal.toString();
                       int i = list.indexOf(valuenew);
                       empNewId = employeeListModelglobel?.data?[i].empId;
-                      print("EmpId  $empNewId");
                       setState(() {
                         dropdownvalue = newVal;
                       });
@@ -257,20 +242,17 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                       var policyidnew = leaveTypeList.elementAt(i);
                       leavereqIdGlobel = newVal.toString().split('-');
                       String idn = leavereqIdGlobel.last;
-                      print('leaveTypeId $idn');
                       setState(() {
-                        print('value1 $i');
-                        print('value $policyidnew');
 
                         dropdownNewvalue = newVal;
                       });
                       if (i == 0 || i == 1 || i == 2) {
                         setState(() {
-                          this.halfDayRadio = true;
+                          halfDayRadio = true;
                         });
                       } else {
                         setState(() {
-                          this.halfDayRadio = false;
+                          halfDayRadio = false;
                         });
                       }
                     },
@@ -297,8 +279,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                     singleDayShow = true;
                                     multipleDayShow = false;
                                     halfDayShow = false;
-                                    print("day show $singleDayShow");
-                                    print("multi show $multipleDayShow");
                                     /*  _singleDayShow == _singleDayShow;
                                            _multipleDayShow == _multipleDayShow;*/
                                   });
@@ -324,8 +304,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                     singleDayShow = true;
                                     multipleDayShow = true;
                                     halfDayShow = false;
-                                    print("day show $singleDayShow");
-                                    print("multi show $multipleDayShow");
                                     /*  _singleDayShow =_singleDayShow;
                                           _multipleDayShow =! _multipleDayShow;*/
                                   });
@@ -354,8 +332,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                           singleDayShow = true;
                                           multipleDayShow = false;
                                           halfDayShow = true;
-                                          print("day show $singleDayShow");
-                                          print("multi show $multipleDayShow");
                                           /* _singleDayShow == _singleDayShow;
                                             _multipleDayShow = !_multipleDayShow;*/
                                         });
@@ -399,7 +375,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                   ).format(fromDate!);
                                 });
 
-                                print(fromDate);
                               },
                               readOnly: true,
                               enabled: true,
@@ -458,7 +433,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                   ).format(toDate!);
                                 });
 
-                                print(toDate);
                               },
                               readOnly: true,
                               enabled: true,
@@ -521,7 +495,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                     );
                                   },
                                 );
-                                print('timenewOut $n');
                                 setState(() {
                                   var now = DateTime.now();
                                   DateTime newt = DateTime(
@@ -532,7 +505,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                     n.minute,
                                   );
                                   var nT = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
                                   _fromTimePicker = nT;
                                   fromTimePickerController.text =
                                       _fromTimePicker;
@@ -591,7 +563,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                     );
                                   },
                                 );
-                                print('timenewOut $o');
                                 setState(() {
                                   var now = DateTime.now();
                                   DateTime newt = DateTime(
@@ -602,7 +573,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                                     o.minute,
                                   );
                                   var ot = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
                                   _toTimePicker = ot;
                                   toTimePickerController.text = _toTimePicker;
                                 });
@@ -667,9 +637,8 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: ButtonBar(
+                      child: OverflowBar(
                         alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
                         children: [
                           ElevatedButton(
                             onPressed: () {
@@ -702,7 +671,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                               //approveLeaveRequisition(_commentController.text, leaveReqId);
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.lightBluishColor,
                               ),
                             ),
@@ -731,7 +700,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -739,11 +707,9 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-              print('Leave');
             }
             if (index == 3) {
               Navigator.push(
@@ -753,7 +719,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -761,7 +726,6 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -816,20 +780,16 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -866,20 +826,16 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -918,20 +874,16 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -947,7 +899,7 @@ class _OthersLeaveReqPageState extends State<OthersLeaveReqPage> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

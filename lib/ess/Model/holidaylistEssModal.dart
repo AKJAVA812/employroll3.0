@@ -25,12 +25,12 @@ class HolidayESSModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['result'] = this.result;
-    data['reason'] = this.reason;
-    if (this.viewHolidayList != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['result'] = result;
+    data['reason'] = reason;
+    if (viewHolidayList != null) {
       data['viewHolidayList'] =
-          this.viewHolidayList!.map((v) => v.toJson()).toList();
+          viewHolidayList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -76,16 +76,16 @@ class ViewHolidayList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['gradeName'] = this.gradeName;
-    data['holidayType'] = this.holidayType;
-    data['holidaystatus'] = this.holidaystatus;
-    data['stateName'] = this.stateName;
-    data['branchName'] = this.branchName;
-    data['userName'] = this.userName;
-    data['holidayName'] = this.holidayName;
-    data['holidayId'] = this.holidayId;
-    data['dateOfHoliday'] = this.dateOfHoliday;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['gradeName'] = gradeName;
+    data['holidayType'] = holidayType;
+    data['holidaystatus'] = holidaystatus;
+    data['stateName'] = stateName;
+    data['branchName'] = branchName;
+    data['userName'] = userName;
+    data['holidayName'] = holidayName;
+    data['holidayId'] = holidayId;
+    data['dateOfHoliday'] = dateOfHoliday;
     return data;
   }
 }

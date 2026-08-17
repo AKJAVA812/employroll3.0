@@ -10,7 +10,7 @@ import '../sharedPrefancePage/ShardPre.dart';
 import 'dart:io';
 
 class MyAllRequestPageNoHead extends StatefulWidget {
-  const MyAllRequestPageNoHead({Key? key}) : super(key: key);
+  const MyAllRequestPageNoHead({super.key});
 
   @override
   State<MyAllRequestPageNoHead> createState() => _MyAllRequestPageNoHeadState();
@@ -65,7 +65,6 @@ class _MyAllRequestPageNoHeadState extends State<MyAllRequestPageNoHead> {
     sessionId = await shared.getSessionId();
     userType = await shared.getUserType();
     setState(() {});
-    print("User Type - $userType");
     setShowPayroll = await shared.getShowPayroll();
     orgId = await shared.getOrgId();
     emailId = await shared.getEmailId();
@@ -79,46 +78,28 @@ class _MyAllRequestPageNoHeadState extends State<MyAllRequestPageNoHead> {
     userPanel = await shared.getUserPanel();
     profileName = await shared.getDefaultProfileName();
     profileId = await shared.getDefaultProfileId();
-    print("Default Profile Name - $profileName");
-    print("Default Profile Id - $profileId");
-    print("User Panel - $userPanel");
-    print('Pre-Onboard $setPreOnboardShow');
-    print('Exit Show $setExitShow');
-    print('empRole $empRoles');
-    print('roRole $roRoles');
-    print('adminRole $adminRoles');
-    print('Response snapshot: ${sessionId}');
-    print('Show Payroll: ${setShowPayroll}');
-    print('OrgId -  ${orgId}');
-    print('OrgName - : ${orgName}');
     setState(() {});
     setState(() {
       if (empRoles == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRoles == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRoles == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRoles == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRoles == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRoles == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -144,7 +125,6 @@ class _MyAllRequestPageNoHeadState extends State<MyAllRequestPageNoHead> {
     double widgetHeight = screenHeight * 0.5; // 50% of the screen height
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
-      print("CheckOrg - $orgId");
       List<Widget> items = [];
 
       //My Attendance Requests

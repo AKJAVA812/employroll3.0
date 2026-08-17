@@ -9,9 +9,9 @@ class LevelTwoPendingLeaveModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.result != null) {
-      data['result'] = this.result!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (result != null) {
+      data['result'] = result!.toJson();
     }
     return data;
   }
@@ -32,7 +32,7 @@ class Result {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -96,23 +96,23 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['summary'] = this.summary;
-    data['employeeName'] = this.employeeName;
-    data['empId'] = this.empId;
-    data['endDate'] = this.endDate;
-    data['document'] = this.document;
-    data['count'] = this.count;
-    data['branchName'] = this.branchName;
-    data['leaveLength'] = this.leaveLength;
-    data['reqId'] = this.reqId;
-    data['totalLeave'] = this.totalLeave;
-    data['leaveType'] = this.leaveType;
-    data['nominee'] = this.nominee;
-    data['department'] = this.department;
-    data['startDate'] = this.startDate;
-    data['applicationDate'] = this.applicationDate;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['summary'] = summary;
+    data['employeeName'] = employeeName;
+    data['empId'] = empId;
+    data['endDate'] = endDate;
+    data['document'] = document;
+    data['count'] = count;
+    data['branchName'] = branchName;
+    data['leaveLength'] = leaveLength;
+    data['reqId'] = reqId;
+    data['totalLeave'] = totalLeave;
+    data['leaveType'] = leaveType;
+    data['nominee'] = nominee;
+    data['department'] = department;
+    data['startDate'] = startDate;
+    data['applicationDate'] = applicationDate;
+    data['status'] = status;
     return data;
   }
 }

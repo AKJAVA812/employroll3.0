@@ -39,18 +39,18 @@ class OthersOnDateAttendanceModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['inTime'] = this.inTime;
-    data['departmentName'] = this.departmentName;
-    data['employeeName'] = this.employeeName;
-    data['empId'] = this.empId;
-    data['workingHrs'] = this.workingHrs;
-    data['onDate'] = this.onDate;
-    data['branchName'] = this.branchName;
-    data['logId'] = this.logId;
-    data['outTime'] = this.outTime;
-    data['applicationDate'] = this.applicationDate;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['inTime'] = inTime;
+    data['departmentName'] = departmentName;
+    data['employeeName'] = employeeName;
+    data['empId'] = empId;
+    data['workingHrs'] = workingHrs;
+    data['onDate'] = onDate;
+    data['branchName'] = branchName;
+    data['logId'] = logId;
+    data['outTime'] = outTime;
+    data['applicationDate'] = applicationDate;
+    data['status'] = status;
     return data;
   }
 }

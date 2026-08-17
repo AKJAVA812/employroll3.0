@@ -8,19 +8,19 @@ class LocationService {
   StreamSubscription<LocationData>? _locationSubscription;
 
   Future<void> initLocationService() async {
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
 
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) return;
+    serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) return;
     }
 
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) return;
+    permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) return;
     }
 
     await location.enableBackgroundMode(enable: true);
@@ -30,7 +30,6 @@ class LocationService {
     await initLocationService();
 
     _locationSubscription = location.onLocationChanged.listen((LocationData currentLocation) {
-      print("Location: Lat: ${currentLocation.latitude}, Lng: ${currentLocation.longitude}");
     });
   }
 

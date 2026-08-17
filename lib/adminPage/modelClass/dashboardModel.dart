@@ -100,43 +100,43 @@ class DashboardModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.mispunchEmpSEt != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (mispunchEmpSEt != null) {
       data['mispunchEmpSEt'] =
-          this.mispunchEmpSEt!.map((v) => v.toJson()).toList();
+          mispunchEmpSEt!.map((v) => v.toJson()).toList();
     }
-    if (this.earlyOutList != null) {
-      data['earlyOutList'] = this.earlyOutList!.map((v) => v.toJson()).toList();
+    if (earlyOutList != null) {
+      data['earlyOutList'] = earlyOutList!.map((v) => v.toJson()).toList();
     }
-    if (this.presentEmp != null) {
-      data['presentEmp'] = this.presentEmp!.map((v) => v.toJson()).toList();
+    if (presentEmp != null) {
+      data['presentEmp'] = presentEmp!.map((v) => v.toJson()).toList();
     }
-    if (this.lateInList != null) {
-      data['lateInList'] = this.lateInList!.map((v) => v.toJson()).toList();
+    if (lateInList != null) {
+      data['lateInList'] = lateInList!.map((v) => v.toJson()).toList();
     }
-    data['mispunchEmp'] = this.mispunchEmp;
-    if (this.absentEmp != null) {
-      data['absentEmp'] = this.absentEmp!.map((v) => v.toJson()).toList();
+    data['mispunchEmp'] = mispunchEmp;
+    if (absentEmp != null) {
+      data['absentEmp'] = absentEmp!.map((v) => v.toJson()).toList();
     }
-    data['totalAbsentEmp'] = this.totalAbsentEmp;
-    data['lateInEmp'] = this.lateInEmp;
-    data['workingEmp'] = this.workingEmp;
-    if (this.halfDayEmpSet != null) {
+    data['totalAbsentEmp'] = totalAbsentEmp;
+    data['lateInEmp'] = lateInEmp;
+    data['workingEmp'] = workingEmp;
+    if (halfDayEmpSet != null) {
       data['halfDayEmpSet'] =
-          this.halfDayEmpSet!.map((v) => v.toJson()).toList();
+          halfDayEmpSet!.map((v) => v.toJson()).toList();
     }
-    if (this.otEmpList != null) {
-      data['otEmpList'] = this.otEmpList!.map((v) => v.toJson()).toList();
+    if (otEmpList != null) {
+      data['otEmpList'] = otEmpList!.map((v) => v.toJson()).toList();
     }
-    data['result'] = this.result;
-    data['otEmp'] = this.otEmp;
-    data['totalEmp'] = this.totalEmp;
-    data['earlyOutEmp'] = this.earlyOutEmp;
-    data['halfEmp'] = this.halfEmp;
-    if (this.workingList != null) {
-      data['workingList'] = this.workingList!.map((v) => v.toJson()).toList();
+    data['result'] = result;
+    data['otEmp'] = otEmp;
+    data['totalEmp'] = totalEmp;
+    data['earlyOutEmp'] = earlyOutEmp;
+    data['halfEmp'] = halfEmp;
+    if (workingList != null) {
+      data['workingList'] = workingList!.map((v) => v.toJson()).toList();
     }
-    data['totalPresentEmp'] = this.totalPresentEmp;
+    data['totalPresentEmp'] = totalPresentEmp;
     return data;
   }
 }
@@ -166,7 +166,7 @@ class MispunchEmpSEt {
   String? lateTime;
   String? empDetailsId;
   String? empDetailId;
-  Null? remarks;
+  Null remarks;
   String? outTime;
 
   MispunchEmpSEt(
@@ -227,33 +227,33 @@ class MispunchEmpSEt {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['date'] = this.date;
-    data['deptName'] = this.deptName;
-    data['shiftInTime'] = this.shiftInTime;
-    data['outPunchType'] = this.outPunchType;
-    data['distance'] = this.distance;
-    data['inPunchType'] = this.inPunchType;
-    data['workHours'] = this.workHours;
-    data['empEmail'] = this.empEmail;
-    data['mobStatus'] = this.mobStatus;
-    data['otHrs'] = this.otHrs;
-    data['contact'] = this.contact;
-    data['branchN'] = this.branchN;
-    data['workingHours'] = this.workingHours;
-    data['empCompStatus'] = this.empCompStatus;
-    data['empPhoto'] = this.empPhoto;
-    data['branchId'] = this.branchId;
-    data['employeeName'] = this.employeeName;
-    data['deptId'] = this.deptId;
-    data['branchName'] = this.branchName;
-    data['inTime'] = this.inTime;
-    data['lateTime'] = this.lateTime;
-    data['empDetailsId'] = this.empDetailsId;
-    data['empDetailId'] = this.empDetailId;
-    data['remarks'] = this.remarks;
-    data['outTime'] = this.outTime;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['date'] = date;
+    data['deptName'] = deptName;
+    data['shiftInTime'] = shiftInTime;
+    data['outPunchType'] = outPunchType;
+    data['distance'] = distance;
+    data['inPunchType'] = inPunchType;
+    data['workHours'] = workHours;
+    data['empEmail'] = empEmail;
+    data['mobStatus'] = mobStatus;
+    data['otHrs'] = otHrs;
+    data['contact'] = contact;
+    data['branchN'] = branchN;
+    data['workingHours'] = workingHours;
+    data['empCompStatus'] = empCompStatus;
+    data['empPhoto'] = empPhoto;
+    data['branchId'] = branchId;
+    data['employeeName'] = employeeName;
+    data['deptId'] = deptId;
+    data['branchName'] = branchName;
+    data['inTime'] = inTime;
+    data['lateTime'] = lateTime;
+    data['empDetailsId'] = empDetailsId;
+    data['empDetailId'] = empDetailId;
+    data['remarks'] = remarks;
+    data['outTime'] = outTime;
     return data;
   }
 }
@@ -347,34 +347,34 @@ class EarlyOutList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['date'] = this.date;
-    data['deptName'] = this.deptName;
-    data['shiftInTime'] = this.shiftInTime;
-    data['outPunchType'] = this.outPunchType;
-    data['distance'] = this.distance;
-    data['inPunchType'] = this.inPunchType;
-    data['workHours'] = this.workHours;
-    data['empEmail'] = this.empEmail;
-    data['mobStatus'] = this.mobStatus;
-    data['otHrs'] = this.otHrs;
-    data['contact'] = this.contact;
-    data['branchN'] = this.branchN;
-    data['workingHours'] = this.workingHours;
-    data['empCompStatus'] = this.empCompStatus;
-    data['empPhoto'] = this.empPhoto;
-    data['branchId'] = this.branchId;
-    data['employeeName'] = this.employeeName;
-    data['earlyTime'] = this.earlyTime;
-    data['deptId'] = this.deptId;
-    data['branchName'] = this.branchName;
-    data['inTime'] = this.inTime;
-    data['lateTime'] = this.lateTime;
-    data['empDetailsId'] = this.empDetailsId;
-    data['empDetailId'] = this.empDetailId;
-    data['remarks'] = this.remarks;
-    data['outTime'] = this.outTime;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['date'] = date;
+    data['deptName'] = deptName;
+    data['shiftInTime'] = shiftInTime;
+    data['outPunchType'] = outPunchType;
+    data['distance'] = distance;
+    data['inPunchType'] = inPunchType;
+    data['workHours'] = workHours;
+    data['empEmail'] = empEmail;
+    data['mobStatus'] = mobStatus;
+    data['otHrs'] = otHrs;
+    data['contact'] = contact;
+    data['branchN'] = branchN;
+    data['workingHours'] = workingHours;
+    data['empCompStatus'] = empCompStatus;
+    data['empPhoto'] = empPhoto;
+    data['branchId'] = branchId;
+    data['employeeName'] = employeeName;
+    data['earlyTime'] = earlyTime;
+    data['deptId'] = deptId;
+    data['branchName'] = branchName;
+    data['inTime'] = inTime;
+    data['lateTime'] = lateTime;
+    data['empDetailsId'] = empDetailsId;
+    data['empDetailId'] = empDetailId;
+    data['remarks'] = remarks;
+    data['outTime'] = outTime;
     return data;
   }
 }
@@ -404,7 +404,7 @@ class WorkingList {
   String? lateTime;
   String? empDetailsId;
   String? empDetailId;
-  Null? remarks;
+  Null remarks;
   String? outTime;
 
   WorkingList({this.empId,
@@ -464,33 +464,33 @@ class WorkingList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['date'] = this.date;
-    data['deptName'] = this.deptName;
-    data['shiftInTime'] = this.shiftInTime;
-    data['outPunchType'] = this.outPunchType;
-    data['distance'] = this.distance;
-    data['inPunchType'] = this.inPunchType;
-    data['workHours'] = this.workHours;
-    data['empEmail'] = this.empEmail;
-    data['mobStatus'] = this.mobStatus;
-    data['otHrs'] = this.otHrs;
-    data['contact'] = this.contact;
-    data['branchN'] = this.branchN;
-    data['workingHours'] = this.workingHours;
-    data['empCompStatus'] = this.empCompStatus;
-    data['empPhoto'] = this.empPhoto;
-    data['branchId'] = this.branchId;
-    data['employeeName'] = this.employeeName;
-    data['deptId'] = this.deptId;
-    data['branchName'] = this.branchName;
-    data['inTime'] = this.inTime;
-    data['lateTime'] = this.lateTime;
-    data['empDetailsId'] = this.empDetailsId;
-    data['empDetailId'] = this.empDetailId;
-    data['remarks'] = this.remarks;
-    data['outTime'] = this.outTime;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['date'] = date;
+    data['deptName'] = deptName;
+    data['shiftInTime'] = shiftInTime;
+    data['outPunchType'] = outPunchType;
+    data['distance'] = distance;
+    data['inPunchType'] = inPunchType;
+    data['workHours'] = workHours;
+    data['empEmail'] = empEmail;
+    data['mobStatus'] = mobStatus;
+    data['otHrs'] = otHrs;
+    data['contact'] = contact;
+    data['branchN'] = branchN;
+    data['workingHours'] = workingHours;
+    data['empCompStatus'] = empCompStatus;
+    data['empPhoto'] = empPhoto;
+    data['branchId'] = branchId;
+    data['employeeName'] = employeeName;
+    data['deptId'] = deptId;
+    data['branchName'] = branchName;
+    data['inTime'] = inTime;
+    data['lateTime'] = lateTime;
+    data['empDetailsId'] = empDetailsId;
+    data['empDetailId'] = empDetailId;
+    data['remarks'] = remarks;
+    data['outTime'] = outTime;
     return data;
   }
 }
@@ -584,34 +584,34 @@ class LateInList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['date'] = this.date;
-    data['deptName'] = this.deptName;
-    data['shiftInTime'] = this.shiftInTime;
-    data['outPunchType'] = this.outPunchType;
-    data['distance'] = this.distance;
-    data['inPunchType'] = this.inPunchType;
-    data['empEmail'] = this.empEmail;
-    data['mobStatus'] = this.mobStatus;
-    data['otHrs'] = this.otHrs;
-    data['contact'] = this.contact;
-    data['branchN'] = this.branchN;
-    data['workingHours'] = this.workingHours;
-    data['empCompStatus'] = this.empCompStatus;
-    data['empPhoto'] = this.empPhoto;
-    data['branchId'] = this.branchId;
-    data['employeeName'] = this.employeeName;
-    data['earlyTime'] = this.earlyTime;
-    data['deptId'] = this.deptId;
-    data['branchName'] = this.branchName;
-    data['inTime'] = this.inTime;
-    data['lateTime'] = this.lateTime;
-    data['empDetailsId'] = this.empDetailsId;
-    data['empDetailId'] = this.empDetailId;
-    data['remarks'] = this.remarks;
-    data['outTime'] = this.outTime;
-    data['workHours'] = this.workHours;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['date'] = date;
+    data['deptName'] = deptName;
+    data['shiftInTime'] = shiftInTime;
+    data['outPunchType'] = outPunchType;
+    data['distance'] = distance;
+    data['inPunchType'] = inPunchType;
+    data['empEmail'] = empEmail;
+    data['mobStatus'] = mobStatus;
+    data['otHrs'] = otHrs;
+    data['contact'] = contact;
+    data['branchN'] = branchN;
+    data['workingHours'] = workingHours;
+    data['empCompStatus'] = empCompStatus;
+    data['empPhoto'] = empPhoto;
+    data['branchId'] = branchId;
+    data['employeeName'] = employeeName;
+    data['earlyTime'] = earlyTime;
+    data['deptId'] = deptId;
+    data['branchName'] = branchName;
+    data['inTime'] = inTime;
+    data['lateTime'] = lateTime;
+    data['empDetailsId'] = empDetailsId;
+    data['empDetailId'] = empDetailId;
+    data['remarks'] = remarks;
+    data['outTime'] = outTime;
+    data['workHours'] = workHours;
     return data;
   }
 }
@@ -705,34 +705,34 @@ class PresentEmp {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['date'] = this.date;
-    data['deptName'] = this.deptName;
-    data['shiftInTime'] = this.shiftInTime;
-    data['outPunchType'] = this.outPunchType;
-    data['distance'] = this.distance;
-    data['inPunchType'] = this.inPunchType;
-    data['empEmail'] = this.empEmail;
-    data['mobStatus'] = this.mobStatus;
-    data['otHrs'] = this.otHrs;
-    data['contact'] = this.contact;
-    data['branchN'] = this.branchN;
-    data['workingHours'] = this.workingHours;
-    data['empCompStatus'] = this.empCompStatus;
-    data['empPhoto'] = this.empPhoto;
-    data['branchId'] = this.branchId;
-    data['employeeName'] = this.employeeName;
-    data['earlyTime'] = this.earlyTime;
-    data['deptId'] = this.deptId;
-    data['branchName'] = this.branchName;
-    data['inTime'] = this.inTime;
-    data['lateTime'] = this.lateTime;
-    data['empDetailsId'] = this.empDetailsId;
-    data['empDetailId'] = this.empDetailId;
-    data['remarks'] = this.remarks;
-    data['outTime'] = this.outTime;
-    data['workHours'] = this.workHours;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['date'] = date;
+    data['deptName'] = deptName;
+    data['shiftInTime'] = shiftInTime;
+    data['outPunchType'] = outPunchType;
+    data['distance'] = distance;
+    data['inPunchType'] = inPunchType;
+    data['empEmail'] = empEmail;
+    data['mobStatus'] = mobStatus;
+    data['otHrs'] = otHrs;
+    data['contact'] = contact;
+    data['branchN'] = branchN;
+    data['workingHours'] = workingHours;
+    data['empCompStatus'] = empCompStatus;
+    data['empPhoto'] = empPhoto;
+    data['branchId'] = branchId;
+    data['employeeName'] = employeeName;
+    data['earlyTime'] = earlyTime;
+    data['deptId'] = deptId;
+    data['branchName'] = branchName;
+    data['inTime'] = inTime;
+    data['lateTime'] = lateTime;
+    data['empDetailsId'] = empDetailsId;
+    data['empDetailId'] = empDetailId;
+    data['remarks'] = remarks;
+    data['outTime'] = outTime;
+    data['workHours'] = workHours;
     return data;
   }
 }
@@ -799,25 +799,25 @@ class AbsentEmp {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['Status'] = this.status;
-    data['date'] = this.date;
-    data['reason'] = this.reason;
-    data['empId'] = this.empId;
-    data['branchId'] = this.branchId;
-    data['employeeName'] = this.employeeName;
-    data['deptName'] = this.deptName;
-    data['distance'] = this.distance;
-    data['empEmail'] = this.empEmail;
-    data['deptId'] = this.deptId;
-    data['branchName'] = this.branchName;
-    data['mobStatus'] = this.mobStatus;
-    data['contact'] = this.contact;
-    data['branchN'] = this.branchN;
-    data['empDetailsId'] = this.empDetailsId;
-    data['empDetailId'] = this.empDetailId;
-    data['empCompStatus'] = this.empCompStatus;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['Status'] = status;
+    data['date'] = date;
+    data['reason'] = reason;
+    data['empId'] = empId;
+    data['branchId'] = branchId;
+    data['employeeName'] = employeeName;
+    data['deptName'] = deptName;
+    data['distance'] = distance;
+    data['empEmail'] = empEmail;
+    data['deptId'] = deptId;
+    data['branchName'] = branchName;
+    data['mobStatus'] = mobStatus;
+    data['contact'] = contact;
+    data['branchN'] = branchN;
+    data['empDetailsId'] = empDetailsId;
+    data['empDetailId'] = empDetailId;
+    data['empCompStatus'] = empCompStatus;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }
@@ -847,7 +847,7 @@ class OtEmpList {
   String? lateTime;
   String? empDetailsId;
   String? empDetailId;
-  Null? remarks;
+  Null remarks;
   String? outTime;
 
   OtEmpList(
@@ -908,33 +908,33 @@ class OtEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['date'] = this.date;
-    data['deptName'] = this.deptName;
-    data['shiftInTime'] = this.shiftInTime;
-    data['outPunchType'] = this.outPunchType;
-    data['distance'] = this.distance;
-    data['inPunchType'] = this.inPunchType;
-    data['empEmail'] = this.empEmail;
-    data['mobStatus'] = this.mobStatus;
-    data['otHrs'] = this.otHrs;
-    data['contact'] = this.contact;
-    data['branchN'] = this.branchN;
-    data['workingHours'] = this.workingHours;
-    data['empCompStatus'] = this.empCompStatus;
-    data['empPhoto'] = this.empPhoto;
-    data['branchId'] = this.branchId;
-    data['employeeName'] = this.employeeName;
-    data['earlyTime'] = this.earlyTime;
-    data['deptId'] = this.deptId;
-    data['branchName'] = this.branchName;
-    data['inTime'] = this.inTime;
-    data['lateTime'] = this.lateTime;
-    data['empDetailsId'] = this.empDetailsId;
-    data['empDetailId'] = this.empDetailId;
-    data['remarks'] = this.remarks;
-    data['outTime'] = this.outTime;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['date'] = date;
+    data['deptName'] = deptName;
+    data['shiftInTime'] = shiftInTime;
+    data['outPunchType'] = outPunchType;
+    data['distance'] = distance;
+    data['inPunchType'] = inPunchType;
+    data['empEmail'] = empEmail;
+    data['mobStatus'] = mobStatus;
+    data['otHrs'] = otHrs;
+    data['contact'] = contact;
+    data['branchN'] = branchN;
+    data['workingHours'] = workingHours;
+    data['empCompStatus'] = empCompStatus;
+    data['empPhoto'] = empPhoto;
+    data['branchId'] = branchId;
+    data['employeeName'] = employeeName;
+    data['earlyTime'] = earlyTime;
+    data['deptId'] = deptId;
+    data['branchName'] = branchName;
+    data['inTime'] = inTime;
+    data['lateTime'] = lateTime;
+    data['empDetailsId'] = empDetailsId;
+    data['empDetailId'] = empDetailId;
+    data['remarks'] = remarks;
+    data['outTime'] = outTime;
     return data;
   }
 }
@@ -1028,34 +1028,34 @@ class HalfDayEmpSet {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['date'] = this.date;
-    data['deptName'] = this.deptName;
-    data['shiftInTime'] = this.shiftInTime;
-    data['outPunchType'] = this.outPunchType;
-    data['distance'] = this.distance;
-    data['inPunchType'] = this.inPunchType;
-    data['workHours'] = this.workHours;
-    data['empEmail'] = this.empEmail;
-    data['mobStatus'] = this.mobStatus;
-    data['otHrs'] = this.otHrs;
-    data['contact'] = this.contact;
-    data['branchN'] = this.branchN;
-    data['workingHours'] = this.workingHours;
-    data['empCompStatus'] = this.empCompStatus;
-    data['empPhoto'] = this.empPhoto;
-    data['branchId'] = this.branchId;
-    data['employeeName'] = this.employeeName;
-    data['earlyTime'] = this.earlyTime;
-    data['deptId'] = this.deptId;
-    data['branchName'] = this.branchName;
-    data['inTime'] = this.inTime;
-    data['lateTime'] = this.lateTime;
-    data['empDetailsId'] = this.empDetailsId;
-    data['empDetailId'] = this.empDetailId;
-    data['remarks'] = this.remarks;
-    data['outTime'] = this.outTime;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['date'] = date;
+    data['deptName'] = deptName;
+    data['shiftInTime'] = shiftInTime;
+    data['outPunchType'] = outPunchType;
+    data['distance'] = distance;
+    data['inPunchType'] = inPunchType;
+    data['workHours'] = workHours;
+    data['empEmail'] = empEmail;
+    data['mobStatus'] = mobStatus;
+    data['otHrs'] = otHrs;
+    data['contact'] = contact;
+    data['branchN'] = branchN;
+    data['workingHours'] = workingHours;
+    data['empCompStatus'] = empCompStatus;
+    data['empPhoto'] = empPhoto;
+    data['branchId'] = branchId;
+    data['employeeName'] = employeeName;
+    data['earlyTime'] = earlyTime;
+    data['deptId'] = deptId;
+    data['branchName'] = branchName;
+    data['inTime'] = inTime;
+    data['lateTime'] = lateTime;
+    data['empDetailsId'] = empDetailsId;
+    data['empDetailId'] = empDetailId;
+    data['remarks'] = remarks;
+    data['outTime'] = outTime;
     return data;
   }
 }

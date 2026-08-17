@@ -50,26 +50,26 @@ class SelfLoanRequestModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['approvedValue'] = this.approvedValue;
-    if (this.loanRequisitionApprovedlist != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['approvedValue'] = approvedValue;
+    if (loanRequisitionApprovedlist != null) {
       data['loanRequisitionApprovedlist'] =
-          this.loanRequisitionApprovedlist!.map((v) => v.toJson()).toList();
+          loanRequisitionApprovedlist!.map((v) => v.toJson()).toList();
     }
-    if (this.loanRequisitionDisapprovelist != null) {
+    if (loanRequisitionDisapprovelist != null) {
       data['loanRequisitionDisapprovelist'] =
-          this.loanRequisitionDisapprovelist!.map((v) => v.toJson()).toList();
+          loanRequisitionDisapprovelist!.map((v) => v.toJson()).toList();
     }
-    if (this.loanRequiDataforOthers != null) {
+    if (loanRequiDataforOthers != null) {
       data['loanRequiDataforOthers'] =
-          this.loanRequiDataforOthers!.map((v) => v.toJson()).toList();
+          loanRequiDataforOthers!.map((v) => v.toJson()).toList();
     }
-    data['disApprovedValue'] = this.disApprovedValue;
-    if (this.loanRequisitionPendinglist != null) {
+    data['disApprovedValue'] = disApprovedValue;
+    if (loanRequisitionPendinglist != null) {
       data['loanRequisitionPendinglist'] =
-          this.loanRequisitionPendinglist!.map((v) => v.toJson()).toList();
+          loanRequisitionPendinglist!.map((v) => v.toJson()).toList();
     }
-    data['pendingAmount'] = this.pendingAmount;
+    data['pendingAmount'] = pendingAmount;
     return data;
   }
 }
@@ -160,33 +160,33 @@ class LoanRequisitionApprovedlist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['desig'] = this.desig;
-    data['LoanType'] = this.loanType;
-    data['statusShow'] = this.statusShow;
-    data['LoanStatus'] = this.loanStatus;
-    data['remark'] = this.remark;
-    data['empDetId'] = this.empDetId;
-    data['branch'] = this.branch;
-    data['orgId'] = this.orgId;
-    data['approvedInstallment'] = this.approvedInstallment;
-    data['empName'] = this.empName;
-    data['requestedInstallment'] = this.requestedInstallment;
-    data['approvedAmount'] = this.approvedAmount;
-    data['raisedBy'] = this.raisedBy;
-    data['loanAdvId'] = this.loanAdvId;
-    data['dept'] = this.dept;
-    data['loanReqId'] = this.loanReqId;
-    data['loanAmount'] = this.loanAmount;
-    data['plainingg1'] = this.plainingg1;
-    data['plainingg2'] = this.plainingg2;
-    data['plainingg3'] = this.plainingg3;
-    data['empCode'] = this.empCode;
-    data['plainingg4'] = this.plainingg4;
-    data['plainingg5'] = this.plainingg5;
-    data['doj'] = this.doj;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['desig'] = desig;
+    data['LoanType'] = loanType;
+    data['statusShow'] = statusShow;
+    data['LoanStatus'] = loanStatus;
+    data['remark'] = remark;
+    data['empDetId'] = empDetId;
+    data['branch'] = branch;
+    data['orgId'] = orgId;
+    data['approvedInstallment'] = approvedInstallment;
+    data['empName'] = empName;
+    data['requestedInstallment'] = requestedInstallment;
+    data['approvedAmount'] = approvedAmount;
+    data['raisedBy'] = raisedBy;
+    data['loanAdvId'] = loanAdvId;
+    data['dept'] = dept;
+    data['loanReqId'] = loanReqId;
+    data['loanAmount'] = loanAmount;
+    data['plainingg1'] = plainingg1;
+    data['plainingg2'] = plainingg2;
+    data['plainingg3'] = plainingg3;
+    data['empCode'] = empCode;
+    data['plainingg4'] = plainingg4;
+    data['plainingg5'] = plainingg5;
+    data['doj'] = doj;
+    data['status'] = status;
     return data;
   }
 }
@@ -277,33 +277,33 @@ class LoanRequisitionDisapprovelist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['desig'] = this.desig;
-    data['LoanType'] = this.loanType;
-    data['statusShow'] = this.statusShow;
-    data['LoanStatus'] = this.loanStatus;
-    data['remark'] = this.remark;
-    data['empDetId'] = this.empDetId;
-    data['branch'] = this.branch;
-    data['orgId'] = this.orgId;
-    data['approvedInstallment'] = this.approvedInstallment;
-    data['empName'] = this.empName;
-    data['requestedInstallment'] = this.requestedInstallment;
-    data['approvedAmount'] = this.approvedAmount;
-    data['raisedBy'] = this.raisedBy;
-    data['loanAdvId'] = this.loanAdvId;
-    data['dept'] = this.dept;
-    data['loanReqId'] = this.loanReqId;
-    data['loanAmount'] = this.loanAmount;
-    data['plainingg1'] = this.plainingg1;
-    data['plainingg2'] = this.plainingg2;
-    data['plainingg3'] = this.plainingg3;
-    data['empCode'] = this.empCode;
-    data['plainingg4'] = this.plainingg4;
-    data['plainingg5'] = this.plainingg5;
-    data['doj'] = this.doj;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['desig'] = desig;
+    data['LoanType'] = loanType;
+    data['statusShow'] = statusShow;
+    data['LoanStatus'] = loanStatus;
+    data['remark'] = remark;
+    data['empDetId'] = empDetId;
+    data['branch'] = branch;
+    data['orgId'] = orgId;
+    data['approvedInstallment'] = approvedInstallment;
+    data['empName'] = empName;
+    data['requestedInstallment'] = requestedInstallment;
+    data['approvedAmount'] = approvedAmount;
+    data['raisedBy'] = raisedBy;
+    data['loanAdvId'] = loanAdvId;
+    data['dept'] = dept;
+    data['loanReqId'] = loanReqId;
+    data['loanAmount'] = loanAmount;
+    data['plainingg1'] = plainingg1;
+    data['plainingg2'] = plainingg2;
+    data['plainingg3'] = plainingg3;
+    data['empCode'] = empCode;
+    data['plainingg4'] = plainingg4;
+    data['plainingg5'] = plainingg5;
+    data['doj'] = doj;
+    data['status'] = status;
     return data;
   }
 }
@@ -394,33 +394,33 @@ class LoanRequiDataforOthers {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['desig'] = this.desig;
-    data['LoanType'] = this.loanType;
-    data['statusShow'] = this.statusShow;
-    data['LoanStatus'] = this.loanStatus;
-    data['remark'] = this.remark;
-    data['empDetId'] = this.empDetId;
-    data['branch'] = this.branch;
-    data['orgId'] = this.orgId;
-    data['approvedInstallment'] = this.approvedInstallment;
-    data['empName'] = this.empName;
-    data['requestedInstallment'] = this.requestedInstallment;
-    data['approvedAmount'] = this.approvedAmount;
-    data['raisedBy'] = this.raisedBy;
-    data['loanAdvId'] = this.loanAdvId;
-    data['dept'] = this.dept;
-    data['loanReqId'] = this.loanReqId;
-    data['loanAmount'] = this.loanAmount;
-    data['plainingg1'] = this.plainingg1;
-    data['plainingg2'] = this.plainingg2;
-    data['plainingg3'] = this.plainingg3;
-    data['empCode'] = this.empCode;
-    data['plainingg4'] = this.plainingg4;
-    data['plainingg5'] = this.plainingg5;
-    data['doj'] = this.doj;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['desig'] = desig;
+    data['LoanType'] = loanType;
+    data['statusShow'] = statusShow;
+    data['LoanStatus'] = loanStatus;
+    data['remark'] = remark;
+    data['empDetId'] = empDetId;
+    data['branch'] = branch;
+    data['orgId'] = orgId;
+    data['approvedInstallment'] = approvedInstallment;
+    data['empName'] = empName;
+    data['requestedInstallment'] = requestedInstallment;
+    data['approvedAmount'] = approvedAmount;
+    data['raisedBy'] = raisedBy;
+    data['loanAdvId'] = loanAdvId;
+    data['dept'] = dept;
+    data['loanReqId'] = loanReqId;
+    data['loanAmount'] = loanAmount;
+    data['plainingg1'] = plainingg1;
+    data['plainingg2'] = plainingg2;
+    data['plainingg3'] = plainingg3;
+    data['empCode'] = empCode;
+    data['plainingg4'] = plainingg4;
+    data['plainingg5'] = plainingg5;
+    data['doj'] = doj;
+    data['status'] = status;
     return data;
   }
 }
@@ -511,33 +511,33 @@ class LoanRequisitionPendinglist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['desig'] = this.desig;
-    data['LoanType'] = this.loanType;
-    data['statusShow'] = this.statusShow;
-    data['LoanStatus'] = this.loanStatus;
-    data['remark'] = this.remark;
-    data['empDetId'] = this.empDetId;
-    data['branch'] = this.branch;
-    data['orgId'] = this.orgId;
-    data['approvedInstallment'] = this.approvedInstallment;
-    data['empName'] = this.empName;
-    data['requestedInstallment'] = this.requestedInstallment;
-    data['approvedAmount'] = this.approvedAmount;
-    data['raisedBy'] = this.raisedBy;
-    data['loanAdvId'] = this.loanAdvId;
-    data['dept'] = this.dept;
-    data['loanReqId'] = this.loanReqId;
-    data['loanAmount'] = this.loanAmount;
-    data['plainingg1'] = this.plainingg1;
-    data['plainingg2'] = this.plainingg2;
-    data['plainingg3'] = this.plainingg3;
-    data['empCode'] = this.empCode;
-    data['plainingg4'] = this.plainingg4;
-    data['plainingg5'] = this.plainingg5;
-    data['doj'] = this.doj;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['desig'] = desig;
+    data['LoanType'] = loanType;
+    data['statusShow'] = statusShow;
+    data['LoanStatus'] = loanStatus;
+    data['remark'] = remark;
+    data['empDetId'] = empDetId;
+    data['branch'] = branch;
+    data['orgId'] = orgId;
+    data['approvedInstallment'] = approvedInstallment;
+    data['empName'] = empName;
+    data['requestedInstallment'] = requestedInstallment;
+    data['approvedAmount'] = approvedAmount;
+    data['raisedBy'] = raisedBy;
+    data['loanAdvId'] = loanAdvId;
+    data['dept'] = dept;
+    data['loanReqId'] = loanReqId;
+    data['loanAmount'] = loanAmount;
+    data['plainingg1'] = plainingg1;
+    data['plainingg2'] = plainingg2;
+    data['plainingg3'] = plainingg3;
+    data['empCode'] = empCode;
+    data['plainingg4'] = plainingg4;
+    data['plainingg5'] = plainingg5;
+    data['doj'] = doj;
+    data['status'] = status;
     return data;
   }
 }

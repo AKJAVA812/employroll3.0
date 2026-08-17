@@ -24,7 +24,7 @@ class RegistrationScreen extends StatefulWidget {
   //const RegistrationScreen({Key? key}) : super(key: key);
 
   final String empId;
-  const RegistrationScreen({Key? key, required this.empId}) : super(key: key);
+  const RegistrationScreen({super.key, required this.empId});
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState(empId);
 }
@@ -76,38 +76,28 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
     empIdReceived = empId;
-    print("EMP ID REC -$empId");
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -144,7 +134,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     //image = await _image?.readAsBytes();
     image = await decodeImageFromList(_image!.readAsBytesSync());
 
-    print("Image Path - $_image");
     //TODO passing input to face detector and getting detected faces
     faces = await faceDetector.processImage(inputImage);
 
@@ -162,7 +151,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       num width = right - left;
       num height = bottom - top;
 
-      print("Ract Position :- " + boundingBox.toString());
       /*if(boundingBox!=null){
         var snackBar = SnackBar(content: Text('Face Id :-'+boundingBox.toString()));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -261,7 +249,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   var image;
   var registerMsg = "";
   drawRectangleAroundFaces() async {
-    print("${image.width}   ${image.height}");
     setState(() {
       image;
       faces;
@@ -413,38 +400,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       // **Debugging Logs**
-      print("ðŸ”¹ API URL: $urlapi");
-      print("ðŸ”¹ Request Fields: ${request.fields}");
-      print("ðŸ”¹ Coordinates JSON: $jsonData");
-      print("ðŸ”¹ Image Path: ${image.path}");
 
       // Send Request
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        print(
-          "âœ… JSON Upload successful: ${await response.stream.bytesToString()}",
-        );
       } else {
-        print(
-          "âŒ JSON Upload Error: ${response.statusCode}, ${await response.stream.bytesToString()}",
-        );
       }
 
       // Now send the Multipart request
       http.StreamedResponse multipartResponse = await request.send();
 
       if (multipartResponse.statusCode == 200) {
-        print(
-          "âœ… Multipart Upload successful: ${await multipartResponse.stream.bytesToString()}",
-        );
       } else {
-        print(
-          "âŒ Multipart Upload Error: ${multipartResponse.statusCode}, ${await multipartResponse.stream.bytesToString()}",
-        );
       }
     } catch (e) {
-      print("âŒ Error uploading file: $e");
     }
   }
 
@@ -485,17 +455,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       // **Debugging Logs**
-      print("ðŸ”¹ API URL: $urlapi");
-      print("ðŸ”¹ Request Fields: ${request.fields}");
-      print("ðŸ”¹ Coordinates JSON: $jsonData");
-      print("ðŸ”¹ Image Path: ${image.path}");
 
       // Send Request
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
         String jsonResponse = await response.stream.bytesToString();
-        print("âœ… JSON Upload successful: $jsonResponse");
 
         Map<String, dynamic> responseData = json.decode(jsonResponse);
 
@@ -545,12 +510,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           },
         );
       } else {
-        print(
-          "âŒ JSON Upload Error: ${response.statusCode}, ${await response.stream.bytesToString()}",
-        );
       }
     } catch (e) {
-      print("âŒ Error uploading file: $e");
     }
   }
 
@@ -626,7 +587,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -634,7 +594,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -643,12 +602,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 builder: (context) => const FaceRecognitinHome(),
               ),
             );
-            print('Face');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -656,7 +613,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

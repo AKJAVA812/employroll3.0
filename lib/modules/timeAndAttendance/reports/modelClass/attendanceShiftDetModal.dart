@@ -42,19 +42,19 @@ class AttendanceShiftDetailsModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['halfdayMaxWorkHour'] = this.halfdayMaxWorkHour;
-    data['result'] = this.result;
-    data['halfdayMinWorkHour'] = this.halfdayMinWorkHour;
-    data['presentWorkHour'] = this.presentWorkHour;
-    data['isAbsentWorkHour'] = this.isAbsentWorkHour;
-    data['isShortWorkHour'] = this.isShortWorkHour;
-    data['id'] = this.id;
-    data['shortMaxWorkHour'] = this.shortMaxWorkHour;
-    data['isPresentWorkHour'] = this.isPresentWorkHour;
-    data['absentWorkHour'] = this.absentWorkHour;
-    data['shortMinWorkHour'] = this.shortMinWorkHour;
-    data['isHalfdayWorkHour'] = this.isHalfdayWorkHour;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['halfdayMaxWorkHour'] = halfdayMaxWorkHour;
+    data['result'] = result;
+    data['halfdayMinWorkHour'] = halfdayMinWorkHour;
+    data['presentWorkHour'] = presentWorkHour;
+    data['isAbsentWorkHour'] = isAbsentWorkHour;
+    data['isShortWorkHour'] = isShortWorkHour;
+    data['id'] = id;
+    data['shortMaxWorkHour'] = shortMaxWorkHour;
+    data['isPresentWorkHour'] = isPresentWorkHour;
+    data['absentWorkHour'] = absentWorkHour;
+    data['shortMinWorkHour'] = shortMinWorkHour;
+    data['isHalfdayWorkHour'] = isHalfdayWorkHour;
     return data;
   }
 }

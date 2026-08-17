@@ -16,7 +16,7 @@ import '../../../../themes/empThemes.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 
 class ODRequisitionSelection extends StatefulWidget {
-  const ODRequisitionSelection({Key? key}) : super(key: key);
+  const ODRequisitionSelection({super.key});
 
   @override
   State<ODRequisitionSelection> createState() => _ODRequisitionSelectionState();
@@ -59,13 +59,11 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
     deptName = await shared.getDept() ?? "N/A";
     empName = await shared.getempName() ?? "N/A";
     setState(() {
-      print('ResponseAttendance: ${sessionId}');
     });
   }
 
   Future getEmpId() async {
     empNewId = await shared.getEmpId();
-    print('Response snapshot: ${empNewId}');
   }
 
   int pageIndex = 0;
@@ -192,8 +190,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                                 setState(() {
                                   singleDayShow = true;
                                   multipleDayShow = false;
-                                  print("day show $singleDayShow");
-                                  print("multi show $multipleDayShow");
                                   /*  _singleDayShow == _singleDayShow;
                                            _multipleDayShow == _multipleDayShow;*/
                                 });
@@ -218,8 +214,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                                 setState(() {
                                   singleDayShow = true;
                                   multipleDayShow = true;
-                                  print("day show $singleDayShow");
-                                  print("multi show $multipleDayShow");
                                   /*  _singleDayShow =_singleDayShow;
                                           _multipleDayShow =! _multipleDayShow;*/
                                 });
@@ -247,8 +241,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                                       setState(() {
                                         singleDayShow = true;
                                         multipleDayShow = false;
-                                        print("day show $singleDayShow");
-                                        print("multi show $multipleDayShow");
                                         /* _singleDayShow == _singleDayShow;
                                             _multipleDayShow = !_multipleDayShow;*/
                                       });
@@ -293,7 +285,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                                 ).format(fromDate!);
                               });
 
-                              print(fromDate);
                             },
                             readOnly: true,
                             enabled: true,
@@ -349,7 +340,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                                 ).format(toDate!);
                               });
 
-                              print(toDate);
                             },
                             readOnly: true,
                             enabled: true,
@@ -423,7 +413,7 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                       //approveLeaveRequisition(_commentController.text, leaveReqId);
                     },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                         Mythemes.lightBluishColor,
                       ),
                     ),
@@ -448,7 +438,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -456,11 +445,9 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-              print('OD');
             }
             if (index == 3) {
               Navigator.push(
@@ -470,7 +457,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -478,7 +464,6 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -530,20 +515,16 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
       "empid=$empNewId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -577,20 +558,16 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
       "empid=$empNewId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -606,7 +583,7 @@ class _ODRequisitionSelectionState extends State<ODRequisitionSelection> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

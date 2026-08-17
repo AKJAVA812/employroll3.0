@@ -31,7 +31,7 @@ class DigiWeighWDSubmit extends StatefulWidget {
     this.custLocation,
     this.systemDet,
     this.natureComplaint,
-    this.dateComplaint,
+    this.dateComplaint, {super.key}
   );
   @override
   State<DigiWeighWDSubmit> createState() => _DigiWeighWDSubmitState(
@@ -62,7 +62,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
   );
 
   var titleName = "Workdone Report";
-  TextEditingController _rectificationController = TextEditingController();
+  final TextEditingController _rectificationController = TextEditingController();
   final TextEditingController _attendingDate = TextEditingController();
   final TextEditingController _rectificationDate = TextEditingController();
   final TextEditingController _stampingDate = TextEditingController();
@@ -78,16 +78,16 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
     "dd-MM-yyyy",
   ).format(DateTime.parse("2019-09-30"));
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePicker = await showDatePicker(
+    DateTime? datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if (_datePicker != null && _datePicker != _date) {
+    if (datePicker != null && datePicker != _date) {
       setState(() {
-        _date = _datePicker;
+        _date = datePicker;
       });
     }
   }
@@ -111,7 +111,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
   void initState() {
     custNameGet = custName;
     imageVal = imageValu;
-    print('Customer Name Get $custNameGet');
     custLocationGet = custLocation;
     systemDetGet = systemDet;
     natureCompGet = natureComplaint;
@@ -129,10 +128,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
     lngg = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
-    print('Response snapshot: ${sessionId}');
-    print('Response snapshot: ${latt}');
-    print('Response snapshot: ${lngg}');
-    print('Response snapshot: ${orgnizationID}');
   }
 
   Future getUploadImage() async {
@@ -146,7 +141,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
         this._image = value;
       });*/
     } on PlatformException catch (e) {
-      print('failed to upload: $e');
     }
   }
 
@@ -175,9 +169,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
     String formattedDate = dateFormat.format(now);
     var length = await imageVal!.length();
-    print('Response status: ${length}');
-    print('Response body: ${stream}');
-    print('Response body: ${imageVal}');
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.customWorkDoneApi;
     var urlapi = Uri.parse(
@@ -218,8 +209,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
       await request.send(),
     );
     result = json.decode(response.body.toString());
-    print('responseemployeeList ${response.request}');
-    print('response body ${response.body}');
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
 
     /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -231,10 +220,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessGo(
           context,
-          "You have successfully submitted task details on server at"
-                  .toString() +
-              " " +
-              formattedDate,
+          "You have successfully submitted task details on server at $formattedDate",
           "Task Submitted",
         );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
@@ -249,11 +235,9 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
       CommonNotificationPage.showDialgError(context, result, "reason");
     }
     var reasonSuccess = result['reason'];
-    print('result${result}');
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run" + result['result']),
     ));*/
-    print('Response body: ${result}');
   }
 
   @override
@@ -294,7 +278,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                             //  DateFormat.yMd().format(date!).toString();
                           });
 
-                          print(date);
                         },
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
@@ -345,7 +328,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                             //  DateFormat.yMd().format(date!).toString();
                           });
 
-                          print(date);
                         },
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
@@ -382,7 +364,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                             //  DateFormat.yMd().format(date!).toString();
                           });
 
-                          print(date);
                         },
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
@@ -419,7 +400,6 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                             //  DateFormat.yMd().format(date!).toString();
                           });
 
-                          print(date);
                         },
                         readOnly: true,
                         //initialValue: "dd-mm-yyyy",
@@ -479,16 +459,15 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ButtonBar(
+                        OverflowBar(
                           alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
                           children: [
                             ElevatedButton(
                               onPressed: () {
                                 uploadImage(context);
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                   Mythemes.lightBluishColor,
                                 ),
                               ),
@@ -511,7 +490,7 @@ class _DigiWeighWDSubmitState extends State<DigiWeighWDSubmit> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import 'package:er_flutter_project/modules/preInductionOnboarding/pendingPreOnboardingList.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
@@ -72,7 +71,7 @@ class ApprovePreOnboarding extends StatefulWidget {
     this.ifscCode,
     this.nomineeName,
     this.nomineeAadhar,
-    this.nomineeRelation,
+    this.nomineeRelation, {super.key}
   );
 
   @override
@@ -102,13 +101,13 @@ class ApprovePreOnboarding extends StatefulWidget {
   );
 }
 
-late List<String?> onboardBranchList = [];
-late List<String?> onboardDeptList = [];
-late List<String?> onboardDesignationList = [];
-late List<String?> onboardUserTypeList = [];
-late List<String?> onboardDocTypeList = [];
-late List<String?> queryTypeList = [];
-late List<String?> subQueryTypeList = [];
+List<String?> onboardBranchList = [];
+List<String?> onboardDeptList = [];
+List<String?> onboardDesignationList = [];
+List<String?> onboardUserTypeList = [];
+List<String?> onboardDocTypeList = [];
+List<String?> queryTypeList = [];
+List<String?> subQueryTypeList = [];
 
 SessionManager sessionManager = SessionManager();
 Map<String, dynamic> mapResponse = {};
@@ -172,7 +171,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
     getSharedPrfanceList();
     setState(() {});
     typeOfHiringRadio = typeOfHiring;
-    print("Hiring Radio - $typeOfHiringRadio");
     aadharNoController.text = aadharNo;
     fullNameController.text = fullName;
     _dobDateController.text = dob;
@@ -180,7 +178,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
     mobNoController.text = contactNo;
     inHandSalaryController.text = inHandSalary;
     accommodationRadio = accomodationCheck;
-    print("Accommodation Radio - $accommodationRadio");
     aadharCardCheckFront = aadharCardFront;
     aadharCardCheckBack = aadharCardBack;
     panCardCheck = panCard;
@@ -364,7 +361,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
             'status': 'Finished',
             'type': 'image', // Mark as image
           });
-          print("Photo path - ${photo.path}");
         });
       }
     } else {
@@ -385,7 +381,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
             'status': 'Finished',
             'type': result.files.single.extension ?? 'file', // Determine type
           });
-          print("File path - ${result.files.single.path!}");
         });
       }
     }
@@ -401,7 +396,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
             borderRadius: BorderRadius.circular(12),
           ),
           contentPadding: EdgeInsets.all(8),
-          content: Container(
+          content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             height: MediaQuery.of(context).size.height * 0.6,
             child:
@@ -414,7 +409,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                       pageSnap: true,
                       fitPolicy: FitPolicy.BOTH,
                       onError: (error) {
-                        print(error.toString());
                       },
                     )
                     : Image.network(
@@ -499,13 +493,10 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
     /*  setState(() {
       isLoading = true; // Start loading
     });*/
-    print('Holiday URL ${response.request}');
-    print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
     mapResponse = json.decode(response.body);
     var getData = mapResponse.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNoData = true;
     }
     onboardDocTypeListModal = OnboardDocTypeListModal.fromJson(mapResponse);
@@ -522,7 +513,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ButtonBar(
+              OverflowBar(
                 alignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
@@ -570,7 +561,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
       child: Scaffold(
         appBar: AppBar(
           actions: [
-            "${fullNameController.text}".text
+            fullNameController.text.text
                 .size(14)
                 .bold
                 .color(Mythemes.dangerColor)
@@ -583,7 +574,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
         bottomNavigationBar: Container(
           height: 75,
           color: context.cardColor,
-          child: ButtonBar(
+          child: OverflowBar(
             alignment: MainAxisAlignment.center,
             //buttonPadding: Vx.mOnly(right: 16),
             children: [
@@ -595,7 +586,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                   disApprovePreOnboarding(context);
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.dangerColor,
                   ),
                 ),
@@ -607,7 +598,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                   approvePreOnboarding(context);
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.successColor,
                   ),
                 ),
@@ -623,7 +614,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
           child: Padding(
             padding: EdgeInsets.all(5.0),
             child: SingleChildScrollView(
-              child: Column(children: [Container(height: 620, child: body())]),
+              child: Column(children: [SizedBox(height: 620, child: body())]),
             ),
           ),
         ),
@@ -883,7 +874,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                         ).format(fromDate!);
                                       });
 
-                                      print(fromDate);
                                     },
                                     readOnly: true,
                                     enabled: false,
@@ -944,7 +934,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                         ).format(fromDate!);
                                       });
 
-                                      print(fromDate);
                                     },
                                     readOnly: true,
                                     enabled: false,
@@ -1541,7 +1530,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                                 (_) => AlertDialog(
                                                   contentPadding:
                                                       EdgeInsets.zero,
-                                                  content: Container(
+                                                  content: SizedBox(
                                                     width:
                                                         MediaQuery.of(
                                                           context,
@@ -1583,9 +1572,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                                             rootNavigator: true,
                                                           ).pop(); // Close the dialog
                                                         } else {
-                                                          print(
-                                                            "âš ï¸ Warning: No route to close.",
-                                                          );
                                                         }
                                                       },
                                                       child: Text("Close"),
@@ -1618,9 +1604,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                                             rootNavigator: true,
                                                           ).pop(); // Close the dialog
                                                         } else {
-                                                          print(
-                                                            "âš ï¸ Warning: No route to close.",
-                                                          );
                                                         }
                                                       },
                                                       child: Text("Close"),
@@ -1695,7 +1678,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                                   (_) => AlertDialog(
                                                     contentPadding:
                                                         EdgeInsets.zero,
-                                                    content: Container(
+                                                    content: SizedBox(
                                                       width:
                                                           MediaQuery.of(
                                                             context,
@@ -1740,9 +1723,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                                                   true,
                                                             ).pop(); // Close the dialog
                                                           } else {
-                                                            print(
-                                                              "âš ï¸ Warning: No route to close.",
-                                                            );
                                                           }
                                                         },
                                                         child: Text("Close"),
@@ -1776,9 +1756,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                                                   true,
                                                             ).pop(); // Close the dialog
                                                           } else {
-                                                            print(
-                                                              "âš ï¸ Warning: No route to close.",
-                                                            );
                                                           }
                                                         },
                                                         child: Text("Close"),
@@ -1912,6 +1889,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Aadhar Card (Front)',
                                           style: TextStyle(
@@ -1919,9 +1897,9 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                       DropdownMenuItem(
+                                        value: 2,
                                         child: Text(
                                           'Aadhar Card (Back)',
                                           style: TextStyle(
@@ -1929,9 +1907,9 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 2,
                                       ),
                                       DropdownMenuItem(
+                                        value: 3,
                                         child: Text(
                                           'Pan Card',
                                           style: TextStyle(
@@ -1939,9 +1917,9 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 3,
                                       ),
                                       DropdownMenuItem(
+                                        value: 4,
                                         child: Text(
                                           'Police Verification',
                                           style: TextStyle(
@@ -1949,9 +1927,9 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 4,
                                       ),
                                       DropdownMenuItem(
+                                        value: 5,
                                         child: Text(
                                           'Medical Certificate',
                                           style: TextStyle(
@@ -1959,9 +1937,9 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 5,
                                       ),
                                       DropdownMenuItem(
+                                        value: 6,
                                         child: Text(
                                           'Employee Photo',
                                           style: TextStyle(
@@ -1969,7 +1947,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 6,
                                       ),
 
                                       /* DropdownMenuItem(
@@ -2049,6 +2026,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -2056,7 +2034,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -2103,6 +2080,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -2110,7 +2088,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -2157,6 +2134,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -2164,7 +2142,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -2211,6 +2188,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -2218,7 +2196,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4733,6 +4710,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4740,7 +4718,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4780,7 +4757,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                       ).format(fromDate!);
                                     });
 
-                                    print(fromDate);
                                   },
                                   readOnly: true,
                                   enabled: true,
@@ -4845,6 +4821,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4852,7 +4829,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4899,6 +4875,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4906,7 +4883,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4949,6 +4925,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4956,7 +4933,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4980,7 +4956,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 
     return
     //ignore this section please
-    ButtonBar(
+    OverflowBar(
       children: [
         /*ElevatedButton(
             onPressed: () {
@@ -5020,17 +4996,14 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -5038,9 +5011,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -5050,15 +5020,13 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -5076,17 +5044,14 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -5094,9 +5059,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -5106,15 +5068,13 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -5144,7 +5104,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
                   ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -5374,10 +5333,6 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 
   void openFile(PlatformFile file) {
     OpenFile.open(file.path!);
-    print('Bytes: ${file.name}');
-    print('Size: ${file.size}');
-    print('Size: ${file.extension}');
-    print('Path: ${file.path}');
   }
 
   Future<File> saveFilePermanently(PlatformFile file) async {
@@ -5390,7 +5345,7 @@ class _ApprovePreOnboardingState extends State<ApprovePreOnboarding> {
 // The DismissKeybaord widget (it's reusable)
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

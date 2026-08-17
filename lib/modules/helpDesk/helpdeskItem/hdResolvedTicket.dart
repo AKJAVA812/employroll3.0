@@ -4,7 +4,7 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 
 class HDResolvedTickets extends StatefulWidget {
-  const HDResolvedTickets({Key? key}) : super(key: key);
+  const HDResolvedTickets({super.key});
 
   @override
   State<HDResolvedTickets> createState() => _HDResolvedTicketsState();

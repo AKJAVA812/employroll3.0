@@ -19,6 +19,8 @@ import 'modalClass/loanLedgerModal.dart';
 import 'modalClass/loanSummaryModal.dart';
 
 class LoanSummaryPage extends StatefulWidget {
+  const LoanSummaryPage({super.key});
+
   @override
   State<LoanSummaryPage> createState() => _LoanSummaryPageState();
 }
@@ -32,7 +34,7 @@ SessionManager shared = SessionManager();
 String? sessionId;
 
 class _LoanSummaryPageState extends State<LoanSummaryPage> {
-  bool _isFirstBuild = true;
+  final bool _isFirstBuild = true;
   bool _isBottomSheetOpen = false;
   bool isLoading = false;
   bool isLoadingCount = true;
@@ -126,12 +128,10 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
 
     setState(() {
       getSharedPrfanceList();
-      var listLength;
-      var loanLedgerList;
+      int listLength;
+      int loanLedgerList;
       listLength = foundDataNew!.length;
       loanLedgerList = foundLoanLedgerData!.length;
-      print('listLength $listLength');
-      print('loanLedgerList $loanLedgerList');
     });
   }
 
@@ -194,21 +194,16 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
   Future<LoanSummaryModal> getLoanSummary(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanSummaryApi;
-    print('employeeList11: ${SessionId}');
     LoanSummaryModal loanSummaryModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
     });
-    print('URL ${response.request}');
     mapResponse = json.decode(response.body);
-    print('responseemployeeList $mapResponse');
     var getData = mapResponse.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     loanSummaryModal = LoanSummaryModal.fromJson(mapResponse);
@@ -227,7 +222,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
       isLoadingCount = false;
     });
 
-    print("Pending List -  ${foundDataNew!.length.toString()}");
     _expandedTiles = List.generate(foundDataNew!.length, (index) => index == 0);
 
     return loanSummaryModal;
@@ -242,7 +236,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
   Future<LoanLedgerModal> getLoanLedger(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanLedgerApi;
-    print('employeeList11: ${SessionId}');
     LoanLedgerModal loanLedgerModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -251,16 +244,12 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
     });
-    print('URL ${response.request}');
     mapResponseLoanLedger = json.decode(response.body);
-    print('responseemployeeList $mapResponseLoanLedger');
     var getData = mapResponseLoanLedger.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     loanLedgerModal = LoanLedgerModal.fromJson(mapResponseLoanLedger);
@@ -275,7 +264,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
       isLoadingCount = false;
     });
 
-    print("Loan Ledger List -  ${foundLoanLedgerData!.length.toString()}");
 
     return loanLedgerModal;
   }
@@ -283,7 +271,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
   Future<LoanWiseSkipModal> getLoanSkipList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanSkipListApi;
-    print('employeeList11: ${SessionId}');
     LoanWiseSkipModal loanWiseSkipModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -292,16 +279,12 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
     });
-    print('URL ${response.request}');
     mapResponseLoanWiseSkip = json.decode(response.body);
-    print('responseemployeeList $mapResponseLoanWiseSkip');
     var getData = mapResponseLoanWiseSkip.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     loanWiseSkipModal = LoanWiseSkipModal.fromJson(mapResponseLoanWiseSkip);
@@ -311,7 +294,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
       isLoadingCount = false;
     });
 
-    print("Loan Wise Skip List -  ${foundLoanWiseSkipData!.length.toString()}");
 
     return loanWiseSkipModal;
   }
@@ -350,9 +332,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -362,13 +341,12 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -398,7 +376,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                   ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -440,7 +417,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                 onPressed: () {
                   Navigator.of(confirmCtx).pop(); // Close the success popup
                 },
-                child: const Text("OK"),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   padding: const EdgeInsets.symmetric(
@@ -451,6 +427,7 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                child: const Text("OK"),
               ),
             ],
           ),
@@ -1119,7 +1096,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                         ),
                         onTap: () {
                           loanId = foundDataNew![index].loanReqId.toString();
-                          print("Loan Id - $loanId");
                           Future<LoanLedgerModal> getEmployeeList11 =
                               getLoanLedger(sessionId!);
                           final loading = Row(
@@ -1159,8 +1135,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                           onPressed: () {
                             loanId = foundDataNew![index].loanReqId.toString();
                             loanType = foundDataNew![index].loanType.toString();
-                            print("Loan Id - $loanId");
-                            print("Loan Type - $loanType");
                             Future<LoanWiseSkipModal> getEmployeeList11 =
                                 getLoanSkipList(sessionId!);
                             final loading = Row(
@@ -1224,7 +1198,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -1234,7 +1207,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -1243,7 +1215,6 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
                 builder: (context) => GetAttendanceDet(showAppBar: true),
               ),
             );
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -1254,13 +1225,11 @@ class _LoanSummaryPageState extends State<LoanSummaryPage> {
             );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";

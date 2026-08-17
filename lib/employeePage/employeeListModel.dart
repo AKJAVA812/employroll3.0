@@ -13,7 +13,7 @@ class EmployeeListModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -53,15 +53,15 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['empContactNo'] = this.empContactNo;
-    data['empName'] = this.empName;
-    data['empdetailsId'] = this.empdetailsId;
-    data['empEmail'] = this.empEmail;
-    data['devicestatus'] = this.devicestatus;
-    data['empDept'] = this.empDept;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['empContactNo'] = empContactNo;
+    data['empName'] = empName;
+    data['empdetailsId'] = empdetailsId;
+    data['empEmail'] = empEmail;
+    data['devicestatus'] = devicestatus;
+    data['empDept'] = empDept;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }

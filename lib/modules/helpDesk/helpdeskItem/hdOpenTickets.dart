@@ -4,7 +4,7 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 
 class HDOpenTickets extends StatefulWidget {
-  const HDOpenTickets({Key? key}) : super(key: key);
+  const HDOpenTickets({super.key});
 
   @override
   State<HDOpenTickets> createState() => _HDOpenTicketsState();
@@ -121,7 +121,7 @@ class _HDOpenTicketsState extends State<HDOpenTickets> {
 }
 
 class GetOpenTickets extends StatefulWidget {
-  const GetOpenTickets({Key? key}) : super(key: key);
+  const GetOpenTickets({super.key});
 
   @override
   State<GetOpenTickets> createState() => _GetOpenTicketsState();

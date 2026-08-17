@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,7 +22,7 @@ import 'attendancMarkAi.dart';
 import 'empListFaceRegistered.dart';
 
 class FaceRecognitinHome extends StatefulWidget {
-  const FaceRecognitinHome({Key? key}) : super(key: key);
+  const FaceRecognitinHome({super.key});
   @override
   State<FaceRecognitinHome> createState() => _FaceRecognitinHomeState();
 }
@@ -73,36 +72,27 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
     empIdSelf = await shared.getEmpId();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -140,12 +130,10 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     InputImage inputImage = InputImage.fromFile(_image!);
     //image = await _image?.readAsBytes();
     imageRecognize = await decodeImageFromList(_image!.readAsBytesSync());
-    print("Image - ${inputImage}");
     recognitionList.clear();
     //TODO passing input to face detector and getting detected faces
     facesRecognized = await faceDetector.processImage(inputImage);
 
-    print("Face Count -  ${facesRecognized.length}");
     for (Face face in facesRecognized) {
       final Rect boundingBox = face.boundingBox;
 
@@ -162,7 +150,6 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       num width = right - left;
       num height = bottom - top;
 
-      print("Ract Position :- " + boundingBox.toString());
 
       final bytes = _image!.readAsBytesSync();
       img.Image? faceImg = img.decodeImage(bytes);
@@ -175,13 +162,10 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       );
       Recognition recognition = recognizer.recognize(croppedFace, boundingBox);
       recognitionList.add(recognition);
-      print("Face List Leng - ${recognitionList.length}");
-      print("Image - ${recognition.embeddings.toString()}");
       getFaceData(context, recognition.embeddings.toString());
       if (recognition.distance > 0.6) {
         recognition.name = "Unknown Face $recognition.distance";
       }
-      print("Face Matche Name " + recognition.name);
 
       /* var snackBar = SnackBar(content: Text(" Face Name " + recognition.name));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);*/
@@ -197,7 +181,7 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
   getFaceData(BuildContext context, String image) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.faceRecognizeOther;
-    Map data = {'image': "$image"};
+    Map data = {'image': image};
     var body = json.encode(data);
     //var uri = Uri.parse("$conn$apiUrl");
     var urlapi = Uri.parse("$conn$apiUrl?");
@@ -207,13 +191,9 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       headers: {"Content-Type": "application/json"},
       body: body,
     );
-    print('URL ${response.request}');
-    print('BODY - ${response.body}');
-    print("Image - $body");
 
     if (response.statusCode == 200) {
       var responseResult = json.decode(response.body);
-      print('Response: $responseResult');
 
       String result =
           responseResult['result'].toLowerCase() ?? "Result not defined";
@@ -250,7 +230,7 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
                 Text(title),
               ],
             ),
-            content: Text("${reason} ${name} ${punchMsg}"),
+            content: Text("$reason $name $punchMsg"),
             actions: [
               TextButton(
                 onPressed: () {
@@ -279,7 +259,6 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
     //TODO passing input to face detector and getting detected faces
     faces = await faceDetector.processImage(inputImage);
 
-    print("Face Length - ${faces.length}");
     for (Face face in faces) {
       final Rect boundingBox = face.boundingBox;
 
@@ -294,9 +273,8 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       num width = right - left;
       num height = bottom - top;
 
-      print("Ract Position :- " + boundingBox.toString());
       var snackBar = SnackBar(
-        content: Text('Face Id :-' + boundingBox.toString()),
+        content: Text('Face Id :-$boundingBox'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
           final bytes = _image!.readAsBytesSync();
@@ -397,7 +375,6 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
   var imageRecognize;
   drawRectangleAroundFaces() async {
     //print("${image.width}   ${image.height}");
-    print("${imageRecognize.width}   ${imageRecognize.height}");
     setState(() {
       image;
       imageRecognize;
@@ -429,9 +406,7 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
       headers: {"Content-Type": "application/json"},
       body: body,
     );
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
-      print("result is ok");
     }
     /* http.Response response = await http.Response.fromStream(await request.send());
 
@@ -657,7 +632,6 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
               ),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -667,7 +641,6 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -676,12 +649,10 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
                 builder: (context) => const FaceRecognitinHome(),
               ),
             );
-            print('Face');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -689,7 +660,6 @@ class _FaceRecognitinHomeState extends State<FaceRecognitinHome> {
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -797,7 +767,7 @@ class FacePainter extends CustomPainter {
     for (Recognition face in facesList) {
       canvas.drawRect(face.location, p);
       TextSpan textSpan = TextSpan(
-        text: face.name + " " + face.distance.toString(),
+        text: "${face.name} ${face.distance}",
         style: TextStyle(color: Colors.white, fontSize: 50),
       );
       TextPainter tp = TextPainter(

@@ -49,7 +49,7 @@ SessionManager shared = SessionManager();
 String? sessionId;
 
 class CompanyPoliciesPage extends StatefulWidget {
-  const CompanyPoliciesPage({Key? key}) : super(key: key);
+  const CompanyPoliciesPage({super.key});
 
   @override
   _CompanyPoliciesPageState createState() => _CompanyPoliciesPageState();
@@ -80,7 +80,6 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
         companyPolicyGlobal = value;
         companyPolicyGlobaled = companyPolicyGlobal;
       });
-      print('Policy list - ${companyPolicyGlobal!.allPolicyList!.length}');
     });
   }
 
@@ -170,17 +169,13 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
   Future<CompanyPolicyModal> getPolicies(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.companyPolicyApi;
-    print('employeeList11: ${SessionId}');
     CompanyPolicyModal companyPolicyModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
 
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['mappedData'];
-    print('responseemployeeList $getData');
     companyPolicyModal = CompanyPolicyModal.fromJson(mapResponse);
     allUsernew = companyPolicyModal.allPolicyList;
     isLoading = false;
@@ -188,7 +183,6 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<AllPolicyList>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -384,7 +378,7 @@ class _CompanyPoliciesPageState extends State<CompanyPoliciesPage> {
 class PdfViewerPage extends StatefulWidget {
   final Policy policy;
 
-  const PdfViewerPage({Key? key, required this.policy}) : super(key: key);
+  const PdfViewerPage({super.key, required this.policy});
 
   @override
   _PdfViewerPageState createState() => _PdfViewerPageState();

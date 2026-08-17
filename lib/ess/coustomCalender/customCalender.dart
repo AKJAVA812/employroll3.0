@@ -24,7 +24,7 @@ class _customCalenderState extends State<customCalender> {
         borderRadius: BorderRadius.all(Radius.circular(20)),
         border: Border.all(color: Colors.blue, width: 4.0)),
        );*/
-  static Widget _eventIcon = Container(
+  static final Widget _eventIcon = Container(
     decoration:  BoxDecoration(
         //color: Colors.transparent,
         borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -32,7 +32,7 @@ class _customCalenderState extends State<customCalender> {
        );
 
 
-  EventList<Event> _markedDateMap = EventList<Event>(
+  final EventList<Event> _markedDateMap = EventList<Event>(
     events: {
       /*new DateTime(2024, 2, 1): [
         new Event(
@@ -101,10 +101,11 @@ class _customCalenderState extends State<customCalender> {
   @override
   Widget build(BuildContext context) {
     /// Example with custom icon
-    final _calendarCarousel = CalendarCarousel<Event>(
+    final calendarCarousel = CalendarCarousel<Event>(
         onDayPressed: (date, events) {
-          this.setState(() => _currentDate = date);
-          events.forEach((event) => print(event.title));
+          setState(() => _currentDate = date);
+          for (var event in events) {
+          }
         },
         weekendTextStyle: TextStyle(
           color: Colors.red,
@@ -145,12 +146,12 @@ class _customCalenderState extends State<customCalender> {
     );
 
     /// Example Calendar Carousel without header and custom prev & next button
-    final _calendarCarouselNoHeader = CalendarCarousel<Event>(
+    final calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Colors.green,
       onDayPressed: (date, events) {
-        this.setState(() => _currentDate2 = date);
-        events.forEach((event) => print(event.title));
-        print(date);
+        setState(() => _currentDate2 = date);
+        for (var event in events) {
+        }
         //Nevigate Next Page
 
       },
@@ -200,13 +201,11 @@ class _customCalenderState extends State<customCalender> {
       onCalendarChanged: (DateTime date) {
           _targetDateTime = date;
           _currentMonth = DateFormat.yMMM().format(_targetDateTime);
-          print('change date $date.month$_targetDateTime');
           setState(() {
             //API month change call
           });
       },
       onDayLongPressed: (DateTime date) {
-        print('long pressed date $date');
       },
     );
     return Scaffold(
@@ -221,7 +220,7 @@ class _customCalenderState extends State<customCalender> {
               //custom icon
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 16.0),
-                child: _calendarCarousel,
+                child: calendarCarousel,
               ), // This trailing comma makes auto-formatting nicer for build methods.
               //custom icon without header
               Container(
@@ -268,7 +267,7 @@ class _customCalenderState extends State<customCalender> {
               ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 22.0),
-                child: _calendarCarouselNoHeader,
+                child: calendarCarouselNoHeader,
               ), //
             ],
           ),

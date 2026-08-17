@@ -10,7 +10,7 @@ import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 
 class QRAttWithoutLocation extends StatefulWidget {
-  const QRAttWithoutLocation({Key? key}) : super(key: key);
+  const QRAttWithoutLocation({super.key});
 
   @override
   State<QRAttWithoutLocation> createState() => _QRAttWithoutLocationState();
@@ -35,7 +35,7 @@ class _QRAttWithoutLocationState extends State<QRAttWithoutLocation> {
 }
 
 class QRPageView extends StatefulWidget {
-  const QRPageView({Key? key}) : super(key: key);
+  const QRPageView({super.key});
 
   @override
   State<QRPageView> createState() => _QRPageViewState();
@@ -90,6 +90,7 @@ class _QRPageViewState extends State<QRPageView> {
   var macAddress;
   var deviceId;
   var battery;
+  @override
   void initState() {
     getSharedPrfanceList();
     empCode = "THUMB141";
@@ -112,10 +113,6 @@ class _QRPageViewState extends State<QRPageView> {
     lng=await shared.getLongitude();
     orgnizationID=await shared.getOrgId();
 
-    print('Response snapshot: ${sessionId}');
-    print('Response Lat: ${lat}');
-    print('Response Long: ${lng}');
-    print('Response snapshot: ${orgnizationID}');
 
   }
   /*Future _qrScanner(BuildContext context) async{
@@ -240,7 +237,6 @@ class _QRPageViewState extends State<QRPageView> {
 
   Future getUserName() async {
     UserName = await shared.getempName();
-    print('Response snapshot: ${UserName}');
   }
 
   void _getTime() {

@@ -31,6 +31,8 @@ class IncidentListPage extends StatelessWidget {
     },
   ];
   int currentIndex = 2;
+
+  IncidentListPage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,29 +54,24 @@ class IncidentListPage extends StatelessWidget {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             //Navigator.pushNamed(context, MyRoutings.preOnboardItemRoute);
-            print('Incident');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

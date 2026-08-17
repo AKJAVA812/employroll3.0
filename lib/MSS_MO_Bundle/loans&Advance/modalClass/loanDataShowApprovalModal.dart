@@ -13,7 +13,7 @@ class LoanDataShowApprovalModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -140,44 +140,44 @@ class DataNew {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['desig'] = this.desig;
-    data['installmentlevelThree'] = this.installmentlevelThree;
-    data['loanType'] = this.loanType;
-    data['approverLevelOneName'] = this.approverLevelOneName;
-    data['dedDateLevelThree'] = this.dedDateLevelThree;
-    data['approverLevelTwoName'] = this.approverLevelTwoName;
-    data['levelThreeAppAmt'] = this.levelThreeAppAmt;
-    data['interestBalance'] = this.interestBalance;
-    data['installmentRequested'] = this.installmentRequested;
-    data['principalbalance'] = this.principalbalance;
-    data['branch'] = this.branch;
-    data['deductFroDate'] = this.deductFroDate;
-    data['levelOneAppAmt'] = this.levelOneAppAmt;
-    data['result'] = this.result;
-    data['interestRateLevelOne'] = this.interestRateLevelOne;
-    data['dedDateLevelTwo'] = this.dedDateLevelTwo;
-    data['empName'] = this.empName;
-    data['interestRateL1'] = this.interestRateL1;
-    data['interestBalanceL3'] = this.interestBalanceL3;
-    data['dept'] = this.dept;
-    data['loanAdId'] = this.loanAdId;
-    data['interestBalanceL2'] = this.interestBalanceL2;
-    data['loanAmount'] = this.loanAmount;
-    data['installmentlevelOne'] = this.installmentlevelOne;
-    data['loanAccountNo'] = this.loanAccountNo;
-    data['deductFromDateL3'] = this.deductFromDateL3;
-    data['approverLevelThreeName'] = this.approverLevelThreeName;
-    data['deductFromDateL2'] = this.deductFromDateL2;
-    data['onDate'] = this.onDate;
-    data['empCode'] = this.empCode;
-    data['installmentlevelTwo'] = this.installmentlevelTwo;
-    data['interestRateL2'] = this.interestRateL2;
-    data['levelTwoAppAmt'] = this.levelTwoAppAmt;
-    data['interestRateL3'] = this.interestRateL3;
-    data['dedDate'] = this.dedDate;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['desig'] = desig;
+    data['installmentlevelThree'] = installmentlevelThree;
+    data['loanType'] = loanType;
+    data['approverLevelOneName'] = approverLevelOneName;
+    data['dedDateLevelThree'] = dedDateLevelThree;
+    data['approverLevelTwoName'] = approverLevelTwoName;
+    data['levelThreeAppAmt'] = levelThreeAppAmt;
+    data['interestBalance'] = interestBalance;
+    data['installmentRequested'] = installmentRequested;
+    data['principalbalance'] = principalbalance;
+    data['branch'] = branch;
+    data['deductFroDate'] = deductFroDate;
+    data['levelOneAppAmt'] = levelOneAppAmt;
+    data['result'] = result;
+    data['interestRateLevelOne'] = interestRateLevelOne;
+    data['dedDateLevelTwo'] = dedDateLevelTwo;
+    data['empName'] = empName;
+    data['interestRateL1'] = interestRateL1;
+    data['interestBalanceL3'] = interestBalanceL3;
+    data['dept'] = dept;
+    data['loanAdId'] = loanAdId;
+    data['interestBalanceL2'] = interestBalanceL2;
+    data['loanAmount'] = loanAmount;
+    data['installmentlevelOne'] = installmentlevelOne;
+    data['loanAccountNo'] = loanAccountNo;
+    data['deductFromDateL3'] = deductFromDateL3;
+    data['approverLevelThreeName'] = approverLevelThreeName;
+    data['deductFromDateL2'] = deductFromDateL2;
+    data['onDate'] = onDate;
+    data['empCode'] = empCode;
+    data['installmentlevelTwo'] = installmentlevelTwo;
+    data['interestRateL2'] = interestRateL2;
+    data['levelTwoAppAmt'] = levelTwoAppAmt;
+    data['interestRateL3'] = interestRateL3;
+    data['dedDate'] = dedDate;
+    data['status'] = status;
     return data;
   }
 }

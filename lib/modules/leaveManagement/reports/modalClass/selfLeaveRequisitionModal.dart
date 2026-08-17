@@ -7,16 +7,16 @@ class SelfLeaveRequisitionListModal {
     final source = json['content'] ?? json['data'];
     if (source is List) {
       data = <Data>[];
-      source.forEach((v) {
+      for (var v in source) {
         if (v is Map) data!.add(Data.fromJson(Map<String, dynamic>.from(v)));
-      });
+      }
     } else {
       data = <Data>[];
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -92,27 +92,27 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['deptName'] = this.deptName;
-    data['branchId'] = this.branchId;
-    data['leavetype'] = this.leavetype;
-    data['noOfDay'] = this.noOfDay;
-    data['endDate'] = this.endDate;
-    data['branchName'] = this.branchName;
-    data['employeeId'] = this.employeeId;
-    data['leaveLength'] = this.leaveLength;
-    data['approvaldate'] = this.approvaldate;
-    data['applicationdate'] = this.applicationdate;
-    data['empName'] = this.empName;
-    data['nominee'] = this.nominee;
-    data['startTime'] = this.startTime;
-    data['leaveId'] = this.leaveId;
-    data['appliedby'] = this.appliedby;
-    data['endTime'] = this.endTime;
-    data['leavereqId'] = this.leavereqId;
-    data['approvarRemark'] = this.approvarRemark;
-    data['startDate'] = this.startDate;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['deptName'] = deptName;
+    data['branchId'] = branchId;
+    data['leavetype'] = leavetype;
+    data['noOfDay'] = noOfDay;
+    data['endDate'] = endDate;
+    data['branchName'] = branchName;
+    data['employeeId'] = employeeId;
+    data['leaveLength'] = leaveLength;
+    data['approvaldate'] = approvaldate;
+    data['applicationdate'] = applicationdate;
+    data['empName'] = empName;
+    data['nominee'] = nominee;
+    data['startTime'] = startTime;
+    data['leaveId'] = leaveId;
+    data['appliedby'] = appliedby;
+    data['endTime'] = endTime;
+    data['leavereqId'] = leavereqId;
+    data['approvarRemark'] = approvarRemark;
+    data['startDate'] = startDate;
+    data['status'] = status;
     return data;
   }
 }

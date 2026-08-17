@@ -13,7 +13,7 @@ class DepartmentListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -33,9 +33,9 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['deptName'] = this.deptName;
-    data['branchDeptId'] = this.branchDeptId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['deptName'] = deptName;
+    data['branchDeptId'] = branchDeptId;
     return data;
   }
 }

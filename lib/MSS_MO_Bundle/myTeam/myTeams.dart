@@ -20,7 +20,7 @@ import '../../main.dart';
 import '../../themes/empThemes.dart';
 
 class EmpListViewMO extends StatefulWidget {
-  const EmpListViewMO({Key? key}) : super(key: key);
+  const EmpListViewMO({super.key});
 
   static const String _title = 'Employee List';
 
@@ -143,7 +143,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
       final response = await MobileHttpClient.instance.post(urlapi);
 
       mapResponse = json.decode(response.body);
-      print("API - ${response.request}");
 
       /// âœ… Always update the main model
       employeeListModelglobel = MyTeamsListModal.fromJson(mapResponse);
@@ -162,7 +161,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
         }
       });
     } catch (e) {
-      print("Error fetching employee list: ${e.toString()}");
     } finally {
       setState(() {
         isLoading = false; // Hide loader always
@@ -174,7 +172,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
 
   bool isLoading = true;
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<ListData>? resultsAll = [];
     List<SharedEmpList>? resultsShared = [];
     List<DirectEmpList>? resultsDirect = [];
@@ -440,7 +437,7 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                         ),
                         ...organizations.map((org) {
                           return DropdownMenuItem(value: org, child: Text(org));
-                        }).toList(),
+                        }),
                       ],
                       onChanged: (value) async {
                         setState(() {
@@ -453,8 +450,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                           );
 
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
                         });
 
                         final selectedId = int.tryParse(getOrgId.toString());
@@ -487,7 +482,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                           userPanel = await shared.getUserPanel();
                           getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print("ORG ID - $getOrgId");
                           try {
                             final value = await getEmployeeList(sessionId!);
                             if (mounted) _applyEmployeeResult(value);
@@ -495,7 +489,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                             setState(() {
                               isLoading = false;
                             });
-                            print('Error while fetching requisitions: $e');
                           }
                         },
                         icon: Icon(Icons.filter_alt),
@@ -536,7 +529,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
           setState(() {
             selectedFilter = label;
             getSharedPrfanceList();
-            print("Selected Filter - $selectedFilter");
           });
         },
       ),
@@ -602,7 +594,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -612,16 +603,13 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if (index == 4) {
             if (userPanelPermission != "USER") {
@@ -637,7 +625,6 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -2047,7 +2034,7 @@ class _EmpListViewMOState extends State<EmpListViewMO> with RouteAware {
 class MyStatelessWidget extends StatefulWidget {
   final MyTeamsListModal employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -2096,7 +2083,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
               Navigator.pop(context);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -2160,8 +2146,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             onTap: () {
               empId = foundDataNewMO![i].empDetId;
               empName = foundDataNewMO![i].empName;
-              print('ID $empId');
-              print('NameCheck $empName');
               //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
             },
             child: Card(

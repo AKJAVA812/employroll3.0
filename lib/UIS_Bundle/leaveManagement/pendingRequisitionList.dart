@@ -22,7 +22,7 @@ import '../../modules/leaveManagement/reports/leaveManageReport.dart';
 
 class UIS_PendingLeaveRequisitionList extends StatefulWidget {
   final PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
-  const UIS_PendingLeaveRequisitionList(this.pendingLeaveRequisitionModal);
+  const UIS_PendingLeaveRequisitionList(this.pendingLeaveRequisitionModal, {super.key});
 
   @override
   State<UIS_PendingLeaveRequisitionList> createState() =>
@@ -74,9 +74,8 @@ class _UIS_PendingLeaveRequisitionListState
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNewUIS!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -121,8 +120,6 @@ class _UIS_PendingLeaveRequisitionListState
     getProfileId = await shared.getDefaultProfileId();
     levelOne = await shared.getLevelOne();
     levelTwo = await shared.getLevelTwo();
-    print("Level 1 - $levelOne");
-    print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingLeaveRequisitionModal> getAppReq11 = getPendingLeaveReq(
       sessionId!,
@@ -142,7 +139,6 @@ class _UIS_PendingLeaveRequisitionListState
         pendingLeaveReqLabeled = pendingLeaveReqLabel;
         if (foundDataNewUIS != null) {
           foundDataNewUIS!.length;
-          print("Fetch data $foundDataNewUIS");
         } else {
           Center(child: "There is no data available right now".text.make());
           foundDataNewUIS = [];
@@ -157,7 +153,6 @@ class _UIS_PendingLeaveRequisitionListState
   ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingLeaveReqList;
-    print('employeeList11: ${SessionId}');
     PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -167,17 +162,12 @@ class _UIS_PendingLeaveRequisitionListState
       "orgId=0",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
-    print("My Data - $getData");
     if (getData == null) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
-    print('responseemployeeList $getData');
     pendingLeaveRequisitionModal = PendingLeaveRequisitionModal.fromJson(
       mapResponse,
     );
@@ -192,7 +182,6 @@ class _UIS_PendingLeaveRequisitionListState
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -422,7 +411,6 @@ class _UIS_PendingLeaveRequisitionListState
                     onChanged: (i) {
                       setState(() {
                         value = i;
-                        print(i);
                       });
 
                       if (value == 0) {
@@ -475,7 +463,6 @@ class _UIS_PendingLeaveRequisitionListState
               ),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -485,23 +472,19 @@ class _UIS_PendingLeaveRequisitionListState
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
             Navigator.pop(context);
-            print('Leave');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -558,7 +541,6 @@ class _UIS_PendingLeaveRequisitionListState
           final item = foundDataNewUIS![index];
           return InkWell(
             onTap: () {
-              print(foundDataNewUIS!.length);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder:
@@ -702,9 +684,6 @@ class _UIS_PendingLeaveRequisitionListState
                               color: Colors.blueAccent,
                             ),
                             onPressed: () {
-                              print(
-                                "Attachment tapped for ${item.employeeName}",
-                              );
                               if (item.document != null &&
                                   item.document.toString().isNotEmpty) {
                                 showAttachmentBottomSheet(

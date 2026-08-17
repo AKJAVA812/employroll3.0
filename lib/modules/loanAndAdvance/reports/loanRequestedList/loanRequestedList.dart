@@ -13,7 +13,7 @@ import '../modalClass/loanAdvanceReqModal.dart';
 
 class PendingLoanRequestedList extends StatefulWidget {
   final LoanAdvanceReqModal loanAdvanceReqModal;
-  const PendingLoanRequestedList(this.loanAdvanceReqModal);
+  const PendingLoanRequestedList(this.loanAdvanceReqModal, {super.key});
 
   @override
   State<PendingLoanRequestedList> createState() =>
@@ -62,9 +62,8 @@ class _PendingLoanRequestedListState extends State<PendingLoanRequestedList>
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -86,25 +85,18 @@ class _PendingLoanRequestedListState extends State<PendingLoanRequestedList>
         loanAdvanceReqModalGlobal = value;
         loanAdvanceReqModalGlobaled = loanAdvanceReqModalGlobal;
       });
-      print(
-        'employeeList00${loanAdvanceReqModalGlobal!.loanRequiDatalist!.length}',
-      );
     });
   }
 
   Future<LoanAdvanceReqModal> getLoanAdvReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanAdvanceReqList;
-    print('employeeList11: ${SessionId}');
     LoanAdvanceReqModal loanAdvanceReqModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['LoanRequiDatalist'];
-    print('responseemployeeList $getData');
     loanAdvanceReqModal = LoanAdvanceReqModal.fromJson(mapResponse);
 
     allUsernew = loanAdvanceReqModal.loanRequiDatalist;
@@ -115,7 +107,6 @@ class _PendingLoanRequestedListState extends State<PendingLoanRequestedList>
   TextEditingController searchType = TextEditingController();
   var titleName = "Pending Requisition List";
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<LoanRequiDatalist>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -370,20 +361,16 @@ class _PendingLoanRequestedListState extends State<PendingLoanRequestedList>
       "loanReqId=$loanReqId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'].toString();
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {

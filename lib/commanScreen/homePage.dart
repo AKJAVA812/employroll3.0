@@ -105,8 +105,8 @@ String timeStringNew = "";
 String? sessionId;
 String? userType;
 int? orgnizationID = 0;
-late String UserName = "Employee Name";
-late String employeeCode = "101";
+String UserName = "Employee Name";
+String employeeCode = "101";
 String? imageStringNew;
 String? defaultProfileName;
 dynamic defaultProfileId;
@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage> {
       actions: [
         TextButton(
           onPressed: () async {
-            await getLogout(this.context);
+            await getLogout(context);
             shared.setSessionId("");
             shared.setAdminRole(0);
             shared.setEmpRoll(0);
@@ -337,10 +337,6 @@ class _HomePageState extends State<HomePage> {
     final accessToken = await shared.getAccessToken();
     final tokenType = await shared.getTokenType() ?? 'Bearer';
     final urlapi = Uri.parse("$conn$apiUrl");
-    print('[MOBILE-AUTH] LOGOUT -> POST $urlapi');
-    print(
-      '[MOBILE-AUTH] LOGOUT headers -> tokenPresent=${accessToken != null && accessToken.isNotEmpty} sessionPresent=${currentSessionId != null && currentSessionId.isNotEmpty}',
-    );
 
     final response = await MobileHttpClient.instance.post(
       urlapi,
@@ -352,10 +348,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
-    print(
-      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
-    );
     if (response.body.isNotEmpty) {
       mapResponse = json.decode(response.body);
     } else {
@@ -371,7 +363,6 @@ class _HomePageState extends State<HomePage> {
         result.compareToIgnoringCase('success') == 0) {
       await NotificationService.instance.deactivateCurrentToken();
       await shared.clearMobileAuth();
-      print('[MOBILE-AUTH] LOGOUT -> success');
       Fluttertoast.showToast(
         msg: message.isNotEmpty ? message : "Logout Successfully !!",
         toastLength: Toast.LENGTH_SHORT,
@@ -382,7 +373,6 @@ class _HomePageState extends State<HomePage> {
         fontSize: 16.0,
       );
     } else {
-      print('[MOBILE-AUTH] LOGOUT -> error message=$message');
       Fluttertoast.showToast(
         msg: message.isNotEmpty ? message : "Logout Error !!",
         toastLength: Toast.LENGTH_SHORT,
@@ -398,7 +388,7 @@ class _HomePageState extends State<HomePage> {
   logoutApp(context) {
     showLogoutPopup(
       context,
-      "Do You Want To Logout?".toString() + " ",
+      "Do You Want To Logout? ",
       "Alert",
     );
   }
@@ -413,7 +403,6 @@ class _HomePageState extends State<HomePage> {
     sessionId = await shared.getSessionId();
     orgId = await shared.getOrgId();
     setGeofenceActive = await shared.getGeofenceActive();
-    print("Geofence Permission - $setGeofenceActive");
     empIdGet = await shared.getEmpId();
     userType = await shared.getUserType();
     defaultProfileName = await shared.getDefaultProfileName();
@@ -441,11 +430,9 @@ class _HomePageState extends State<HomePage> {
       organisationListModal =
           await MobileMoOrganisationService.loadForActivePanel();
 
-      print("Organisation List - loaded for active panel");
 
       return organisationListModal!;
     } catch (e) {
-      print("Error loading profiles: $e");
       rethrow;
     }
   }
@@ -472,7 +459,7 @@ class _HomePageState extends State<HomePage> {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.pop(this.context);
+            Navigator.pop(context);
           },
           child: "Cancel".text.color(Mythemes.dangerColorOne).make(),
         ),
@@ -480,7 +467,7 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             shared.setSessionId("");
             Navigator.pushAndRemoveUntil(
-              this.context,
+              context,
               MaterialPageRoute(builder: (context) => LoginPage()),
               (route) => false,
             );
@@ -606,9 +593,6 @@ class _HomePageState extends State<HomePage> {
           selectedFontSize: 12,
           unselectedFontSize: 10,
           onTap: (index) async {
-            print(
-              '[MOBILE-DASHBOARD] bottom-nav tap index=$index userType=$userType currentIndex=$currentIndex',
-            );
             if (isManagerPanel) {
               final titles = ['Home', 'Team', 'Requests', 'People'];
               setState(() {
@@ -641,9 +625,6 @@ class _HomePageState extends State<HomePage> {
                 break;
               case 4:
                 newTitle = "My Dashboard";
-                print(
-                  '[MOBILE-DASHBOARD] creating dashboard wrapper from homePage',
-                );
                 screens[4] = Dashboard(key: UniqueKey());
                 break;
             }
@@ -725,7 +706,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<bool?> _showBackDialog() {
     return showDialog<bool>(
-      context: this.context,
+      context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Info'),
@@ -773,7 +754,7 @@ class _HomePageState extends State<HomePage> {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.pop(this.context);
+            Navigator.pop(context);
           },
           child: "No".text.color(Mythemes.dangerColorOne).make(),
         ),
@@ -789,7 +770,7 @@ class _HomePageState extends State<HomePage> {
       elevation: 24.0,
     );
     showDialog(
-      context: this.context,
+      context: context,
       builder: (BuildContext context) {
         return alertDialog;
       },
@@ -806,8 +787,7 @@ class _HomePageState extends State<HomePage> {
       actions: [
         ElevatedButton(
           onPressed: () {
-            Navigator.pop(this.context);
-            print('response11 ${result}');
+            Navigator.pop(context);
           },
           child: Text("Ok"),
         ),
@@ -815,7 +795,7 @@ class _HomePageState extends State<HomePage> {
       elevation: 24.0,
     );
     showDialog(
-      context: this.context,
+      context: context,
       builder: (BuildContext context) {
         return alertDialog;
       },
@@ -855,7 +835,7 @@ class _NoEssPermissionHome extends StatelessWidget {
 }
 
 class DefaultPage extends StatefulWidget {
-  const DefaultPage({Key? key}) : super(key: key);
+  const DefaultPage({super.key});
 
   @override
   State<DefaultPage> createState() => _DefaultPageState();
@@ -930,7 +910,6 @@ class _DefaultPageState extends State<DefaultPage> {
         );
       }
 
-      print('ðŸƒâ€â™‚ï¸ Position Updated: $currentPostion');
     });
   }
 
@@ -941,7 +920,6 @@ class _DefaultPageState extends State<DefaultPage> {
       if (mounted) setState(() => setGeofenceActive = context.geofenceRequired);
       return context.toLegacyGeofenceList();
     } catch (e) {
-      print("ðŸš¨ Error fetching geofence list: $e");
       // âœ… Return empty model in case of failure
       return GeofenceListModal(userdata: []);
     }
@@ -1311,7 +1289,6 @@ class _DefaultPageState extends State<DefaultPage> {
     double lat = shared.getLatitude();
     double lng = shared.getLongitude();
     currentPostion = LatLng(lat, lng);
-    print('Setcurrent ');
     positionCheck = await GeolocatorPlatform.instance.getCurrentPosition();
     //position = await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
     //print('SetcurrentCL  $position');
@@ -1329,7 +1306,7 @@ class _DefaultPageState extends State<DefaultPage> {
         getAddress(positionCheck!);
       });
     } else {
-      showAboutDialog(context: this.context);
+      showAboutDialog(context: context);
     }
   }
 
@@ -1339,7 +1316,6 @@ class _DefaultPageState extends State<DefaultPage> {
       positionCheck.longitude,
     );
     Placemark placemarkee = pleaceMark[0];
-    print('currentPosition $currentAddressNew');
     var contryName = placemarkee.country;
     var locality = placemarkee.locality;
     var sublocality = placemarkee.subLocality;
@@ -1349,11 +1325,7 @@ class _DefaultPageState extends State<DefaultPage> {
     var nameAdd = placemarkee.name;
     setState(() {
       currentAddressNew =
-          '$street ' +
-          '$nameAdd ' +
-          '$sublocality ' +
-          '$locality ' +
-          '$administrativeArea ' +
+          '$street ' '$nameAdd ' '$sublocality ' '$locality ' '$administrativeArea ' +
           '$contryName ' +
           '$postalCode ';
     });
@@ -1391,42 +1363,32 @@ class _DefaultPageState extends State<DefaultPage> {
     lng = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
     attAction = await shared.getAttAction();
-    print(
-      "LatLong - ${LatLng(positionCheck!.latitude, positionCheck!.longitude)}",
-    );
     //print("Long - $lng");
     currentPostion = LatLng(positionCheck!.latitude, positionCheck!.longitude);
 
     mobAction = await shared.getMobAction();
-    print('mobActions $mobAction');
 
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -1452,8 +1414,6 @@ class _DefaultPageState extends State<DefaultPage> {
     setState(() {
       _platformVersion = platformVersion;
       _autoTimezone = autoTimezone;
-      print('timeZone $_autoTimezone');
-      print('PlatoformVersion $_platformVersion');
       _autoTime = autoTime;
       //_list = list;
       _daftar = "";
@@ -1471,7 +1431,7 @@ class _DefaultPageState extends State<DefaultPage> {
         final imageValue = await ImagePicker()
             .pickImage(source: ImageSource.camera)
             .then((value) {
-              if (value != null) this._workDoneImage = File(value.path);
+              if (value != null) _workDoneImage = File(value.path);
               if (value == null) {
                 Navigator.pushNamed(context, MyRoutings.punchInRoute);
                 //Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
@@ -1519,7 +1479,7 @@ class _DefaultPageState extends State<DefaultPage> {
         //if(imageValue==null) return;
 
         //final imagePath= File(imageValue.path);
-      } on PlatformException catch (e) {
+      } on PlatformException {
         //print('failed to upload: $e');
       }
     }
@@ -1531,7 +1491,7 @@ class _DefaultPageState extends State<DefaultPage> {
         final imageValue = await ImagePicker()
             .pickImage(source: ImageSource.camera)
             .then((value) {
-              this._workDoneImage = File(value!.path);
+              _workDoneImage = File(value!.path);
             });
 
         Navigator.of(context).push(
@@ -1546,14 +1506,13 @@ class _DefaultPageState extends State<DefaultPage> {
           ),
         );
       } catch (e) {
-        print('failed to upload: $e');
       }
     }
 
     return SingleChildScrollView(
       child: Column(
         children: [
-          Container(
+          SizedBox(
             height: MediaQuery.of(context).size.height * 0.4,
             child: Card(
               child:
@@ -1582,9 +1541,9 @@ class _DefaultPageState extends State<DefaultPage> {
           Card(
             child: ListTile(
               //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
-              title: "${UserName + "($employeeCode)"}".text.make(),
-              subtitle: Text('$currentAddressNew'),
-              leading: Container(
+              title: ("$UserName($employeeCode)").text.make(),
+              subtitle: Text(currentAddressNew),
+              leading: SizedBox(
                 width: 45,
                 height: 45,
                 child:
@@ -1622,7 +1581,7 @@ class _DefaultPageState extends State<DefaultPage> {
                       Container(
                         padding: EdgeInsets.all(15),
                         child: Text(
-                          '$todayDateShowNew',
+                          todayDateShowNew,
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 18),
                         ),
@@ -1698,7 +1657,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                   bool isFakeLocation =
                                       await DetectFakeLocation()
                                           .detectFakeLocation();
-                                  print("Fake Location - $isFakeLocation");
                                   if (isFakeLocation == true) {
                                     showDialog(
                                       context: context,
@@ -1724,8 +1682,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                         await DatetimeSetting.timeIsAuto();
                                     bool timezoneAuto =
                                         await DatetimeSetting.timeZoneIsAuto();
-                                    print("AUTO TIME $timeAuto");
-                                    print("AUTO TIME ZONE $timezoneAuto");
                                     if (!timeAuto) {
                                       //DatetimeSetting.openSetting();
                                       showAutoTimeZone(
@@ -1736,7 +1692,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                     } else {
                                       clockingType = "In";
                                       if (attAction == '0') {
-                                        print("ORGID - $orgId");
                                         if (orgId == 201 ||
                                             orgId == 200 ||
                                             orgId == 199 ||
@@ -1862,15 +1817,11 @@ class _DefaultPageState extends State<DefaultPage> {
                                   });*/
                                           //picker.dispose();
                                           if (imageValue == null) return;
-                                          print(
-                                            "Heloo ji "
-                                            "$imageValue",
-                                          );
                                           setState(() {
                                             final imagePath = File(
                                               imageValue!.path,
                                             );
-                                            this._workDoneImage = imagePath;
+                                            _workDoneImage = imagePath;
                                           });
                                           imageValue = null;
                                           //imageCache.clear();
@@ -1886,7 +1837,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                             ),
                                           );
                                         } on Exception catch (e) {
-                                          print('failed to upload: $e');
                                         }
                                       }
                                     }
@@ -1894,7 +1844,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                 } else {
                                   clockingType = "In";
                                   if (attAction == '0') {
-                                    print("ORGID - $orgId");
                                     if (setGeofenceActive == true) {
                                       showGeofenceDialog(
                                         context,
@@ -1924,15 +1873,11 @@ class _DefaultPageState extends State<DefaultPage> {
                                   });*/
                                       //picker.dispose();
                                       if (imageValue == null) return;
-                                      print(
-                                        "Heloo ji "
-                                        "$imageValue",
-                                      );
                                       setState(() {
                                         final imagePath = File(
                                           imageValue!.path,
                                         );
-                                        this._workDoneImage = imagePath;
+                                        _workDoneImage = imagePath;
                                       });
                                       imageValue = null;
                                       //imageCache.clear();
@@ -1948,7 +1893,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                         ),
                                       );
                                     } on Exception catch (e) {
-                                      print('failed to upload: $e');
                                     }
                                   }
 
@@ -1975,13 +1919,13 @@ class _DefaultPageState extends State<DefaultPage> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 10),
                                     child: CircleAvatar(
+                                      backgroundColor: Mythemes.successColor,
+                                      radius: 30,
                                       child: Icon(
                                         Icons.touch_app,
                                         size: 30,
                                         color: Mythemes.creamColor,
                                       ),
-                                      backgroundColor: Mythemes.successColor,
-                                      radius: 30,
                                     ),
                                   ),
                                   Container(height: 5),
@@ -2029,7 +1973,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                   bool isFakeLocation =
                                       await DetectFakeLocation()
                                           .detectFakeLocation();
-                                  print("Fake Location - $isFakeLocation");
                                   if (isFakeLocation == true) {
                                     showDialog(
                                       context: context,
@@ -2055,8 +1998,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                         await DatetimeSetting.timeIsAuto();
                                     bool timezoneAuto =
                                         await DatetimeSetting.timeZoneIsAuto();
-                                    print("AUTO TIME $timeAuto");
-                                    print("AUTO TIME ZONE $timezoneAuto");
                                     if (!timeAuto) {
                                       //DatetimeSetting.openSetting();
                                       showAutoTimeZone(
@@ -2077,14 +2018,14 @@ class _DefaultPageState extends State<DefaultPage> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8),
                                     child: CircleAvatar(
+                                      backgroundColor:
+                                          Mythemes.lightBluishColor,
+                                      radius: 30,
                                       child: Icon(
                                         Icons.work_history,
                                         size: 30,
                                         color: Mythemes.creamColor,
                                       ),
-                                      backgroundColor:
-                                          Mythemes.lightBluishColor,
-                                      radius: 30,
                                     ),
                                   ),
                                   Container(height: 5),
@@ -2132,7 +2073,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                   bool isFakeLocation =
                                       await DetectFakeLocation()
                                           .detectFakeLocation();
-                                  print("Fake Location - $isFakeLocation");
                                   if (isFakeLocation == true) {
                                     showDialog(
                                       context: context,
@@ -2158,8 +2098,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                         await DatetimeSetting.timeIsAuto();
                                     bool timezoneAuto =
                                         await DatetimeSetting.timeZoneIsAuto();
-                                    print("AUTO TIME $timeAuto");
-                                    print("AUTO TIME ZONE $timezoneAuto");
                                     if (!timeAuto) {
                                       //DatetimeSetting.openSetting();
                                       showAutoTimeZone(
@@ -2170,7 +2108,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                     } else {
                                       clockingType = "Out";
                                       if (attAction == '0') {
-                                        print("ORGID - $orgId");
                                         if (setGeofenceActive == true) {
                                           showGeofenceDialogPunchOut(
                                             context,
@@ -2189,7 +2126,6 @@ class _DefaultPageState extends State<DefaultPage> {
                                 } else {
                                   clockingType = "Out";
                                   if (attAction == '0') {
-                                    print("ORGID - $orgId");
                                     if (setGeofenceActive == true) {
                                       showGeofenceDialogPunchOut(
                                         context,
@@ -2210,13 +2146,13 @@ class _DefaultPageState extends State<DefaultPage> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 10),
                                     child: CircleAvatar(
+                                      backgroundColor: Mythemes.dangerColorOne,
+                                      radius: 30,
                                       child: Icon(
                                         Icons.touch_app,
                                         size: 30,
                                         color: Mythemes.creamColor,
                                       ),
-                                      backgroundColor: Mythemes.dangerColorOne,
-                                      radius: 30,
                                     ),
                                   ),
                                   Container(height: 5),
@@ -2265,7 +2201,6 @@ class _DefaultPageState extends State<DefaultPage> {
         TextButton(
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
-            print("ORGID - $orgId");
             if (setGeofenceActive == true) {
               showGeofenceDialog(
                 buildContext,
@@ -2360,19 +2295,13 @@ class _DefaultPageState extends State<DefaultPage> {
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
-    print('result${result}');
 
-    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
-    print(
-      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
-    );
     if (response.statusCode == 200) {
-      print("I m Punch in");
       Navigator.of(context, rootNavigator: true).pop();
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessStay(
           context,
-          reasonSuccess.upperCamelCase + " " + formattedDate,
+          "${reasonSuccess.upperCamelCase} $formattedDate",
           "Successfully Punch In",
         );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
@@ -2428,11 +2357,6 @@ class _DefaultPageState extends State<DefaultPage> {
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
 
-    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
-    print(
-      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
-    );
-    print("I m Punch in");
 
     // âœ… Always pop loader safely
     if (rootContext.mounted) {
@@ -2487,19 +2411,13 @@ class _DefaultPageState extends State<DefaultPage> {
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
-    print('result${result}');
 
-    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
-    print(
-      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
-    );
     if (response.statusCode == 200) {
-      print("I m Punch Out");
       Navigator.of(context, rootNavigator: true).pop();
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessStay(
           context,
-          reasonSuccess.upperCamelCase + " " + formattedDate,
+          "${reasonSuccess.upperCamelCase} $formattedDate",
           "Successfully Punch Out",
         );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
@@ -2551,14 +2469,8 @@ class _DefaultPageState extends State<DefaultPage> {
     result = json.decode(response.body.toString());
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
-    print('result${result}');
 
-    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
-    print(
-      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
-    );
     if (response.statusCode == 200) {
-      print("I m Punch Out");
       // âœ… Always pop loader safely
       if (rootContext.mounted) {
         Navigator.of(rootContext, rootNavigator: true).pop();
@@ -2567,7 +2479,7 @@ class _DefaultPageState extends State<DefaultPage> {
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessStay(
           rootContext,
-          reasonSuccess.upperCamelCase + " " + formattedDate,
+          "${reasonSuccess.upperCamelCase} $formattedDate",
           "Successfully Punch Out",
         );
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
@@ -2590,8 +2502,6 @@ class _DefaultPageState extends State<DefaultPage> {
   Future punchInnew(String? sessionId) async {
     double lat = currentPostion!.latitude;
     double lng = currentPostion!.longitude;
-    print('click $lat');
-    print('click $lng');
     var urlapi = Uri.parse(
       "http://www.employroll.com/restful/service/attendance/via/mobile/without/image?"
       "sessionId=$sessionId&"
@@ -2608,12 +2518,12 @@ class _DefaultPageState extends State<DefaultPage> {
       "battery=$sessionId&",
     );
     final response = await MobileHttpClient.instance.get(urlapi);
-    print({response.request});
   }
 
   Future<String?> _getId() async {
     var deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    return null;
     /*  print('Running on ${androidInfo.model}');
     print('Running on ${androidInfo.androidId}');
     print('Running on ${androidInfo.device}');
@@ -2635,7 +2545,7 @@ class _DefaultPageState extends State<DefaultPage> {
 }
 
 class Workflow extends StatelessWidget {
-  const Workflow({Key? key}) : super(key: key);
+  const Workflow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -2644,7 +2554,7 @@ class Workflow extends StatelessWidget {
 }
 
 class MyRequests extends StatelessWidget {
-  const MyRequests({Key? key}) : super(key: key);
+  const MyRequests({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -2653,7 +2563,7 @@ class MyRequests extends StatelessWidget {
 }
 
 class Report extends StatelessWidget {
-  const Report({Key? key}) : super(key: key);
+  const Report({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -2676,7 +2586,7 @@ class _ProfileCheckState extends State<ProfileCheck> {
 }
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+  const Dashboard({super.key});
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -2688,17 +2598,11 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    print(
-      '[MOBILE-DASHBOARD] homePage Dashboard wrapper init userPanelPermission=$userPanelPermission',
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isMss = userPanelPermission == "USER";
-    print(
-      '[MOBILE-DASHBOARD] homePage Dashboard wrapper build target=${isMss ? "MSS" : "ESS"} userPanelPermission=$userPanelPermission',
-    );
     return isMss
         ? mss.Admin_UIS_Dashboard(DashboardModel())
         : ess.EssAdminDashboard(EssDashboarrdModel());
@@ -2706,6 +2610,8 @@ class _DashboardState extends State<Dashboard> {
 }
 
 class DrawerFile extends StatefulWidget {
+  const DrawerFile({super.key});
+
   @override
   State<DrawerFile> createState() => _DrawerFileState();
 }
@@ -2745,7 +2651,6 @@ class _DrawerFileState extends State<DrawerFile> {
 
   Future<void> getSharedPreferences() async {
     orgId = await shared.getOrgId();
-    print("Org Id Check - $orgId");
     selectedProfileId = await shared.getDefaultProfileId();
     selectedProfileName = await shared.getDefaultProfileName();
 
@@ -2769,7 +2674,6 @@ class _DrawerFileState extends State<DrawerFile> {
     selectedProfileId = await shared.getDefaultProfileId();
     selectedProfileName = await shared.getDefaultProfileName();
 
-    print("$selectedProfileId");
     // Optional: update the ValueNotifiers if needed globally
     selectedProfileIdNotifier.value = selectedProfileId;
     selectedProfileNameNotifier.value = selectedProfileName!;
@@ -2787,11 +2691,7 @@ class _DrawerFileState extends State<DrawerFile> {
       profileListGetter.clear();
       profileListGetter.addAll(profileListModal?.data ?? []);
 
-      print('[MOBILE-AUTH] PROFILE_CACHE -> count=${profileListGetter.length}');
       for (int i = 0; i < profileListGetter.length; i++) {
-        print(
-          'Profile ${i + 1} -> ${profileListGetter[i].profileName} permissions=${profileListGetter[i].profilePermission?.length ?? 0}',
-        );
       }
 
       if (profileListGetter.isNotEmpty) {
@@ -2816,12 +2716,10 @@ class _DrawerFileState extends State<DrawerFile> {
       } else {
         selectedProfileId = 0;
         selectedProfileName = '';
-        print('[MOBILE-AUTH] PROFILE_CACHE -> profile list is empty');
       }
 
       return profileListModal ?? ProfileListModal(data: <ProfileData>[]);
     } catch (e) {
-      print('[MOBILE-AUTH] PROFILE_CACHE -> error=$e');
       return ProfileListModal(data: <ProfileData>[]);
     } finally {
       setState(() {
@@ -2839,9 +2737,6 @@ class _DrawerFileState extends State<DrawerFile> {
     tourReqCount = prefs.getInt("tourReqCount") ?? 0;
     attReqCount = prefs.getInt("attReqCount") ?? 0;
 
-    print(
-      "Loaded counts â†’ attReqCount: $attReqCount, leaveReqCount: $leaveReqCount",
-    );
   }
 
   Future<void> getRequisitionCounts(String sessionId) async {
@@ -2860,8 +2755,6 @@ class _DrawerFileState extends State<DrawerFile> {
 
       final response = await MobileHttpClient.instance.post(urlapi);
 
-      print("Requisition Count API - ${response.request}");
-      print("Response Body - ${response.body}");
 
       Map<String, dynamic> mapResponse = json.decode(response.body);
 
@@ -2908,9 +2801,7 @@ class _DrawerFileState extends State<DrawerFile> {
       await prefs.setInt("tourReqCount", tourReqCount);
       await prefs.setInt("attReqCount", attReqCount);
 
-      print("Saved Requisition Counts to SharedPreferences âœ…");
     } catch (e) {
-      print("Error fetching requisition counts: $e");
     } finally {
       setState(() {
         //isLoading = false; // hide loader always
@@ -2927,30 +2818,24 @@ class _DrawerFileState extends State<DrawerFile> {
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -3468,7 +3353,6 @@ class _DrawerFileState extends State<DrawerFile> {
                                               "EXIT_RESIGN_REQUEST_LIST_VIEW",
                                             ) ==
                                             true) {
-                                          print("true");
                                           shared.setExitResignationListShow(
                                             "true",
                                           );
@@ -3476,7 +3360,6 @@ class _DrawerFileState extends State<DrawerFile> {
                                             "1",
                                           );
                                         } else {
-                                          print("false");
                                           shared.setExitResignationListShow(
                                             "false",
                                           );

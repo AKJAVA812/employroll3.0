@@ -8,7 +8,7 @@ class LoginFaild {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -28,9 +28,9 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['result'] = this.result;
-    data['reason'] = this.reason;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['result'] = result;
+    data['reason'] = reason;
     return data;
   }
 }

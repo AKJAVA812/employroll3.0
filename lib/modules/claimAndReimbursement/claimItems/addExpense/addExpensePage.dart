@@ -18,7 +18,7 @@ import 'dart:io';
 import '../modalClass/addExpensesDropsModal.dart';
 
 class AddExpensePage extends StatefulWidget {
-  const AddExpensePage({Key? key}) : super(key: key);
+  const AddExpensePage({super.key});
 
   @override
   State<AddExpensePage> createState() => _AddExpensePageState();
@@ -50,12 +50,12 @@ Map<String, dynamic> catMapResponse = {};
 SessionManager shared = SessionManager();
 
 String? sessionId;
-late List<String?> list = [];
-late List<String?> expList = [];
-late List<String?> subExpList = [];
-late List<String?> catList = [];
-late List<int?> policyList = [];
-late List<String?> newList = [];
+List<String?> list = [];
+List<String?> expList = [];
+List<String?> subExpList = [];
+List<String?> catList = [];
+List<int?> policyList = [];
+List<String?> newList = [];
 AddExpDropPolicyModal? addExpDropPolicyLabel;
 AddExpensesDrops? addExpensesDropsLabel;
 String valuenew = "listText";
@@ -139,19 +139,15 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.addExpDropPolicy;
-    print('employeeList11: ${SessionId}');
     AddExpDropPolicyModal addExpensesDrops;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
-    print('URL ${response.request}');
     mapResponse = json.decode(response.body);
     catMapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     addExpensesDrops = AddExpDropPolicyModal.fromJson(mapResponse);
     int length = addExpensesDrops.claimDataList!.length;
-    print('totallenth $length ');
     for (int i = 0; i < addExpensesDrops.claimDataList!.length; i++) {
       String? policyName = addExpensesDrops.claimDataList![i].policyName;
       policyIdCheck = addExpensesDrops.claimDataList![i].policyId;
@@ -159,15 +155,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
       String? policyCode = addExpensesDrops.claimDataList![i].policyCode;
       list.add(addExpensesDrops.claimDataList![i].policyName);
       policyList.add(addExpensesDrops.claimDataList![i].policyId);
-      print('dataExpense $policyName');
-      print('dataExpense $policyIdCheck');
-      print('dataExpense $claimIdCheck');
-      print('dataExpense $policyCode');
     }
     String? newPolicyCode = addExpensesDrops.claimDataList![0].policyCode;
     newList.add(addExpensesDrops.claimDataList![0].policyName);
-    print('new policy $newPolicyCode');
-    print('listdata $list');
 
     return addExpensesDrops;
   }
@@ -182,7 +172,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.addExpenseDrops;
-    print('employeeList11: ${SessionId}');
     AddExpensesDrops addExpensesDrops;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -191,38 +180,26 @@ class _AddExpensePageState extends State<AddExpensePage> {
       "policyId=$policyIdCheck",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URLNEW ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
     addExpensesDrops = AddExpensesDrops.fromJson(mapResponse);
     int length = addExpensesDrops.expenseDataList!.length;
-    print('totallenth $length ');
     for (int i = 0; i < addExpensesDrops.expenseDataList!.length; i++) {
       expName = addExpensesDrops.expenseDataList![i].expenseName;
 
       expList.add(addExpensesDrops.expenseDataList![i].expenseName);
       policyList.add(addExpensesDrops.expenseDataList![i].expenseId);
-      print('dataExpenseType $expName');
-      print('dataExpense $policyIdCheck');
-      print('dataExpense $claimIdCheck');
     }
     for (int i = 0; i < addExpensesDrops.subExpDataList!.length; i++) {
       subExpName = addExpensesDrops.subExpDataList![i].subExpName;
       subExpId = addExpensesDrops.subExpDataList![i].subExpId;
-      print("SubExpId - $subExpId");
       subExpList.add(addExpensesDrops.subExpDataList![i].subExpName);
       //policyList.add(addExpensesDrops.expenseDataList![i].expenseId);
-      print('Sub Exp Name $subExpName');
-      print('Sub Exp Id $subExpId');
-      print('dataExpense $policyIdCheck');
-      print('dataExpense $claimIdCheck');
     }
     for (int i = 0; i < addExpensesDrops.catDataList!.length; i++) {
       catId = addExpensesDrops.catDataList![i].catId;
       catList.add(addExpensesDrops.catDataList![i].catName);
-      print('Catid - $catId');
     }
 
     /*for(int i=0; i<addExpensesDrops.catDataList!.length;i++){
@@ -245,7 +222,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
     //String? newPolicyCode = addExpensesDrops.expenseDataList![0].policyCode;
     //newList.add(addExpensesDrops.expenseDataList![0].expenseName);
 
-    print('listdata $list');
 
     return addExpensesDrops;
   }
@@ -258,7 +234,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
     var baseUrl = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
 
     final response = await MobileHttpClient.instance.post(baseUrl);
-    print('responseemployeeList ${response.body}');
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
       setState(() {
@@ -286,7 +261,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
             height: 120,
             child: Column(
               children: [
-                ButtonBar(
+                OverflowBar(
                   alignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
@@ -299,21 +274,15 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
                           //picker.dispose();
                           if (imageValue == null) return;
-                          print(
-                            "Heloo ji "
-                            "$imageValue",
-                          );
                           setState(() {
                             final imagePath = File(imageValue!.path);
                             //this._workDoneImage=imagePath;
                             file = File(imageValue!.path);
                             filePath.text = File(imageValue!.path).toString();
-                            print("IMage name - $file");
                           });
                           imageValue = null;
                           //imageCache.clear();
                         } on Exception catch (e) {
-                          print('failed to upload: $e');
                         }
                         Navigator.pop(context);
                       },
@@ -330,7 +299,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                           final file = result.files.first;
                           filePath.text = file.name;
                           //print('Bytes: ${file.bytes}');
-                          print('Name: ${file.name}');
 
                           //print('Size: ${file.size}');
                           //print('Size: ${file.extension}');
@@ -350,7 +318,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
           //print('File Object: $file');
         });*/
                         } catch (e) {
-                          print('Error picking file: $e');
                         }
                         Navigator.pop(context);
                       },
@@ -405,7 +372,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                   ).format(fromDate!);
                                 });
 
-                                print(fromDate);
                               },
                               readOnly: true,
                               enabled: true,
@@ -462,7 +428,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                   ).format(toDate!);
                                 });
 
-                                print(toDate);
                               },
                               readOnly: true,
                               enabled: true,
@@ -638,7 +603,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                   ) {
                                     final truncatedValue =
                                         value!.length > 18
-                                            ? value.substring(0, 18) + '...'
+                                            ? '${value.substring(0, 18)}...'
                                             : value;
                                     return DropdownMenuItem<String>(
                                       value: value,
@@ -663,8 +628,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 int i = list.indexOf(valuenew);
                                 int? policyidnew = policyList.elementAt(i);
                                 setState(() {
-                                  print('value1 $i');
-                                  print('value $policyidnew');
                                   dropdownvalue = newVal;
                                   Future<AddExpensesDrops> getAppReq12 =
                                       getExpTypeList(sessionId!);
@@ -732,7 +695,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                     // Truncate the value if it exceeds a certain length
                                     final truncatedValue =
                                         value!.length > 18
-                                            ? value.substring(0, 18) + '...'
+                                            ? '${value.substring(0, 18)}...'
                                             : value;
                                     return DropdownMenuItem<String>(
                                       value: value,
@@ -751,7 +714,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                   int i = expList.indexOf(valuenew);
                                   expIdNew =
                                       mapResponse['expenseDataList'][i]['expenseId'];
-                                  print('EXPENSE ID -  $expIdNew');
 
                                   /*subExpId = mapResponse['subExpDataList'][i]['expenseId'];
                                     subExpName = mapResponse['subExpDataList'][i]['subExpName'];
@@ -811,7 +773,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                     // Truncate the value if it exceeds a certain length
                                     final truncatedValue =
                                         value!.length > 18
-                                            ? value.substring(0, 18) + '...'
+                                            ? '${value.substring(0, 18)}...'
                                             : value;
                                     return DropdownMenuItem<String>(
                                       value: value,
@@ -831,7 +793,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                   int i = subExpList.indexOf(valuenew);
                                   subExpId =
                                       mapResponse['subExpDataList'][i]['subExpId'];
-                                  print('SUB EXPENSE ID -  $subExpId');
 
                                   for (
                                     int j = 0;
@@ -849,9 +810,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                         addExpensesDropsLabel!
                                             .catDataList![j]
                                             .subExpId) {
-                                      print(
-                                        "Category Subexp Id - $catSubExpId",
-                                      );
                                       catList.add(
                                         addExpensesDropsLabel!
                                             .catDataList![j]
@@ -918,7 +876,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                     // Truncate the value if it exceeds a certain length
                                     final truncatedValue =
                                         value!.length > 18
-                                            ? value.substring(0, 18) + '...'
+                                            ? '${value.substring(0, 18)}...'
                                             : value;
                                     return DropdownMenuItem<String>(
                                       value: value,
@@ -946,7 +904,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                         addExpensesDropsLabel!
                                             .catDataList![j]
                                             .catId;
-                                    print('cat ID -  $catId');
                                   }
                                 });
                               },
@@ -1085,8 +1042,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 ),
                               ),
                               items: [
-                                DropdownMenuItem(child: Text('Yes'), value: 1),
-                                DropdownMenuItem(child: Text('No'), value: 2),
+                                DropdownMenuItem(value: 1, child: Text('Yes')),
+                                DropdownMenuItem(value: 2, child: Text('No')),
 
                                 /* DropdownMenuItem(
                                       child: Text('Advance'),
@@ -1162,29 +1119,13 @@ class _AddExpensePageState extends State<AddExpensePage> {
         bottomNavigationBar: Container(
           height: 80,
           color: context.cardColor,
-          child: ButtonBar(
+          child: OverflowBar(
             alignment: MainAxisAlignment.center,
-            buttonPadding: Vx.mOnly(right: 16),
             children: [
               ElevatedButton(
                 onPressed: () {
                   //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
-                  file == null ? 0 : file;
-                  print(_fromDateController.text);
-                  print(_toDateController.text);
-                  print(_fromPlaceController.text);
-                  print(_toPlaceController.text);
-                  print(_purposeController.text);
-                  print(claimIdCheck);
-                  print(policyIdCheck);
-                  print(catId);
-                  print(subExpId);
-                  print(expIdNew);
-                  print(_remarksController.text);
-                  print(_amountController.text);
-                  print(billAllow);
-                  print(_distanceController.text);
-                  print(file);
+                  file ?? 0;
                   saveExpense(
                     sessionId!,
                     _fromDateController.text,
@@ -1208,7 +1149,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   );
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.lightBluishColor,
                   ),
                 ),
@@ -1295,7 +1236,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
     request.fields['perkilometer'] = _distanceController.text;
     request.fields['claimNumberRequition'] = "0";
     request.fields['claimReqId'] = "0";
-    print('URL $uri');
 
     /*  String jsonString = createJsonWithImage(imageValue);
 
@@ -1345,10 +1285,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
 
     //final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(this.context);
       mapResponse = json.decode(response.body);
       //String reason = mapResponse['reason'];
@@ -1359,7 +1297,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           this.context,
-          result.upperCamelCase + " ",
+          "${result.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -1375,7 +1313,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

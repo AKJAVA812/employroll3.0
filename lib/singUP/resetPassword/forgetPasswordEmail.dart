@@ -24,7 +24,6 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
     String apiUrl = ApiDetails.otpSendApi;
     final url = Uri.parse('$conn$apiUrl?email=${emailController.text}');
 
-    print("Calling API: $url");
 
     // Show loader
     showDialog(
@@ -35,8 +34,6 @@ class _ForgotPasswordEmailPageState extends State<ForgotPasswordEmailPage> {
 
     try {
       final response = await MobileHttpClient.instance.post(url);
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       // Dismiss loader
       Navigator.of(context, rootNavigator: true).pop();

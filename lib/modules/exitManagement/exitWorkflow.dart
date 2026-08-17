@@ -2,9 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:er_flutter_project/modules/exitManagement/exitList.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -26,14 +24,14 @@ import 'modalClasses/separationListModal.dart';
 class ExitWorkflow extends StatefulWidget {
   int? empId;
   String? empName;
-  ExitWorkflow(this.empId, this.empName);
+  ExitWorkflow(this.empId, this.empName, {super.key});
 
   @override
   State<ExitWorkflow> createState() => _ExitWorkflowState(empId, empName);
 }
 
 SeparationListModal? separationListLabel;
-late List<String?> separationList = [];
+List<String?> separationList = [];
 
 SessionManager sessionManager = SessionManager();
 Map<String, dynamic> mapResponse = {};
@@ -210,7 +208,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ButtonBar(
+              OverflowBar(
                 alignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
@@ -287,7 +285,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
   void initState() {
     empIds = empId;
     empNames = empName;
-    print("EMP Id- $empIds");
     getSharedPrfanceList();
     setState(() {});
     // TODO: implement initState
@@ -314,20 +311,14 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
     separationList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.exitSeparationListApi;
-    print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['leaveTypeList'];
-    print("GETDATA $getData");
 
-    print('responseLeaveTypeList $getData');
     separationListLabel = SeparationListModal.fromJson(mapResponse);
     int? length = separationListLabel?.list?.length;
 
-    print('totalleaveLength $length ');
     /*for(int i=0; i<leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;i++){
       String? leaveTypeName = leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i];
         leaveTypeList.add(leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i]);
@@ -355,7 +346,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
         bottomNavigationBar: Container(
           height: 75,
           color: context.cardColor,
-          child: ButtonBar(
+          child: OverflowBar(
             alignment: MainAxisAlignment.center,
             //buttonPadding: Vx.mOnly(right: 16),
             children: [
@@ -382,7 +373,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                   }
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.successColor,
                   ),
                 ),
@@ -400,7 +391,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Container(
+                  SizedBox(
                     height: 720,
                     child: SingleChildScrollView(
                       child: Card(
@@ -597,8 +588,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                       .toString()
                                       .split('-');
                                   String idn = separationListGlobal.last;
-                                  print('SeparationId $separationListId');
-                                  print('Separation Name $separationName');
                                   setState(() {
                                     dropdownNewvalue = newVal;
                                   });
@@ -1045,8 +1034,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                           separationName = mapResponse['list'][i]['name'];
                           separationListGlobal = newVal.toString().split('-');
                           String idn = separationListGlobal.last;
-                          print('SeparationId $separationListId');
-                          print('Separation Name $separationName');
                           setState(() {
                             dropdownNewvalue = newVal;
                           });
@@ -1263,6 +1250,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -1270,7 +1258,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -1317,6 +1304,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -1324,7 +1312,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -1371,6 +1358,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -1378,7 +1366,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -1425,6 +1412,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -1432,7 +1420,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -3947,6 +3934,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -3954,7 +3942,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -3994,7 +3981,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                       ).format(fromDate!);
                                     });
 
-                                    print(fromDate);
                                   },
                                   readOnly: true,
                                   enabled: true,
@@ -4059,6 +4045,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4066,7 +4053,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4113,6 +4099,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4120,7 +4107,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4163,6 +4149,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4170,7 +4157,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4194,7 +4180,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
 
     return
     //ignore this section please
-    ButtonBar(
+    OverflowBar(
       children: [
         /*ElevatedButton(
             onPressed: () {
@@ -4246,7 +4232,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
                   ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -4292,17 +4277,14 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -4310,9 +4292,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -4322,15 +4301,13 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
 
         // Handle success or error response
         if (status.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (status.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -4564,20 +4541,16 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
       "docs=$docs",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String reason = mapResponse['reason'];
       String status = mapResponse['status'];
-      print('reason both $reason $status');
-      print('reason${reason}');
       if (status.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (status.compareToIgnoringCase("error") == 0) {
@@ -4636,20 +4609,16 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
       "docs=$docs",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(context);
       mapResponse = json.decode(response.body);
       String reason = mapResponse['reason'];
       String status = mapResponse['status'];
-      print('reason both $reason $status');
-      print('reason${reason}');
       if (status.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (status.compareToIgnoringCase("error") == 0) {
@@ -4761,10 +4730,6 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
 
   void openFile(PlatformFile file) {
     OpenFile.open(file.path!);
-    print('Bytes: ${file.name}');
-    print('Size: ${file.size}');
-    print('Size: ${file.extension}');
-    print('Path: ${file.path}');
   }
 
   Future<File> saveFilePermanently(PlatformFile file) async {
@@ -4777,7 +4742,7 @@ class _ExitWorkflowState extends State<ExitWorkflow> {
 // The DismissKeybaord widget (it's reusable)
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

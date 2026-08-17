@@ -21,7 +21,7 @@ import '../../themes/empThemes.dart';
 import 'modalClass/onboardingListModal.dart';
 
 class OnboardListView extends StatefulWidget {
-  const OnboardListView({Key? key}) : super(key: key);
+  const OnboardListView({super.key});
 
   static const String _title = 'Employee List';
 
@@ -67,15 +67,13 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
-    print("Status $statusUpdate");
     // await Future.delayed(Duration(seconds: 5));
     Future<OnboardingListModal> getEmployeeList11 = getEmployeeList(sessionId!);
     final loading = Row(
@@ -92,14 +90,12 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
         onboardingListModalGlobal = value;
         onboardingListModalGlobaled = onboardingListModalGlobal;
       });
-      print('employeeList00${onboardingListModalGlobal!.data!.length}');
     });
   }
 
   Future<OnboardingListModal> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.onboardingList;
-    print('employeeList11: ${SessionId}');
     OnboardingListModal employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -107,12 +103,9 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
       "status=$statusUpdate",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = OnboardingListModal.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
 
@@ -120,7 +113,6 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -221,7 +213,6 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -233,7 +224,6 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
           }
           if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Onboarding');
           }
           if (index == 3) {
             Navigator.push(
@@ -243,14 +233,12 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -346,7 +334,6 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
                   onChanged: (i) {
                     setState(() {
                       value = i;
-                      print(i);
                     });
                     if (value == 0) {
                       statusUpdate = "DRAFT";
@@ -384,7 +371,7 @@ class _OnboardListViewState extends State<OnboardListView> with RouteAware {
 class MyStatelessWidget extends StatefulWidget {
   final OnboardingListModal employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -433,7 +420,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
               Navigator.pop(context);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -488,8 +474,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
           onTap: () {
             empId = foundDataNew![i].emailId;
             empName = foundDataNew![i].firstName;
-            print('ID $empId');
-            print('NameCheck $empName');
             Navigator.pushNamed(context, MyRoutings.addInductionProcessRoute);
             //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
           },
@@ -555,7 +539,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          "$statusUpdate".text
+                          statusUpdate.text
                               .color(
                                 statusUpdate == "DRAFT"
                                     ? Mythemes.alertColor

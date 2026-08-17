@@ -5,7 +5,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 
 class ProjectManageItems extends StatelessWidget {
-  const ProjectManageItems({Key? key}) : super(key: key);
+  const ProjectManageItems({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class ProjectManageItems extends StatelessWidget {
 }
 
 class ItemsList extends StatefulWidget {
-  const ItemsList({Key? key}) : super(key: key);
+  const ItemsList({super.key});
 
   @override
   State<ItemsList> createState() => _ItemsListState();

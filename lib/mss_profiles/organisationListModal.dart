@@ -19,9 +19,9 @@ class OrganisationListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.list != null) {
-      data['list'] = this.list!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (list != null) {
+      data['list'] = list!.map((v) => v.toJson()).toList();
     }
     data['parentOrgId'] = parentOrgId;
     return data;
@@ -59,12 +59,12 @@ class OrgList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['orgName'] = this.orgName;
-    data['displayName'] = this.displayName;
-    data['id'] = this.id;
-    data['parentOrgId'] = this.parentOrgId;
-    data['parentName'] = this.parentName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['orgName'] = orgName;
+    data['displayName'] = displayName;
+    data['id'] = id;
+    data['parentOrgId'] = parentOrgId;
+    data['parentName'] = parentName;
     return data;
   }
 }

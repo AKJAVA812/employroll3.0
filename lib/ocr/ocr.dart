@@ -12,7 +12,7 @@ import '../commanScreen/recognization_page.dart';
 import '../themes/empThemes.dart';
 
 class OCRPage extends StatefulWidget {
-  const OCRPage({Key? key}) : super(key: key);
+  const OCRPage({super.key});
 
   @override
   State<OCRPage> createState() => _OCRPageState();
@@ -62,7 +62,7 @@ class _OCRPageState extends State<OCRPage> {
             height: 120,
             child: Column(
               children: [
-                ButtonBar(
+                OverflowBar(
                   alignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(

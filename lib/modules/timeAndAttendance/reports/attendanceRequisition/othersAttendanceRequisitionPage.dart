@@ -29,7 +29,7 @@ class OthersAttendanceRequisition extends StatefulWidget {
   OthersAttendanceRequisition(
     this.attendanceModelGlobel,
     this.onDateAttModel,
-    this.indexCont,
+    this.indexCont, {super.key}
   );
 
   @override
@@ -73,7 +73,6 @@ class _OthersAttendanceRequisitionState
     //print('responseemployeeList $empid');
 
     if (attendanceModelGlobel != null) {
-      print('attendanceModelGlobel');
       branchNameset = attendanceModelGlobel!.data![indexCont].branchName;
       departmentset = attendanceModelGlobel!.data![indexCont].departmentName;
       employeeNameset = attendanceModelGlobel!.data![indexCont].employeeName;
@@ -82,7 +81,6 @@ class _OthersAttendanceRequisitionState
       actualOutTimeset = attendanceModelGlobel!.data![indexCont].outTime;
       empId = attendanceModelGlobel!.data![indexCont].empId;
     } else {
-      print('onModelrun');
       branchNameset = onDateAttModel!.branchName;
       departmentset = onDateAttModel!.departmentName;
       employeeNameset = onDateAttModel!.employeeName;
@@ -335,7 +333,6 @@ class _OthersAttendanceRequisitionState
                                   );
                                 },
                               );
-                              print('timenewOut $n');
                               setState(() {
                                 var now = DateTime.now();
                                 DateTime newt = DateTime(
@@ -346,7 +343,6 @@ class _OthersAttendanceRequisitionState
                                   n.minute,
                                 );
                                 var nT = DateFormat('HH:mm').format(newt);
-                                print(DateFormat('HH:mm').format(newt));
                                 _inTimePicker = nT;
                               });
                             },
@@ -440,7 +436,6 @@ class _OthersAttendanceRequisitionState
                                   );
                                 },
                               );
-                              print('timenewOut $o');
                               setState(() {
                                 var newNow = DateTime.now();
                                 DateTime newt = DateTime(
@@ -451,7 +446,6 @@ class _OthersAttendanceRequisitionState
                                   o.minute,
                                 );
                                 var oT = DateFormat('HH:mm').format(newt);
-                                print(DateFormat('HH:mm').format(newt));
                                 _outTimePicker = oT;
                               });
                             },
@@ -508,9 +502,8 @@ class _OthersAttendanceRequisitionState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ButtonBar(
+                      OverflowBar(
                         alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
                         children: [
                           ElevatedButton(
                             onPressed: () {
@@ -580,9 +573,8 @@ class _OthersAttendanceRequisitionState
                                         return setState(() {
                                           CommonNotificationPage.showWorkDoneSuccess(
                                             context,
-                                            "Your working hours going to negative, Please select requisition time correctly."
-                                                    .upperCamelCase +
-                                                " ",
+                                            "${"Your working hours going to negative, Please select requisition time correctly."
+                                                    .upperCamelCase} ",
                                             "Alert Message",
                                           );
                                         });
@@ -630,7 +622,7 @@ class _OthersAttendanceRequisitionState
                               }
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.lightBluishColor,
                               ),
                             ),
@@ -661,7 +653,6 @@ class _OthersAttendanceRequisitionState
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.pop(context);
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -669,11 +660,9 @@ class _OthersAttendanceRequisitionState
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
             }
             if (index == 3) {
               Navigator.push(
@@ -683,7 +672,6 @@ class _OthersAttendanceRequisitionState
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -691,7 +679,6 @@ class _OthersAttendanceRequisitionState
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -765,15 +752,12 @@ class _OthersAttendanceRequisitionState
       if (nextday) 'nextday': true,
       if (compOff) 'compOff': true,
     };
-    print('[ATT_REQ_MOBILE] -> ${ApiDetails.mobileAttendanceRequisition} body=$body requestId=$requestId');
     final response = await foundation.postJson(
       ApiDetails.mobileAttendanceRequisition,
       body: body,
       headers: await foundation.authHeaders(requestId: requestId, json: true),
       tag: 'ATT_REQ_MOBILE',
     );
-    print('[ATT_REQ_MOBILE] request ${response.request}');
-    print('[ATT_REQ_MOBILE] <- status=${response.statusCode} body=${response.body}');
     Navigator.of(context, rootNavigator: true).pop();
 
     mapResponse = response.body.isNotEmpty ? json.decode(response.body) : {};
@@ -788,7 +772,6 @@ class _OthersAttendanceRequisitionState
     } else {
       showDialgSucess1(context, reason.isEmpty ? result : reason, "Warning");
     }
-    print('[ATT_REQ_MOBILE] result=$result reason=$reason');
   }
 
   Future<void> sendRequsitionToServer(
@@ -815,7 +798,6 @@ class _OthersAttendanceRequisitionState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
 
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
@@ -837,7 +819,6 @@ class _OthersAttendanceRequisitionState
           showDialgSucess1(context, result, "Error");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -866,7 +847,6 @@ class _OthersAttendanceRequisitionState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.pop(context);
       String result = "";
@@ -885,7 +865,6 @@ class _OthersAttendanceRequisitionState
           showDialgSucess1(context, result, "Error");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -914,7 +893,6 @@ class _OthersAttendanceRequisitionState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.pop(context);
       String result = "";
@@ -933,7 +911,6 @@ class _OthersAttendanceRequisitionState
           showDialgSucess1(context, result, "Error");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -985,7 +962,7 @@ class _OthersAttendanceRequisitionState
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

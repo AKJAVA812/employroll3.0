@@ -60,7 +60,7 @@ class TravelExpenseRequestUpdate extends StatefulWidget {
     this.claimedAmount,
     this.remarks,
     this.documents,
-    this.claimIdCheck,
+    this.claimIdCheck, {super.key}
   );
 
   @override
@@ -87,10 +87,10 @@ class TravelExpenseRequestUpdate extends StatefulWidget {
       );
 }
 
-late List<String?> reimbursementTypeList = [];
-late List<String?> expCategoryList = [];
-late List<String?> subExpCategoryList = [];
-late List<String?> subSubExpCategoryList = [];
+List<String?> reimbursementTypeList = [];
+List<String?> expCategoryList = [];
+List<String?> subExpCategoryList = [];
+List<String?> subSubExpCategoryList = [];
 
 List<CardData> cardList = [];
 
@@ -161,7 +161,7 @@ class _TravelExpenseRequestUpdateState
           height: 120,
           child: Column(
             children: [
-              ButtonBar(
+              OverflowBar(
                 alignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
@@ -240,40 +240,24 @@ class _TravelExpenseRequestUpdateState
         reimbursementTypeListModal = value;
       });
       reimbursementTypeCheck = reimbursementType;
-      print("Reimbursement Type Check - $reimbursementTypeCheck");
       reimbursementTypeIdCheck = reimbursementTypeId;
-      print("Reimbursement Type ID Check - $reimbursementTypeIdCheck");
       expCategoryCheck = expCategory;
-      print("Expense Category - $expCategoryCheck");
       expCategoryIdCheck = expCategoryIdNew;
 
       subExpCategoryCheck = subExpCategory;
-      print("Sub Expense Category - $subExpCategoryCheck");
       subExpCategoryIdCheck = subExpCategoryIdNew;
       travelFromCheck = travelFrom;
-      print("Travel From - $travelFromCheck");
       travelToCheck = travelTo;
-      print("Travel To - $travelToCheck");
       odometerStartCheck = odometerStart;
-      print("ODOMETER START - $odometerStartCheck");
       odometerEndCheck = odometerEnd;
-      print("ODOMETER End - $odometerEndCheck");
       merchantCheck = merchant;
-      print("MERCHANT - $merchantCheck");
       kilometersCheck = kilometers;
-      print("KM - $kilometersCheck");
       monthCheck = month;
-      print("Month - $monthCheck");
       claimDateCheck = claimDate;
-      print("Claim Date - $claimDateCheck");
       claimedAmountCheck = claimedAmount;
-      print("Claim Amount - $claimedAmountCheck");
       remarksCheck = remarks;
-      print("Remarks - $remarksCheck");
       documentsCheck = documents;
-      print("Document - $documentsCheck");
       claimIdChecks = claimIdChecking;
-      print("Claim Id - $claimIdChecks");
 
       expenseCatShow = false;
       subExpenseCatShow = false;
@@ -317,11 +301,9 @@ class _TravelExpenseRequestUpdateState
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['claimDataList'];
-    print('responseemployeeList $getData');
     reimbursementTypeListModal = ReimbursementTypeListModal.fromJson(
       mapResponse,
     );
@@ -332,7 +314,6 @@ class _TravelExpenseRequestUpdateState
       );
       reimbursementId = mapResponse['claimDataList'][i]['policyId'].toString();
 
-      print('ID -  $reimbursementId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -352,7 +333,6 @@ class _TravelExpenseRequestUpdateState
       // Make the HTTP request
       final response = await MobileHttpClient.instance.post(urlapi);
 
-      print('Default Check API - ${response.request}');
 
       // Check if the response is successful
       if (response.statusCode == 200) {
@@ -369,15 +349,9 @@ class _TravelExpenseRequestUpdateState
         claimIdChecks = mapResponse['claimId'];
 
         // Print the values to confirm they are retrieved correctly
-        print('Claim ID: $claimIdChecks');
-        print('Local Conveyance Taxi: $localConveyanceTaxi');
-        print('Mobile Reimbursement: $mobileReimbursement');
-        print('Conveyance Policy: $conveyance_policy');
-        print('Status: $status');
 
         Future<CategoriesModalClass> getCats = getCategories(sessionId);
         getCats.then((value) {
-          print("I am Category");
           setState(() {
             categoriesModalClass = value;
             if (conveyance_policy == true) {
@@ -423,11 +397,8 @@ class _TravelExpenseRequestUpdateState
 
         // You can now use these values in your app as needed
       } else {
-        print('Failed to fetch data. Status Code: ${response.statusCode}');
-        print('Response Body: ${response.body}');
       }
     } catch (e) {
-      print('An error occurred: $e');
     }
   }
 
@@ -451,7 +422,6 @@ class _TravelExpenseRequestUpdateState
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     /* var getData = mapResponse['data'];
@@ -465,7 +435,6 @@ class _TravelExpenseRequestUpdateState
       );
       expCategoryId = mapResponse['expenseDataList'][i]['expenseId'].toString();
 
-      print('Cat ID -  $expCategoryId');
     }
     //Sub Expense Category List
     for (int i = 0; i < mapResponse['subExpDataList'].length; i++) {
@@ -475,7 +444,6 @@ class _TravelExpenseRequestUpdateState
       subExpCategoryId =
           mapResponse['subExpDataList'][i]['subExpId'].toString();
 
-      print('Sub Cat ID -  $subExpCategoryId');
     }
     //Sub Sub Expense Category List
     for (int i = 0; i < mapResponse['catDataList'].length; i++) {
@@ -484,7 +452,6 @@ class _TravelExpenseRequestUpdateState
       );
       subSubExpCategoryId = mapResponse['catDataList'][i]['catId'].toString();
 
-      print('Sub Sub Cat ID -  $subSubExpCategoryId');
     }
 
     return categoriesModalClass;
@@ -508,15 +475,14 @@ class _TravelExpenseRequestUpdateState
     });
   }
 
-  List<int> _selectedDropdownValues = [];
-  List<int> _selectedDropdownValuesOne = [];
-  List<int> _selectedDropdownValuesTwo = [];
+  final List<int> _selectedDropdownValues = [];
+  final List<int> _selectedDropdownValuesOne = [];
+  final List<int> _selectedDropdownValuesTwo = [];
 
-  List<List<DropdownMenuItem<int>>> _dropdownItems = [];
-  List<List<DropdownMenuItem<int>>> _dropdownItemsOne = [];
-  List<List<DropdownMenuItem<int>>> _dropdownItemsTwo = [];
+  final List<List<DropdownMenuItem<int>>> _dropdownItems = [];
+  final List<List<DropdownMenuItem<int>>> _dropdownItemsOne = [];
+  final List<List<DropdownMenuItem<int>>> _dropdownItemsTwo = [];
   void addNewCard() {
-    print("Added");
     setState(() {
       cardList.add(
         CardData(
@@ -819,7 +785,6 @@ class _TravelExpenseRequestUpdateState
                                     onChanged: (value) {
                                       //value = cardData.fromPlaceController.text;
                                       _fromPlaceController.text = value;
-                                      print("$value");
                                     },
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(
@@ -859,7 +824,6 @@ class _TravelExpenseRequestUpdateState
                                     onChanged: (value) {
                                       //value = cardData.fromPlaceController.text;
                                       _toPlaceController.text = value;
-                                      print("$value");
                                     },
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(
@@ -906,7 +870,6 @@ class _TravelExpenseRequestUpdateState
                                       //value = cardData.fromPlaceController.text;
                                       _odometerStartController.text = value;
                                       //calculateKilometers();
-                                      print("$value");
                                     },
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.electric_meter),
@@ -946,7 +909,6 @@ class _TravelExpenseRequestUpdateState
                                       //value = cardData.fromPlaceController.text;
                                       _odometerEndController.text = value;
                                       //calculateKilometers();
-                                      print("$value");
                                     },
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.electric_meter),
@@ -989,7 +951,6 @@ class _TravelExpenseRequestUpdateState
                                     onChanged: (value) {
                                       //value = cardData.fromPlaceController.text;
                                       _merchantController.text = value;
-                                      print("$value");
                                     },
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.business_center),
@@ -1028,7 +989,6 @@ class _TravelExpenseRequestUpdateState
                                     onChanged: (value) {
                                       //value = cardData.fromPlaceController.text;
                                       _kmController.text = value;
-                                      print("$value");
                                     },
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.car_crash_rounded),
@@ -1080,8 +1040,6 @@ class _TravelExpenseRequestUpdateState
                                                 data: ThemeData(
                                                   primaryColor:
                                                       Colors.lightBlue,
-                                                  dialogBackgroundColor:
-                                                      Colors.white,
                                                   colorScheme: ColorScheme.light(
                                                     primary:
                                                         Colors
@@ -1106,7 +1064,7 @@ class _TravelExpenseRequestUpdateState
                                                       color: Colors.black,
                                                       letterSpacing: 0,
                                                     ), // Style for unselected items
-                                                  ),
+                                                  ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
                                                 ),
                                                 child: child!,
                                               );
@@ -1117,14 +1075,12 @@ class _TravelExpenseRequestUpdateState
                                             DateFormat("MMMM-yy").format(date!);
                                         selectedDate =
                                             cardData.monthController.text;
-                                        print('MonthPicker $selectedDate');
                                       });
                                     },
                                     controller: _monthController,
                                     onChanged: (value) {
                                       //value = cardData.fromPlaceController.text;
                                       _monthController.text = value;
-                                      print("$value");
                                     },
                                     readOnly: true,
                                     // initialValue: "Head Office",
@@ -1183,18 +1139,15 @@ class _TravelExpenseRequestUpdateState
                                         ).format(date);
                                         _dateController.text =
                                             cardData.dateController.text;
-                                        print('Date ${_dateController.text}');
 
                                         //  DateFormat.yMd().format(date!).toString();
                                       });
 
-                                      print(date);
                                     },
                                     controller: _dateController,
                                     onChanged: (value) {
                                       //value = cardData.fromPlaceController.text;
                                       _dateController.text = value;
-                                      print("$value");
                                     },
                                     readOnly: true,
                                     // initialValue: "Head Office",
@@ -1241,7 +1194,6 @@ class _TravelExpenseRequestUpdateState
                                     onChanged: (value) {
                                       //value = cardData.fromPlaceController.text;
                                       _claimAmtController.text = value;
-                                      print("$value");
                                     },
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.currency_rupee),
@@ -1285,7 +1237,6 @@ class _TravelExpenseRequestUpdateState
                                     onChanged: (value) {
                                       //value = cardData.fromPlaceController.text;
                                       _remarksController.text = value;
-                                      print("$value");
                                     },
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.textsms_outlined),
@@ -1366,7 +1317,7 @@ class _TravelExpenseRequestUpdateState
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            ButtonBar(
+                            OverflowBar(
                               alignment: MainAxisAlignment.center,
                               //buttonPadding: Vx.mOnly(right: 16),
                               children: [
@@ -1375,7 +1326,7 @@ class _TravelExpenseRequestUpdateState
                                     Navigator.pop(context);
                                   },
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
+                                    backgroundColor: WidgetStateProperty.all(
                                       Mythemes.dangerColorOne,
                                     ),
                                   ),
@@ -1425,7 +1376,7 @@ class _TravelExpenseRequestUpdateState
                                     );
                                   },
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
+                                    backgroundColor: WidgetStateProperty.all(
                                       Mythemes.successColor,
                                     ),
                                   ),
@@ -1457,7 +1408,6 @@ class _TravelExpenseRequestUpdateState
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -1465,11 +1415,9 @@ class _TravelExpenseRequestUpdateState
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.claimItemsListRoute);
-              print('Claim Items');
             }
             if (index == 3) {
               Navigator.push(
@@ -1480,7 +1428,6 @@ class _TravelExpenseRequestUpdateState
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -1488,7 +1435,6 @@ class _TravelExpenseRequestUpdateState
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -1579,17 +1525,14 @@ class _TravelExpenseRequestUpdateState
         );
     // Construct API URL with parameters
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
     //final response = await MobileHttpClient.instance.post(urlapi);
     http.Response response = await http.Response.fromStream(
       await request.send(),
@@ -1598,15 +1541,12 @@ class _TravelExpenseRequestUpdateState
 
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String reason = mapResponse['reason'];
       String result = mapResponse['result'];
-      print('reason both $reason $result');
-      print('reason${reason}');
       if (result.compareToIgnoringCase("Success") == 0) {
-        showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("Error") == 0) {
         showDialgSucess(context, reason.upperCamelCase, " Error ");
       }
@@ -1687,7 +1627,7 @@ class CardData {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

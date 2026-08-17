@@ -13,9 +13,9 @@ class LoanWiseSkipModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.loandata != null) {
-      data['loandata'] = this.loandata!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (loandata != null) {
+      data['loandata'] = loandata!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -89,27 +89,27 @@ class Loandata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['actualPaidAmount'] = this.actualPaidAmount;
-    data['loanType'] = this.loanType;
-    data['monthName'] = this.monthName;
-    data['skipId'] = this.skipId;
-    data['approvedBy'] = this.approvedBy;
-    data['installmentMonth'] = this.installmentMonth;
-    data['creationDate'] = this.creationDate;
-    data['branch'] = this.branch;
-    data['ledgerId'] = this.ledgerId;
-    data['skipStatus'] = this.skipStatus;
-    data['monthlyActualAmt'] = this.monthlyActualAmt;
-    data['skipEmiMonth'] = this.skipEmiMonth;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['userType'] = this.userType;
-    data['monthlyAmt'] = this.monthlyAmt;
-    data['monthVal'] = this.monthVal;
-    data['doj'] = this.doj;
-    data['status'] = this.status;
-    data['isLoanCheck'] = this.isLoanCheck;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['actualPaidAmount'] = actualPaidAmount;
+    data['loanType'] = loanType;
+    data['monthName'] = monthName;
+    data['skipId'] = skipId;
+    data['approvedBy'] = approvedBy;
+    data['installmentMonth'] = installmentMonth;
+    data['creationDate'] = creationDate;
+    data['branch'] = branch;
+    data['ledgerId'] = ledgerId;
+    data['skipStatus'] = skipStatus;
+    data['monthlyActualAmt'] = monthlyActualAmt;
+    data['skipEmiMonth'] = skipEmiMonth;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['userType'] = userType;
+    data['monthlyAmt'] = monthlyAmt;
+    data['monthVal'] = monthVal;
+    data['doj'] = doj;
+    data['status'] = status;
+    data['isLoanCheck'] = isLoanCheck;
     return data;
   }
 }

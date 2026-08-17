@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MealSelectionPage extends StatelessWidget {
+  const MealSelectionPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +46,7 @@ class MealSelectionPage extends StatelessWidget {
 
 class QRScannerPage extends StatefulWidget {
   final String mealName;
-  QRScannerPage({required this.mealName});
+  const QRScannerPage({super.key, required this.mealName});
 
   @override
   _QRScannerPageState createState() => _QRScannerPageState();

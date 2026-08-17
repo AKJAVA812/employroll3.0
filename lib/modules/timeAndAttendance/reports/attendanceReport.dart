@@ -17,17 +17,17 @@ class AttendanceReport extends StatefulWidget {
   final String toDateString;
 
   const AttendanceReport({
-    Key? key,
+    super.key,
     required this.forDateString,
     required this.toDateString,
-  }) : super(key: key);
+  });
 
   @override
   State<AttendanceReport> createState() =>
       _AttendanceReportState(forDateString, toDateString);
 }
 
-late AttendanceReportModel? employeeListModelglobel = AttendanceReportModel(
+AttendanceReportModel? employeeListModelglobel = AttendanceReportModel(
   data: List.empty(),
 );
 var status = "Present";
@@ -174,7 +174,6 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -184,7 +183,6 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -193,7 +191,6 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
                 builder: (context) => GetAttendanceDet(showAppBar: true),
               ),
             );
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -204,13 +201,11 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
             );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -246,7 +241,7 @@ class _AttendanceReportState extends State<AttendanceReport> with RouteAware {
 class AttList extends StatefulWidget {
   final AttendanceReportModel attendanceReportModel1;
 
-  AttList(this.attendanceReportModel1);
+  const AttList(this.attendanceReportModel1, {super.key});
 
   @override
   State<AttList> createState() => _AttListState(attendanceReportModel1);

@@ -26,7 +26,6 @@ class NotificationService {
   initFCM() async {
     await _firebaseMessaging.requestPermission();
     final FCMToken = await _firebaseMessaging.getToken();
-    print("FCMTOKEN $FCMToken");
 
     // Save token to SharedPreferences
     if (FCMToken != null) {
@@ -34,11 +33,9 @@ class NotificationService {
     }
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Message: ${message.notification?.title}');
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Message: ${message.notification?.title}');
     });
 
 /*    FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {

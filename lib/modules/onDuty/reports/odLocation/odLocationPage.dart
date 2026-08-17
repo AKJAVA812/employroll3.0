@@ -19,11 +19,10 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import 'odPunchUpload.dart';
 import 'odWorkDonePage.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 
 class ODLocationView extends StatefulWidget {
-  const ODLocationView({Key? key}) : super(key: key);
+  const ODLocationView({super.key});
 
   @override
   State<ODLocationView> createState() => _ODLocationViewState();
@@ -61,26 +60,22 @@ class _ODLocationViewState extends State<ODLocationView> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
             //Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            print('My All Requests');
           }
           if(index==3){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -88,7 +83,6 @@ class _ODLocationViewState extends State<ODLocationView> {
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -125,7 +119,7 @@ class _ODLocationViewState extends State<ODLocationView> {
 }
 
 class ODPageView extends StatefulWidget {
-  const ODPageView({Key? key}) : super(key: key);
+  const ODPageView({super.key});
 
   @override
   State<ODPageView> createState() => _ODPageViewState();
@@ -152,7 +146,6 @@ class _ODPageViewState extends State<ODPageView> {
   }
   Future getUserName() async {
     UserName = await shared.getempName();
-    print('Response snapshot: ${UserName}');
   }
 
   Future<void> _initializeLocation() async {
@@ -230,7 +223,6 @@ class _ODPageViewState extends State<ODPageView> {
         );
       }
 
-      print('🏃‍♂️ Position Updated: $currentPostion');
     });
   }
 
@@ -242,7 +234,6 @@ class _ODPageViewState extends State<ODPageView> {
       );
 
       if (placemarks.isEmpty) {
-        print("❌ No placemark found");
         return;
       }
 
@@ -270,10 +261,8 @@ class _ODPageViewState extends State<ODPageView> {
         currentAddress = formattedAddress;
       });
 
-      print('📍 Current Address: $currentAddress');
 
     } catch (e) {
-      print("❌ Error getting address: $e");
       currentAddress = "Address Not Find";
     }
   }
@@ -366,14 +355,13 @@ class _ODPageViewState extends State<ODPageView> {
 
         final imagePath= File(imageValue.path);
         setState(() {
-          this._workDoneImage=imagePath;
+          _workDoneImage=imagePath;
           Navigator.of(context).push(MaterialPageRoute(builder: (context)
           =>OdWorkDonePage(value: _workDoneImage, address: currentAddress, time: timeString )));
         });
 
       }on PlatformException catch (e) {
 
-        print('failed to upload: $e');
       }
     }
     /*getImageODOut() async{
@@ -479,7 +467,7 @@ class _ODPageViewState extends State<ODPageView> {
                   child: ListTile(
                     //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
                     title: Text(UserName),
-                    subtitle: Text('$currentAddress'),
+                    subtitle: Text(currentAddress),
                     leading: CircleAvatar(
                       radius: 30,
                       backgroundColor: Colors.grey.shade300,
@@ -517,7 +505,7 @@ class _ODPageViewState extends State<ODPageView> {
                             height: 25,
                             width: 125,
                             child: Text(
-                              '$todayDateShow',
+                              todayDateShow,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18,
@@ -544,7 +532,7 @@ class _ODPageViewState extends State<ODPageView> {
                             height: 25,
                             width: 125,
                             child: Text(
-                              '$timeString',
+                              timeString,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18,
@@ -585,7 +573,6 @@ class _ODPageViewState extends State<ODPageView> {
                               else {
                                 bool isFakeLocation =
                                 await DetectFakeLocation().detectFakeLocation();
-                                print("Fake Location - $isFakeLocation");
                                 if(isFakeLocation == true) {
                                   showDialog(
                                     context: context,
@@ -625,13 +612,13 @@ class _ODPageViewState extends State<ODPageView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 10),
                                   child: CircleAvatar(
+                                    backgroundColor: Mythemes.successColor,
+                                    radius: 30,
                                     child: Icon(
                                       Icons.touch_app,
                                       size: 30,
                                       color: Mythemes.creamColor,
                                     ),
-                                    backgroundColor: Mythemes.successColor,
-                                    radius: 30,
                                   ),
                                 ),
                                 Container(
@@ -674,7 +661,6 @@ class _ODPageViewState extends State<ODPageView> {
                               else {
                                 bool isFakeLocation =
                                 await DetectFakeLocation().detectFakeLocation();
-                                print("Fake Location - $isFakeLocation");
                                 if(isFakeLocation == true) {
                                   showDialog(
                                     context: context,
@@ -705,13 +691,13 @@ class _ODPageViewState extends State<ODPageView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8),
                                   child: CircleAvatar(
+                                    backgroundColor: Mythemes.lightBluishColor,
+                                    radius: 30,
                                     child: Icon(
                                       Icons.work_history,
                                       size: 30,
                                       color: Mythemes.creamColor,
                                     ),
-                                    backgroundColor: Mythemes.lightBluishColor,
-                                    radius: 30,
                                   ),
                                 ),
                                 Container(
@@ -754,7 +740,6 @@ class _ODPageViewState extends State<ODPageView> {
                               else {
                                 bool isFakeLocation =
                                 await DetectFakeLocation().detectFakeLocation();
-                                print("Fake Location - $isFakeLocation");
                                 if(isFakeLocation == true) {
                                   showDialog(
                                     context: context,
@@ -786,13 +771,13 @@ class _ODPageViewState extends State<ODPageView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 10),
                                   child: CircleAvatar(
+                                    backgroundColor: Mythemes.dangerColorOne,
+                                    radius: 30,
                                     child: Icon(
                                       Icons.touch_app,
                                       size: 30,
                                       color: Mythemes.creamColor,
                                     ),
-                                    backgroundColor: Mythemes.dangerColorOne,
-                                    radius: 30,
                                   ),
                                 ),
                                 Container(

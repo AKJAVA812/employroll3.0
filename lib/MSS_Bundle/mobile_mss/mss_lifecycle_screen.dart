@@ -255,18 +255,20 @@ class _MssLifecycleDetailScreenState extends State<MssLifecycleDetailScreen> {
           widget.module == 'EXIT_CASE'
               ? await MobileMssLifecycleService.exitEmployeeDetail(_id)
               : await MobileMssLifecycleService.detail(widget.module, _id);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _data = data;
           _loading = false;
           _error = null;
         });
+      }
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _loading = false;
           _error = _message(error);
         });
+      }
     }
   }
 

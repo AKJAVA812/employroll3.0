@@ -46,25 +46,25 @@ class MyTeamsListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.dottedEmpList != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (dottedEmpList != null) {
       data['dottedEmpList'] =
-          this.dottedEmpList!.map((v) => v.toJson()).toList();
+          dottedEmpList!.map((v) => v.toJson()).toList();
     }
-    if (this.sharedEmpList != null) {
+    if (sharedEmpList != null) {
       data['sharedEmpList'] =
-          this.sharedEmpList!.map((v) => v.toJson()).toList();
+          sharedEmpList!.map((v) => v.toJson()).toList();
     }
-    if (this.listData != null) {
-      data['listData'] = this.listData!.map((v) => v.toJson()).toList();
+    if (listData != null) {
+      data['listData'] = listData!.map((v) => v.toJson()).toList();
     }
-    if (this.directEmpList != null) {
+    if (directEmpList != null) {
       data['directEmpList'] =
-          this.directEmpList!.map((v) => v.toJson()).toList();
+          directEmpList!.map((v) => v.toJson()).toList();
     }
-    if (this.designatedEmpList != null) {
+    if (designatedEmpList != null) {
       data['designatedEmpList'] =
-          this.designatedEmpList!.map((v) => v.toJson()).toList();
+          designatedEmpList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -123,22 +123,22 @@ class ListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['profileName'] = this.profileName;
-    data['reportingOfficerId'] = this.reportingOfficerId;
-    data['empDeptName'] = this.empDeptName;
-    data['empContact'] = this.empContact;
-    data['empDetId'] = this.empDetId;
-    data['empBranchName'] = this.empBranchName;
-    data['employeeStatus'] = this.employeeStatus;
-    data['empDesignationName'] = this.empDesignationName;
-    data['reportingOfficerName'] = this.reportingOfficerName;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['reportieeStatus'] = this.reportieeStatus;
-    data['empEmailId'] = this.empEmailId;
-    data['reportieeType'] = this.reportieeType;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profileName'] = profileName;
+    data['reportingOfficerId'] = reportingOfficerId;
+    data['empDeptName'] = empDeptName;
+    data['empContact'] = empContact;
+    data['empDetId'] = empDetId;
+    data['empBranchName'] = empBranchName;
+    data['employeeStatus'] = employeeStatus;
+    data['empDesignationName'] = empDesignationName;
+    data['reportingOfficerName'] = reportingOfficerName;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['reportieeStatus'] = reportieeStatus;
+    data['empEmailId'] = empEmailId;
+    data['reportieeType'] = reportieeType;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }
@@ -196,22 +196,22 @@ class DottedEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['profileName'] = this.profileName;
-    data['reportingOfficerId'] = this.reportingOfficerId;
-    data['empDeptName'] = this.empDeptName;
-    data['empContact'] = this.empContact;
-    data['empDetId'] = this.empDetId;
-    data['empBranchName'] = this.empBranchName;
-    data['employeeStatus'] = this.employeeStatus;
-    data['empDesignationName'] = this.empDesignationName;
-    data['reportingOfficerName'] = this.reportingOfficerName;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['reportieeStatus'] = this.reportieeStatus;
-    data['empEmailId'] = this.empEmailId;
-    data['reportieeType'] = this.reportieeType;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profileName'] = profileName;
+    data['reportingOfficerId'] = reportingOfficerId;
+    data['empDeptName'] = empDeptName;
+    data['empContact'] = empContact;
+    data['empDetId'] = empDetId;
+    data['empBranchName'] = empBranchName;
+    data['employeeStatus'] = employeeStatus;
+    data['empDesignationName'] = empDesignationName;
+    data['reportingOfficerName'] = reportingOfficerName;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['reportieeStatus'] = reportieeStatus;
+    data['empEmailId'] = empEmailId;
+    data['reportieeType'] = reportieeType;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }
@@ -270,22 +270,22 @@ class DirectEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['profileName'] = this.profileName;
-    data['reportingOfficerId'] = this.reportingOfficerId;
-    data['empDeptName'] = this.empDeptName;
-    data['empContact'] = this.empContact;
-    data['empDetId'] = this.empDetId;
-    data['empBranchName'] = this.empBranchName;
-    data['employeeStatus'] = this.employeeStatus;
-    data['empDesignationName'] = this.empDesignationName;
-    data['reportingOfficerName'] = this.reportingOfficerName;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['reportieeStatus'] = this.reportieeStatus;
-    data['empEmailId'] = this.empEmailId;
-    data['reportieeType'] = this.reportieeType;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profileName'] = profileName;
+    data['reportingOfficerId'] = reportingOfficerId;
+    data['empDeptName'] = empDeptName;
+    data['empContact'] = empContact;
+    data['empDetId'] = empDetId;
+    data['empBranchName'] = empBranchName;
+    data['employeeStatus'] = employeeStatus;
+    data['empDesignationName'] = empDesignationName;
+    data['reportingOfficerName'] = reportingOfficerName;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['reportieeStatus'] = reportieeStatus;
+    data['empEmailId'] = empEmailId;
+    data['reportieeType'] = reportieeType;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }
@@ -344,22 +344,22 @@ class SharedEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['profileName'] = this.profileName;
-    data['reportingOfficerId'] = this.reportingOfficerId;
-    data['empDeptName'] = this.empDeptName;
-    data['empContact'] = this.empContact;
-    data['empDetId'] = this.empDetId;
-    data['empBranchName'] = this.empBranchName;
-    data['employeeStatus'] = this.employeeStatus;
-    data['empDesignationName'] = this.empDesignationName;
-    data['reportingOfficerName'] = this.reportingOfficerName;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['reportieeStatus'] = this.reportieeStatus;
-    data['empEmailId'] = this.empEmailId;
-    data['reportieeType'] = this.reportieeType;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profileName'] = profileName;
+    data['reportingOfficerId'] = reportingOfficerId;
+    data['empDeptName'] = empDeptName;
+    data['empContact'] = empContact;
+    data['empDetId'] = empDetId;
+    data['empBranchName'] = empBranchName;
+    data['employeeStatus'] = employeeStatus;
+    data['empDesignationName'] = empDesignationName;
+    data['reportingOfficerName'] = reportingOfficerName;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['reportieeStatus'] = reportieeStatus;
+    data['empEmailId'] = empEmailId;
+    data['reportieeType'] = reportieeType;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }
@@ -418,22 +418,22 @@ class DesignatedEmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['profileName'] = this.profileName;
-    data['reportingOfficerId'] = this.reportingOfficerId;
-    data['empDeptName'] = this.empDeptName;
-    data['empContact'] = this.empContact;
-    data['empDetId'] = this.empDetId;
-    data['empBranchName'] = this.empBranchName;
-    data['employeeStatus'] = this.employeeStatus;
-    data['empDesignationName'] = this.empDesignationName;
-    data['reportingOfficerName'] = this.reportingOfficerName;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['reportieeStatus'] = this.reportieeStatus;
-    data['empEmailId'] = this.empEmailId;
-    data['reportieeType'] = this.reportieeType;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profileName'] = profileName;
+    data['reportingOfficerId'] = reportingOfficerId;
+    data['empDeptName'] = empDeptName;
+    data['empContact'] = empContact;
+    data['empDetId'] = empDetId;
+    data['empBranchName'] = empBranchName;
+    data['employeeStatus'] = employeeStatus;
+    data['empDesignationName'] = empDesignationName;
+    data['reportingOfficerName'] = reportingOfficerName;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['reportieeStatus'] = reportieeStatus;
+    data['empEmailId'] = empEmailId;
+    data['reportieeType'] = reportieeType;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }

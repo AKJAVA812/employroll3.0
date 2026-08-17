@@ -16,7 +16,7 @@ import '../../../timeAndAttendance/reports/attendanceRequisition/model/onDateRep
 import 'odRequisitionPage.dart';
 
 class ODAttendanceList extends StatefulWidget {
-  ODAttendanceList({Key? key}) : super(key: key);
+  const ODAttendanceList({super.key});
 
   @override
   State<ODAttendanceList> createState() => _ODAttendanceListState();
@@ -68,14 +68,12 @@ class _ODAttendanceListState extends State<ODAttendanceList> with RouteAware {
       setState(() {
         attendanceModelGlobel = value;
       });
-      print('employeeList00${attendanceModelGlobel!.data!.length}');
     });
   }
 
   Future<AttendanceReportModel> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getAttendance;
-    print('employeeList11: ${SessionId}');
     AttendanceReportModel employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -83,11 +81,9 @@ class _ODAttendanceListState extends State<ODAttendanceList> with RouteAware {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = AttendanceReportModel.fromJson(mapResponse);
 
     return employeeListModel;
@@ -134,7 +130,6 @@ class _ODAttendanceListState extends State<ODAttendanceList> with RouteAware {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -142,16 +137,13 @@ class _ODAttendanceListState extends State<ODAttendanceList> with RouteAware {
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-            print('OD');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -159,7 +151,6 @@ class _ODAttendanceListState extends State<ODAttendanceList> with RouteAware {
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -257,7 +248,7 @@ class SearchItems extends SearchDelegate {
 class AttList extends StatefulWidget {
   final AttendanceReportModel attendanceReportModel1;
 
-  AttList(this.attendanceReportModel1);
+  const AttList(this.attendanceReportModel1, {super.key});
 
   @override
   State<AttList> createState() => _AttListState(attendanceReportModel1);
@@ -276,7 +267,6 @@ class _AttListState extends State<AttList> {
       itemBuilder: (context, itemCount) {
         return InkWell(
           onTap: () {
-            print('attendanceReport$attendanceModelGlobel!.data![itemCount]');
             // Navigator.pushNamed(context, MyRoutings.attendanceRequisitionRoute);
             Navigator.of(context).push(
               MaterialPageRoute(

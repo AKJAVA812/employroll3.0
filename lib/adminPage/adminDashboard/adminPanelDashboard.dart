@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/adminPage/adminDashboard/presentEmpList.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -25,7 +24,7 @@ import 'overTimeEmpList.dart';
 class AdminPanelDashboard extends StatefulWidget {
   final DashboardModel dashboardModel1;
 
-  AdminPanelDashboard(this.dashboardModel1);
+  const AdminPanelDashboard(this.dashboardModel1, {super.key});
 
   @override
   State<AdminPanelDashboard> createState() =>
@@ -50,9 +49,9 @@ var eventSingleDateString;
 var day = DateTime.now();
 var single = DateFormat('dd');
 var singleDay = single.format(day);
-late List<String?> list = [];
-late List<String?> branchList = [];
-late List<String?>? shiftList = [];
+List<String?> list = [];
+List<String?> branchList = [];
+List<String?>? shiftList = [];
 
 String valuenew = "listText";
 String shiftValue = "listText";
@@ -140,7 +139,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.adminDashboardAPi;
 
-    print('employeeList11: ${SessionId}');
     DashboardModel dashboardModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -151,7 +149,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -166,7 +163,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.branchListApi;
 
-    print('employeeList11: ${SessionId}');
     BranchListModal branchListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -176,17 +172,14 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     branchListModal = BranchListModal.fromJson(mapResponse);
     for (int i = 0; i < branchListModal.data!.length; i++) {
       var branchName = branchListModal.data![i].branchName;
       branchList.add(branchListModal.data![i].branchName);
-      print('branchNameNew $branchName');
     }
     return branchListModal;
   }
@@ -196,7 +189,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.shiftListApi;
 
-    print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -206,17 +198,14 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     shiftListModal = ShiftListModal.fromJson(mapResponse);
     for (int i = 0; i < shiftListModal.data!.length; i++) {
       var shiftName = shiftListModal.data![i].shiftName;
       shiftList?.add(shiftListModal.data![i].shiftName);
-      print('shiftNames $shiftName');
     }
     return shiftListModal;
   }
@@ -294,8 +283,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
             getSharedPrfanceList();
             singleDateString = DateFormat('dd-MM-yyyy').format(date);
             singleDay = DateFormat('dd').format(date);
-            print("SingleDateNew $singleDateString");
-            print("singleDay $singleDay");
             //dateController.text = DateFormat("dd").format(date!);
 
             //  DateFormat.yMd().format(date!).toString();
@@ -326,7 +313,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
     earlyOutEmp = dashboardModelGlobal!.earlyOutEmp;
     halfEmp = dashboardModelGlobal!.halfEmp;
     overTime = dashboardModelGlobal!.otEmp;
-    print("Total Employees $totalPresentEmp");
     shift = 0;
     branchId = 0;
     return DismissKeyboard(
@@ -381,7 +367,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                                 var i = branchList.indexOf(valuenew);
                                 branchId =
                                     branchListModalGloabal!.data![i].branchId!;
-                                print("Branch ID $branchId");
                                 setState(() {
                                   getSharedPrfanceList();
                                   //print('value1 $i');
@@ -444,7 +429,6 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
                             shiftValue = newVal.toString();
                             var i = shiftList!.indexOf(shiftValue);
                             shift = shiftListModalGlobal!.data![i].shiftId!;
-                            print("Shift ID $shift");
                             setState(() {
                               getSharedPrfanceList();
                               //print('value1 $i');
@@ -1305,7 +1289,7 @@ class _AdminPanelDashboardState extends State<AdminPanelDashboard> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

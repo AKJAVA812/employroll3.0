@@ -20,6 +20,8 @@ import 'exitResignationReqL1AppovalPage.dart';
 import 'exitResignationReqL2ApprovalPage.dart';
 
 class ExitResignationRequestPage extends StatefulWidget {
+  const ExitResignationRequestPage({super.key});
+
   @override
   _ExitResignationRequestPageState createState() =>
       _ExitResignationRequestPageState();
@@ -77,9 +79,8 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
 
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -193,7 +194,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
         exitResignationRequisitionListLabeled =
             exitResignationRequisitionListLabel;
       });
-      print('All LIST - ${exitResignationRequisitionListLabel!.data!.length}');
     });
   }
 
@@ -241,7 +241,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.employeeResignationMSSList;
 
-    print('employeeList11: $sessionId');
     if (selectedFilter == "All") {
       statusChange = "0";
     }
@@ -266,28 +265,22 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
       );
       final response = await MobileHttpClient.instance.post(urlapi);
 
-      print('responseemployeeList ${response.body}');
-      print('URL ${response.request}');
 
       mapResponse = json.decode(response.body);
-      print('responseemployeeList $mapResponse');
 
       var getData = mapResponse.length;
       if (getData == 0) {
-        print("getData111 $getData");
         showNodata(context, "Oops", "There is no any requisition.");
       }
 
       ExitResignationRquisitionListModal exitResignationRequisitionList =
           ExitResignationRquisitionListModal.fromJson(mapResponse);
-      print("mymanger ${exitResignationRequisitionList.data}");
       // Assign data based on selected filter
       allUsernew = exitResignationRequisitionList.data!;
 
       setState(() {});
       return exitResignationRequisitionList;
     } catch (e) {
-      print("Error fetching reporting officers: $e");
       rethrow;
     } finally {
       setState(() {
@@ -297,7 +290,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<ListData>? resultsAll = [];
 
     if (enteredKeyword.isEmpty) {
@@ -478,7 +470,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -488,11 +479,9 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -503,7 +492,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -511,7 +499,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -979,9 +966,6 @@ class _ExitResignationRequestPageState extends State<ExitResignationRequestPage>
 
             // âœ… Prevent auto-reset
             getSharedPrfanceList(fromUser: true);
-            print(
-              "Selected Filter - $selectedFilter, statusChange - $statusChange",
-            );
           });
         },
       ),

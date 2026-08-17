@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
-import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:er_flutter_project/services/attendance_calendar_api.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
-import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../ess/EssDashboarrddModel.dart';
 import '../../../../ess/Model/calendarModalClass.dart';
@@ -20,11 +18,10 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
 import 'dart:developer' as developer;
 import '../../calendarPage/attendanceRequetCalendar.dart';
-import '../modelClass/attendanceReportModel.dart';
 
 class GetAttendanceDet extends StatefulWidget {
   final bool showAppBar;
-  GetAttendanceDet({this.showAppBar = true});
+  const GetAttendanceDet({super.key, this.showAppBar = true});
   //GetAttendanceDet({Key? key}) : super(key: key);
 
   @override
@@ -87,13 +84,11 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
     checkAndRunApi();
     setState(() {
-      print('ResponseAttendance: ${sessionId}');
     });
   }
 
   Future<CalendarModalClass> getCalendarData(String sessionId) async {
-    String _currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
-    print("Current Month - $_currentMonth $_currentMonthc");
+    String currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
 
     CalendarModalClass calendarModalClass;
     setState(() {
@@ -105,15 +100,12 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     final prefs = await SharedPreferences.getInstance();
 
     // âœ… STEP 1: Try loading from SharedPreferences first
-    if (_currentMonthc == _currentMonth) {
+    if (currentMonthc == _currentMonth) {
       final cachedData = prefs.getString('calendarDataMyRequest');
       final cachedMonth = prefs.getString('calendarMonthMyRequest');
 
-      print("Calendar Data - $cachedData");
-      print("Calendar Month - $cachedMonth");
 
       if (cachedData != null) {
-        print("Cachded Month $cachedMonth");
         try {
           //print("Loaded calendar data from cache âœ…");
           mapResponse = json.decode(cachedData);
@@ -128,14 +120,9 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     try {
       final result = await AttendanceCalendarApi().fetchMonth(_currentMonth);
       mapResponse = result.data;
-      print(
-        result.cached
-            ? "Calendar loaded from mobile cache ${result.cachedAt}"
-            : "Calendar loaded from mobile API",
-      );
 
       // Save to SharedPreferences
-      if (_currentMonthc == _currentMonth) {
+      if (currentMonthc == _currentMonth) {
         await prefs.setString(
           'calendarDataMyRequest',
           json.encode(mapResponse),
@@ -145,7 +132,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       // Rebuild UI from fresh API data
       _buildCalendarFromMap(mapResponse);
     } catch (e) {
-      print("Error calling calendar API: $e");
     } finally {
       setState(() {
         isLoading = false;
@@ -156,7 +142,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     return calendarModalClass;
   }
 
-  EventList<Event> _markedDateMap = EventList<Event>(
+  final EventList<Event> _markedDateMap = EventList<Event>(
     events: {
       /*new DateTime(2024, 2, 1): [
         new Event(
@@ -240,7 +226,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         );
       }
     } catch (e) {
-      print("Error parsing calendar data: $e");
     }
 
     setState(() {}); // Refresh UI
@@ -295,7 +280,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 
     if (runApi) {
       // âœ… Run API only if needed
-      print("ðŸ”„ Running API for today...");
 
       Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
       getCalendar.then((value) {
@@ -305,7 +289,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         });
       });
     } else {
-      print("â¸ Skipping API. Loading from cache...");
       await loadSavedData(); // ðŸ”¹ Load saved modal data
     }
   }
@@ -329,11 +312,9 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     final calendarJson = prefs.getString('calendarDataMyRequest');
     final calendarMonth = prefs.getString('calendarMonthMyRequest');
 
-    print("Calendar Data Loaded - $calendarJson");
 
     if (calendarJson != null && calendarMonth == _currentMonth) {
       final mapResponse = jsonDecode(calendarJson);
-      print("Loaded calendar data from cache âœ…");
       calendarModalGlobal = CalendarModalClass.fromJson(mapResponse);
       _buildCalendarFromMap(mapResponse);
 
@@ -349,16 +330,16 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     "dd-MM-yyyy",
   ).format(DateTime.parse("2019-09-30"));
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePicker = await showDatePicker(
+    DateTime? datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if (_datePicker != null && _datePicker != _date) {
+    if (datePicker != null && datePicker != _date) {
       setState(() {
-        _date = _datePicker;
+        _date = datePicker;
       });
     }
   }
@@ -441,7 +422,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                       ),
                     );
                     //Navigator.pop(context);
-                    print('home tab');
                   }
                   if (index == 1) {
                     Navigator.push(
@@ -452,7 +432,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                       ),
                     );
                     //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-                    print('Workflow');
                   }
                   if (index == 2) {
                     /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
@@ -467,7 +446,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                       ),
                     );
                     //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                    print('Dashboard');
                   }
                   if (index == 4) {
                     Navigator.push(
@@ -483,7 +461,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                     //     MaterialPageRoute(builder: (context) => ProfilePageNew())
                     // );
                     //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-                    print('Profile');
                   }
                   /*if(index==3){
                 title="Notifications";
@@ -667,7 +644,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                       });
                     });
                     // ðŸ‘‡ Your action here
-                    print("Update your dashboard clicked");
                   },
                   icon: const Icon(
                     Icons.dashboard_customize,
@@ -719,14 +695,15 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
   DateTime? _lastApiCallMonth;
   CalendarShow() {
     /// Example with custom icon
-    final _calendarCarousel = Container(
+    final calendarCarousel = Container(
       constraints: BoxConstraints(
         maxHeight: 300.0, // Set a valid maximum height
       ),
       child: CalendarCarousel<Event>(
         onDayPressed: (date, events) {
           setState(() => _currentDate = date);
-          events.forEach((event) => print(event.title));
+          for (var event in events) {
+          }
         },
         weekendTextStyle: TextStyle(color: Colors.black),
         thisMonthDayBorderColor: Colors.grey,
@@ -758,7 +735,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
     double dynamicHeight = (rowCount * rowHeight) + topPadding;
 
     /// Example Calendar Carousel without header and custom prev & next button
-    final _calendarCarouselNoHeader = CalendarCarousel<Event>(
+    final calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Mythemes.lightBluishColor,
       pageScrollPhysics: NeverScrollableScrollPhysics(),
       /*onDayPressed: (date, events) {
@@ -779,7 +756,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         // Prevent selecting dates older than current month view
         if (date.month < _targetDateTime.month &&
             date.year == _targetDateTime.year) {
-          print("â›” Last month dates are not selectable");
           Fluttertoast.showToast(
             msg: "You cannot select last month's dates.",
             toastLength: Toast.LENGTH_SHORT,
@@ -835,7 +811,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         DateTime cycleEnd;
         int startDay = int.parse(deadlineStartDate);
         int endDay = int.parse(deadlineEndDate);
-        print('date start and End $startDay $endDay');
         /* int startDay = 0;
         int endDay = 0;*/
 
@@ -858,7 +833,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           startDay = startDayInt;
           endDay = endDayInt;
         }
-        print('date start and End $startDay $endDay');
         if (today.day < startDay) {
           // Current month cycle is last month â†’ this month
           cycleStart = DateTime(today.year, today.month - 1, startDay);
@@ -869,8 +843,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           cycleEnd = DateTime(today.year, today.month + 1, endDay);
         }
 
-        print("Cycle Start: $cycleStart");
-        print("Cycle End:   $cycleEnd");
         if (lockDateStr.trim().isNotEmpty) {
           // Convert String â†’ DateTime
           DateTime lockDateTime = DateFormat(
@@ -943,7 +915,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           _currentDate = date;
           _currentDate2 = date;
           formattedDate = DateFormat('dd-MM-yyyy').format(date);
-          print("Formatted Date - $formattedDate");
           calendarSendData = selectedCalendarRow;
         });
 
@@ -1040,7 +1011,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       onCalendarChanged: (DateTime date) async {
         // 1. Prevent sliding beyond allowed range
         if (date.isBefore(_minDateAllowed) || date.isAfter(_maxDateAllowed)) {
-          print("â›” Calendar slide limit reached");
           return;
         }
 
@@ -1049,7 +1019,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         if (_lastApiCallMonth != null &&
             _lastApiCallMonth!.month == date.month &&
             _lastApiCallMonth!.year == date.year) {
-          print("â›” Duplicate onCalendarChanged â€” API blocked");
           return;
         }
 
@@ -1061,9 +1030,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
 
         singleDateString = DateFormat('dd-MM-yyyy').format(date);
-        print("Updated Date Change - $singleDateString");
 
-        print("âœ… Calling Calendar API for: $_currentMonth");
 
         // 5. Call API â€” only ONE time now
         CalendarModalClass result = await getCalendarData(sessionId!);
@@ -1072,7 +1039,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           calendarModalGlobal = result;
         });
 
-        print("âœ” Calendar API Updated");
       },
       onDayLongPressed: (DateTime date) {
         //print('long pressed date $date');
@@ -1128,7 +1094,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                       _targetDateTime.month - 1,
                     );
                     if (previousMonth.isBefore(_minDateAllowed)) {
-                      print("â›” You canâ€™t go beyond last 2 months");
                       Fluttertoast.showToast(
                         msg: "Can't go before this month !!",
                         toastLength: Toast.LENGTH_SHORT,
@@ -1165,7 +1130,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                       _targetDateTime.month + 1,
                     );
                     if (nextMonth.isAfter(_maxDateAllowed)) {
-                      print("â›” You canâ€™t go beyond next month");
                       Fluttertoast.showToast(
                         msg: "Can't go beyond this month !!",
                         toastLength: Toast.LENGTH_SHORT,
@@ -1188,7 +1152,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 22.0),
-            child: _calendarCarouselNoHeader,
+            child: calendarCarouselNoHeader,
           ), //
           if (_legends.isNotEmpty)
             LegendWidget(legends: _legends), // Dynamically show legends
@@ -1202,7 +1166,7 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
 class LegendWidget extends StatelessWidget {
   final List<Map<String, String>> legends;
 
-  LegendWidget({required this.legends});
+  const LegendWidget({super.key, required this.legends});
 
   @override
   Widget build(BuildContext context) {
@@ -1294,7 +1258,7 @@ class LegendWidget extends StatelessWidget {
                                 ],
                               ),
                             );
-                          }).toList(),
+                          }),
                         ],
                       ),
                     ),

@@ -25,7 +25,7 @@ import 'myLoanRequestRaisePage.dart';
 import 'myLoanRequestUpdate.dart';
 
 class MyLoanRequestList extends StatefulWidget {
-  const MyLoanRequestList({Key? key}) : super(key: key);
+  const MyLoanRequestList({super.key});
 
   @override
   State<MyLoanRequestList> createState() => _MyLoanRequestListState();
@@ -129,9 +129,8 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
 
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -175,15 +174,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
         selfLoanRequisitionLabeled = selfLoanRequisitionLabel;
       });
       //print('Draft LIST - ${selfLoanRequisitionLabel!.claimRequisitionDraftlist!.length}');
-      print(
-        'Pending LIST - ${selfLoanRequisitionLabel!.loanRequisitionPendinglist!.length}',
-      );
-      print(
-        'Approved LIST - ${selfLoanRequisitionLabel!.loanRequisitionApprovedlist!.length}',
-      );
-      print(
-        'Disapproved LIST - ${selfLoanRequisitionLabel!.loanRequisitionDisapprovelist!.length}',
-      );
     });
   }
 
@@ -225,21 +215,16 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
   Future<SelfLoanRequestModal> getSelfLoanReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.essLoanListApi;
-    print('employeeList11: ${SessionId}');
     SelfLoanRequestModal selfLoanRequestModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
     });
-    print('URL ${response.request}');
     mapResponse = json.decode(response.body);
-    print('responseemployeeList $mapResponse');
     var getData = mapResponse.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
 
@@ -270,7 +255,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
       isLoadingCount = false;
     });
 
-    print("Pending List -  ${pendingData.length.toString()}");
 
     return selfLoanRequestModal;
   }
@@ -290,9 +274,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -302,13 +283,12 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -335,7 +315,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
                   getSharedPrfanceList();
                   //Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -429,7 +408,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -437,11 +415,9 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -452,7 +428,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -460,7 +435,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -692,7 +666,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
                       isLoading = true; // Show loader
                       isLoadingCount = true;
                       valueChange = i;
-                      print(i);
                     });
                     //Draft
                     if (valueChange == 0) {
@@ -779,7 +752,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
                 itemCount: foundDataNewPending!.length,
                 itemBuilder: (context, i) {
                   foundDataNewPending![i].status;
-                  print(foundDataNewPending![i].status);
 
                   return InkWell(
                     onTap: () {
@@ -822,7 +794,6 @@ class _MyLoanRequestListState extends State<MyLoanRequestList> with RouteAware {
                             MaterialPageRoute(builder: (context) => UpdateLoanRequestPage(
 
                             )));*/
-                        print("Loan Id Sending - $loanIdSend");
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder:

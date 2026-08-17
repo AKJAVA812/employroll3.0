@@ -29,7 +29,7 @@ class UpdateLoanRequestPage extends StatefulWidget {
     this.loanStartDate,
     this.instalments,
     this.remarks,
-    this.loanIdSend,
+    this.loanIdSend, {super.key}
   );
 
   @override
@@ -147,7 +147,6 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
 
@@ -181,7 +180,6 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
     startDateController.text = loanStartDate;
     installmentController.text = instalments.toString();
     remarkController.text = remarks;
-    print("Loan Type Choose - $loanType");
     if (loanType != null && loanTypes.contains(loanType)) {
       selectedLoanType = loanType;
     } else {
@@ -190,11 +188,6 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
     getLoanTypeMaster(sessionId!);
     setState(() {});
 
-    print("SessionId - $sessionId");
-    print("Department - $department");
-    print("Branch - $branch");
-    print("EmployeeName - $employeeName");
-    print("Loan Id - $loanIdCheck");
   }
 
   @override
@@ -312,18 +305,14 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
                           int i = loanTypes.indexOf(newVal);
                           if (i != -1 && i < loanTypeId.length) {
                             loanId = loanTypeId[i].toString();
-                            print("depart $loanId");
                           } else {
                             loanTypeId;
-                            print("Invalid Loan selection");
                           }
                           int j = loanTypes.indexOf(newVal);
                           if (i != -1 && j < loanTypeSend.length) {
                             loanTypeSending = loanTypeSend[i].toString();
-                            print("loanType -  $loanTypeSending");
                           } else {
                             loanTypeSending;
-                            print("Invalid Loan selection");
                           }
                         });
                       },
@@ -545,9 +534,6 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -557,7 +543,7 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
           final totalAmount = double.tryParse(amountController.text) ?? 0.0;
           final totalInstallments =
               int.tryParse(installmentController.text) ?? 1;
@@ -595,7 +581,6 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -619,23 +604,17 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -645,7 +624,7 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
           final totalAmount = double.tryParse(amountController.text) ?? 0.0;
           final totalInstallments =
               int.tryParse(installmentController.text) ?? 1;
@@ -683,7 +662,6 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -713,7 +691,6 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
                   ).pop(); // Close the dialog
                   //Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -823,7 +800,7 @@ class _UpdateLoanRequestPageState extends State<UpdateLoanRequestPage> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

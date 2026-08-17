@@ -11,7 +11,7 @@ import '../modalClass/advanceTypeModal.dart';
 import '../modalClass/loanAdvanceTypeModal.dart';
 
 class LoanAdvanceRequisition extends StatefulWidget {
-  const LoanAdvanceRequisition({Key? key}) : super(key: key);
+  const LoanAdvanceRequisition({super.key});
 
   @override
   State<LoanAdvanceRequisition> createState() => _LoanAdvanceRequisitionState();
@@ -81,21 +81,15 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
     loanTypeList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanRequest;
-    print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseLeaveTypeList $getData');
     loanTypeListLabel = LoanTypeListModal.fromJson(mapResponse);
     int? length = loanTypeListLabel?.loandata?.length;
-    print('totalLoanType $length');
     for (int i = 0; i < loanTypeListLabel!.loandata!.length; i++) {
       String? loanTypeName = loanTypeListLabel!.loandata![i].loanName;
       loanTypeList.add(loanTypeListLabel!.loandata![i].loanName);
-      print('dataLeaveTypeName $loanTypeName');
     }
     return loanTypeListLabel;
   }
@@ -104,22 +98,16 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
     advanceTypeList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.advanceRequest;
-    print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseLeaveTypeList $getData');
     advanceTypeListLabel = AdvanceTypeListModal.fromJson(mapResponse);
     int? length = advanceTypeListLabel?.advancedata?.length;
-    print('totalAdvanceType $length');
     for (int i = 0; i < advanceTypeListLabel!.advancedata!.length; i++) {
       String? advanceTypeName =
           advanceTypeListLabel!.advancedata![i].advanceName;
       advanceTypeList.add(advanceTypeListLabel!.advancedata![i].advanceName);
-      print('dataAdvanceType $advanceTypeName');
     }
     return advanceTypeListLabel;
   }
@@ -155,8 +143,7 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                                 content: Text("Loan Click"),
                               ));*/
                               setState(() {
-                                this.loanShow = true;
-                                print(this.loanShow);
+                                loanShow = true;
                                 advanceShow = false;
                                 radios = value.toString();
                               });
@@ -240,11 +227,7 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                                 var policyidnew = loanTypeList.elementAt(i);
                                 loanTypeGlobal = newVal.toString().split('-');
                                 String idn = loanTypeGlobal.last;
-                                print('loanId $idn');
                                 setState(() {
-                                  print('value1 $i');
-                                  print('value $policyidnew');
-                                  print('loanId $loanId');
                                   dropdownNewvalue = newVal;
                                 });
                               },
@@ -311,8 +294,6 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                                 //String idn=loanTypeGlobal.last;
                                 //print('loanId $idn');
                                 setState(() {
-                                  print('value $policyidnew');
-                                  print('advanceId $advanceId');
                                   advanceDropValue = valNew;
                                 });
                               },
@@ -407,9 +388,8 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
         bottomNavigationBar: Container(
           height: 100,
           color: context.cardColor,
-          child: ButtonBar(
+          child: OverflowBar(
             alignment: MainAxisAlignment.center,
-            buttonPadding: Vx.mOnly(right: 16),
             children: [
               ElevatedButton(
                 onPressed: () {
@@ -426,7 +406,7 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
                   );
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.lightBluishColor,
                   ),
                 ),
@@ -454,20 +434,16 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
       "remarks=$remarks",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       var result = mapResponse['result'].toString();
       var reason = mapResponse['reason'].toString();
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -483,7 +459,7 @@ class _LoanAdvanceRequisitionState extends State<LoanAdvanceRequisition> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

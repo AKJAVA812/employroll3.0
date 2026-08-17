@@ -4,7 +4,6 @@ import 'package:er_flutter_project/modules/claimAndReimbursement/mss/claimMssIte
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
-import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
@@ -22,10 +21,10 @@ class ClaimMssApproval extends StatefulWidget {
   final String empId;
 
   const ClaimMssApproval({
-    Key? key,
+    super.key,
     required this.levelStatus,
     required this.empId,
-  }) : super(key: key);
+  });
   @override
   State<ClaimMssApproval> createState() =>
       _ClaimMssApprovalState(levelStatus, empId);
@@ -115,7 +114,6 @@ class _ClaimMssApprovalState extends State<ClaimMssApproval> {
       empIdReceived = empIdSendUIS;
       levelStatusChecked = levelStatusCheckUIS;
     }
-    print("EMP ID REC - $empIdReceive");
 
     if (levelStatusChecked == "LEVEL_ONE_PENDING") {
       permissionCode = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
@@ -146,14 +144,12 @@ class _ClaimMssApprovalState extends State<ClaimMssApproval> {
         claimMssApprovalDataModalGlobaled = claimMssApprovalDataModalGlobal;
         isLoading = false;
       });
-      print('employeeList00${claimMssApprovalDataModalGlobal!.data!.length}');
     });
   }
 
   Future<ClaimMssApprovalDataModal> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimApproveDataApi;
-    print('employeeList11: ${SessionId}');
     ClaimMssApprovalDataModal claimMssApprovalDataModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -166,12 +162,9 @@ class _ClaimMssApprovalState extends State<ClaimMssApproval> {
       isLoading = true; // Start loading
       isLoadingNew = true; // Start loading
     });
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     claimMssApprovalDataModal = ClaimMssApprovalDataModal.fromJson(mapResponse);
     allUsernew = claimMssApprovalDataModal.data;
     setState(() {
@@ -181,7 +174,6 @@ class _ClaimMssApprovalState extends State<ClaimMssApproval> {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -247,7 +239,7 @@ class _ClaimMssApprovalState extends State<ClaimMssApproval> {
 class MyStatelessWidget extends StatefulWidget {
   final ClaimMssApprovalDataModal employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -313,7 +305,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 String approverAmt = approveAmtController.text.trim();
                 if (remarks.isNotEmpty) {
                   // Process the remarks (e.g., send to API)
-                  print("Remarks for $action: $remarks");
                   if (action == "Approve") {
                     approveClaim(context, remarks, claimRaiseId, approverAmt);
                   } else {
@@ -340,7 +331,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }
               },
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.green),
+                backgroundColor: WidgetStateProperty.all(Colors.green),
               ),
               child: Text("Submit"),
             ),
@@ -361,7 +352,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
   Future<ClaimMssApprovalDataModal> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimApproveDataApi;
-    print('employeeList11: ${SessionId}');
     ClaimMssApprovalDataModal claimMssApprovalDataModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -370,12 +360,9 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       "empId=$empIdReceived",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     claimMssApprovalDataModal = ClaimMssApprovalDataModal.fromJson(mapResponse);
     allUsernew = claimMssApprovalDataModal.data;
 
@@ -399,16 +386,12 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       "claimRaiseId=$claimRaiseId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         //showDialgSucess1(context,reason.upperCamelCase+" ","Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -458,7 +441,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     );
 
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
 
     // Close the loader once API response is received
     if (Navigator.of(context, rootNavigator: true).canPop()) {
@@ -467,7 +449,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
 
     if (response.statusCode == 200) {
       var responseResult = json.decode(response.body);
-      print('Response: $responseResult');
 
       String status = responseResult['status'].toLowerCase();
       String reason = responseResult['reason'];
@@ -561,7 +542,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
     );
 
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
 
     // Close the loader once API response is received
     if (Navigator.of(context, rootNavigator: true).canPop()) {
@@ -570,7 +550,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
 
     if (response.statusCode == 200) {
       var responseResult = json.decode(response.body);
-      print('Response: $responseResult');
 
       String status = responseResult['status'].toLowerCase();
       String reason = responseResult['reason'];
@@ -633,7 +612,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             borderRadius: BorderRadius.circular(12),
           ),
           contentPadding: EdgeInsets.all(8),
-          content: Container(
+          content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             height: MediaQuery.of(context).size.height * 0.6,
             child:
@@ -646,7 +625,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                       pageSnap: true,
                       fitPolicy: FitPolicy.BOTH,
                       onError: (error) {
-                        print(error.toString());
                       },
                     )
                     : Image.network(
@@ -699,7 +677,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
           itemBuilder: (context, index) {
             reimbursementTypeController.text =
                 foundDataNew![index].reimburName.toString();
-            print("Reimbursement Type - ${reimbursementTypeController.text}");
             expenseTypeController.text =
                 foundDataNew![index].expName.toString();
             subExpTypeController.text =
@@ -717,7 +694,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             kmController.text = foundDataNew![index].kilometer;
             claimAmtController.text =
                 foundDataNew![index].claimAMount.toString();
-            print("Claim Amt. - ${claimAmtController.text}");
             remarksController.text = foundDataNew![index].remarks;
             //final cardData = cardList[index];
             return Card(
@@ -1396,13 +1372,12 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          ButtonBar(
+                          OverflowBar(
                             alignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton(
                                 onPressed: () {
                                   claimRaiseId = foundDataNew![index].claimId;
-                                  print("$claimRaiseId");
                                   showApprovalDialog(
                                     context,
                                     "Disapprove",
@@ -1411,7 +1386,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                   setState(() {});
                                 },
                                 style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
+                                  backgroundColor: WidgetStateProperty.all(
                                     Mythemes.dangerColor,
                                   ),
                                 ),
@@ -1421,7 +1396,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                               ElevatedButton(
                                 onPressed: () {
                                   claimRaiseId = foundDataNew![index].claimId;
-                                  print("$claimRaiseId");
                                   showApprovalDialog(
                                     context,
                                     "Approve",
@@ -1430,7 +1404,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                                   setState(() {});
                                 },
                                 style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
+                                  backgroundColor: WidgetStateProperty.all(
                                     Mythemes.successColor,
                                   ),
                                 ),
@@ -1454,7 +1428,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

@@ -22,13 +22,9 @@ class OdPunchApi {
     final uri = Uri.parse(
       '${ApiDetails.server}${ApiDetails.mobileOdPunchContext}',
     );
-    print('[MOBILE-OD] CONTEXT -> GET $uri');
     final response = await MobileHttpClient.instance
         .get(uri, headers: await _headers(requestId))
         .timeout(const Duration(seconds: 30));
-    print(
-      '[MOBILE-OD] CONTEXT <- status=${response.statusCode} body=${response.body}',
-    );
     return _legacyCompatible(response);
   }
 
@@ -77,21 +73,10 @@ class OdPunchApi {
       ),
     );
 
-    print('[MOBILE-OD] PUNCH -> POST ${request.url}');
-    print(
-      '[MOBILE-OD] PUNCH headers -> tokenPresent=${request.headers['Authorization']?.isNotEmpty == true} sessionPresent=${request.headers['X-Mobile-Session-Id']?.isNotEmpty == true} requestId=$eventId',
-    );
-    print('[MOBILE-OD] PUNCH fields -> ${request.fields['metadata']}');
-    print(
-      '[MOBILE-OD] PUNCH file -> path=${image.path} contentType=${_imageContentType(image)}',
-    );
     final streamed = await MobileHttpClient.instance
         .send(request)
         .timeout(const Duration(seconds: 45));
     final response = await http.Response.fromStream(streamed);
-    print(
-      '[MOBILE-OD] PUNCH <- status=${response.statusCode} body=${response.body}',
-    );
     return _legacyCompatible(response);
   }
 
@@ -194,10 +179,6 @@ class OdPunchApi {
     if (token == null || token.isEmpty) {
       throw const OdPunchException('AUTHENTICATION_REQUIRED');
     }
-    print(
-      '[MOBILE-OD] headers -> tokenPresent=${token.isNotEmpty} '
-      'sessionPresent=${sessionId != null && sessionId.isNotEmpty}',
-    );
     return <String, String>{
       'Authorization': '$tokenType $token',
       if (sessionId != null && sessionId.isNotEmpty)

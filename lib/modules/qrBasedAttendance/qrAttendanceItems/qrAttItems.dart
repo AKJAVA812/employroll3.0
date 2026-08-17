@@ -5,7 +5,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 
 class QRAttTypes extends StatefulWidget {
-  const QRAttTypes({Key? key}) : super(key: key);
+  const QRAttTypes({super.key});
 
   @override
   State<QRAttTypes> createState() => _QRAttTypesState();

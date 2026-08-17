@@ -12,7 +12,7 @@ import '../../../sharedPrefancePage/ShardPre.dart';
 import '../../../themes/empThemes.dart';
 
 class OnDutyReports extends StatefulWidget {
-  const OnDutyReports({Key? key}) : super(key: key);
+  const OnDutyReports({super.key});
 
   @override
   State<OnDutyReports> createState() => _OnDutyReportsState();
@@ -37,39 +37,30 @@ class _OnDutyReportsState extends State<OnDutyReports> {
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
     if(empRole==1){
       showHide=true;
       showRo = false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if(empRole==0){
       showHide=false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if (adminRole == 0) {
       showAdmin = false;
-      print("Show Admin $showAdmin");
     }
     if (adminRole == 1) {
       showAdmin = true;
-      print("Show Admin $showAdmin");
     }
     if (roRole == 0) {
       showRo = false;
 
-      print("Show Ro $showRo");
     }
     if (roRole == 1) {
       showRo = true;
-      print("Show Ro $showRo");
     }
   }
 
@@ -415,29 +406,24 @@ class _OnDutyReportsState extends State<OnDutyReports> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => HomePage()));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-            print('OD');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

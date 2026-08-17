@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class ProfilePageNew extends StatefulWidget {
-  const ProfilePageNew({Key? key}) : super(key: key);
+  const ProfilePageNew({super.key});
 
   @override
   State<ProfilePageNew> createState() => _ProfilePageNewState();

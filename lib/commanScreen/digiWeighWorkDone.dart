@@ -21,7 +21,7 @@ class DigiWeighWorkDone extends StatefulWidget {
   final String address;
 
   const DigiWeighWorkDone(
-      {required this.value, required this.address, required this.time});
+      {super.key, required this.value, required this.address, required this.time});
 
   @override
   State<DigiWeighWorkDone> createState() => _DigiWeighWorkDoneState(value, address, time);
@@ -48,22 +48,19 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
 
   _DigiWeighWorkDoneState(this.value, this.currentAddress, this.time);
 
-  TextEditingController _customerNameController = TextEditingController();
-  TextEditingController _customerLocationController = TextEditingController();
-  TextEditingController _systemDetController = TextEditingController();
-  TextEditingController _natureController = TextEditingController();
-  TextEditingController _contNoController = TextEditingController();
+  final TextEditingController _customerNameController = TextEditingController();
+  final TextEditingController _customerLocationController = TextEditingController();
+  final TextEditingController _systemDetController = TextEditingController();
+  final TextEditingController _natureController = TextEditingController();
+  final TextEditingController _contNoController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  bool _enabled = false;
+  final bool _enabled = false;
   File? _image;
   late var result;
 
   @override
   void initState() {
     //getUploadImage();
-    print('Workdone${value}');
-    print('Workdone${time}');
-    print('Workdone${currentAddress}');
     getSharedPrfanceList();
 
     setState(() {
@@ -80,10 +77,6 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
     lngg = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
-    print('Response snapshot: ${sessionId}');
-    print('Response snapshot: ${latt}');
-    print('Response snapshot: ${lngg}');
-    print('Response snapshot: ${orgnizationID}');
   }
 
   Future getUploadImage() async {
@@ -97,7 +90,6 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
         this._image = value;
       });*/
     } on PlatformException catch (e) {
-      print('failed to upload: $e');
     }
   }
 
@@ -118,9 +110,6 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
     String formattedDate = dateFormat.format(now);
     var length = await value!.length();
-    print('Response status: ${length}');
-    print('Response body: ${stream}');
-    print('Response body: ${value}');
 
     //var uri = Uri.parse("http://23ba-122-176-34-239.ngrok.io/restful/service/task/via/mobile");
     var uri = Uri.parse("http://www.employroll.com/restful/service/task/via/mobile");
@@ -153,7 +142,7 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
       Navigator.pop(context);
       if (resultSuccess.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showSuccessGo(
-            context, "You have successfully submitted task details on server at".toString() + " " + formattedDate, "Task Submitted");
+            context, "You have successfully submitted task details on server at $formattedDate", "Task Submitted");
       } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
         CommonNotificationPage.showSuccessGo(
             context, resultSuccess, " Failed ");
@@ -163,11 +152,9 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
       CommonNotificationPage.showDialgError(context, result, "reason");
     }
     String reasonSuccess = result['reason'];
-    print('result${result}');
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run" + result['result']),
     ));*/
-    print('Response body: ${result}');
   }
   String singleDateString="";
 
@@ -175,16 +162,16 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
   String formattedDate = DateFormat.ABBR_MONTH;
   String dateFormate = DateFormat("dd-MM-yyyy").format(DateTime.parse("2019-09-30"));
   Future <Null> _selectDate (BuildContext context) async {
-    DateTime? _datePicker =await showDatePicker(
+    DateTime? datePicker =await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if(_datePicker != null && _datePicker != _date){
+    if(datePicker != null && datePicker != _date){
       setState(() {
-        _date = _datePicker;
+        _date = datePicker;
       });
     }
   }
@@ -336,7 +323,6 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
                                 //  DateFormat.yMd().format(date!).toString();
                               });
 
-                              print(date);
                             },
                             readOnly: true,
                             //initialValue: "dd-mm-yyyy",
@@ -358,24 +344,17 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ButtonBar(
+                        OverflowBar(
                             alignment: MainAxisAlignment.center,
-                            buttonPadding: Vx.mOnly(right: 16),
                             children: [
                               ElevatedButton(
                                 onPressed: () async {
                                   imageValu = value;
-                                  print('ImageValue $imageValu');
                                   custName = _customerNameController.text;
-                                  print('Customer Name $custName');
                                   custLocation = _customerLocationController.text;
-                                  print('customerLocation $custLocation');
                                   systemDet = _systemDetController.text;
-                                  print('systemDetails $systemDet');
                                   natureComplaint = _natureController.text;
-                                  print('NatureComplaint $natureComplaint');
                                   dateComplaint = _dateController.text;
-                                  print('Date Complaint $dateComplaint');
                                   if (_formKey.currentState!.validate()) {
                                     return
                                       setState(() {
@@ -392,7 +371,7 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
                                 },
                                 style: ButtonStyle(
                                   backgroundColor:
-                                  MaterialStateProperty.all(Mythemes.lightBluishColor),
+                                  WidgetStateProperty.all(Mythemes.lightBluishColor),
                                 ),
                                 child: "Next".text.make(),
                               ).wh(150, 40).py12()
@@ -413,7 +392,7 @@ class _DigiWeighWorkDoneState extends State<DigiWeighWorkDone> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

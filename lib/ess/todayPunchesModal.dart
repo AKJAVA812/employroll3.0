@@ -13,7 +13,7 @@ class TodayPunchesModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -59,17 +59,17 @@ class TodayData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['dt'] = this.dt;
-    data['punchType'] = this.punchType;
-    data['attMode'] = this.attMode;
-    data['deviceSerial'] = this.deviceSerial;
-    data['empCode'] = this.empCode;
-    data['createdDateTime'] = this.createdDateTime;
-    data['enrollId'] = this.enrollId;
-    data['time'] = this.time;
-    data['event'] = this.event;
-    data['apiType'] = this.apiType;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['dt'] = dt;
+    data['punchType'] = punchType;
+    data['attMode'] = attMode;
+    data['deviceSerial'] = deviceSerial;
+    data['empCode'] = empCode;
+    data['createdDateTime'] = createdDateTime;
+    data['enrollId'] = enrollId;
+    data['time'] = time;
+    data['event'] = event;
+    data['apiType'] = apiType;
     return data;
   }
 }

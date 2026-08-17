@@ -24,7 +24,7 @@ import '../../commanScreen/commanNotificationPage.dart';
 import 'modalClass/mssLoanListModal.dart';
 
 class PendingLoanRequestListMO extends StatefulWidget {
-  const PendingLoanRequestListMO({Key? key}) : super(key: key);
+  const PendingLoanRequestListMO({super.key});
 
   @override
   State<PendingLoanRequestListMO> createState() =>
@@ -241,7 +241,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
   Future<MSSLoanListModal> getMSSLoanList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.mssLoanListApi;
-    print('employeeList11: ${SessionId}');
     MSSLoanListModal mssLoanListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -253,17 +252,13 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
       isLoading = true;
     });
-    print('URL ${response.request}');
     mapResponse = json.decode(response.body);
-    print('responseemployeeList $mapResponse');
     var getData = mapResponse.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     mssLoanListModal = MSSLoanListModal.fromJson(mapResponse);
@@ -296,9 +291,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -308,13 +300,12 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -341,7 +332,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                   getSharedPrfanceList();
                   //Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -426,7 +416,7 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                         ),
                         ...organizations.map((org) {
                           return DropdownMenuItem(value: org, child: Text(org));
-                        }).toList(),
+                        }),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -439,8 +429,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                           );
 
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
                         });
 
                         setModalState(() {});
@@ -485,7 +473,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                           userPanel = await shared.getUserPanel();
                           getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print("ORG ID - $getOrgId");
                           try {
                             final value = await getMSSLoanList(sessionId!);
 
@@ -496,14 +483,10 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                               isLoading = false;
                             });
 
-                            print(
-                              'employeeList00: ${value.loanRequiDataforOthers?.length}',
-                            );
                           } catch (e) {
                             setState(() {
                               isLoading = false;
                             });
-                            print('Error while fetching requisitions: $e');
                           }
                         },
                         icon: Icon(Icons.filter_alt),
@@ -599,7 +582,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -607,11 +589,9 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -622,7 +602,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -630,7 +609,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -902,7 +880,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                         isLoading = false;
                         isLoadingCount = false;
                       });
-                      print('Error fetching requisitions: $e');
                     }
 
                     // Then stop the loader
@@ -962,7 +939,6 @@ class _PendingLoanRequestListMOState extends State<PendingLoanRequestListMO>
                 }
 
                 foundDataNew![i].status;
-                print(foundDataNew![i].status);
 
                 return InkWell(
                   onTap: () {

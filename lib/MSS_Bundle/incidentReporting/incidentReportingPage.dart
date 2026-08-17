@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class IncidentFormPage extends StatefulWidget {
+  const IncidentFormPage({super.key});
+
   @override
   State<IncidentFormPage> createState() => _IncidentFormPageState();
 }

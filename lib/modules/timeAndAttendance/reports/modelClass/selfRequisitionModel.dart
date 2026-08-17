@@ -7,16 +7,16 @@ class SelfRequisitionModel {
     final source = json['content'] ?? json['data'];
     if (source is List) {
       data = <Data>[];
-      source.forEach((v) {
+      for (var v in source) {
         if (v is Map) data!.add(Data.fromJson(Map<String, dynamic>.from(v)));
-      });
+      }
     } else {
       data = <Data>[];
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -85,23 +85,23 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['employeeName'] = this.employeeName;
-    data['inTimeRemark'] = this.inTimeRemark;
-    data['attendanceRequisionType'] = this.attendanceRequisionType;
-    data['compOffRequistionType'] = this.compOffRequistionType;
-    data['outTimeRemark'] = this.outTimeRemark;
-    data['creationDate'] = this.creationDate;
-    data['reqId'] = this.reqId;
-    data['inTime'] = this.inTime;
-    data['reqDate'] = this.reqDate;
-    data['nightRequistionType'] = this.nightRequistionType;
-    data['empDetailsId'] = this.empDetailsId;
-    data['outTime'] = this.outTime;
-    data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;
-    data['odRequistionType'] = this.odRequistionType;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['employeeName'] = employeeName;
+    data['inTimeRemark'] = inTimeRemark;
+    data['attendanceRequisionType'] = attendanceRequisionType;
+    data['compOffRequistionType'] = compOffRequistionType;
+    data['outTimeRemark'] = outTimeRemark;
+    data['creationDate'] = creationDate;
+    data['reqId'] = reqId;
+    data['inTime'] = inTime;
+    data['reqDate'] = reqDate;
+    data['nightRequistionType'] = nightRequistionType;
+    data['empDetailsId'] = empDetailsId;
+    data['outTime'] = outTime;
+    data['shortLeaveRequistionType'] = shortLeaveRequistionType;
+    data['odRequistionType'] = odRequistionType;
+    data['status'] = status;
     return data;
   }
 }

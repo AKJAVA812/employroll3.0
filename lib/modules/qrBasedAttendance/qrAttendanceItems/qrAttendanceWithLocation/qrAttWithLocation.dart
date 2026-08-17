@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/services.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
@@ -12,7 +10,7 @@ import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 
 class QRAttLocationPage extends StatefulWidget {
-  const QRAttLocationPage({Key? key}) : super(key: key);
+  const QRAttLocationPage({super.key});
 
   @override
   State<QRAttLocationPage> createState() => _QRAttLocationPageState();
@@ -38,7 +36,7 @@ class _QRAttLocationPageState extends State<QRAttLocationPage> {
 }
 
 class QRPageView extends StatefulWidget {
-  const QRPageView({Key? key}) : super(key: key);
+  const QRPageView({super.key});
 
   @override
   State<QRPageView> createState() => _QRPageViewState();
@@ -96,6 +94,7 @@ class _QRPageViewState extends State<QRPageView> {
   var macAddress;
   var deviceId;
   var battery;
+  @override
   void initState() {
     getSharedPrfanceList();
     empCode = "THUMB141";
@@ -118,10 +117,6 @@ class _QRPageViewState extends State<QRPageView> {
     lng=await shared.getLongitude();
     orgnizationID=await shared.getOrgId();
 
-    print('Response snapshot: ${sessionId}');
-    print('Response snapshot: ${lat}');
-    print('Response snapshot: ${lng}');
-    print('Response snapshot: ${orgnizationID}');
 
   }
  /* Future _qrScanner(BuildContext context) async{
@@ -232,7 +227,6 @@ class _QRPageViewState extends State<QRPageView> {
 
   Future getUserName() async {
     UserName = await shared.getempName();
-    print('Response snapshot: ${UserName}');
   }
 
   void _getTime() {
@@ -280,7 +274,7 @@ class _QRPageViewState extends State<QRPageView> {
                   child: ListTile(
                     //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
                     title: Text(UserName),
-                    subtitle: Text('$currentAddress'),
+                    subtitle: Text(currentAddress),
                     leading: Container(
                       child:imageString==null ? Center(child : CircularProgressIndicator()) :CircleAvatar(
                         radius: 30,
@@ -316,7 +310,7 @@ class _QRPageViewState extends State<QRPageView> {
                             height: 25,
                             width: 125,
                             child: Text(
-                              '$todayDateShow',
+                              todayDateShow,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18,
@@ -343,7 +337,7 @@ class _QRPageViewState extends State<QRPageView> {
                             height: 25,
                             width: 125,
                             child: Text(
-                              '$timeString',
+                              timeString,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18,
@@ -398,13 +392,13 @@ class _QRPageViewState extends State<QRPageView> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
                                 child: CircleAvatar(
+                                  backgroundColor: Mythemes.successColor,
+                                  radius: 20,
                                   child: Icon(
                                     Icons.fingerprint,
                                     size: 30,
                                     color: Mythemes.creamColor,
                                   ),
-                                  backgroundColor: Mythemes.successColor,
-                                  radius: 20,
                                 ),
                               ),
                               Container(
@@ -452,13 +446,13 @@ class _QRPageViewState extends State<QRPageView> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
                                 child: CircleAvatar(
+                                  backgroundColor: Mythemes.dangerColorOne,
+                                  radius: 20,
                                   child: Icon(
                                     Icons.fingerprint,
                                     size: 30,
                                     color: Mythemes.creamColor,
                                   ),
-                                  backgroundColor: Mythemes.dangerColorOne,
-                                  radius: 20,
                                 ),
                               ),
                               Container(

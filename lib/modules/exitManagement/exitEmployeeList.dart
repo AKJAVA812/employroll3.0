@@ -20,7 +20,7 @@ import '../../themes/empThemes.dart';
 import 'modalClasses/exitEmpListModal.dart';
 
 class ExitEmployeeListView extends StatefulWidget {
-  const ExitEmployeeListView({Key? key}) : super(key: key);
+  const ExitEmployeeListView({super.key});
 
   static const String _title = 'Employee List';
 
@@ -70,9 +70,8 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -97,14 +96,12 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
         employeeListModelglobel = value;
         employeeListModelglobeled = employeeListModelglobel;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
   }
 
   Future<ExitEmpListModal> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.exitEmpListApi;
-    print('employeeList11: ${SessionId}');
     ExitEmpListModal employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -115,12 +112,9 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
-    print('Exit API - ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = ExitEmpListModal.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
     setState(() {
@@ -141,10 +135,8 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
       "status=true",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
       }
@@ -152,11 +144,9 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
       mapResponse = json.decode(response.body);
       String status = mapResponse['status'];
       String reason = mapResponse['reason'];
-      print('result both $status $reason');
-      print('result${status}');
       if (status.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
         } else if (status.compareToIgnoringCase("error") == 0) {
           showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
@@ -175,10 +165,8 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
       "status=false",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
       }
@@ -186,11 +174,9 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
       mapResponse = json.decode(response.body);
       String status = mapResponse['status'];
       String reason = mapResponse['reason'];
-      print('result both $status $reason');
-      print('result${status}');
       if (status.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
         } else if (status.compareToIgnoringCase("error") == 0) {
           showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
@@ -244,7 +230,6 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -344,7 +329,6 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -354,7 +338,6 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if (index == 3) {
             Navigator.push(
@@ -364,14 +347,12 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -434,16 +415,12 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
                   onTap: () {
                     empIdExited = foundDataNew![i].empdetailsId;
                     empNameExited = foundDataNew![i].empName;
-                    print('ID $empIdExited');
-                    print('NameCheck $empNameExited');
                     //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
                   },
                   child: GestureDetector(
                     onTap: () async {
                       empIdExited = foundDataNew![i].empdetailsId;
                       empNameExited = foundDataNew![i].empName;
-                      print('ID $empIdExited');
-                      print('NameCheck $empNameExited');
                       if (foundDataNew![i].initiate == true) {
                         bool? result = await showDialog(
                           context: context,
@@ -476,10 +453,10 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
                                       empIdExited.toString(),
                                     );
                                   },
-                                  child: Text("Yes"),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.green,
                                   ),
+                                  child: Text("Yes"),
                                 ),
                               ],
                             );
@@ -523,10 +500,10 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
                                     empIdExited = foundDataNew![i].empdetailsId;
                                     initiateExitProcess(empIdExited.toString());
                                   },
-                                  child: Text("Yes"),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.green,
                                   ),
+                                  child: Text("Yes"),
                                 ),
                               ],
                             );
@@ -686,7 +663,7 @@ class _ExitEmployeeListViewState extends State<ExitEmployeeListView>
 class MyStatelessWidget extends StatefulWidget {
   final ExitEmpListModal employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -714,10 +691,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       "status=true",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
       }
@@ -725,11 +700,9 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       mapResponse = json.decode(response.body);
       String status = mapResponse['status'];
       String reason = mapResponse['reason'];
-      print('result both $status $reason');
-      print('result${status}');
       if (status.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
         } else if (status.compareToIgnoringCase("error") == 0) {
           showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
@@ -748,10 +721,8 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       "status=false",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
       }
@@ -759,11 +730,9 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
       mapResponse = json.decode(response.body);
       String status = mapResponse['status'];
       String reason = mapResponse['reason'];
-      print('result both $status $reason');
-      print('result${status}');
       if (status.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
         } else if (status.compareToIgnoringCase("error") == 0) {
           showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }
@@ -846,7 +815,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
               Navigator.pop(context);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -914,16 +882,12 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             onTap: () {
               empIdExited = foundDataNew![i].empdetailsId;
               empNameExited = foundDataNew![i].empName;
-              print('ID $empIdExited');
-              print('NameCheck $empNameExited');
               //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
             },
             child: GestureDetector(
               onTap: () async {
                 empIdExited = foundDataNew![i].empdetailsId;
                 empNameExited = foundDataNew![i].empName;
-                print('ID $empIdExited');
-                print('NameCheck $empNameExited');
                 if (foundDataNew![i].initiate == true) {
                   bool? result = await showDialog(
                     context: context,
@@ -954,10 +918,10 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                               empIdExited = foundDataNew![i].empdetailsId;
                               unInitiateExitProcess(empIdExited.toString());
                             },
-                            child: Text("Yes"),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
                             ),
+                            child: Text("Yes"),
                           ),
                         ],
                       );
@@ -1001,10 +965,10 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                               empIdExited = foundDataNew![i].empdetailsId;
                               initiateExitProcess(empIdExited.toString());
                             },
-                            child: Text("Yes"),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
                             ),
+                            child: Text("Yes"),
                           ),
                         ],
                       );

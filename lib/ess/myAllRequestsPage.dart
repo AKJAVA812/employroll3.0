@@ -16,7 +16,7 @@ import 'EssDashboarrddModel.dart';
 import 'essDashboardNavigate.dart';
 
 class MyAllRequestPage extends StatefulWidget {
-  const MyAllRequestPage({Key? key}) : super(key: key);
+  const MyAllRequestPage({super.key});
 
   @override
   State<MyAllRequestPage> createState() => _MyAllRequestPageState();
@@ -71,7 +71,6 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
     sessionId = await shared.getSessionId();
     userType = await shared.getUserType();
     setState(() {});
-    print("User Type - $userType");
     setShowPayroll = await shared.getShowPayroll();
     orgId = await shared.getOrgId();
     emailId = await shared.getEmailId();
@@ -85,46 +84,28 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
     userPanel = await shared.getUserPanel();
     profileName = await shared.getDefaultProfileName();
     profileId = await shared.getDefaultProfileId();
-    print("Default Profile Name - $profileName");
-    print("Default Profile Id - $profileId");
-    print("User Panel - $userPanel");
-    print('Pre-Onboard $setPreOnboardShow');
-    print('Exit Show $setExitShow');
-    print('empRole $empRoles');
-    print('roRole $roRoles');
-    print('adminRole $adminRoles');
-    print('Response snapshot: ${sessionId}');
-    print('Show Payroll: ${setShowPayroll}');
-    print('OrgId -  ${orgId}');
-    print('OrgName - : ${orgName}');
     setState(() {});
     setState(() {
       if (empRoles == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRoles == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRoles == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRoles == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRoles == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRoles == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -150,7 +131,6 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
     double widgetHeight = screenHeight * 0.5; // 50% of the screen height
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
-      print("CheckOrg - $orgId");
       List<Widget> items = [];
 
       //My Attendance Requests
@@ -561,7 +541,7 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: '$titleName',
+                  text: titleName,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -609,7 +589,6 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
                 ),
               );
               //Navigator.pop(context);
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -627,7 +606,6 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Claim');
             }
             if (index == 3) {
               Navigator.push(
@@ -638,7 +616,6 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
               );
 
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -651,7 +628,6 @@ class _MyAllRequestPageState extends State<MyAllRequestPage> {
               /* Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
               );*/
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";

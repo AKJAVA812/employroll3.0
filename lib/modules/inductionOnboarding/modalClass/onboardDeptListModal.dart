@@ -13,7 +13,7 @@ class OnboardDeptListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -37,11 +37,11 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['isCheck'] = this.isCheck;
-    data['name'] = this.name;
-    data['id'] = this.id;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['isCheck'] = isCheck;
+    data['name'] = name;
+    data['id'] = id;
+    data['status'] = status;
     return data;
   }
 }

@@ -24,7 +24,7 @@ class OdWorkDonePage extends StatefulWidget {
   final String address;
 
   const OdWorkDonePage(
-      {required this.value, required this.address, required this.time});
+      {super.key, required this.value, required this.address, required this.time});
 
   @override
   State<OdWorkDonePage> createState() => _OdWorkDonePageState(value, address, time);
@@ -45,21 +45,18 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
 
   _OdWorkDonePageState(this.value, this.currentAddress, this.time);
 
-  TextEditingController _remarkController = TextEditingController();
-  TextEditingController _clientNameController = TextEditingController();
-  TextEditingController _orgNameController = TextEditingController();
-  TextEditingController _emailIdController = TextEditingController();
-  TextEditingController _contNoController = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
+  final TextEditingController _clientNameController = TextEditingController();
+  final TextEditingController _orgNameController = TextEditingController();
+  final TextEditingController _emailIdController = TextEditingController();
+  final TextEditingController _contNoController = TextEditingController();
 
-  bool _enabled = false;
+  final bool _enabled = false;
   File? _image;
 
   @override
   void initState() {
     //getUploadImage();
-    print('Workdone${value}');
-    print('Workdone${time}');
-    print('Workdone${currentAddress}');
     getSharedPrfanceList();
     setState(() {
 
@@ -75,10 +72,6 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
     lng = await shared.getLongitude();
     orgnizationID = await shared.getOrgId();
 
-    print('Response snapshot: ${sessionId}');
-    print('Response snapshot: ${lat}');
-    print('Response snapshot: ${lng}');
-    print('Response snapshot: ${orgnizationID}');
   }
 
   Future getUploadImage() async {
@@ -92,7 +85,6 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
         this._image = value;
       });*/
     } on PlatformException catch (e) {
-      print('failed to upload: $e');
     }
   }
 
@@ -111,7 +103,6 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
     }
 
     final formattedDate = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now());
-    print('[MOBILE-WORKDONE][OD] screen submit -> image=${value!.path} lat=$lat lng=$lng address=$currentAddress');
     CommonNotificationPage.showLoaderDialog(context);
     try {
       final response = await WorkDoneApi().submit(
@@ -142,10 +133,8 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
       } else {
         CommonNotificationPage.showDialgError(context, "Failed", reason);
       }
-      print('[MOBILE-WORKDONE][OD] response status=${response.statusCode} body=$decoded');
     } catch (error) {
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
-      print('[MOBILE-WORKDONE][OD] submit error -> $error');
       CommonNotificationPage.showDialgError(context, "Failed", error.toString());
     }
   }
@@ -385,9 +374,8 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
                   Container(
                     height: 80,
                     color: context.cardColor,
-                    child: ButtonBar(
+                    child: OverflowBar(
                         alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
                         children: [
                           ElevatedButton(
                             onPressed: () async {
@@ -398,7 +386,7 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
                             },
                             style: ButtonStyle(
                               backgroundColor:
-                              MaterialStateProperty.all(Mythemes.lightBluishColor),
+                              WidgetStateProperty.all(Mythemes.lightBluishColor),
                             ),
                             child: "Submit".text.make(),
                           ).wh(150, 40).py12()
@@ -425,29 +413,24 @@ class _OdWorkDonePageState extends State<OdWorkDonePage> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => HomePage()));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-            print('OD');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

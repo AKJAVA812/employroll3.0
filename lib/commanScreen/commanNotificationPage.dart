@@ -1,6 +1,5 @@
 
 import 'package:er_flutter_project/commanScreen/routes.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -68,7 +67,6 @@ class CommonNotificationPage{
 
   static void showDialgSucess(BuildContext buildContext, String result, String alert) {
     if (!buildContext.mounted) {
-      print("⚠️ Warning: context is not mounted, cannot show dialog.");
       return;
     }
 
@@ -93,7 +91,6 @@ class CommonNotificationPage{
                 if (Navigator.of(buildContext, rootNavigator: true).canPop()) {
                   Navigator.of(buildContext, rootNavigator: true).pop();
                 } else {
-                  print("⚠️ Warning: No route to close.");
                 }
               },
               child: const Text("Ok"),
@@ -123,7 +120,7 @@ class CommonNotificationPage{
         builder: (context) {
           /* var height = MediaQuery.of(context).size.height;
           var width = MediaQuery.of(context).size.width;*/
-          return Container(
+          return SizedBox(
             height:  15,
             width:  20,
             child: "Sure you want to cancel requisition?".text.make(),

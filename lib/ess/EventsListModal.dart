@@ -20,12 +20,12 @@ class EssEventsListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.bdayList != null) {
-      data['bdayList'] = this.bdayList!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (bdayList != null) {
+      data['bdayList'] = bdayList!.map((v) => v.toJson()).toList();
     }
-    if (this.joblist != null) {
-      data['joblist'] = this.joblist!.map((v) => v.toJson()).toList();
+    if (joblist != null) {
+      data['joblist'] = joblist!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -63,15 +63,15 @@ class BdayList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['image'] = this.image;
-    data['dob'] = this.dob;
-    data['contact'] = this.contact;
-    data['fullName'] = this.fullName;
-    data['emailId'] = this.emailId;
-    data['empDetailsId'] = this.empDetailsId;
-    data['employeeId'] = this.employeeId;
-    data['department'] = this.department;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['image'] = image;
+    data['dob'] = dob;
+    data['contact'] = contact;
+    data['fullName'] = fullName;
+    data['emailId'] = emailId;
+    data['empDetailsId'] = empDetailsId;
+    data['employeeId'] = employeeId;
+    data['department'] = department;
     return data;
   }
 }
@@ -108,15 +108,15 @@ class Joblist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['image'] = this.image;
-    data['doj'] = this.doj;
-    data['contact'] = this.contact;
-    data['fullName'] = this.fullName;
-    data['emailId'] = this.emailId;
-    data['empDetailsId'] = this.empDetailsId;
-    data['employeeId'] = this.employeeId;
-    data['department'] = this.department;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['image'] = image;
+    data['doj'] = doj;
+    data['contact'] = contact;
+    data['fullName'] = fullName;
+    data['emailId'] = emailId;
+    data['empDetailsId'] = empDetailsId;
+    data['employeeId'] = employeeId;
+    data['department'] = department;
     return data;
   }
 }

@@ -21,7 +21,7 @@ import '../../modules/leaveManagement/reports/modalClass/levelTwoPendingLeaveMod
 
 class MSS_LevelTwoPendingLeave extends StatefulWidget {
   final LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
-  const MSS_LevelTwoPendingLeave(this.pendingLeaveRequisitionModal);
+  const MSS_LevelTwoPendingLeave(this.pendingLeaveRequisitionModal, {super.key});
 
   @override
   State<MSS_LevelTwoPendingLeave> createState() =>
@@ -71,10 +71,9 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNewMSSL2!.length;
 
-      print('listLength $listLength');
     });
   }
 
@@ -136,7 +135,6 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
         pendingLeaveReqLabeled = pendingLeaveReqLabel;
         if (foundDataNewMSSL2 != null) {
           foundDataNewMSSL2!.length;
-          print("Fetch data $foundDataNewMSSL2");
         } else {
           Center(child: "There is no data available right now".text.make());
           foundDataNewMSSL2 = [];
@@ -149,7 +147,6 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
   Future<LevelTwoPendingLeaveModal> getPendingLeaveReq(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingLeaveReqList;
-    print('employeeList11: ${SessionId}');
     LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -159,16 +156,12 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
       "orgId=0",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
     if (getData == null) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
-    print('responseemployeeList $getData');
     pendingLeaveRequisitionModal = LevelTwoPendingLeaveModal.fromJson(
       mapResponse,
     );
@@ -183,7 +176,6 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -381,7 +373,6 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -389,16 +380,13 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-            print('Leave');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -406,7 +394,6 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -459,7 +446,6 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
           final item = foundDataNewMSSL2![index];
           return InkWell(
             onTap: () {
-              print(foundDataNewMSSL2!.length);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder:
@@ -603,9 +589,6 @@ class _MSS_LevelTwoPendingLeaveState extends State<MSS_LevelTwoPendingLeave>
                               color: Colors.blueAccent,
                             ),
                             onPressed: () {
-                              print(
-                                "Attachment tapped for ${item.employeeName}",
-                              );
                               if (item.document != null &&
                                   item.document.toString().isNotEmpty) {
                                 showAttachmentBottomSheet(

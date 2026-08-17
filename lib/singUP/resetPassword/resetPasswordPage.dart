@@ -10,6 +10,8 @@ import '../../themes/empThemes.dart';
 import '../login_page.dart';
 
 class ResetPasswordPage extends StatefulWidget {
+  const ResetPasswordPage({super.key});
+
   @override
   _ResetPasswordPageState createState() => _ResetPasswordPageState();
 }
@@ -45,10 +47,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     final accessToken = await shared.getAccessToken();
     final tokenType = await shared.getTokenType() ?? 'Bearer';
     final urlapi = Uri.parse("$conn$apiUrl");
-    print('[MOBILE-AUTH] LOGOUT -> POST $urlapi');
-    print(
-      '[MOBILE-AUTH] LOGOUT headers -> tokenPresent=${accessToken != null && accessToken.isNotEmpty} sessionPresent=${currentSessionId != null && currentSessionId.isNotEmpty}',
-    );
 
     final response = await MobileHttpClient.instance.post(
       urlapi,
@@ -60,10 +58,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       },
     );
 
-    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
-    print(
-      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
-    );
     if (response.body.isNotEmpty) {
       mapResponse = json.decode(response.body);
     } else {
@@ -78,7 +72,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (response.statusCode == 200 &&
         result.compareToIgnoringCase('success') == 0) {
       await shared.clearMobileAuth();
-      print('[MOBILE-AUTH] LOGOUT -> success');
       Fluttertoast.showToast(
         msg: message.isNotEmpty ? message : "Logout Successfully !!",
         toastLength: Toast.LENGTH_SHORT,
@@ -89,7 +82,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         fontSize: 16.0,
       );
     } else {
-      print('[MOBILE-AUTH] LOGOUT -> error message=$message');
       Fluttertoast.showToast(
         msg: message.isNotEmpty ? message : "Logout Error !!",
         toastLength: Toast.LENGTH_SHORT,
@@ -110,11 +102,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     });
     final url = Uri.parse(
       '$conn$apiUrl?'
-      'email=${getEmailId}&'
+      'email=$getEmailId&'
       'resend=$resendKey',
     );
 
-    print("Calling API: $url");
 
     // Show loader
     /*    showDialog(
@@ -125,8 +116,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     try {
       final response = await MobileHttpClient.instance.post(url);
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       setState(() {
         isLoading = false;
@@ -207,7 +196,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       'otp=${otpController.text}',
     );
 
-    print("Calling API: $url");
 
     // Show loader
     showDialog(
@@ -218,8 +206,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     try {
       final response = await MobileHttpClient.instance.post(url);
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       // Dismiss loader
       Navigator.of(context, rootNavigator: true).pop();
@@ -262,10 +248,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     shared.setMobAction(0);
                     final service = FlutterBackgroundService();
                     var isRunning = await service.isRunning();
-                    print(isRunning);
                     if (isRunning) {
                       service.invoke("stopService");
-                      print("Background Stop");
                     }
                     setState(() {});
                     Navigator.of(context, rootNavigator: true).pop();
@@ -348,10 +332,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   void changePasswords() {
     // Add validation and backend logic here
-    print("OTP: ${otpController.text}");
-    print("Current Password: ${currentPasswordController.text}");
-    print("New Password: ${newPasswordController.text}");
-    print("Confirm Password: ${confirmPasswordController.text}");
 
     // After success:
     showDialog(
@@ -377,10 +357,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 shared.setMobAction(0);
                 final service = FlutterBackgroundService();
                 var isRunning = await service.isRunning();
-                print(isRunning);
                 if (isRunning) {
                   service.invoke("stopService");
-                  print("Background Stop");
                 }
                 setState(() {});
                 Navigator.of(context, rootNavigator: true).pop();

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +22,7 @@ import '../../../modules/onDuty/reports/pendingRequisition/odAttendanceApproval.
 class UIS_PendingOdRequisition extends StatefulWidget {
   final PendingOdReqList pendingOdReqList;
 
-  UIS_PendingOdRequisition(this.pendingOdReqList);
+  const UIS_PendingOdRequisition(this.pendingOdReqList, {super.key});
 
   @override
   State<UIS_PendingOdRequisition> createState() =>
@@ -79,15 +78,13 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
     startDate = "2015-01-01";
     DateFormat currentDateFormat = DateFormat("yyyy-MM-dd");
     String currentDateFormatString = currentDateFormat.format(now);
-    print("current date $currentDateFormatString");
     endDate = currentDateFormatString;
     // TODO: implement initState
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNewUIS!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -112,7 +109,6 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
         pendingOdReqListLabeled = pendingOdReqListLabel;
         if (foundDataNewUIS != null) {
           foundDataNewUIS!.length;
-          print("Fetch data $foundDataNewUIS");
           isLoading = false;
         } else {
           Center(child: "There is no data available right now".text.make());
@@ -127,7 +123,6 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
   Future<PendingOdReqList> getPendingOdReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.odPendingReqListNew;
-    print('employeeList11: ${SessionId}');
     PendingOdReqList pendingOdReqList;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -138,16 +133,12 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
     );
 
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result'];
     if (getData == "Error") {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
-    print('responseemployeeList $getData');
     pendingOdReqList = PendingOdReqList.fromJson(mapResponse);
     allUsernew = pendingOdReqList.listdata;
 
@@ -191,7 +182,6 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Listdata>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -333,7 +323,6 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
                   onChanged: (i) {
                     setState(() {
                       value = i;
-                      print(i);
                     });
 
                     if (value == 0) {
@@ -392,7 +381,6 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -400,16 +388,13 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-            print('OD');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -417,7 +402,6 @@ class _UIS_PendingOdRequisitionState extends State<UIS_PendingOdRequisition>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

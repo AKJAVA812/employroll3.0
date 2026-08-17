@@ -27,7 +27,7 @@ class RoWorkDoneReport extends StatefulWidget {
     this.toDatePickedStringRo,
     this.fromDatePickedStringRo,
     this.filterType,
-    this.empNewId,
+    this.empNewId, {super.key}
   );
 
   @override
@@ -47,10 +47,10 @@ dynamic getProfileId;
 dynamic orgId;
 List<Data>? allUsernew = [];
 List<Data>? foundDataNew = [];
-late ROWorkdoneReportModel? roWorkDoneReportModelGlobal = ROWorkdoneReportModel(
+ROWorkdoneReportModel? roWorkDoneReportModelGlobal = ROWorkdoneReportModel(
   data: [],
 );
-late ROWorkdoneReportModel? roWorkDoneReportModelGlobaled =
+ROWorkdoneReportModel? roWorkDoneReportModelGlobaled =
     ROWorkdoneReportModel(data: []);
 
 class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
@@ -69,13 +69,8 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
   @override
   void initState() {
     getSharedPrfanceList();
-    var listLength;
+    int listLength;
     listLength = foundDataNew!.length;
-    print('listLength $listLength');
-    print(fromDatePickedString);
-    print(toDatePickedStringRo);
-    print(filterType);
-    print(empNewId);
     // TODO: implement initState
     super.initState();
   }
@@ -84,9 +79,6 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
     sessionId = await shared.getSessionId();
     userPanel = await shared.getUserPanel();
     getProfileId = await shared.getDefaultProfileId();
-    print('ResponseAttendance: ${sessionId}');
-    print('ResponseAttendance: ${fromDatePickedString}');
-    print('ResponseAttendance: ${toDatePickedStringRo}');
     //await Future.delayed(Duration(seconds: 3));
     Future<ROWorkdoneReportModel> getEmployeeList11 = getEmployeeList(
       sessionId!,
@@ -108,7 +100,6 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
         roWorkDoneReportModelGlobal = value;
         roWorkDoneReportModelGlobaled = roWorkDoneReportModelGlobal;
       });
-      print('workDoneReport00${roWorkDoneReportModelGlobal!.data!.length}');
     });
   }
 
@@ -156,7 +147,6 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
   ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.roWorkDoneReport;
-    print('workDoneReport: ${sessionId}');
     ROWorkdoneReportModel roWorkdoneReportModel;
     //http://www.employroll.com/restful/service/get/self/mobile/task/list?sessionId=49a180fd3893b71baf3b030f39e0782d51d02cbe51a&fromdate=01-10-2022&todate=31-10-2022
     var urlapi = Uri.parse(
@@ -172,14 +162,10 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     if (getData.length == 0) {
-      print("getData111 $getData");
       showNodata(context, "Alert", "There is no data available for this date.");
     }
 
@@ -212,7 +198,6 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -331,7 +316,6 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -359,14 +343,12 @@ class _RoWorkDoneReportState extends State<RoWorkDoneReport> {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -465,7 +447,7 @@ class SearchItems extends SearchDelegate {
 class GetWorkDoneReports extends StatefulWidget {
   final ROWorkdoneReportModel roWorkdoneReportModel;
 
-  GetWorkDoneReports(this.roWorkdoneReportModel);
+  const GetWorkDoneReports(this.roWorkdoneReportModel, {super.key});
 
   @override
   State<GetWorkDoneReports> createState() =>
@@ -535,7 +517,7 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
               children: [
                 Row(
                   children: [
-                    Container(width: 75, child: "Mobile No :".text.make()),
+                    SizedBox(width: 75, child: "Mobile No :".text.make()),
                     foundDataNew![itemCount].cNumber
                         .toString()
                         .text
@@ -546,7 +528,7 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
                 ),
                 Row(
                   children: [
-                    Container(width: 75, child: "Email Id :".text.make()),
+                    SizedBox(width: 75, child: "Email Id :".text.make()),
                     Expanded(
                       child:
                           foundDataNew![itemCount].cMailId
@@ -560,7 +542,7 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
                 ),
                 Row(
                   children: [
-                    Container(width: 75, child: "Time :".text.make()),
+                    SizedBox(width: 75, child: "Time :".text.make()),
                     foundDataNew![itemCount].time
                         .toString()
                         .text
@@ -571,7 +553,7 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
                 ),
                 Row(
                   children: [
-                    Container(width: 75, child: "Location :".text.make()),
+                    SizedBox(width: 75, child: "Location :".text.make()),
                     Expanded(
                       child:
                           foundDataNew![itemCount].cAddress

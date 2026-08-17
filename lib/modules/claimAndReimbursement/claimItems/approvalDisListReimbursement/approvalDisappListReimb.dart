@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
@@ -12,7 +11,7 @@ import '../modalClass/appDisReimbListModal.dart';
 
 class ApprovalListReimbursement extends StatefulWidget {
   final AppDisReimbListModal appDisReimbListModal;
-  ApprovalListReimbursement(this.appDisReimbListModal);
+  const ApprovalListReimbursement(this.appDisReimbListModal, {super.key});
   @override
   State<ApprovalListReimbursement> createState() =>
       _ApprovalListReimbursementState(appDisReimbListModal);
@@ -79,16 +78,13 @@ class _ApprovalListReimbursementState extends State<ApprovalListReimbursement>
   Future<AppDisReimbListModal> getAppDisReimbList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.appDisReimbList;
-    print('employeeList11: ${SessionId}');
     AppDisReimbListModal appDisReimbListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     appDisReimbListModal = AppDisReimbListModal.fromJson(mapResponse);
 
     return appDisReimbListModal;

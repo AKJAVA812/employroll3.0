@@ -13,10 +13,10 @@ class ReimbursementTypeListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.claimDataList != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (claimDataList != null) {
       data['claimDataList'] =
-          this.claimDataList!.map((v) => v.toJson()).toList();
+          claimDataList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -45,12 +45,12 @@ class ClaimDataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['policyId'] = this.policyId;
-    data['policyName'] = this.policyName;
-    data['claimId'] = this.claimId;
-    data['policyCode'] = this.policyCode;
-    data['reimbId'] = this.reimbId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['policyId'] = policyId;
+    data['policyName'] = policyName;
+    data['claimId'] = claimId;
+    data['policyCode'] = policyCode;
+    data['reimbId'] = reimbId;
     return data;
   }
 }

@@ -25,7 +25,7 @@ class RaiseVisitorRequisition extends StatefulWidget {
   final File? value;
 
 
-  RaiseVisitorRequisition({required this.value});
+  const RaiseVisitorRequisition({super.key, required this.value});
 
   @override
   State<RaiseVisitorRequisition> createState() => _RaiseVisitorRequisitionState(value);
@@ -51,8 +51,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
 
   @override
   void initState() {
-    print("image - $value");
-    print(value!.lengthSync());
     saveCount = _myBox.get('saveCount') ?? 0;
     // TODO: implement initState
     getSharedPrfanceList();
@@ -75,7 +73,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
 
     //Image Getter
     var stream = http.ByteStream(value!.openRead());
-    print("Save Count - $saveCount");
     stream.cast();
     var length = await value!.length();
     var bytes = await stream.toBytes();
@@ -91,7 +88,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
   //Read Data
   void readData() {
     for (int i = 0; i <= _myBox.get(saveCount, defaultValue: 0); i++) {
-      print(_myBox.get(i));
     }
   }
 
@@ -105,7 +101,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
 
   _incrementCounter() {
 
-    print("$_clickCount");
   }
   String? _platformVersion = 'Unknown', _autoTimezone, _autoTime, _daftar = "";
   Map<String, dynamic>? _list;
@@ -165,7 +160,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
       _autoTime = autoTime;
       _list = list;
       _daftar = "";
-      print('autoupdateChange $_platformVersion $_autoTimezone $autoTime');
       list!.forEach((k, v) {
         _daftar = "$k : $v \n";
       });
@@ -180,10 +174,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
     orgnizationID=await shared.getOrgId();
     _getDeviceId();
 
-    print('Response snapshot: ${sessionId}');
-    print('Response snapshot: ${lat}');
-    print('Response snapshot: ${lng}');
-    print('Response snapshot: ${orgnizationID}');
 
   }
 
@@ -258,7 +248,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
             if (_clickCount > 2) {
               //print("I am touched 2 times");
               //Navigator.pop(context);
-              savedDataLocally(context,"Data Saved Offline !"+"","Your punch is saved offline, Please sync the punch once you are in network area.");
+              savedDataLocally(context,"Data Saved Offline !""","Your punch is saved offline, Please sync the punch once you are in network area.");
               writeData();
               readData();
             } else {
@@ -341,29 +331,10 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
         var androidInfo = await deviceInfo.androidInfo;
         //AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
         deviceId = androidInfo.id; // Unique ID on Android
-        print('Device ID 1 - ${androidInfo.id}');
-        print("Device ID 2- ${androidInfo.serialNumber}");
-        print("Device ID 3- ${androidInfo.hardware}");
-        print("Device ID 4- ${androidInfo.device}");
-        print("Device ID 5- ${androidInfo.board}");
-        print("Device ID 6- ${androidInfo.bootloader}");
-        print("Device ID 7- ${androidInfo.brand}");
-        print("Device ID 8- ${androidInfo.display}");
         //print("Device ID 9- ${androidInfo.displayMetrics}");
-        print("Device ID 10- ${androidInfo.fingerprint}");
-        print("Device ID 11- ${androidInfo.host}");
-        print("Device ID 12- ${androidInfo.isPhysicalDevice}");
-        print("Device ID 13- ${androidInfo.manufacturer}");
-        print("Device ID 14- ${androidInfo.model}");
-        print("Device ID 15- ${androidInfo.product}");
-        print("Device ID 16- ${androidInfo.tags}");
-        print("Device ID 17- ${androidInfo.version}");
-        print("Device ID 18- ${androidInfo.type}");
-        print("Device ID 19- ${androidInfo.data}");
       } else if (Platform.isIOS) {
         var iosInfo = await deviceInfo.iosInfo;
         deviceId = iosInfo.identifierForVendor; // Unique ID on iOS
-        print('Device ID 1 - ${iosInfo.identifierForVendor}');
       } else {
         deviceId = 'Unsupported platform';
       }
@@ -381,7 +352,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
     if(internetCheck == false) {
       setState(() {
         Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(context,"Slow Internet Connection !"+"","Your Punch in not submitted, Please try again.");
+        slowInternetPop(context,"Slow Internet Connection !""","Your Punch in not submitted, Please try again.");
       });
 
     }
@@ -395,10 +366,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
     DateFormat currentDateFormat=DateFormat("yyyy-MM-dd HH:mm:ss");
     String currentDateFormatString = currentDateFormat.format(now);
     var length = await value!.length();
-    print('Response status - Image: ${length}');
-    print('Response Date: ${currentDateFormatString}');
-    print('Response body: ${stream}');
-    print('Response body: ${value}');
     /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Sucessfully Run"+formattedDate!),
       ));*/
@@ -431,17 +398,13 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
       http.Response response = await http.Response.fromStream(await request.send().timeout(const Duration(seconds: 30)));
       // Process the response here
 
-      print('Response received: ${response.body}');
-      print('URL ${response.request}');
       if(response.statusCode==500){
         Navigator.of(context, rootNavigator: true).pop();
-        slowInternetPop(context,"Slow Internet Connection !"+"","Your Punch in not submitted, Please try again.");
+        slowInternetPop(context,"Slow Internet Connection !""","Your Punch in not submitted, Please try again.");
       }
       result= json.decode(response.body.toString());
       String resultSuccess=result['result'];
       String reasonSuccess=result['reason'];
-      print('URL ${response.request}');
-      print('result${result}');
 
       /*ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Sucessfully Run"+result['result']),
@@ -451,7 +414,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
       Navigator.of(context, rootNavigator: true).pop();
       showDialgError(context, "Alert", "Please Try again !");
     },);*/
-      print('Response body: ${result}');
 
       //var response = await request.send();
       // listen for response
@@ -468,7 +430,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
       if(response.statusCode==200){
         Navigator.of(context, rootNavigator: true).pop();
         if(resultSuccess.compareToIgnoringCase("success")==0){
-          CommonNotificationPage.showSuccessGo(context,reasonSuccess.upperCamelCase+" "+formattedDate,"Successfully Punch");
+          CommonNotificationPage.showSuccessGo(context,"${reasonSuccess.upperCamelCase} $formattedDate","Successfully Punch");
         }else if(resultSuccess.compareToIgnoringCase("failed")==0){
           if (reasonSuccess == "non-geofence area") {
             showSuccessGo(context, result, " Non Geofence Area ");
@@ -551,7 +513,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
   String valuenewOne="listText";
   var dropdownNewvalue;
   var dropdownNewvalueOne;
-  String _inTimePicker = '00:00';
+  final String _inTimePicker = '00:00';
 
   void imagePickerModal(BuildContext context,
       {VoidCallback? onCameraTap, VoidCallback? onGalleryTap}) {
@@ -593,7 +555,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
                     GestureDetector(
                       onTap: () {
                         // Define the action when "Change phone number?" is clicked
-                        print("Change phone number clicked!");
                       },
                       child: Text(
                         'Change phone number?',
@@ -683,9 +644,8 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
 
         bottomNavigationBar: Container(
           color: context.cardColor,
-          child: ButtonBar(
+          child: OverflowBar(
               alignment: MainAxisAlignment.center,
-              buttonPadding: Vx.mOnly(right: 16),
               children: [
 
 
@@ -699,7 +659,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
 
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Mythemes.lightBluishColor),
+                    backgroundColor: WidgetStateProperty.all(Mythemes.lightBluishColor),
                   ),
                   child: "Send".text.make(),
                 ).wh(150, 40).py32()
@@ -798,18 +758,18 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
                               ),
                               items: [
                                 DropdownMenuItem(
-                                  child: Text('Official'),
                                   value: 1,
+                                  child: Text('Official'),
 
                                 ),
                                 DropdownMenuItem(
-                                  child: Text('Meeting'),
                                   value: 2,
+                                  child: Text('Meeting'),
 
                                 ),
                                 DropdownMenuItem(
-                                  child: Text('Personal'),
                                   value: 3,
+                                  child: Text('Personal'),
 
                                 ),
                               ],
@@ -823,7 +783,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
                                 //print('leaveTypeId $idn');
                                 setState(() {
                                   dropdownNewvalue = newVal;
-                                  print("Dropvalue $dropdownNewvalue");
 
                                 });
                               }
@@ -862,18 +821,18 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
                               ),
                               items: [
                                 DropdownMenuItem(
-                                  child: Text('Ankur Kumar'),
                                   value: 1,
+                                  child: Text('Ankur Kumar'),
 
                                 ),
                                 DropdownMenuItem(
-                                  child: Text('Ankush Sethi'),
                                   value: 2,
+                                  child: Text('Ankush Sethi'),
 
                                 ),
                                 DropdownMenuItem(
-                                  child: Text('Suket Chauhan'),
                                   value: 3,
+                                  child: Text('Suket Chauhan'),
 
                                 ),
                               ],
@@ -887,7 +846,6 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
                                 //print('leaveTypeId $idn');
                                 setState(() {
                                   dropdownNewvalueOne = newVal;
-                                  print("Dropvalue $dropdownNewvalueOne");
 
                                 });
                               }
@@ -931,7 +889,7 @@ class _RaiseVisitorRequisitionState extends State<RaiseVisitorRequisition> {
 
 @override
 Widget UploadedLocation() {
-  return Container(
+  return SizedBox(
     height: 80,
     child: SingleChildScrollView(
       child: Row(
@@ -974,7 +932,7 @@ Widget UploadedLocation() {
 @override
 Widget UploadedTime(String time) {
 
-  return Container(
+  return SizedBox(
     height: 68,
     child: Row(
       children: [
@@ -1011,7 +969,7 @@ Widget UploadedTime(String time) {
 
 @override
 Widget UploadedReading() {
-  return Container(
+  return SizedBox(
 
     height: 68,
     child: Row(
@@ -1049,7 +1007,7 @@ Widget UploadedReading() {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

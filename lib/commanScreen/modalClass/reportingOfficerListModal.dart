@@ -13,9 +13,9 @@ class ReportingOfficerListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.listData != null) {
-      data['listData'] = this.listData!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (listData != null) {
+      data['listData'] = listData!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -44,12 +44,12 @@ class ListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['reportingOfficerId'] = this.reportingOfficerId;
-    data['reportingOfficerName'] = this.reportingOfficerName;
-    data['reportieeType'] = this.reportieeType;
-    data['emailId'] = this.emailId;
-    data['empDetId'] = this.empDetId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['reportingOfficerId'] = reportingOfficerId;
+    data['reportingOfficerName'] = reportingOfficerName;
+    data['reportieeType'] = reportieeType;
+    data['emailId'] = emailId;
+    data['empDetId'] = empDetId;
     return data;
   }
 }

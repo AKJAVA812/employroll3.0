@@ -13,9 +13,9 @@ class GeofenceListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.userdata != null) {
-      data['userdata'] = this.userdata!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (userdata != null) {
+      data['userdata'] = userdata!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -53,15 +53,15 @@ class Userdata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empid'] = this.empid;
-    data['name'] = this.name;
-    data['geofencetypename'] = this.geofencetypename;
-    data['locationLatitude'] = this.locationLatitude;
-    data['locationLongitude'] = this.locationLongitude;
-    data['id'] = this.id;
-    data['geofencetypeid'] = this.geofencetypeid;
-    data['radius'] = this.radius;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empid'] = empid;
+    data['name'] = name;
+    data['geofencetypename'] = geofencetypename;
+    data['locationLatitude'] = locationLatitude;
+    data['locationLongitude'] = locationLongitude;
+    data['id'] = id;
+    data['geofencetypeid'] = geofencetypeid;
+    data['radius'] = radius;
     return data;
   }
 }

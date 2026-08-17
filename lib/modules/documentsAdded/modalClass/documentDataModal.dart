@@ -13,7 +13,7 @@ class DocumentDataModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -68,20 +68,20 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['code'] = this.code;
-    data['document'] = this.document;
-    data['dept'] = this.dept;
-    data['branch'] = this.branch;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['letter'] = this.letter;
-    data['name'] = this.name;
-    data['id'] = this.id;
-    data['designation'] = this.designation;
-    data['department'] = this.department;
-    data['doj'] = this.doj;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['code'] = code;
+    data['document'] = document;
+    data['dept'] = dept;
+    data['branch'] = branch;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['letter'] = letter;
+    data['name'] = name;
+    data['id'] = id;
+    data['designation'] = designation;
+    data['department'] = department;
+    data['doj'] = doj;
     return data;
   }
 }

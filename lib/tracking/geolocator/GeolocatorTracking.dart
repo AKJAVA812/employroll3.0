@@ -92,7 +92,6 @@ class _GeolocatortrackingState extends State<Geolocatortracking> {
       ).listen((event) async {
         currentLocation = event;
         //log(currentLocation.toString() as num);
-        print("Geolocator Latlng $currentLocation");
       });
     });
   }

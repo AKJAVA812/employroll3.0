@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FlashScreen extends StatefulWidget {
-  const FlashScreen({Key? key}) : super(key: key);
+  const FlashScreen({super.key});
 
   @override
   _FlashScreenState createState() => _FlashScreenState();

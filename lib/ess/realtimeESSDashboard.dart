@@ -14,11 +14,9 @@ import 'package:er_flutter_project/ess/Model/missPunchempList.dart';
 import 'package:er_flutter_project/ess/Model/onDutyEmpList.dart';
 import 'package:er_flutter_project/ess/Model/overTimeEmpList.dart';
 import 'package:er_flutter_project/ess/Model/presentEmpList.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
-import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -41,7 +39,7 @@ import 'Model/holidaylistEssModal.dart';
 class RealTimeESSDashboard extends StatefulWidget {
   final EssDashboarrdModel dashboardModel1N;
 
-  RealTimeESSDashboard(this.dashboardModel1N);
+  const RealTimeESSDashboard(this.dashboardModel1N, {super.key});
 
   @override
   State<RealTimeESSDashboard> createState() =>
@@ -119,9 +117,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
       });
       return;
     }
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
     Future<EssDashboarrdModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<EssEventsListModal> getEmployeeList14 = getEventData(sessionId!);
@@ -165,30 +160,24 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
     setState(() {
@@ -231,9 +220,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
   }
 
   Future<EssDashboarrdModel> getDashboardData(String sessionId) async {
-    print(
-      '[ESS_DASHBOARD_FETCH_START] date=$singleDateString branch=$branchId shift=$shift',
-    );
     EssDashboarrdModel dashboardModel;
     final foundation = MobileApiFoundation.instance;
     final requestId = foundation.newRequestId();
@@ -246,9 +232,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
             ? storedEmpCode
             : storedEmployeeId;
     final dashboardMonth = DateFormat('yyyy-MM').format(date);
-    print(
-      '[ESS_DASHBOARD_PARAMS] orgId=$dashboardOrgId employeeDetailsId=$dashboardEmployeeDetailsId employeeCode=$dashboardEmployeeCode month=$dashboardMonth',
-    );
     final response = await foundation.postForm(
       ApiDetails.essDashboardAPi,
       queryParameters: <String, Object?>{
@@ -267,9 +250,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     setState(() {
       isLoading = true; // Start loading
     });
-    print('URL ${response.request}');
     _logLong('ESS_DASHBOARD_RAW_RESPONSE', response.body);
-    print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final prefs = await SharedPreferences.getInstance();
@@ -288,7 +269,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
   void _logDashboardSummary(Map<String, dynamic> body) {
     final countData = body['countData'];
     if (countData is! Map) {
-      print('[ESS_DASHBOARD_COUNT_SUMMARY] countData missing');
       return;
     }
     final summary = <String, Object?>{
@@ -307,18 +287,15 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
       'halfday': countData['halfday'],
       'halfDayList': _listLength(countData['halfDayList']),
     };
-    print('[ESS_DASHBOARD_COUNT_SUMMARY] $summary');
   }
 
   int _listLength(Object? value) => value is List ? value.length : 0;
 
   void _logLong(String tag, String value) {
     const chunkSize = 700;
-    print('[$tag] length=${value.length}');
     for (var start = 0; start < value.length; start += chunkSize) {
       final end =
           start + chunkSize > value.length ? value.length : start + chunkSize;
-      print('[$tag][$start-$end] ${value.substring(start, end)}');
     }
   }
 
@@ -336,13 +313,10 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     setState(() {
       isLoading = true; // Start loading
     });
-    print('Holiday URL ${response.request}');
-    print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
     mapResponse = json.decode(response.body);
     var getData = mapResponse.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNoData = true;
     }
     holidayESSModal = HolidayESSModal.fromJson(mapResponse);
@@ -374,7 +348,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
   Future<CalendarModalClass> getCalendarData(String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.calendarApi;
-    print("Current Month - $_currentMonth");
     CalendarModalClass calendarModalClass;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -389,8 +362,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     try {
       final response = await MobileHttpClient.instance.post(urlapi);
       if (response.statusCode == 200) {
-        print('Calendar URL - ${response.request}');
-        print('response body ${response.body}');
 
         var mapResponse = json.decode(response.body);
 
@@ -416,7 +387,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
               event['mobColor'] ??
               "0xff2196F3"; // Default color if not provided
 
-          print("Color - $mobColor");
           // Add event to _markedDateMap
           _markedDateMap.add(
             eventDate,
@@ -428,10 +398,8 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
           );
         }
       } else {
-        print('Failed to load calendar data: ${response.statusCode}');
       }
     } catch (e) {
-      print("Error: $e");
     } finally {
       setState(() {
         isLoading = false; // Stop loading
@@ -466,7 +434,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
   }
 
   Future<EssEventsListModal> getEventData(String SessionId) async {
-    print('employeeList11: ${SessionId}');
     EssEventsListModal eventsListModal;
     final foundation = MobileApiFoundation.instance;
     final requestId = foundation.newRequestId();
@@ -482,12 +449,10 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
       tag: 'ESS_EVENTS',
     );
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     eventsListModal = EssEventsListModal.fromJson(mapResponse);
     return eventsListModal;
   }
@@ -508,7 +473,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     );
   }
 
-  static Widget _eventIcon = Container(
+  static final Widget _eventIcon = Container(
     decoration: BoxDecoration(
       //color: Colors.transparent,
       borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -516,7 +481,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     ),
   );
 
-  EventList<Event> _markedDateMap = EventList<Event>(
+  final EventList<Event> _markedDateMap = EventList<Event>(
     events: {
       /*new DateTime(2024, 2, 1): [
         new Event(
@@ -575,30 +540,24 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
     setState(() {});
@@ -777,16 +736,15 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     shortLeaveCount = essDashboardModelGlobal!.countData!.shortlev;
 
     presentCount = attendanceCardCount(essDashboardModelGlobal!.countData);
-    print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
     int value = 0;
 
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
 
     /*for(int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
@@ -804,20 +762,16 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
-        print("oldEvent $oldEvent");
       }
     } else {
-      print("bdayList is null");
     }
 
     if (eventsListModalGlobal?.joblist != null) {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
-        print("oldJobEvent $oldJobEvent");
       }
     } else {
-      print("joblist is null");
     }
 
     if (holidayListModalGlobal?.result == "success") {
@@ -828,10 +782,8 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
       ) {
         holidayDate = holidayListModalGlobal!.viewHolidayList![i].dateOfHoliday;
         holidayLength = holidayListModalGlobal!.viewHolidayList!.length;
-        print("Holiday Length $holidayLength");
       }
     } else {
-      print("holiday list is null");
     }
 
     /*if(holidayListModalGlobal?.viewHolidayList!.length != null) {
@@ -911,7 +863,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                       onChanged: (i) {
                         setState(() {
                           value = i;
-                          print(i);
                         });
                         if (value == 1) {
                           Navigator.pushNamed(
@@ -982,7 +933,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                       onChanged: (i) {
                         setState(() {
                           value = i;
-                          print(i);
                         });
                         if (value == 1) {
                           Navigator.pushNamed(
@@ -1945,7 +1895,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                                         .dob
                                                         .toString(),
                                                   ),
-                                                  leading: Container(
+                                                  leading: SizedBox(
                                                     width: 40,
                                                     height: 40,
                                                     child: CircleAvatar(
@@ -2010,7 +1960,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                                         .doj
                                                         .toString(),
                                                   ),
-                                                  leading: Container(
+                                                  leading: SizedBox(
                                                     width: 40,
                                                     height: 40,
                                                     child: CircleAvatar(
@@ -2079,7 +2029,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                                             .dob
                                                             .toString(),
                                                       ),
-                                                      leading: Container(
+                                                      leading: SizedBox(
                                                         width: 40,
                                                         height: 40,
                                                         child: CircleAvatar(
@@ -2140,7 +2090,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                                             .doj
                                                             .toString(),
                                                       ),
-                                                      leading: Container(
+                                                      leading: SizedBox(
                                                         width: 40,
                                                         height: 40,
                                                         child: CircleAvatar(
@@ -2226,14 +2176,15 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
 
   CalendarShow() {
     /// Example with custom icon
-    final _calendarCarousel = Container(
+    final calendarCarousel = Container(
       constraints: BoxConstraints(
         maxHeight: 300.0, // Set a valid maximum height
       ),
       child: CalendarCarousel<Event>(
         onDayPressed: (date, events) {
           setState(() => _currentDate = date);
-          events.forEach((event) => print(event.title));
+          for (var event in events) {
+          }
         },
         weekendTextStyle: TextStyle(color: Colors.black),
         thisMonthDayBorderColor: Colors.grey,
@@ -2254,16 +2205,15 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     );
 
     /// Example Calendar Carousel without header and custom prev & next button
-    final _calendarCarouselNoHeader = CalendarCarousel<Event>(
+    final calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Mythemes.lightBluishColor,
       onDayPressed: (date, events) {
-        this.setState(() => _currentDate = date);
-        this.setState(() => _currentDate2 = date);
-        events.forEach((event) => print(event.title));
-        print(date);
+        setState(() => _currentDate = date);
+        setState(() => _currentDate2 = date);
+        for (var event in events) {
+        }
         setState(() {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
-          print("Formatted Date - $formattedDate");
         });
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -2315,9 +2265,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
         _targetDateTime = date;
         _currentMonth = DateFormat('MM-yyyy').format(_targetDateTime);
         //_currentMonth = DateFormat.yMMM().format(_targetDateTime);
-        print('change date $date.month$_targetDateTime');
         singleDateString = DateFormat('dd-MM-yyyy').format(date);
-        print("Updated Date Change - $singleDateString");
         getSharedPrfanceList();
         setState(() {
           Future<CalendarModalClass> getCalendar = getCalendarData(sessionId!);
@@ -2331,7 +2279,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
         });
       },
       onDayLongPressed: (DateTime date) {
-        print('long pressed date $date');
       },
     );
 
@@ -2394,7 +2341,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 22.0),
-            child: _calendarCarouselNoHeader,
+            child: calendarCarouselNoHeader,
           ), //
           if (_legends.isNotEmpty)
             LegendWidget(legends: _legends), // Dynamically show legends
@@ -2405,11 +2352,11 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
   }
 
   TabSection(EventsListModal eventsListModal) {
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
@@ -2420,7 +2367,6 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
     for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
-      print("oldJobEvent $oldJobEvent");
     }
 
     todayEvent = DateTime.now();
@@ -2504,7 +2450,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                           .dob
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -2559,7 +2505,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                           .doj
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -2617,7 +2563,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                               .dob
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2668,7 +2614,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                               .doj
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2729,7 +2675,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                               .dob
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2780,7 +2726,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
                                               .doj
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2815,7 +2761,7 @@ class _RealTimeESSDashboardState extends State<RealTimeESSDashboard> {
 class LegendWidget extends StatelessWidget {
   final List<Map<String, String>> legends;
 
-  LegendWidget({required this.legends});
+  const LegendWidget({super.key, required this.legends});
 
   @override
   Widget build(BuildContext context) {
@@ -2854,7 +2800,7 @@ class LegendWidget extends StatelessWidget {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

@@ -17,12 +17,12 @@ class SalarySlipDownloadModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['result'] = this.result;
-    data['empId'] = this.empId;
-    data['month'] = this.month;
-    data['salarySlip'] = this.salarySlip;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['result'] = result;
+    data['empId'] = empId;
+    data['month'] = month;
+    data['salarySlip'] = salarySlip;
+    data['status'] = status;
     return data;
   }
 }

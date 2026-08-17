@@ -18,7 +18,7 @@ import '../../modules/timeAndAttendance/reports/attendanceRequisition/othersSing
 import '../../modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 
 class UIS_OthersAttendanceRequisitionPage extends StatefulWidget {
-  const UIS_OthersAttendanceRequisitionPage({Key? key}) : super(key: key);
+  const UIS_OthersAttendanceRequisitionPage({super.key});
 
   @override
   State<UIS_OthersAttendanceRequisitionPage> createState() =>
@@ -33,8 +33,8 @@ String? sessionId;
 RequistionEmpListModel? employeeListModelglobel;
 LeaveBalanceModel? leaveBalanceLabel;
 String valuenew = "listText";
-late List<String?> list = [];
-late List<String?> leaveTypeList = [];
+List<String?> list = [];
+List<String?> leaveTypeList = [];
 String? branchName;
 String? deptName;
 String? empName;
@@ -59,8 +59,8 @@ class _UIS_OthersAttendanceRequisitionPageState
       TextEditingController();
   final TextEditingController toTimePickerController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
-  String _fromTimePicker = '00:00';
-  String _toTimePicker = '00:00';
+  final String _fromTimePicker = '00:00';
+  final String _toTimePicker = '00:00';
   var dropdownvalue;
   var dropdownNewvalue;
   var fromDate;
@@ -103,7 +103,6 @@ class _UIS_OthersAttendanceRequisitionPageState
       setState(() {
         employeeListModelglobel = value;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
 
     /* getLeaveType12.then((value) {
@@ -120,7 +119,6 @@ class _UIS_OthersAttendanceRequisitionPageState
     list = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.othersReqEmpList;
-    print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -130,18 +128,13 @@ class _UIS_OthersAttendanceRequisitionPageState
       "orgId=$orgId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     requistionEmpListModel = RequistionEmpListModel.fromJson(mapResponse);
     int length = requistionEmpListModel.data!.length;
-    print('totallenth $length ');
     for (int i = 0; i < requistionEmpListModel.data!.length; i++) {
       String? empName = requistionEmpListModel.data![i].empName;
       list.add(requistionEmpListModel.data![i].empName);
-      print('dataExpenseType $empName');
     }
     return requistionEmpListModel;
   }
@@ -150,18 +143,13 @@ class _UIS_OthersAttendanceRequisitionPageState
     leaveTypeList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBalanceApi;
-    print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseLeaveTypeList $getData');
     leaveBalanceLabel = LeaveBalanceModel.fromJson(mapResponse);
     int? length =
         leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
-    print('totalleaveLength $length ');
     for (
       int i = 0;
       i < leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;
@@ -172,7 +160,6 @@ class _UIS_OthersAttendanceRequisitionPageState
       leaveTypeList.add(
         leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i],
       );
-      print('dataLeaveTypeName $leaveTypeName');
     }
     return leaveBalanceLabel;
   }
@@ -183,16 +170,16 @@ class _UIS_OthersAttendanceRequisitionPageState
     "dd-MM-yyyy",
   ).format(DateTime.parse("2019-09-30"));
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePicker = await showDatePicker(
+    DateTime? datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime(2040),
     );
 
-    if (_datePicker != null && _datePicker != _date) {
+    if (datePicker != null && datePicker != _date) {
       setState(() {
-        _date = _datePicker;
+        _date = datePicker;
       });
     }
   }
@@ -302,7 +289,6 @@ class _UIS_OthersAttendanceRequisitionPageState
                       valuenew = newVal.toString();
                       int i = list.indexOf(valuenew);
                       empNewIdUSER = employeeListModelglobel?.data?[i].empId;
-                      print("EmpId  $empNewIdUSER");
                       setState(() {
                         dropdownvalue = newVal;
                       });
@@ -376,7 +362,6 @@ class _UIS_OthersAttendanceRequisitionPageState
                           //  DateFormat.yMd().format(date!).toString();
                         });
 
-                        print(date);
                       },
                       readOnly: true,
                       //initialValue: "dd-mm-yyyy",
@@ -394,15 +379,13 @@ class _UIS_OthersAttendanceRequisitionPageState
                 Container(
                   height: 90,
                   color: context.cardColor,
-                  child: ButtonBar(
+                  child: OverflowBar(
                     alignment: MainAxisAlignment.center,
-                    buttonPadding: Vx.mOnly(right: 16),
                     children: [
                       ElevatedButton(
                         onPressed: () {
                           //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
                           if (singleDateString.compareToIgnoringCase("") == 0) {
-                            print('responseemployeeList');
                             setState(() {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -411,7 +394,6 @@ class _UIS_OthersAttendanceRequisitionPageState
                               );
                             });
                           } else {
-                            print("EmpIdOther - $empNewIdUSER");
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder:
@@ -426,7 +408,7 @@ class _UIS_OthersAttendanceRequisitionPageState
                           }
                         },
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                             Mythemes.lightBluishColor,
                           ),
                         ),
@@ -455,7 +437,6 @@ class _UIS_OthersAttendanceRequisitionPageState
                 ),
               );
               //Navigator.pop(context);
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -465,17 +446,14 @@ class _UIS_OthersAttendanceRequisitionPageState
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               Navigator.pop(context);
-              print('Attendance');
             }
             if (index == 3) {
               Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('My Reports');
             }
             if (index == 4) {
               Navigator.pushNamed(context, MyRoutings.uisNewDashboardRoute);
@@ -483,7 +461,6 @@ class _UIS_OthersAttendanceRequisitionPageState
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";
@@ -538,20 +515,16 @@ class _UIS_OthersAttendanceRequisitionPageState
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -588,20 +561,16 @@ class _UIS_OthersAttendanceRequisitionPageState
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -640,20 +609,16 @@ class _UIS_OthersAttendanceRequisitionPageState
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -669,7 +634,7 @@ class _UIS_OthersAttendanceRequisitionPageState
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

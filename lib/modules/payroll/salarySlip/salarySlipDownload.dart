@@ -9,7 +9,7 @@ import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:intl/intl.dart';
 
 class SalarySlipDownload extends StatefulWidget {
-  const SalarySlipDownload({Key? key}) : super(key: key);
+  const SalarySlipDownload({super.key});
 
   @override
   State<SalarySlipDownload> createState() => _SalarySlipDownloadState();

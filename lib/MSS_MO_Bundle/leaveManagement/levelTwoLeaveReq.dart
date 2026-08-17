@@ -22,7 +22,7 @@ import '../../modules/leaveManagement/reports/modalClass/levelTwoPendingLeaveMod
 
 class MSS_MO_LevelTwoPendingLeave extends StatefulWidget {
   final LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
-  const MSS_MO_LevelTwoPendingLeave(this.pendingLeaveRequisitionModal);
+  const MSS_MO_LevelTwoPendingLeave(this.pendingLeaveRequisitionModal, {super.key});
 
   @override
   State<MSS_MO_LevelTwoPendingLeave> createState() =>
@@ -182,7 +182,7 @@ class _MSS_MO_LevelTwoPendingLeaveState
                         ),
                         ...organizations.map((org) {
                           return DropdownMenuItem(value: org, child: Text(org));
-                        }).toList(),
+                        }),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -195,8 +195,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
                           );
 
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
                         });
 
                         setModalState(() {});
@@ -222,12 +220,9 @@ class _MSS_MO_LevelTwoPendingLeaveState
                           sessionId = await shared.getSessionId();
                           levelOne = await shared.getLevelOne();
                           levelTwo = await shared.getLevelTwo();
-                          print("Level 1 - $levelOne");
-                          print("Level 2 - $levelTwo");
                           userPanel = await shared.getUserPanel();
                           getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print("ORG ID - $getOrgId");
                           try {
                             final value = await getPendingLeaveReq(sessionId!);
 
@@ -237,7 +232,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
                               pendingLeaveReqLabeled = pendingLeaveReqLabel;
                               if (foundDataNewMOL2 != null) {
                                 foundDataNewMOL2!.length;
-                                print("Fetch data $foundDataNewMOL2");
                               } else {
                                 Center(
                                   child:
@@ -253,7 +247,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
                             setState(() {
                               isLoading = false;
                             });
-                            print('Error while fetching requisitions: $e');
                           }
                         },
                         icon: Icon(Icons.filter_alt),
@@ -313,7 +306,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
   Future<LevelTwoPendingLeaveModal> getPendingLeaveReq(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingLeaveReqList;
-    print('employeeList11: ${SessionId}');
     LevelTwoPendingLeaveModal pendingLeaveRequisitionModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -323,16 +315,12 @@ class _MSS_MO_LevelTwoPendingLeaveState
       "orgId=$getOrgId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
     if (getData == null) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
-    print('responseemployeeList $getData');
     pendingLeaveRequisitionModal = LevelTwoPendingLeaveModal.fromJson(
       mapResponse,
     );
@@ -347,7 +335,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -545,7 +532,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -553,16 +539,13 @@ class _MSS_MO_LevelTwoPendingLeaveState
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-            print('Leave');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -570,7 +553,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -623,7 +605,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
           final item = foundDataNewMOL2![index];
           return InkWell(
             onTap: () {
-              print(foundDataNewMOL2!.length);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder:
@@ -767,9 +748,6 @@ class _MSS_MO_LevelTwoPendingLeaveState
                               color: Colors.blueAccent,
                             ),
                             onPressed: () {
-                              print(
-                                "Attachment tapped for ${item.employeeName}",
-                              );
                               if (item.document != null &&
                                   item.document.toString().isNotEmpty) {
                                 showAttachmentBottomSheet(

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:er_flutter_project/ess/Model/LeaveCombinedResponse.dart';
 import 'package:file_picker/file_picker.dart';
@@ -31,7 +30,7 @@ import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 
 class LeaveRequisitionPage extends StatefulWidget {
   final bool showShortcuts;
-  LeaveRequisitionPage({this.showShortcuts = true});
+  const LeaveRequisitionPage({super.key, this.showShortcuts = true});
 
   @override
   State<LeaveRequisitionPage> createState() => _LeaveRequisitionPageState();
@@ -47,8 +46,8 @@ LeaveBalModal? leaveBalLabel;
 LeaveBalanceModel? leaveBalanceLabel;
 String valuenew = "listText";
 List<String> leavereqIdGlobel = [];
-late List<String?> list = [];
-late List<String?> leaveTypeList = [];
+List<String?> list = [];
+List<String?> leaveTypeList = [];
 
 class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
     with RouteAware {
@@ -74,8 +73,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
   final TextEditingController toTimePickerController = TextEditingController();
   final TextEditingController _nomineeController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
-  String _fromTimePicker = '00:00';
-  String _toTimePicker = '00:00';
+  final String _fromTimePicker = '00:00';
+  final String _toTimePicker = '00:00';
   var fromDate;
   var getRemark;
   var leaveTypeId;
@@ -230,12 +229,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBalanceApi;
 
-    print('employeeList11: $sessionId');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
-    print('responseLeaveTypeList ${response.body}');
 
     mapResponse = json.decode(response.body);
 
@@ -250,17 +246,12 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
             ? LeaveBalModal.fromJson({"leaveData": leaveGetData})
             : null;
 
-    print("Parsed LeaveBalModal leaveData: ${modelLeaveData?.leaveData}");
-    print(
-      "Parsed LeaveBalModal leaveData: ${modelLeaveData?.leaveData?.leaveDetails}",
-    );
     setState(() {
       leaveBalances = {};
       leaveTypes = [];
 
       // âœ… Step 1: Ensure we have valid data
       if (modelLeaveData!.leaveData == null) {
-        print("âŒ No leaveData found in API response");
         return;
       }
 
@@ -272,8 +263,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
       leaveTypes = parsedBalances.keys.toList();
 
       // âœ… Debug info
-      print("âœ… leaveTypes: $leaveTypes");
-      print("âœ… leaveBalances: $leaveBalances");
     });
     // Populate dropdown list
     if (mapResponse['leaveTypeList'] != null) {
@@ -457,7 +446,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
 
         // âœ… Step 1: Ensure we have valid data
         if (leaveBalLabel!.leaveData == null) {
-          print("âŒ No leaveData found in API response");
           return;
         }
 
@@ -469,12 +457,8 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
         leaveTypes = parsedBalances.keys.toList();
 
         // âœ… Debug info
-        print("âœ… leaveTypes: $leaveTypes");
-        print("âœ… leaveBalances: $leaveBalances");
       });
     } catch (e, st) {
-      print("âŒ Error in fetchLeaveBalance: $e");
-      print(st);
       setState(() {
         leaveBalances = {};
         leaveTypes = [];
@@ -496,27 +480,22 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
 
   Future getUserName() async {
     empName = await shared.getempName();
-    print('Response snapshot: ${empName}');
   }
 
   Future getDept() async {
     deptName = await shared.getDept();
-    print('Response snapshot: ${deptName}');
   }
 
   Future getBranch() async {
     branchName = await shared.getBranch();
-    print('Response snapshot: ${branchName}');
   }
 
   Future getEmpId() async {
     empNewId = await shared.getEmpId();
-    print('Response snapshot: ${empNewId}');
   }
 
   Future getOrgId() async {
     orgNewId = await shared.getOrgId();
-    print('ORGID: ${orgNewId}');
   }
 
   final List<Map<String, String>> leaveData = [
@@ -707,7 +686,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                 ),
               );
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -717,7 +695,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.push(
@@ -726,7 +703,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                   builder: (context) => GetAttendanceDet(showAppBar: true),
                 ),
               );
-              print('Leave');
             }
             if (index == 3) {
               Navigator.push(
@@ -736,7 +712,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.pushNamed(
@@ -747,7 +722,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
               );*/
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -1075,7 +1049,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                       //print('Leave Half Day $leaveHalfDay');
                       var policyidnew = leaveTypeList.elementAt(i);
                       leavereqIdGlobel = <String>[leaveTypeId?.toString() ?? ''];
-                      print('leaveTypeId $leaveTypeId');
                       setState(() {
                         //print('value1 $i');
                         //print('value $policyidnew');
@@ -1084,11 +1057,11 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                       });
                       if (leaveHalfDay == true) {
                         setState(() {
-                          this.halfDayRadio = true;
+                          halfDayRadio = true;
                         });
                       } else {
                         setState(() {
-                          this.halfDayRadio = false;
+                          halfDayRadio = false;
                         });
                       }
                       /*if(i == 0 || i == 1 || i == 2) {
@@ -1126,8 +1099,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                     singleDayShow = true;
                                     multipleDayShow = false;
                                     halfDayShow = false;
-                                    print("day show $singleDayShow");
-                                    print("multi show $multipleDayShow");
                                     /*  _singleDayShow == _singleDayShow;
                                            _multipleDayShow == _multipleDayShow;*/
                                   });
@@ -1153,8 +1124,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                     singleDayShow = true;
                                     multipleDayShow = true;
                                     halfDayShow = false;
-                                    print("day show $singleDayShow");
-                                    print("multi show $multipleDayShow");
                                     /*  _singleDayShow =_singleDayShow;
                                           _multipleDayShow =! _multipleDayShow;*/
                                   });
@@ -1183,8 +1152,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                           singleDayShow = true;
                                           multipleDayShow = false;
                                           halfDayShow = true;
-                                          print("day show $singleDayShow");
-                                          print("multi show $multipleDayShow");
                                           /* _singleDayShow == _singleDayShow;
                                             _multipleDayShow = !_multipleDayShow;*/
                                         });
@@ -1229,7 +1196,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                   ).format(fromDate!);
                                 });
 
-                                print(fromDate);
                               },
                               readOnly: true,
                               enabled: true,
@@ -1301,10 +1267,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                             .inDays +
                                         1;
 
-                                    print(
-                                      "Sick Leave Value - $sickLeaveMedicalShowValue",
-                                    );
-                                    print("Day Difference - $dayDifference");
                                     // ðŸ§  Show medical section if dayDifference > medValue
                                     if (dayDifference >
                                             sickLeaveMedicalShowValue) {
@@ -1323,7 +1285,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                   }
                                 });
 
-                                print(toDate);
                               },
                               readOnly: true,
                               enabled: true,
@@ -1385,7 +1346,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                     });
                                     setState(() {
                                       halfDayNewRadios = value.toString();
-                                      print("$halfDayNewRadios");
                                     });
                                   },
                                 ),
@@ -1408,7 +1368,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                                     });
                                     setState(() {
                                       halfDayNewRadios = value.toString();
-                                      print("$halfDayNewRadios");
                                     });
                                   },
                                 ),
@@ -1489,7 +1448,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                           .px12(),
                       IconButton(
                         onPressed: () {
-                          print("My File - $uploadedFile");
                           if (uploadedFile != null &&
                               uploadedFile.toString().isNotEmpty) {
                             showAttachmentBottomSheet(
@@ -1605,7 +1563,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                         //approveLeaveRequisition(_commentController.text, leaveReqId);
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
+                        backgroundColor: WidgetStateProperty.all(
                           Mythemes.lightBluishColor,
                         ),
                       ),
@@ -2172,23 +2130,18 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
     }*/
 
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
-    print('API URL with Parameters: $apiWithParams');
+            .join('&')}';
 
     //final response = await MobileHttpClient.instance.post(urlapi);
     http.StreamedResponse response = await request.send();
     http.Response httpResponse = await http.Response.fromStream(response);
-    print('URL ${httpResponse.request}');
     if (httpResponse.statusCode == 200) {
       var responseResult = httpResponse.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(httpResponse.body);
       String result = mapResponse['result']['result'];
@@ -2201,12 +2154,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
         isValidate = true;
       }
 
-      print('result both $result $reason');
-      print('result${result}');
-      print("IsValidate - $isValidate");
       if (isValidate == false) {
         if (result.compareToIgnoringCase("success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, " Error ");
         } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -2214,7 +2164,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
         }
       } else {
         if (result.compareToIgnoringCase("success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, " Error ");
         } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -2261,23 +2211,18 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
         request.fields['confirmyes'] = confirmyes;
 
         String apiWithParams =
-            urlapi.toString() +
-            '?' +
-            request.fields.entries
+            '$urlapi?${request.fields.entries
                 .map(
                   (e) =>
                       '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
                 )
-                .join('&');
-        print('API URL with Parameters: $apiWithParams');
+                .join('&')}';
 
         //final response = await MobileHttpClient.instance.post(urlapi);
         http.StreamedResponse response = await request.send();
         http.Response httpResponse = await http.Response.fromStream(response);
-        print('URL ${httpResponse.request}');
         if (httpResponse.statusCode == 200) {
           var responseResult = httpResponse.body;
-          print('success $responseResult');
           Navigator.of(context, rootNavigator: true).pop();
           mapResponse = json.decode(httpResponse.body);
           String result = mapResponse['result']['result'];
@@ -2290,12 +2235,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
             isValidate = true;
           }
 
-          print('result both $result $reason');
-          print('result${result}');
-          print("IsValidate - $isValidate");
           if (isValidate == false) {
             if (result.compareToIgnoringCase("success") == 0) {
-              showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+              showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
             } else if (result.compareToIgnoringCase("error") == 0) {
               showDialgSucess(context, reason.upperCamelCase, " Error ");
             } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -2303,7 +2245,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
             }
           } else {
             if (result.compareToIgnoringCase("success") == 0) {
-              showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+              showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
             } else if (result.compareToIgnoringCase("error") == 0) {
               showDialgSucess(context, reason.upperCamelCase, " Error ");
             } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -2351,23 +2293,18 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
       request.fields['confirmyes'] = confirmyes;
 
       String apiWithParams =
-          urlapi.toString() +
-          '?' +
-          request.fields.entries
+          '$urlapi?${request.fields.entries
               .map(
                 (e) =>
                     '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
               )
-              .join('&');
-      print('API URL with Parameters: $apiWithParams');
+              .join('&')}';
 
       //final response = await MobileHttpClient.instance.post(urlapi);
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL ${httpResponse.request}');
       if (httpResponse.statusCode == 200) {
         var responseResult = httpResponse.body;
-        print('success $responseResult');
         Navigator.of(context, rootNavigator: true).pop();
         mapResponse = json.decode(httpResponse.body);
         String result = mapResponse['result']['result'];
@@ -2380,12 +2317,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
           isValidate = true;
         }
 
-        print('result both $result $reason');
-        print('result${result}');
-        print("IsValidate - $isValidate");
         if (isValidate == false) {
           if (result.compareToIgnoringCase("success") == 0) {
-            showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+            showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
           } else if (result.compareToIgnoringCase("error") == 0) {
             showDialgSucess(context, reason.upperCamelCase, " Error ");
           } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -2393,7 +2327,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
           }
         } else {
           if (result.compareToIgnoringCase("success") == 0) {
-            showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+            showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
           } else if (result.compareToIgnoringCase("error") == 0) {
             showDialgSucess(context, reason.upperCamelCase, " Error ");
           } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -2461,22 +2395,17 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
       request.fields['document'] = "";
     }*/
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
-    print('API URL with Parameters: $apiWithParams');
+            .join('&')}';
     //final response = await MobileHttpClient.instance.post(urlapi);
     http.StreamedResponse response = await request.send();
     http.Response httpResponse = await http.Response.fromStream(response);
-    print('URL ${httpResponse.request}');
     if (httpResponse.statusCode == 200) {
       var responseResult = httpResponse.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(httpResponse.body);
       String result = mapResponse['result']['result'];
@@ -2489,12 +2418,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
         isValidate = true;
       }
 
-      print('result both $result $reason');
-      print('result${result}');
-      print("IsValidate - $isValidate");
       if (isValidate == false) {
         if (result.compareToIgnoringCase("success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, " Error ");
         } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -2502,7 +2428,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
         }
       } else {
         if (result.compareToIgnoringCase("success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, " Error ");
         } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -2538,7 +2464,6 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                   ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -2553,7 +2478,7 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

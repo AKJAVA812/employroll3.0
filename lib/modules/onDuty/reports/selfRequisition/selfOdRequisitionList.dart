@@ -19,10 +19,10 @@ class SelfODRequisitionList extends StatefulWidget {
   final String endDate;
 
   const SelfODRequisitionList({
-    Key? key,
+    super.key,
     required this.startDate,
     required this.endDate,
-  }) : super(key: key);
+  });
 
   @override
   State<SelfODRequisitionList> createState() =>
@@ -99,17 +99,17 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
   bool changeNewDate = true;
 
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePicker = await showDatePicker(
+    DateTime? datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_datePicker != null && _datePicker != _date) {
+    if (datePicker != null && datePicker != _date) {
       setState(() {
         changeDates = false;
-        _date = _datePicker;
+        _date = datePicker;
         startDate = DateFormat('yyyy-MM-dd').format(_date);
         setState(() {
           //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
@@ -121,17 +121,17 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
 
   DateTime _newdate = (DateTime.now());
   Future<Null> _selectToDate(BuildContext context) async {
-    DateTime? _newDatePicker = await showDatePicker(
+    DateTime? newDatePicker = await showDatePicker(
       context: context,
       initialDate: _newdate,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_newDatePicker != null && _newDatePicker != _newdate) {
+    if (newDatePicker != null && newDatePicker != _newdate) {
       setState(() {
         changeNewDate = false;
-        _newdate = _newDatePicker;
+        _newdate = newDatePicker;
         endDate = DateFormat('yyyy-MM-dd').format(_newdate);
         setState(() {
           //singleDateString = DateFormat('dd-MM-yyyy').format(date!);
@@ -312,7 +312,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                             content:
                                 "Please select valid date range".text.make(),
                           );
-                          print("select valid date range");
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Please Select Valid Date Range "),
@@ -343,7 +342,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                           await _loadReport();
                         }
                       } else {
-                        print("Please select date");
                         setState(() {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -354,7 +352,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                       }
                     },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
                         Mythemes.lightBluishColor,
                       ),
                     ),
@@ -389,7 +387,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                 ),
               );
               //Navigator.pop(context);
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -399,7 +396,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.push(
@@ -408,7 +404,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                   builder: (context) => GetAttendanceDet(showAppBar: true),
                 ),
               );
-              print('My Requests');
             }
             if (index == 3) {
               Navigator.push(
@@ -419,7 +414,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
               );
 
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('My Reports');
             }
             if (index == 4) {
               Navigator.pushNamed(
@@ -428,7 +422,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
               );
 
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";
@@ -510,7 +503,6 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
       shrinkWrap: true,
       itemBuilder: (context, itemCount) {
         length = selfOdReqListModal.listdata!.length;
-        print("length of data $length");
         var statusCheck =
             selfOdReqListModal.listdata![itemCount].approvalstatus;
         if (statusCheck == 'Approved') {
@@ -523,7 +515,7 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
         if (length == null) {
           return showNullDialog(
             context,
-            "There is no data avialable.".upperCamelCase + " ",
+            "${"There is no data avialable.".upperCamelCase} ",
             "Alert Message",
           );
         }
@@ -531,11 +523,10 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
         return InkWell(
           onTap: () {
             length = selfOdReqListModal.listdata!.length;
-            print("length of data $length");
             if (length == null) {
               return showNullDialog(
                 context,
-                "There is no data avialable.".upperCamelCase + " ",
+                "${"There is no data avialable.".upperCamelCase} ",
                 "Alert Message",
               );
             }

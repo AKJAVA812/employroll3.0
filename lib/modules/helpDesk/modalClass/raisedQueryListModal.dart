@@ -15,10 +15,10 @@ class RaisedQueryListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['status'] = this.status;
-    if (this.dataList != null) {
-      data['dataList'] = this.dataList!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    if (dataList != null) {
+      data['dataList'] = dataList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -99,31 +99,31 @@ class DataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['level'] = this.level;
-    data['queryStatus'] = this.queryStatus;
-    data['empId'] = this.empId;
-    if (this.queryStatusList != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['level'] = level;
+    data['queryStatus'] = queryStatus;
+    data['empId'] = empId;
+    if (queryStatusList != null) {
       data['queryStatusList'] =
-          this.queryStatusList!.map((v) => v.toJson()).toList();
+          queryStatusList!.map((v) => v.toJson()).toList();
     }
-    data['reOpenId'] = this.reOpenId;
-    data['isReOpend'] = this.isReOpend;
-    data['ticketNo'] = this.ticketNo;
-    data['creationDate'] = this.creationDate;
-    data['queryStatusName'] = this.queryStatusName;
-    data['status'] = this.status;
-    data['timeAgo'] = this.timeAgo;
-    data['pid'] = this.pid;
-    if (this.priorityList != null) {
-      data['priorityList'] = this.priorityList!.map((v) => v.toJson()).toList();
+    data['reOpenId'] = reOpenId;
+    data['isReOpend'] = isReOpend;
+    data['ticketNo'] = ticketNo;
+    data['creationDate'] = creationDate;
+    data['queryStatusName'] = queryStatusName;
+    data['status'] = status;
+    data['timeAgo'] = timeAgo;
+    data['pid'] = pid;
+    if (priorityList != null) {
+      data['priorityList'] = priorityList!.map((v) => v.toJson()).toList();
     }
-    data['imagePath'] = this.imagePath;
-    data['tempStatus'] = this.tempStatus;
-    data['ticketId'] = this.ticketId;
-    data['description'] = this.description;
-    data['subject'] = this.subject;
-    data['priority'] = this.priority;
+    data['imagePath'] = imagePath;
+    data['tempStatus'] = tempStatus;
+    data['ticketId'] = ticketId;
+    data['description'] = description;
+    data['subject'] = subject;
+    data['priority'] = priority;
     return data;
   }
 }
@@ -140,9 +140,9 @@ class PriorityList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['name'] = this.name;
-    data['id'] = this.id;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['id'] = id;
     return data;
   }
 }
@@ -159,9 +159,9 @@ class QueryStatusList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['name'] = this.name;
-    data['id'] = this.id;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['id'] = id;
     return data;
   }
 }

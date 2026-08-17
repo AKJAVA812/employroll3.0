@@ -199,9 +199,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
     loanApprovalL2Perm = await shared.getLoanApprovalL2MSS();
     loanApprovalL3Perm = await shared.getLoanApprovalL3MSS();
 
-    print("Loan Approval L1 - $loanApprovalL1Perm");
-    print("Loan Approval L2 - $loanApprovalL2Perm");
-    print("Loan Approval L3 - $loanApprovalL3Perm");
     // await Future.delayed(Duration(seconds: 5));
     Future<LoanDataShowApprovalModal> getEmployeeList11 =
         getLoanDataForApproval(sessionId!);
@@ -220,7 +217,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
         loanDataShowApprovalLabel = value;
         loanDataShowApprovalLabeled = loanDataShowApprovalLabel;
         isLoading = false;
-        print('Loan Data - ${foundDataNew!.length}');
 
         principalBalance = foundDataNew![0].principalbalance.toString();
         instalmentRequested = foundDataNew![0].installmentRequested.toString();
@@ -258,7 +254,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
             _totalLoanRequestedControllerL2.text;
           }
           interestBalL2 = foundDataNew![0].interestRateL2;
-          print("Int Bal 2$interestBalL2");
         } else if (valueChange == 2) {
           if (_deductionDateControllerL3.text == "" ||
               _installmentsApprovedControllerL3.text == "" ||
@@ -275,7 +270,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
             _totalLoanRequestedControllerL3.text;
           }
           interestBalL3 = foundDataNew![0].interestRateL3;
-          print("Int Bal 3$interestBalL3");
         }
       });
     });
@@ -287,7 +281,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
     _updateMonthlyStatus();
     loanReqIdReceived = loanReqIdSend;
-    print("Loan Req Id - $loanReqIdReceived");
     getSharedPrfanceList();
   }
 
@@ -296,7 +289,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
   ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanDataViewToApproveApi;
-    print('employeeList11: ${SessionId}');
     LoanDataShowApprovalModal loanDataShowApprovalModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -305,14 +297,11 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
       isLoading = true;
     });
-    print('URL ${response.request}');
     mapResponse = json.decode(response.body);
-    print('responseemployeeList $mapResponse');
     var getData = mapResponse.length;
 
     loanDataShowApprovalModal = LoanDataShowApprovalModal.fromJson(mapResponse);
@@ -373,7 +362,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
                           ),
                           _buildLoanDetailRow(
                             'Interest Rate',
-                            '${interestBalL1}%',
+                            '$interestBalL1%',
                             Colors.orange,
                           ),
                           _buildLoanDetailRow(
@@ -454,7 +443,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
                           ),
                           _buildLoanDetailRow(
                             'Interest Rate',
-                            '${interestBalL2}%',
+                            '$interestBalL2%',
                             Colors.orange,
                           ),
                           _buildLoanDetailRow(
@@ -535,7 +524,7 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
                           ),
                           _buildLoanDetailRow(
                             'Interest Rate',
-                            '${interestBalL3}%',
+                            '$interestBalL3%',
                             Colors.orange,
                           ),
                           _buildLoanDetailRow(
@@ -676,7 +665,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -684,11 +672,9 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -699,7 +685,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -707,7 +692,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -764,17 +748,14 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -782,9 +763,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -794,15 +772,13 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -831,17 +807,14 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -849,9 +822,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -861,15 +831,13 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -898,17 +866,14 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -916,9 +881,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -928,15 +890,13 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -965,17 +925,14 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -983,9 +940,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -995,15 +949,13 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -1032,17 +984,14 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -1050,9 +999,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -1062,15 +1008,13 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -1099,17 +1043,14 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -1117,9 +1058,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -1129,15 +1067,13 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -1167,7 +1103,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
                   ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -1214,7 +1149,6 @@ class _LoanApprovalPageState extends State<LoanApprovalPage> {
       onChanged: (i) async {
         setState(() {
           valueChange = i;
-          print("Level Value - $valueChange");
           getSharedPrfanceList();
         });
         switch (valueChange) {

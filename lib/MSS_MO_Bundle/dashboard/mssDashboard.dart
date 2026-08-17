@@ -34,7 +34,7 @@ import '../../sharedPrefancePage/ShardPre.dart';
 class MSS_MO_Dashboard extends StatefulWidget {
   final DashboardModel dashboardModel1;
 
-  MSS_MO_Dashboard(this.dashboardModel1);
+  const MSS_MO_Dashboard(this.dashboardModel1, {super.key});
 
   @override
   State<MSS_MO_Dashboard> createState() =>
@@ -59,9 +59,9 @@ var eventSingleDateString;
 var day = DateTime.now();
 var single = DateFormat('dd');
 var singleDay = single.format(day);
-late List<String?> list = [];
-late List<String?> branchList = [];
-late List<String?>? shiftList = [];
+List<String?> list = [];
+List<String?> branchList = [];
+List<String?>? shiftList = [];
 bool isLoading = false;
 bool isLoadingEvent = true;
 String valuenew = "listText";
@@ -268,8 +268,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                             orElse: () => {},
                           );
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
 
                           // Step 4: Fetch Branch Data
                           await getBranchList(sessionId!);
@@ -353,8 +351,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
 
                                     selectedBranchId =
                                         matchedBranch['branchId'] ?? 0;
-                                    print('Branch Name: $selectedBranchName');
-                                    print('Branch ID: $selectedBranchId');
                                   });
 
                                   setModalState(() {});
@@ -380,8 +376,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                               'dd-MM-yyyy',
                             ).format(date);
                             singleDay = DateFormat('dd').format(date);
-                            print("SingleDateNew $singleDateString");
-                            print("singleDay $singleDay");
                             //dateController.text = DateFormat("dd").format(date!);
 
                             //  DateFormat.yMd().format(date!).toString();
@@ -446,7 +440,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                                 isLoading = false; // Stop loader
                               });
                             } catch (e) {
-                              print("Error while fetching dashboard data: $e");
                               setState(() {
                                 isLoading = false; // Stop loader even on error
                               });
@@ -560,7 +553,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -610,7 +602,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('BRANCH URL ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
@@ -631,7 +622,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.shiftListApi;
 
-    print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -641,12 +631,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     shiftListModal = ShiftListModal.fromJson(mapResponse);
     for (int i = 0; i < shiftListModal.data!.length; i++) {
       var shiftName = shiftListModal.data![i].shiftName;
@@ -660,7 +648,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalNewApi;
 
-    print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
     setState(() {
       isLoadingEvent = true;
@@ -678,12 +665,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
 
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     eventsListModal = EventsListModal.fromJson(mapResponse);
     setState(() {
       isLoadingEvent = false;
@@ -865,7 +850,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.pushReplacement(
@@ -876,7 +860,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
             );
 
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('workflow');
           }
           if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
@@ -887,19 +870,16 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                     (context) => const PunchInOUtActivity(selectedIndex: 2),
               ),
             );
-            print('Reports');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -941,16 +921,15 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
     earlyOutEmp = dashboardModelGlobal!.earlyOutEmp;
     halfEmp = dashboardModelGlobal!.halfEmp;
     overTime = dashboardModelGlobal!.otEmp;
-    print("Total Employees $totalPresentEmp");
     shift = 0;
     branchId = 0;
     int value = 1;
 
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     if (eventsListModalGlobal != null &&
         eventsListModalGlobal!.bdayList != null) {
       setState(() {
@@ -959,7 +938,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
-        print("oldEvent $oldEvent");
         setState(() {
           isLoadingEvent = false;
         });
@@ -968,7 +946,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
       setState(() {
         isLoadingEvent = false;
       });
-      print("bdayList is null or eventsListModalGlobal is null");
     }
 
     if (eventsListModalGlobal != null &&
@@ -979,7 +956,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
-        print("oldJobEvent $oldJobEvent");
         setState(() {
           isLoadingEvent = false;
         });
@@ -988,7 +964,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
       setState(() {
         isLoadingEvent = false;
       });
-      print("job list is null or eventsListModalGlobal is null");
     }
 
     /*for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
@@ -999,7 +974,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
 */
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-    print("Todayevent $todayEvent");
     return DismissKeyboard(
       child: SingleChildScrollView(
         child: Padding(
@@ -1060,7 +1034,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                       onChanged: (i) {
                         setState(() {
                           value = i;
-                          print(i);
                         });
                         if (value == 1) {
                           Navigator.pushNamed(
@@ -1131,7 +1104,6 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                       onChanged: (i) {
                         setState(() {
                           value = i;
-                          print(i);
                         });
                         if (value == 1) {
                           Navigator.pushNamed(
@@ -1302,11 +1274,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                                   style: TextStyle(fontSize: 10),
                                 ),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (newVal) {
                             branchId = newVal!;
-                            print("Branch ID $branchId");
 
                             setState(() {
                               getSharedPrfanceList();
@@ -1367,11 +1338,10 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                                   ),
                                 ),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (newVal) {
                             shift = newVal!;
-                            print("Shift ID $shift");
 
                             setState(() {
                               getSharedPrfanceList();
@@ -2430,26 +2400,23 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
   }
 
   TabSection(EventsListModal eventsListModal) {
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
-      print("oldEvent $oldEvent");
     }
 
     for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
-      print("oldJobEvent $oldJobEvent");
     }
 
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-    print("Todayevent $todayEvent");
 
     return DefaultTabController(
       length: 3,
@@ -2521,7 +2488,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                                           .dob
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -2576,7 +2543,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                                           .doj
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -2634,7 +2601,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                                               .dob
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2685,7 +2652,7 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
                                               .doj
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2718,6 +2685,8 @@ class _MSS_MO_DashboardState extends State<MSS_MO_Dashboard> with RouteAware {
 }
 
 class FilterBottomSheet extends StatefulWidget {
+  const FilterBottomSheet({super.key});
+
   @override
   _FilterBottomSheetState createState() => _FilterBottomSheetState();
 }
@@ -2814,8 +2783,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: ElevatedButton.icon(
               onPressed: () {
                 Navigator.pop(context);
-                print("Selected Org: $selectedOrg");
-                print("Selected Date: $selectedDateFormatted");
               },
               icon: Icon(Icons.filter_alt),
               label: Text("Apply Filter"),
@@ -2832,7 +2799,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

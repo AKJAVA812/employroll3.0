@@ -11,7 +11,7 @@ import '../modalClass/loanApprovedListModal.dart';
 
 class LoanApprovedReqList extends StatefulWidget {
   final LoanApprovedReqModal loanApprovedReqModal;
-  const LoanApprovedReqList(this.loanApprovedReqModal);
+  const LoanApprovedReqList(this.loanApprovedReqModal, {super.key});
 
   @override
   State<LoanApprovedReqList> createState() =>
@@ -74,25 +74,18 @@ class _LoanApprovedReqListState extends State<LoanApprovedReqList>
       setState(() {
         loanApprovedReqModalGlobal = value;
       });
-      print(
-        'employeeList00${loanApprovedReqModalGlobal!.loanAppReqDatalist!.length}',
-      );
     });
   }
 
   Future<LoanApprovedReqModal> getLoanAppReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.loanApprovedReq;
-    print('employeeList11: ${SessionId}');
     LoanApprovedReqModal loanApprovedReqModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['LoanRequiDatalist'];
-    print('responseemployeeList $getData');
     loanApprovedReqModal = LoanApprovedReqModal.fromJson(mapResponse);
 
     return loanApprovedReqModal;

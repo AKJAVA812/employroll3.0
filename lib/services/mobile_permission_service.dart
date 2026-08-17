@@ -117,11 +117,7 @@ class MobilePermissionService {
       hasSelfieConflict: hasSelfieConflict,
     );
 
-    print('[MOBILE-PERMISSION] ESS state -> ${state.toLogJson()}');
     if (hasSelfieConflict) {
-      print(
-        '[MOBILE-PERMISSION] Conflict: SELFIE and WITHOUT_SELFIE both present. SELFIE will be used.',
-      );
     }
     _lastKnownState = state;
     return state;
@@ -137,9 +133,6 @@ class MobilePermissionService {
     if (!hasBootstrap) {
       _readIdsFromJson(prefs.getString('mobileLoginResponseJson'), ids);
     }
-    print(
-      '[MOBILE-PERMISSION] securityGroupIds loaded -> ${ids.toList()..sort()}',
-    );
     return ids;
   }
 
@@ -149,7 +142,6 @@ class MobilePermissionService {
       _collectSecurityGroupIds(json.decode(rawJson), ids);
       return true;
     } catch (error) {
-      print('[MOBILE-PERMISSION] unable to parse cached auth JSON -> $error');
       return false;
     }
   }

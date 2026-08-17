@@ -16,7 +16,7 @@ import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../attendanceRequisition/getAttendanceDetails.dart';
 
 class WorkDoneReportDateSelect extends StatefulWidget {
-  const WorkDoneReportDateSelect({Key? key}) : super(key: key);
+  const WorkDoneReportDateSelect({super.key});
 
   @override
   State<WorkDoneReportDateSelect> createState() => _WorkDoneReport();
@@ -39,9 +39,9 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
 
   @override
   void initState() {
-    this.year;
-    this.date;
-    this.month;
+    year;
+    date;
+    month;
     //formattedDate = DateFormat.yMd() as String;
     setState(() {
       getSharedPrfanceList();
@@ -56,39 +56,30 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
     setState(() {
       if(empRole==1){
         showHide=true;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if(empRole==0){
         showHide=false;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -100,17 +91,17 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
   String formattedDate = DateFormat.ABBR_MONTH;
 
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePickPicker = await showDatePicker(
+    DateTime? datePickPicker = await showDatePicker(
       context: context,
       initialDate: _datePick,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_datePickPicker != null && _datePickPicker != _datePick) {
+    if (datePickPicker != null && datePickPicker != _datePick) {
       setState(() {
         pickDates = false;
-        _datePick = _datePickPicker;
+        _datePick = datePickPicker;
         toDatePickedString = DateFormat('dd-MM-yyyy').format(_datePick);
       });
     }
@@ -120,17 +111,17 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
   String formatDate = DateFormat.ABBR_MONTH;
 
   Future<Null> _selectToDate(BuildContext context) async {
-    DateTime? _newDatePickPicker = await showDatePicker(
+    DateTime? newDatePickPicker = await showDatePicker(
       context: context,
       initialDate: _newDatePick,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_newDatePickPicker != null && _newDatePickPicker != _newDatePick) {
+    if (newDatePickPicker != null && newDatePickPicker != _newDatePick) {
       setState(() {
         pickNewDate = false;
-        _newDatePick = _newDatePickPicker;
+        _newDatePick = newDatePickPicker;
         fromDatePickedString = DateFormat('dd-MM-yyyy').format(_newDatePick);
       });
     }
@@ -164,31 +155,26 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
-            print('My Requests');
           }
           if(index==3){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if(index==4){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -267,7 +253,6 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
                   onChanged: (i) {
                     setState(() {
                       value = i;
-                      print(i);
 
                     });
                     if(value == 1) {
@@ -463,9 +448,8 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                child: ButtonBar(
+                child: OverflowBar(
                     alignment: MainAxisAlignment.center,
-                    buttonPadding: Vx.mOnly(right: 16),
                     children: [
                       ElevatedButton(
                         /*onPressed: (){
@@ -478,7 +462,6 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
                               AlertDialog(
                                 content: "Please select valid date range".text.make(),
                               );
-                              print("select valid date range");
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Please Select Valid Date Range "),
                               ));
@@ -508,7 +491,6 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
 
 
                           } else {
-                            print("Please select date");
                             setState(() {
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text("Please Select Date Range "),
@@ -518,7 +500,7 @@ class _WorkDoneReport extends State<WorkDoneReportDateSelect> {
                         },
                         style: ButtonStyle(
                           backgroundColor:
-                          MaterialStateProperty.all(Mythemes.lightBluishColor),
+                          WidgetStateProperty.all(Mythemes.lightBluishColor),
                         ),
                         child: "Submit".text.make(),
                       ).wh(120, 40).py32()

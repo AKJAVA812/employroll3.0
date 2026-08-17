@@ -21,8 +21,7 @@ class SingleDateAttendance extends StatefulWidget {
 
   final String singleDateString;
 
-  const SingleDateAttendance({Key? key, required this.singleDateString})
-    : super(key: key);
+  const SingleDateAttendance({super.key, required this.singleDateString});
 
   @override
   State<SingleDateAttendance> createState() =>
@@ -63,7 +62,6 @@ class _SingleDateAttendanceState extends State<SingleDateAttendance>
 
   @override
   void initState() {
-    print("single new date $singleDateString");
 
     getSharedPrfanceList();
     setState(() {});
@@ -93,14 +91,12 @@ class _SingleDateAttendanceState extends State<SingleDateAttendance>
   ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getAttDetails;
-    print('employeeList11: ${SessionId}');
     OnDateAttModel onDateAttModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?sessionId=$sessionId&date=$singleDate",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     onDateAttModel = OnDateAttModel.fromJson(mapResponse);
@@ -139,7 +135,6 @@ class _SingleDateAttendanceState extends State<SingleDateAttendance>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -147,16 +142,13 @@ class _SingleDateAttendanceState extends State<SingleDateAttendance>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -164,7 +156,6 @@ class _SingleDateAttendanceState extends State<SingleDateAttendance>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -200,7 +191,7 @@ class _SingleDateAttendanceState extends State<SingleDateAttendance>
 class AttList extends StatefulWidget {
   final OnDateAttModel onDateAttModel;
 
-  AttList(this.onDateAttModel);
+  const AttList(this.onDateAttModel, {super.key});
 
   @override
   State<AttList> createState() => _AttListState(onDateAttModel);
@@ -216,14 +207,12 @@ class _AttListState extends State<AttList> {
     String dateFormate = DateFormat(
       "dd-MM-yyyy",
     ).format(DateTime.parse(onDateAttModelGlobel!.date!.toString()));
-    print("helooo $dateFormate");
     return ListView.builder(
       padding: const EdgeInsets.all(4.0),
       itemCount: 1,
       itemBuilder: (context, itemCount) {
         return InkWell(
           onTap: () {
-            print('attendanceReport$onDateAttModel!.data![itemCount]');
             // Navigator.pushNamed(context, MyRoutings.attendanceRequisitionRoute);
             Navigator.of(context).push(
               MaterialPageRoute(

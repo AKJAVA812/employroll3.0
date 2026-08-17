@@ -33,18 +33,18 @@ class CategoriesModalClass {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['billAllow'] = this.billAllow;
-    if (this.subExpDataList != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['billAllow'] = billAllow;
+    if (subExpDataList != null) {
       data['subExpDataList'] =
-          this.subExpDataList!.map((v) => v.toJson()).toList();
+          subExpDataList!.map((v) => v.toJson()).toList();
     }
-    if (this.expenseDataList != null) {
+    if (expenseDataList != null) {
       data['expenseDataList'] =
-          this.expenseDataList!.map((v) => v.toJson()).toList();
+          expenseDataList!.map((v) => v.toJson()).toList();
     }
-    if (this.catDataList != null) {
-      data['catDataList'] = this.catDataList!.map((v) => v.toJson()).toList();
+    if (catDataList != null) {
+      data['catDataList'] = catDataList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -73,12 +73,12 @@ class SubExpDataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['subExpName'] = this.subExpName;
-    data['isPerkmAllowed'] = this.isPerkmAllowed;
-    data['subExpId'] = this.subExpId;
-    data['expenseId'] = this.expenseId;
-    data['uptoValue'] = this.uptoValue;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['subExpName'] = subExpName;
+    data['isPerkmAllowed'] = isPerkmAllowed;
+    data['subExpId'] = subExpId;
+    data['expenseId'] = expenseId;
+    data['uptoValue'] = uptoValue;
     return data;
   }
 }
@@ -106,12 +106,12 @@ class ExpenseDataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['expenseId'] = this.expenseId;
-    data['isOtherAllowed'] = this.isOtherAllowed;
-    data['claimId'] = this.claimId;
-    data['uptoValue'] = this.uptoValue;
-    data['expenseName'] = this.expenseName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['expenseId'] = expenseId;
+    data['isOtherAllowed'] = isOtherAllowed;
+    data['claimId'] = claimId;
+    data['uptoValue'] = uptoValue;
+    data['expenseName'] = expenseName;
     return data;
   }
 }
@@ -139,12 +139,12 @@ class CatDataList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['catId'] = this.catId;
-    data['isPerkmAllowed'] = this.isPerkmAllowed;
-    data['catName'] = this.catName;
-    data['subExpId'] = this.subExpId;
-    data['uptoValue'] = this.uptoValue;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['catId'] = catId;
+    data['isPerkmAllowed'] = isPerkmAllowed;
+    data['catName'] = catName;
+    data['subExpId'] = subExpId;
+    data['uptoValue'] = uptoValue;
     return data;
   }
 }

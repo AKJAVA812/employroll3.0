@@ -11,7 +11,7 @@ import '../myAllReports.dart';
 class OnDutyEmpList extends StatefulWidget {
   final EssDashboarrdModel dashboardModelGlobal;
 
-  OnDutyEmpList(this.dashboardModelGlobal);
+  const OnDutyEmpList(this.dashboardModelGlobal, {super.key});
 
   @override
   State<OnDutyEmpList> createState() => _OnDutyEmpListState(dashboardModelGlobal);
@@ -66,13 +66,11 @@ class _OnDutyEmpListState extends State<OnDutyEmpList> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
@@ -82,7 +80,6 @@ class _OnDutyEmpListState extends State<OnDutyEmpList> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
@@ -92,7 +89,6 @@ class _OnDutyEmpListState extends State<OnDutyEmpList> {
             //     MaterialPageRoute(builder: (context) => ProfilePageNew())
             // );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -129,7 +125,6 @@ class _OnDutyEmpListState extends State<OnDutyEmpList> {
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
     final int itemCount = dashboardModel.countData?.presentList?.length ?? 0;
-    print("ItemCount - $itemCount");
     return ListView.builder(
       itemCount: itemCount,
       itemBuilder: (context, index) {

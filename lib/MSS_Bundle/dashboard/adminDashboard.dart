@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/adminPage/adminDashboard/presentEmpList.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
@@ -28,7 +27,7 @@ import '../../adminPage/modelClass/shiftListModal.dart';
 class AdminNewDashboard extends StatefulWidget {
   final DashboardModel dashboardModel1;
 
-  AdminNewDashboard(this.dashboardModel1);
+  const AdminNewDashboard(this.dashboardModel1, {super.key});
 
   @override
   State<AdminNewDashboard> createState() =>
@@ -51,9 +50,9 @@ var eventSingleDateString;
 var day = DateTime.now();
 var single = DateFormat('dd');
 var singleDay = single.format(day);
-late List<String?> list = [];
-late List<String?> branchList = [];
-late List<String?>? shiftList = [];
+List<String?> list = [];
+List<String?> branchList = [];
+List<String?>? shiftList = [];
 String? userPanelPermission;
 dynamic defaultProfileId;
 String? defaultProfileName;
@@ -161,7 +160,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -186,7 +184,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -233,7 +230,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.shiftListApi;
 
-    print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -243,12 +239,10 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     shiftListModal = ShiftListModal.fromJson(mapResponse);
     for (int i = 0; i < shiftListModal.data!.length; i++) {
       var shiftName = shiftListModal.data![i].shiftName;
@@ -262,7 +256,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalApi;
 
-    print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -273,12 +266,10 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     eventsListModal = EventsListModal.fromJson(mapResponse);
     return eventsListModal;
   }
@@ -334,8 +325,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
             getSharedPrfanceList();
             singleDateString = DateFormat('dd-MM-yyyy').format(date);
             singleDay = DateFormat('dd').format(date);
-            print("SingleDateNew $singleDateString");
-            print("singleDay $singleDay");
             //dateController.text = DateFormat("dd").format(date!);
 
             //  DateFormat.yMd().format(date!).toString();
@@ -366,24 +355,21 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
     earlyOutEmp = dashboardModelGlobal!.earlyOutEmp;
     halfEmp = dashboardModelGlobal!.halfEmp;
     overTime = dashboardModelGlobal!.otEmp;
-    print("Total Employees $totalPresentEmp");
     shift = 0;
     branchId = 0;
 
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     if (eventsListModalGlobal != null &&
         eventsListModalGlobal!.bdayList != null) {
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
-        print("oldEvent $oldEvent");
       }
     } else {
-      print("bdayList is null or eventsListModalGlobal is null");
     }
 
     if (eventsListModalGlobal != null &&
@@ -391,10 +377,8 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
-        print("oldJobEvent $oldJobEvent");
       }
     } else {
-      print("job list is null or eventsListModalGlobal is null");
     }
 
     /* for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
@@ -405,7 +389,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
 
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-    print("Todayevent $todayEvent");
     return DismissKeyboard(
       child: SingleChildScrollView(
         child: Padding(
@@ -464,7 +447,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                     onChanged: (i) {
                       setState(() {
                         value = i;
-                        print(i);
                       });
                       if (value == 0) {
                         Navigator.pushNamed(
@@ -523,7 +505,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                 var i = branchList.indexOf(valuenew) + 1;
                                 branchId =
                                     branchListModalGloabal!.data![i].branchId!;
-                                print("Branch ID $branchId");
                                 setState(() {
                                   getSharedPrfanceList();
                                   dropdownNewvalue = newVal;
@@ -594,7 +575,6 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                             shiftValue = newVal.toString();
                             var i = shiftList!.indexOf(shiftValue);
                             shift = shiftListModalGlobal!.data![i].shiftId!;
-                            print("Shift ID $shift");
                             setState(() {
                               getSharedPrfanceList();
                               //print('value1 $i');
@@ -1339,7 +1319,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                                         .dob
                                                         .toString(),
                                                   ),
-                                                  leading: Container(
+                                                  leading: SizedBox(
                                                     width: 40,
                                                     height: 40,
                                                     child: CircleAvatar(
@@ -1400,7 +1380,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                                         .doj
                                                         .toString(),
                                                   ),
-                                                  leading: Container(
+                                                  leading: SizedBox(
                                                     width: 40,
                                                     height: 40,
                                                     child: CircleAvatar(
@@ -1465,7 +1445,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                                             .dob
                                                             .toString(),
                                                       ),
-                                                      leading: Container(
+                                                      leading: SizedBox(
                                                         width: 40,
                                                         height: 40,
                                                         child: CircleAvatar(
@@ -1522,7 +1502,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                                             .doj
                                                             .toString(),
                                                       ),
-                                                      leading: Container(
+                                                      leading: SizedBox(
                                                         width: 40,
                                                         height: 40,
                                                         child: CircleAvatar(
@@ -1563,26 +1543,23 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
   }
 
   TabSection(EventsListModal eventsListModal) {
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
-      print("oldEvent $oldEvent");
     }
 
     for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
-      print("oldJobEvent $oldJobEvent");
     }
 
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-    print("Todayevent $todayEvent");
 
     return DefaultTabController(
       length: 3,
@@ -1656,7 +1633,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                           .dob
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -1713,7 +1690,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                           .doj
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -1773,7 +1750,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                               .dob
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -1826,7 +1803,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
                                               .doj
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -1860,7 +1837,7 @@ class _AdminNewDashboardState extends State<AdminNewDashboard> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

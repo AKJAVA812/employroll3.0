@@ -54,30 +54,30 @@ class CompanyPolicyModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.payrollPolicyList != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (payrollPolicyList != null) {
       data['payrollPolicyList'] =
-          this.payrollPolicyList!.map((v) => v.toJson()).toList();
+          payrollPolicyList!.map((v) => v.toJson()).toList();
     }
-    if (this.timeAttPolicyList != null) {
+    if (timeAttPolicyList != null) {
       data['timeAttPolicyList'] =
-          this.timeAttPolicyList!.map((v) => v.toJson()).toList();
+          timeAttPolicyList!.map((v) => v.toJson()).toList();
     }
-    if (this.leavePolicyList != null) {
+    if (leavePolicyList != null) {
       data['leavePolicyList'] =
-          this.leavePolicyList!.map((v) => v.toJson()).toList();
+          leavePolicyList!.map((v) => v.toJson()).toList();
     }
-    if (this.allPolicyList != null) {
+    if (allPolicyList != null) {
       data['allPolicyList'] =
-          this.allPolicyList!.map((v) => v.toJson()).toList();
+          allPolicyList!.map((v) => v.toJson()).toList();
     }
-    if (this.orgPolicyList != null) {
+    if (orgPolicyList != null) {
       data['orgPolicyList'] =
-          this.orgPolicyList!.map((v) => v.toJson()).toList();
+          orgPolicyList!.map((v) => v.toJson()).toList();
     }
-    if (this.claimsPolicyList != null) {
+    if (claimsPolicyList != null) {
       data['claimsPolicyList'] =
-          this.claimsPolicyList!.map((v) => v.toJson()).toList();
+          claimsPolicyList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -109,13 +109,13 @@ class PayrollPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['uploadedFileName'] = this.uploadedFileName;
-    data['policyName'] = this.policyName;
-    data['policytype'] = this.policytype;
-    data['description'] = this.description;
-    data['id'] = this.id;
-    data['docPath'] = this.docPath;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['uploadedFileName'] = uploadedFileName;
+    data['policyName'] = policyName;
+    data['policytype'] = policytype;
+    data['description'] = description;
+    data['id'] = id;
+    data['docPath'] = docPath;
     return data;
   }
 }
@@ -146,13 +146,13 @@ class TimeAttPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['uploadedFileName'] = this.uploadedFileName;
-    data['policyName'] = this.policyName;
-    data['policytype'] = this.policytype;
-    data['description'] = this.description;
-    data['id'] = this.id;
-    data['docPath'] = this.docPath;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['uploadedFileName'] = uploadedFileName;
+    data['policyName'] = policyName;
+    data['policytype'] = policytype;
+    data['description'] = description;
+    data['id'] = id;
+    data['docPath'] = docPath;
     return data;
   }
 }
@@ -183,13 +183,13 @@ class LeavePolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['uploadedFileName'] = this.uploadedFileName;
-    data['policyName'] = this.policyName;
-    data['policytype'] = this.policytype;
-    data['description'] = this.description;
-    data['id'] = this.id;
-    data['docPath'] = this.docPath;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['uploadedFileName'] = uploadedFileName;
+    data['policyName'] = policyName;
+    data['policytype'] = policytype;
+    data['description'] = description;
+    data['id'] = id;
+    data['docPath'] = docPath;
     return data;
   }
 }
@@ -220,13 +220,13 @@ class AllPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['uploadedFileName'] = this.uploadedFileName;
-    data['policyName'] = this.policyName;
-    data['policytype'] = this.policytype;
-    data['description'] = this.description;
-    data['id'] = this.id;
-    data['docPath'] = this.docPath;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['uploadedFileName'] = uploadedFileName;
+    data['policyName'] = policyName;
+    data['policytype'] = policytype;
+    data['description'] = description;
+    data['id'] = id;
+    data['docPath'] = docPath;
     return data;
   }
 }
@@ -257,13 +257,13 @@ class OrgPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['uploadedFileName'] = this.uploadedFileName;
-    data['policyName'] = this.policyName;
-    data['policytype'] = this.policytype;
-    data['description'] = this.description;
-    data['id'] = this.id;
-    data['docPath'] = this.docPath;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['uploadedFileName'] = uploadedFileName;
+    data['policyName'] = policyName;
+    data['policytype'] = policytype;
+    data['description'] = description;
+    data['id'] = id;
+    data['docPath'] = docPath;
     return data;
   }
 }
@@ -294,13 +294,13 @@ class ClaimsPolicyList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['uploadedFileName'] = this.uploadedFileName;
-    data['policyName'] = this.policyName;
-    data['policytype'] = this.policytype;
-    data['description'] = this.description;
-    data['id'] = this.id;
-    data['docPath'] = this.docPath;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['uploadedFileName'] = uploadedFileName;
+    data['policyName'] = policyName;
+    data['policytype'] = policytype;
+    data['description'] = description;
+    data['id'] = id;
+    data['docPath'] = docPath;
     return data;
   }
 }

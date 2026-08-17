@@ -14,6 +14,5 @@ class SharedPrefHelper {
     await prefs.remove('calendarMonth');
     await prefs.remove('dashboardData');
 
-    print("🧹 Cleared cached API data on login");
   }
 }

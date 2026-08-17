@@ -17,7 +17,7 @@ class DeleteExpenseList extends StatefulWidget {
   ExpensesListModal expensesListModal;
   int i;
 
-  DeleteExpenseList(this.expensesListModal, this.i);
+  DeleteExpenseList(this.expensesListModal, this.i, {super.key});
 
   @override
   State<DeleteExpenseList> createState() =>
@@ -32,7 +32,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
 
   var titleName = "Claim Requisition List";
   final TextEditingController _fromDateController = TextEditingController();
-  TextEditingController _toDateController = TextEditingController();
+  final TextEditingController _toDateController = TextEditingController();
   final TextEditingController _reasonController = TextEditingController();
   SessionManager shared = SessionManager();
   Map<String, dynamic> mapResponse = {};
@@ -123,7 +123,6 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                                   ).format(fromDate!);
                                 });
 
-                                print(fromDate);
                               },
                               readOnly: true,
                               enabled: false,
@@ -180,7 +179,6 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                                   ).format(toDate!);
                                 });
 
-                                print(toDate);
                               },
                               readOnly: true,
                               enabled: false,
@@ -326,7 +324,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 150,
                                 child:
                                     reimbType
@@ -362,8 +360,8 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                               ),
                               items: [
                                 DropdownMenuItem(
-                                  child: Text('ER_Conveyence_Policy'),
                                   value: 1,
+                                  child: Text('ER_Conveyence_Policy'),
                                 ),
 
                                 /* DropdownMenuItem(
@@ -386,7 +384,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 120,
                                 child:
                                     expenseType
@@ -422,8 +420,8 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                               ),
                               items: [
                                 DropdownMenuItem(
-                                  child: Text('Conveyance'),
                                   value: 1,
+                                  child: Text('Conveyance'),
                                 ),
 
                                 /* DropdownMenuItem(
@@ -442,7 +440,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 120,
                                 child:
                                     subExpenseType
@@ -478,6 +476,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                               ),
                               items: [
                                 DropdownMenuItem(
+                                  value: 1,
                                   child: Text(
                                     'Bike 2 Wheeler Local',
                                     style: TextStyle(
@@ -485,9 +484,9 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                                       fontSize: 13,
                                     ),
                                   ),
-                                  value: 1,
                                 ),
                                 DropdownMenuItem(
+                                  value: 2,
                                   child: Text(
                                     'Cab Taxi',
                                     style: TextStyle(
@@ -495,7 +494,6 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                                       fontSize: 13,
                                     ),
                                   ),
-                                  value: 2,
                                 ),
 
                                 /* DropdownMenuItem(
@@ -518,7 +516,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 120,
                                 child:
                                     catName
@@ -557,6 +555,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                               ),
                               items: [
                                 DropdownMenuItem(
+                                  value: 1,
                                   child: Text(
                                     'Employee Owned Bike',
                                     style: TextStyle(
@@ -564,7 +563,6 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                                       fontSize: 13,
                                     ),
                                   ),
-                                  value: 1,
                                 ),
 
                                 /* DropdownMenuItem(
@@ -693,7 +691,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 120,
                                 child:
                                     billAvail
@@ -728,8 +726,8 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                                 ),
                               ),
                               items: [
-                                DropdownMenuItem(child: Text('Yes'), value: 1),
-                                DropdownMenuItem(child: Text('No'), value: 2),
+                                DropdownMenuItem(value: 1, child: Text('Yes')),
+                                DropdownMenuItem(value: 2, child: Text('No')),
 
                                 /* DropdownMenuItem(
                                       child: Text('Advance'),
@@ -785,7 +783,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ButtonBar(
+                      OverflowBar(
                         alignment: MainAxisAlignment.center,
                         //buttonPadding: Vx.mOnly(right: 16),
                         children: [
@@ -797,7 +795,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                               );
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.lightBluishColor,
                               ),
                             ),
@@ -815,7 +813,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
                               deleteClaimReq(_reasonController.text);
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.dangerColorOne,
                               ),
                             ),
@@ -846,18 +844,14 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
       "claimId=$claimReqId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(context);
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -909,7 +903,7 @@ class _DeleteExpenseListState extends State<DeleteExpenseList> {
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
 
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

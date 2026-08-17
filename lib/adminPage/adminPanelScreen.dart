@@ -24,7 +24,7 @@ import 'adminDashboard/adminPanelDashboard.dart';
 
 class AdminPanelScreen extends StatefulWidget {
 
-  const AdminPanelScreen({Key? key}) : super(key: key);
+  const AdminPanelScreen({super.key});
 
   @override
   State<AdminPanelScreen> createState() => _AdminPanelScreenState();
@@ -57,7 +57,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
   logoutApp(context) {
     CommonNotificationPage.showLogoutPopup(
-        context, "Do You Want To Logout?".toString() + " " , "Alert");
+        context, "Do You Want To Logout? " , "Alert");
   }
 
 
@@ -92,7 +92,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.pop(this.context);
+            Navigator.pop(context);
           },
           child: "Cancel".text.color(Mythemes.dangerColorOne).make(),
         ),
@@ -100,7 +100,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           onPressed: () {
             shared.setSessionId("");
             Navigator.pushAndRemoveUntil(
-              this.context,
+              context,
               MaterialPageRoute(builder: (context) => LoginPage()),
                   (route) => false,
             );
@@ -247,7 +247,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         getAddress(positions!);
         //print('Response1111c $currentAddresses');
       } else {
-        showAboutDialog(context: this.context);
+        showAboutDialog(context: context);
       }
     });
   }
@@ -301,11 +301,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     var street = placemarkee.street;
     var postalCode = placemarkee.postalCode;
     var nameAdd = placemarkee.name;
-    currentAddresses = '$street ' +
-        '$nameAdd ' +
-        '$sublocality ' +
-        '$locality ' +
-        '$administrativeArea ' +
+    currentAddresses = '$street ' '$nameAdd ' '$sublocality ' '$locality ' '$administrativeArea ' +
         '$contryName ' +
         '$postalCode ';
     setState(() {
@@ -315,7 +311,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
     imageString= await shared.getProfileImage();
-    print('Response snapshot: ${sessionId}');
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
@@ -362,7 +357,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.pop(this.context);
+            Navigator.pop(context);
           },
           child: "No".text.color(Mythemes.dangerColorOne).make(),
         ),
@@ -378,7 +373,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       elevation: 24.0,
     );
     showDialog(
-        context: this.context,
+        context: context,
         builder: (BuildContext context) {
           return alertDialog;
         });
@@ -399,8 +394,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       actions: [
         ElevatedButton(
           onPressed: () {
-            Navigator.pop(this.context);
-            print('response11 ${result}');
+            Navigator.pop(context);
           },
           child: Text("Ok"),
         )
@@ -408,7 +402,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       elevation: 24.0,
     );
     showDialog(
-        context: this.context,
+        context: context,
         builder: (BuildContext context) {
           return alertDialog;
         });
@@ -417,7 +411,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+  const Dashboard({super.key});
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -432,7 +426,7 @@ class _DashboardState extends State<Dashboard> {
 }
 
 class Workflow extends StatelessWidget {
-  const Workflow({Key? key}) : super(key: key);
+  const Workflow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -441,7 +435,7 @@ class Workflow extends StatelessWidget {
 }
 
 class Report extends StatelessWidget {
-  const Report({Key? key}) : super(key: key);
+  const Report({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -457,6 +451,8 @@ class Report extends StatelessWidget {
 
 
 class DrawerFile extends StatefulWidget {
+  const DrawerFile({super.key});
+
   @override
   State<DrawerFile> createState() => _DrawerFileState();
 }
@@ -472,16 +468,12 @@ class _DrawerFileState extends State<DrawerFile> {
     urlImage= await shared.getProfileImage();
     name= await shared.getempName();
     emailid=await shared.getEmailId();
-    print('drawer: ${urlImage}');
-    print('drawer: ${name}');
 
-    print('drawer: ${emailid}');
     setState(() { });
   }
   @override
   void didChangeDependencies() {
     //getUserNameImage();
-    print('drawer: didChangeDependencies');
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
@@ -490,25 +482,20 @@ class _DrawerFileState extends State<DrawerFile> {
 
     getUserNameImage();
 
-    print('drawer: initState');
     // TODO: implement initState
 
-    print('drawer: ${urlImage}');
-    print('drawer: ${name}');
 
     super.initState();
   }
   @override
   void didUpdateWidget(covariant DrawerFile oldWidget) {
     //getUserNameImage();
-    print('drawer: didUpdateWidget');
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
   }
   @override
   void setState(VoidCallback fn) {
     //getUserNameImage();
-    print('drawer: setState');
     // TODO: implement setState
     super.setState(fn);
   }
@@ -540,7 +527,7 @@ class _DrawerFileState extends State<DrawerFile> {
                   currentAccountPicture:
                   CircleAvatar(backgroundImage:
 
-                  NetworkImage('$urlImage') , backgroundColor: Mythemes.greyish,
+                  NetworkImage(urlImage) , backgroundColor: Mythemes.greyish,
                   ),
                 ),
               ),
@@ -553,7 +540,6 @@ class _DrawerFileState extends State<DrawerFile> {
                 textScaleFactor: 1.2,
               ),
               onTap: (){
-                print("profile click");
                 /*Fluttertoast.showToast(
                     msg: "Profile Click",
                     toastLength: Toast.LENGTH_SHORT,
@@ -578,7 +564,6 @@ class _DrawerFileState extends State<DrawerFile> {
                 setState(() {
                   //Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
                   //Navigator.pop(context);
-                  print( "hollaa $screens[3]");
                   screens[3];
                 });
                 Navigator.pop(context);

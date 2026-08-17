@@ -13,7 +13,7 @@ class ExitEmpListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -83,25 +83,25 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['approveStatus'] = this.approveStatus;
-    data['empId'] = this.empId;
-    data['resignData'] = this.resignData;
-    data['noticePayServeActive'] = this.noticePayServeActive;
-    data['lastworkingData'] = this.lastworkingData;
-    data['document'] = this.document;
-    data['empdetailsId'] = this.empdetailsId;
-    data['empEmail'] = this.empEmail;
-    data['seprationId'] = this.seprationId;
-    data['devicestatus'] = this.devicestatus;
-    data['partialDaysActive'] = this.partialDaysActive;
-    data['empDept'] = this.empDept;
-    data['initiate'] = this.initiate;
-    data['empContactNo'] = this.empContactNo;
-    data['seprationMode'] = this.seprationMode;
-    data['partialDaysValue'] = this.partialDaysValue;
-    data['empName'] = this.empName;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['approveStatus'] = approveStatus;
+    data['empId'] = empId;
+    data['resignData'] = resignData;
+    data['noticePayServeActive'] = noticePayServeActive;
+    data['lastworkingData'] = lastworkingData;
+    data['document'] = document;
+    data['empdetailsId'] = empdetailsId;
+    data['empEmail'] = empEmail;
+    data['seprationId'] = seprationId;
+    data['devicestatus'] = devicestatus;
+    data['partialDaysActive'] = partialDaysActive;
+    data['empDept'] = empDept;
+    data['initiate'] = initiate;
+    data['empContactNo'] = empContactNo;
+    data['seprationMode'] = seprationMode;
+    data['partialDaysValue'] = partialDaysValue;
+    data['empName'] = empName;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }

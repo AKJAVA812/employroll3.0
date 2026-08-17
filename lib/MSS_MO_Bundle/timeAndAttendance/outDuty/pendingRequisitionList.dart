@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +24,7 @@ import '../../../modules/onDuty/reports/pendingRequisition/odAttendanceApproval.
 class MSS_MO_PendingOdRequisition extends StatefulWidget {
   final PendingOdReqList pendingOdReqList;
 
-  MSS_MO_PendingOdRequisition(this.pendingOdReqList);
+  const MSS_MO_PendingOdRequisition(this.pendingOdReqList, {super.key});
 
   @override
   State<MSS_MO_PendingOdRequisition> createState() =>
@@ -86,13 +85,11 @@ class _MSS_MO_PendingOdRequisitionState
 
         DateFormat currentDateFormat = DateFormat("yyyy-MM-dd");
         String currentDateFormatString = currentDateFormat.format(now);
-        print("current date $currentDateFormatString");
         endDate = currentDateFormatString;
         getSharedPrfanceList();
 
         setState(() {
           int listLength = foundDataNewMO?.length ?? 0;
-          print('listLength $listLength');
         });
       });
     }
@@ -237,7 +234,7 @@ class _MSS_MO_PendingOdRequisitionState
                         ),
                         ...organizations.map((org) {
                           return DropdownMenuItem(value: org, child: Text(org));
-                        }).toList(),
+                        }),
                       ],
                       onChanged: (value) async {
                         setState(() {
@@ -250,8 +247,6 @@ class _MSS_MO_PendingOdRequisitionState
                           );
 
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
                         });
 
                         final selectedId = int.tryParse(getOrgId.toString());
@@ -302,7 +297,6 @@ class _MSS_MO_PendingOdRequisitionState
                               pendingOdReqListLabeled = pendingOdReqListLabel;
                               if (foundDataNewMO != null) {
                                 foundDataNewMO!.length;
-                                print("Fetch data $foundDataNewMO");
                                 isLoading = false;
                               } else {
                                 Center(
@@ -358,7 +352,6 @@ class _MSS_MO_PendingOdRequisitionState
         pendingOdReqListLabeled = pendingOdReqListLabel;
         if (foundDataNewMO != null) {
           foundDataNewMO!.length;
-          print("Fetch data $foundDataNewMO");
           isLoading = false;
         } else {
           Center(child: "There is no data available right now".text.make());
@@ -373,7 +366,6 @@ class _MSS_MO_PendingOdRequisitionState
   Future<PendingOdReqList> getPendingOdReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.odPendingReqListNew;
-    print('employeeList11: ${SessionId}');
     PendingOdReqList pendingOdReqList;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -387,16 +379,12 @@ class _MSS_MO_PendingOdRequisitionState
     );
 
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result'];
     if (getData == "Error") {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
-    print('responseemployeeList $getData');
     pendingOdReqList = PendingOdReqList.fromJson(mapResponse);
     allUsernew = pendingOdReqList.listdata;
 
@@ -440,7 +428,6 @@ class _MSS_MO_PendingOdRequisitionState
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Listdata>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -611,7 +598,6 @@ class _MSS_MO_PendingOdRequisitionState
                   onChanged: (i) {
                     setState(() {
                       value = i;
-                      print(i);
                     });
 
                     if (value == 0) {
@@ -667,7 +653,6 @@ class _MSS_MO_PendingOdRequisitionState
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -675,16 +660,13 @@ class _MSS_MO_PendingOdRequisitionState
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-            print('OD');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -692,7 +674,6 @@ class _MSS_MO_PendingOdRequisitionState
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

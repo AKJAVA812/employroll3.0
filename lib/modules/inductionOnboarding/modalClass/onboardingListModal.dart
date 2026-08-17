@@ -15,8 +15,8 @@ class OnboardingListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['result'] = this.result;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['result'] = result;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -101,30 +101,30 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['gender'] = this.gender;
-    data['userType'] = this.userType;
-    data['branchName'] = this.branchName;
-    data['aadharNo'] = this.aadharNo;
-    data['maritalStatus'] = this.maritalStatus;
-    data['userTypeName'] = this.userTypeName;
-    data['doj'] = this.doj;
-    data['firstName'] = this.firstName;
-    data['currentAddress'] = this.currentAddress;
-    data['designationName'] = this.designationName;
-    data['department'] = this.department;
-    data['departmentName'] = this.departmentName;
-    data['aadharRegisNo'] = this.aadharRegisNo;
-    data['permanentAddress'] = this.permanentAddress;
-    data['empPhoto'] = this.empPhoto;
-    data['branch'] = this.branch;
-    data['mobileNo'] = this.mobileNo;
-    data['designation'] = this.designation;
-    data['skillType'] = this.skillType;
-    data['dob'] = this.dob;
-    data['empStatus'] = this.empStatus;
-    data['emailId'] = this.emailId;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['gender'] = gender;
+    data['userType'] = userType;
+    data['branchName'] = branchName;
+    data['aadharNo'] = aadharNo;
+    data['maritalStatus'] = maritalStatus;
+    data['userTypeName'] = userTypeName;
+    data['doj'] = doj;
+    data['firstName'] = firstName;
+    data['currentAddress'] = currentAddress;
+    data['designationName'] = designationName;
+    data['department'] = department;
+    data['departmentName'] = departmentName;
+    data['aadharRegisNo'] = aadharRegisNo;
+    data['permanentAddress'] = permanentAddress;
+    data['empPhoto'] = empPhoto;
+    data['branch'] = branch;
+    data['mobileNo'] = mobileNo;
+    data['designation'] = designation;
+    data['skillType'] = skillType;
+    data['dob'] = dob;
+    data['empStatus'] = empStatus;
+    data['emailId'] = emailId;
+    data['status'] = status;
     return data;
   }
 }

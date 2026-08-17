@@ -14,6 +14,8 @@ import 'package:velocity_x/velocity_x.dart';
 import 'myAllReports.dart';
 
 class ReportingOfficersPage extends StatefulWidget {
+  const ReportingOfficersPage({super.key});
+
   @override
   _ReportingOfficersPageState createState() => _ReportingOfficersPageState();
 }
@@ -113,9 +115,11 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
 
   Future<MyManagersModalList> getMyReportingOfficersList() async {
 
-    if (mounted) setState(() {
+    if (mounted) {
+      setState(() {
       isLoadingCount = true; // âœ… Start loader before API
     });
+    }
 
     try {
       final api = MobileApiFoundation.instance;
@@ -156,7 +160,6 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
 
       return myManagersModalList;
     } catch (e) {
-      print("Error fetching reporting officers: $e");
       final errorMessage =
           e is MobileApiException
               ? (e.message ?? e.code)
@@ -184,9 +187,11 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
       }
       return empty;
     } finally {
-      if (mounted) setState(() {
+      if (mounted) {
+        setState(() {
         isLoadingCount = false; // âœ… Always stop loader
       });
+      }
     }
   }
 
@@ -301,7 +306,6 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
               ),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -311,7 +315,6 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -321,7 +324,6 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
               ),
             );
 
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -332,7 +334,6 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
             );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My reports');
           }
           if (index == 4) {
             Navigator.push(
@@ -346,7 +347,6 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -1145,7 +1145,6 @@ class _ReportingOfficersPageState extends State<ReportingOfficersPage>
         onSelected: (val) {
           setState(() {
             selectedFilter = label;
-            print("Selected Filter - $selectedFilter");
           });
         },
       ),

@@ -81,10 +81,6 @@ class _ExitResignationL2ApprovalPageState
     disApproveButtonL2Show = await shared.getExitResignationDisApproveL2Show();
     disApproveButtonL2View = await shared.getExitResignationDisApproveL2View();
 
-    print("Approve L2 Show - $approveButtonL2Show");
-    print("Approve L2 View - $approveButtonL2View");
-    print("DisApprove L2 Show - $disApproveButtonL2Show");
-    print("DisApprove L2 View - $disApproveButtonL2View");
     // await Future.delayed(Duration(seconds: 5));
     //Future<LoanDataShowApprovalModal> getEmployeeList11 = getLoanDataForApproval(sessionId!);
     isLoading = true;
@@ -107,7 +103,6 @@ class _ExitResignationL2ApprovalPageState
         fetchSingleResignationRequestLabeled =
             fetchSingleResignationRequestLabel;
         isLoading = false;
-        print('Loan Data - ${foundDataNew!.length}');
 
         reasonForLeavingController.text =
             foundDataNew![0].seprationName.toString();
@@ -204,7 +199,6 @@ class _ExitResignationL2ApprovalPageState
   void initState() {
     super.initState();
     requestIdReceived = requestIdSend;
-    print("Request ID - $requestIdReceived");
     getSharedPrfanceList();
   }
 
@@ -213,7 +207,6 @@ class _ExitResignationL2ApprovalPageState
   ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.fetchSingleEmployeeExitData;
-    print('employeeList11: ${SessionId}');
     FetchSingleResignationRequestModal fetchSingleResignationRequestModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -222,14 +215,11 @@ class _ExitResignationL2ApprovalPageState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
       isLoading = true;
     });
-    print('URL ${response.request}');
     mapResponse = json.decode(response.body);
-    print('responseemployeeList $mapResponse');
     var getData = mapResponse.length;
 
     fetchSingleResignationRequestModal =
@@ -645,7 +635,6 @@ class _ExitResignationL2ApprovalPageState
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -655,11 +644,9 @@ class _ExitResignationL2ApprovalPageState
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -670,7 +657,6 @@ class _ExitResignationL2ApprovalPageState
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -678,7 +664,6 @@ class _ExitResignationL2ApprovalPageState
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -736,7 +721,6 @@ class _ExitResignationL2ApprovalPageState
                   ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -765,17 +749,14 @@ class _ExitResignationL2ApprovalPageState
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -783,9 +764,6 @@ class _ExitResignationL2ApprovalPageState
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -795,15 +773,13 @@ class _ExitResignationL2ApprovalPageState
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -824,17 +800,14 @@ class _ExitResignationL2ApprovalPageState
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -842,9 +815,6 @@ class _ExitResignationL2ApprovalPageState
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -854,15 +824,13 @@ class _ExitResignationL2ApprovalPageState
 
         // Handle success or error response
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 }

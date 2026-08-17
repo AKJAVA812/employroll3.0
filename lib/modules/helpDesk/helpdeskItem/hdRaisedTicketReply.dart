@@ -12,7 +12,7 @@ import 'package:velocity_x/velocity_x.dart';
 import '../../../themes/empThemes.dart';
 
 class HDRaisedTicketReply extends StatefulWidget {
-  const HDRaisedTicketReply({Key? key}) : super(key: key);
+  const HDRaisedTicketReply({super.key});
 
   @override
   State<HDRaisedTicketReply> createState() => _HDRaisedTicketReplyState();
@@ -245,11 +245,6 @@ class _HDRaisedTicketReplyState extends State<HDRaisedTicketReply> {
                           if (result == null) return;
 
                           final file = result.files.first;
-                          print('Bytes: ${file.bytes}');
-                          print('Name: ${file.name}');
-                          print('Size: ${file.size}');
-                          print('Size: ${file.extension}');
-                          print('Path: ${file.path}');
 
                           final newFile = await saveFilePermanently(file);
                           //openFiles(result.files);
@@ -282,7 +277,6 @@ class _HDRaisedTicketReplyState extends State<HDRaisedTicketReply> {
                               isSentByMe: true);
                           setState(() {
                             if (typedText.text.isEmpty) {
-                              print("no chat");
                             }
                             typedText.clear();
                             messages.add(message);
@@ -340,10 +334,6 @@ class _HDRaisedTicketReplyState extends State<HDRaisedTicketReply> {
 
 void openFile(PlatformFile file) {
   OpenFile.open(file.path!);
-  print('Bytes: ${file.name}');
-  print('Size: ${file.size}');
-  print('Size: ${file.extension}');
-  print('Path: ${file.path}');
 }
 
 Future<File> saveFilePermanently(PlatformFile file) async {

@@ -4,7 +4,7 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 
 class HDOnHoldTickets extends StatefulWidget {
-  const HDOnHoldTickets({Key? key}) : super(key: key);
+  const HDOnHoldTickets({super.key});
 
   @override
   State<HDOnHoldTickets> createState() => _HDOnHoldTicketsState();

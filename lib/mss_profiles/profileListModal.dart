@@ -18,7 +18,7 @@ class ProfileListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -72,18 +72,18 @@ class ProfileData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['profileName'] = this.profileName;
-    data['profileType'] = this.profileType;
-    data['profileTypeId'] = this.profileTypeId;
-    data['profilePermission'] = this.profilePermission ?? <String>[];
-    data['roMapId'] = this.roMapId;
-    data['profileId'] = this.profileId;
-    data['profileCode'] = this.profileCode;
-    data['defaultProfile'] = this.defaultProfile;
-    data['mappedID'] = this.mappedID;
-    data['isDefaultProfile'] = this.isDefaultProfile;
-    data['userId'] = this.userId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['profileName'] = profileName;
+    data['profileType'] = profileType;
+    data['profileTypeId'] = profileTypeId;
+    data['profilePermission'] = profilePermission ?? <String>[];
+    data['roMapId'] = roMapId;
+    data['profileId'] = profileId;
+    data['profileCode'] = profileCode;
+    data['defaultProfile'] = defaultProfile;
+    data['mappedID'] = mappedID;
+    data['isDefaultProfile'] = isDefaultProfile;
+    data['userId'] = userId;
     return data;
   }
 }
@@ -109,9 +109,11 @@ bool? _boolValue(dynamic value) {
   if (value == null) return null;
   if (value is bool) return value;
   final normalized = value.toString().toLowerCase();
-  if (normalized == 'true' || normalized == '1' || normalized == 'yes')
+  if (normalized == 'true' || normalized == '1' || normalized == 'yes') {
     return true;
-  if (normalized == 'false' || normalized == '0' || normalized == 'no')
+  }
+  if (normalized == 'false' || normalized == '0' || normalized == 'no') {
     return false;
+  }
   return null;
 }

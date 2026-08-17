@@ -14,7 +14,7 @@ import 'package:er_flutter_project/services/mobile_http_client.dart';
 class ApproveDisappReimbursement extends StatefulWidget {
   PendingReimbListModal pendingReimbListModal;
   int i;
-  ApproveDisappReimbursement(this.pendingReimbListModal, this.i);
+  ApproveDisappReimbursement(this.pendingReimbListModal, this.i, {super.key});
 
   @override
   State<ApproveDisappReimbursement> createState() =>
@@ -28,8 +28,8 @@ class _ApproveDisappReimbursementState
 
   _ApproveDisappReimbursementState(this.pendingReimbListModal, this.i);
   var titleName = "Approved and Disapproved";
-  TextEditingController _approvedAmtController = TextEditingController();
-  TextEditingController _remarksController = TextEditingController();
+  final TextEditingController _approvedAmtController = TextEditingController();
+  final TextEditingController _remarksController = TextEditingController();
   final TextEditingController _toDateController = TextEditingController();
   final TextEditingController _fromDateController = TextEditingController();
   SessionManager shared = SessionManager();
@@ -128,7 +128,6 @@ class _ApproveDisappReimbursementState
                                   ).format(fromDate!);
                                 });
 
-                                print(fromDate);
                               },
                               readOnly: true,
                               enabled: false,
@@ -185,7 +184,6 @@ class _ApproveDisappReimbursementState
                                   ).format(toDate!);
                                 });
 
-                                print(toDate);
                               },
                               readOnly: true,
                               enabled: false,
@@ -331,7 +329,7 @@ class _ApproveDisappReimbursementState
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 150,
                                 child:
                                     reimpType
@@ -367,8 +365,8 @@ class _ApproveDisappReimbursementState
                               ),
                               items: [
                                 DropdownMenuItem(
-                                  child: Text('ER_Conveyence_Policy'),
                                   value: 1,
+                                  child: Text('ER_Conveyence_Policy'),
                                 ),
 
                                 /* DropdownMenuItem(
@@ -391,7 +389,7 @@ class _ApproveDisappReimbursementState
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 120,
                                 child:
                                     expName
@@ -427,6 +425,7 @@ class _ApproveDisappReimbursementState
                               ),
                               items: [
                                 DropdownMenuItem(
+                                  value: 1,
                                   child: Container(
                                     child:
                                         "Conveyance".text
@@ -434,7 +433,6 @@ class _ApproveDisappReimbursementState
                                             .overflow(TextOverflow.ellipsis)
                                             .make(),
                                   ),
-                                  value: 1,
                                 ),
 
                                 /* DropdownMenuItem(
@@ -453,7 +451,7 @@ class _ApproveDisappReimbursementState
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 120,
                                 child:
                                     subExpName
@@ -489,7 +487,8 @@ class _ApproveDisappReimbursementState
                               ),
                               items: [
                                 DropdownMenuItem(
-                                  child: Container(
+                                  value: 1,
+                                  child: SizedBox(
                                     width: 120,
                                     child:
                                         "Bike 2 Wheeler Local".text
@@ -497,10 +496,10 @@ class _ApproveDisappReimbursementState
                                             .overflow(TextOverflow.ellipsis)
                                             .make(),
                                   ),
-                                  value: 1,
                                 ),
                                 DropdownMenuItem(
-                                  child: Container(
+                                  value: 2,
+                                  child: SizedBox(
                                     width: 120,
                                     child:
                                         "Cab Taxi".text
@@ -508,7 +507,6 @@ class _ApproveDisappReimbursementState
                                             .overflow(TextOverflow.ellipsis)
                                             .make(),
                                   ),
-                                  value: 2,
                                 ),
 
                                 /* DropdownMenuItem(
@@ -531,7 +529,7 @@ class _ApproveDisappReimbursementState
                       Expanded(
                         child:
                             DropdownButtonFormField(
-                              disabledHint: Container(
+                              disabledHint: SizedBox(
                                 width: 120,
                                 child:
                                     catName
@@ -570,7 +568,8 @@ class _ApproveDisappReimbursementState
                               ),
                               items: [
                                 DropdownMenuItem(
-                                  child: Container(
+                                  value: 1,
+                                  child: SizedBox(
                                     width: 120,
                                     child:
                                         "Employee Owned Bike".text
@@ -578,7 +577,6 @@ class _ApproveDisappReimbursementState
                                             .overflow(TextOverflow.ellipsis)
                                             .make(),
                                   ),
-                                  value: 1,
                                 ),
 
                                 /* DropdownMenuItem(
@@ -775,7 +773,7 @@ class _ApproveDisappReimbursementState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ButtonBar(
+                      OverflowBar(
                         alignment: MainAxisAlignment.center,
                         //buttonPadding: Vx.mOnly(right: 16),
                         children: [
@@ -789,7 +787,7 @@ class _ApproveDisappReimbursementState
                               //Navigator.pushNamed(context, MyRoutings.expenseListRoute);
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.successColor,
                               ),
                             ),
@@ -812,7 +810,7 @@ class _ApproveDisappReimbursementState
                                     "Claim Cancel");*/
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.dangerColorOne,
                               ),
                             ),
@@ -832,8 +830,7 @@ class _ApproveDisappReimbursementState
   }
 
   Future<void> approveReimbursementReq(String claimId, remark) async {
-    claimId = claimReqId! + '/' + _approvedAmtController.text;
-    print("claimId Test $claimId");
+    claimId = '${claimReqId!}/${_approvedAmtController.text}';
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.approveDisapproveReimbReq;
     CommonNotificationPage.showLoaderDialog(context);
@@ -845,18 +842,14 @@ class _ApproveDisappReimbursementState
       "remark=$remark",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(context);
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -864,8 +857,7 @@ class _ApproveDisappReimbursementState
   }
 
   Future<void> disApproveReimbursementReq(String claimId, remark) async {
-    claimId = claimReqId! + '/' + _approvedAmtController.text;
-    print("claimId Test $claimId");
+    claimId = '${claimReqId!}/${_approvedAmtController.text}';
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.approveDisapproveReimbReq;
     CommonNotificationPage.showLoaderDialog(context);
@@ -877,18 +869,14 @@ class _ApproveDisappReimbursementState
       "remark=$remark",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(context);
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -941,7 +929,7 @@ class _ApproveDisappReimbursementState
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

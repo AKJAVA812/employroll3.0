@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class OfflineAttendanceSyncPage extends StatefulWidget {
+  const OfflineAttendanceSyncPage({super.key});
+
   @override
   _OfflineAttendanceSyncPageState createState() => _OfflineAttendanceSyncPageState();
 }

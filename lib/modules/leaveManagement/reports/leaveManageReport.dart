@@ -13,7 +13,7 @@ import '../../../sharedPrefancePage/ShardPre.dart';
 
 
 class LeaveManageReports extends StatefulWidget {
-  const LeaveManageReports({Key? key}) : super(key: key);
+  const LeaveManageReports({super.key});
 
   @override
   State<LeaveManageReports> createState() => _LeaveManageReportsState();
@@ -59,9 +59,7 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
     userPanelPermission= await shared.getUserPanel();
     pendingLeaveRequestMOPermission= (await shared.getPendingLeaveReqMSSMOPermission())!;
     pendingLeaveL1RequestMOPermission= (await shared.getPendingLeaveReqL1MSSMOPermission())!;
-    print("MO L1 - $pendingLeaveL1RequestMOPermission");
     pendingLeaveL2RequestMOPermission= (await shared.getPendingLeaveReqL2MSSMOPermission())!;
-    print("MO L2 - $pendingLeaveL2RequestMOPermission");
     pendingLeaveRequestMSSPermission= (await shared.getPendingLeaveReqMSSPermission())!;
     pendingLeaveL1RequestMSSPermission= (await shared.getPendingLeaveReqL1MSSPermission())!;
     pendingLeaveL2RequestMSSPermission= (await shared.getPendingLeaveReqL2MSSPermission())!;
@@ -71,43 +69,30 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
     othersLeaveRequestMSSPermission= (await shared.getOthersLeaveReqMSSPermission())!;
     othersLeaveRequestMOPermission= (await shared.getOthersLeaveReqMSSMOPermission())!;
     othersLeaveRequestUISPermission= (await shared.getOthersLeaveReqUISPermission())!;
-    print("User Panel - $userPanelPermission");
-    print("Level 1 - $levelOne");
-    print("Level 2 - $levelTwo");
-    print("Pending Leave Requisitions - $pendingLeaveRequisitions");
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
     if(empRole==1){
       showHide=true;
       showRo = false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if(empRole==0){
       showHide=false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if (adminRole == 0) {
       showAdmin = false;
-      print("Show Admin $showAdmin");
     }
     if (adminRole == 1) {
       showAdmin = true;
-      print("Show Admin $showAdmin");
     }
     if (roRole == 0) {
       showRo = false;
 
-      print("Show Ro $showRo");
     }
     if (roRole == 1) {
       showRo = true;
-      print("Show Ro $showRo");
     }
   }
   int pageIndex = 0;
@@ -1259,23 +1244,19 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             //Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-            print('Leave');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if(index==4){
             if(userPanelPermission != "USER") {
@@ -1286,7 +1267,6 @@ class _LeaveManageReportsState extends State<LeaveManageReports> {
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";

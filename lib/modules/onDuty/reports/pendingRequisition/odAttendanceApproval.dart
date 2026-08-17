@@ -21,7 +21,7 @@ import 'package:er_flutter_project/UIS_Bundle/timeAndAttendance/outDuty/pendingR
 class OdApproveDisapproveReq extends StatefulWidget {
   PendingOdReqList? pendingOdReqList;
   int indexCont;
-  OdApproveDisapproveReq(this.pendingOdReqList, this.indexCont);
+  OdApproveDisapproveReq(this.pendingOdReqList, this.indexCont, {super.key});
 
   @override
   State<OdApproveDisapproveReq> createState() =>
@@ -67,7 +67,6 @@ class _OdApproveDisapproveReqState extends State<OdApproveDisapproveReq> {
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -75,11 +74,9 @@ class _OdApproveDisapproveReqState extends State<OdApproveDisapproveReq> {
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-              print('OD');
             }
             if (index == 3) {
               Navigator.push(
@@ -89,7 +86,6 @@ class _OdApproveDisapproveReqState extends State<OdApproveDisapproveReq> {
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -97,7 +93,6 @@ class _OdApproveDisapproveReqState extends State<OdApproveDisapproveReq> {
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -135,7 +130,7 @@ class RadioGroups extends StatefulWidget {
   PendingOdReqList pendingOdReqList;
   int indexCont;
 
-  RadioGroups(this.pendingOdReqList, this.indexCont);
+  RadioGroups(this.pendingOdReqList, this.indexCont, {super.key});
 
   @override
   State<RadioGroups> createState() =>
@@ -402,9 +397,8 @@ class _RadioGroupsState extends State<RadioGroups> {
           Row(
             children: [
               Expanded(
-                child: ButtonBar(
+                child: OverflowBar(
                   alignment: MainAxisAlignment.center,
-                  buttonPadding: Vx.mOnly(right: 16),
                   children: [
                     ElevatedButton(
                       onPressed: () {
@@ -413,7 +407,7 @@ class _RadioGroupsState extends State<RadioGroups> {
                         //disapprovedRequisition(_commentController.text, attReqId);
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
+                        backgroundColor: WidgetStateProperty.all(
                           Mythemes.dangerColorOne,
                         ),
                       ),
@@ -422,12 +416,11 @@ class _RadioGroupsState extends State<RadioGroups> {
                     ElevatedButton(
                       onPressed: () {
                         type = "Approved";
-                        print(_commentController.text);
                         approveODReq(_commentController.text);
                         //approvedRequisition(_commentController.text, attReqId);
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
+                        backgroundColor: WidgetStateProperty.all(
                           Mythemes.successColor,
                         ),
                       ),
@@ -455,18 +448,14 @@ class _RadioGroupsState extends State<RadioGroups> {
       "remark=$getComment",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -485,18 +474,14 @@ class _RadioGroupsState extends State<RadioGroups> {
       "remark=$getComment",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -529,7 +514,6 @@ class _RadioGroupsState extends State<RadioGroups> {
               ).pop(); // Close the dialog
               Navigator.of(buildContext).maybePop();
             } else {
-              print("âš ï¸ Warning: No route to close.");
             }
           },
           child: Text("Ok"),
@@ -548,7 +532,7 @@ class _RadioGroupsState extends State<RadioGroups> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

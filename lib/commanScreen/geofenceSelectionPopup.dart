@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class GeofenceSelectionPopup extends StatefulWidget {
-  const GeofenceSelectionPopup({Key? key}) : super(key: key);
+  const GeofenceSelectionPopup({super.key});
 
   @override
   State<GeofenceSelectionPopup> createState() => _GeofenceSelectionPopupState();

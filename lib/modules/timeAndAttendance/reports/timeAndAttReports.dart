@@ -12,7 +12,7 @@ import '../../../themes/empThemes.dart';
 
 
 class TimeAndAttendanceReports extends StatefulWidget {
-  const TimeAndAttendanceReports({Key? key}) : super(key: key);
+  const TimeAndAttendanceReports({super.key});
 
   @override
   State<TimeAndAttendanceReports> createState() => _TimeAndAttendanceReportsState();
@@ -54,46 +54,32 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
       pendingAttReqL2MSSMO= (await shared.getPendingAttendanceReqL2MO())!;
       pendingAttReqL1UIS= (await shared.getPendingAttendanceReqL1UIS())!;
       pendingAttReqL2UIS= (await shared.getPendingAttendanceReqL2UIS())!;
-      print("Pending Attendance Request MSS MO- $pendingAttRequestMOPermission");
-      print("Pending Attendance Request MSS- $pendingAttRequestMSSPermission");
-      print("Pending Attendance Request UIS- $pendingAttRequestUISPermission");
-      print("Pending Attendance Request MSS L1- $pendingAttReqL1MSS");
-      print("User Panel - $userPanelPermission");
       adminRole= await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
 
       setState(() {
         if(empRole==1){
           showHide=true;
-          print('Show Emp $showHide');
           setState(() {
           });
         }
         if(empRole==0){
           showHide=false;
-          print('Show Emp $showHide');
           setState(() {
           });
         }
         if (adminRole == 0) {
           showAdmin = false;
-          print("Show Admin $showAdmin");
         }
         if (adminRole == 1) {
           showAdmin = true;
-          print("Show Admin $showAdmin");
         }
         if (roRole == 0) {
           showRo = false;
 
-          print("Show Ro $showRo");
         }
         if (roRole == 1) {
           showRo = true;
-          print("Show Ro $showRo");
         }
       });
 
@@ -951,22 +937,18 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if(index==3){
               Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if(index==4){
             if(userPanelPermission != "USER") {
@@ -977,7 +959,6 @@ class _TimeAndAttendanceReportsState extends State<TimeAndAttendanceReports> {
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

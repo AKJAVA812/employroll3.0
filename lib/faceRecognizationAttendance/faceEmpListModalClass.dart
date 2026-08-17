@@ -13,7 +13,7 @@ class EmployeeListFaceModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -50,14 +50,14 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['empContactNo'] = this.empContactNo;
-    data['face'] = this.face;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['empEmail'] = this.empEmail;
-    data['empPhoto'] = this.empPhoto;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['empContactNo'] = empContactNo;
+    data['face'] = face;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['empEmail'] = empEmail;
+    data['empPhoto'] = empPhoto;
     return data;
   }
 }

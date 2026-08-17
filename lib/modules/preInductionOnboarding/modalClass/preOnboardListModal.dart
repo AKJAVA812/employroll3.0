@@ -17,11 +17,11 @@ class PreOnboardListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['result'] = this.result;
-    data['reason'] = this.reason;
-    if (this.list != null) {
-      data['list'] = this.list!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['result'] = result;
+    data['reason'] = reason;
+    if (list != null) {
+      data['list'] = list!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -119,35 +119,35 @@ class PreOnboardListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['nomineeAadhar'] = this.nomineeAadhar;
-    data['branchName'] = this.branchName;
-    data['ifscCode'] = this.ifscCode;
-    data['reqStatus'] = this.reqStatus;
-    data['id'] = this.id;
-    data['department'] = this.department;
-    data['designationName'] = this.designationName;
-    data['nomineeRelation'] = this.nomineeRelation;
-    data['branch'] = this.branch;
-    data['aadharDocumentFront'] = this.aadharDocumentFront;
-    data['inHandSalary'] = this.inHandSalary;
-    data['aadharDocumentBack'] = this.aadharDocumentBack;
-    data['dateOfJoining'] = this.dateOfJoining;
-    data['nomineeName'] = this.nomineeName;
-    data['status'] = this.status;
-    data['panDocument'] = this.panDocument;
-    data['departmentName'] = this.departmentName;
-    data['contact'] = this.contact;
-    data['accountNo'] = this.accountNo;
-    data['typeOfHire'] = this.typeOfHire;
-    data['designation'] = this.designation;
-    data['fullName'] = this.fullName;
-    data['empPhoto'] = this.empPhoto;
-    data['aadharDocument'] = this.aadharDocument;
-    data['dob'] = this.dob;
-    data['bankName'] = this.bankName;
-    data['aadharNumber'] = this.aadharNumber;
-    data['withAccomodation'] = this.withAccomodation;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['nomineeAadhar'] = nomineeAadhar;
+    data['branchName'] = branchName;
+    data['ifscCode'] = ifscCode;
+    data['reqStatus'] = reqStatus;
+    data['id'] = id;
+    data['department'] = department;
+    data['designationName'] = designationName;
+    data['nomineeRelation'] = nomineeRelation;
+    data['branch'] = branch;
+    data['aadharDocumentFront'] = aadharDocumentFront;
+    data['inHandSalary'] = inHandSalary;
+    data['aadharDocumentBack'] = aadharDocumentBack;
+    data['dateOfJoining'] = dateOfJoining;
+    data['nomineeName'] = nomineeName;
+    data['status'] = status;
+    data['panDocument'] = panDocument;
+    data['departmentName'] = departmentName;
+    data['contact'] = contact;
+    data['accountNo'] = accountNo;
+    data['typeOfHire'] = typeOfHire;
+    data['designation'] = designation;
+    data['fullName'] = fullName;
+    data['empPhoto'] = empPhoto;
+    data['aadharDocument'] = aadharDocument;
+    data['dob'] = dob;
+    data['bankName'] = bankName;
+    data['aadharNumber'] = aadharNumber;
+    data['withAccomodation'] = withAccomodation;
     return data;
   }
 }

@@ -21,7 +21,7 @@ import '../../profiles/profilePageWithHead.dart';
 import '../../themes/empThemes.dart';
 
 class ExitListViewMO extends StatefulWidget {
-  const ExitListViewMO({Key? key}) : super(key: key);
+  const ExitListViewMO({super.key});
 
   static const String _title = 'Employee List';
 
@@ -231,7 +231,7 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
                         ),
                         ...organizations.map((org) {
                           return DropdownMenuItem(value: org, child: Text(org));
-                        }).toList(),
+                        }),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -244,8 +244,6 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
                           );
 
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
                         });
 
                         setModalState(() {});
@@ -272,7 +270,6 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
                           userPanel = await shared.getUserPanel();
                           getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print("ORG ID - $getOrgId");
                           try {
                             final value = await getEmployeeList(sessionId!);
 
@@ -284,12 +281,10 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
                               isLoading = false;
                             });
 
-                            print('employeeList00: ${value.data?.length}');
                           } catch (e) {
                             setState(() {
                               isLoading = false;
                             });
-                            print('Error while fetching requisitions: $e');
                           }
                         },
                         icon: Icon(Icons.filter_alt),
@@ -314,7 +309,6 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
   Future<EmployeeListModel> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getEmpList;
-    print('employeeList11: ${SessionId}');
     EmployeeListModel employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -325,12 +319,9 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
-    print('emp list api - ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = EmployeeListModel.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
 
@@ -338,7 +329,6 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -440,7 +430,6 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -452,7 +441,6 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
           }
           if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Exit List');
           }
           if (index == 3) {
             Navigator.push(
@@ -462,14 +450,12 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -561,7 +547,7 @@ class _ExitListViewMOState extends State<ExitListViewMO> with RouteAware {
 class MyStatelessWidget extends StatefulWidget {
   final EmployeeListModel employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -610,7 +596,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
               Navigator.pop(context);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -674,8 +659,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             onTap: () {
               empId = foundDataNewMO![i].empdetailsId;
               empName = foundDataNewMO![i].empName;
-              print('ID $empId');
-              print('NameCheck $empName');
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ExitWorkflow(empId, empName),

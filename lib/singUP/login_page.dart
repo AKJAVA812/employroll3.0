@@ -105,10 +105,6 @@ class _LoginPageState extends State<LoginPage> {
     version = packageInfo.version; // e.g. 1.0.0
     buildNumber = packageInfo.buildNumber; // e.g. 1
 
-    print("App Name: $appName");
-    print("Package Name: $packageName");
-    print("Version: $version");
-    print("Build Number: $buildNumber");
     shared.setAppVersion(version);
   }
 
@@ -153,11 +149,7 @@ class _LoginPageState extends State<LoginPage> {
     print('EmpRoleChecks $empRole');
     print('roRole $roRole');
     print('adminRole $adminRole');*/
-    print('[MOBILE-AUTH] LOGIN -> POST $urlapi');
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('[MOBILE-AUTH] LOGIN request -> ${response.request}');
-    print('[MOBILE-AUTH] LOGIN <- status=${response.statusCode}');
-    print('[MOBILE-AUTH] LOGIN <- bodyLength=${response.body.length}');
     //print('Response body: ${response.body}');
     if (response.statusCode == 500) {
       Fluttertoast.showToast(
@@ -205,9 +197,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (response.statusCode == 200) {
         setState(() {
-          print("My APP Version - $version");
           accountExpired = loginData.expired ?? false;
-          print("Account Expired - $accountExpired");
 
           SharedPrefHelper.clearApiCacheOnLogin();
           SharedPrefHelperMyRequest.clearApiCacheOnLogin();
@@ -224,7 +214,6 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      print('response error $e');
     }
 
     // shared?.setSessionId(loginModel!.data!.sessionId);
@@ -239,7 +228,6 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     final response = await MobileHttpClient.instance.get(urlapi);
-    print('URL: ${response.request}');
     //print('Response status: ${response.statusCode}');
     //print('Response body: ${response.body}');
     mapResponse = json.decode(response.body);
@@ -255,7 +243,6 @@ class _LoginPageState extends State<LoginPage> {
     //print('response data $getData');
     var result = getData['reason'];
     if (result != null) {
-      print('response reason $result');
       showDialgErro(buildContext, result);
     }
     //print('Response body: ${mapResponse}');
@@ -309,7 +296,6 @@ class _LoginPageState extends State<LoginPage> {
     sessionId = await shared.getSessionId();
     userPanel = await shared.getUserPanel();
     //fcmToken = await NotificationService.getToken();
-    print("User Panel - $userPanel");
     setState(() {});
     levelOne = await shared.getLevelOne();
     levelTwo = await shared.getLevelTwo();
@@ -326,12 +312,6 @@ class _LoginPageState extends State<LoginPage> {
         //print('response Login ${loginModel.data!.sessionId}');
         //print('response {$loginValidation.toString()}');
 
-        print('response user $sessionId');
-        print('response user $empLength');
-        print('response user $roLength');
-        print('response user admin $adminlength');
-        print('response user1 $levelOne');
-        print('response user2 $levelTwo');
         /*  accountExpired = mapResponse['data']['expired'] ?? false;
         //accountExpired = mapResponse['data']['expired'];
         print("Account Expired - $accountExpired");
@@ -343,7 +323,6 @@ class _LoginPageState extends State<LoginPage> {
         }*/
         if (mapResponse['data'] != null) {
           accountExpired = mapResponse['data']['expired'] ?? false;
-          print("Account Expired - $accountExpired");
           if (accountExpired == true) {
             Navigator.push(
               context,
@@ -457,25 +436,18 @@ class _LoginPageState extends State<LoginPage> {
         "firebaseId=$fcmToken",
       );
 
-      print("Geofence URL: $urlapi");
 
       // Send POST request
-      print('[MOBILE-AUTH] FCM -> POST $urlapi');
       final response = await MobileHttpClient.instance.post(urlapi);
-      print('[MOBILE-AUTH] FCM <- status=${response.statusCode}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        print("Success: $jsonResponse");
       } else {
-        print("Failed with status: ${response.statusCode}");
-        print("Response body: ${response.body}");
 
         // Retry logic (similar to your Android code)
         //await sendGeoFenceId(sessionId, geofenceTokenId);
       }
     } catch (e) {
-      print("Error sending GeoFence ID: $e");
 
       // Retry on error
       //await sendGeoFenceId(sessionId, geofenceTokenId);
@@ -657,9 +629,6 @@ class _LoginPageState extends State<LoginPage> {
                                           return;
                                         }
                                         value.data!.sessionId;
-                                        print(
-                                          'session id ${value.data!.sessionId}',
-                                        );
                                         shared.setAdminRole(
                                           value.data!.adminrole!.length,
                                         );
@@ -742,7 +711,6 @@ class _LoginPageState extends State<LoginPage> {
         ElevatedButton(
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
-            print('response11 $result');
             setState(() {
               changeButton = false;
             });
@@ -784,9 +752,6 @@ class _LoginPageState extends State<LoginPage> {
     await shared.setMobileSessionId(mobileSessionId ?? '');
     await shared.setLoginResponseJson(json.encode(loginModelglobal.toJson()));
     MobileHttpClient.instance.markAuthenticated();
-    print(
-      '[MOBILE-AUTH] LOGIN session saved -> sessionPresent=${mobileSessionId != null && mobileSessionId.isNotEmpty}',
-    );
     MobileAuthService.instance.syncAfterLogin(
       accessToken:
           loginModelglobal.accessToken ?? loginModelglobal.data?.accessToken,
@@ -805,7 +770,6 @@ class _LoginPageState extends State<LoginPage> {
         loginModelglobal.data?.sessionId ?? loginModelglobal.session?.sessionId;
     setState(() {
       shared.setSessionId(mobileSessionId ?? "");
-      print("MY NEW SESSION - ${shared.getSessionId}");
       shared.setDept(loginModelglobal.data!.department);
       shared.setName(loginModelglobal.data!.userLoginned!.name);
       shared.setProfileImage(loginModelglobal.data!.userImage);
@@ -848,15 +812,12 @@ class _LoginPageState extends State<LoginPage> {
       if (loginModelglobal.data!.endDate == null) {
         endPayCycle = "0";
         shared.setPayCycleEnd(endPayCycle);
-        print("If Null Show 0 - $endPayCycle");
       } else {
         endPayCycle = loginModelglobal.data!.endDate;
         shared.setPayCycleEnd(endPayCycle);
-        print("Else Show value - $startPayCycle");
       }
     });
 
-    print("Check User Panel - $userPanel");
     setState(() {});
 
     shared.setEmpRoll(loginModelglobal.data!.empRole!.length);
@@ -914,11 +875,9 @@ class _LoginPageState extends State<LoginPage> {
               loginModelglobal.data!.profileList![i].profilePermission.contains(
                 "LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD",
               )) {
-            print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
             //levelOne = "true";
             shared.setLevelOne("true");
           } else {
-            print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
             //levelOne = "false";
             shared.setLevelOne("false");
           }
@@ -932,85 +891,70 @@ class _LoginPageState extends State<LoginPage> {
               loginModelglobal.data!.profileList![i].profilePermission.contains(
                 "FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD",
               )) {
-            print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
             //levelTwo = "true";
             shared.setLevelTwo("true");
           } else {
-            print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
             //levelTwo = "false";
             shared.setLevelTwo("false");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "LEAVE_REQ_APPROVAL_ADD",
           )) {
-            print("resopnse LEAVE_REQ_APPROVAL_ADD");
             //pendingLeaveRequisitions = "true";
             shared.setPendingLeaveReq("true");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
           )) {
-            print("resopnse CLAIM_APPROVAL_LEVEL_ONE_VIEW");
             //claimLevelOne = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
             shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
           } else {
-            print("claimLevelOne else");
             //claimLevelOne = "";
             shared.setClaimLevelOne("");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
           )) {
-            print("resopnse CLAIM_APPROVAL_LEVEL_TWO_VIEW");
             //claimLevelTwo = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
             shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
           } else {
-            print("claimLevelTwo else");
             //claimLevelTwo = "";
             shared.setClaimLevelTwo("");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "CLAIM_APPROVAL_LEVEL_THREE_VIEW",
           )) {
-            print("Response: CLAIM_APPROVAL_LEVEL_THREE_VIEW");
             //claimLevelThree = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
             shared.setClaimLevelThree("CLAIM_APPROVAL_LEVEL_THREE_VIEW");
           } else {
-            print("claimLevelThree else");
             //claimLevelThree = "";
             shared.setClaimLevelThree("");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "PRE_INDUCTION_ONBOARDING_ADD",
           )) {
-            print("Response: PRE_INDUCTION_ONBOARDING_ADD");
             //preOnboardShow = "true";
             shared.setPreOnboardShow("true");
           } else {
-            print("preOnboardShow else");
             //preOnboardShow = "false";
             shared.setPreOnboardShow("false");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_EMP_LIST_ADD",
           )) {
-            print("Response: EXIT_EMP_LIST_ADD");
             //exitShow = "true";
             shared.setExitShow("true");
           } else {
-            print("exitShow else");
             //exitShow = "false";
             shared.setExitShow("false");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "HRIS_EMP_LIST_VIEW",
           )) {
-            print("Response: HRIS_EMP_LIST_VIEW");
             //myTeamShow = "true";
             shared.setMyTeamShow("true");
             shared.setMyTeamPageShow("1");
           } else {
-            print("My Team else");
             //myTeamShow = "false";
             shared.setMyTeamShow("false");
             shared.setMyTeamPageShow("0");
@@ -1020,13 +964,11 @@ class _LoginPageState extends State<LoginPage> {
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESIGN_REQUEST_LIST_VIEW",
           )) {
-            print("Response: EXIT_RESIGN_REQUEST_LIST_VIEW");
             //exitResignationListShow = "true";
             //exitResignationListView = "1";
             shared.setExitResignationListShow("true");
             shared.setExitResignationListView("1");
           } else {
-            print("EXIT_RESIGN_REQUEST_LIST_VIEW else");
             //exitResignationListShow = "false";
             //exitResignationListView = "0";
             shared.setExitResignationListShow("false");
@@ -1035,44 +977,36 @@ class _LoginPageState extends State<LoginPage> {
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD",
           )) {
-            print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD");
             //exitResignationApproveL1Show = "true";
             shared.setExitResignationApproveL1Show("true");
           } else {
-            print("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD else");
             //exitResignationApproveL1Show = "false";
             shared.setExitResignationApproveL1Show("false");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD",
           )) {
-            print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD");
             //exitResignationApproveL2Show = "true";
             shared.setExitResignationApproveL2Show("true");
           } else {
-            print("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD else");
             //exitResignationApproveL2Show = "false";
             shared.setExitResignationApproveL2Show("false");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE",
           )) {
-            print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE");
             //exitResignationDisApproveL1Show = "true";
             shared.setExitResignationDisApproveL1Show("true");
           } else {
-            print("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE else");
             //exitResignationDisApproveL1Show = "false";
             shared.setExitResignationDisApproveL1Show("false");
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE",
           )) {
-            print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE");
             //exitResignationDisApproveL2Show = "true";
             shared.setExitResignationDisApproveL2Show("true");
           } else {
-            print("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE else");
             //exitResignationDisApproveL2Show = "false";
             shared.setExitResignationDisApproveL2Show("false");
           }
@@ -1544,9 +1478,6 @@ class _LoginPageState extends State<LoginPage> {
           }
         }
 
-        print('Profile Name $profileName');
-        print('Profile Id $profileId');
-        print('Default Profile $defaultProfile');
       }
     }
     setState(() {});
@@ -1559,7 +1490,6 @@ class _LoginPageState extends State<LoginPage> {
     shared.setLevelOne(levelOne);
     shared.setLevelTwo(levelTwo);
     shared.setPendingLeaveReq(pendingLeaveRequisitions);*/
-    print("User Role Length - ${loginModelglobal.data!.profileList!.length}");
 
     setState(() {});
 
@@ -1573,7 +1503,6 @@ class _LoginPageState extends State<LoginPage> {
         loginModelglobal.data?.sessionId ?? loginModelglobal.session?.sessionId;
     setState(() {
       shared.setSessionId(mobileSessionId ?? "");
-      print("MY NEW SESSION - ${shared.getSessionId}");
       shared.setDept(loginModelglobal.data!.department);
       shared.setName(loginModelglobal.data!.userLoginned!.name);
       shared.setProfileImage(loginModelglobal.data!.userImage);
@@ -1606,21 +1535,17 @@ class _LoginPageState extends State<LoginPage> {
       if (loginModelglobal.data!.startDate == null) {
         startPayCycle = "0";
         shared.setPayCycleStart(startPayCycle);
-        print("If Null Show 0 - $startPayCycle");
       } else {
         startPayCycle = loginModelglobal.data!.startDate;
         shared.setPayCycleStart(startPayCycle);
-        print("Else Show value - $startPayCycle");
       }
 
       if (loginModelglobal.data!.endDate == null) {
         endPayCycle = "0";
         shared.setPayCycleEnd(endPayCycle);
-        print("If Null Show 0 - $endPayCycle");
       } else {
         endPayCycle = loginModelglobal.data!.endDate;
         shared.setPayCycleEnd(endPayCycle);
-        print("Else Show value - $startPayCycle");
       }
     });
     shared.setEmpRoll(loginModelglobal.data!.empRole!.length);
@@ -1640,7 +1565,6 @@ class _LoginPageState extends State<LoginPage> {
     shared.setAdminRole(loginModelglobal.data!.adminrole!.length);
 
     adminRoleChcker = loginModelglobal.data!.adminrole!.length;
-    print('adminRolesCheckss $adminRoleChcker');
     for (int i = 0; i < loginModelglobal.data!.profileList!.length; i++) {
       profileName = loginModelglobal.data!.profileList![i].profileName;
       profileId = loginModelglobal.data!.profileList![i].profileId;
@@ -1660,11 +1584,9 @@ class _LoginPageState extends State<LoginPage> {
             loginModelglobal.data!.profileList![i].profilePermission.contains(
               "LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD",
             )) {
-          print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
           //levelOne = "true";
           shared.setLevelOne("true");
         } else {
-          print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
           //levelOne = "false";
           shared.setLevelOne("false");
         }
@@ -1678,85 +1600,70 @@ class _LoginPageState extends State<LoginPage> {
             loginModelglobal.data!.profileList![i].profilePermission.contains(
               "FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD",
             )) {
-          print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
           //levelTwo = "true";
           shared.setLevelTwo("true");
         } else {
-          print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
           //levelTwo = "false";
           shared.setLevelTwo("false");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "LEAVE_REQ_APPROVAL_ADD",
         )) {
-          print("resopnse LEAVE_REQ_APPROVAL_ADD");
           //pendingLeaveRequisitions = "true";
           shared.setPendingLeaveReq("true");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
         )) {
-          print("resopnse CLAIM_APPROVAL_LEVEL_ONE_VIEW");
           //claimLevelOne = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
           shared.setClaimLevelOne("CLAIM_APPROVAL_LEVEL_ONE_VIEW");
         } else {
-          print("claimLevelOne else");
           //claimLevelOne = "";
           shared.setClaimLevelOne("");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
         )) {
-          print("resopnse CLAIM_APPROVAL_LEVEL_TWO_VIEW");
           //claimLevelTwo = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
           shared.setClaimLevelTwo("CLAIM_APPROVAL_LEVEL_TWO_VIEW");
         } else {
-          print("claimLevelTwo else");
           //claimLevelTwo = "";
           shared.setClaimLevelTwo("");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "CLAIM_APPROVAL_LEVEL_THREE_VIEW",
         )) {
-          print("Response: CLAIM_APPROVAL_LEVEL_THREE_VIEW");
           //claimLevelThree = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
           shared.setClaimLevelThree("CLAIM_APPROVAL_LEVEL_THREE_VIEW");
         } else {
-          print("claimLevelThree else");
           //claimLevelThree = "";
           shared.setClaimLevelThree("");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "PRE_INDUCTION_ONBOARDING_ADD",
         )) {
-          print("Response: PRE_INDUCTION_ONBOARDING_ADD");
           //preOnboardShow = "true";
           shared.setPreOnboardShow("true");
         } else {
-          print("preOnboardShow else");
           //preOnboardShow = "false";
           shared.setPreOnboardShow("false");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "EXIT_EMP_LIST_ADD",
         )) {
-          print("Response: EXIT_EMP_LIST_ADD");
           //exitShow = "true";
           shared.setExitShow("true");
         } else {
-          print("exitShow else");
           //exitShow = "false";
           shared.setExitShow("false");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "HRIS_EMP_LIST_VIEW",
         )) {
-          print("Response: HRIS_EMP_LIST_VIEW");
           //myTeamShow = "true";
           shared.setMyTeamShow("true");
           shared.setMyTeamPageShow("1");
         } else {
-          print("My Team else");
           //myTeamShow = "false";
           shared.setMyTeamShow("false");
           shared.setMyTeamPageShow("0");
@@ -1766,13 +1673,11 @@ class _LoginPageState extends State<LoginPage> {
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "EXIT_RESIGN_REQUEST_LIST_VIEW",
         )) {
-          print("Response: EXIT_RESIGN_REQUEST_LIST_VIEW");
           //exitResignationListShow = "true";
           //exitResignationListView = "1";
           shared.setExitResignationListShow("true");
           shared.setExitResignationListView("1");
         } else {
-          print("EXIT_RESIGN_REQUEST_LIST_VIEW else");
           //exitResignationListShow = "false";
           //exitResignationListView = "0";
           shared.setExitResignationListShow("false");
@@ -1781,44 +1686,36 @@ class _LoginPageState extends State<LoginPage> {
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD",
         )) {
-          print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD");
           //exitResignationApproveL1Show = "true";
           shared.setExitResignationApproveL1Show("true");
         } else {
-          print("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD else");
           //exitResignationApproveL1Show = "false";
           shared.setExitResignationApproveL1Show("false");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD",
         )) {
-          print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD");
           //exitResignationApproveL2Show = "true";
           shared.setExitResignationApproveL2Show("true");
         } else {
-          print("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD else");
           //exitResignationApproveL2Show = "false";
           shared.setExitResignationApproveL2Show("false");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE",
         )) {
-          print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE");
           //exitResignationDisApproveL1Show = "true";
           shared.setExitResignationDisApproveL1Show("true");
         } else {
-          print("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE else");
           //exitResignationDisApproveL1Show = "false";
           shared.setExitResignationDisApproveL1Show("false");
         }
         if (loginModelglobal.data!.profileList![i].profilePermission.contains(
           "EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE",
         )) {
-          print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE");
           //exitResignationDisApproveL2Show = "true";
           shared.setExitResignationDisApproveL2Show("true");
         } else {
-          print("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE else");
           //exitResignationDisApproveL2Show = "false";
           shared.setExitResignationDisApproveL2Show("false");
         }
@@ -2368,9 +2265,6 @@ class _LoginPageState extends State<LoginPage> {
           print("Ã¢Å“â€¦ Pending Attendance L2 UIS Permission for profileId $profileIdNew: $pendingAttendanceRequestUISL2");*/
       }
 
-      print('Profile Name $profileName');
-      print('Profile Id $profileId');
-      print('Default Profile $defaultProfile');
     }
 
     /*for(int i=0; i<loginModelglobal.data!.profileList!.length;i++){
@@ -2415,11 +2309,9 @@ class _LoginPageState extends State<LoginPage> {
               loginModelglobal.data!.profileList![i].profilePermission.contains(
                 "LEVEL_ONE_LEAVE_APPROVE_MYTEAM_ADD",
               )) {
-            print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
             levelOne = "true";
             shared.setLevelOne(levelOne);
           } else {
-            print("resopnse LEVEL_ONE_LEAVE_APPROVE_ADD");
             levelOne = "false";
             shared.setLevelOne(levelOne);
           }
@@ -2433,85 +2325,70 @@ class _LoginPageState extends State<LoginPage> {
               loginModelglobal.data!.profileList![i].profilePermission.contains(
                 "FINAL_LEVEL_LEAVE_APPROVE_MYTEAM_ADD",
               )) {
-            print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
             levelTwo = "true";
             shared.setLevelTwo(levelTwo);
           } else {
-            print("resopnse LEVEL_TWO_LEAVE_APPROVE_ADD");
             levelTwo = "false";
             shared.setLevelTwo(levelTwo);
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "LEAVE_REQ_APPROVAL_ADD",
           )) {
-            print("resopnse LEAVE_REQ_APPROVAL_ADD");
             pendingLeaveRequisitions = "true";
             shared.setPendingLeaveReq(pendingLeaveRequisitions);
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "CLAIM_APPROVAL_LEVEL_ONE_VIEW",
           )) {
-            print("resopnse CLAIM_APPROVAL_LEVEL_ONE_VIEW");
             claimLevelOne = "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
             shared.setClaimLevelOne(claimLevelOne);
           } else {
-            print("claimLevelOne else");
             claimLevelOne = "";
             shared.setClaimLevelOne(claimLevelOne);
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "CLAIM_APPROVAL_LEVEL_TWO_VIEW",
           )) {
-            print("resopnse CLAIM_APPROVAL_LEVEL_TWO_VIEW");
             claimLevelTwo = "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
             shared.setClaimLevelTwo(claimLevelTwo);
           } else {
-            print("claimLevelTwo else");
             claimLevelTwo = "";
             shared.setClaimLevelTwo(claimLevelTwo);
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "CLAIM_APPROVAL_LEVEL_THREE_VIEW",
           )) {
-            print("Response: CLAIM_APPROVAL_LEVEL_THREE_VIEW");
             claimLevelThree = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
             shared.setClaimLevelThree(claimLevelThree);
           } else {
-            print("claimLevelThree else");
             claimLevelThree = "";
             shared.setClaimLevelThree(claimLevelThree);
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "PRE_INDUCTION_ONBOARDING_ADD",
           )) {
-            print("Response: PRE_INDUCTION_ONBOARDING_ADD");
             preOnboardShow = "true";
             shared.setPreOnboardShow(preOnboardShow);
           } else {
-            print("preOnboardShow else");
             preOnboardShow = "false";
             shared.setPreOnboardShow(preOnboardShow);
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_EMP_LIST_ADD",
           )) {
-            print("Response: EXIT_EMP_LIST_ADD");
             exitShow = "true";
             shared.setExitShow(exitShow);
           } else {
-            print("exitShow else");
             exitShow = "false";
             shared.setExitShow(exitShow);
           }
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "HRIS_EMP_LIST_VIEW",
           )) {
-            print("Response: HRIS_EMP_LIST_VIEW");
             //myTeamShow = "true";
             shared.setMyTeamShow("true");
             shared.setMyTeamPageShow("1");
           } else {
-            print("My Team else");
             //myTeamShow = "false";
             shared.setMyTeamShow("false");
             shared.setMyTeamPageShow("0");
@@ -2521,13 +2398,11 @@ class _LoginPageState extends State<LoginPage> {
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESIGN_REQUEST_LIST_VIEW",
           )) {
-            print("Response: EXIT_RESIGN_REQUEST_LIST_VIEW");
             //exitResignationListShow = "true";
             //exitResignationListView = "1";
             shared.setExitResignationListShow("true");
             shared.setExitResignationListView("1");
           } else {
-            print("EXIT_RESIGN_REQUEST_LIST_VIEW else");
             //exitResignationListShow = "false";
             //exitResignationListView = "0";
             shared.setExitResignationListShow("false");
@@ -2536,13 +2411,11 @@ class _LoginPageState extends State<LoginPage> {
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD",
           )) {
-            print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD");
             exitResignationApproveL1Show = "true";
             shared.setExitResignationApproveL1Show(
               exitResignationApproveL1Show,
             );
           } else {
-            print("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_ADD else");
             exitResignationApproveL1Show = "false";
             shared.setExitResignationApproveL1Show(
               exitResignationApproveL1Show,
@@ -2551,13 +2424,11 @@ class _LoginPageState extends State<LoginPage> {
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD",
           )) {
-            print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD");
             exitResignationApproveL2Show = "true";
             shared.setExitResignationApproveL2Show(
               exitResignationApproveL2Show,
             );
           } else {
-            print("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_ADD else");
             exitResignationApproveL2Show = "false";
             shared.setExitResignationApproveL2Show(
               exitResignationApproveL2Show,
@@ -2566,13 +2437,11 @@ class _LoginPageState extends State<LoginPage> {
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE",
           )) {
-            print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE");
             exitResignationDisApproveL1Show = "true";
             shared.setExitResignationDisApproveL1Show(
               exitResignationDisApproveL1Show,
             );
           } else {
-            print("EXIT_RESGINATION_APPROVAL_LEVEL_ONE_DELETE else");
             exitResignationDisApproveL1Show = "false";
             shared.setExitResignationDisApproveL1Show(
               exitResignationDisApproveL1Show,
@@ -2581,13 +2450,11 @@ class _LoginPageState extends State<LoginPage> {
           if (loginModelglobal.data!.profileList![i].profilePermission.contains(
             "EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE",
           )) {
-            print("Response: EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE");
             exitResignationDisApproveL2Show = "true";
             shared.setExitResignationDisApproveL2Show(
               exitResignationDisApproveL2Show,
             );
           } else {
-            print("EXIT_RESGINATION_APPROVAL_LEVEL_TWO_DELETE else");
             exitResignationDisApproveL2Show = "false";
             shared.setExitResignationDisApproveL2Show(
               exitResignationDisApproveL2Show,
@@ -3115,9 +2982,6 @@ class _LoginPageState extends State<LoginPage> {
           print("Ã¢Å“â€¦ Pending Attendance L2 UIS Permission for profileId $profileIdNew: $pendingAttendanceRequestUISL2");*/
         }
 
-        print('Profile Name $profileName');
-        print('Profile Id $profileId');
-        print('Default Profile $defaultProfile');
       }
     }
     setState(() {});
@@ -3130,7 +2994,6 @@ class _LoginPageState extends State<LoginPage> {
     shared.setLevelOne(levelOne);
     shared.setLevelTwo(levelTwo);
     shared.setPendingLeaveReq(pendingLeaveRequisitions);*/
-    print("User Role Length - ${loginModelglobal.data!.profileList!.length}");
 
     setState(() {});
 

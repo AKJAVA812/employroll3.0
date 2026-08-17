@@ -25,7 +25,7 @@ class PendingLeaveApproveDisapprove extends StatefulWidget {
 
   PendingLeaveApproveDisapprove(
     this.pendingLeaveRequisitionModal,
-    this.itemCount,
+    this.itemCount, {super.key}
   );
 
   @override
@@ -80,7 +80,6 @@ class _PendingLeaveApproveDisapproveState
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -88,11 +87,9 @@ class _PendingLeaveApproveDisapproveState
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-              print('Leave');
             }
             if (index == 3) {
               Navigator.push(
@@ -102,7 +99,6 @@ class _PendingLeaveApproveDisapproveState
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -110,7 +106,6 @@ class _PendingLeaveApproveDisapproveState
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -150,7 +145,7 @@ class PendingLeaveApprovalDisapproval extends StatefulWidget {
 
   PendingLeaveApprovalDisapproval(
     this.pendingLeaveRequisitionModal,
-    this.itemCount,
+    this.itemCount, {super.key}
   );
 
   @override
@@ -273,7 +268,6 @@ class _PendingLeaveApprovalDisapprovalState
     }
 
     setState(() {});
-    print("Panel - $userPanelPermissions");
   }
 
   @override
@@ -489,9 +483,8 @@ class _PendingLeaveApprovalDisapprovalState
           Row(
             children: [
               Expanded(
-                child: ButtonBar(
+                child: OverflowBar(
                   alignment: MainAxisAlignment.center,
-                  buttonPadding: Vx.mOnly(right: 16),
                   children: [
                     ElevatedButton(
                       onPressed: () {
@@ -502,7 +495,7 @@ class _PendingLeaveApprovalDisapprovalState
                         );
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
+                        backgroundColor: WidgetStateProperty.all(
                           Mythemes.dangerColorOne,
                         ),
                       ),
@@ -517,7 +510,7 @@ class _PendingLeaveApprovalDisapprovalState
                         );
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
+                        backgroundColor: WidgetStateProperty.all(
                           Mythemes.successColor,
                         ),
                       ),
@@ -548,18 +541,14 @@ class _PendingLeaveApprovalDisapprovalState
       "comment=$getComment",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       } else if (result.compareToIgnoringCase("warning") == 0) {
@@ -583,18 +572,14 @@ class _PendingLeaveApprovalDisapprovalState
       "comment=$getComment",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -651,7 +636,7 @@ class _PendingLeaveApprovalDisapprovalState
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

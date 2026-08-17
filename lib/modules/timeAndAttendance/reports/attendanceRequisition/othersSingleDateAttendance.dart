@@ -25,10 +25,10 @@ class OthersSingleDateAttendance extends StatefulWidget {
   final int empId;
 
   const OthersSingleDateAttendance({
-    Key? key,
+    super.key,
     required this.singleDateString,
     required this.empId,
-  }) : super(key: key);
+  });
 
   @override
   State<OthersSingleDateAttendance> createState() =>
@@ -53,7 +53,6 @@ class _OthersSingleDateAttendanceState
   var userPanel;
   @override
   void initState() {
-    print("single new date $singleDateString");
 
     getSharedPrfanceList();
     setState(() {});
@@ -97,12 +96,10 @@ class _OthersSingleDateAttendanceState
       });
 
       if (getData == 0) {
-        print("No data found in the model");
         if (!mounted) return; // ðŸ‘ˆ check again before using context
         showNodata(context, "Oops", "No data available.");
       }
     } catch (e) {
-      print("Error: $e");
       if (!mounted) return; // ðŸ‘ˆ prevent error here too
       showNodata(context, "Error", "Failed to fetch data.");
     }
@@ -149,7 +146,6 @@ class _OthersSingleDateAttendanceState
   ) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getOtherAttDetails;
-    print('employeeList11: ${SessionId}');
     OthersOnDateAttendanceModal onDateAttModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?sessionId=$sessionId&"
@@ -158,13 +154,10 @@ class _OthersSingleDateAttendanceState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     getData = mapResponse.length;
-    print("My Get Data - $getData");
     if (getData == 0) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
       var map = {
         "inTime": "",
@@ -222,7 +215,6 @@ class _OthersSingleDateAttendanceState
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -230,16 +222,13 @@ class _OthersSingleDateAttendanceState
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -247,7 +236,6 @@ class _OthersSingleDateAttendanceState
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -283,7 +271,7 @@ class _OthersSingleDateAttendanceState
 class AttList extends StatefulWidget {
   final OthersOnDateAttendanceModal onDateAttModel;
 
-  AttList(this.onDateAttModel);
+  const AttList(this.onDateAttModel, {super.key});
 
   @override
   State<AttList> createState() => _AttListState(onDateAttModel);
@@ -305,7 +293,6 @@ class _AttListState extends State<AttList> {
       itemBuilder: (context, itemCount) {
         return InkWell(
           onTap: () {
-            print('attendanceReport$onDateAttModel!.data![itemCount]');
             // Navigator.pushNamed(context, MyRoutings.attendanceRequisitionRoute);
             Navigator.of(context).push(
               MaterialPageRoute(

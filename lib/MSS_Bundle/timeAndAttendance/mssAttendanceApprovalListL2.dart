@@ -20,7 +20,7 @@ import '../shortLeaveApprovalPageL2.dart';
 
 class MSS_Att_PendingRequisitionL2 extends StatefulWidget {
   final PendingRequisitionModel pendingRequisitionModel;
-  MSS_Att_PendingRequisitionL2(this.pendingRequisitionModel);
+  const MSS_Att_PendingRequisitionL2(this.pendingRequisitionModel, {super.key});
 
   @override
   State<MSS_Att_PendingRequisitionL2> createState() =>
@@ -74,9 +74,8 @@ class _MSS_Att_PendingRequisitionL2State
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNewMSS!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -86,8 +85,6 @@ class _MSS_Att_PendingRequisitionL2State
     getProfileId = await shared.getDefaultProfileId();
     levelOne = await shared.getPendingAttendanceReqL2MSS();
     levelTwo = await shared.getPendingAttendanceReqL2MSS();
-    print("Level 1 - $levelOne");
-    print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingRequisitionModel> getEmployeeList11 = getPendingReqList(
       sessionId!,
@@ -106,7 +103,6 @@ class _MSS_Att_PendingRequisitionL2State
         pendingRequisitionLabel = value;
         pendingRequisitionLabeled = pendingRequisitionLabel;
       });
-      print('employeeList00${pendingRequisitionLabel!.data!.length}');
     });
   }
 
@@ -149,7 +145,6 @@ class _MSS_Att_PendingRequisitionL2State
   Future<PendingRequisitionModel> getPendingReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingReqListRo;
-    print('employeeList11: ${SessionId}');
     PendingRequisitionModel pendingRequisitionModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -162,13 +157,10 @@ class _MSS_Att_PendingRequisitionL2State
 
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     if (getData.length == 0) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
     pendingRequisitionModel = PendingRequisitionModel.fromJson(mapResponse);
@@ -184,7 +176,6 @@ class _MSS_Att_PendingRequisitionL2State
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -326,7 +317,6 @@ class _MSS_Att_PendingRequisitionL2State
                     onChanged: (i) {
                       setState(() {
                         value = i;
-                        print(i);
                       });
                       if (value == 0) {
                         levelChange = "LEVEL_ONE_PENDING";
@@ -400,7 +390,6 @@ class _MSS_Att_PendingRequisitionL2State
                     onChanged: (i) {
                       setState(() {
                         value = i;
-                        print(i);
                       });
                       if (value == 0) {
                         levelChange = "LEVEL_ONE_PENDING";
@@ -448,7 +437,6 @@ class _MSS_Att_PendingRequisitionL2State
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -458,17 +446,14 @@ class _MSS_Att_PendingRequisitionL2State
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
             Navigator.pop(context);
-            print('Attendance');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -476,7 +461,6 @@ class _MSS_Att_PendingRequisitionL2State
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -553,7 +537,6 @@ class _MSS_Att_PendingRequisitionL2State
                   onTap: () {
                     if (foundDataNewMSS![itemCount].shortLeaveRequistionType ==
                         true) {
-                      print(foundDataNewMSS!.length);
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder:
@@ -564,7 +547,6 @@ class _MSS_Att_PendingRequisitionL2State
                         ),
                       );
                     } else {
-                      print(foundDataNewMSS!.length);
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder:

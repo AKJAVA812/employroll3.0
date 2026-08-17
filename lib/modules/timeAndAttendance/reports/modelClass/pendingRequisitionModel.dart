@@ -13,7 +13,7 @@ class PendingRequisitionModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -108,32 +108,32 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['attendanceRequisionType'] = this.attendanceRequisionType;
-    data['compOffRequistionType'] = this.compOffRequistionType;
-    data['outRemarks'] = this.outRemarks;
-    data['actualInTime'] = this.actualInTime;
-    data['isShortLeave'] = this.isShortLeave;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['updatedWorkingHour'] = this.updatedWorkingHour;
-    data['relaxationHour'] = this.relaxationHour;
-    data['nightRequistionType'] = this.nightRequistionType;
-    data['onDate'] = this.onDate;
-    data['requestId'] = this.requestId;
-    data['empName'] = this.empName;
-    data['inRemarks'] = this.inRemarks;
-    data['actualOutTime'] = this.actualOutTime;
-    data['department'] = this.department;
-    data['shiftWorkingHour'] = this.shiftWorkingHour;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['shortLeaveRequistionType'] = this.shortLeaveRequistionType;
-    data['odRequistionType'] = this.odRequistionType;
-    data['requestType'] = this.requestType;
-    data['currentLevel'] = this.currentLevel;
-    data['totalLevels'] = this.totalLevels;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['attendanceRequisionType'] = attendanceRequisionType;
+    data['compOffRequistionType'] = compOffRequistionType;
+    data['outRemarks'] = outRemarks;
+    data['actualInTime'] = actualInTime;
+    data['isShortLeave'] = isShortLeave;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['updatedWorkingHour'] = updatedWorkingHour;
+    data['relaxationHour'] = relaxationHour;
+    data['nightRequistionType'] = nightRequistionType;
+    data['onDate'] = onDate;
+    data['requestId'] = requestId;
+    data['empName'] = empName;
+    data['inRemarks'] = inRemarks;
+    data['actualOutTime'] = actualOutTime;
+    data['department'] = department;
+    data['shiftWorkingHour'] = shiftWorkingHour;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['shortLeaveRequistionType'] = shortLeaveRequistionType;
+    data['odRequistionType'] = odRequistionType;
+    data['requestType'] = requestType;
+    data['currentLevel'] = currentLevel;
+    data['totalLevels'] = totalLevels;
     return data;
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
@@ -33,7 +32,7 @@ class AttendanceRequestCurrentMonth extends StatefulWidget {
   AttendanceRequestCurrentMonth(
     this.attendanceModelGlobel,
     this.onDateAttModel,
-    this.indexCont,
+    this.indexCont, {super.key}
   );
 
   @override
@@ -88,7 +87,6 @@ class _AttendanceRequestCurrentMonthState
     //print('responseemployeeList $empid');
 
     if (attendanceModelGlobel != null) {
-      print('attendanceModelGlobel');
       /*branchNameset= attendanceModelGlobel!.data![indexCont].branchName;
       updatedWorkHourSet= attendanceModelGlobel!.data![indexCont].branchName;
       departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
@@ -118,15 +116,7 @@ class _AttendanceRequestCurrentMonthState
       empId = attendanceModelGlobel!.data![indexCont].empId;
 
       // Log for debugging
-      print('Branch: $branchNameset');
-      print('Department: $departmentset');
-      print('Employee Name: $employeeNameset');
-      print('Date: $onDateset');
-      print('In Time: $actualTimeset');
-      print('Out Time: $actualOutTimeset');
-      print('Employee ID: $empId');
     } else {
-      print('onModelrun');
       branchNameset =
           attendanceModelGlobel!.data![indexCont].branchName.toString();
       updatedWorkHourSet =
@@ -147,13 +137,6 @@ class _AttendanceRequestCurrentMonthState
       empId = attendanceModelGlobel!.data![indexCont].empId;
 
       // Log for debugging
-      print('Branch: $branchNameset');
-      print('Department: $departmentset');
-      print('Employee Name: $employeeNameset');
-      print('Date: $onDateset');
-      print('In Time: $actualTimeset');
-      print('Out Time: $actualOutTimeset');
-      print('Employee ID: $empId');
     }
 
     _loadOrgId();
@@ -179,7 +162,7 @@ class _AttendanceRequestCurrentMonthState
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
-  List<bool> _isSelected = [false, false, false];
+  final List<bool> _isSelected = [false, false, false];
   bool nightShift = false;
   bool compOff = false;
   bool shortLeave = false;
@@ -399,14 +382,12 @@ class _AttendanceRequestCurrentMonthState
                           compOff = false;
                           shortLeave = false;
                           outDuty = false;
-                          print("Night Shift - $nightShift");
                         }),
                         buildVerticalToggle("Comp. Off", compOff, (val) {
                           setState(() => compOff = val);
                           nightShift = false;
                           shortLeave = false;
                           outDuty = false;
-                          print("Comp Off - $compOff");
                         }),
 
                         Visibility(
@@ -419,7 +400,6 @@ class _AttendanceRequestCurrentMonthState
                               compOff = false;
                               nightShift = false;
                               outDuty = false;
-                              print("Short Leave - $shortLeave");
                             },
                           ),
                         ),
@@ -430,7 +410,6 @@ class _AttendanceRequestCurrentMonthState
                             compOff = false;
                             nightShift = false;
                             shortLeave = false;
-                            print("Out Duty - $outDuty");
                           }),
                         ),
                       ],
@@ -651,7 +630,6 @@ class _AttendanceRequestCurrentMonthState
                                       );
                                     },
                                   );
-                                  print('timenewOut $n');
                                   setState(() {
                                     var now = DateTime.now();
                                     DateTime newt = DateTime(
@@ -662,7 +640,6 @@ class _AttendanceRequestCurrentMonthState
                                       n.minute,
                                     );
                                     var nT = DateFormat('HH:mm').format(newt);
-                                    print(DateFormat('HH:mm').format(newt));
                                     _inTimePicker = nT;
                                   });
                                 },
@@ -764,7 +741,6 @@ class _AttendanceRequestCurrentMonthState
                                       );
                                     },
                                   );
-                                  print('timenewOut $o');
                                   setState(() {
                                     var newNow = DateTime.now();
                                     DateTime newt = DateTime(
@@ -775,7 +751,6 @@ class _AttendanceRequestCurrentMonthState
                                       o.minute,
                                     );
                                     var oT = DateFormat('HH:mm').format(newt);
-                                    print(DateFormat('HH:mm').format(newt));
                                     _outTimePicker = oT;
                                   });
                                 },
@@ -1004,9 +979,8 @@ class _AttendanceRequestCurrentMonthState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ButtonBar(
+                      OverflowBar(
                         alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
                         children: [
                           ElevatedButton(
                             onPressed: () {
@@ -1091,7 +1065,6 @@ class _AttendanceRequestCurrentMonthState
                                     );
                                   } else {
                                     outTimeReq = _outTimePicker;
-                                    print("outtime $outTimeReq");
                                   }
                                 } else {
                                   if (_outTimePicker.compareToIgnoringCase(
@@ -1144,26 +1117,17 @@ class _AttendanceRequestCurrentMonthState
                                 if (nightShift == false &&
                                     compOff == false &&
                                     outDuty == false) {
-                                  print("intime $inTimeReq");
-                                  print("outtime $outTimeReq");
-                                  print("night shift  $nightShift");
-                                  print("compoff $compOff");
 
                                   if (inTimeReq!.compareTo(outTimeReq!) > 0) {
                                     return setState(() {
                                       CommonNotificationPage.showWorkDoneSuccess(
                                         context,
-                                        "Your working hours going to negative, Please select requisition time correctly."
-                                                .upperCamelCase +
-                                            " ",
+                                        "${"Your working hours going to negative, Please select requisition time correctly."
+                                                .upperCamelCase} ",
                                         "Alert Message",
                                       );
                                     });
                                   } else {
-                                    print("intime $inTimeReq");
-                                    print("outtime $outTimeReq");
-                                    print("night shift  $nightShift");
-                                    print("compoff $compOff");
                                     if (inRemarkController.text.isEmpty ||
                                         outRemarkController.text.isEmpty) {
                                       ScaffoldMessenger.of(
@@ -1189,10 +1153,6 @@ class _AttendanceRequestCurrentMonthState
                                     }
                                   }
                                 } else if (nightShift == true) {
-                                  print("intime $inTimeReq");
-                                  print("outtime $outTimeReq");
-                                  print("night shift  $nightShift");
-                                  print("compoff $compOff");
                                   if (inRemarkController.text.isEmpty ||
                                       outRemarkController.text.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -1219,18 +1179,12 @@ class _AttendanceRequestCurrentMonthState
                                     return setState(() {
                                       CommonNotificationPage.showWorkDoneSuccess(
                                         context,
-                                        "Your working hours going to negative, Please select requisition time correctly."
-                                                .upperCamelCase +
-                                            " ",
+                                        "${"Your working hours going to negative, Please select requisition time correctly."
+                                                .upperCamelCase} ",
                                         "Alert Message",
                                       );
                                     });
                                   } else {
-                                    print("intime $inTimeReq");
-                                    print("outtime $outTimeReq");
-                                    print("night shift  $nightShift");
-                                    print("compoff $compOff");
-                                    print("outDuty $outDuty");
                                     if (inRemarkController.text.isEmpty ||
                                         outRemarkController.text.isEmpty) {
                                       ScaffoldMessenger.of(
@@ -1256,10 +1210,6 @@ class _AttendanceRequestCurrentMonthState
                                     }
                                   }
                                 } else if (compOff == true) {
-                                  print("intime $inTimeReq");
-                                  print("outtime $outTimeReq");
-                                  print("night shift  $nightShift");
-                                  print("compoff $compOff");
                                   if (actualTimeset!.compareToIgnoringCase(
                                             "N/A",
                                           ) ==
@@ -1382,7 +1332,7 @@ class _AttendanceRequestCurrentMonthState
                               }
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.lightBluishColor,
                               ),
                             ),
@@ -1413,7 +1363,6 @@ class _AttendanceRequestCurrentMonthState
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.pop(context);
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -1421,11 +1370,9 @@ class _AttendanceRequestCurrentMonthState
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
             }
             if (index == 3) {
               Navigator.push(
@@ -1435,7 +1382,6 @@ class _AttendanceRequestCurrentMonthState
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -1443,7 +1389,6 @@ class _AttendanceRequestCurrentMonthState
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -1523,15 +1468,12 @@ class _AttendanceRequestCurrentMonthState
       if (compOff) 'compOff': true,
       if (shortLeave) 'shortLeave': 1,
     };
-    print('[ATT_REQ_MOBILE] -> ${ApiDetails.mobileAttendanceRequisition} body=$body requestId=$requestId');
     final response = await foundation.postJson(
       ApiDetails.mobileAttendanceRequisition,
       body: body,
       headers: await foundation.authHeaders(requestId: requestId, json: true),
       tag: 'ATT_REQ_MOBILE',
     );
-    print('[ATT_REQ_MOBILE] request ${response.request}');
-    print('[ATT_REQ_MOBILE] <- status=${response.statusCode} body=${response.body}');
     Navigator.of(context, rootNavigator: true).pop();
 
     mapResponse = response.body.isNotEmpty ? json.decode(response.body) : {};
@@ -1546,7 +1488,6 @@ class _AttendanceRequestCurrentMonthState
     } else {
       showDialgSucess1(context, reason.isEmpty ? result : reason, "Warning");
     }
-    print('[ATT_REQ_MOBILE] result=$result reason=$reason');
   }
 
   Future<void> sendRequsitionToServer(
@@ -1573,7 +1514,6 @@ class _AttendanceRequestCurrentMonthState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
 
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
@@ -1595,7 +1535,6 @@ class _AttendanceRequestCurrentMonthState
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1624,7 +1563,6 @@ class _AttendanceRequestCurrentMonthState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       String result = "";
@@ -1643,7 +1581,6 @@ class _AttendanceRequestCurrentMonthState
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1672,7 +1609,6 @@ class _AttendanceRequestCurrentMonthState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       String result = "";
@@ -1691,7 +1627,6 @@ class _AttendanceRequestCurrentMonthState
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1720,7 +1655,6 @@ class _AttendanceRequestCurrentMonthState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       String result = "";
@@ -1739,7 +1673,6 @@ class _AttendanceRequestCurrentMonthState
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1768,7 +1701,6 @@ class _AttendanceRequestCurrentMonthState
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       String result = "";
@@ -1787,7 +1719,6 @@ class _AttendanceRequestCurrentMonthState
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1839,7 +1770,7 @@ class _AttendanceRequestCurrentMonthState
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

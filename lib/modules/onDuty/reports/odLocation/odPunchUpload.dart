@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:er_flutter_project/commanScreen/punchInOutScreen.dart';
 import 'package:er_flutter_project/commanScreen/routes.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
@@ -28,7 +27,7 @@ class ODImageUpload extends StatefulWidget {
   final String address;
   final String? punchType;
 
-  ODImageUpload({required this.value, required this.time, required this.address, required this.punchType});
+  const ODImageUpload({super.key, required this.value, required this.time, required this.address, required this.punchType});
 
   @override
   State<ODImageUpload> createState() => _ODImageUploadState(value,time,address,punchType);
@@ -40,7 +39,7 @@ SessionManager shared = SessionManager();
 
 class _ODImageUploadState extends State<ODImageUpload> {
   static const Set<int> _fieldVisitOrganisationIds = {23, 24, 44};
-  TextEditingController _remarkController = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
   String? _platformVersion = 'Unknown', _autoTimezone, _autoTime, _daftar = "";
   Map<String, dynamic>? _list;
   final File? value;
@@ -114,7 +113,6 @@ class _ODImageUploadState extends State<ODImageUpload> {
       _autoTime = autoTime;
       _list = list;
       _daftar = "";
-      print('autoupdateChange $_platformVersion $_autoTimezone $autoTime');
       list!.forEach((k, v) {
         _daftar = "$k : $v \n";
       });
@@ -167,7 +165,6 @@ class _ODImageUploadState extends State<ODImageUpload> {
 
     final formattedDate = DateFormat("dd-MM-yyyy HH:mm:ss").format(DateTime.now());
     final action = (clockingType ?? '').trim().toUpperCase();
-    print('[MOBILE-OD] screen submit -> action=$action image=${value!.path} lat=$lat lng=$lng address=$address');
     setState(() => _isSubmitting = true);
     CommonNotificationPage.showLoaderDialog(context);
     try {
@@ -192,10 +189,8 @@ class _ODImageUploadState extends State<ODImageUpload> {
       } else {
         showDialgError(context, "Failed", reason);
       }
-      print('[MOBILE-OD] screen response status=${response.statusCode} body=$decoded');
     } catch (error) {
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
-      print('[MOBILE-OD] screen submit error -> $error');
       showDialgError(context, "Failed", error.toString());
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
@@ -465,16 +460,15 @@ class _ODImageUploadState extends State<ODImageUpload> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          ButtonBar(
+                          OverflowBar(
                               alignment: MainAxisAlignment.center,
-                              buttonPadding: Vx.mOnly(right: 16),
                               children: [
                                 ElevatedButton(
                                   onPressed: _isSubmitting
                                       ? null
                                       : () => odUploadImage(context),
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(Mythemes.lightBluishColor),
+                                    backgroundColor: WidgetStateProperty.all(Mythemes.lightBluishColor),
                                   ),
                                   child: Text(
                                     _isSubmitting
@@ -508,31 +502,26 @@ class _ODImageUploadState extends State<ODImageUpload> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => HomePage()));
                 //Navigator.of(context, rootNavigator: true).pop();
-                print('home tab');
               }
               if(index==1){
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
                 //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-                print('Workflow');
               }
               if(index==2){
                 Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-                print('OD');
               }
               if(index==3){
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
                 );
                 //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-                print('Dashboard');
               }
               if(index==4){
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => ProfilePageNew())
                 );
                 //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-                print('Profile');
               }
               /*if(index==3){
                 title="Notifications";
@@ -632,7 +621,7 @@ Widget UploadedReading() {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

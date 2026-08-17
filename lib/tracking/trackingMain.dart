@@ -84,7 +84,6 @@ class _TrackingmainState extends State<Trackingmain> {
     getLatlngAll();
     String deviceIdString = await getUniqueDeviceId();
 
-    print('deviceIdString ${deviceIdString}');
   }
 
   void _listenLocation() async {
@@ -95,7 +94,6 @@ class _TrackingmainState extends State<Trackingmain> {
         try{
           setState(() {
             _currPosition = LatLng(event.latitude, event.longitude);
-            print(_currPosition);
 
           });
         }catch(e){
@@ -107,19 +105,15 @@ class _TrackingmainState extends State<Trackingmain> {
         print(timeFormat.format( DateTime.fromMillisecondsSinceEpoch(myvalue*1000)));
         print("time ${timeFormat.toString()}");*/
         String formattedDate = DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
-        print('time $formattedDate');
         //print("laglng $_currPosition");
         if(_points.length>2){
           //print("print $_points[_points.length-2].latitude $_points[_points.length-2].longitude");
           //print("print $_points[_points.length-1].latitude $_points[_points.length-1].longitude");
           for(int i=0 ;i<=_points.length-1;i++){
             double latlng = _points[i].longitude;
-            print("latlnd $i  $latlng");
           }
           totalDistance = calculateDistance(_points[_points.length-2].latitude, _points[_points.length-2].longitude, _points[_points.length-1].latitude, _points[_points.length-1].longitude);
-          print("Total distance :- $totalDistance");
           String latLngString = '${_currPosition?.latitude},${_currPosition?.longitude}';
-          print('latlong String  $latLngString');
 
           insertLatlngData(latLngString,  formattedDate);
 
@@ -157,14 +151,11 @@ class _TrackingmainState extends State<Trackingmain> {
   }
   void insertLatlngData(String latlng, String time)
   {
-    print('insertLatlng $latlng');
-    print('insertLatlng $time');
     Map<String, dynamic> rowData = {
       SaveLatlng.latlng : latlng,
       SaveLatlng.timestamp : time,
     };
     final latlngIdSave = databaseLatlngSave.insertlatlng(rowData);
-    print("Save latlng $latlngIdSave");
   }
 
   void getLatlngAll() async {
@@ -172,11 +163,7 @@ class _TrackingmainState extends State<Trackingmain> {
     final allLatlng = await databaseLatlngSave.getAllData();
     //print('total number Data $allLatlng');
     log('data $allLatlng');
-    print(allLatlng);
     for (final row in allLatlng) {
-        print("latlng ${row[SaveLatlng.id]}");
-        print("latlng ${row[SaveLatlng.latlng]}");
-        print("latlng ${row[SaveLatlng.timestamp]}");
       }
   }
 
@@ -189,7 +176,6 @@ class _TrackingmainState extends State<Trackingmain> {
       return Future.value(false);
     }
     if(permissionGranted==PermissionStatus.deniedForever){
-      print("location permission not granted");
       openAppSettingsDialog();
       return ;
     }
@@ -219,7 +205,6 @@ class _TrackingmainState extends State<Trackingmain> {
       points: _points,
     );
     setState(() {
-      print("Polyline Mapping ");
       _polylines.add(polyline);
     });
   }
@@ -262,7 +247,6 @@ class _TrackingmainState extends State<Trackingmain> {
     );
 
     setState(() {
-      print("Add marker running ${_points[0].longitude}");
       _markers.add(marker);
     });
   }

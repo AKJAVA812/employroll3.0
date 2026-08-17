@@ -9,9 +9,9 @@ class ApprovedLeaveReqModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.result != null) {
-      data['result'] = this.result!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (result != null) {
+      data['result'] = result!.toJson();
     }
     return data;
   }
@@ -32,7 +32,7 @@ class Result {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -84,19 +84,19 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['employeeName'] = this.employeeName;
-    data['leaveType'] = this.leaveType;
-    data['endDate'] = this.endDate;
-    data['approvedBy'] = this.approvedBy;
-    data['count'] = this.count;
-    data['nominee'] = this.nominee;
-    data['leaveLength'] = this.leaveLength;
-    data['startDate'] = this.startDate;
-    data['status'] = this.status;
-    data['applicationDate'] = this.applicationDate;
-    data['startTime'] = this.startTime;
-    data['endTime'] = this.endTime;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['employeeName'] = employeeName;
+    data['leaveType'] = leaveType;
+    data['endDate'] = endDate;
+    data['approvedBy'] = approvedBy;
+    data['count'] = count;
+    data['nominee'] = nominee;
+    data['leaveLength'] = leaveLength;
+    data['startDate'] = startDate;
+    data['status'] = status;
+    data['applicationDate'] = applicationDate;
+    data['startTime'] = startTime;
+    data['endTime'] = endTime;
     return data;
   }
 }

@@ -75,13 +75,6 @@ class MobileApiFoundation {
       'ngrok-skip-browser-warning': 'true',
       if (json) 'Content-Type': 'application/json',
     };
-    print(
-      '[MOBILE-API] headers -> tokenPresent=${token.isNotEmpty} '
-      'sessionPresent=${sessionId != null && sessionId.isNotEmpty} '
-      'mssProfileId=${isMssPanel ? mssProfileId : null} '
-      'mssOrganisationId=${isMssPanel ? mssOrganisationId : null} '
-      'requestId=$requestId',
-    );
     return headers;
   }
 
@@ -160,12 +153,10 @@ class MobileApiFoundation {
     Duration timeout = uploadTimeout,
     String tag = 'MULTIPART',
   }) async {
-    print('[MOBILE-API] $tag -> ${request.method} ${request.url}');
     try {
       final response = await MobileHttpClient.instance
           .send(request)
           .timeout(timeout);
-      print('[MOBILE-API] $tag <- status=${response.statusCode}');
       return response;
     } on TimeoutException {
       throw MobileApiException.timeout();
@@ -259,14 +250,12 @@ class MobileApiFoundation {
     required String tag,
     required Uri uri,
   }) async {
-    print('[MOBILE-API] $tag -> $uri');
     try {
       final response = await call();
       final body =
           response.body.length > 1200
               ? '${response.body.substring(0, 1200)}...'
               : response.body;
-      print('[MOBILE-API] $tag <- status=${response.statusCode} body=$body');
       return response;
     } on TimeoutException {
       throw MobileApiException.timeout();

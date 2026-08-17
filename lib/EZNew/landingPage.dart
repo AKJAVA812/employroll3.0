@@ -25,7 +25,7 @@ bool? setShowPayroll;
 int? orgId;
 //List<Data>? allUsernew=[];
 //List<Data>? foundDataNew=[];
-late List<String?> list = [];
+List<String?> list = [];
 String valuenew="listText";
 
 var titleName = "Landing Page";
@@ -67,7 +67,6 @@ class _LandingPageState extends State<LandingPage> {
     double boxText = widgetWidth;
     timeDilation = 0.5;
     List<Widget> generateGridViewItems() {
-      print("CheckOrg - $orgId");
       List<Widget> items = [];
 
       items.add(
@@ -769,7 +768,6 @@ class _LandingPageState extends State<LandingPage> {
                 onChanged: (i) {
                   setState(() {
                     value = i;
-                    print(i);
 
                   });
                 },
@@ -852,19 +850,15 @@ class _LandingPageState extends State<LandingPage> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if(index==2){
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Dashboard');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.profileRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:er_flutter_project/modules/visitorManagement/raiseVisitorRequisition.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
@@ -38,9 +37,8 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -62,23 +60,19 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
         employeeListModelglobel = value;
         employeeListModelglobeled = employeeListModelglobel;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
   }
 
   Future<EmployeeListModel> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getEmpList;
-    print('employeeList11: ${SessionId}');
     EmployeeListModel employeeListModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = EmployeeListModel.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
 
@@ -86,7 +80,6 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -178,21 +171,21 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
             children: [
               ElevatedButton(
                 onPressed: _setToday,
-                child: Text('Today'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(20, 30),
                   backgroundColor: Mythemes.lightBluishColor, // Button color
                   foregroundColor: Colors.white, // Text color
                 ),
+                child: Text('Today'),
               ),
               SizedBox(width: 8),
               ElevatedButton(
                 onPressed: _previousDay,
-                child: Icon(Icons.chevron_left),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(20, 30),
                   backgroundColor: Mythemes.lightBluishColor,
                 ),
+                child: Icon(Icons.chevron_left),
               ),
               TextButton(
                 onPressed: () => _selectDate(context),
@@ -203,11 +196,11 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
               ),
               ElevatedButton(
                 onPressed: _nextDay,
-                child: Icon(Icons.chevron_right),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(20, 30),
                   backgroundColor: Mythemes.lightBluishColor,
                 ),
+                child: Icon(Icons.chevron_right),
               ),
             ],
           ),
@@ -260,7 +253,6 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
                 onChanged: (i) {
                   setState(() {
                     value = i;
-                    print(i);
                   });
                 },
               ),
@@ -303,13 +295,9 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
             );
             //picker.dispose();
             if (imageValue == null) return;
-            print(
-              "Heloo ji "
-              "$imageValue",
-            );
             setState(() {
               final imagePath = File(imageValue!.path);
-              this._workDoneImage = imagePath;
+              _workDoneImage = imagePath;
             });
             imageValue = null;
             //imageCache.clear();
@@ -320,7 +308,6 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
               ),
             );
           } on Exception catch (e) {
-            print('failed to upload: $e');
           }
         },
         child: const Icon(Icons.add),
@@ -426,7 +413,7 @@ class _VisitorManageSectionsState extends State<VisitorManageSections> {
 class MyStatelessWidget extends StatefulWidget {
   final EmployeeListModel employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -482,7 +469,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
 
               //Navigator.pop(buildContext);
             },
@@ -521,8 +507,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
           onTap: () {
             empId = foundDataNew![i].empdetailsId;
             empName = foundDataNew![i].empName;
-            print('ID $empId');
-            print('NameCheck $empName');
             //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
           },
           child: Card(

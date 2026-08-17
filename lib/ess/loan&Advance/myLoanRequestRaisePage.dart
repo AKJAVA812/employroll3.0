@@ -9,6 +9,8 @@ import '../../commanScreen/commanNotificationPage.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
 class LoanRequestPage extends StatefulWidget {
+  const LoanRequestPage({super.key});
+
   @override
   _LoanRequestPageState createState() => _LoanRequestPageState();
 }
@@ -92,7 +94,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
 
@@ -124,10 +125,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     getLoanTypeMaster(sessionId!);
     setState(() {});
 
-    print("SessionId - $sessionId");
-    print("Department - $department");
-    print("Branch - $branch");
-    print("EmployeeName - $employeeName");
   }
 
   @override
@@ -243,19 +240,14 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                           int i = loanTypes.indexOf(newVal);
                           if (i != -1 && i < loanTypeId.length) {
                             loanId = loanTypeId[i].toString();
-                            print("depart $loanTypeId");
-                            print("loan Id -  $loanId");
                           } else {
                             loanTypeId;
-                            print("Invalid Loan selection");
                           }
                           int j = loanTypes.indexOf(newVal);
                           if (j != -1 && j < loanTypeSend.length) {
                             loanTypeSending = loanTypeSend[i].toString();
-                            print("loanType -  $loanTypeSending");
                           } else {
                             loanTypeSending;
-                            print("Invalid Loan selection");
                           }
                         });
                       },
@@ -477,9 +469,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -489,7 +478,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
           final totalAmount = double.tryParse(amountController.text) ?? 0.0;
           final totalInstallments =
               int.tryParse(installmentController.text) ?? 1;
@@ -527,7 +516,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -557,7 +545,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                   ).pop(); // Close the dialog
                   //Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -667,7 +654,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

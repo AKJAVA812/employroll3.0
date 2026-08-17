@@ -3,7 +3,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 
 class AlarmSetRing extends StatefulWidget {
-  const AlarmSetRing({Key? key}) : super(key: key);
+  const AlarmSetRing({super.key});
 
   @override
   State<AlarmSetRing> createState() => _AlarmSetRingState();

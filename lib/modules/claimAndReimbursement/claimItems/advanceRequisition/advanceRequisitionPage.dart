@@ -12,7 +12,7 @@ import '../modalClass/advanceRequisitionListModal.dart';
 import 'advanceRequisitionList.dart';
 
 class AdvanceRequisitionPage extends StatefulWidget {
-  const AdvanceRequisitionPage({Key? key}) : super(key: key);
+  const AdvanceRequisitionPage({super.key});
 
   @override
   State<AdvanceRequisitionPage> createState() => _AdvanceRequisitionPageState();
@@ -278,9 +278,8 @@ class _AdvanceRequisitionPageState extends State<AdvanceRequisitionPage> {
         bottomNavigationBar: Container(
           height: 80,
           color: context.cardColor,
-          child: ButtonBar(
+          child: OverflowBar(
             alignment: MainAxisAlignment.center,
-            buttonPadding: Vx.mOnly(right: 16),
             children: [
               ElevatedButton(
                 onPressed: () {
@@ -294,7 +293,7 @@ class _AdvanceRequisitionPageState extends State<AdvanceRequisitionPage> {
                   //Navigator.pushNamed(context, MyRoutings.singleDateAttendanceRoute);
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.lightBluishColor,
                   ),
                 ),
@@ -327,18 +326,14 @@ class _AdvanceRequisitionPageState extends State<AdvanceRequisitionPage> {
       "ndays=$ndays",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body.toString());
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -391,7 +386,7 @@ class _AdvanceRequisitionPageState extends State<AdvanceRequisitionPage> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

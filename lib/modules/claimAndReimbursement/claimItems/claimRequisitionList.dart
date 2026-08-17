@@ -21,7 +21,7 @@ import '../../../sharedPrefancePage/ShardPre.dart';
 import '../newModalClasses/selfClaimRequisitionListModal.dart';
 
 class ClaimRequisitionList extends StatefulWidget {
-  const ClaimRequisitionList({Key? key}) : super(key: key);
+  const ClaimRequisitionList({super.key});
 
   @override
   State<ClaimRequisitionList> createState() => _ClaimRequisitionListState();
@@ -116,9 +116,8 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
 
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -161,18 +160,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
         claimRequisitionLabel = value;
         claimRequisitionLabeled = claimRequisitionLabel;
       });
-      print(
-        'Draft LIST - ${claimRequisitionLabel!.claimRequisitionDraftlist!.length}',
-      );
-      print(
-        'Pending LIST - ${claimRequisitionLabel!.claimRequisitionPendinglist!.length}',
-      );
-      print(
-        'Approved LIST - ${claimRequisitionLabel!.claimRequisitionApprovedlist!.length}',
-      );
-      print(
-        'Disapproved LIST - ${claimRequisitionLabel!.claimRequisitionDisapprovelist!.length}',
-      );
     });
   }
 
@@ -214,21 +201,16 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
   Future<ClaimRequisitionModal> getSelfReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.selfClaimRequestListApi;
-    print('employeeList11: ${SessionId}');
     ClaimRequisitionModal claimRequisitionModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
     });
-    print('URL ${response.request}');
     mapResponse = json.decode(response.body);
-    print('responseemployeeList $mapResponse');
     var getData = mapResponse.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
 
@@ -260,7 +242,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
       isLoadingCount = false;
     });
 
-    print("Pending List -  ${pendingData.length.toString()}");
 
     return claimRequisitionModal;
   }
@@ -349,7 +330,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -357,11 +337,9 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.myAllRequestRoute);
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -372,7 +350,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -380,7 +357,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -661,7 +637,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
                       isLoading = true; // Show loader
                       isLoadingCount = true;
                       valueChange = i;
-                      print(i);
                     });
                     //Draft
                     if (valueChange == 0) {
@@ -747,7 +722,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
                 itemCount: foundDataNewDraft!.length,
                 itemBuilder: (context, i) {
                   foundDataNewDraft![i].status;
-                  print(foundDataNewDraft![i].status);
                   return InkWell(
                     onTap: () {
                       foundDataNewDraft![i].claimRaiseId;
@@ -778,7 +752,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
                       documents = foundDataNewDraft![i].document!.toString();
                       claimIdChecking =
                           foundDataNewDraft![i].claimRaiseId!.toString();
-                      print("Claim id - ${foundDataNewDraft![i].claimRaiseId}");
 
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -1148,7 +1121,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
                 //controller: _controller,
                 itemCount: foundDataNewPending!.length,
                 itemBuilder: (context, i) {
-                  print(foundDataNewPending![i].status);
                   bool levelOnePendingStatus = false;
                   bool levelTwoPendingStatus = false;
                   bool levelThreePendingStatus = false;
@@ -1183,11 +1155,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
                   }
 
                   // Print the statuses for debugging
-                  print("Level 1 Pending: $levelOnePendingStatus");
-                  print("Level 2 Pending: $levelTwoPendingStatus");
-                  print("Level 3 Pending: $levelThreePendingStatus");
-                  print("Level 4 Pending: $levelFourPendingStatus");
-                  print("Level 5 Pending: $levelFivePendingStatus");
                   return InkWell(
                     onTap: () {
                       foundDataNewDraft![i].claimRaiseId;
@@ -1220,9 +1187,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
                       documents = foundDataNewPending![i].document!.toString();
                       claimIdChecking =
                           foundDataNewPending![i].claimRaiseId!.toString();
-                      print(
-                        "Claim id - ${foundDataNewPending![i].claimRaiseId}",
-                      );
 
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -1599,9 +1563,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
                       documents = foundDataNewApproved![i].document!.toString();
                       claimIdChecking =
                           foundDataNewApproved![i].claimRaiseId!.toString();
-                      print(
-                        "Claim id - ${foundDataNewApproved![i].claimRaiseId}",
-                      );
 
                       /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
                             TravelExpenseRequestUpdate(
@@ -1936,9 +1897,6 @@ class _ClaimRequisitionListState extends State<ClaimRequisitionList>
                           foundDataNewDisapproved![i].document!.toString();
                       claimIdChecking =
                           foundDataNewDisapproved![i].claimRaiseId!.toString();
-                      print(
-                        "Claim id - ${foundDataNewDisapproved![i].claimRaiseId}",
-                      );
 
                       /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
                             TravelExpenseRequestUpdate(

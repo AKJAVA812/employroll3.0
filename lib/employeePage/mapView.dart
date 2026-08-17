@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/employeePage/employeeListPage.dart';
@@ -21,7 +20,7 @@ class HistoryMapView extends StatefulWidget {
   String empName;
   int? empId;
 
-  HistoryMapView(this.empName, this.empId);
+  HistoryMapView(this.empName, this.empId, {super.key});
 
   @override
   State<HistoryMapView> createState() => _HistoryMapViewState(empName, empId);
@@ -38,7 +37,7 @@ var taskLtt;
 var taskLang;
 
 class _HistoryMapViewState extends State<HistoryMapView> {
-  CustomInfoWindowController _customInfoWindowController =
+  final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
 
   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
@@ -66,12 +65,10 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     //addCustomIcon();
     empNames = empName;
     empIds = empId;
-    print('empNames $empName');
-    print('empIds $empId');
 
     Future.delayed(Duration.zero, () {
       dateSelection();
-      final List<LatLng> _latlng = <LatLng>[];
+      final List<LatLng> latlng = <LatLng>[];
     });
 
     // TODO: implement initState
@@ -79,7 +76,6 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     _determinePosition();
     _getUserLocation();
     //selectedDate = _dateController;
-    print('selectedDate $selectedDate');
   }
 
   dateSelection() async {
@@ -101,15 +97,11 @@ class _HistoryMapViewState extends State<HistoryMapView> {
       //  DateFormat.yMd().format(date!).toString();
     });
 
-    print(date);
   }
 
   Future<HistoryTrackingModal> getTracking(String sessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.historyTracking;
-    print(
-      'Fetching Tracking Data for Session: $sessionId on Date: $selectedDate',
-    );
 
     // âœ… Clear previous tracking data before fetching new data
     setState(() {
@@ -122,12 +114,10 @@ class _HistoryMapViewState extends State<HistoryMapView> {
       "$conn$apiUrl?sessionId=$sessionId&date=$selectedDate&empId=$empId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('API URL: ${response.request}');
 
     // âœ… Decode JSON Response
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('Tracking Data: $getData');
 
     // âœ… Parse Response into Model
     HistoryTrackingModal historyTrackingModal = HistoryTrackingModal.fromJson(
@@ -160,7 +150,6 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     ).then((icon) {
       setState(() {
         markerIcon = icon;
-        print('icon Name $markerIcon');
       });
     });
   }
@@ -586,8 +575,9 @@ class _HistoryMapViewState extends State<HistoryMapView> {
         trackingLatLng.add(LatLng(lat, lng));
       }
     }
-    if (trackingLatLng.isNotEmpty)
+    if (trackingLatLng.isNotEmpty) {
       _addPolyline('3', trackingLatLng, Colors.green);
+    }
 
     // âœ… Load Task Data
     for (int i = 0; i < historyTrackingModalGlobal!.taskData!.length; i++) {
@@ -667,8 +657,9 @@ class _HistoryMapViewState extends State<HistoryMapView> {
 
   // âœ… Function to Add a Polyline
   void _addPolyline(String id, List<LatLng> points, Color color) {
-    if (points.length < 2)
+    if (points.length < 2) {
       return; // Prevents creating polylines with < 2 points
+    }
     _polyline.add(
       Polyline(
         polylineId: PolylineId(id),
@@ -691,7 +682,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     String? time,
   ) {
     return Card(
-      child: Container(
+      child: SizedBox(
         height: 250,
         width: 200,
         child: Column(
@@ -709,7 +700,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
   // âœ… Info Window for Task Data
   Widget _buildTaskInfoWindow(String? image, dynamic taskData) {
     return Card(
-      child: Container(
+      child: SizedBox(
         height: 250,
         width: 200,
         child: Column(
@@ -774,7 +765,6 @@ class _HistoryMapViewState extends State<HistoryMapView> {
 
     getEmployeeList11.then((value) {
       setState(() {
-        print('marker Icon $markerIcon');
 
         historyTrackingModalGlobal = value;
 
@@ -783,7 +773,7 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     });
   }
 
-  LatLng _center = LatLng(32.5367794, -121.2714404);
+  final LatLng _center = LatLng(32.5367794, -121.2714404);
 
   Position? position;
   LatLng? currentPostion;
@@ -840,17 +830,13 @@ class _HistoryMapViewState extends State<HistoryMapView> {
     var position = await GeolocatorPlatform.instance.getCurrentPosition();
     var lastPosition = await Geolocator.getLastKnownPosition();
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
-    print('Response1111l $lastPosition');
 
     setState(() {
       currentPostion = LatLng(position.latitude, position.longitude);
-      print('Response1111c $currentPostion');
 
       StreamSubscription<ServiceStatus> serviceStatusStream =
           Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
-            print('Response1111s $status');
           });
-      print('Response1111s $serviceStatusStream');
     });
   }
 

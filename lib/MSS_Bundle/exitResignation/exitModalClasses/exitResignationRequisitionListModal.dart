@@ -15,8 +15,8 @@ class ExitResignationRquisitionListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['orgName'] = this.orgName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['orgName'] = orgName;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -95,28 +95,28 @@ class ListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['resignDate'] = this.resignDate;
-    data['lastWorkingDate'] = this.lastWorkingDate;
-    data['statusShow'] = this.statusShow;
-    data['showStatus'] = this.showStatus;
-    data['remark'] = this.remark;
-    data['branch'] = this.branch;
-    data['orgId'] = this.orgId;
-    data['plainingg1'] = this.plainingg1;
-    data['plainingg2'] = this.plainingg2;
-    data['plainingg3'] = this.plainingg3;
-    data['empCode'] = this.empCode;
-    data['plainingg4'] = this.plainingg4;
-    data['requestId'] = this.requestId;
-    data['plainingg5'] = this.plainingg5;
-    data['empName'] = this.empName;
-    data['requestDate'] = this.requestDate;
-    data['designation'] = this.designation;
-    data['department'] = this.department;
-    data['doj'] = this.doj;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['resignDate'] = resignDate;
+    data['lastWorkingDate'] = lastWorkingDate;
+    data['statusShow'] = statusShow;
+    data['showStatus'] = showStatus;
+    data['remark'] = remark;
+    data['branch'] = branch;
+    data['orgId'] = orgId;
+    data['plainingg1'] = plainingg1;
+    data['plainingg2'] = plainingg2;
+    data['plainingg3'] = plainingg3;
+    data['empCode'] = empCode;
+    data['plainingg4'] = plainingg4;
+    data['requestId'] = requestId;
+    data['plainingg5'] = plainingg5;
+    data['empName'] = empName;
+    data['requestDate'] = requestDate;
+    data['designation'] = designation;
+    data['department'] = department;
+    data['doj'] = doj;
+    data['status'] = status;
     return data;
   }
 }

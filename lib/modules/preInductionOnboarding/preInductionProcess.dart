@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:developer' as developer;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -26,7 +25,7 @@ import '../inductionOnboarding/modalClass/onboardDocTypeListModal.dart';
 import '../inductionOnboarding/modalClass/onboardUserTypeListModal.dart';
 
 class PreInductionProcess extends StatefulWidget {
-  const PreInductionProcess({Key? key}) : super(key: key);
+  const PreInductionProcess({super.key});
 
   @override
   State<PreInductionProcess> createState() => _PreInductionProcessState();
@@ -163,7 +162,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
             'status': 'Finished',
             'type': 'image',
           });
-          print("Photo path - ${photo.path}");
         });
       }
     } else {
@@ -183,7 +181,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
             'status': 'Finished',
             'type': result.files.single.extension ?? 'file',
           });
-          print("File path - ${result.files.single.path!}");
         });
       }
     }
@@ -230,9 +227,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -243,7 +237,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
         if (result.compareToIgnoringCase("Success") == 0) {
           Fluttertoast.showToast(
-            msg: "$reason",
+            msg: reason,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 1,
@@ -256,7 +250,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
           });
         } else if (result.compareToIgnoringCase("Error") == 0) {
           Fluttertoast.showToast(
-            msg: "$reason",
+            msg: reason,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 1,
@@ -270,7 +264,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -333,18 +326,15 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('branch List ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     onboardBranchListModal = OnboardBranchListModal.fromJson(mapResponse);
 
     for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardBranchList.add(mapResponse['data'][i]['name'].toString());
       branchId = mapResponse['data'][i]['id'].toString();
 
-      print('ID -  $branchId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -365,18 +355,15 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     onboardDeptListModal = OnboardDeptListModal.fromJson(mapResponse);
 
     for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardDeptList.add(mapResponse['data'][i]['name'].toString());
       deptId = mapResponse['data'][i]['id'].toString();
 
-      print('ID -  $deptId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -399,11 +386,9 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     onboardDesignationListModal = OnboardDesignationListModal.fromJson(
       mapResponse,
     );
@@ -413,8 +398,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
       desigId = mapResponse['data'][i]['id'].toString();
       desigName = mapResponse['data'][i]['name'].toString();
 
-      print('Designation ID -  $desigId');
-      print('Designation Name -  $desigName');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -435,18 +418,15 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     onboardUserTypeListModal = OnboardUserTypeListModal.fromJson(mapResponse);
 
     for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardUserTypeList.add(mapResponse['data'][i]['name'].toString());
       userTypeId = mapResponse['data'][i]['id'].toString();
 
-      print('ID -  $userTypeId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -479,13 +459,10 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     /*  setState(() {
       isLoading = true; // Start loading
     });*/
-    print('Holiday URL ${response.request}');
-    print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
     mapResponse = json.decode(response.body);
     var getData = mapResponse.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNoData = true;
     }
     onboardDocTypeListModal = OnboardDocTypeListModal.fromJson(mapResponse);
@@ -502,7 +479,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ButtonBar(
+              OverflowBar(
                 alignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
@@ -553,7 +530,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         bottomNavigationBar: Container(
           height: 75,
           color: context.cardColor,
-          child: ButtonBar(
+          child: OverflowBar(
             alignment: MainAxisAlignment.center,
             //buttonPadding: Vx.mOnly(right: 16),
             children: [
@@ -584,7 +561,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                   saveInductionData(context);
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.successColor,
                   ),
                 ),
@@ -600,7 +577,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
           child: Padding(
             padding: EdgeInsets.all(5.0),
             child: SingleChildScrollView(
-              child: Column(children: [Container(height: 620, child: body())]),
+              child: Column(children: [SizedBox(height: 620, child: body())]),
             ),
           ),
         ),
@@ -903,7 +880,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                         ).format(fromDate!);
                                       });
 
-                                      print(fromDate);
                                     },
                                     readOnly: true,
                                     enabled: true,
@@ -964,7 +940,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                         ).format(fromDate!);
                                       });
 
-                                      print(fromDate);
                                     },
                                     readOnly: true,
                                     enabled: true,
@@ -1117,7 +1092,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                         branchId =
                                             onboardBranchListModal!.data![i].id!
                                                 .toString();
-                                        print("Branch Id $branchId");
                                       }
                                     }
                                     setState(() {
@@ -1181,7 +1155,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                       if (dept.name!.toLowerCase() ==
                                           newVal!.toLowerCase()) {
                                         deptId = dept.id.toString();
-                                        print("Dept Id $deptId");
                                       }
                                     }
                                     setState(() {
@@ -1276,7 +1249,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                                     .data![i]
                                                     .id!
                                                     .toString();
-                                            print("DEsi Id $desigId");
                                           }
                                         }
                                         setState(() {
@@ -1760,6 +1732,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -1767,7 +1740,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -1814,6 +1786,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -1821,7 +1794,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -1868,6 +1840,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -1875,7 +1848,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -1922,6 +1894,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -1929,7 +1902,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4444,6 +4416,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4451,7 +4424,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4491,7 +4463,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                       ).format(fromDate!);
                                     });
 
-                                    print(fromDate);
                                   },
                                   readOnly: true,
                                   enabled: true,
@@ -4556,6 +4527,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4563,7 +4535,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4610,6 +4581,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4617,7 +4589,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4660,6 +4631,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4667,7 +4639,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4691,7 +4662,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
     return
     //ignore this section please
-    ButtonBar(
+    OverflowBar(
       children: [
         /*ElevatedButton(
             onPressed: () {
@@ -4890,7 +4861,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
     request.fields['nomineeAadhar'] = nomineeAadharController.text;
     request.fields['withAccomodation'] = accomodationCheck.toString();
 
-    print("Uploaded Document Count - ${uploadedDocuments.length}");
 
     // Mapping titles to server keys
     Map<String, String> titleKeyMap = {
@@ -4909,21 +4879,15 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         try {
           var file = await http.MultipartFile.fromPath(key, filePath);
           request.files.add(file);
-          print("âœ… File added: $key -> $filePath");
         } catch (e) {
-          print('âŒ Error adding file [$title]: $e');
         }
       } else {
-        print('âš ï¸ File not found for $title');
       }
     }
 
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -4933,13 +4897,12 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -4969,7 +4932,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
                   ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -5080,10 +5042,6 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 
   void openFile(PlatformFile file) {
     OpenFile.open(file.path!);
-    print('Bytes: ${file.name}');
-    print('Size: ${file.size}');
-    print('Size: ${file.extension}');
-    print('Path: ${file.path}');
   }
 
   Future<File> saveFilePermanently(PlatformFile file) async {
@@ -5096,7 +5054,7 @@ class _PreInductionProcessState extends State<PreInductionProcess> {
 // The DismissKeybaord widget (it's reusable)
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

@@ -9,7 +9,7 @@ import 'package:image/image.dart' as img;
 import 'package:velocity_x/velocity_x.dart';
 
 class RecognitionScreen extends StatefulWidget {
-  const RecognitionScreen({Key? key}) : super(key: key);
+  const RecognitionScreen({super.key});
 
   @override
   State<RecognitionScreen> createState() => _RecognitionScreenState();
@@ -85,7 +85,6 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
       num width = right-left;
       num height = bottom - top;
 
-      print("Ract Position :- " +boundingBox.toString());
 
       final bytes= _image!.readAsBytesSync();
       img.Image? faceImg = img.decodeImage(bytes);
@@ -95,9 +94,8 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
       if(recognition.distance>0.5){
         recognition.name= "Unknown Face $recognition.distance";
       }
-      print("Face Matche Name " + recognition.name);
 
-      var snackBar = SnackBar(content: Text(" Face Name " + recognition.name));
+      var snackBar = SnackBar(content: Text(" Face Name ${recognition.name}"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       //showFaceRegistrationDialogue(Uint8List.fromList(img.encodeBmp(croppedFace)), recognition);
     }
@@ -161,7 +159,6 @@ class _RecognitionScreenState extends State<RecognitionScreen> {
   var image;
   drawRectangleAroundFaces() async {
 
-    print("${image.width}   ${image.height}");
     setState(() {
       image;
       recognitionList;
@@ -277,7 +274,7 @@ class FacePainter extends CustomPainter {
 
     for (Recognition face in facesList) {
       canvas.drawRect(face.location, p);
-      TextSpan textSpan = TextSpan(text: face.name+ " " +face.distance.toString(),
+      TextSpan textSpan = TextSpan(text: "${face.name} ${face.distance}",
           style: TextStyle(color: Colors.white, fontSize: 50));
       TextPainter tp = TextPainter(text: textSpan, textDirection: TextDirection.ltr);
       tp.layout();

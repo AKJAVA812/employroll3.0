@@ -46,13 +46,11 @@ class LocationClient {
       permissionStatus = await _location.requestPermission();
     }
     if (permissionStatus == PermissionStatus.granted) {
-      print("permission Granted");
       //await _location.enableBackgroundMode(enable: true);
       /*bool backgroundEnabled = await _location.enableBackgroundMode(enable: true);
       print("Background mode enabled: $backgroundEnabled");
 */
       enableBackgroundMode();
-      print("permission Granted 2");
       Stream<LocationData> getLocationStream() {
         _location.changeSettings(
           accuracy: LocationAccuracy.high,
@@ -82,8 +80,8 @@ class LocationClient {
     }
   }
   Future<bool> enableBackgroundMode() async {
-    bool _bgModeEnabled = await _location.isBackgroundModeEnabled();
-    if (_bgModeEnabled) {
+    bool bgModeEnabled = await _location.isBackgroundModeEnabled();
+    if (bgModeEnabled) {
       return true;
     } else {
       try {
@@ -92,12 +90,11 @@ class LocationClient {
         debugPrint(e.toString());
       }
       try {
-        _bgModeEnabled = await _location.enableBackgroundMode();
+        bgModeEnabled = await _location.enableBackgroundMode();
       } catch (e) {
         debugPrint(e.toString());
       }
-      print(_bgModeEnabled); //True!
-      return _bgModeEnabled;
+      return bgModeEnabled;
     }
   }
   Future<bool> isServiceEnabled() async {

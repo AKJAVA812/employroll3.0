@@ -13,7 +13,7 @@ class TimeLineModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -50,14 +50,14 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['datetime'] = this.datetime;
-    data['address'] = this.address;
-    data['lng'] = this.lng;
-    data['comment'] = this.comment;
-    data['time'] = this.time;
-    data['type'] = this.type;
-    data['lat'] = this.lat;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['datetime'] = datetime;
+    data['address'] = address;
+    data['lng'] = lng;
+    data['comment'] = comment;
+    data['time'] = time;
+    data['type'] = type;
+    data['lat'] = lat;
     return data;
   }
 }

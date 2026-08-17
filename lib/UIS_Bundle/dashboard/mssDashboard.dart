@@ -32,7 +32,7 @@ import '../../sharedPrefancePage/ShardPre.dart';
 class UIS_Dashboard extends StatefulWidget {
   final DashboardModel dashboardModel1;
 
-  UIS_Dashboard(this.dashboardModel1);
+  const UIS_Dashboard(this.dashboardModel1, {super.key});
 
   @override
   State<UIS_Dashboard> createState() => _UIS_DashboardState(dashboardModel1);
@@ -57,9 +57,9 @@ var eventSingleDateString;
 var day = DateTime.now();
 var single = DateFormat('dd');
 var singleDay = single.format(day);
-late List<String?> list = [];
-late List<String?> branchList = [];
-late List<String?>? shiftList = [];
+List<String?> list = [];
+List<String?> branchList = [];
+List<String?>? shiftList = [];
 bool isLoading = true;
 bool isLoadingEvent = true;
 String valuenew = "listText";
@@ -171,7 +171,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -196,7 +195,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('BRANCH URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -216,7 +214,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.shiftListApi;
 
-    print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -226,12 +223,10 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     shiftListModal = ShiftListModal.fromJson(mapResponse);
     for (int i = 0; i < shiftListModal.data!.length; i++) {
       var shiftName = shiftListModal.data![i].shiftName;
@@ -245,7 +240,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalNewApi;
 
-    print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
     setState(() {
       isLoadingEvent = true;
@@ -262,12 +256,10 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     eventsListModal = EventsListModal.fromJson(mapResponse);
     setState(() {
       isLoadingEvent = false;
@@ -340,8 +332,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
             getSharedPrfanceList();
             singleDateString = DateFormat('dd-MM-yyyy').format(date);
             singleDay = DateFormat('dd').format(date);
-            print("SingleDateNew $singleDateString");
-            print("singleDay $singleDay");
             //dateController.text = DateFormat("dd").format(date!);
 
             //  DateFormat.yMd().format(date!).toString();
@@ -458,7 +448,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.pushReplacement(
@@ -469,7 +458,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
             );
 
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('workflow');
           }
           if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
@@ -480,19 +468,16 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                     (context) => const PunchInOUtActivity(selectedIndex: 2),
               ),
             );
-            print('Reports');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.uisNewDashboardRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -534,25 +519,22 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
     earlyOutEmp = dashboardModelGlobal!.earlyOutEmp;
     halfEmp = dashboardModelGlobal!.halfEmp;
     overTime = dashboardModelGlobal!.otEmp;
-    print("Total Employees $totalPresentEmp");
     shift = 0;
     branchId = 0;
     int value = 1;
 
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     if (eventsListModalGlobal != null &&
         eventsListModalGlobal!.bdayList != null) {
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
-        print("oldEvent $oldEvent");
       }
     } else {
-      print("bdayList is null or eventsListModalGlobal is null");
     }
 
     if (eventsListModalGlobal != null &&
@@ -560,10 +542,8 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
-        print("oldJobEvent $oldJobEvent");
       }
     } else {
-      print("job list is null or eventsListModalGlobal is null");
     }
 
     /*for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
@@ -574,7 +554,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 */
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-    print("Todayevent $todayEvent");
     return DismissKeyboard(
       child: SingleChildScrollView(
         child: Padding(
@@ -635,7 +614,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onChanged: (i) {
                         setState(() {
                           value = i;
-                          print(i);
                         });
                         if (value == 1) {
                           Navigator.pushNamed(
@@ -706,7 +684,6 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                       onChanged: (i) {
                         setState(() {
                           value = i;
-                          print(i);
                         });
                         if (value == 1) {
                           Navigator.pushNamed(
@@ -877,11 +854,10 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                   style: TextStyle(fontSize: 10),
                                 ),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (newVal) {
                             branchId = newVal!;
-                            print("Branch ID $branchId");
 
                             setState(() {
                               getSharedPrfanceList();
@@ -942,11 +918,10 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                   ),
                                 ),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (newVal) {
                             shift = newVal!;
-                            print("Shift ID $shift");
 
                             setState(() {
                               getSharedPrfanceList();
@@ -1776,26 +1751,23 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
   }
 
   TabSection(EventsListModal eventsListModal) {
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
-      print("oldEvent $oldEvent");
     }
 
     for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
-      print("oldJobEvent $oldJobEvent");
     }
 
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-    print("Todayevent $todayEvent");
 
     return DefaultTabController(
       length: 3,
@@ -1867,7 +1839,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                           .dob
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -1922,7 +1894,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                           .doj
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -1980,7 +1952,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                               .dob
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2031,7 +2003,7 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
                                               .doj
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2064,6 +2036,8 @@ class _UIS_DashboardState extends State<UIS_Dashboard> {
 }
 
 class FilterBottomSheet extends StatefulWidget {
+  const FilterBottomSheet({super.key});
+
   @override
   _FilterBottomSheetState createState() => _FilterBottomSheetState();
 }
@@ -2160,8 +2134,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: ElevatedButton.icon(
               onPressed: () {
                 Navigator.pop(context);
-                print("Selected Org: $selectedOrg");
-                print("Selected Date: $selectedDateFormatted");
               },
               icon: Icon(Icons.filter_alt),
               label: Text("Apply Filter"),
@@ -2178,7 +2150,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

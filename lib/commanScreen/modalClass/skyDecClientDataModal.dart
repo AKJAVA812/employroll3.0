@@ -13,7 +13,7 @@ class ClientDataListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -44,12 +44,12 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['clientMailId'] = this.clientMailId;
-    data['clientId'] = this.clientId;
-    data['orgName'] = this.orgName;
-    data['clientName'] = this.clientName;
-    data['clientContact'] = this.clientContact;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['clientMailId'] = clientMailId;
+    data['clientId'] = clientId;
+    data['orgName'] = orgName;
+    data['clientName'] = clientName;
+    data['clientContact'] = clientContact;
     return data;
   }
 }

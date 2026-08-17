@@ -13,10 +13,10 @@ class LoanAdvanceReqModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.loanRequiDatalist != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (loanRequiDatalist != null) {
       data['loanRequiDatalist'] =
-          this.loanRequiDatalist!.map((v) => v.toJson()).toList();
+          loanRequiDatalist!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -69,20 +69,20 @@ class LoanRequiDatalist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['loanType'] = this.loanType;
-    data['advanceActive'] = this.advanceActive;
-    data['remark'] = this.remark;
-    data['loanAdId'] = this.loanAdId;
-    data['empDetId'] = this.empDetId;
-    data['loanReqId'] = this.loanReqId;
-    data['loanActive'] = this.loanActive;
-    data['loanAmount'] = this.loanAmount;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['raisedBy'] = this.raisedBy;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['loanType'] = loanType;
+    data['advanceActive'] = advanceActive;
+    data['remark'] = remark;
+    data['loanAdId'] = loanAdId;
+    data['empDetId'] = empDetId;
+    data['loanReqId'] = loanReqId;
+    data['loanActive'] = loanActive;
+    data['loanAmount'] = loanAmount;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['raisedBy'] = raisedBy;
+    data['status'] = status;
     return data;
   }
 }

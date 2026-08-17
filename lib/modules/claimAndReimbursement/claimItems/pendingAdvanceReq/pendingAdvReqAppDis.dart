@@ -15,7 +15,7 @@ class AppDispPendingAdvanceReq extends StatefulWidget {
   PendingAdvReqListModal pendingAdvReqListModal;
   int i;
 
-  AppDispPendingAdvanceReq(this.pendingAdvReqListModal, this.i);
+  AppDispPendingAdvanceReq(this.pendingAdvReqListModal, this.i, {super.key});
 
   @override
   State<AppDispPendingAdvanceReq> createState() =>
@@ -56,7 +56,6 @@ class _AppDispPendingAdvanceReqState extends State<AppDispPendingAdvanceReq> {
     appAmt = foundDataNew![i].approvedAmount;
     appStatus = foundDataNew![i].approvedStatus;
     setState(() {
-      print('check $placeTour');
     });
     // TODO: implement initState
     super.initState();
@@ -369,9 +368,8 @@ class _AppDispPendingAdvanceReqState extends State<AppDispPendingAdvanceReq> {
                   Row(
                     children: [
                       Expanded(
-                        child: ButtonBar(
+                        child: OverflowBar(
                           alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
                           children: [
                             ElevatedButton(
                               onPressed: () {
@@ -383,7 +381,7 @@ class _AppDispPendingAdvanceReqState extends State<AppDispPendingAdvanceReq> {
                                 );
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                   Mythemes.successColor,
                                 ),
                               ),
@@ -399,7 +397,7 @@ class _AppDispPendingAdvanceReqState extends State<AppDispPendingAdvanceReq> {
                                 );
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                   Mythemes.dangerColorOne,
                                 ),
                               ),
@@ -432,18 +430,14 @@ class _AppDispPendingAdvanceReqState extends State<AppDispPendingAdvanceReq> {
       "status=$appStatus",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(context);
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -463,18 +457,14 @@ class _AppDispPendingAdvanceReqState extends State<AppDispPendingAdvanceReq> {
       "status=$appStatus",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(context);
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -528,7 +518,7 @@ class _AppDispPendingAdvanceReqState extends State<AppDispPendingAdvanceReq> {
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
 
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

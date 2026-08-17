@@ -1,3 +1,3 @@
 class SessionManger {
-  var _sessionManger = "";
+  final _sessionManger = "";
 }

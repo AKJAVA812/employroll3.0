@@ -69,21 +69,10 @@ class WorkDoneApi {
       ),
     );
 
-    print('[MOBILE-WORKDONE] SUBMIT -> POST ${request.url}');
-    print(
-      '[MOBILE-WORKDONE] SUBMIT headers -> tokenPresent=${request.headers['Authorization']?.isNotEmpty == true} sessionPresent=${request.headers['X-Mobile-Session-Id']?.isNotEmpty == true} requestId=$eventId',
-    );
-    print('[MOBILE-WORKDONE] SUBMIT fields -> ${request.fields['metadata']}');
-    print(
-      '[MOBILE-WORKDONE] SUBMIT file -> path=${image.path} contentType=${_imageContentType(image)}',
-    );
     final streamed = await MobileHttpClient.instance
         .send(request)
         .timeout(const Duration(seconds: 45));
     final response = await http.Response.fromStream(streamed);
-    print(
-      '[MOBILE-WORKDONE] SUBMIT <- status=${response.statusCode} body=${response.body}',
-    );
     return _legacyCompatible(response);
   }
 
@@ -94,10 +83,6 @@ class WorkDoneApi {
     if (token == null || token.isEmpty) {
       throw const WorkDoneException('AUTHENTICATION_REQUIRED');
     }
-    print(
-      '[MOBILE-WORKDONE] headers -> tokenPresent=${token.isNotEmpty} '
-      'sessionPresent=${sessionId != null && sessionId.isNotEmpty}',
-    );
     return <String, String>{
       'Authorization': '$tokenType $token',
       if (sessionId != null && sessionId.isNotEmpty)

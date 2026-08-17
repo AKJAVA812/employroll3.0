@@ -14,7 +14,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 class MyAllReportsPage extends StatefulWidget {
   final bool showAppBar;
-  MyAllReportsPage({this.showAppBar = true});
+  const MyAllReportsPage({super.key, this.showAppBar = true});
 
   @override
   State<MyAllReportsPage> createState() => _MyAllReportsPageState();
@@ -52,13 +52,6 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
     empRoles= await shared.getEmpRoll();
     roRoles= await shared.getRoRole();
     adminRoles= await shared.getAdminRole();
-    print('empRole $empRoles');
-    print('roRole $roRoles');
-    print('adminRole $adminRoles');
-    print('Response snapshot: ${sessionId}');
-    print('Show Payroll: ${setShowPayroll}');
-    print('OrgId -  ${orgId}');
-    print('OrgName - : ${orgName}');
     userPanel= await shared.getUserPanel();
     profileName= await shared.getDefaultProfileName();
     profileId= await shared.getDefaultProfileId();
@@ -68,32 +61,26 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
     setState(() {
       if(empRoles==1){
         showHide=true;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if(empRoles==0){
         showHide=false;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if (adminRoles == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRoles == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRoles == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRoles == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -120,7 +107,6 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
     double widgetHeight = screenHeight * 0.5; // 50% of the screen height
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
-      print("CheckOrg - $orgId");
       List<Widget> items = [];
 
       // My Attendance
@@ -517,7 +503,7 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: '$titleName',
+                  text: titleName,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -548,7 +534,6 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.pop(context);
-              print('home tab');
             }
             if(index==1){
               Navigator.push(context,
@@ -558,18 +543,15 @@ class _MyAllReportsPageState extends State<MyAllReportsPage> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => GetAttendanceDet(showAppBar: true,)));
               //Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-              print('My Requests');
             }
             if(index==3){
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
 
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('My Reports');
             }
             if(index==4){
               Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
-              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";

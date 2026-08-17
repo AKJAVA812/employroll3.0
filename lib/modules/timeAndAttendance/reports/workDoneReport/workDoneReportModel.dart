@@ -7,16 +7,16 @@ class WorkdoneReportModel {
     final source = json['content'] ?? json['data'];
     if (source is List) {
       data = <DataNew>[];
-      source.forEach((v) {
+      for (var v in source) {
         if (v is Map) data!.add(DataNew.fromJson(Map<String, dynamic>.from(v)));
-      });
+      }
     } else {
       data = <DataNew>[];
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -68,15 +68,15 @@ class DataNew {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['image'] = this.image;
-    data['cMailId'] = this.cMailId;
-    data['cAddress'] = this.cAddress;
-    data['cName'] = this.cName;
-    data['cNumber'] = this.cNumber;
-    data['remark'] = this.remark;
-    data['time'] = this.time;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['image'] = image;
+    data['cMailId'] = cMailId;
+    data['cAddress'] = cAddress;
+    data['cName'] = cName;
+    data['cNumber'] = cNumber;
+    data['remark'] = remark;
+    data['time'] = time;
     return data;
   }
 }

@@ -103,8 +103,8 @@ class Mythemes {
   static Color VoiletColor = Color(0xff00b0ff);
   static Color lightBlue = Color(0xffe1f5fe);
   static Color blueShade = Colors.grey.shade200;
-  static Color cyan = Color(0xB2FFFF);
-  static Color darkCreamColor = Color(0x4FFFB0);
+  static Color cyan = Color(0x00b2ffff);
+  static Color darkCreamColor = Color(0x004fffb0);
   static Color lightBluishColor = Colors.lightBlue;
   static Color creamColor = Color(0xfff5f5f5);
   static Color whiteShadeSeventy = Colors.white70;

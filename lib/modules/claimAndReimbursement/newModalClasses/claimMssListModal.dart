@@ -26,14 +26,14 @@ class ClaimApproverListModalClass {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['appList'] = this.appList;
-    data['disAppList'] = this.disAppList;
-    data['draftList'] = this.draftList;
-    data['pendingList'] = this.pendingList;
+    data['appList'] = appList;
+    data['disAppList'] = disAppList;
+    data['draftList'] = draftList;
+    data['pendingList'] = pendingList;
     return data;
   }
 }
@@ -112,29 +112,29 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['claimNo'] = this.claimNo;
-    data['raiseOn'] = this.raiseOn;
-    data['raisedOn'] = this.raisedOn;
-    data['claimAmount'] = this.claimAmount;
-    data['statusShow'] = this.statusShow;
-    data['claimId'] = this.claimId;
-    data['dept'] = this.dept;
-    data['branch'] = this.branch;
-    data['orgId'] = this.orgId;
-    data['plainingg1'] = this.plainingg1;
-    data['isCheck'] = this.isCheck;
-    data['plainingg2'] = this.plainingg2;
-    data['plainingg3'] = this.plainingg3;
-    data['empCode'] = this.empCode;
-    data['plainingg4'] = this.plainingg4;
-    data['plainingg5'] = this.plainingg5;
-    data['empName'] = this.empName;
-    data['designation'] = this.designation;
-    data['approvedAmount'] = this.approvedAmount;
-    data['reimbName'] = this.reimbName;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['claimNo'] = claimNo;
+    data['raiseOn'] = raiseOn;
+    data['raisedOn'] = raisedOn;
+    data['claimAmount'] = claimAmount;
+    data['statusShow'] = statusShow;
+    data['claimId'] = claimId;
+    data['dept'] = dept;
+    data['branch'] = branch;
+    data['orgId'] = orgId;
+    data['plainingg1'] = plainingg1;
+    data['isCheck'] = isCheck;
+    data['plainingg2'] = plainingg2;
+    data['plainingg3'] = plainingg3;
+    data['empCode'] = empCode;
+    data['plainingg4'] = plainingg4;
+    data['plainingg5'] = plainingg5;
+    data['empName'] = empName;
+    data['designation'] = designation;
+    data['approvedAmount'] = approvedAmount;
+    data['reimbName'] = reimbName;
+    data['status'] = status;
     return data;
   }
 }

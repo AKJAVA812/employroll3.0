@@ -198,7 +198,6 @@ class AttendancePunchApi {
         (punch) => punch['clientEventId']?.toString() == eventId,
       );
     } catch (error) {
-      print('[ATTENDANCE-PUNCH] recovery lookup failed -> $error');
       return false;
     }
   }
@@ -254,10 +253,6 @@ class AttendancePunchApi {
     if (token == null || token.isEmpty) {
       throw const AttendancePunchException('AUTHENTICATION_REQUIRED');
     }
-    print(
-      '[ATTENDANCE-PUNCH] headers -> tokenPresent=${token.isNotEmpty} '
-      'sessionPresent=${sessionId != null && sessionId.isNotEmpty}',
-    );
     return <String, String>{
       'Authorization': '$tokenType $token',
       if (sessionId != null && sessionId.isNotEmpty)

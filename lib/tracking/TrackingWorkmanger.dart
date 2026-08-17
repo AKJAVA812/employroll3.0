@@ -48,7 +48,6 @@ class _trackingWorkmangerState extends State<trackingWorkmanger> {
       setState(() {
         _currentLocation = locationData;
       });
-      print("Foreground Location: ${locationData.latitude}, ${locationData.longitude}");
     });
   }
 }

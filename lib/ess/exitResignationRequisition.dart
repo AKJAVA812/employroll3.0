@@ -56,7 +56,6 @@ class _ResignationRequisitionPageState
       noticePeriodController = TextEditingController(text: noticePeriod);
       var listLength;
 
-      print('listLength $listLength');
     });
   }
 
@@ -96,18 +95,15 @@ class _ResignationRequisitionPageState
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('branch List ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['list'];
-    print('responseemployeeList $getData');
     reasonForLeavingModal = ReasonForLeavingModal.fromJson(mapResponse);
 
     for (int i = 0; i < mapResponse['list'].length; i++) {
       reasonForLeavingList.add(mapResponse['list'][i]['name'].toString());
       reasonForLeavingId = mapResponse['list'][i]['id'].toString();
 
-      print('ID -  $reasonForLeavingId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -122,7 +118,6 @@ class _ResignationRequisitionPageState
       var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
       final response = await MobileHttpClient.instance.post(urlapi);
 
-      print('ðŸ”— API: ${response.request}');
       var mapResponse = json.decode(response.body);
 
       if (mapResponse["result"] == "success" &&
@@ -146,10 +141,8 @@ class _ResignationRequisitionPageState
           );
         });
       } else {
-        print("âš ï¸ No resignation history found.");
       }
     } catch (e) {
-      print("ðŸš¨ Error fetching resignation list: $e");
     }
   }
 
@@ -308,22 +301,16 @@ class _ResignationRequisitionPageState
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
-    print('API URL with Parameters: $apiWithParams');
+            .join('&')}';
 
     try {
       http.StreamedResponse response = await request.send();
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Status Code: ${httpResponse.statusCode}');
-      print('Response: ${httpResponse.body}');
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -333,13 +320,12 @@ class _ResignationRequisitionPageState
         String result = mapResponse['result'];
 
         if (result.compareToIgnoringCase("Success") == 0) {
-          showDialgSucess(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("Error") == 0) {
           showDialgSucess(context, reason.upperCamelCase, "Error");
         }
       }
     } catch (e) {
-      print('âŒ Exception during API call: $e');
     }
   }
 
@@ -369,7 +355,6 @@ class _ResignationRequisitionPageState
                   ).pop(); // Close the dialog
                   Navigator.of(buildContext).maybePop();
                 } else {
-                  print("âš ï¸ Warning: No route to close.");
                 }
               },
               child: Text("Ok"),
@@ -730,7 +715,6 @@ class _ResignationRequisitionPageState
                             onChanged: (value) {
                               setState(() {
                                 noticeServing = value!;
-                                print("Notice Period - $noticeServing");
                               });
                             },
                           ),
@@ -742,7 +726,6 @@ class _ResignationRequisitionPageState
                             onChanged: (value) {
                               setState(() {
                                 noticeServing = value!;
-                                print("Notice Period - $noticeServing");
                               });
                             },
                           ),
@@ -759,7 +742,6 @@ class _ResignationRequisitionPageState
                           controller: noticePeriodController,
                           onChanged: (value) {
                             noticePeriod = value; // âœ… keep variable updated
-                            print("$noticePeriod");
                           },
                         ),
                       const SizedBox(height: 15),
@@ -812,7 +794,6 @@ class _ResignationRequisitionPageState
                               reasonForLeavingId =
                                   reasonForLeavingModal!.list![i].id!
                                       .toString();
-                              print("Branch Id $reasonForLeavingId");
                             }
                           }
                           setState(() {
@@ -1147,7 +1128,6 @@ class _ResignationRequisitionPageState
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -1157,7 +1137,6 @@ class _ResignationRequisitionPageState
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -1167,7 +1146,6 @@ class _ResignationRequisitionPageState
               ),
             );
 
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -1178,12 +1156,10 @@ class _ResignationRequisitionPageState
             );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";

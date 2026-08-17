@@ -8,7 +8,7 @@ import '../../../themes/empThemes.dart';
 
 
 class LoanAdvanceReport extends StatefulWidget {
-  const LoanAdvanceReport({Key? key}) : super(key: key);
+  const LoanAdvanceReport({super.key});
 
   @override
   State<LoanAdvanceReport> createState() => _LoanAdvanceReportState();
@@ -53,45 +53,32 @@ class _LoanAdvanceReportState extends State<LoanAdvanceReport> {
     pendingLoanRequestMoL3Permission = (await shared.getLoanApprovalL3MO())!;
     pendingLoanRequestMSSL3Permission= (await shared.getLoanApprovalL3MSS())!;
     pendingLoanRequestUISL3Permission= (await shared.getLoanApprovalL3UIS())!;
-    print("Pending Attendance Request MSS MO- $pendingLoanRequestMoL1Permission");
-    print("Pending Attendance Request MSS- $pendingLoanRequestMSSL1Permission");
-    print("Pending Attendance Request UIS- $pendingLoanRequestUISL1Permission");
-    print("User Panel - $userPanelPermission");
     adminRole= await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
 
     setState(() {
       if(empRole==1){
         showHide=true;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if(empRole==0){
         showHide=false;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
 
@@ -127,7 +114,7 @@ class _LoanAdvanceReportState extends State<LoanAdvanceReport> {
 }
 
 class LoanAdvanceWidget extends StatefulWidget {
-  const LoanAdvanceWidget({Key? key}) : super(key: key);
+  const LoanAdvanceWidget({super.key});
 
   @override
   State<LoanAdvanceWidget> createState() => _LoanAdvanceWidgetState();

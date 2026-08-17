@@ -12,7 +12,7 @@ import 'dart:io';
 import 'package:velocity_x/velocity_x.dart';
 
 class ReportPageHead extends StatefulWidget {
-  const ReportPageHead({Key? key}) : super(key: key);
+  const ReportPageHead({super.key});
 
   @override
   State<ReportPageHead> createState() => _ReportPageHeadState();
@@ -50,13 +50,6 @@ class _ReportPageHeadState extends State<ReportPageHead> {
     empRoles= await shared.getEmpRoll();
     roRoles= await shared.getRoRole();
     adminRoles= await shared.getAdminRole();
-    print('empRole $empRoles');
-    print('roRole $roRoles');
-    print('adminRole $adminRoles');
-    print('Response snapshot: ${sessionId}');
-    print('Show Payroll: ${setShowPayroll}');
-    print('OrgId -  ${orgId}');
-    print('OrgName - : ${orgName}');
     userPanel= await shared.getUserPanel();
     profileName= await shared.getDefaultProfileName();
     profileId= await shared.getDefaultProfileId();
@@ -66,32 +59,26 @@ class _ReportPageHeadState extends State<ReportPageHead> {
     setState(() {
       if(empRoles==1){
         showHide=true;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if(empRoles==0){
         showHide=false;
-        print('Show Emp $showHide');
         setState(() {
         });
       }
       if (adminRoles == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRoles == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRoles == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRoles == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -118,7 +105,6 @@ class _ReportPageHeadState extends State<ReportPageHead> {
     double widgetHeight = screenHeight * 0.5; // 50% of the screen height
     double boxText = widgetWidth;
     List<Widget> generateGridViewItems() {
-      print("CheckOrg - $orgId");
       List<Widget> items = [];
 
       if(userPanel == "COMPANY_EMPLOYEE" || userPanel == "MSS" || userPanel == "MSS_MO_ADMIN"){
@@ -556,26 +542,21 @@ class _ReportPageHeadState extends State<ReportPageHead> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => HomePage()));
               //Navigator.pop(context);
-              print('home tab');
             }
             if(index==1){
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
             }
             if(index==2){
               Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-              print('Reports');
             }
             if(index==3){
               Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if(index==4){
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
               );
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";

@@ -11,7 +11,7 @@ import '../myAllReports.dart';
 class EarlyGoEmpList extends StatefulWidget {
   final EssDashboarrdModel dashboardModelGlobal;
 
-  EarlyGoEmpList(this.dashboardModelGlobal);
+  const EarlyGoEmpList(this.dashboardModelGlobal, {super.key});
 
 
   @override
@@ -68,13 +68,11 @@ class _EarlyGoEmpListState extends State<EarlyGoEmpList> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
@@ -84,7 +82,6 @@ class _EarlyGoEmpListState extends State<EarlyGoEmpList> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
@@ -94,7 +91,6 @@ class _EarlyGoEmpListState extends State<EarlyGoEmpList> {
             //     MaterialPageRoute(builder: (context) => ProfilePageNew())
             // );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -131,7 +127,6 @@ class _EarlyGoEmpListState extends State<EarlyGoEmpList> {
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
     itemCount = dashboardModelGlobal?.countData?.earlyGoList?.length ?? 0;
-    print("ItemCount - $itemCount");
     return ListView.builder(
       padding: const EdgeInsets.all(4.0),
       itemCount: itemCount,

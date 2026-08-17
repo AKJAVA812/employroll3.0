@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:animation_search_bar/animation_search_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/claimAndReimbursement/claimItems/pendingAdvanceReq/pendingAdvReqAppDis.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -14,7 +13,7 @@ import '../modalClass/pendingAdvanceReqListModal.dart';
 
 class PendingAdvanceReqList extends StatefulWidget {
   final PendingAdvReqListModal pendingAdvReqListModal;
-  PendingAdvanceReqList(this.pendingAdvReqListModal);
+  const PendingAdvanceReqList(this.pendingAdvReqListModal, {super.key});
   @override
   State<PendingAdvanceReqList> createState() =>
       _PendingAdvanceReqListState(pendingAdvReqListModal);
@@ -60,9 +59,8 @@ class _PendingAdvanceReqListState extends State<PendingAdvanceReqList>
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -93,16 +91,13 @@ class _PendingAdvanceReqListState extends State<PendingAdvanceReqList>
   Future<PendingAdvReqListModal> getPendingAdvReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.pendingAdvReqList;
-    print('employeeList11: ${SessionId}');
     PendingAdvReqListModal pendingAdvReqListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     pendingAdvReqListModal = PendingAdvReqListModal.fromJson(mapResponse);
     allUsernew = pendingAdvReqListModal.claimAdvDatalist;
 
@@ -111,7 +106,6 @@ class _PendingAdvanceReqListState extends State<PendingAdvanceReqList>
 
   var titleName = "Pending Advance List";
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<ClaimAdvDatalist>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -237,7 +231,6 @@ class _PendingAdvanceReqListState extends State<PendingAdvanceReqList>
         itemBuilder: (context, i) {
           return InkWell(
             onTap: () {
-              print(foundDataNew!.length);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder:

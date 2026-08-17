@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:developer' as developer;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -25,19 +24,19 @@ import 'modalClass/onboardDocTypeListModal.dart';
 import 'modalClass/onboardUserTypeListModal.dart';
 
 class AddInductionProcess extends StatefulWidget {
-  const AddInductionProcess({Key? key}) : super(key: key);
+  const AddInductionProcess({super.key});
 
   @override
   State<AddInductionProcess> createState() => _AddInductionProcessState();
 }
 
-late List<String?> onboardBranchList = [];
-late List<String?> onboardDeptList = [];
-late List<String?> onboardDesignationList = [];
-late List<String?> onboardUserTypeList = [];
-late List<String?> onboardDocTypeList = [];
-late List<String?> queryTypeList = [];
-late List<String?> subQueryTypeList = [];
+List<String?> onboardBranchList = [];
+List<String?> onboardDeptList = [];
+List<String?> onboardDesignationList = [];
+List<String?> onboardUserTypeList = [];
+List<String?> onboardDocTypeList = [];
+List<String?> queryTypeList = [];
+List<String?> subQueryTypeList = [];
 
 SessionManager sessionManager = SessionManager();
 Map<String, dynamic> mapResponse = {};
@@ -220,7 +219,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
             'status': 'Finished',
             'type': 'image', // Mark as image
           });
-          print("Photo path - ${photo.path}");
         });
       }
     } else {
@@ -241,7 +239,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
             'status': 'Finished',
             'type': result.files.single.extension ?? 'file', // Determine type
           });
-          print("File path - ${result.files.single.path!}");
         });
       }
     }
@@ -343,18 +340,15 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     onboardBranchListModal = OnboardBranchListModal.fromJson(mapResponse);
 
     for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardBranchList.add(mapResponse['data'][i]['name'].toString());
       branchId = mapResponse['data'][i]['id'].toString();
 
-      print('ID -  $branchId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -375,18 +369,15 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     onboardDeptListModal = OnboardDeptListModal.fromJson(mapResponse);
 
     for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardDeptList.add(mapResponse['data'][i]['name'].toString());
       deptId = mapResponse['data'][i]['id'].toString();
 
-      print('ID -  $deptId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -409,11 +400,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     onboardDesignationListModal = OnboardDesignationListModal.fromJson(
       mapResponse,
     );
@@ -423,8 +412,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
       desigId = mapResponse['data'][i]['id'].toString();
       desigName = mapResponse['data'][i]['name'].toString();
 
-      print('Designation ID -  $desigId');
-      print('Designation Name -  $desigName');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -445,18 +432,15 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     onboardUserTypeListModal = OnboardUserTypeListModal.fromJson(mapResponse);
 
     for (int i = 0; i < mapResponse['data'].length; i++) {
       onboardUserTypeList.add(mapResponse['data'][i]['name'].toString());
       userTypeId = mapResponse['data'][i]['id'].toString();
 
-      print('ID -  $userTypeId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -479,13 +463,10 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
     /*  setState(() {
       isLoading = true; // Start loading
     });*/
-    print('Holiday URL ${response.request}');
-    print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
     mapResponse = json.decode(response.body);
     var getData = mapResponse.length;
     if (getData == 0) {
-      print("getData111 $getData");
       showNoData = true;
     }
     onboardDocTypeListModal = OnboardDocTypeListModal.fromJson(mapResponse);
@@ -502,7 +483,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ButtonBar(
+              OverflowBar(
                 alignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
@@ -563,7 +544,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
         bottomNavigationBar: Container(
           height: 75,
           color: context.cardColor,
-          child: ButtonBar(
+          child: OverflowBar(
             alignment: MainAxisAlignment.center,
             //buttonPadding: Vx.mOnly(right: 16),
             children: [
@@ -580,7 +561,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                   draftInductionData(context);
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.alertColor,
                   ),
                 ),
@@ -599,7 +580,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                   saveInductionData(context);
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                     Mythemes.successColor,
                   ),
                 ),
@@ -643,7 +624,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                     },
                   ),
                   headerText().px12(),*/
-                  Container(height: 720, child: body()),
+                  SizedBox(height: 720, child: body()),
                 ],
               ),
             ),
@@ -1018,7 +999,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                         ).format(fromDate!);
                                       });
 
-                                      print(fromDate);
                                     },
                                     readOnly: true,
                                     enabled: true,
@@ -1087,6 +1067,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Male',
                                           style: TextStyle(
@@ -1094,9 +1075,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                       DropdownMenuItem(
+                                        value: 2,
                                         child: Text(
                                           'Female',
                                           style: TextStyle(
@@ -1104,9 +1085,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 2,
                                       ),
                                       DropdownMenuItem(
+                                        value: 3,
                                         child: Text(
                                           'Others',
                                           style: TextStyle(
@@ -1114,7 +1095,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 3,
                                       ),
 
                                       /* DropdownMenuItem(
@@ -1139,8 +1119,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                         if (genderDrop == 3) {
                                           genderName = "Others";
                                         }
-                                        print("GenderCheck - $genderDrop");
-                                        print("GenderName - $genderName");
                                       });
                                     },
                                   ).p8(),
@@ -1185,6 +1163,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Contract',
                                           style: TextStyle(
@@ -1192,9 +1171,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                       DropdownMenuItem(
+                                        value: 2,
                                         child: Text(
                                           'Permanent',
                                           style: TextStyle(
@@ -1202,9 +1181,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 2,
                                       ),
                                       DropdownMenuItem(
+                                        value: 3,
                                         child: Text(
                                           'Probationer',
                                           style: TextStyle(
@@ -1212,9 +1191,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 3,
                                       ),
                                       DropdownMenuItem(
+                                        value: 4,
                                         child: Text(
                                           'Temporary',
                                           style: TextStyle(
@@ -1222,9 +1201,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 4,
                                       ),
                                       DropdownMenuItem(
+                                        value: 5,
                                         child: Text(
                                           'Trainee',
                                           style: TextStyle(
@@ -1232,9 +1211,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 5,
                                       ),
                                       DropdownMenuItem(
+                                        value: 6,
                                         child: Text(
                                           'Regular',
                                           style: TextStyle(
@@ -1242,9 +1221,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 6,
                                       ),
                                       DropdownMenuItem(
+                                        value: 7,
                                         child: Text(
                                           'Contractual',
                                           style: TextStyle(
@@ -1252,7 +1231,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 7,
                                       ),
                                     ],
                                     onChanged: (int? value) {
@@ -1279,8 +1257,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                         if (empStatusDrop == 7) {
                                           empStatusName = "Contractual";
                                         }
-                                        print("EmpStatus - $empStatusDrop");
-                                        print("EmpStatusName - $empStatusName");
                                       });
                                     },
                                   ).p8(),
@@ -1321,6 +1297,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Single',
                                           style: TextStyle(
@@ -1328,9 +1305,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                       DropdownMenuItem(
+                                        value: 2,
                                         child: Text(
                                           'Married',
                                           style: TextStyle(
@@ -1338,9 +1315,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 2,
                                       ),
                                       DropdownMenuItem(
+                                        value: 3,
                                         child: Text(
                                           'Divorced',
                                           style: TextStyle(
@@ -1348,9 +1325,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 3,
                                       ),
                                       DropdownMenuItem(
+                                        value: 4,
                                         child: Text(
                                           'Widowed',
                                           style: TextStyle(
@@ -1358,9 +1335,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 4,
                                       ),
                                       DropdownMenuItem(
+                                        value: 5,
                                         child: Text(
                                           "Domestic Partner",
                                           style: TextStyle(
@@ -1368,9 +1345,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 5,
                                       ),
                                       DropdownMenuItem(
+                                        value: 6,
                                         child: Text(
                                           'Separated',
                                           style: TextStyle(
@@ -1378,7 +1355,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 6,
                                       ),
                                     ],
                                     onChanged: (int? value) {
@@ -1403,10 +1379,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                         if (maritalStatusDrop == 6) {
                                           maritalStatusName = "Separated";
                                         }
-                                        print("EmpStatus - $maritalStatusDrop");
-                                        print(
-                                          "Marital Status Name - $maritalStatusName",
-                                        );
                                       });
                                     },
                                   ).p8(),
@@ -1443,7 +1415,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                         ).format(fromDate!);
                                       });
 
-                                      print(fromDate);
                                     },
                                     readOnly: true,
                                     enabled: true,
@@ -1542,7 +1513,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           deptId =
                                               onboardDeptListModal!.data![i].id!
                                                   .toString();
-                                          print("Dept Id $deptId");
                                         }
                                       }
                                       setState(() {
@@ -1628,7 +1598,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                                   .data![i]
                                                   .id!
                                                   .toString();
-                                          print("DEsi Id $desigId");
                                         }
                                       }
                                       setState(() {
@@ -1706,7 +1675,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                                   .data![i]
                                                   .id!
                                                   .toString();
-                                          print("Branch Id $branchId");
                                         }
                                       }
                                       setState(() {
@@ -1813,6 +1781,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Skilled',
                                           style: TextStyle(
@@ -1820,9 +1789,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                       DropdownMenuItem(
+                                        value: 2,
                                         child: Text(
                                           'Semi Skilled',
                                           style: TextStyle(
@@ -1830,9 +1799,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 2,
                                       ),
                                       DropdownMenuItem(
+                                        value: 3,
                                         child: Text(
                                           'Unskilled',
                                           style: TextStyle(
@@ -1840,9 +1809,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 3,
                                       ),
                                       DropdownMenuItem(
+                                        value: 4,
                                         child: Text(
                                           'Technical',
                                           style: TextStyle(
@@ -1850,9 +1819,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 4,
                                       ),
                                       DropdownMenuItem(
+                                        value: 5,
                                         child: Text(
                                           'Non Technical',
                                           style: TextStyle(
@@ -1860,9 +1829,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 5,
                                       ),
                                       DropdownMenuItem(
+                                        value: 6,
                                         child: Text(
                                           'Skill Non Defined',
                                           style: TextStyle(
@@ -1870,9 +1839,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 6,
                                       ),
                                       DropdownMenuItem(
+                                        value: 7,
                                         child: Text(
                                           'Highly Skilled',
                                           style: TextStyle(
@@ -1880,9 +1849,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 7,
                                       ),
                                       DropdownMenuItem(
+                                        value: 8,
                                         child: Text(
                                           'Chargehand',
                                           style: TextStyle(
@@ -1890,9 +1859,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 8,
                                       ),
                                       DropdownMenuItem(
+                                        value: 9,
                                         child: Text(
                                           'HighlySkilled',
                                           style: TextStyle(
@@ -1900,9 +1869,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 9,
                                       ),
                                       DropdownMenuItem(
+                                        value: 10,
                                         child: Text(
                                           'Senior Supervisor',
                                           style: TextStyle(
@@ -1910,9 +1879,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 10,
                                       ),
                                       DropdownMenuItem(
+                                        value: 11,
                                         child: Text(
                                           'Supervisor',
                                           style: TextStyle(
@@ -1920,9 +1889,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 11,
                                       ),
                                       DropdownMenuItem(
+                                        value: 12,
                                         child: Text(
                                           'Functional',
                                           style: TextStyle(
@@ -1930,7 +1899,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 12,
                                       ),
                                     ],
                                     onChanged: (int? value) {
@@ -1972,12 +1940,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                         if (skillTypeDrop == 12) {
                                           skillTypeName = "Functional";
                                         }
-                                        print(
-                                          "Skill Type Drop - $skillTypeDrop",
-                                        );
-                                        print(
-                                          "Skill Type Name - $skillTypeName",
-                                        );
                                       });
                                     },
                                   ).p8(),
@@ -2204,6 +2166,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Aadhar Card (Front)',
                                           style: TextStyle(
@@ -2211,9 +2174,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                       DropdownMenuItem(
+                                        value: 2,
                                         child: Text(
                                           'Aadhar Card (Back)',
                                           style: TextStyle(
@@ -2221,9 +2184,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 2,
                                       ),
                                       DropdownMenuItem(
+                                        value: 3,
                                         child: Text(
                                           'Pan Card',
                                           style: TextStyle(
@@ -2231,9 +2194,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 3,
                                       ),
                                       DropdownMenuItem(
+                                        value: 4,
                                         child: Text(
                                           'Police Verification',
                                           style: TextStyle(
@@ -2241,9 +2204,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 4,
                                       ),
                                       DropdownMenuItem(
+                                        value: 5,
                                         child: Text(
                                           'Medical Certificate',
                                           style: TextStyle(
@@ -2251,9 +2214,9 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 5,
                                       ),
                                       DropdownMenuItem(
+                                        value: 6,
                                         child: Text(
                                           'Employee Photo',
                                           style: TextStyle(
@@ -2261,7 +2224,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 6,
                                       ),
 
                                       /* DropdownMenuItem(
@@ -2567,11 +2529,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                       if (result == null) return;
 
                                       final file = result.files.first;
-                                      print('Bytes: ${file.bytes}');
-                                      print('Name: ${file.name}');
-                                      print('Size: ${file.size}');
-                                      print('Size: ${file.extension}');
-                                      print('Path: ${file.path}');
 
                                       final newFile = await saveFilePermanently(
                                         file,
@@ -2715,6 +2672,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Designer',
                                           style: TextStyle(
@@ -2722,7 +2680,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                     ],
 
@@ -2765,6 +2722,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Designer',
                                           style: TextStyle(
@@ -2772,7 +2730,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                     ],
 
@@ -2896,6 +2853,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Designer',
                                           style: TextStyle(
@@ -2903,7 +2861,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                     ],
 
@@ -2946,6 +2903,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Designer',
                                           style: TextStyle(
@@ -2953,7 +2911,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                     ],
 
@@ -3150,6 +3107,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Designer',
                                           style: TextStyle(
@@ -3157,7 +3115,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                     ],
 
@@ -3204,6 +3161,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Designer',
                                           style: TextStyle(
@@ -3211,7 +3169,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                     ],
 
@@ -3343,6 +3300,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Designer',
                                           style: TextStyle(
@@ -3350,7 +3308,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                     ],
 
@@ -3758,7 +3715,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                         ).format(fromDate!);
                                       });
 
-                                      print(fromDate);
                                     },
                                     readOnly: true,
                                     enabled: true,
@@ -3819,7 +3775,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                         ).format(fromDate!);
                                       });
 
-                                      print(fromDate);
                                     },
                                     readOnly: true,
                                     enabled: true,
@@ -3933,6 +3888,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
+                                        value: 1,
                                         child: Text(
                                           'Designer',
                                           style: TextStyle(
@@ -3940,7 +3896,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                        value: 1,
                                       ),
                                     ],
 
@@ -3960,11 +3915,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                       if (result == null) return;
 
                                       final file = result.files.first;
-                                      print('Bytes: ${file.bytes}');
-                                      print('Name: ${file.name}');
-                                      print('Size: ${file.size}');
-                                      print('Size: ${file.extension}');
-                                      print('Path: ${file.path}');
 
                                       final newFile = await saveFilePermanently(
                                         file,
@@ -4079,6 +4029,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4086,7 +4037,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4133,6 +4083,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4140,7 +4091,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4187,6 +4137,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4194,7 +4145,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -4241,6 +4191,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -4248,7 +4199,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -6763,6 +6713,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -6770,7 +6721,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -6810,7 +6760,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                       ).format(fromDate!);
                                     });
 
-                                    print(fromDate);
                                   },
                                   readOnly: true,
                                   enabled: true,
@@ -6875,6 +6824,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -6882,7 +6832,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -6929,6 +6878,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -6936,7 +6886,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -6979,6 +6928,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                   ),
                                   items: [
                                     DropdownMenuItem(
+                                      value: 1,
                                       child: Text(
                                         'Designer',
                                         style: TextStyle(
@@ -6986,7 +6936,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
                                           fontSize: 13,
                                         ),
                                       ),
-                                      value: 1,
                                     ),
                                   ],
 
@@ -7010,7 +6959,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
 
     return
     //ignore this section please
-    ButtonBar(
+    OverflowBar(
       children: [
         /*ElevatedButton(
             onPressed: () {
@@ -7205,37 +7154,30 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
 
     // Construct API URL with parameters
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
     //final response = await MobileHttpClient.instance.post(urlapi);
     http.Response response = await http.Response.fromStream(
       await request.send(),
     );
-    print('URL ${response.request}');
     result = json.decode(response.body.toString());
 
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String reason = mapResponse['reason'];
       String result = mapResponse['result'];
-      print('reason both $reason $result');
-      print('reason${reason}');
       if (result.compareToIgnoringCase("Success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("Error") == 0) {
@@ -7276,7 +7218,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
     request.fields['currentAddress'] = currentAddressController.text;
     request.fields['saveStatus'] = "FINAL";
 
-    print("Uploaded Document -  ${uploadedDocuments.length}");
     // Add dynamic documents (if any)
     for (int i = 0; i < uploadedDocuments.length; i++) {
       String docType =
@@ -7291,27 +7232,21 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
           ); // Use dynamic key
           request.files.add(file);
         } catch (e) {
-          print('Error adding file: $filePath');
-          print('Error: $e');
         }
       } else {
-        print('File not found: $filePath');
       }
     }
 
     // Construct the API URL with parameters (for debugging)
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Debugging: Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
 
     try {
       // Send the request
@@ -7319,9 +7254,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
 
       // Parse the response
       http.Response httpResponse = await http.Response.fromStream(response);
-      print('URL: ${httpResponse.request}');
-      print('Response Status Code: ${httpResponse.statusCode}');
-      print('Response Body: ${httpResponse.body}');
 
       if (httpResponse.statusCode == 200) {
         Navigator.of(context, rootNavigator: true).pop();
@@ -7333,7 +7265,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
         if (result.compareToIgnoringCase("Success") == 0) {
           CommonNotificationPage.showDialgSucess(
             context,
-            reason.upperCamelCase + " ",
+            "${reason.upperCamelCase} ",
             "Success",
           );
         } else if (result.compareToIgnoringCase("Error") == 0) {
@@ -7344,10 +7276,8 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
           );
         }
       } else {
-        print('API Call Failed: ${httpResponse.statusCode}');
       }
     } catch (e) {
-      print('Error occurred: $e');
     }
   }
 
@@ -7401,37 +7331,30 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
 
     // Construct API URL with parameters
     String apiWithParams =
-        urlapi.toString() +
-        '?' +
-        request.fields.entries
+        '$urlapi?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
     //final response = await MobileHttpClient.instance.post(urlapi);
     http.Response response = await http.Response.fromStream(
       await request.send(),
     );
-    print('URL ${response.request}');
     result = json.decode(response.body.toString());
 
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String reason = mapResponse['reason'];
       String result = mapResponse['result'];
-      print('reason both $reason $result');
-      print('reason${reason}');
       if (result.compareToIgnoringCase("Success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("Error") == 0) {
@@ -7543,10 +7466,6 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
 
   void openFile(PlatformFile file) {
     OpenFile.open(file.path!);
-    print('Bytes: ${file.name}');
-    print('Size: ${file.size}');
-    print('Size: ${file.extension}');
-    print('Path: ${file.path}');
   }
 
   Future<File> saveFilePermanently(PlatformFile file) async {
@@ -7559,7 +7478,7 @@ class _AddInductionProcessState extends State<AddInductionProcess> {
 // The DismissKeybaord widget (it's reusable)
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

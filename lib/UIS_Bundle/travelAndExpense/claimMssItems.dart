@@ -19,7 +19,7 @@ import '../../modules/claimAndReimbursement/mss/claimMssApprovalPage.dart';
 import '../../modules/claimAndReimbursement/newModalClasses/claimMssListModal.dart';
 
 class UIS_ClaimMSSItemsList extends StatefulWidget {
-  const UIS_ClaimMSSItemsList({Key? key}) : super(key: key);
+  const UIS_ClaimMSSItemsList({super.key});
 
   static const String _title = 'Employee List';
 
@@ -86,9 +86,8 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
     setState(() {
       setApprovalLevel();
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -113,10 +112,6 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
       permissionId = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
       statusUpdate = "LEVEL_THREE_PENDING";
     }*/
-    print("Claim L1 $claimLevelOne");
-    print("Claim L2 $claimLevelTwo");
-    print("Claim L3 $claimLevelThree");
-    print("Status $statusUpdate");
 
     /* lOne = claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
     lTwo = claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
@@ -164,7 +159,6 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
         claimApproverListModalGlobaled = claimApproverListModalGlobal;
         isLoading = false;
       });
-      print('employeeList00${claimApproverListModalGlobal!.data!.length}');
     });
   }
 
@@ -183,7 +177,6 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
   Future<ClaimApproverListModalClass> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimApproveListApi;
-    print('employeeList11: ${SessionId}');
     ClaimApproverListModalClass employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -195,15 +188,12 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
       "profileId=$getProfileId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
       isLoading = true;
     });
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = ClaimApproverListModalClass.fromJson(mapResponse);
     totalDraftAmt = employeeListModel.draftList;
     totalDisApproved = employeeListModel.disAppList;
@@ -219,7 +209,6 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -320,7 +309,6 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -330,7 +318,6 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if (index == 3) {
             Navigator.push(
@@ -340,14 +327,12 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -819,12 +804,10 @@ class _UIS_ClaimMSSItemsListState extends State<UIS_ClaimMSSItemsList>
             itemCount: foundDataNew!.length,
             itemBuilder: (context, i) {
               foundDataNew![i].status;
-              print(foundDataNew![i].status);
               return InkWell(
                 onTap: () {
                   levelStatusCheckUIS = foundDataNew![i].status;
                   empIdSendUIS = foundDataNew![i].empId.toString();
-                  print("EMP ID --> $empIdSendUIS");
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder:

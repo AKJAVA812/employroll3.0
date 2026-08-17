@@ -1,10 +1,8 @@
-import 'dart:convert';
 
 import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/workDoneReport/workDoneReportModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -22,10 +20,10 @@ class WorkDoneReport extends StatefulWidget {
   final String toDatePickedString;
 
   const WorkDoneReport({
-    Key? key,
+    super.key,
     required this.forDatePickedString,
     required this.toDatePickedString,
-  }) : super(key: key);
+  });
 
   @override
   State<WorkDoneReport> createState() =>
@@ -37,10 +35,10 @@ SessionManager shared = SessionManager();
 String? sessionId;
 List<DataNew>? allUsernew = [];
 List<DataNew>? foundDataNew = [];
-late WorkdoneReportModel? workDoneReportModelGlobal = WorkdoneReportModel(
+WorkdoneReportModel? workDoneReportModelGlobal = WorkdoneReportModel(
   data: [],
 );
-late WorkdoneReportModel? workDoneReportModelGlobaled = WorkdoneReportModel(
+WorkdoneReportModel? workDoneReportModelGlobaled = WorkdoneReportModel(
   data: [],
 );
 
@@ -55,20 +53,14 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
   @override
   void initState() {
     getSharedPrfanceList();
-    var listLength;
+    int listLength;
     listLength = foundDataNew!.length;
-    print('listLength $listLength');
-    print(forDatePickedString);
-    print(toDatePickedString);
     // TODO: implement initState
     super.initState();
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
-    print('ResponseAttendance: ${sessionId}');
-    print('ResponseAttendance: ${forDatePickedString}');
-    print('ResponseAttendance: ${toDatePickedString}');
     //await Future.delayed(Duration(seconds: 3));
     Future<WorkdoneReportModel> getEmployeeList11 = getEmployeeList(
       sessionId!,
@@ -88,7 +80,6 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
         workDoneReportModelGlobal = value;
         workDoneReportModelGlobaled = workDoneReportModelGlobal;
       });
-      print('workDoneReport00${workDoneReportModelGlobal!.data!.length}');
     });
   }
 
@@ -216,7 +207,6 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<DataNew>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -323,7 +313,6 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -333,7 +322,6 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -342,7 +330,6 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
                 builder: (context) => GetAttendanceDet(showAppBar: true),
               ),
             );
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -353,13 +340,11 @@ class _WorkDoneReportState extends State<WorkDoneReport> {
             );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -474,7 +459,7 @@ class SearchItems extends SearchDelegate {
 class GetWorkDoneReports extends StatefulWidget {
   final WorkdoneReportModel workdoneReportModel;
 
-  GetWorkDoneReports(this.workdoneReportModel);
+  const GetWorkDoneReports(this.workdoneReportModel, {super.key});
 
   @override
   State<GetWorkDoneReports> createState() =>
@@ -527,7 +512,7 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
             children: [
               Row(
                 children: [
-                  Container(width: 75, child: "Mobile No :".text.make()),
+                  SizedBox(width: 75, child: "Mobile No :".text.make()),
                   foundDataNew![itemCount].cNumber
                       .toString()
                       .text
@@ -538,7 +523,7 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
               ),
               Row(
                 children: [
-                  Container(width: 75, child: "Email Id :".text.make()),
+                  SizedBox(width: 75, child: "Email Id :".text.make()),
                   Expanded(
                     child:
                         foundDataNew![itemCount].cMailId
@@ -552,7 +537,7 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
               ),
               Row(
                 children: [
-                  Container(width: 75, child: "Time :".text.make()),
+                  SizedBox(width: 75, child: "Time :".text.make()),
                   foundDataNew![itemCount].time
                       .toString()
                       .text
@@ -563,7 +548,7 @@ class _GetWorkDoneReportsState extends State<GetWorkDoneReports> {
               ),
               Row(
                 children: [
-                  Container(width: 75, child: "Location :".text.make()),
+                  SizedBox(width: 75, child: "Location :".text.make()),
                   Expanded(
                     child:
                         foundDataNew![itemCount].cAddress

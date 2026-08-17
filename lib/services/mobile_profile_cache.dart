@@ -37,7 +37,6 @@ class MobileProfileCache {
           .map(ProfileData.fromJson)
           .toList();
     } catch (error) {
-      print('[MOBILE-AUTH] PROFILE_CACHE -> parse error=$error');
       return <ProfileData>[];
     }
   }

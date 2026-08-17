@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:er_flutter_project/commanScreen/allAPIList.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';

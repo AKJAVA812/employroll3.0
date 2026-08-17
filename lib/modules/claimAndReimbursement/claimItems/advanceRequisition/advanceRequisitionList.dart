@@ -19,7 +19,7 @@ import '../modalClass/advanceRequisitionListModal.dart';
 class AdvanceRequisitionList extends StatefulWidget {
   final AdvanceRequestedListModal advanceRequestedListModal;
 
-  AdvanceRequisitionList(this.advanceRequestedListModal);
+  const AdvanceRequisitionList(this.advanceRequestedListModal, {super.key});
 
   @override
   State<AdvanceRequisitionList> createState() =>
@@ -46,13 +46,11 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
 
   @override
   void initState() {
-    print('object change call init');
     // TODO: implement initState
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
     super.initState();
     WidgetsBinding.instance.addObserver(this);
@@ -63,7 +61,6 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
     setState(() {
-      print("update List");
       getSharedPrfanceList();
     });
   }
@@ -110,11 +107,9 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
   Future<AdvanceRequestedListModal> getAdvanceReqList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.advanceRequisitionList;
-    print('employeeList11: ${SessionId}');
     AdvanceRequestedListModal advanceRequestedListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('responseemployeeList ${response.body}');
     mapResponse = json.decode(response.body);
     advanceRequestedListModal = AdvanceRequestedListModal.fromJson(mapResponse);
     allUsernew = advanceRequestedListModal.claimAdvDatalist;
@@ -127,7 +122,6 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<ClaimAdvDatalist>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -165,7 +159,6 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
 
   @override
   Widget build(BuildContext context) {
-    print('build method call');
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(double.infinity, 100),
@@ -251,9 +244,7 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
             onTap: () {
               claimId = foundDataNew![itemCount].claimId;
               setState(() {
-                print('object in $itemCount');
               });
-              print('object out $itemCount');
               var statusCheck =
                   foundDataNew![itemCount].approvedStatus.toString();
               if (statusCheck == 'PENDING') {
@@ -486,18 +477,14 @@ class _AdvanceRequisitionListState extends State<AdvanceRequisitionList>
       "claimId=$claimId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(context);
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+        showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,

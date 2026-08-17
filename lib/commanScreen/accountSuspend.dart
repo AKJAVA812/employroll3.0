@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:er_flutter_project/singUP/model/loginModel.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 //import 'package:safe_device/safe_device.dart';
 //import 'package:trust_location/trust_location.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/singUP/login_page.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
@@ -18,6 +16,8 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'allAPIList.dart';
 
 class AccountSuspendPage extends StatefulWidget {
+  const AccountSuspendPage({super.key});
+
   @override
   _AccountSuspendPageState createState() => _AccountSuspendPageState();
 }
@@ -64,7 +64,7 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
       actions: [
         TextButton(
           onPressed: () async {
-            await getLogout(this.context);
+            await getLogout(context);
             shared.setSessionId("");
             shared.setAdminRole(0);
             shared.setEmpRoll(0);
@@ -72,10 +72,8 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
             shared.setMobAction(0);
             final service = FlutterBackgroundService();
             var isRunning = await service.isRunning();
-            print(isRunning);
             if (isRunning) {
               service.invoke("stopService");
-              print("Background Stop");
             }
             if (!isRunning) {
               text = 'Stop Service';
@@ -114,10 +112,6 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
     final accessToken = await shared.getAccessToken();
     final tokenType = await shared.getTokenType() ?? 'Bearer';
     final urlapi = Uri.parse("$conn$apiUrl");
-    print('[MOBILE-AUTH] LOGOUT -> POST $urlapi');
-    print(
-      '[MOBILE-AUTH] LOGOUT headers -> tokenPresent=${accessToken != null && accessToken.isNotEmpty} sessionPresent=${currentSessionId != null && currentSessionId.isNotEmpty}',
-    );
 
     final response = await MobileHttpClient.instance.post(
       urlapi,
@@ -129,10 +123,6 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
       },
     );
 
-    print('[MOBILE-AUTH] LOGOUT request -> ${response.request}');
-    print(
-      '[MOBILE-AUTH] LOGOUT <- status=${response.statusCode} body=${response.body}',
-    );
     if (response.body.isNotEmpty) {
       mapResponse = json.decode(response.body);
     } else {
@@ -148,7 +138,6 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
         result.compareToIgnoringCase('success') == 0) {
       await NotificationService.instance.deactivateCurrentToken();
       await shared.clearMobileAuth();
-      print('[MOBILE-AUTH] LOGOUT -> success');
       Fluttertoast.showToast(
         msg: message.isNotEmpty ? message : "Logout Successfully !!",
         toastLength: Toast.LENGTH_SHORT,
@@ -159,7 +148,6 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
         fontSize: 16.0,
       );
     } else {
-      print('[MOBILE-AUTH] LOGOUT -> error message=$message');
       Fluttertoast.showToast(
         msg: message.isNotEmpty ? message : "Logout Error !!",
         toastLength: Toast.LENGTH_SHORT,
@@ -182,10 +170,8 @@ class _AccountSuspendPageState extends State<AccountSuspendPage> {
     shared.setMobAction(0);
     final service = FlutterBackgroundService();
     var isRunning = await service.isRunning();
-    print(isRunning);
     if (isRunning) {
       service.invoke("stopService");
-      print("Background Stop");
     }
     if (!isRunning) {
       text = 'Stop Service';

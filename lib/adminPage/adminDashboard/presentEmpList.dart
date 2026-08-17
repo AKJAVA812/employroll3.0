@@ -11,7 +11,7 @@ import '../../profiles/profilePageWithHead.dart';
 class PresentEmpList extends StatefulWidget {
   final DashboardModel dashboardModelGlobal;
 
-  PresentEmpList(this.dashboardModelGlobal);
+  const PresentEmpList(this.dashboardModelGlobal, {super.key});
 
   @override
   State<PresentEmpList> createState() => _PresentEmpListState(dashboardModelGlobal);

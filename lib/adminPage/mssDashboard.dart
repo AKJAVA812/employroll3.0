@@ -30,7 +30,7 @@ import 'modelClass/shiftListModal.dart';
 class MSSDashboard extends StatefulWidget {
   final DashboardModel dashboardModel1;
 
-  MSSDashboard(this.dashboardModel1);
+  const MSSDashboard(this.dashboardModel1, {super.key});
 
   @override
   State<MSSDashboard> createState() => _MSSDashboardState(dashboardModel1);
@@ -54,9 +54,9 @@ var eventSingleDateString;
 var day = DateTime.now();
 var single = DateFormat('dd');
 var singleDay = single.format(day);
-late List<String?> list = [];
-late List<String?> branchList = [];
-late List<String?>? shiftList = [];
+List<String?> list = [];
+List<String?> branchList = [];
+List<String?>? shiftList = [];
 bool isLoading = true;
 String valuenew = "listText";
 String shiftValue = "listText";
@@ -92,8 +92,6 @@ class _MSSDashboardState extends State<MSSDashboard> {
     userPanel = await shared.getUserPanel();
     defaultProfileName = await shared.getDefaultProfileName();
     defaultProfileId = await shared.getDefaultProfileId();
-    print("Default Profile Name - $defaultProfileName");
-    print("Default Profile Id - $defaultProfileId");
     Future<DashboardModel> getEmployeeList11 = getDashboardData(sessionId!);
     Future<BranchListModal> getEmployeeList12 = getBranchList(sessionId!);
     Future<ShiftListModal> getEmployeeList13 = getShiftList(sessionId!);
@@ -165,7 +163,6 @@ class _MSSDashboardState extends State<MSSDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -190,7 +187,6 @@ class _MSSDashboardState extends State<MSSDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('BRANCH URL ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -210,7 +206,6 @@ class _MSSDashboardState extends State<MSSDashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.shiftListApi;
 
-    print('employeeList11: ${SessionId}');
     ShiftListModal shiftListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -220,12 +215,10 @@ class _MSSDashboardState extends State<MSSDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     shiftListModal = ShiftListModal.fromJson(mapResponse);
     for (int i = 0; i < shiftListModal.data!.length; i++) {
       var shiftName = shiftListModal.data![i].shiftName;
@@ -239,7 +232,6 @@ class _MSSDashboardState extends State<MSSDashboard> {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.eventListModalApi;
 
-    print('employeeList11: ${SessionId}');
     EventsListModal eventsListModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -250,12 +242,10 @@ class _MSSDashboardState extends State<MSSDashboard> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.request}');
     //print('response body ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse;
-    print('Body Data $getData');
     eventsListModal = EventsListModal.fromJson(mapResponse);
     return eventsListModal;
   }
@@ -425,27 +415,22 @@ class _MSSDashboardState extends State<MSSDashboard> {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.reportSectionHead);
-            print('Reports');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -487,25 +472,22 @@ class _MSSDashboardState extends State<MSSDashboard> {
     earlyOutEmp = dashboardModelGlobal!.earlyOutEmp;
     halfEmp = dashboardModelGlobal!.halfEmp;
     overTime = dashboardModelGlobal!.otEmp;
-    print("Total Employees $totalPresentEmp");
     shift = 0;
     branchId = 0;
     int value = 1;
 
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     if (eventsListModalGlobal != null &&
         eventsListModalGlobal!.bdayList != null) {
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
-        print("oldEvent $oldEvent");
       }
     } else {
-      print("bdayList is null or eventsListModalGlobal is null");
     }
 
     if (eventsListModalGlobal != null &&
@@ -513,10 +495,8 @@ class _MSSDashboardState extends State<MSSDashboard> {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
-        print("oldJobEvent $oldJobEvent");
       }
     } else {
-      print("job list is null or eventsListModalGlobal is null");
     }
 
     /*for(int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
@@ -527,7 +507,6 @@ class _MSSDashboardState extends State<MSSDashboard> {
 */
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-    print("Todayevent $todayEvent");
     return DismissKeyboard(
       child: SingleChildScrollView(
         child: Padding(
@@ -586,7 +565,6 @@ class _MSSDashboardState extends State<MSSDashboard> {
                     onChanged: (i) {
                       setState(() {
                         value = i;
-                        print(i);
                       });
                       if (value == 0) {
                         Navigator.pushNamed(
@@ -750,11 +728,10 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                   style: TextStyle(fontSize: 10),
                                 ),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (newVal) {
                             branchId = newVal!;
-                            print("Branch ID $branchId");
 
                             setState(() {
                               getSharedPrfanceList();
@@ -815,11 +792,10 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                   ),
                                 ),
                               );
-                            }).toList(),
+                            }),
                           ],
                           onChanged: (newVal) {
                             shift = newVal!;
-                            print("Shift ID $shift");
 
                             setState(() {
                               getSharedPrfanceList();
@@ -1571,7 +1547,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                                         .dob
                                                         .toString(),
                                                   ),
-                                                  leading: Container(
+                                                  leading: SizedBox(
                                                     width: 40,
                                                     height: 40,
                                                     child: CircleAvatar(
@@ -1636,7 +1612,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                                         .doj
                                                         .toString(),
                                                   ),
-                                                  leading: Container(
+                                                  leading: SizedBox(
                                                     width: 40,
                                                     height: 40,
                                                     child: CircleAvatar(
@@ -1705,7 +1681,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                                             .dob
                                                             .toString(),
                                                       ),
-                                                      leading: Container(
+                                                      leading: SizedBox(
                                                         width: 40,
                                                         height: 40,
                                                         child: CircleAvatar(
@@ -1766,7 +1742,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                                             .doj
                                                             .toString(),
                                                       ),
-                                                      leading: Container(
+                                                      leading: SizedBox(
                                                         width: 40,
                                                         height: 40,
                                                         child: CircleAvatar(
@@ -1807,26 +1783,23 @@ class _MSSDashboardState extends State<MSSDashboard> {
   }
 
   TabSection(EventsListModal eventsListModal) {
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
-      print("oldEvent $oldEvent");
     }
 
     for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
-      print("oldJobEvent $oldJobEvent");
     }
 
     todayEvent = DateTime.now();
     todayEvent = DateFormat('dd-MM-yyyy').format(date);
-    print("Todayevent $todayEvent");
 
     return DefaultTabController(
       length: 3,
@@ -1898,7 +1871,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                           .dob
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -1953,7 +1926,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                           .doj
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -2011,7 +1984,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                               .dob
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2062,7 +2035,7 @@ class _MSSDashboardState extends State<MSSDashboard> {
                                               .doj
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -2095,6 +2068,8 @@ class _MSSDashboardState extends State<MSSDashboard> {
 }
 
 class FilterBottomSheet extends StatefulWidget {
+  const FilterBottomSheet({super.key});
+
   @override
   _FilterBottomSheetState createState() => _FilterBottomSheetState();
 }
@@ -2191,8 +2166,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: ElevatedButton.icon(
               onPressed: () {
                 Navigator.pop(context);
-                print("Selected Org: $selectedOrg");
-                print("Selected Date: $selectedDateFormatted");
               },
               icon: Icon(Icons.filter_alt),
               label: Text("Apply Filter"),
@@ -2209,7 +2182,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

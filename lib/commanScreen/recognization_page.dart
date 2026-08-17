@@ -7,7 +7,7 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 
 class RecognizePage extends StatefulWidget {
   final String? path;
-  const RecognizePage({Key? key, this.path}) : super(key: key);
+  const RecognizePage({super.key, this.path});
 
   @override
   State<RecognizePage> createState() => _RecognizePageState();

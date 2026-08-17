@@ -18,7 +18,7 @@ class ShortLeaveApprovalPage extends StatefulWidget {
   PendingRequisitionModel pendingRequisitionModel;
   int itemCount;
 
-  ShortLeaveApprovalPage(this.pendingRequisitionModel, this.itemCount);
+  ShortLeaveApprovalPage(this.pendingRequisitionModel, this.itemCount, {super.key});
 
   @override
   State<ShortLeaveApprovalPage> createState() =>
@@ -60,12 +60,10 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
     userPanel = await shared.getUserPanel();
-    print("User Panel - $userPanel");
 
     setState(() {});
     if (userPanel == "MSS") {
       _inTimePicker = foundDataNewMSS![itemCount].inTime.toString();
-      print("Intime - $_inTimePicker");
       _outTimePicker = foundDataNewMSS![itemCount].outTime.toString();
       employeeNameset = foundDataNewMSS![itemCount].empName.toString();
       departmentset = foundDataNewMSS![itemCount].department.toString();
@@ -76,7 +74,6 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
       relaxationHourSet = foundDataNewMSS![itemCount].relaxationHour.toString();
       workingHrsSet = foundDataNewMSS![itemCount].shiftWorkingHour.toString();
       shortLeave = foundDataNewMSS![itemCount].shortLeaveRequistionType;
-      print("Short Leave Fields - $shortLeave");
       actualTimeset = foundDataNewMSS![itemCount].actualInTime;
       inTimeReqset = foundDataNewMSS![itemCount].inTime;
       //inRemarkset= foundDataNewMSS![itemCount].inRemarks;
@@ -96,7 +93,6 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
       relaxationHourSet = foundDataNewMSS![itemCount].relaxationHour.toString();
       workingHrsSet = foundDataNewMSS![itemCount].shiftWorkingHour.toString();
       shortLeave = foundDataNewMSS![itemCount].shortLeaveRequistionType;
-      print("Short Leave Fields - $shortLeave");
       actualTimeset = foundDataNewMSS![itemCount].actualInTime;
       inTimeReqset = foundDataNewMSS![itemCount].inTime;
       //inRemarkset= foundDataNewMSS![itemCount].inRemarks;
@@ -125,7 +121,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
-  List<bool> _isSelected = [false, false, false];
+  final List<bool> _isSelected = [false, false, false];
   bool nightShift = false;
   bool compOff = false;
   bool shortLeave = false;
@@ -451,9 +447,8 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
                   Row(
                     children: [
                       Expanded(
-                        child: ButtonBar(
+                        child: OverflowBar(
                           alignment: MainAxisAlignment.center,
-                          buttonPadding: Vx.mOnly(right: 16),
                           children: [
                             ElevatedButton(
                               onPressed: () {
@@ -463,7 +458,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
                                 );
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                   Mythemes.dangerColorOne,
                                 ),
                               ),
@@ -471,14 +466,13 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
                             ).wh(150, 40).py12(),
                             ElevatedButton(
                               onPressed: () {
-                                print(inRemarkController.text);
                                 approvedRequisition(
                                   inRemarkController.text,
                                   attReqId,
                                 );
                               },
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                   Mythemes.successColor,
                                 ),
                               ),
@@ -512,7 +506,6 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
                 ),
               );
               //Navigator.pop(context);
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -522,17 +515,14 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
               Navigator.pop(context);
-              print('Attendance');
             }
             if (index == 3) {
               Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('My Reports');
             }
             if (index == 4) {
               Navigator.pushNamed(
@@ -543,7 +533,6 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";
@@ -589,20 +578,16 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'].toString();
       String title = mapResponse['title'].toString();
       String body = mapResponse['body'].toString();
       String reason = mapResponse['reason'].toString();
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(context, "$reason" + " ", "Success");
+        showDialgSucess1(context, "$reason ", "Success");
       } else if (result.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(context, reason.upperCamelCase, " Error ");
       }
@@ -621,7 +606,6 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
@@ -689,7 +673,7 @@ class _ShortLeaveApprovalPageState extends State<ShortLeaveApprovalPage>
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

@@ -14,8 +14,8 @@ class SeparationListModal {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    if (this.list != null) {
-      data['list'] = this.list!.map((v) => v.toJson()).toList();
+    if (list != null) {
+      data['list'] = list!.map((v) => v.toJson()).toList();
     }
     return data;
   }

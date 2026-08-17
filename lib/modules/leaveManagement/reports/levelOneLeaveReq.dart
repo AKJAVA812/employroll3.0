@@ -23,7 +23,7 @@ import 'modalClass/levelOnePendingLeaveModal.dart';
 
 class LevelOnePendingLeave extends StatefulWidget {
   final LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
-  const LevelOnePendingLeave(this.pendingLeaveRequisitionModal);
+  const LevelOnePendingLeave(this.pendingLeaveRequisitionModal, {super.key});
 
   @override
   State<LevelOnePendingLeave> createState() =>
@@ -72,9 +72,8 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -101,13 +100,11 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
         pendingLeaveReqLabeled = pendingLeaveReqLabel;
         if (foundDataNew != null) {
           foundDataNew!.length;
-          print("Fetch data $foundDataNew");
         } else {
           Center(child: "There is no data available right now".text.make());
           foundDataNew = [];
         }
       });
-      print('employeeList00${pendingLeaveReqLabel!.result!.data!.length}');
     });
   }
 
@@ -149,7 +146,6 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
   Future<LevelOnePendingLeaveModal> getPendingLeaveReq(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.levelOneLeaveList;
-    print('employeeList11: ${SessionId}');
     LevelOnePendingLeaveModal pendingLeaveRequisitionModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?sessionId=$SessionId&"
@@ -158,16 +154,12 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
       "orgId=0",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
     if (getData == null) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
-    print('responseemployeeList $getData');
     pendingLeaveRequisitionModal = LevelOnePendingLeaveModal.fromJson(
       mapResponse,
     );
@@ -182,7 +174,6 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
 
   // This function is called whenever the text field changes
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -410,7 +401,6 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
                   onChanged: (i) {
                     setState(() {
                       value = i;
-                      print(i);
                     });
 
                     if (value == 0) {
@@ -459,7 +449,6 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -467,16 +456,13 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-            print('Leave');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -484,7 +470,6 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -536,7 +521,6 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
           final item = foundDataNew![index];
           return InkWell(
             onTap: () {
-              print(foundDataNew!.length);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder:
@@ -680,9 +664,6 @@ class _LevelOnePendingLeaveState extends State<LevelOnePendingLeave>
                               color: Colors.blueAccent,
                             ),
                             onPressed: () {
-                              print(
-                                "Attachment tapped for ${item.employeeName}",
-                              );
                               if (item.document != null &&
                                   item.document.toString().isNotEmpty) {
                                 showAttachmentBottomSheet(

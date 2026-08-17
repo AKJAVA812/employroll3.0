@@ -11,7 +11,7 @@ import '../myAllReports.dart';
 class AbsentEmpList extends StatefulWidget {
   final EssDashboarrdModel dashboardModelGlobal;
 
-  AbsentEmpList(this.dashboardModelGlobal);
+  const AbsentEmpList(this.dashboardModelGlobal, {super.key});
 
 
   @override
@@ -68,13 +68,11 @@ class _AbsentEmpListState extends State<AbsentEmpList> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
             //Navigator.pop(context);
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
@@ -84,7 +82,6 @@ class _AbsentEmpListState extends State<AbsentEmpList> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => MyAllReportsPage(showAppBar: true,)));
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
@@ -94,7 +91,6 @@ class _AbsentEmpListState extends State<AbsentEmpList> {
             //     MaterialPageRoute(builder: (context) => ProfilePageNew())
             // );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -140,7 +136,6 @@ class _AbsentEmpListState extends State<AbsentEmpList> {
 
   getPresentEmp(EssDashboarrdModel dashboardModel){
 
-    print("Data Length - ${dashboardModelGlobal!.countData!.data!.length}");
  /*   for(int i = 0; i < dashboardModelGlobal!.countData!.data!.length; i++) {
       itemCount = dashboardModelGlobal!.countData!.absentList!.length;
       onDate = dashboardModelGlobal!.countData!.absentList![i].logDate!;
@@ -150,7 +145,6 @@ class _AbsentEmpListState extends State<AbsentEmpList> {
     //var distance =dashboardModelGlobal!.presentEmp![itemCount].distance;
 
 
-    print("ItemCount - $itemCount");
     return ListView.builder(
       padding: const EdgeInsets.all(4.0),
       itemCount: dashboardModelGlobal!.countData!.absentList!.length,
@@ -171,11 +165,8 @@ class _AbsentEmpListState extends State<AbsentEmpList> {
             //workHour =  dashboardModelGlobal!.countData!.absentList![i].workingHours!.toString();
             absentDate =  dashboardModelGlobal!.countData!.absentList![i].logDate!.toString();
 
-            print("Absent Date- $absentDate");
           }
-          print("Status - $status");
         } else {
-          print("Invalid index or empty list.");
         }
         return InkWell(
           onTap: () {

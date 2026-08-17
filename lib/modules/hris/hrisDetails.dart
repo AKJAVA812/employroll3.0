@@ -20,7 +20,7 @@ import '../../ess/myAllReports.dart';
 import '../../sharedPrefancePage/ShardPre.dart';
 
 class HRISDetails extends StatefulWidget {
-  const HRISDetails({Key? key}) : super(key: key);
+  const HRISDetails({super.key});
 
   @override
   State<HRISDetails> createState() => _HRISDetailsState();
@@ -87,21 +87,6 @@ class _HRISDetailsState extends State<HRISDetails> {
     bankAccName.text = await shared.getBankName();
     dateOfjoin = await shared.getDoj();
 
-    print('Image: ${urlImage.text}');
-    print('Employee Name: ${name.text}');
-    print('Email Id: ${emailId.text}');
-    print('Department: ${dept.text}');
-    print('Branch: ${branch.text}');
-    print('Date of Birth: ${dateOfBirth.text}');
-    print('Mobile No: ${mobileNo.text}');
-    print('Designation: ${designation.text}');
-    print('Aadhar No.: ${aadhar.text}');
-    print('PF No.: ${pfNo.text}');
-    print('ESIC No.: ${esicNo.text}');
-    print('Bank A/c: ${bankAcc.text}');
-    print('IFSC Code: ${ifscCode.text}');
-    print('Bank Name: ${bankAccName.text}');
-    print('Date of Joining: ${dateOfjoin.text}');
     setState(() {});
   }
 
@@ -119,7 +104,7 @@ class _HRISDetailsState extends State<HRISDetails> {
           height: 120,
           child: Column(
             children: [
-              ButtonBar(
+              OverflowBar(
                 alignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
@@ -132,10 +117,6 @@ class _HRISDetailsState extends State<HRISDetails> {
 
                         //picker.dispose();
                         if (imageValue == null) return;
-                        print(
-                          "Heloo ji "
-                          "$imageValue",
-                        );
                         /*setState(() {
                               final imagePath= File(imageValue!.path);
                               //this._workDoneImage=imagePath;
@@ -148,12 +129,10 @@ class _HRISDetailsState extends State<HRISDetails> {
                           urlImage =
                               imageValue!
                                   .path; // âœ… keep the actual path, not file.toString()
-                          print("IMAGE Change - $urlImage");
                         });
                         imageValue = null;
                         //imageCache.clear();
                       } on Exception catch (e) {
-                        print('failed to upload: $e');
                       }
                       Navigator.of(context, rootNavigator: true).pop();
                     },
@@ -169,10 +148,6 @@ class _HRISDetailsState extends State<HRISDetails> {
 
                         //picker.dispose();
                         if (imageValue == null) return;
-                        print(
-                          "Heloo ji "
-                          "$imageValue",
-                        );
                         /*setState(() {
                               final imagePath= File(imageValue!.path);
                               //this._workDoneImage=imagePath;
@@ -186,12 +161,10 @@ class _HRISDetailsState extends State<HRISDetails> {
                           urlImage =
                               imageValue!
                                   .path; // âœ… keep the actual path, not file.toString()
-                          print("IMAGE Change - $urlImage");
                         });
                         imageValue = null;
                         //imageCache.clear();
                       } on Exception catch (e) {
-                        print('failed to upload: $e');
                       }
                       Navigator.of(context, rootNavigator: true).pop();
                     },
@@ -531,7 +504,6 @@ class _HRISDetailsState extends State<HRISDetails> {
                                   //  DateFormat.yMd().format(date!).toString();
                                 });
 
-                                print(date);
                               },
                               controller: dateOfBirth,
                               enabled: true,
@@ -575,7 +547,6 @@ class _HRISDetailsState extends State<HRISDetails> {
                                   //  DateFormat.yMd().format(date!).toString();
                                 });
 
-                                print(date);
                               },
                               controller: TextEditingController(
                                 text: dateOfjoin,
@@ -874,9 +845,8 @@ class _HRISDetailsState extends State<HRISDetails> {
                     Container(
                       height: 90,
                       color: context.cardColor,
-                      child: ButtonBar(
+                      child: OverflowBar(
                         alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
                         children: [
                           ElevatedButton(
                             onPressed: () {
@@ -891,16 +861,9 @@ class _HRISDetailsState extends State<HRISDetails> {
                                 dateOfBirth.text,
                               );
 
-                              print(aadhar.text);
-                              print(bankAcc.text);
-                              print(bankAccName.text);
-                              print(esicNo.text);
-                              print(ifscCode.text);
-                              print(pfNo.text);
-                              print(dateOfBirth.text);
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.successColor,
                               ),
                             ),
@@ -946,7 +909,6 @@ class _HRISDetailsState extends State<HRISDetails> {
                 ),
               );
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -956,7 +918,6 @@ class _HRISDetailsState extends State<HRISDetails> {
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.push(
@@ -965,7 +926,6 @@ class _HRISDetailsState extends State<HRISDetails> {
                   builder: (context) => GetAttendanceDet(showAppBar: true),
                 ),
               );
-              print('My Requests');
             }
             if (index == 3) {
               Navigator.push(
@@ -976,7 +936,6 @@ class _HRISDetailsState extends State<HRISDetails> {
               );
 
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -987,7 +946,6 @@ class _HRISDetailsState extends State<HRISDetails> {
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -1046,19 +1004,15 @@ class _HRISDetailsState extends State<HRISDetails> {
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(this.context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'].toString();
       String status = mapResponse['status'].toString();
       String reason = mapResponse['reason'].toString();
-      print('result both $result $reason');
-      print('result${result}');
       if (status.compareToIgnoringCase("success") == 0) {
-        showDialgSucess1(this.context, result.upperCamelCase + " ", "Success");
+        showDialgSucess1(this.context, "${result.upperCamelCase} ", "Success");
       } else if (status.compareToIgnoringCase("error") == 0) {
         showDialgSucess1(this.context, result.upperCamelCase, " Error ");
       }
@@ -1114,7 +1068,7 @@ class _HRISDetailsState extends State<HRISDetails> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

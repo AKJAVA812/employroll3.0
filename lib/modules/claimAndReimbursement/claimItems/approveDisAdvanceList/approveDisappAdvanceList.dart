@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
@@ -10,7 +9,7 @@ import '../modalClass/appDisAdvListModal.dart';
 
 class ApproveDisapAdvanceRequisitionList extends StatefulWidget {
   final AppDisAdvListModal appDisAdvListModal;
-  ApproveDisapAdvanceRequisitionList(this.appDisAdvListModal);
+  const ApproveDisapAdvanceRequisitionList(this.appDisAdvListModal, {super.key});
   @override
   State<ApproveDisapAdvanceRequisitionList> createState() =>
       _ApproveDisapAdvanceRequisitionListState(appDisAdvListModal);
@@ -58,16 +57,13 @@ class _ApproveDisapAdvanceRequisitionListState
   Future<AppDisAdvListModal> getAppDisAdvList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.appDisAdvList;
-    print('employeeList11: ${SessionId}');
     AppDisAdvListModal appDisAdvListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     appDisAdvListModal = AppDisAdvListModal.fromJson(mapResponse);
 
     return appDisAdvListModal;

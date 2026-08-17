@@ -13,7 +13,7 @@ class FetchSingleResignationRequestModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -74,22 +74,22 @@ class DataNew {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['resignDate'] = this.resignDate;
-    data['lastWorkingDate'] = this.lastWorkingDate;
-    data['levelOneRemarks'] = this.levelOneRemarks;
-    data['resignationDate'] = this.resignationDate;
-    data['noticePeriodActive'] = this.noticePeriodActive;
-    data['organisationName'] = this.organisationName;
-    data['levelTwoRemarks'] = this.levelTwoRemarks;
-    data['lwdDate'] = this.lwdDate;
-    data['attachment'] = this.attachment;
-    data['empNameCode'] = this.empNameCode;
-    data['seprationName'] = this.seprationName;
-    data['id'] = this.id;
-    data['noticeperiod'] = this.noticeperiod;
-    data['remarks'] = this.remarks;
-    data['reasonForLeave'] = this.reasonForLeave;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['resignDate'] = resignDate;
+    data['lastWorkingDate'] = lastWorkingDate;
+    data['levelOneRemarks'] = levelOneRemarks;
+    data['resignationDate'] = resignationDate;
+    data['noticePeriodActive'] = noticePeriodActive;
+    data['organisationName'] = organisationName;
+    data['levelTwoRemarks'] = levelTwoRemarks;
+    data['lwdDate'] = lwdDate;
+    data['attachment'] = attachment;
+    data['empNameCode'] = empNameCode;
+    data['seprationName'] = seprationName;
+    data['id'] = id;
+    data['noticeperiod'] = noticeperiod;
+    data['remarks'] = remarks;
+    data['reasonForLeave'] = reasonForLeave;
     return data;
   }
 }

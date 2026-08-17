@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:velocity_x/velocity_x.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +10,6 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:er_flutter_project/services/mobile_http_client.dart';
-import 'dart:convert' show utf8;
 import '../main.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../singUP/model/loginModel.dart';
@@ -22,7 +19,7 @@ import '../mss_profiles/global_profile.dart';
 import 'allAPIList.dart';
 
 class ProjectList extends StatefulWidget {
-  const ProjectList({Key? key}) : super(key: key);
+  const ProjectList({super.key});
 
   @override
   State<ProjectList> createState() => _ProjectListState();
@@ -339,11 +336,11 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
     }
   }
 
-  void uploadImage1(File _image) async {
-    var stream = http.ByteStream(_image.openRead());
+  void uploadImage1(File image) async {
+    var stream = http.ByteStream(image.openRead());
     stream.cast();
     // get file length
-    var length = await _image.length();
+    var length = await image.length();
 
     // string to uri
     var uri = Uri.parse("enter here upload URL");
@@ -359,7 +356,7 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
       'image_file',
       stream,
       length,
-      filename: basename(_image.path),
+      filename: basename(image.path),
     );
 
     // add file to multipart
@@ -1761,8 +1758,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
         //Exit Resignation Approval
         if (setExitResignationListShow == "true" ||
             setExitResignationListView == "1") {
-          print("Check Permission - $setExitResignationListShow");
-          print("Check - $setExitResignationListView");
           items.add(
             Hero(
               tag: 'exitResignationApproval',
@@ -1821,8 +1816,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
 
         //My Teams
         if (setMyTeamShow == "true" || setMyTeamPageShow == "1") {
-          print("Check My Team Permission - $setMyTeamShow");
-          print("Check My Team- $setMyTeamPageShow");
           items.add(
             Hero(
               tag: 'myTeams',
@@ -2288,7 +2281,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
                         onChanged: (i) {
                           setState(() {
                             value = i;
-                            print(i);
                           });
                           if (value == 1) {
                             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
@@ -2350,7 +2342,6 @@ class _ProjectListState extends State<ProjectList> with RouteAware {
                         onChanged: (i) {
                           setState(() {
                             value = i;
-                            print(i);
                           });
                           if (value == 1) {
                             //Navigator.pushNamed(context, MyRoutings.mssMoNewDashboardRoute);

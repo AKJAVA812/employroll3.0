@@ -15,10 +15,10 @@ class EmployeeResignationListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['result'] = this.result;
-    if (this.exitlist != null) {
-      data['exitlist'] = this.exitlist!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['result'] = result;
+    if (exitlist != null) {
+      data['exitlist'] = exitlist!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -95,28 +95,28 @@ class Exitlist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['separationMode'] = this.separationMode;
-    data['resignDate'] = this.resignDate;
-    data['lastWorkingDate'] = this.lastWorkingDate;
-    data['separationModeId'] = this.separationModeId;
-    data['resonForleaving'] = this.resonForleaving;
-    data['dept'] = this.dept;
-    data['branch'] = this.branch;
-    data['resignationDate'] = this.resignationDate;
-    data['noticePeriod'] = this.noticePeriod;
-    data['tentativeLeavingDate'] = this.tentativeLeavingDate;
-    data['attachment'] = this.attachment;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['resignationActionDate'] = this.resignationActionDate;
-    data['designation'] = this.designation;
-    data['resignStatus'] = this.resignStatus;
-    data['exitId'] = this.exitId;
-    data['noticePeriodDays'] = this.noticePeriodDays;
-    data['doj'] = this.doj;
-    data['remarks'] = this.remarks;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['separationMode'] = separationMode;
+    data['resignDate'] = resignDate;
+    data['lastWorkingDate'] = lastWorkingDate;
+    data['separationModeId'] = separationModeId;
+    data['resonForleaving'] = resonForleaving;
+    data['dept'] = dept;
+    data['branch'] = branch;
+    data['resignationDate'] = resignationDate;
+    data['noticePeriod'] = noticePeriod;
+    data['tentativeLeavingDate'] = tentativeLeavingDate;
+    data['attachment'] = attachment;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['resignationActionDate'] = resignationActionDate;
+    data['designation'] = designation;
+    data['resignStatus'] = resignStatus;
+    data['exitId'] = exitId;
+    data['noticePeriodDays'] = noticePeriodDays;
+    data['doj'] = doj;
+    data['remarks'] = remarks;
+    data['status'] = status;
     return data;
   }
 }

@@ -51,22 +51,22 @@ class OnDateAttModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['empId'] = this.empId;
-    data['workingHrs'] = this.workingHrs;
-    data['isShortLeave'] = this.isShortLeave;
-    data['isOdReq'] = this.isOdReq;
-    data['isNormalCoff'] = this.isNormalCoff;
-    data['dept'] = this.dept;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['updatedWorkingHour'] = this.updatedWorkingHour;
-    data['relaxationHour'] = this.relaxationHour;
-    data['empName'] = this.empName;
-    data['shiftWorkingHour'] = this.shiftWorkingHour;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['empId'] = empId;
+    data['workingHrs'] = workingHrs;
+    data['isShortLeave'] = isShortLeave;
+    data['isOdReq'] = isOdReq;
+    data['isNormalCoff'] = isNormalCoff;
+    data['dept'] = dept;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['updatedWorkingHour'] = updatedWorkingHour;
+    data['relaxationHour'] = relaxationHour;
+    data['empName'] = empName;
+    data['shiftWorkingHour'] = shiftWorkingHour;
+    data['outTime'] = outTime;
+    data['status'] = status;
     return data;
   }
 }

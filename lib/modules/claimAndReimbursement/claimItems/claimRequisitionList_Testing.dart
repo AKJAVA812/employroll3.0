@@ -9,6 +9,8 @@ import '../../../sharedPrefancePage/ShardPre.dart';
 import '../newModalClasses/selfClaimRequisitionListModal.dart';
 
 class ClaimRequisitionPageTesting extends StatefulWidget {
+  const ClaimRequisitionPageTesting({super.key});
+
   @override
   _ClaimRequisitionPageTestingState createState() =>
       _ClaimRequisitionPageTestingState();

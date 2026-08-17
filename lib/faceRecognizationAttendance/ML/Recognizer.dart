@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
@@ -21,7 +19,7 @@ class Recognizer {
   static const int WIDTH = 160;
   static const int HEIGHT = 160;
   final dbHelper = DatabaseHelper();
-  Map<String, Recognition> registered = Map();
+  Map<String, Recognition> registered = {};
   @override
   //String get modelName => 'assets/mobile_face_net.tflite';
   String get modelName => 'assets/facenet.tflite';
@@ -48,7 +46,6 @@ class Recognizer {
     // debugPrint('query all rows:');
     for (final row in allRows) {
       //  debugPrint(row.toString());
-      print(row[DatabaseHelper.columnName]);
       String name = row[DatabaseHelper.columnName];
       List<double> embd =
           row[DatabaseHelper.columnEmbedding]
@@ -62,11 +59,9 @@ class Recognizer {
         embd,
         0,
       );
-      print("ImageData" + recognition.embeddings.toString());
 
       registered.putIfAbsent(name, () => recognition);
     }
-    print("Total Faces- ${allRows.length}");
   }
 
   void registerFaceInDB(String name, List<double> embedding) async {
@@ -76,7 +71,6 @@ class Recognizer {
       DatabaseHelper.columnEmbedding: embedding.join(","),
     };
     final id = await dbHelper.insert(row);
-    print('inserted row id: $id');
   }
 
   getFaceData() async {
@@ -92,13 +86,9 @@ class Recognizer {
       headers: {"Content-Type": "application/json"},
       body: body,
     );
-    print('URL ${response.request}');
-    print('BODY - ${response.body}');
-    print("Image - $body");
 
     if (response.statusCode == 200) {
       var responseResult = json.decode(response.body);
-      print('Response: $responseResult');
 
       String status = responseResult['status'].toLowerCase();
       String reason = responseResult['reason'];
@@ -149,7 +139,6 @@ class Recognizer {
     try {
       interpreter = await Interpreter.fromAsset(modelName);
     } catch (e) {
-      print('Unable to create interpreter, Caught Exception: ${e.toString()}');
     }
   }
 
@@ -186,7 +175,6 @@ class Recognizer {
   Recognition recognize(img.Image image, Rect location) {
     //TODO crop face from image resize it and convert it to float array
     var input = imageToArray(image);
-    print(input.shape.toString());
 
     //TODO output array
     //List output = List.filled(1*192, 0).reshape([1,192]);
@@ -196,14 +184,12 @@ class Recognizer {
     final runs = DateTime.now().millisecondsSinceEpoch;
     interpreter.run(input, output);
     final run = DateTime.now().millisecondsSinceEpoch - runs;
-    print('Time to run inference: $run ms$output');
 
     //TODO convert dynamic list to double list
     List<double> outputArray = output.first.cast<double>();
 
     //TODO looks for the nearest embeeding in the database and returns the pair
     Pair pair = findNearest(outputArray);
-    print("distance= ${pair.distance}");
 
     return Recognition(pair.name, location, outputArray, pair.distance);
   }

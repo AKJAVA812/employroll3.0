@@ -6,7 +6,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 
 class PayrollItems extends StatefulWidget {
-  const PayrollItems({Key? key}) : super(key: key);
+  const PayrollItems({super.key});
 
   @override
   State<PayrollItems> createState() => _PayrollItemsState();

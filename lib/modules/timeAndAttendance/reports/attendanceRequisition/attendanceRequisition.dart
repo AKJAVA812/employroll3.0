@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/attendanceReportModel.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
@@ -33,7 +32,7 @@ class AttendanceRequisition extends StatefulWidget {
   AttendanceRequisition(
     this.attendanceModelGlobel,
     this.onDateAttModel,
-    this.indexCont,
+    this.indexCont, {super.key}
   );
 
   @override
@@ -90,7 +89,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
     //print('responseemployeeList $empid');
 
     if (attendanceModelGlobel != null) {
-      print('attendanceModelGlobel');
       /*branchNameset= attendanceModelGlobel!.data![indexCont].branchName;
       updatedWorkHourSet= attendanceModelGlobel!.data![indexCont].branchName;
       departmentset= attendanceModelGlobel!.data![indexCont].departmentName;
@@ -106,7 +104,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
       isShortLeave = onDateAttModel!.isShortLeave ?? false;
       isOutDuty = onDateAttModel!.isOdReq ?? isOutDuty;
       isCompOff = onDateAttModel!.isNormalCoff ?? isCompOff;
-      print("Short Leave Check - $isShortLeave");
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
       departmentset = onDateAttModel!.dept;
@@ -117,21 +114,12 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
       empId = onDateAttModel!.empId;
 
       // Log for debugging
-      print('Branch: $branchNameset');
-      print('Department: $departmentset');
-      print('Employee Name: $employeeNameset');
-      print('Date: $onDateset');
-      print('In Time: $actualTimeset');
-      print('Out Time: $actualOutTimeset');
-      print('Employee ID: $empId');
     } else {
-      print('onModelrun');
       branchNameset = onDateAttModel!.branch;
       updatedWorkHourSet = onDateAttModel!.updatedWorkingHour;
       isShortLeave = onDateAttModel!.isShortLeave ?? isShortLeave;
       isOutDuty = onDateAttModel!.isOdReq ?? isOutDuty;
       isCompOff = onDateAttModel!.isNormalCoff ?? isCompOff;
-      print("Short Leave Check - $isShortLeave");
       relaxationHourSet = onDateAttModel!.relaxationHour;
       workingHrsSet = onDateAttModel!.workingHrs;
       shiftWorkingHourSet = onDateAttModel!.shiftWorkingHour;
@@ -143,13 +131,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
       empId = onDateAttModel!.empId;
 
       // Log for debugging
-      print('Branch: $branchNameset');
-      print('Department: $departmentset');
-      print('Employee Name: $employeeNameset');
-      print('Date: $onDateset');
-      print('In Time: $actualTimeset');
-      print('Out Time: $actualOutTimeset');
-      print('Employee ID: $empId');
     }
 
     super.initState();
@@ -167,7 +148,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
     departmentset = _firstText(departmentset, sharedDept);
     employeeNameset = _firstText(employeeNameset, sharedEmpName);
     empId = _firstInt(empId, sharedEmployeeDetailsId ?? sharedEmpId);
-    print("orgIDCHECK - $orgId");
     setState(() {});
   }
 
@@ -217,7 +197,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
-  List<bool> _isSelected = [false, false, false];
+  final List<bool> _isSelected = [false, false, false];
   bool nightShift = false;
   bool compOff = false;
   bool shortLeave = false;
@@ -439,14 +419,12 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                           compOff = false;
                           shortLeave = false;
                           outDuty = false;
-                          print("Night Shift - $nightShift");
                         }),
                         buildVerticalToggle("Comp. Off", compOff, (val) {
                           setState(() => compOff = val);
                           nightShift = false;
                           shortLeave = false;
                           outDuty = false;
-                          print("Comp Off - $compOff");
                         }),
 
                         Visibility(
@@ -459,7 +437,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                               compOff = false;
                               nightShift = false;
                               outDuty = false;
-                              print("Short Leave - $shortLeave");
                             },
                           ),
                         ),
@@ -470,7 +447,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                             compOff = false;
                             nightShift = false;
                             shortLeave = false;
-                            print("Out Duty - $outDuty");
                           }),
                         ),
                       ],
@@ -691,7 +667,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                       );
                                     },
                                   );
-                                  print('timenewOut $n');
                                   setState(() {
                                     var now = DateTime.now();
                                     DateTime newt = DateTime(
@@ -702,7 +677,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                       n.minute,
                                     );
                                     var nT = DateFormat('HH:mm').format(newt);
-                                    print(DateFormat('HH:mm').format(newt));
                                     _inTimePicker = nT;
                                   });
                                 },
@@ -804,7 +778,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                       );
                                     },
                                   );
-                                  print('timenewOut $o');
                                   setState(() {
                                     var newNow = DateTime.now();
                                     DateTime newt = DateTime(
@@ -815,7 +788,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                       o.minute,
                                     );
                                     var oT = DateFormat('HH:mm').format(newt);
-                                    print(DateFormat('HH:mm').format(newt));
                                     _outTimePicker = oT;
                                   });
                                 },
@@ -1044,9 +1016,8 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ButtonBar(
+                      OverflowBar(
                         alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
                         children: [
                           ElevatedButton(
                             onPressed: () {
@@ -1131,7 +1102,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                     );
                                   } else {
                                     outTimeReq = _outTimePicker;
-                                    print("outtime $outTimeReq");
                                   }
                                 } else {
                                   if (_outTimePicker.compareToIgnoringCase(
@@ -1184,26 +1154,17 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                 if (nightShift == false &&
                                     compOff == false &&
                                     outDuty == false) {
-                                  print("intime $inTimeReq");
-                                  print("outtime $outTimeReq");
-                                  print("night shift  $nightShift");
-                                  print("compoff $compOff");
 
                                   if (inTimeReq!.compareTo(outTimeReq!) > 0) {
                                     return setState(() {
                                       CommonNotificationPage.showWorkDoneSuccess(
                                         context,
-                                        "Your working hours going to negative, Please select requisition time correctly."
-                                                .upperCamelCase +
-                                            " ",
+                                        "${"Your working hours going to negative, Please select requisition time correctly."
+                                                .upperCamelCase} ",
                                         "Alert Message",
                                       );
                                     });
                                   } else {
-                                    print("intime $inTimeReq");
-                                    print("outtime $outTimeReq");
-                                    print("night shift  $nightShift");
-                                    print("compoff $compOff");
                                     if (inRemarkController.text.isEmpty ||
                                         outRemarkController.text.isEmpty) {
                                       ScaffoldMessenger.of(
@@ -1229,10 +1190,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                     }
                                   }
                                 } else if (nightShift == true) {
-                                  print("intime $inTimeReq");
-                                  print("outtime $outTimeReq");
-                                  print("night shift  $nightShift");
-                                  print("compoff $compOff");
                                   if (inRemarkController.text.isEmpty ||
                                       outRemarkController.text.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -1259,18 +1216,12 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                     return setState(() {
                                       CommonNotificationPage.showWorkDoneSuccess(
                                         context,
-                                        "Your working hours going to negative, Please select requisition time correctly."
-                                                .upperCamelCase +
-                                            " ",
+                                        "${"Your working hours going to negative, Please select requisition time correctly."
+                                                .upperCamelCase} ",
                                         "Alert Message",
                                       );
                                     });
                                   } else {
-                                    print("intime $inTimeReq");
-                                    print("outtime $outTimeReq");
-                                    print("night shift  $nightShift");
-                                    print("compoff $compOff");
-                                    print("outDuty $outDuty");
                                     if (inRemarkController.text.isEmpty ||
                                         outRemarkController.text.isEmpty) {
                                       ScaffoldMessenger.of(
@@ -1296,10 +1247,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                                     }
                                   }
                                 } else if (compOff == true) {
-                                  print("intime $inTimeReq");
-                                  print("outtime $outTimeReq");
-                                  print("night shift  $nightShift");
-                                  print("compoff $compOff");
                                   if (actualTimeset!.compareToIgnoringCase(
                                             "N/A",
                                           ) ==
@@ -1422,7 +1369,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                               }
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.lightBluishColor,
                               ),
                             ),
@@ -1453,7 +1400,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.pop(context);
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -1461,11 +1407,9 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
             }
             if (index == 3) {
               Navigator.push(
@@ -1475,7 +1419,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
@@ -1483,7 +1426,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -1557,15 +1499,12 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
       if (compOff) 'compOff': true,
       if (shortLeave) 'shortLeave': 1,
     };
-    print('[ATT_REQ_MOBILE] -> ${ApiDetails.mobileAttendanceRequisition} body=$body requestId=$requestId');
     final response = await foundation.postJson(
       ApiDetails.mobileAttendanceRequisition,
       body: body,
       headers: await foundation.authHeaders(requestId: requestId, json: true),
       tag: 'ATT_REQ_MOBILE',
     );
-    print('[ATT_REQ_MOBILE] request ${response.request}');
-    print('[ATT_REQ_MOBILE] <- status=${response.statusCode} body=${response.body}');
     Navigator.of(context, rootNavigator: true).pop();
 
     mapResponse = response.body.isNotEmpty ? json.decode(response.body) : {};
@@ -1580,7 +1519,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
     } else {
       showDialgSucess1(context, reason.isEmpty ? result : reason, "Warning");
     }
-    print('[ATT_REQ_MOBILE] result=$result reason=$reason');
   }
 
   Future<void> sendRequsitionToServer(
@@ -1607,7 +1545,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
 
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
@@ -1629,7 +1566,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1658,7 +1594,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       String result = "";
@@ -1677,7 +1612,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1706,7 +1640,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       String result = "";
@@ -1725,7 +1658,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1754,7 +1686,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       String result = "";
@@ -1773,7 +1704,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1802,7 +1732,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       Navigator.of(context, rootNavigator: true).pop();
       String result = "";
@@ -1821,7 +1750,6 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
           showDialgSucess1(context, result, "âš ï¸Warning");
         }
       }
-      print('result ${result} reason ${reason}');
     }
   }
 
@@ -1873,7 +1801,7 @@ class _AttendanceRequisitionState extends State<AttendanceRequisition>
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

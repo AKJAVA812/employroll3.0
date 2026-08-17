@@ -20,7 +20,7 @@ import '../adminPage/modelClass/dashboardModel.dart';
 import 'myTeamListModal.dart';
 
 class EmpListView extends StatefulWidget {
-  const EmpListView({Key? key}) : super(key: key);
+  const EmpListView({super.key});
 
   static const String _title = 'Employee List';
 
@@ -77,9 +77,8 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -118,13 +117,6 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
         employeeListModelglobel = value;
         employeeListModelglobeled = employeeListModelglobel;
       });
-      print('All LIST - ${employeeListModelglobel!.listData!.length}');
-      print('Direct LIST - ${employeeListModelglobel!.directEmpList!.length}');
-      print('Dotted LIST - ${employeeListModelglobel!.dottedEmpList!.length}');
-      print('Shared LIST - ${employeeListModelglobel!.sharedEmpList!.length}');
-      print(
-        'Designated LIST - ${employeeListModelglobel!.designatedEmpList!.length}',
-      );
     });
   }
 
@@ -152,7 +144,6 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
       /// âœ… Always update the main model
       employeeListModelglobel = MyTeamsListModal.fromJson(mapResponse);
 
-      print("Employee List API - ${response.request}");
       setState(() {
         if (selectedFilter == "All") {
           allUsernew = employeeListModelglobel!.listData!;
@@ -167,7 +158,6 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
         }
       });
     } catch (e) {
-      print("Error fetching employee list: ${e.toString()}");
     } finally {
       setState(() {
         isLoading = false; // Hide loader always
@@ -179,7 +169,6 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
 
   bool isLoading = true;
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<ListData>? resultsAll = [];
     List<SharedEmpList>? resultsShared = [];
     List<DirectEmpList>? resultsDirect = [];
@@ -297,7 +286,6 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
           setState(() {
             selectedFilter = label;
             getSharedPrfanceList();
-            print("Selected Filter - $selectedFilter");
           });
         },
       ),
@@ -363,7 +351,6 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -380,7 +367,6 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
                 builder: (context) => PunchInOUtActivity(selectedIndex: 2),
               ),
             );
-            print('Reports');
           }
           if (index == 3) {
             Navigator.push(
@@ -390,14 +376,12 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -1582,7 +1566,7 @@ class _EmpListViewState extends State<EmpListView> with RouteAware {
 class MyStatelessWidget extends StatefulWidget {
   final MyTeamsListModal employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -1631,7 +1615,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
               Navigator.pop(context);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -1695,8 +1678,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
             onTap: () {
               empId = foundDataNew![i].empDetId;
               empName = foundDataNew![i].empName;
-              print('ID $empId');
-              print('NameCheck $empName');
               //Navigator.pushNamed(context, MyRoutings.hdRaisedTicketReplyRoute);
             },
             child: Card(

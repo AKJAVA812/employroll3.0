@@ -11,7 +11,7 @@ import '../../../../commanScreen/routes.dart';
 import '../../../../profiles/profilePageWithHead.dart';
 
 class OdSelfReqDate extends StatefulWidget {
-  const OdSelfReqDate({Key? key}) : super(key: key);
+  const OdSelfReqDate({super.key});
 
   @override
   State<OdSelfReqDate> createState() => _OdSelfReqDateState();
@@ -26,9 +26,9 @@ class _OdSelfReqDateState extends State<OdSelfReqDate> {
 
   @override
   void initState() {
-    this.year;
-    this.date;
-    this.month;
+    year;
+    date;
+    month;
     //formattedDate = DateFormat.yMd() as String;
     // TODO: implement initState
     super.initState();
@@ -41,19 +41,18 @@ class _OdSelfReqDateState extends State<OdSelfReqDate> {
   bool changeNewDate = true;
 
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePicker = await showDatePicker(
+    DateTime? datePicker = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_datePicker != null && _datePicker != _date) {
+    if (datePicker != null && datePicker != _date) {
       setState(() {
         changeDates = false;
-        _date = _datePicker;
+        _date = datePicker;
         endDate = DateFormat('yyyy-MM-dd').format(_date);
-        print('dateTime${formattedDate}');
       });
     }
   }
@@ -62,17 +61,17 @@ class _OdSelfReqDateState extends State<OdSelfReqDate> {
   String formatDate = DateFormat.ABBR_MONTH;
 
   Future<Null> _selectToDate(BuildContext context) async {
-    DateTime? _newDatePicker = await showDatePicker(
+    DateTime? newDatePicker = await showDatePicker(
       context: context,
       initialDate: _newdate,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_newDatePicker != null && _newDatePicker != _newdate) {
+    if (newDatePicker != null && newDatePicker != _newdate) {
       setState(() {
         changeNewDate = false;
-        _newdate = _newDatePicker;
+        _newdate = newDatePicker;
         startDate = DateFormat('yyyy-MM-dd').format(_newdate);
       });
     }
@@ -275,7 +274,6 @@ class _OdSelfReqDateState extends State<OdSelfReqDate> {
                       AlertDialog(
                         content: "Please select valid date range".text.make(),
                       );
-                      print("select valid date range");
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text("Please Select Valid Date Range "),
                       ));
@@ -303,7 +301,6 @@ class _OdSelfReqDateState extends State<OdSelfReqDate> {
                     }
 
                   } else {
-                    print("Please select date");
                     setState(() {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text("Please Select Date Range "),
@@ -313,7 +310,7 @@ class _OdSelfReqDateState extends State<OdSelfReqDate> {
                 },
                 style: ButtonStyle(
                   backgroundColor:
-                  MaterialStateProperty.all(Mythemes.lightBluishColor),
+                  WidgetStateProperty.all(Mythemes.lightBluishColor),
                 ),
                 child: "Submit".text.make(),
               ).wh(190, 45).py32(),
@@ -337,29 +334,24 @@ class _OdSelfReqDateState extends State<OdSelfReqDate> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => HomePage()));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity()));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-            print('OD');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

@@ -20,7 +20,7 @@ import '../modalClass/selfLeaveRequisitionModal.dart';
 
 class RequestedRequisitionList extends StatefulWidget {
   final SelfLeaveRequisitionListModal selfLeaveRequisitionListModal;
-  const RequestedRequisitionList(this.selfLeaveRequisitionListModal);
+  const RequestedRequisitionList(this.selfLeaveRequisitionListModal, {super.key});
 
   @override
   State<RequestedRequisitionList> createState() =>
@@ -90,9 +90,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
         selfLeaveRequisitionLabel = value;
       });
       if (selfLeaveRequisitionLabel?.data != null) {
-        print('employeeList00: ${selfLeaveRequisitionLabel!.data!.length}');
       } else {
-        print('employeeList00: No data found');
       }
     });
   }
@@ -327,7 +325,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
               ),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -337,7 +334,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -346,7 +342,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
                 builder: (context) => GetAttendanceDet(showAppBar: true),
               ),
             );
-            print('My All Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -357,7 +352,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
             );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -365,7 +359,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -424,7 +417,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
           return InkWell(
             onTap: () {
               leaveId = leaveData.leavereqId;
-              print("leaveId $leaveId");
 
               if (statusCheck == 'Level_One_Pending' ||
                   statusCheck == 'Level_Two_Pending' ||
@@ -731,10 +723,8 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
       "leaveId=$leaveId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
       }
@@ -742,11 +732,9 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
       mapResponse = json.decode(response.body);
       String result = mapResponse['result'];
       String reason = mapResponse['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         if (mounted) {
-          showDialgSucess1(context, reason.upperCamelCase + " ", "Success");
+          showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
         } else if (result.compareToIgnoringCase("error") == 0) {
           showDialgSucess1(context, reason.upperCamelCase, " Error ");
         }

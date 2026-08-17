@@ -13,7 +13,7 @@ class MonthAttendanceModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -65,19 +65,19 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['departmentName'] = this.departmentName;
-    data['inTime'] = this.inTime;
-    data['empId'] = this.empId;
-    data['employeeName'] = this.employeeName;
-    data['workingHrs'] = this.workingHrs;
-    data['empCode'] = this.empCode;
-    data['branchName'] = this.branchName;
-    data['logId'] = this.logId;
-    data['attendanceDate'] = this.attendanceDate;
-    data['outTime'] = this.outTime;
-    data['applicationDate'] = this.applicationDate;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['departmentName'] = departmentName;
+    data['inTime'] = inTime;
+    data['empId'] = empId;
+    data['employeeName'] = employeeName;
+    data['workingHrs'] = workingHrs;
+    data['empCode'] = empCode;
+    data['branchName'] = branchName;
+    data['logId'] = logId;
+    data['attendanceDate'] = attendanceDate;
+    data['outTime'] = outTime;
+    data['applicationDate'] = applicationDate;
+    data['status'] = status;
     return data;
   }
 }

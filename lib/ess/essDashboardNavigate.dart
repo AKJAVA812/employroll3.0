@@ -20,7 +20,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
-import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -45,7 +44,7 @@ import 'myAllReports.dart';
 class EssAdminDashboardHead extends StatefulWidget {
   final EssDashboarrdModel dashboardModel1N;
 
-  EssAdminDashboardHead(this.dashboardModel1N);
+  const EssAdminDashboardHead(this.dashboardModel1N, {super.key});
 
   @override
   State<EssAdminDashboardHead> createState() =>
@@ -144,12 +143,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     deadlineStartDate = await shared.getPayCycleStart() ?? "0";
     deadlineEndDate = await shared.getPayCycleEnd() ?? "0";
     lockDateStr = await shared.getRaiseRequisition() ?? "0";
-    print(
-      '[MOBILE-DASHBOARD] ESS navigate shared loaded sessionId=${sessionId == null ? "null" : "present"} orgId=$orgId userPanel=$userPanel empRole=$empRole roRole=$roRole adminRole=$adminRole',
-    );
 
-    print("Start Pay $deadlineStartDate");
-    print("End Pay $deadlineEndDate");
 
     //print('empRole $empRole');
     //print('roRole $roRole');
@@ -210,30 +204,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
     setState(() {
@@ -259,9 +247,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     final dashboardDate = _dashboardDateForTargetMonth();
     final dashboardMonth = DateFormat('yyyy-MM').format(dashboardDate);
     singleDateString = DateFormat('dd-MM-yyyy').format(dashboardDate);
-    print(
-      '[ESS_DASHBOARD_FETCH_START] date=$singleDateString branch=$branchId shift=$shift',
-    );
     EssDashboarrdModel dashboardModel;
     final foundation = MobileApiFoundation.instance;
     final requestId = foundation.newRequestId();
@@ -273,9 +258,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         storedEmpCode?.toString().trim().isNotEmpty == true
             ? storedEmpCode
             : storedEmployeeId;
-    print(
-      '[ESS_DASHBOARD_PARAMS] orgId=$dashboardOrgId employeeDetailsId=$dashboardEmployeeDetailsId employeeCode=$dashboardEmployeeCode month=$dashboardMonth',
-    );
     final response = await foundation.postForm(
       ApiDetails.essDashboardAPi,
       queryParameters: <String, Object?>{
@@ -294,9 +276,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     setState(() {
       isLoading = true; // Start loading
     });
-    print('URL ${response.request}');
     _logLong('ESS_DASHBOARD_RAW_RESPONSE', response.body);
-    print('response body ${response.body}');
     developer.log("response:- ", name: response.body);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final prefs = await SharedPreferences.getInstance();
@@ -340,7 +320,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   Future<void> _loadDashboardForMonth(DateTime monthDate) async {
     if (monthDate.isBefore(_minDateAllowed) || monthDate.isAfter(_maxDateAllowed)) {
-      print("[ESS_DASHBOARD_MONTH_CHANGE] blocked month=$monthDate");
       return;
     }
 
@@ -351,7 +330,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     });
 
     _lastApiCallMonth = DateTime(monthDate.year, monthDate.month);
-    print("[ESS_DASHBOARD_MONTH_CHANGE] loading month=$_currentMonth");
 
     try {
       final dashboardData = await getDashboardData(sessionId!);
@@ -360,10 +338,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         essDashboardModelGlobal = dashboardData;
         isLoading = false;
       });
-      print("[ESS_DASHBOARD_MONTH_CHANGE] loaded month=$_currentMonth");
     } catch (error, stackTrace) {
-      print("[ESS_DASHBOARD_MONTH_CHANGE] failed month=$_currentMonth error=$error");
-      print(stackTrace);
       if (!mounted) return;
       setState(() {
         isLoading = false;
@@ -374,7 +349,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   void _logDashboardSummary(Map<String, dynamic> body) {
     final countData = body['countData'];
     if (countData is! Map) {
-      print('[ESS_DASHBOARD_COUNT_SUMMARY] countData missing');
       return;
     }
     final summary = <String, Object?>{
@@ -393,18 +367,15 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       'halfday': countData['halfday'],
       'halfDayList': _listLength(countData['halfDayList']),
     };
-    print('[ESS_DASHBOARD_COUNT_SUMMARY] $summary');
   }
 
   int _listLength(Object? value) => value is List ? value.length : 0;
 
   void _logLong(String tag, String value) {
     const chunkSize = 700;
-    print('[$tag] length=${value.length}');
     for (var start = 0; start < value.length; start += chunkSize) {
       final end =
           start + chunkSize > value.length ? value.length : start + chunkSize;
-      print('[$tag][$start-$end] ${value.substring(start, end)}');
     }
   }
 
@@ -447,15 +418,12 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       final response = await MobileHttpClient.instance.post(urlapi);
 
-      print('Holiday URL: ${response.request}');
-      print('Response body: ${response.body}');
       developer.log("Response :- ", name: response.body);
 
       final mapResponse = json.decode(response.body);
 
       // âœ… Handle empty data
       if (mapResponse == null || mapResponse.isEmpty) {
-        print("No holiday data found");
         showNoData = true;
         setState(() {
           isLoading = false;
@@ -470,11 +438,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('holidayData', jsonEncode(mapResponse));
 
-      print("âœ… Holiday data saved to SharedPreferences");
 
       return holidayESSModal;
     } catch (e) {
-      print("âŒ Error fetching holiday data: $e");
       return null;
     } finally {
       setState(() {
@@ -571,8 +537,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     return calendarModalClass;
   }*/
   Future<CalendarModalClass> getCalendarData(String sessionId) async {
-    String _currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
-    print("Current Month - $_currentMonth $_currentMonthc");
+    String currentMonthc = DateFormat('MM-yyyy').format(DateTime.now());
 
     CalendarModalClass calendarModalClass;
     setState(() {
@@ -582,12 +547,10 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     Map<String, dynamic> mapResponse = {};
     final prefs = await SharedPreferences.getInstance();
 
-    if (_currentMonthc == _currentMonth) {
+    if (currentMonthc == _currentMonth) {
       final cachedData = prefs.getString('calendarData');
       final cachedMonth = prefs.getString('calendarMonth');
-      print("Calendar Month - $cachedMonth");
       if (cachedData != null) {
-        print("Cachded Month $cachedMonth");
         try {
           mapResponse = json.decode(cachedData);
           _buildCalendarFromMap(mapResponse);
@@ -598,13 +561,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     try {
       final result = await AttendanceCalendarApi().fetchMonth(_currentMonth);
       mapResponse = result.data;
-      print(
-        result.cached
-            ? "Calendar loaded from mobile cache ${result.cachedAt}"
-            : "Calendar loaded from mobile API",
-      );
 
-      if (_currentMonthc == _currentMonth) {
+      if (currentMonthc == _currentMonth) {
         await prefs.setString('calendarData', json.encode(mapResponse));
         await prefs.setString('calendarMonth', _currentMonth);
       }
@@ -614,7 +572,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       }
       _buildCalendarFromMap(mapResponse);
     } catch (e) {
-      print("Error calling calendar API: $e");
     } finally {
       setState(() {
         isLoading = false;
@@ -669,7 +626,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         );
       }
     } catch (e) {
-      print("Error parsing calendar data: $e");
     }
 
     setState(() {}); // Refresh UI
@@ -871,11 +827,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 */
   void checkAndRunApi() async {
-    print('[ESS_DASHBOARD_FLOW] checkAndRunApi started');
     final permissionState = await MobilePermissionService.loadEssState();
-    print(
-      '[ESS_DASHBOARD_FLOW] canViewDashboard=${permissionState.canViewDashboard}',
-    );
     if (!permissionState.canViewDashboard) {
       _showDashboardPermissionDialog();
       setState(() {
@@ -891,12 +843,10 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     runApi = true;
 
     if (!runApi) {
-      print("â¸ Skipping API. Loading from cache...");
       await loadSavedData();
       return;
     }
 
-    print("ðŸ”„ Running API for today...");
 
     try {
       final dashboardData = await getDashboardData(sessionId!);
@@ -919,10 +869,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       });
       _loadDashboardSupportData(sessionId!);
 
-      print("âœ… All APIs loaded successfully.");
     } catch (e, st) {
-      print("âŒ Error loading APIs: $e");
-      print(st);
 
       setState(() {
         isLoading = false;
@@ -943,7 +890,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         });
       }
     } catch (e) {
-      print("Error loading dashboard event data: $e");
     }
   }
 
@@ -1148,7 +1094,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       );
       final mapResponse = json.decode(response.body);
 
-      print("Event API -${response.request}");
       final eventsListModal = EssEventsListModal.fromJson(mapResponse);
       eventsListModal.bdayList ??= <BdayList>[];
       eventsListModal.joblist ??= <Joblist>[];
@@ -1160,7 +1105,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       return eventsListModal;
     } catch (e) {
-      print("âŒ Error fetching event data: $e");
       return null;
     } finally {
       setState(() {
@@ -1190,7 +1134,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       final response = await MobileHttpClient.instance.post(urlapi);
       final mapResponse = json.decode(response.body);
 
-      print("Today Event - ${response.request}");
 
       final todayEventListModal = TodayEventListModal.fromJson(mapResponse);
       todayEventListModal.todayEventList ??= <TodayEventList>[];
@@ -1202,7 +1145,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
       return todayEventListModal;
     } catch (e) {
-      print("âŒ Error fetching todayâ€™s event data: $e");
       rethrow;
     } finally {
       setState(() {
@@ -1224,15 +1166,12 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     final dashboardData = prefs.getString('dashboardData');
 
     if (eventsJson != null) {
-      print("Event JSON - $eventsJson");
       final mapResponse = jsonDecode(eventsJson);
       eventsListModalGlobal = EssEventsListModal.fromJson(mapResponse);
       //isLoadingEvent = false;
       //isLoading = false;
       //isLoadingTodayEvent = false;
-      print("ðŸ“¦ Loaded eventsJson data from SharedPreferences");
     } else {
-      print("ðŸ“¦ Loaded eventsJson data not save from SharedPreferences");
     }
 
     if (todayEventsJson != null) {
@@ -1241,9 +1180,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
       //isLoadingEvent = false;
       //isLoading = false;
       //isLoadingTodayEvent = false;
-      print("ðŸ“¦ Loaded todayEventsJson data from SharedPreferences");
     } else {
-      print("ðŸ“¦ Loaded todayEventsJson data not save from SharedPreferences");
     }
 
     if (holidayJson != null) {
@@ -1256,12 +1193,9 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         //isLoadingTodayEvent = false;
       });
 
-      print("ðŸ“¦ Loaded Holiday data from SharedPreferences");
     } else {
-      print("âš ï¸ No saved holiday data found in SharedPreferences");
     }
 
-    print("Calendar Data Loaded - $calendarJson");
 
     /*if (calendarMonth != null) {
       final mapResponse = jsonDecode(calendarMonth);
@@ -1272,28 +1206,22 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     }*/
     if (calendarJson != null && calendarMonth == _currentMonth) {
       final mapResponse = jsonDecode(calendarJson);
-      print("Loaded calendar data from cache âœ…");
       calendarModalGlobal = CalendarModalClass.fromJson(mapResponse);
       _buildCalendarFromMap(mapResponse);
       isLoadingEvent = false;
       isLoadingEvent = false;
       isLoading = false;
       isLoadingTodayEvent = false;
-      print("ðŸ“¦ Loaded calender data from SharedPreferences");
     } else {
-      print("ðŸ“¦ Loaded calender data from SharedPreferences");
     }
     if (dashboardData != null) {
       final mapResponse = jsonDecode(dashboardData);
-      print("Loaded Dashboard Data data from cache âœ…");
       essDashboardModelGlobal = EssDashboarrdModel.fromJson(mapResponse);
       //isLoadingEvent = false;
       //isLoadingEvent = false;
       //isLoading = false;
       //isLoadingTodayEvent = false;
-      print("ðŸ“¦ Loaded Dashboard data from SharedPreferences");
     } else {
-      print("ðŸ“¦ Loaded Dashboard data Not Saved from SharedPreferences");
     }
     setState(() {
       isLoading = false;
@@ -1356,10 +1284,8 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     if (!foundation.isSuccess(response)) {
       throw MobileApiException('Unable to load today punches');
     }
-    print('responseemployeeList ${response.request}');
 
     mapResponse = json.decode(response.body);
-    print('Body Data $mapResponse');
 
     todayPunchesModal = TodayPunchesModal.fromJson(mapResponse);
 
@@ -1418,7 +1344,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     );
   }
 
-  static Widget _eventIcon = Container(
+  static final Widget _eventIcon = Container(
     decoration: BoxDecoration(
       //color: Colors.transparent,
       borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -1426,7 +1352,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     ),
   );
 
-  EventList<Event> _markedDateMap = EventList<Event>(
+  final EventList<Event> _markedDateMap = EventList<Event>(
     events: {
       /*new DateTime(2024, 2, 1): [
         new Event(
@@ -1456,7 +1382,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 
   @override
   void initState() {
-    print('[MOBILE-DASHBOARD] EssAdminDashboardHead initState');
     /*_markedDateMap.add(
         DateTime(2024, 12, 10),
         Event(
@@ -1486,30 +1411,24 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
     setState(() {});
@@ -1610,7 +1529,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -1620,7 +1538,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             /*Navigator.pushNamed(context, MyRoutings.timeAttRoute);
@@ -1634,7 +1551,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -1649,7 +1565,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
             //     MaterialPageRoute(builder: (context) => ProfilePageNew())
             // );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -1702,43 +1617,36 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     shortLeaveCount = countData.shortlev;
 
     presentCount = attendanceCardCount(countData);
-    print("Total Employees $totalAttendance");
     shift = 0;
     branchId = 0;
 
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
 
     if (eventsListModalGlobal?.bdayList != null) {
       for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
         oldEvent = eventsListModalGlobal!.bdayList![i].dob;
         oldEventLength = eventsListModalGlobal!.bdayList!.length;
-        print("oldEvent $oldEvent");
       }
     } else {
-      print("bdayList is null");
     }
 
     if (eventsListModalGlobal?.joblist != null) {
       for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
         oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
         oldJobLength = eventsListModalGlobal!.joblist!.length;
-        print("oldJobEvent $oldJobEvent");
       }
     } else {
-      print("joblist is null");
     }
     if (todayEventModalGlobal?.todayEventList != null) {
       for (int i = 0; i < todayEventModalGlobal!.todayEventList!.length; i++) {
         oldJobEvent = todayEventModalGlobal!.todayEventList![i].dob;
         oldJobLength = todayEventModalGlobal!.todayEventList!.length;
-        print("oldJobEvent $oldJobEvent");
       }
     } else {
-      print("joblist is null");
     }
 
     /*if (holidayListModalGlobal?.result == "success") {
@@ -1930,7 +1838,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                       ),
                                     ),
                                   );
-                                }).toList(),
+                                }),
                               ],
                             ),
                           ),
@@ -2660,7 +2568,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       });
                       */
                       // ðŸ‘‡ Your action here
-                      print("Update your dashboard clicked");
                     },
                     icon: const Icon(
                       Icons.dashboard_customize,
@@ -3233,14 +3140,15 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   DateTime? _lastApiCallMonth;
   CalendarShow() {
     /// Example with custom icon
-    final _calendarCarousel = Container(
+    final calendarCarousel = Container(
       constraints: BoxConstraints(
         maxHeight: 300.0, // Set a valid maximum height
       ),
       child: CalendarCarousel<Event>(
         onDayPressed: (date, events) {
           setState(() => _currentDate = date);
-          events.forEach((event) => print(event.title));
+          for (var event in events) {
+          }
         },
         weekendTextStyle: TextStyle(color: Colors.black),
         thisMonthDayBorderColor: Colors.grey,
@@ -3272,7 +3180,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     double dynamicHeight = (rowCount * rowHeight) + topPadding;
 
     /// Example Calendar Carousel without header and custom prev & next button
-    final _calendarCarouselNoHeader = CalendarCarousel<Event>(
+    final calendarCarouselNoHeader = CalendarCarousel<Event>(
       todayBorderColor: Mythemes.lightBluishColor,
       pageScrollPhysics: NeverScrollableScrollPhysics(),
       /*onDayPressed: (date, events) {
@@ -3293,7 +3201,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         // Prevent selecting dates older than current month view
         if (date.month < _targetDateTime.month &&
             date.year == _targetDateTime.year) {
-          print("â›” Last month dates are not selectable");
           Fluttertoast.showToast(
             msg: "You cannot select last month's dates.",
             toastLength: Toast.LENGTH_SHORT,
@@ -3349,7 +3256,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         DateTime cycleEnd;
         int startDay = int.parse(deadlineStartDate);
         int endDay = int.parse(deadlineEndDate);
-        print('date start and End $startDay $endDay');
         /* int startDay = 0;
         int endDay = 0;*/
 
@@ -3372,7 +3278,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           startDay = startDayInt;
           endDay = endDayInt;
         }
-        print('date start and End $startDay $endDay');
         if (today.day < startDay) {
           // Current month cycle is last month â†’ this month
           cycleStart = DateTime(today.year, today.month - 1, startDay);
@@ -3383,8 +3288,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           cycleEnd = DateTime(today.year, today.month + 1, endDay);
         }
 
-        print("Cycle Start: $cycleStart");
-        print("Cycle End:   $cycleEnd");
         if (lockDateStr.trim().isNotEmpty) {
           // Convert String â†’ DateTime
           DateTime lockDateTime = DateFormat(
@@ -3458,8 +3361,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         setState(() {
           formattedDate = DateFormat('dd-MM-yyyy').format(_currentDate);
           int dayOnly = int.parse(DateFormat('dd').format(_currentDate));
-          print("Formatted Date - $formattedDate");
-          print(data[dayOnly - 1]);
           calendarSendData = data[dayOnly - 1];
 
           //print("Formatted Date - $date");
@@ -3560,7 +3461,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
         if (_lastApiCallMonth != null &&
             _lastApiCallMonth!.month == date.month &&
             _lastApiCallMonth!.year == date.year) {
-          print("[ESS_DASHBOARD_MONTH_CHANGE] duplicate blocked month=$date");
           return;
         }
         await _loadDashboardForMonth(date);
@@ -3619,7 +3519,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       _targetDateTime.month - 1,
                     );
                     if (previousMonth.isBefore(_minDateAllowed)) {
-                      print("â›” You canâ€™t go beyond last 2 months");
                       Fluttertoast.showToast(
                         msg: "Can't go before this month !!",
                         toastLength: Toast.LENGTH_SHORT,
@@ -3653,7 +3552,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                       _targetDateTime.month + 1,
                     );
                     if (nextMonth.isAfter(_maxDateAllowed)) {
-                      print("â›” You canâ€™t go beyond next month");
                       Fluttertoast.showToast(
                         msg: "Can't go beyond this month !!",
                         toastLength: Toast.LENGTH_SHORT,
@@ -3673,7 +3571,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 22.0),
-            child: _calendarCarouselNoHeader,
+            child: calendarCarouselNoHeader,
           ), //
           if (_legends.isNotEmpty)
             LegendWidget(legends: _legends), // Dynamically show legends
@@ -3684,11 +3582,11 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
   }
 
   TabSection(EventsListModal eventsListModal) {
-    var todayEvent;
-    var oldEvent;
-    var oldEventLength;
-    var oldJobLength;
-    var oldJobEvent;
+    Object todayEvent;
+    String? oldEvent;
+    int? oldEventLength;
+    int? oldJobLength;
+    String? oldJobEvent;
     for (int i = 0; i < eventsListModalGlobal!.bdayList!.length; i++) {
       oldEvent = eventsListModalGlobal!.bdayList![i].dob;
       oldEventLength = eventsListModalGlobal!.bdayList!.length;
@@ -3699,7 +3597,6 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
     for (int i = 0; i < eventsListModalGlobal!.joblist!.length; i++) {
       oldJobEvent = eventsListModalGlobal!.joblist![i].doj;
       oldJobLength = eventsListModalGlobal!.joblist!.length;
-      print("oldJobEvent $oldJobEvent");
     }
 
     todayEvent = DateTime.now();
@@ -3786,7 +3683,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                           .dob
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -3841,7 +3738,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                           .doj
                                           .toString(),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       width: 40,
                                       height: 40,
                                       child: CircleAvatar(
@@ -3899,7 +3796,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                               .dob
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -3950,7 +3847,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                               .doj
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -4011,7 +3908,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                               .dob
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -4062,7 +3959,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
                                               .doj
                                               .toString(),
                                         ),
-                                        leading: Container(
+                                        leading: SizedBox(
                                           width: 40,
                                           height: 40,
                                           child: CircleAvatar(
@@ -4134,7 +4031,7 @@ class _EssAdminDashboardHeadState extends State<EssAdminDashboardHead> {
 class LegendWidget extends StatelessWidget {
   final List<Map<String, String>> legends;
 
-  LegendWidget({required this.legends});
+  const LegendWidget({super.key, required this.legends});
 
   @override
   Widget build(BuildContext context) {
@@ -4228,7 +4125,7 @@ class LegendWidget extends StatelessWidget {
                                 ],
                               ),
                             );
-                          }).toList(),
+                          }),
                         ],
                       ),
                     ),
@@ -4249,7 +4146,7 @@ class LegendWidget extends StatelessWidget {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

@@ -25,7 +25,7 @@ import '../attendanceRequisition/getAttendanceDetails.dart';
 class PendingRequisition extends StatefulWidget {
   final SelfRequisitionModel selfRequisitionModel;
 
-  PendingRequisition(this.selfRequisitionModel);
+  const PendingRequisition(this.selfRequisitionModel, {super.key});
 
   @override
   State<PendingRequisition> createState() =>
@@ -106,12 +106,10 @@ class _PendingRequisitionState extends State<PendingRequisition>
 
         if (foundDataNew != null) {
           foundDataNew!.length;
-          print("Fetch data $foundDataNew");
         } else {
           Center(child: "There is no data available right now".text.make());
           foundDataNew = [];
         }
-        print("Attendance Request Data - $selfRequisitionLabeled");
       });
 
       //print('employeeList00${selfRequisitionLabel!.data!.length}');
@@ -394,7 +392,6 @@ class _PendingRequisitionState extends State<PendingRequisition>
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -404,7 +401,6 @@ class _PendingRequisitionState extends State<PendingRequisition>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -413,7 +409,6 @@ class _PendingRequisitionState extends State<PendingRequisition>
                 builder: (context) => GetAttendanceDet(showAppBar: true),
               ),
             );
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -424,7 +419,6 @@ class _PendingRequisitionState extends State<PendingRequisition>
             );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -432,7 +426,6 @@ class _PendingRequisitionState extends State<PendingRequisition>
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );*/
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -490,7 +483,6 @@ class _PendingRequisitionState extends State<PendingRequisition>
             onTap: _isPending(foundDataNew![i]) ? () {
               reqId = foundDataNew![i].reqId;
 
-              print("Req ID - $reqId");
 
               showDialgCancel(context, context, context);
               //CommonNotificationPage.showDeleteMessage(context, context, context);
@@ -710,7 +702,6 @@ class _PendingRequisitionState extends State<PendingRequisition>
 
     if (!mounted) return;
     CommonNotificationPage.showLoaderDialog(context);
-    print("ðŸ”„ Loader shown...");
 
     try {
       var urlapi = Uri.parse(
@@ -720,17 +711,13 @@ class _PendingRequisitionState extends State<PendingRequisition>
       );
 
       final response = await MobileHttpClient.instance.post(urlapi);
-      print('ðŸŒ URL: ${response.request}');
-      print('ðŸ“© Raw Response: ${response.body}');
 
       String result = "unknown";
 
       if (response.statusCode == 200) {
         Map<String, dynamic> mapResponse = json.decode(response.body);
         result = mapResponse['result']?.toString() ?? "unknown";
-        print("ðŸ“Œ API Result: $result");
       } else {
-        print("âŒ API Error ${response.statusCode}");
       }
 
       // âœ… Always close loader no matter success/failure
@@ -765,7 +752,6 @@ class _PendingRequisitionState extends State<PendingRequisition>
         }
       }
     } catch (e) {
-      print("âŒ Exception: $e");
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // âœ… close loader
         CommonNotificationPage.showDialgSucess(

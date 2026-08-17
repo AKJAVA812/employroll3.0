@@ -13,10 +13,10 @@ class TodayEventListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.todayEventList != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (todayEventList != null) {
       data['todayEventList'] =
-          this.todayEventList!.map((v) => v.toJson()).toList();
+          todayEventList!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -57,16 +57,16 @@ class TodayEventList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['image'] = this.image;
-    data['dob'] = this.dob;
-    data['contact'] = this.contact;
-    data['fullName'] = this.fullName;
-    data['emailId'] = this.emailId;
-    data['empDetailsId'] = this.empDetailsId;
-    data['employeeId'] = this.employeeId;
-    data['department'] = this.department;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['image'] = image;
+    data['dob'] = dob;
+    data['contact'] = contact;
+    data['fullName'] = fullName;
+    data['emailId'] = emailId;
+    data['empDetailsId'] = empDetailsId;
+    data['employeeId'] = employeeId;
+    data['department'] = department;
+    data['status'] = status;
     return data;
   }
 }

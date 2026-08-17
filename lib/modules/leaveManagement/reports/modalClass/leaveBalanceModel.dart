@@ -17,13 +17,13 @@ class LeaveBalanceModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.leaveTypeListDetails != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (leaveTypeListDetails != null) {
       data['leaveTypeListDetails'] =
-          this.leaveTypeListDetails!.map((v) => v.toJson()).toList();
+          leaveTypeListDetails!.map((v) => v.toJson()).toList();
     }
-    if (this.leaveData != null) {
-      data['leaveData'] = this.leaveData!.toJson();
+    if (leaveData != null) {
+      data['leaveData'] = leaveData!.toJson();
     }
     return data;
   }
@@ -67,17 +67,17 @@ class LeaveTypeListDetails {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['medCerti'] = this.medCerti;
-    data['leavetype'] = this.leavetype;
-    data['lwpActive'] = this.lwpActive;
-    data['noLwp'] = this.noLwp;
-    data['lwpWithNotification'] = this.lwpWithNotification;
-    data['medValue'] = this.medValue;
-    data['leaveId'] = this.leaveId;
-    data['leaveStatus'] = this.leaveStatus;
-    data['leaveTypecode'] = this.leaveTypecode;
-    data['isHalfday'] = this.isHalfday;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['medCerti'] = medCerti;
+    data['leavetype'] = leavetype;
+    data['lwpActive'] = lwpActive;
+    data['noLwp'] = noLwp;
+    data['lwpWithNotification'] = lwpWithNotification;
+    data['medValue'] = medValue;
+    data['leaveId'] = leaveId;
+    data['leaveStatus'] = leaveStatus;
+    data['leaveTypecode'] = leaveTypecode;
+    data['isHalfday'] = isHalfday;
     return data;
   }
 }
@@ -100,18 +100,18 @@ class LeaveData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.cL607 != null) {
-      data['CL-607'] = this.cL607!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (cL607 != null) {
+      data['CL-607'] = cL607!.toJson();
     }
-    if (this.leaveTypeList != null) {
-      data['leaveTypeList'] = this.leaveTypeList!.toJson();
+    if (leaveTypeList != null) {
+      data['leaveTypeList'] = leaveTypeList!.toJson();
     }
-    if (this.eL608 != null) {
-      data['EL-608'] = this.eL608!.toJson();
+    if (eL608 != null) {
+      data['EL-608'] = eL608!.toJson();
     }
-    if (this.sL606 != null) {
-      data['SL-606'] = this.sL606!.toJson();
+    if (sL606 != null) {
+      data['SL-606'] = sL606!.toJson();
     }
     return data;
   }
@@ -140,12 +140,12 @@ class CL607 {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['lwp'] = this.lwp;
-    data['leavesTaken'] = this.leavesTaken;
-    data['totalLeavesPending'] = this.totalLeavesPending;
-    data['currentYearLeaves'] = this.currentYearLeaves;
-    data['lastYearLeaves'] = this.lastYearLeaves;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['lwp'] = lwp;
+    data['leavesTaken'] = leavesTaken;
+    data['totalLeavesPending'] = totalLeavesPending;
+    data['currentYearLeaves'] = currentYearLeaves;
+    data['lastYearLeaves'] = lastYearLeaves;
     return data;
   }
 }
@@ -160,8 +160,8 @@ class LeaveTypeList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['leaveTypelist'] = this.leaveTypelist;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['leaveTypelist'] = leaveTypelist;
     return data;
   }
 }

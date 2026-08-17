@@ -61,7 +61,6 @@ class LeaveData {
     final leaveBalances = <String, dynamic>{};
 
     final leaveTypeItems = leaveTypeList?.leaveTypelist ?? [];
-    print("🧩 Final leaveDataMap keys: ${leaveDetails?.keys.toList()}");
 
     for (var typeItem in leaveTypeItems) {
       // Example: "Casual Leave-CL-789"
@@ -71,7 +70,6 @@ class LeaveData {
         final typeId = parts[2];   // e.g. "789"
         final matchedKey = "$typeCode-$typeId";
 
-        print("🔍 Matching type=$typeCode -> matchedKey=$matchedKey");
 
         final data = leaveDetails?[matchedKey];
 
@@ -85,7 +83,6 @@ class LeaveData {
       }
     }
 
-    print("✅ Final leaveBalances: $leaveBalances");
     return leaveBalances;
   }
 }

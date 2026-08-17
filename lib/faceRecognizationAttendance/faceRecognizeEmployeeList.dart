@@ -19,7 +19,7 @@ import 'attendancMarkAiMSS.dart';
 import 'faceEmpListModalClass.dart';
 
 class EmpListFaceRecognize extends StatefulWidget {
-  const EmpListFaceRecognize({Key? key}) : super(key: key);
+  const EmpListFaceRecognize({super.key});
 
   static const String _title = 'Employee List';
 
@@ -45,9 +45,8 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -71,24 +70,19 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
         employeeListModelglobel = value;
         employeeListModelglobeled = employeeListModelglobel;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
   }
 
   Future<EmployeeListFaceModel> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.getEmpFaceList;
-    print('employeeList11: ${SessionId}');
     EmployeeListFaceModel employeeListModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
-    print("URL - ${response.request}");
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = EmployeeListFaceModel.fromJson(mapResponse);
     allUsernew = employeeListModel.data;
 
@@ -96,7 +90,6 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -193,7 +186,6 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -201,7 +193,6 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -210,12 +201,10 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
                 builder: (context) => const FaceRecognitinHome(),
               ),
             );
-            print('Face');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -223,7 +212,6 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -270,7 +258,7 @@ class _EmpListFaceRecognizeState extends State<EmpListFaceRecognize> {
 class MyStatelessWidget extends StatefulWidget {
   final EmployeeListFaceModel employeeListModel;
 
-  MyStatelessWidget(this.employeeListModel);
+  const MyStatelessWidget(this.employeeListModel, {super.key});
   @override
   State<MyStatelessWidget> createState() =>
       _MyStatelessWidgetState(employeeListModel);
@@ -312,7 +300,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 }*/
               //print('emPI $empId');
               //print('emName $empName');
-              print("Emp list clicked");
               Navigator.of(context, rootNavigator: true).pop();
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -377,9 +364,6 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 empId = foundDataNew![i].empId;
                 empName = foundDataNew![i].empName;
                 empFace = foundDataNew![i].empPhoto;
-                print('emID $empId');
-                print('name $empName');
-                print("Emp list clicked");
               });
               Navigator.push(
                 context,
@@ -404,7 +388,7 @@ class _MyStatelessWidgetState extends State<MyStatelessWidget> {
                 radius: 25,
                 backgroundImage: NetworkImage(foundDataNew![i].empPhoto!),
               ),
-              title: "${foundDataNew![i].empName.toString()}".text.make().py8(),
+              title: foundDataNew![i].empName.toString().text.make().py8(),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,

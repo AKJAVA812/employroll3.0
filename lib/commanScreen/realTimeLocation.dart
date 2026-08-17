@@ -3,6 +3,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 class RealTimeLocationWithAddress extends StatefulWidget {
+  const RealTimeLocationWithAddress({super.key});
+
   @override
   _RealTimeLocationWithAddressState createState() =>
       _RealTimeLocationWithAddressState();
@@ -38,13 +40,11 @@ class _RealTimeLocationWithAddressState
         setState(() {
           _currentPosition = position;
         });
-        print("Current Position $_currentPosition");
 
         // Fetch the address for the new position
         await _getAddressFromLatLng(position);
       });
     } else {
-      print("Location permission not granted");
     }
   }
 
@@ -61,7 +61,6 @@ class _RealTimeLocationWithAddressState
         "${place.street}, ${place.name}, ${place.postalCode}, ${place.subAdministrativeArea}, ${place.locality}, ${place.subLocality}, ${place.administrativeArea}, ${place.country}";
       });
     } catch (e) {
-      print("Error fetching address: $e");
     }
   }
 

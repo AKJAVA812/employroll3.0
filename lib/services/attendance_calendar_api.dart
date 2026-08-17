@@ -11,7 +11,6 @@ class AttendanceCalendarApi {
   final MobileApiFoundation _foundation;
 
   Future<AttendanceCalendarResult> fetchMonth(String month) async {
-    print('[MOBILE_CALENDAR_FETCH_START] month=$month');
     final cacheKey = _cacheKey(month);
     final cached = await MobileApiCache.instance.readJson(cacheKey);
     try {
@@ -25,10 +24,6 @@ class AttendanceCalendarApi {
           storedEmployeeCode?.toString().trim().isNotEmpty == true
           ? storedEmployeeCode
           : storedEmployeeId;
-      print(
-        '[MOBILE_CALENDAR_PARAMS] organisationId=$organisationId '
-        'employeeDetailsId=$employeeDetailsId employeeCode=$employeeCode month=$month',
-      );
       final response = await _foundation.get(
         ApiDetails.mobileCalendar,
         queryParameters: <String, Object?>{
@@ -98,16 +93,13 @@ class AttendanceCalendarApi {
         }
       }
     }
-    print('[MOBILE_CALENDAR_STATUS_COUNTS] $counts');
   }
 
   void _logLong(String tag, String value) {
     const chunkSize = 700;
-    print('[$tag] length=${value.length}');
     for (var start = 0; start < value.length; start += chunkSize) {
       final end =
           start + chunkSize > value.length ? value.length : start + chunkSize;
-      print('[$tag][$start-$end] ${value.substring(start, end)}');
     }
   }
 }

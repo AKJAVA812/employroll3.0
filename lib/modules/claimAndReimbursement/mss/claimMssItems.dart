@@ -18,7 +18,7 @@ import '../newModalClasses/claimMssListModal.dart';
 import 'claimMssApprovalPage.dart';
 
 class ClaimMSSItemsList extends StatefulWidget {
-  const ClaimMSSItemsList({Key? key}) : super(key: key);
+  const ClaimMSSItemsList({super.key});
 
   static const String _title = 'Employee List';
 
@@ -81,9 +81,8 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
     setState(() {
       setApprovalLevel();
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -105,10 +104,6 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
       permissionId = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
       statusUpdate = "LEVEL_THREE_PENDING";
     }*/
-    print("Claim L1 $claimLevelOne");
-    print("Claim L2 $claimLevelTwo");
-    print("Claim L3 $claimLevelThree");
-    print("Status $statusUpdate");
 
     /* lOne = claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
     lTwo = claimLevelTwo == "CLAIM_APPROVAL_LEVEL_TWO_VIEW";
@@ -156,7 +151,6 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
         claimApproverListModalGlobaled = claimApproverListModalGlobal;
         isLoading = false;
       });
-      print('employeeList00${claimApproverListModalGlobal!.data!.length}');
     });
   }
 
@@ -175,7 +169,6 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
   Future<ClaimApproverListModalClass> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimApproveListApi;
-    print('employeeList11: ${SessionId}');
     ClaimApproverListModalClass employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -184,15 +177,12 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
       "status=$statusUpdate",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
       isLoading = true;
     });
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = ClaimApproverListModalClass.fromJson(mapResponse);
     totalDraftAmt = employeeListModel.draftList;
     totalDisApproved = employeeListModel.disAppList;
@@ -208,7 +198,6 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -311,7 +300,6 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -323,7 +311,6 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
           }
           if (index == 2) {
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Claim');
           }
           if (index == 3) {
             Navigator.push(
@@ -333,14 +320,12 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -812,12 +797,10 @@ class _ClaimMSSItemsListState extends State<ClaimMSSItemsList> with RouteAware {
             itemCount: foundDataNew!.length,
             itemBuilder: (context, i) {
               foundDataNew![i].status;
-              print(foundDataNew![i].status);
               return InkWell(
                 onTap: () {
                   levelStatusCheck = foundDataNew![i].status;
                   empIdSend = foundDataNew![i].empId.toString();
-                  print("EMP ID --> $empIdSend");
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder:

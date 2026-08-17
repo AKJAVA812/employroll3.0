@@ -16,9 +16,9 @@ class EssDashboarrdModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.countData != null) {
-      data['countData'] = this.countData!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (countData != null) {
+      data['countData'] = countData!.toJson();
     }
     return data;
   }
@@ -340,44 +340,44 @@ class CountData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.presentList != null) {
-      data['presentList'] = this.presentList!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (presentList != null) {
+      data['presentList'] = presentList!.map((v) => v.toJson()).toList();
     }
-    if (this.lateList != null) {
-      data['lateList'] = this.lateList!.map((v) => v.toJson()).toList();
+    if (lateList != null) {
+      data['lateList'] = lateList!.map((v) => v.toJson()).toList();
     }
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['halfday'] = this.halfday;
-    if (this.earlyGoList != null) {
-      data['earlyGoList'] = this.earlyGoList!.map((v) => v.toJson()).toList();
+    data['halfday'] = halfday;
+    if (earlyGoList != null) {
+      data['earlyGoList'] = earlyGoList!.map((v) => v.toJson()).toList();
     }
-    if (this.absentList != null) {
-      data['absentList'] = this.absentList!.map((v) => v.toJson()).toList();
+    if (absentList != null) {
+      data['absentList'] = absentList!.map((v) => v.toJson()).toList();
     }
-    if (this.halfDayList != null) {
-      data['halfDayList'] = this.halfDayList!.map((v) => v.toJson()).toList();
+    if (halfDayList != null) {
+      data['halfDayList'] = halfDayList!.map((v) => v.toJson()).toList();
     }
-    data['totalAtt'] = this.totalAtt;
-    data['absentCount'] = this.absentCount;
-    if (this.shortLeaveList != null) {
+    data['totalAtt'] = totalAtt;
+    data['absentCount'] = absentCount;
+    if (shortLeaveList != null) {
       data['shortLeaveList'] =
-          this.shortLeaveList!.map((v) => v.toJson()).toList();
+          shortLeaveList!.map((v) => v.toJson()).toList();
     }
-    if (this.totalList != null) {
-      data['totalList'] = this.totalList!.map((v) => v.toJson()).toList();
+    if (totalList != null) {
+      data['totalList'] = totalList!.map((v) => v.toJson()).toList();
     }
-    data['late'] = this.late;
-    data['shortlev'] = this.shortlev;
-    data['totalDays'] = this.totalDays;
-    if (this.mispunchList != null) {
-      data['mispunchList'] = this.mispunchList!.map((v) => v.toJson()).toList();
+    data['late'] = late;
+    data['shortlev'] = shortlev;
+    data['totalDays'] = totalDays;
+    if (mispunchList != null) {
+      data['mispunchList'] = mispunchList!.map((v) => v.toJson()).toList();
     }
-    data['mispunch'] = this.mispunch;
-    data['earlygo'] = this.earlygo;
-    data['paidDaysCount'] = this.paidDaysCount;
+    data['mispunch'] = mispunch;
+    data['earlygo'] = earlygo;
+    data['paidDaysCount'] = paidDaysCount;
     return data;
   }
 }
@@ -398,11 +398,11 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['empName'] = this.empName;
-    data['dept'] = this.dept;
-    data['branch'] = this.branch;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['empName'] = empName;
+    data['dept'] = dept;
+    data['branch'] = branch;
     return data;
   }
 }
@@ -463,23 +463,23 @@ class AbsentList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['lateTime'] = this.lateTime;
-    data['earlyTime'] = this.earlyTime;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['empName'] = this.empName;
-    data['workingHours'] = this.workingHours;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['lateTime'] = lateTime;
+    data['earlyTime'] = earlyTime;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['empName'] = empName;
+    data['workingHours'] = workingHours;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }
@@ -540,23 +540,23 @@ class PresentList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['lateTime'] = this.lateTime;
-    data['earlyTime'] = this.earlyTime;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['empName'] = this.empName;
-    data['workingHours'] = this.workingHours;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['lateTime'] = lateTime;
+    data['earlyTime'] = earlyTime;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['empName'] = empName;
+    data['workingHours'] = workingHours;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }
@@ -617,23 +617,23 @@ class LateList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['lateTime'] = this.lateTime;
-    data['earlyTime'] = this.earlyTime;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['empName'] = this.empName;
-    data['workingHours'] = this.workingHours;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['lateTime'] = lateTime;
+    data['earlyTime'] = earlyTime;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['empName'] = empName;
+    data['workingHours'] = workingHours;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }
@@ -694,23 +694,23 @@ class MispunchList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['lateTime'] = this.lateTime;
-    data['earlyTime'] = this.earlyTime;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['empName'] = this.empName;
-    data['workingHours'] = this.workingHours;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['lateTime'] = lateTime;
+    data['earlyTime'] = earlyTime;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['empName'] = empName;
+    data['workingHours'] = workingHours;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }
@@ -771,23 +771,23 @@ class EarlyGoList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['lateTime'] = this.lateTime;
-    data['earlyTime'] = this.earlyTime;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['empName'] = this.empName;
-    data['workingHours'] = this.workingHours;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['lateTime'] = lateTime;
+    data['earlyTime'] = earlyTime;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['empName'] = empName;
+    data['workingHours'] = workingHours;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }
@@ -848,23 +848,23 @@ class HalfDayList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['lateTime'] = this.lateTime;
-    data['earlyTime'] = this.earlyTime;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['empName'] = this.empName;
-    data['workingHours'] = this.workingHours;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['lateTime'] = lateTime;
+    data['earlyTime'] = earlyTime;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['empName'] = empName;
+    data['workingHours'] = workingHours;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }
@@ -925,23 +925,23 @@ class ShortLeaveList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['lateTime'] = this.lateTime;
-    data['earlyTime'] = this.earlyTime;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['empName'] = this.empName;
-    data['workingHours'] = this.workingHours;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['lateTime'] = lateTime;
+    data['earlyTime'] = earlyTime;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['empName'] = empName;
+    data['workingHours'] = workingHours;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }
@@ -1002,23 +1002,23 @@ class TotalList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['lateTime'] = this.lateTime;
-    data['earlyTime'] = this.earlyTime;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['inTime'] = this.inTime;
-    data['empName'] = this.empName;
-    data['workingHours'] = this.workingHours;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['lateTime'] = lateTime;
+    data['earlyTime'] = earlyTime;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['inTime'] = inTime;
+    data['empName'] = empName;
+    data['workingHours'] = workingHours;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }

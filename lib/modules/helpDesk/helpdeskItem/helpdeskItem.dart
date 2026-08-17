@@ -26,7 +26,7 @@ import '../modalClass/raisedQueryListModal.dart';
 import '../modalClass/subQueryTypeListModal.dart';
 
 class HelpDeskItems extends StatefulWidget {
-  const HelpDeskItems({Key? key}) : super(key: key);
+  const HelpDeskItems({super.key});
 
   @override
   State<HelpDeskItems> createState() => _HelpDeskItemsState();
@@ -60,9 +60,9 @@ Map<String, dynamic> mapResponseRaised = {};
 SessionManager shared = SessionManager();
 String? sessionId;
 
-late List<String?> deptList = [];
-late List<String?> queryTypeList = [];
-late List<String?> subQueryTypeList = [];
+List<String?> deptList = [];
+List<String?> queryTypeList = [];
+List<String?> subQueryTypeList = [];
 
 class _HelpDeskItemsState extends State<HelpDeskItems> {
   bool raiseTicketShow = true;
@@ -102,7 +102,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
     empIdCheck = await shared.getEmpId();
-    print("EMPID - $empIdCheck");
     //empId=await shared!.getEmpId();
     // await Future.delayed(Duration(seconds: 5));
     Future<DepartmentListModal> getEmployeeList13 = getDepartmentList(
@@ -122,7 +121,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
         raisedQueryListGlobal = value;
         raisedQueryListGlobaled = raisedQueryListGlobal;
       });
-      print('employeeList00${raisedQueryListGlobal!.dataList!.length}');
     });
   }
 
@@ -140,18 +138,15 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     departmentListModal = DepartmentListModal.fromJson(mapResponse);
 
     for (int i = 0; i < mapResponse['data'].length; i++) {
       deptList.add(mapResponse['data'][i]['deptName']);
       deptId = mapResponse['data'][i]['branchDeptId'];
 
-      print('ID -  $deptId');
       //print("HalfDayShow $halfDayRadioShow");
     }
 
@@ -173,18 +168,15 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponseQuery = json.decode(response.body);
     var getData = mapResponseQuery['statusdata'];
-    print('responseemployeeList $getData');
     queryTypeListModal = QueryTypeListModal.fromJson(mapResponseQuery);
 
     for (int i = 0; i < mapResponseQuery['statusdata'].length; i++) {
       queryTypeList.add(mapResponseQuery['statusdata'][i]['name']);
       queryTypeId = mapResponseQuery['statusdata'][i]['id'];
 
-      print('ID -  $queryTypeId');
       //print("HalfDayShow $halfDayRadioShow");
     }
     return queryTypeListModal;
@@ -206,11 +198,9 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     final response = await MobileHttpClient.instance.post(urlapi);
     //print("Status $status");
     //print(inductionListLabel!.data!.length);
-    print('LOcations ${response.request}');
 
     mapResponseSubQuery = json.decode(response.body);
     var getData = mapResponseSubQuery['statusdata'];
-    print('responseemployeeList $getData');
     subQueryTypeListModal = SubQueryTypeListModal.fromJson(mapResponseQuery);
 
     for (int i = 0; i < mapResponseSubQuery['statusdata'].length; i++) {
@@ -219,7 +209,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
       );
       subQueryTypeId = mapResponseSubQuery['statusdata'][i]['id'];
 
-      print('ID -  $subQueryTypeId');
       //print("HalfDayShow $halfDayRadioShow");
     }
     return subQueryTypeListModal;
@@ -228,17 +217,13 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
   Future<RaisedQueryListModal> getRaisedList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.queryRaisedList;
-    print('employeeList11: ${SessionId}');
     RaisedQueryListModal raisedQueryListModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('Query List - ${response.request}');
 
-    print('responseemployeeList ${response.body}');
 
     mapResponseRaised = json.decode(response.body);
     var getData = mapResponseRaised['data'];
-    print('responseemployeeList $getData');
     raisedQueryListModal = RaisedQueryListModal.fromJson(mapResponseRaised);
     allUsernew = raisedQueryListModal.dataList;
 
@@ -246,7 +231,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<DataList>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -328,15 +312,11 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     var ticketNo = "1AB4124";
 
     var dropdownNewvalue;
-    var dropdownNewvalueNew;
-    var dropDownSubLocation;
+    String? dropdownNewvalueNew;
+    String? dropDownSubLocation;
 
     void openFile(PlatformFile file) {
       OpenFile.open(file.path!);
-      print('Bytes: ${file.name}');
-      print('Size: ${file.size}');
-      print('Size: ${file.extension}');
-      print('Path: ${file.path}');
     }
 
     Future<File> saveFilePermanently(PlatformFile file) async {
@@ -358,7 +338,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
             height: 120,
             child: Column(
               children: [
-                ButtonBar(
+                OverflowBar(
                   alignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
@@ -371,10 +351,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
 
                           //picker.dispose();
                           if (imageValue == null) return;
-                          print(
-                            "Heloo ji "
-                            "$imageValue",
-                          );
                           setState(() {
                             final imagePath = File(imageValue!.path);
                             //this._workDoneImage=imagePath;
@@ -383,7 +359,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                           imageValue = null;
                           //imageCache.clear();
                         } on Exception catch (e) {
-                          print('failed to upload: $e');
                         }
                         Navigator.of(context, rootNavigator: true).pop();
                       },
@@ -399,10 +374,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
 
                           //picker.dispose();
                           if (imageValue == null) return;
-                          print(
-                            "Heloo ji "
-                            "$imageValue",
-                          );
                           setState(() {
                             final imagePath = File(imageValue!.path);
                             //this._workDoneImage=imagePath;
@@ -411,7 +382,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                           imageValue = null;
                           //imageCache.clear();
                         } on Exception catch (e) {
-                          print('failed to upload: $e');
                         }
                         Navigator.of(context, rootNavigator: true).pop();
                       },
@@ -439,7 +409,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
         final file = result.files.first;
         filePath.text = file.name;
         //print('Bytes: ${file.bytes}');
-        print('Name: ${file.name}');
 
         //print('Size: ${file.size}');
         //print('Size: ${file.extension}');
@@ -459,7 +428,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
           //print('File Object: $file');
         });*/
       } catch (e) {
-        print('Error picking file: $e');
       }
 
       /* if (status.isGranted) {
@@ -535,10 +503,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                           requestedTicketShow = false;
                           ticketDashboardShow = false;
                         });
-                        print(
-                          "m innocent"
-                          "$raiseTicketShow",
-                        );
                         //Navigator.pushNamed(context, MyRoutings.helpDeskItemsRoute);
                       },
                       child: Stack(
@@ -804,8 +768,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                                 mapResponse['data'][i]['branchDeptId'];
                                             subject =
                                                 mapResponse['data'][i]['deptName'];
-                                            print("workTypeId $deptId");
-                                            print("workTypeId $subject");
                                           }
                                         }
                                         setState(() {
@@ -886,7 +848,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                               0) {
                                             queryTypeId =
                                                 mapResponseQuery['statusdata'][i]['id'];
-                                            print("subLocation $queryTypeId");
                                           }
                                         }
                                         setState(() {
@@ -967,7 +928,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                               0) {
                                             subQueryTypeId =
                                                 mapResponseSubQuery['statusdata'][i]['id'];
-                                            print("Id -  $subQueryTypeId");
                                           }
                                         }
                                         setState(() {
@@ -1054,9 +1014,8 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              ButtonBar(
+                              OverflowBar(
                                 alignment: MainAxisAlignment.center,
-                                buttonPadding: Vx.mOnly(right: 16),
                                 children: [
                                   ElevatedButton(
                                     onPressed: () {
@@ -1075,7 +1034,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
                                     },
                                     style: ButtonStyle(
                                       backgroundColor:
-                                          MaterialStateProperty.all(
+                                          WidgetStateProperty.all(
                                             Mythemes.lightBluishColor,
                                           ),
                                     ),
@@ -1903,7 +1862,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     request.fields['description'] = description;
     request.fields['status'] = "SAVE";
     request.fields['subqueryObj'] = "$subQueryTypeId";
-    print('URL $uri');
 
     /*  String jsonString = createJsonWithImage(imageValue);
 
@@ -1925,10 +1883,6 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     var stream = http.ByteStream(file!.openRead());
     stream.cast();
     var length = await file!.length();
-    print('Response status: ${length}');
-    print('Response body: ${stream}');
-    print('Response body: ${file}');
-    print("$stream");
 
     var multipart = http.MultipartFile(
       'image',
@@ -1957,10 +1911,8 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
     );
 
     //final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.pop(this.context);
       mapResponse = json.decode(response.body);
       //String reason = mapResponse['reason'];
@@ -1971,7 +1923,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           this.context,
-          result.upperCamelCase + " ",
+          "${result.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -2044,7 +1996,7 @@ class _HelpDeskItemsState extends State<HelpDeskItems> {
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
 
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

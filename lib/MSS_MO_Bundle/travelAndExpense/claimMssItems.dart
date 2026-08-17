@@ -20,7 +20,7 @@ import '../../modules/claimAndReimbursement/mss/claimMssApprovalPage.dart';
 import '../../modules/claimAndReimbursement/newModalClasses/claimMssListModal.dart';
 
 class MSS_MO_ClaimMSSItemsList extends StatefulWidget {
-  const MSS_MO_ClaimMSSItemsList({Key? key}) : super(key: key);
+  const MSS_MO_ClaimMSSItemsList({super.key});
 
   static const String _title = 'Employee List';
 
@@ -307,7 +307,7 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
                         ),
                         ...organizations.map((org) {
                           return DropdownMenuItem(value: org, child: Text(org));
-                        }).toList(),
+                        }),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -320,8 +320,6 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
                           );
 
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
                         });
 
                         setModalState(() {});
@@ -363,10 +361,6 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
                             permissionId = "CLAIM_APPROVAL_LEVEL_THREE_VIEW";
                             statusUpdate = "LEVEL_THREE_PENDING";
                           }
-                          print("Claim L1 $claimLevelOne");
-                          print("Claim L2 $claimLevelTwo");
-                          print("Claim L3 $claimLevelThree");
-                          print("Status $statusUpdate");
 
                           lOne =
                               claimLevelOne == "CLAIM_APPROVAL_LEVEL_ONE_VIEW";
@@ -427,9 +421,6 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
                                   claimApproverListModalGlobal;
                               isLoading = false;
                             });
-                            print(
-                              'employeeList00${claimApproverListModalGlobal!.data!.length}',
-                            );
                           });
                         },
                         icon: Icon(Icons.filter_alt),
@@ -466,7 +457,6 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
   Future<ClaimApproverListModalClass> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.claimApproveListApi;
-    print('employeeList11: ${SessionId}');
     ClaimApproverListModalClass employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -478,15 +468,12 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
       "profileId=$getProfileId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
     setState(() {
       isLoadingCount = true;
       isLoading = true;
     });
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = ClaimApproverListModalClass.fromJson(mapResponse);
     totalDraftAmt = employeeListModel.draftList;
     totalDisApproved = employeeListModel.disAppList;
@@ -502,7 +489,6 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<Data>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -603,7 +589,6 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -613,7 +598,6 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Attendance');
           }
           if (index == 3) {
             Navigator.push(
@@ -623,14 +607,12 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -1107,12 +1089,10 @@ class _MSS_MO_ClaimMSSItemsListState extends State<MSS_MO_ClaimMSSItemsList>
             itemCount: foundDataNew!.length,
             itemBuilder: (context, i) {
               foundDataNew![i].status;
-              print(foundDataNew![i].status);
               return InkWell(
                 onTap: () {
                   levelStatusCheckMO = foundDataNew![i].status;
                   empIdSendMO = foundDataNew![i].empId.toString();
-                  print("EMP ID --> $empIdSendMO");
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder:

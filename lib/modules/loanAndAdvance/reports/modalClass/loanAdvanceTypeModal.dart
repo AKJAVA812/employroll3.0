@@ -13,9 +13,9 @@ class LoanTypeListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.loandata != null) {
-      data['loandata'] = this.loandata!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (loandata != null) {
+      data['loandata'] = loandata!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -35,10 +35,10 @@ class Loandata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['loanName'] = this.loanName;
-    data['loanId'] = this.loanId;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['loanName'] = loanName;
+    data['loanId'] = loanId;
+    data['status'] = status;
     return data;
   }
 }

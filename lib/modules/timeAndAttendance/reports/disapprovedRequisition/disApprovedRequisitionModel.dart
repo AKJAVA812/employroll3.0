@@ -13,7 +13,7 @@ class DisapprovedRequisitionModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -68,20 +68,20 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['outtime'] = this.outtime;
-    data['actualInTime'] = this.actualInTime;
-    data['remark'] = this.remark;
-    data['reqId'] = this.reqId;
-    data['inTime'] = this.inTime;
-    data['intimeRemarks'] = this.intimeRemarks;
-    data['outtimeRemarks'] = this.outtimeRemarks;
-    data['reqDate'] = this.reqDate;
-    data['onDate'] = this.onDate;
-    data['updationDate'] = this.updationDate;
-    data['empName'] = this.empName;
-    data['actualOutTime'] = this.actualOutTime;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['outtime'] = outtime;
+    data['actualInTime'] = actualInTime;
+    data['remark'] = remark;
+    data['reqId'] = reqId;
+    data['inTime'] = inTime;
+    data['intimeRemarks'] = intimeRemarks;
+    data['outtimeRemarks'] = outtimeRemarks;
+    data['reqDate'] = reqDate;
+    data['onDate'] = onDate;
+    data['updationDate'] = updationDate;
+    data['empName'] = empName;
+    data['actualOutTime'] = actualOutTime;
+    data['status'] = status;
     return data;
   }
 }

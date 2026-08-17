@@ -20,9 +20,9 @@ class CalendarModalClass {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.legends != null) {
-      data['legends'] = this.legends!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (legends != null) {
+      data['legends'] = legends!.map((v) => v.toJson()).toList();
     }
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
@@ -45,10 +45,10 @@ class Legends {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['mobColor'] = this.mobColor;
-    data['status'] = this.status;
-    data['statusName'] = this.statusName;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['mobColor'] = mobColor;
+    data['status'] = status;
+    data['statusName'] = statusName;
     return data;
   }
 }
@@ -106,22 +106,22 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['outPunchType'] = this.outPunchType;
-    data['logDate'] = this.logDate;
-    data['inPunchType'] = this.inPunchType;
-    data['shortStatus'] = this.shortStatus;
-    data['dept'] = this.dept;
-    data['type'] = this.type;
-    data['branch'] = this.branch;
-    data['webColor'] = this.webColor;
-    data['inTime'] = this.inTime;
-    data['mobColor'] = this.mobColor;
-    data['empName'] = this.empName;
-    data['outTime'] = this.outTime;
-    data['status'] = this.status;
-    data['statusCode'] = this.statusCode;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['outPunchType'] = outPunchType;
+    data['logDate'] = logDate;
+    data['inPunchType'] = inPunchType;
+    data['shortStatus'] = shortStatus;
+    data['dept'] = dept;
+    data['type'] = type;
+    data['branch'] = branch;
+    data['webColor'] = webColor;
+    data['inTime'] = inTime;
+    data['mobColor'] = mobColor;
+    data['empName'] = empName;
+    data['outTime'] = outTime;
+    data['status'] = status;
+    data['statusCode'] = statusCode;
     return data;
   }
 }

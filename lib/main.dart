@@ -45,7 +45,6 @@ import 'package:er_flutter_project/widgets/expendableList.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:location/location.dart';
 import 'package:month_year_picker/month_year_picker.dart';
@@ -64,7 +63,6 @@ import 'MSS_Bundle/incidentReporting/incidentReportList.dart';
 import 'MSS_Bundle/leaveManagement/levelOneLeaveReq.dart';
 import 'MSS_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import 'MSS_Bundle/leaveManagement/othersEmpRequisition.dart';
-import 'MSS_Bundle/leaveManagement/pendingRequisitionList.dart';
 import 'MSS_Bundle/loans&Advance/loanApprovalPage.dart';
 import 'MSS_Bundle/loans&Advance/pendingLoanRequestList.dart';
 import 'MSS_Bundle/reports/RoWorkDoneReportFiltering.dart' as mss;
@@ -72,7 +70,6 @@ import 'MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL1.dart';
 import 'MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL2.dart';
 import 'MSS_Bundle/timeAndAttendance/mssAttendanceApprovalListL3.dart';
 import 'MSS_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
-import 'MSS_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
 import 'MSS_Bundle/mobile_mss/mss_attendance_approval_screen.dart';
 import 'MSS_Bundle/mobile_mss/mss_requisition_approval_screen.dart';
 import 'MSS_Bundle/mobile_mss/mss_team_screen.dart';
@@ -84,14 +81,12 @@ import 'MSS_MO_Bundle/exitProcess/exitListMO.dart';
 import 'MSS_MO_Bundle/leaveManagement/levelOneLeaveReq.dart';
 import 'MSS_MO_Bundle/leaveManagement/levelTwoLeaveReq.dart';
 import 'MSS_MO_Bundle/leaveManagement/othersEmpRequisition.dart';
-import 'MSS_MO_Bundle/leaveManagement/pendingRequisitionList.dart';
 import 'MSS_MO_Bundle/loans&Advance/pendingLoanRequestList.dart';
 import 'MSS_MO_Bundle/myTeam/myTeams.dart';
 import 'MSS_MO_Bundle/reports/RoWorkDoneReportFiltering.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL1.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/mssMoAttendanceApprovalListL2.dart';
 import 'MSS_MO_Bundle/timeAndAttendance/otherEmpRequisitionAttendance.dart';
-import 'MSS_MO_Bundle/timeAndAttendance/outDuty/pendingRequisitionList.dart';
 import 'MSS_MO_Bundle/travelAndExpense/claimMssItems.dart';
 import 'UIS_Bundle/dashboard/adminDashboard.dart';
 import 'UIS_Bundle/dashboard/mssDashboard.dart';
@@ -266,7 +261,6 @@ bool _shouldPrintAppLog(String line) {
 }
 
 void _handleZoneError(Object error, StackTrace stackTrace) {
-  print('[APP-ERROR] $error');
 }
 
 const String taskName = "background_location_task";
@@ -393,7 +387,6 @@ Future<void> _requestPermission() async {
   );
 
   // Log the user's permission decision
-  print('User granted permission: ${result.authorizationStatus}');
 }
 
 void openAppSettingsDialog() {
@@ -526,7 +519,6 @@ class _MyHomePageState extends State<MyHomePage> {
     //requestStoragePermission();
     // TODO: implement initState
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message in foreground: ${message.notification?.title}');
 
       // Show local notification
       if (message.notification != null) {
@@ -639,7 +631,7 @@ class _MyHomePageState extends State<MyHomePage> {
         shared.setLongitude(position!.longitude);
         //print('Response1111c $currentAddress');
       } else {
-        showAboutDialog(context: this.context);
+        showAboutDialog(context: context);
       }
     });
     positionCheck = await GeolocatorPlatform.instance.getCurrentPosition();
@@ -658,7 +650,7 @@ class _MyHomePageState extends State<MyHomePage> {
         shared.setLongitude(positionCheck!.longitude);
         //print('Response1111c $currentAddress');
       } else {
-        showAboutDialog(context: this.context);
+        showAboutDialog(context: context);
       }
     });
   }
@@ -1198,7 +1190,4 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
-  print('Title: ${message.notification?.title}');
-  print('Body: ${message.notification?.body}');
-  print('Payload: ${message.data}');
 }

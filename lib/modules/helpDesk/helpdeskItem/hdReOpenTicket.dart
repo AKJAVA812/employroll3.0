@@ -4,7 +4,7 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 
 class HDReOpenTickets extends StatefulWidget {
-  const HDReOpenTickets({Key? key}) : super(key: key);
+  const HDReOpenTickets({super.key});
 
   @override
   State<HDReOpenTickets> createState() => _HDReOpenTicketsState();

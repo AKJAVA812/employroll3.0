@@ -20,7 +20,7 @@ import '../../../../profiles/profilePageWithHead.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 
 class MSS_MO_RoWorkDoneReportFiltering extends StatefulWidget {
-  const MSS_MO_RoWorkDoneReportFiltering({Key? key}) : super(key: key);
+  const MSS_MO_RoWorkDoneReportFiltering({super.key});
 
   @override
   State<MSS_MO_RoWorkDoneReportFiltering> createState() => _WorkDoneReport();
@@ -36,7 +36,7 @@ List<Data>? foundDataNew = [];
 EmployeeListModel? employeeListModelglobel;
 EmployeeListModel? employeeListModelglobeled;
 
-late List<String?> list = [];
+List<String?> list = [];
 String valuenew = "listText";
 var empNewIdRo;
 var filterType;
@@ -55,14 +55,13 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
 
   @override
   void initState() {
-    this.year;
-    this.date;
-    this.month;
+    year;
+    date;
+    month;
     setState(() {
       getSharedPrfanceList();
       filterType = "0";
       empNewIdRo = "";
-      print("FilterTypeCheck - $filterType");
     });
 
     //formattedDate = DateFormat.yMd() as String;
@@ -77,17 +76,17 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
   String formattedDate = DateFormat.ABBR_MONTH;
 
   Future<Null> _selectDate(BuildContext context) async {
-    DateTime? _datePickPicker = await showDatePicker(
+    DateTime? datePickPicker = await showDatePicker(
       context: context,
       initialDate: _datePick,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_datePickPicker != null && _datePickPicker != _datePick) {
+    if (datePickPicker != null && datePickPicker != _datePick) {
       setState(() {
         pickDates = false;
-        _datePick = _datePickPicker;
+        _datePick = datePickPicker;
         toDatePickedStringRo = DateFormat('dd-MM-yyyy').format(_datePick);
       });
     }
@@ -97,17 +96,17 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
   String formatDate = DateFormat.ABBR_MONTH;
 
   Future<Null> _selectToDate(BuildContext context) async {
-    DateTime? _newDatePickPicker = await showDatePicker(
+    DateTime? newDatePickPicker = await showDatePicker(
       context: context,
       initialDate: _newDatePick,
       firstDate: DateTime(1947),
       lastDate: DateTime.now().add(Duration(days: 0)),
     );
 
-    if (_newDatePickPicker != null && _newDatePickPicker != _newDatePick) {
+    if (newDatePickPicker != null && newDatePickPicker != _newDatePick) {
       setState(() {
         pickNewDate = false;
-        _newDatePick = _newDatePickPicker;
+        _newDatePick = newDatePickPicker;
         fromDatePickedStringRo = DateFormat('dd-MM-yyyy').format(_newDatePick);
       });
     }
@@ -118,9 +117,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
     empRole = await shared.getEmpRoll();
     roRole = await shared.getRoRole();
     adminRole = await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
     // await Future.delayed(Duration(seconds: 5));
     Future<EmployeeListModel> getEmployeeList11 = getEmployeeList(sessionId!);
     final loading = Row(
@@ -137,36 +133,29 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
         employeeListModelglobel = value;
         employeeListModelglobeled = employeeListModelglobel;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
 
     setState(() {
       if (empRole == 1) {
         showHide = true;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (empRole == 0) {
         showHide = false;
-        print('Show Emp $showHide');
         setState(() {});
       }
       if (adminRole == 0) {
         showAdmin = false;
-        print("Show Admin $showAdmin");
       }
       if (adminRole == 1) {
         showAdmin = true;
-        print("Show Admin $showAdmin");
       }
       if (roRole == 0) {
         showRo = false;
 
-        print("Show Ro $showRo");
       }
       if (roRole == 1) {
         showRo = true;
-        print("Show Ro $showRo");
       }
     });
   }
@@ -175,22 +164,16 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
     list = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.othersReqEmpList;
-    print('employeeList11: ${sessionId}');
     EmployeeListModel requistionEmpListModel;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     requistionEmpListModel = EmployeeListModel.fromJson(mapResponse);
     int length = requistionEmpListModel.data!.length;
-    print('totallenth $length ');
     for (int i = 0; i < requistionEmpListModel.data!.length; i++) {
       String? empName = requistionEmpListModel.data![i].empName;
       list.add(requistionEmpListModel.data![i].empName);
-      print('dataExpenseType $empName');
     }
     return requistionEmpListModel;
   }
@@ -229,7 +212,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                 MaterialPageRoute(builder: (context) => HomePage()),
               );
               //Navigator.pop(context);
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -239,7 +221,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
             }
             if (index == 2) {
               Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Attendance');
             }
             if (index == 3) {
               Navigator.push(
@@ -249,14 +230,12 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if (index == 4) {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew()),
               );
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";
@@ -339,7 +318,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                     onChanged: (i) {
                       setState(() {
                         value = i;
-                        print(i);
                       });
                       if (value == 1) {
                         Navigator.pushNamed(
@@ -411,7 +389,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                     onChanged: (i) {
                       setState(() {
                         switcherIndex1 = i;
-                        print(i);
                       });
                       if (switcherIndex1 == 0) {
                         filterType = "0";
@@ -419,7 +396,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                       } else {
                         filterType = "1";
                       }
-                      print("FilterTYPE - $filterType");
                     },
                   ),
                 ],
@@ -501,7 +477,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                             empNewIdRo =
                                 employeeListModelglobel?.data?[i].empId
                                     .toString();
-                            print("EmpId  $empNewIdRo");
                             setState(() {
                               dropdownvalue = newVal;
                             });
@@ -714,9 +689,8 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  child: ButtonBar(
+                  child: OverflowBar(
                     alignment: MainAxisAlignment.center,
-                    buttonPadding: Vx.mOnly(right: 16),
                     children: [
                       ElevatedButton(
                         /*onPressed: (){
@@ -730,7 +704,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                                     "Please select valid date range".text
                                         .make(),
                               );
-                              print("select valid date range");
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -774,7 +747,6 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                               );
                             }
                           } else {
-                            print("Please select date");
                             setState(() {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -785,7 +757,7 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
                           }
                         },
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                             Mythemes.lightBluishColor,
                           ),
                         ),
@@ -805,7 +777,7 @@ class _WorkDoneReport extends State<MSS_MO_RoWorkDoneReportFiltering> {
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

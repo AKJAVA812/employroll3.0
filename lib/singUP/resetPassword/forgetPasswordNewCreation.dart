@@ -9,7 +9,7 @@ import '../login_page.dart';
 class ForgotPasswordResetPage extends StatefulWidget {
   var emailControllerNew;
 
-  ForgotPasswordResetPage(this.emailControllerNew);
+  ForgotPasswordResetPage(this.emailControllerNew, {super.key});
 
   @override
   State<ForgotPasswordResetPage> createState() =>
@@ -52,7 +52,6 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
       'pw=${_newPasswordController.text}',
     );
 
-    print("Calling API: $url");
 
     // Show loader
     showDialog(
@@ -63,8 +62,6 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
 
     try {
       final response = await MobileHttpClient.instance.post(url);
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       // Dismiss loader
       Navigator.of(context, rootNavigator: true).pop();
@@ -101,7 +98,6 @@ class _ForgotPasswordResetPageState extends State<ForgotPasswordResetPage> {
                           MaterialPageRoute(builder: (context) => LoginPage()),
                         );
                       } else {
-                        print("âš ï¸ Warning: No route to close.");
                       }
                     },
                     child: const Text("OK"),

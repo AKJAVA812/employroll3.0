@@ -10,7 +10,7 @@ import '../../../commanScreen/punchInOutScreen.dart';
 import '../../../sharedPrefancePage/ShardPre.dart';
 
 class OnDutyTypes extends StatefulWidget {
-  const OnDutyTypes({Key? key}) : super(key: key);
+  const OnDutyTypes({super.key});
 
   @override
   State<OnDutyTypes> createState() => _OnDutyTypesState();
@@ -45,40 +45,30 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
     odPendingPermissionMO= (await shared.getODPendingListMO())!;
     odPendingPermissionMSS= (await shared.getODPendingList())!;
     odPendingPermissionUIS= (await shared.getODPendingListUIS())!;
-    print("User Panel - $userPanelPermission");
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
     if(empRole==1){
       showHide=true;
       showRo = false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if(empRole==0){
       showHide=false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if (adminRole == 0) {
       showAdmin = false;
-      print("Show Admin $showAdmin");
     }
     if (adminRole == 1) {
       showAdmin = true;
-      print("Show Admin $showAdmin");
     }
     if (roRole == 0) {
       showRo = false;
 
-      print("Show Ro $showRo");
     }
     if (roRole == 1) {
       showRo = true;
-      print("Show Ro $showRo");
     }
   }
 
@@ -444,17 +434,14 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 0,)));
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if(index==1){
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if(index==2){
               Navigator.pushNamed(context, MyRoutings.onDutyTypes);
-              print('OD');
             }
             if(index==3){
               Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
@@ -462,7 +449,6 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
                   MaterialPageRoute(builder: (context) => MSSDashboard(DashboardModel()))
               );*/
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('Dashboard');
             }
             if(index==4){
               Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
@@ -470,7 +456,6 @@ class _OnDutyTypesState extends State<OnDutyTypes> {
                   MaterialPageRoute(builder: (context) => ProfilePageNew())
               );*/
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Profile');
             }
             /*if(index==3){
                 title="Notifications";

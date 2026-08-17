@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:er_flutter_project/employeePage/employeeListPage.dart';
 import 'package:er_flutter_project/employeePage/mapView.dart';
@@ -16,7 +15,7 @@ class TimeLineEmp extends StatefulWidget {
   int? empId;
   var selectedDate;
 
-  TimeLineEmp(this.empId, this.selectedDate);
+  TimeLineEmp(this.empId, this.selectedDate, {super.key});
 
   @override
   State<TimeLineEmp> createState() => _TimeLineEmpState(empId, selectedDate);
@@ -113,7 +112,6 @@ class _TimeLineEmpState extends State<TimeLineEmp> {
 
       final response = await MobileHttpClient.instance.post(urlapi);
 
-      print('URL: ${response.request}');
 
       mapResponse = json.decode(response.body);
       getData = mapResponse['data'];
@@ -126,7 +124,6 @@ class _TimeLineEmpState extends State<TimeLineEmp> {
 
       return timeLineModal; // âœ… Always return a valid object
     } catch (e) {
-      print("âŒ Error fetching timeline data: $e");
 
       setState(() {
         isLoading = false; // âœ… Hide loader on error

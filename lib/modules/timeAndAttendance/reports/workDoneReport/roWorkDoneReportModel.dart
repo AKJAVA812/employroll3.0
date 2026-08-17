@@ -13,7 +13,7 @@ class ROWorkdoneReportModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -65,19 +65,19 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['empId'] = this.empId;
-    data['image'] = this.image;
-    data['cMailId'] = this.cMailId;
-    data['empCode'] = this.empCode;
-    data['cAddress'] = this.cAddress;
-    data['cName'] = this.cName;
-    data['empName'] = this.empName;
-    data['branchName'] = this.branchName;
-    data['cNumber'] = this.cNumber;
-    data['remark'] = this.remark;
-    data['time'] = this.time;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['empId'] = empId;
+    data['image'] = image;
+    data['cMailId'] = cMailId;
+    data['empCode'] = empCode;
+    data['cAddress'] = cAddress;
+    data['cName'] = cName;
+    data['empName'] = empName;
+    data['branchName'] = branchName;
+    data['cNumber'] = cNumber;
+    data['remark'] = remark;
+    data['time'] = time;
     return data;
   }
 }

@@ -17,7 +17,7 @@ import '../../modules/leaveManagement/reports/modalClass/leaveBalanceModel.dart'
 import '../../modules/leaveManagement/reports/modalClass/otherReqEmpList.dart';
 
 class MSS_MO_OthersLeaveReqPage extends StatefulWidget {
-  const MSS_MO_OthersLeaveReqPage({Key? key}) : super(key: key);
+  const MSS_MO_OthersLeaveReqPage({super.key});
 
   @override
   State<MSS_MO_OthersLeaveReqPage> createState() =>
@@ -36,8 +36,8 @@ dynamic matchedOrg;
 RequistionEmpListModel? employeeListModelglobel;
 LeaveBalanceModel? leaveBalanceLabel;
 String valuenew = "listText";
-late List<String?> list = [];
-late List<String?> leaveTypeList = [];
+List<String?> list = [];
+List<String?> leaveTypeList = [];
 
 class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
     with RouteAware {
@@ -160,7 +160,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
       setState(() {
         employeeListModelglobel = value;
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
 
     getLeaveType12.then((value) {
@@ -169,7 +168,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
         //var leaveTypeId = value?.leaveData.leaveTypeList;
         //print('object$leaveTypeId');
       });
-      print('employeeList00${employeeListModelglobel!.data!.length}');
     });
   }
 
@@ -177,7 +175,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
     list = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.othersReqEmpList;
-    print('employeeList11: ${sessionId}');
     RequistionEmpListModel requistionEmpListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -187,18 +184,13 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
       "orgId=$getOrgId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     requistionEmpListModel = RequistionEmpListModel.fromJson(mapResponse);
     int length = requistionEmpListModel.data!.length;
-    print('totallenth $length ');
     for (int i = 0; i < requistionEmpListModel.data!.length; i++) {
       String? empName = requistionEmpListModel.data![i].empName;
       list.add(requistionEmpListModel.data![i].empName);
-      print('dataExpenseType $empName');
     }
     return requistionEmpListModel;
   }
@@ -207,18 +199,13 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
     leaveTypeList = [];
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBalanceApi;
-    print('employeeList11: ${sessionId}');
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$sessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseLeaveTypeList ${response.body}');
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseLeaveTypeList $getData');
     leaveBalanceLabel = LeaveBalanceModel.fromJson(mapResponse);
     int? length =
         leaveBalanceLabel?.leaveData?.leaveTypeList?.leaveTypelist?.length;
-    print('totalleaveLength $length ');
     for (
       int i = 0;
       i < leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist!.length;
@@ -229,7 +216,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
       leaveTypeList.add(
         leaveBalanceLabel!.leaveData!.leaveTypeList!.leaveTypelist![i],
       );
-      print('dataLeaveTypeName $leaveTypeName');
     }
     return leaveBalanceLabel;
   }
@@ -293,7 +279,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                         ),
                         ...organizations.map((org) {
                           return DropdownMenuItem(value: org, child: Text(org));
-                        }).toList(),
+                        }),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -306,8 +292,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                           );
 
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print('Org Name: $selectedOrg');
-                          print('Org ID: $getOrgId');
                         });
 
                         setModalState(() {});
@@ -330,7 +314,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                           userPanel = await shared.getUserPanel();
                           getProfileId = await shared.getDefaultProfileId();
                           getOrgId = matchedOrg['id']?.toString() ?? '';
-                          print("ORG ID - $getOrgId");
                           Future<RequistionEmpListModel> getEmployeeList11 =
                               getEmployeeList(sessionId!);
                           Future<LeaveBalanceModel?> getLeaveType12 =
@@ -347,9 +330,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                             setState(() {
                               employeeListModelglobel = value;
                             });
-                            print(
-                              'employeeList00${employeeListModelglobel!.data!.length}',
-                            );
                           });
 
                           getLeaveType12.then((value) {
@@ -358,9 +338,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                               //var leaveTypeId = value?.leaveData.leaveTypeList;
                               //print('object$leaveTypeId');
                             });
-                            print(
-                              'employeeList00${employeeListModelglobel!.data!.length}',
-                            );
                           });
                         },
                         icon: Icon(Icons.filter_alt),
@@ -437,7 +414,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                       valuenew = newVal.toString();
                       int i = list.indexOf(valuenew);
                       empNewId = employeeListModelglobel?.data?[i].empId;
-                      print("EmpId  $empNewId");
                       setState(() {
                         dropdownvalue = newVal;
                       });
@@ -487,20 +463,17 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                       var policyidnew = leaveTypeList.elementAt(i);
                       leavereqIdGlobel = newVal.toString().split('-');
                       String idn = leavereqIdGlobel.last;
-                      print('leaveTypeId $idn');
                       setState(() {
-                        print('value1 $i');
-                        print('value $policyidnew');
 
                         dropdownNewvalue = newVal;
                       });
                       if (i == 0 || i == 1 || i == 2) {
                         setState(() {
-                          this.halfDayRadio = true;
+                          halfDayRadio = true;
                         });
                       } else {
                         setState(() {
-                          this.halfDayRadio = false;
+                          halfDayRadio = false;
                         });
                       }
                     },
@@ -527,8 +500,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                     singleDayShow = true;
                                     multipleDayShow = false;
                                     halfDayShow = false;
-                                    print("day show $singleDayShow");
-                                    print("multi show $multipleDayShow");
                                     /*  _singleDayShow == _singleDayShow;
                                            _multipleDayShow == _multipleDayShow;*/
                                   });
@@ -554,8 +525,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                     singleDayShow = true;
                                     multipleDayShow = true;
                                     halfDayShow = false;
-                                    print("day show $singleDayShow");
-                                    print("multi show $multipleDayShow");
                                     /*  _singleDayShow =_singleDayShow;
                                           _multipleDayShow =! _multipleDayShow;*/
                                   });
@@ -584,8 +553,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                           singleDayShow = true;
                                           multipleDayShow = false;
                                           halfDayShow = true;
-                                          print("day show $singleDayShow");
-                                          print("multi show $multipleDayShow");
                                           /* _singleDayShow == _singleDayShow;
                                             _multipleDayShow = !_multipleDayShow;*/
                                         });
@@ -629,7 +596,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                   ).format(fromDate!);
                                 });
 
-                                print(fromDate);
                               },
                               readOnly: true,
                               enabled: true,
@@ -688,7 +654,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                   ).format(toDate!);
                                 });
 
-                                print(toDate);
                               },
                               readOnly: true,
                               enabled: true,
@@ -751,7 +716,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                     );
                                   },
                                 );
-                                print('timenewOut $n');
                                 setState(() {
                                   var now = DateTime.now();
                                   DateTime newt = DateTime(
@@ -762,7 +726,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                     n.minute,
                                   );
                                   var nT = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
                                   _fromTimePicker = nT;
                                   fromTimePickerController.text =
                                       _fromTimePicker;
@@ -821,7 +784,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                     );
                                   },
                                 );
-                                print('timenewOut $o');
                                 setState(() {
                                   var now = DateTime.now();
                                   DateTime newt = DateTime(
@@ -832,7 +794,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                                     o.minute,
                                   );
                                   var ot = DateFormat('HH:mm').format(newt);
-                                  print(DateFormat('HH:mm').format(newt));
                                   _toTimePicker = ot;
                                   toTimePickerController.text = _toTimePicker;
                                 });
@@ -897,9 +858,8 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                 Row(
                   children: [
                     Expanded(
-                      child: ButtonBar(
+                      child: OverflowBar(
                         alignment: MainAxisAlignment.center,
-                        buttonPadding: Vx.mOnly(right: 16),
                         children: [
                           ElevatedButton(
                             onPressed: () {
@@ -932,7 +892,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                               //approveLeaveRequisition(_commentController.text, leaveReqId);
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                 Mythemes.lightBluishColor,
                               ),
                             ),
@@ -963,7 +923,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                 ),
               );
               //Navigator.of(context, rootNavigator: true).pop();
-              print('home tab');
             }
             if (index == 1) {
               Navigator.push(
@@ -973,17 +932,14 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
                 ),
               );
               //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-              print('Workflow');
             }
             if (index == 2) {
               //Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
               Navigator.pop(context);
-              print('Leave');
             }
             if (index == 3) {
               Navigator.pushNamed(context, MyRoutings.myAllReportsRoute);
               //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-              print('My Reports');
             }
             if (index == 4) {
               Navigator.pushNamed(
@@ -992,7 +948,6 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
               );
 
               //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-              print('Dashboard');
             }
             /*if(index==3){
                 title="Notifications";
@@ -1047,20 +1002,16 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -1097,20 +1048,16 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -1149,20 +1096,16 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
       "nominee=",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     if (response.statusCode == 200) {
       var responseResult = response.body;
-      print('success $responseResult');
       Navigator.of(context, rootNavigator: true).pop();
       mapResponse = json.decode(response.body);
       String result = mapResponse['result']['result'];
       String reason = mapResponse['result']['reason'];
-      print('result both $result $reason');
-      print('result${result}');
       if (result.compareToIgnoringCase("success") == 0) {
         CommonNotificationPage.showDialgSucess(
           context,
-          reason.upperCamelCase + " ",
+          "${reason.upperCamelCase} ",
           "Success",
         );
       } else if (result.compareToIgnoringCase("error") == 0) {
@@ -1178,7 +1121,7 @@ class _MSS_MO_OthersLeaveReqPageState extends State<MSS_MO_OthersLeaveReqPage>
 
 class DismissKeyboard extends StatelessWidget {
   final Widget child;
-  const DismissKeyboard({Key? key, required this.child}) : super(key: key);
+  const DismissKeyboard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

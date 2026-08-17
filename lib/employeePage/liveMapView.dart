@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/services.dart';
 import 'package:er_flutter_project/employeePage/employeeListPage.dart';
@@ -21,7 +20,7 @@ class LiveMapView extends StatefulWidget {
   String empName;
   int? empId;
 
-  LiveMapView(this.empName, this.empId);
+  LiveMapView(this.empName, this.empId, {super.key});
 
   @override
   State<LiveMapView> createState() => _LiveMapViewState(empName, empId);
@@ -34,7 +33,7 @@ LiveTrackingModal? liveTrackingModalGlobal;
 String? selectedDate;
 
 class _LiveMapViewState extends State<LiveMapView> {
-  CustomInfoWindowController _customInfoWindowController =
+  final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
 
   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
@@ -64,8 +63,6 @@ class _LiveMapViewState extends State<LiveMapView> {
   void initState() {
     empNames = empName;
     empIds = empId;
-    print('empNames $empName');
-    print('empIds $empId');
     // TODO: implement initState
     super.initState();
     _determinePosition();
@@ -73,9 +70,7 @@ class _LiveMapViewState extends State<LiveMapView> {
     var now = DateTime.now();
     var formatter = DateFormat('yyyy-MM-dd');
     todayDate = formatter.format(now);
-    print('todayDate $todayDate');
     //selectedDate = _dateController;
-    print('selectedDate $selectedDate');
     getSharedPrfanceList();
   }
 
@@ -98,13 +93,11 @@ class _LiveMapViewState extends State<LiveMapView> {
       //  DateFormat.yMd().format(date!).toString();
     });
 
-    print(date);
   }
 
   Future<LiveTrackingModal> getTracking(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.historyTracking;
-    print('employeeList11: ${SessionId}');
     LiveTrackingModal liveTrackingModal;
     var urlapi = Uri.parse(
       "$conn$apiUrl?"
@@ -113,19 +106,14 @@ class _LiveMapViewState extends State<LiveMapView> {
       "empId=$empId",
     );
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
-    print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     liveTrackingModal = LiveTrackingModal.fromJson(mapResponse);
 
     for (int i = 0; i < liveTrackingModal.attData!.length; i++) {
       inImage = liveTrackingModal.attData![i].inPhoto;
 
-      print('inImage $inImage');
-      print('outImage $outImage');
     }
     distanceLength = liveTrackingModal.distance;
 
@@ -136,7 +124,6 @@ class _LiveMapViewState extends State<LiveMapView> {
     var position = await GeolocatorPlatform.instance.getCurrentPosition();
     var lastPosition = await Geolocator.getLastKnownPosition();
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
-    print('Response1111l $lastPosition');
 
     setState(() {
       //currentPostion = LatLng(ltt, lngg);
@@ -144,9 +131,7 @@ class _LiveMapViewState extends State<LiveMapView> {
 
       StreamSubscription<ServiceStatus> serviceStatusStream =
           Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
-            print('Response1111s $status');
           });
-      print('Response1111s $serviceStatusStream');
     });
   }
 
@@ -176,9 +161,7 @@ class _LiveMapViewState extends State<LiveMapView> {
         'assets/images/fingerMaker.png',
         200,
       );
-      print('lengthPunchIn $i');
       var long = liveTrackingModalGlobal!.attData![i].inlng;
-      print('object2 $long');
       var lati = liveTrackingModalGlobal!.attData![i].inlat;
       var inImage = liveTrackingModalGlobal!.attData![i].inPhoto;
       newPunchLatlng.add(LatLng(lati, long));
@@ -191,7 +174,7 @@ class _LiveMapViewState extends State<LiveMapView> {
             onTap: () {
               _customInfoWindowController.addInfoWindow!(
                 Card(
-                  child: Container(
+                  child: SizedBox(
                     height: 300,
                     width: 200,
                     child: Column(
@@ -294,7 +277,6 @@ class _LiveMapViewState extends State<LiveMapView> {
         'assets/images/workdoneMarker.png',
         200,
       );
-      print('lengthI $i');
       var latlng = double.parse(liveTrackingModalGlobal!.taskData![i].tasklng);
       var ltt = double.parse(liveTrackingModalGlobal!.taskData![i].tasklat);
       var taskImage = liveTrackingModalGlobal!.taskData![i].taskPhoto;
@@ -310,7 +292,7 @@ class _LiveMapViewState extends State<LiveMapView> {
             onTap: () {
               _customInfoWindowController.addInfoWindow!(
                 Card(
-                  child: Container(
+                  child: SizedBox(
                     height: 300,
                     width: 200,
                     child: Column(
@@ -428,7 +410,6 @@ class _LiveMapViewState extends State<LiveMapView> {
         liveTrackingModalGlobal = value;
         loadData();
       });
-      print('employeeList00${liveTrackingModalGlobal!.data!.length}');
 
       /* for(int i=0; i<liveTrackingModalGlobal!.data!.length;i++){
         ltt = liveTrackingModalGlobal!.data![i].lat;
@@ -463,10 +444,9 @@ class _LiveMapViewState extends State<LiveMapView> {
         .animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: LatLng(28.5318562, 77.2731763), zoom: 17)));*/
 
-    print('Response1111c Onpressed $position');
   }
 
-  LatLng _center = LatLng(32.5367794, -121.2714404);
+  final LatLng _center = LatLng(32.5367794, -121.2714404);
 
   getCurrentLocation() async {
     position = await Geolocator.getCurrentPosition(
@@ -548,9 +528,8 @@ class _LiveMapViewState extends State<LiveMapView> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-              child: ButtonBar(
+              child: OverflowBar(
                 alignment: MainAxisAlignment.center,
-                buttonPadding: Vx.mOnly(right: 30),
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(

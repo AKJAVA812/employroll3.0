@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:er_flutter_project/commanScreen/punchInOutScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
@@ -14,13 +13,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
-import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/attendance_punch_api.dart';
 
 import '../sharedPrefancePage/ShardPre.dart';
 import '../themes/empThemes.dart';
 import 'allAPIList.dart';
-import 'commanNotificationPage.dart';
 import 'modalClass/geofenceListModal.dart';
 
 class ImageUploaded extends StatefulWidget {
@@ -29,7 +26,7 @@ class ImageUploaded extends StatefulWidget {
   final String address;
   final String? punchType;
 
-  ImageUploaded({
+  const ImageUploaded({super.key, 
     required this.value,
     required this.time,
     required this.address,
@@ -59,8 +56,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
   @override
   void initState() {
-    print("image - $value");
-    print(value!.lengthSync());
     //saveCount = _myBox.get('saveCount') ?? 0;
     // TODO: implement initState
     getSharedPrfanceList();
@@ -83,7 +78,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
     //Image Getter
     var stream = http.ByteStream(value!.openRead());
-    print("Save Count - $saveCount");
     stream.cast();
     var length = await value!.length();
     var bytes = await stream.toBytes();
@@ -161,7 +155,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
   int _clickCount = 0;
 
   _incrementCounter() {
-    print("$_clickCount");
   }
 
   String? _platformVersion = 'Unknown', _autoTimezone, _autoTime, _daftar = "";
@@ -223,7 +216,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
       _autoTime = autoTime;
       _list = list;
       _daftar = "";
-      print('autoupdateChange $_platformVersion $_autoTimezone $autoTime');
       list!.forEach((k, v) {
         _daftar = "$k : $v \n";
       });
@@ -271,7 +263,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
         TextButton(
           onPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
-            print("ORGID - $orgId");
             if (setGeofenceActive == true) {
               showGeofenceDialog(
                 context,
@@ -327,13 +318,12 @@ class _ImageUploadedState extends State<ImageUploaded> {
               //await _closeRootDialog(context);
               savedDataLocally(
                 context,
-                "Data Saved Offline !" + "",
+                "Data Saved Offline !" "",
                 "Your punch is saved offline, Please sync the punch once you are in network area.",
               );
               writeData();
               //readData();
             } else {
-              print("ORGID - $orgId");
               if (setGeofenceActive == true) {
                 showGeofenceDialog(
                   context,
@@ -443,7 +433,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
       } else if (Platform.isIOS) {
         var iosInfo = await deviceInfo.iosInfo;
         deviceId = iosInfo.identifierForVendor; // Unique ID on iOS
-        print('Device ID 1 - ${iosInfo.identifierForVendor}');
       } else {
         deviceId = 'Unsupported platform';
       }
@@ -506,7 +495,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       await _closeRootDialog(context);
       slowInternetPop(
         context,
-        "Slow Internet Connection !" + "",
+        "Slow Internet Connection !" "",
         "Your Punch in not submitted, Please try again.",
       );
       return;
@@ -547,17 +536,14 @@ class _ImageUploadedState extends State<ImageUploaded> {
     request.files.add(multipart);
     // Construct API URL with parameters
     String apiWithParams =
-        uri.toString() +
-        '?' +
-        request.fields.entries
+        '$uri?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
@@ -566,7 +552,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
         address: currentAddress,
       );
 
-      print('Response received: ${response.body}');
 
       if (response.statusCode == 500) {
         await _closeRootDialog(context);
@@ -582,24 +567,20 @@ class _ImageUploadedState extends State<ImageUploaded> {
       String resultSuccess = result['result'];
       String reasonSuccess = result['reason'];
 
-      print('URL ${response.request}');
-      print('result: $result');
-      print("Reason: $reasonSuccess");
-      print("Result: $resultSuccess");
 
       if (response.statusCode == 200) {
         await _closeRootDialog(context);
         if (resultSuccess.compareToIgnoringCase("success") == 0) {
           showSuccessGo(
             context,
-            reasonSuccess.upperCamelCase + " " + formattedDate,
+            "${reasonSuccess.upperCamelCase} $formattedDate",
             "Successfully Punch $clockingType",
           );
         } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
           if (reasonSuccess == "non-geofence area") {
             showSuccessGo(
               context,
-              reasonSuccess.upperCamelCase + " " + formattedDate,
+              "${reasonSuccess.upperCamelCase} $formattedDate",
               " Non Geofence Area ",
             );
           } else {
@@ -645,7 +626,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       await _closeRootDialog(rootContext);
       slowInternetPop(
         rootContext,
-        "Slow Internet Connection !" + "",
+        "Slow Internet Connection !" "",
         "Your Punch in not submitted, Please try again.",
       );
       return;
@@ -690,17 +671,14 @@ class _ImageUploadedState extends State<ImageUploaded> {
     request.files.add(multipart);
     // Construct API URL with parameters
     String apiWithParams =
-        uri.toString() +
-        '?' +
-        request.fields.entries
+        '$uri?${request.fields.entries
             .map(
               (e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
             )
-            .join('&');
+            .join('&')}';
 
     // Print the full API URL with parameters
-    print('API URL with Parameters: $apiWithParams');
     //http.Response response = await http.Response.fromStream(await request.send());
 
     try {
@@ -711,14 +689,13 @@ class _ImageUploadedState extends State<ImageUploaded> {
       );
       // Process the response here
 
-      print('Response received: ${response.body}');
       //print('URL ${response.request}');
 
       if (response.statusCode == 500) {
         await _closeRootDialog(rootContext);
         slowInternetPop(
           rootContext,
-          "Slow Internet Connection !" + "",
+          "Slow Internet Connection !" "",
           "Your Punch in not submitted, Please try again.",
         );
         return;
@@ -726,16 +703,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
       result = json.decode(response.body.toString());
       String resultSuccess = result['result'];
       String reasonSuccess = result['reason'];
-      print('URL ${response.request}');
-      print('result${result}');
-      print(
-        "Reason: ${result['reason']}, Type: ${result['reason'].runtimeType}",
-      );
-      print(
-        "Result: ${result['result']}, Type: ${result['result'].runtimeType}",
-      );
 
-      print('Response body: ${result}');
 
       //var response = await request.send();
       // listen for response
@@ -743,19 +711,18 @@ class _ImageUploadedState extends State<ImageUploaded> {
       //var responseData = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        print("I am hit 2 times");
         await _closeRootDialog(rootContext);
         if (resultSuccess.compareToIgnoringCase("success") == 0) {
           showSuccessGo(
             rootContext,
-            reasonSuccess.upperCamelCase + " " + formattedDate,
+            "${reasonSuccess.upperCamelCase} $formattedDate",
             "Successfully Punch $clockingType",
           );
         } else if (resultSuccess.compareToIgnoringCase("failed") == 0) {
           if (reasonSuccess == "non-geofence area") {
             showSuccessGo(
               rootContext,
-              reasonSuccess.upperCamelCase + " " + formattedDate,
+              "${reasonSuccess.upperCamelCase} $formattedDate",
               " Non Geofence Area ",
             );
           } else {
@@ -1005,7 +972,6 @@ class _ImageUploadedState extends State<ImageUploaded> {
       if (mounted) setState(() => setGeofenceActive = context.geofenceRequired);
       return context.toLegacyGeofenceList();
     } catch (e) {
-      print("ðŸš¨ Error fetching geofence list: $e");
       // âœ… Return empty model in case of failure
       return GeofenceListModal(userdata: []);
     }
@@ -1308,15 +1274,13 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
       bottomNavigationBar: Container(
         color: context.cardColor,
-        child: ButtonBar(
+        child: OverflowBar(
           alignment: MainAxisAlignment.center,
-          buttonPadding: Vx.mOnly(right: 16),
           children: [
             ElevatedButton(
               onPressed: () {
                 //getUploadImage();
 
-                print("ORGID - $orgId");
                 if (setGeofenceActive == true) {
                   showGeofenceDialog(
                     context,
@@ -1329,7 +1293,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
                 }
               },
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(
+                backgroundColor: WidgetStateProperty.all(
                   Mythemes.lightBluishColor,
                 ),
               ),
@@ -1404,7 +1368,7 @@ class _ImageUploadedState extends State<ImageUploaded> {
 
 @override
 Widget UploadedLocation() {
-  return Container(
+  return SizedBox(
     height: 80,
     child: SingleChildScrollView(
       child: Row(
@@ -1447,7 +1411,7 @@ Widget UploadedLocation() {
 
 @override
 Widget UploadedTime(String time) {
-  return Container(
+  return SizedBox(
     height: 68,
     child: Row(
       children: [
@@ -1490,7 +1454,7 @@ Widget UploadedTime(String time) {
 
 @override
 Widget UploadedReading() {
-  return Container(
+  return SizedBox(
     height: 68,
     child: Row(
       children: [

@@ -280,9 +280,7 @@ class MobileHttpClient extends http.BaseClient {
     final context = SecurityContext(withTrustedRoots: true);
     try {
       context.setTrustedCertificatesBytes(utf8.encode(_sectigoR36Pem));
-      print('[MOBILE-AUTH] SSL trust bundle loaded');
     } catch (error) {
-      print('[MOBILE-AUTH] SSL trust bundle load failed -> $error');
     }
 
     final client = HttpClient(context: context);

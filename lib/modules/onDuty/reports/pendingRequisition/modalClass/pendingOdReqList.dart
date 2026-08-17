@@ -15,10 +15,10 @@ class PendingOdReqList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['result'] = this.result;
-    if (this.listdata != null) {
-      data['listdata'] = this.listdata!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['result'] = result;
+    if (listdata != null) {
+      data['listdata'] = listdata!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -79,23 +79,23 @@ class Listdata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['approvaldate'] = this.approvaldate;
-    data['image'] = this.image;
-    data['odtime'] = this.odtime;
-    data['lng'] = this.lng;
-    data['approvalstatus'] = this.approvalstatus;
-    data['odaddress'] = this.odaddress;
-    data['name'] = this.name;
-    data['id'] = this.id;
-    data['odtype'] = this.odtype;
-    data['lat'] = this.lat;
-    data['Remark'] = this.remark;
-    data['branch'] = this.branch;
-    data['requestType'] = this.requestType;
-    data['currentLevel'] = this.currentLevel;
-    data['totalLevels'] = this.totalLevels;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['approvaldate'] = approvaldate;
+    data['image'] = image;
+    data['odtime'] = odtime;
+    data['lng'] = lng;
+    data['approvalstatus'] = approvalstatus;
+    data['odaddress'] = odaddress;
+    data['name'] = name;
+    data['id'] = id;
+    data['odtype'] = odtype;
+    data['lat'] = lat;
+    data['Remark'] = remark;
+    data['branch'] = branch;
+    data['requestType'] = requestType;
+    data['currentLevel'] = currentLevel;
+    data['totalLevels'] = totalLevels;
     return data;
   }
 }

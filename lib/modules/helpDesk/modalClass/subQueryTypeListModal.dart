@@ -13,9 +13,9 @@ class SubQueryTypeListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.statusdata != null) {
-      data['statusdata'] = this.statusdata!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (statusdata != null) {
+      data['statusdata'] = statusdata!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -53,15 +53,15 @@ class Statusdata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['code'] = this.code;
-    data['subQueryname'] = this.subQueryname;
-    data['queryName'] = this.queryName;
-    data['description'] = this.description;
-    data['id'] = this.id;
-    data['dept'] = this.dept;
-    data['branchDeptId'] = this.branchDeptId;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['code'] = code;
+    data['subQueryname'] = subQueryname;
+    data['queryName'] = queryName;
+    data['description'] = description;
+    data['id'] = id;
+    data['dept'] = dept;
+    data['branchDeptId'] = branchDeptId;
+    data['status'] = status;
     return data;
   }
 }

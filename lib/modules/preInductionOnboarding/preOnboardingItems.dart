@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -12,7 +11,7 @@ import '../../../sharedPrefancePage/ShardPre.dart';
 
 
 class PreOnboardingItems extends StatefulWidget {
-  const PreOnboardingItems({Key? key}) : super(key: key);
+  const PreOnboardingItems({super.key});
 
   @override
   State<PreOnboardingItems> createState() => _PreOnboardingItemsState();
@@ -48,52 +47,36 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
     orgId= await shared.getOrgId();
     setPreOnboardShow= await shared.getPreOnboardShow();
     userPanelPermission= await shared.getUserPanel();
-    print("User Panel - $userPanelPermission");
     emailId= await shared.getEmailId();
     levelOne = await shared.getLevelOne();
     levelTwo = await shared.getLevelTwo();
     pendingLeaveRequisitions = await shared.getPendingLeaveReq();
-    print("Level 1 - $levelOne");
-    print("Level 2 - $levelTwo");
-    print("Pending Leave Requisitions - $pendingLeaveRequisitions");
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
-    print('EMP ID - $empId');
-    print('ORG ID - $orgId');
-    print('PreOnboardShow- $setPreOnboardShow');
 
 
 
     if(empRole==1){
       showHide=true;
       showRo = false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if(empRole==0){
       showHide=false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if (adminRole == 0) {
       showAdmin = false;
-      print("Show Admin $showAdmin");
     }
     if (adminRole == 1) {
       showAdmin = true;
-      print("Show Admin $showAdmin");
     }
     if (roRole == 0) {
       showRo = false;
 
-      print("Show Ro $showRo");
     }
     if (roRole == 1) {
       showRo = true;
-      print("Show Ro $showRo");
     }
   }
   int pageIndex = 0;
@@ -312,29 +295,24 @@ class _PreOnboardingItemsState extends State<PreOnboardingItems> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.pushNamed(context, MyRoutings.preOnboardItemRoute);
-            print('Pre-Onboard');
           }
           if(index==3){
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

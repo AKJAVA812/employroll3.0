@@ -19,7 +19,7 @@ import 'ApprovePreOnboarding.dart';
 import 'modalClass/preOnboardListModal.dart';
 
 class PendingPreOnboardingList extends StatefulWidget {
-  const PendingPreOnboardingList({Key? key}) : super(key: key);
+  const PendingPreOnboardingList({super.key});
 
   static const String _title = 'Employee List';
 
@@ -90,16 +90,14 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList>
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
-    print("Status $statusUpdate");
     Future<PreOnboardListModal> getEmployeeList11 = getEmployeeList(sessionId!);
     futureExitEmpList = getEmployeeList(sessionId!);
     final loading = Row(
@@ -122,7 +120,6 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList>
   Future<PreOnboardListModal> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.preOnboardListApi;
-    print('employeeList11: ${SessionId}');
     PreOnboardListModal employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?sessionId=$SessionId&"
@@ -130,12 +127,9 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
-    print('PreOnboard API - ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = PreOnboardListModal.fromJson(mapResponse);
     allUsernew = employeeListModel.list;
     setState(() {
@@ -191,7 +185,6 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList>
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<PreOnboardListData>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -291,7 +284,6 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -299,16 +291,13 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.preOnboardItemRoute);
-            print('Pre-Onboard');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -316,7 +305,6 @@ class _PendingPreOnboardingListState extends State<PendingPreOnboardingList>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

@@ -15,11 +15,11 @@ class LoanSummaryModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.loanSummary != null) {
-      data['loanSummary'] = this.loanSummary!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (loanSummary != null) {
+      data['loanSummary'] = loanSummary!.map((v) => v.toJson()).toList();
     }
-    data['pendingValue'] = this.pendingValue;
+    data['pendingValue'] = pendingValue;
     return data;
   }
 }
@@ -107,32 +107,32 @@ class LoanSummary {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['desig'] = this.desig;
-    data['loanType'] = this.loanType;
-    data['installmentAmount'] = this.installmentAmount;
-    data['loanAppliedFor'] = this.loanAppliedFor;
-    data['remark'] = this.remark;
-    data['empDetId'] = this.empDetId;
-    data['branch'] = this.branch;
-    data['orgId'] = this.orgId;
-    data['totalEmiPaid'] = this.totalEmiPaid;
-    data['empName'] = this.empName;
-    data['approvedAmount'] = this.approvedAmount;
-    data['pendingEmiCount'] = this.pendingEmiCount;
-    data['totalPendingAmt'] = this.totalPendingAmt;
-    data['raisedBy'] = this.raisedBy;
-    data['loanPaidUp'] = this.loanPaidUp;
-    data['loanAdvId'] = this.loanAdvId;
-    data['dept'] = this.dept;
-    data['loanReqId'] = this.loanReqId;
-    data['loanAmount'] = this.loanAmount;
-    data['empCode'] = this.empCode;
-    data['doj'] = this.doj;
-    data['paidEmiCount'] = this.paidEmiCount;
-    data['status'] = this.status;
-    data['pendingInstallments'] = this.pendingInstallments;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['desig'] = desig;
+    data['loanType'] = loanType;
+    data['installmentAmount'] = installmentAmount;
+    data['loanAppliedFor'] = loanAppliedFor;
+    data['remark'] = remark;
+    data['empDetId'] = empDetId;
+    data['branch'] = branch;
+    data['orgId'] = orgId;
+    data['totalEmiPaid'] = totalEmiPaid;
+    data['empName'] = empName;
+    data['approvedAmount'] = approvedAmount;
+    data['pendingEmiCount'] = pendingEmiCount;
+    data['totalPendingAmt'] = totalPendingAmt;
+    data['raisedBy'] = raisedBy;
+    data['loanPaidUp'] = loanPaidUp;
+    data['loanAdvId'] = loanAdvId;
+    data['dept'] = dept;
+    data['loanReqId'] = loanReqId;
+    data['loanAmount'] = loanAmount;
+    data['empCode'] = empCode;
+    data['doj'] = doj;
+    data['paidEmiCount'] = paidEmiCount;
+    data['status'] = status;
+    data['pendingInstallments'] = pendingInstallments;
     return data;
   }
 }

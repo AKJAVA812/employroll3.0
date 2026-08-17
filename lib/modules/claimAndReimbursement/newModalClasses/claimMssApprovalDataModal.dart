@@ -13,7 +13,7 @@ class ClaimMssApprovalDataModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -131,41 +131,41 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['claimNo'] = this.claimNo;
-    data['levelThreeappAmt'] = this.levelThreeappAmt;
-    data['reimburName'] = this.reimburName;
-    data['endReading'] = this.endReading;
-    data['fromPlace'] = this.fromPlace;
-    data['subexpenseId'] = this.subexpenseId;
-    data['odoMeter'] = this.odoMeter;
-    data['levelFiveAppAmt'] = this.levelFiveAppAmt;
-    data['categoryName'] = this.categoryName;
-    data['claimAMount'] = this.claimAMount;
-    data['toPlace'] = this.toPlace;
-    data['levelOneappAmt'] = this.levelOneappAmt;
-    data['subExpname'] = this.subExpname;
-    data['levelTFourAppAmt'] = this.levelTFourAppAmt;
-    data['image'] = this.image;
-    data['expName'] = this.expName;
-    data['levelFourRemarks'] = this.levelFourRemarks;
-    data['levelOneRemarks'] = this.levelOneRemarks;
-    data['startReading'] = this.startReading;
-    data['merchant'] = this.merchant;
-    data['claimId'] = this.claimId;
-    data['isImage'] = this.isImage;
-    data['levelTwoRemarks'] = this.levelTwoRemarks;
-    data['isCheck'] = this.isCheck;
-    data['month'] = this.month;
-    data['levelFiveRemarks'] = this.levelFiveRemarks;
-    data['expenseId'] = this.expenseId;
-    data['kilometer'] = this.kilometer;
-    data['reimbId'] = this.reimbId;
-    data['levelTwoappAmt'] = this.levelTwoappAmt;
-    data['levelThreeRemarks'] = this.levelThreeRemarks;
-    data['categoryId'] = this.categoryId;
-    data['remarks'] = this.remarks;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['claimNo'] = claimNo;
+    data['levelThreeappAmt'] = levelThreeappAmt;
+    data['reimburName'] = reimburName;
+    data['endReading'] = endReading;
+    data['fromPlace'] = fromPlace;
+    data['subexpenseId'] = subexpenseId;
+    data['odoMeter'] = odoMeter;
+    data['levelFiveAppAmt'] = levelFiveAppAmt;
+    data['categoryName'] = categoryName;
+    data['claimAMount'] = claimAMount;
+    data['toPlace'] = toPlace;
+    data['levelOneappAmt'] = levelOneappAmt;
+    data['subExpname'] = subExpname;
+    data['levelTFourAppAmt'] = levelTFourAppAmt;
+    data['image'] = image;
+    data['expName'] = expName;
+    data['levelFourRemarks'] = levelFourRemarks;
+    data['levelOneRemarks'] = levelOneRemarks;
+    data['startReading'] = startReading;
+    data['merchant'] = merchant;
+    data['claimId'] = claimId;
+    data['isImage'] = isImage;
+    data['levelTwoRemarks'] = levelTwoRemarks;
+    data['isCheck'] = isCheck;
+    data['month'] = month;
+    data['levelFiveRemarks'] = levelFiveRemarks;
+    data['expenseId'] = expenseId;
+    data['kilometer'] = kilometer;
+    data['reimbId'] = reimbId;
+    data['levelTwoappAmt'] = levelTwoappAmt;
+    data['levelThreeRemarks'] = levelThreeRemarks;
+    data['categoryId'] = categoryId;
+    data['remarks'] = remarks;
     return data;
   }
 }

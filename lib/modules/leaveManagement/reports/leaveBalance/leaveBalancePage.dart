@@ -15,7 +15,7 @@ import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 
 class LeaveBalancePage extends StatefulWidget {
-  const LeaveBalancePage({Key? key}) : super(key: key);
+  const LeaveBalancePage({super.key});
 
   @override
   State<LeaveBalancePage> createState() => _LeaveBalancePageState();
@@ -137,11 +137,9 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
   Future<LeaveBalModal> getLeaveBalance(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.leaveBal;
-    print('employeeList11: ${SessionId}');
     LeaveBalModal leaveBalModal;
     var urlapi = Uri.parse("$conn$apiUrl?sessionId=$SessionId");
     final response = await MobileHttpClient.instance.post(urlapi);
-    print('URL ${response.request}');
     //print('responseemployeeList ${response.body}');
 
     mapResponse = json.decode(response.body);
@@ -153,15 +151,11 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
     var notEmptyjson = mapResponse.isNotEmpty;
     var containsEmptyjson = mapResponse.length;
 
-    print('responseemployeeList $emptyjson');
-    print('responseemployeeList $notEmptyjson');
-    print('responseemployeeList $containsEmptyjson');
 
     /* if (containsEmptyjson==1)  {
       //print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }*/
-    print('responseemployeeList $mapResponse');
     leaveBalModal = LeaveBalModal.fromJson(mapResponse);
 
     //print("typename:-${mapResponse['leaveData']['CO-578']['leavesTaken']}");
@@ -300,7 +294,6 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
               ),
             );
             //Navigator.pop(context);
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -310,7 +303,6 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
               ),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.push(
@@ -319,7 +311,6 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
                 builder: (context) => GetAttendanceDet(showAppBar: true),
               ),
             );
-            print('My Requests');
           }
           if (index == 3) {
             Navigator.push(
@@ -330,13 +321,11 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
             );
 
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('My Reports');
           }
           if (index == 4) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
 
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Dashboard');
           }
           /*if(index==3){
                 title="Notifications";
@@ -371,7 +360,7 @@ class _LeaveBalancePageState extends State<LeaveBalancePage> {
 
 class GetLeaveBal extends StatefulWidget {
   final LeaveBalModal leaveBalModal;
-  const GetLeaveBal(this.leaveBalModal);
+  const GetLeaveBal(this.leaveBalModal, {super.key});
 
   @override
   State<GetLeaveBal> createState() => _GetLeaveBalState(leaveBalModal);
@@ -408,7 +397,6 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
         itemCount = 0;
       }
 
-      print("itemcount $itemCount");
     });
 
     super.initState();
@@ -431,14 +419,12 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
           var splitLeave = leaveTypeName.split("-")[2];
           var newListLeave = leaveTypeName.split("-")[1];
           var nameOnly = leaveTypeName.split("-")[0];
-          var newString = "$newListLeave-" + "$splitLeave";
+          var newString = "$newListLeave-$splitLeave";
           //print("$newListLeave-" + "$splitLeave");
-          print("Leave Type - $nameOnly");
 
           var leaveTypeShort =
-              mapResponse['leaveData']['$newString']['leavesTaken'];
+              mapResponse['leaveData'][newString]['leavesTaken'];
           //var leaveTypeShort = ;
-          print("$leaveTypeShort");
 
           return Card(
             child: ExpansionTile(
@@ -448,7 +434,7 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
 
               title: nameOnly.toString().text.bold.make(),
               subtitle:
-                  "Balance - ${mapResponse['leaveData']['$newString']['totalLeavesPending'].toString()}"
+                  "Balance - ${mapResponse['leaveData'][newString]['totalLeavesPending'].toString()}"
                       .text
                       .bold
                       .color(Mythemes.successColor)
@@ -503,7 +489,7 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          mapResponse['leaveData']['$newString']['leavesTaken']
+                          mapResponse['leaveData'][newString]['leavesTaken']
                               .toString()
                               .text
                               .bold
@@ -553,7 +539,7 @@ class _GetLeaveBalState extends State<GetLeaveBal> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          mapResponse['leaveData']['$newString']['totalLeavesPending']
+                          mapResponse['leaveData'][newString]['totalLeavesPending']
                               .toString()
                               .text
                               .bold

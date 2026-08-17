@@ -16,7 +16,7 @@ import '../../themes/empThemes.dart';
 import 'modalClass/preOnboardListModal.dart';
 
 class PreOnboardListView extends StatefulWidget {
-  const PreOnboardListView({Key? key}) : super(key: key);
+  const PreOnboardListView({super.key});
 
   static const String _title = 'Employee List';
 
@@ -64,16 +64,14 @@ class _PreOnboardListViewState extends State<PreOnboardListView>
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
   Future getSharedPrfanceList() async {
     sessionId = await shared.getSessionId();
     // await Future.delayed(Duration(seconds: 5));
-    print("Status $statusUpdate");
     Future<PreOnboardListModal> getEmployeeList11 = getEmployeeList(sessionId!);
     futureExitEmpList = getEmployeeList(sessionId!);
     final loading = Row(
@@ -96,7 +94,6 @@ class _PreOnboardListViewState extends State<PreOnboardListView>
   Future<PreOnboardListModal> getEmployeeList(String SessionId) async {
     String conn = ApiDetails.server;
     String apiUrl = ApiDetails.preOnboardListApi;
-    print('employeeList11: ${SessionId}');
     PreOnboardListModal employeeListModel;
     var urlapi = Uri.parse(
       "$conn$apiUrl?sessionId=$SessionId&"
@@ -104,12 +101,9 @@ class _PreOnboardListViewState extends State<PreOnboardListView>
     );
     final response = await MobileHttpClient.instance.post(urlapi);
 
-    print('responseemployeeList ${response.body}');
-    print('PreOnboard API - ${response.request}');
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['data'];
-    print('responseemployeeList $getData');
     employeeListModel = PreOnboardListModal.fromJson(mapResponse);
     allUsernew = employeeListModel.list;
     setState(() {
@@ -165,7 +159,6 @@ class _PreOnboardListViewState extends State<PreOnboardListView>
   }
 
   void _runFilter(String enteredKeyword) {
-    print('value$enteredKeyword');
     List<PreOnboardListData>? results = [];
 
     if (enteredKeyword.isEmpty) {
@@ -265,7 +258,6 @@ class _PreOnboardListViewState extends State<PreOnboardListView>
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -273,16 +265,13 @@ class _PreOnboardListViewState extends State<PreOnboardListView>
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.preOnboardItemRoute);
-            print('Pre-Onboard');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -290,7 +279,6 @@ class _PreOnboardListViewState extends State<PreOnboardListView>
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

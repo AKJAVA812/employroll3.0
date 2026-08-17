@@ -1,4 +1,4 @@
 class Car {
-  int? _tyer = 0;
-  String? _name = '';
+  final int _tyer = 0;
+  final String _name = '';
 }

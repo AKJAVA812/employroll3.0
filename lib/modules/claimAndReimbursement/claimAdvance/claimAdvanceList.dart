@@ -11,7 +11,7 @@ import '../claimItems/modalClass/advanceRequisitionListModal.dart';
 
 
 class ClaimAdvanceList extends StatefulWidget {
-  const ClaimAdvanceList({Key? key}) : super(key: key);
+  const ClaimAdvanceList({super.key});
 
   @override
   State<ClaimAdvanceList> createState() => _ClaimAdvanceListState();
@@ -54,39 +54,30 @@ class _ClaimAdvanceListState extends State<ClaimAdvanceList> with RouteAware {
     empRole= await shared.getEmpRoll();
     roRole= await shared.getRoRole();
     adminRole= await shared.getAdminRole();
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
     if(empRole==1){
       showHide=true;
       showRo = false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if(empRole==0){
       showHide=false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if (adminRole == 0) {
       showAdmin = false;
-      print("Show Admin $showAdmin");
     }
     if (adminRole == 1) {
       showAdmin = true;
-      print("Show Admin $showAdmin");
     }
     if (roRole == 0) {
       showRo = false;
 
-      print("Show Ro $showRo");
     }
     if (roRole == 1) {
       showRo = true;
-      print("Show Ro $showRo");
     }
   }
   int pageIndex = 0;

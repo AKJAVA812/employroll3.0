@@ -1196,8 +1196,9 @@ String _attendanceTime(
 }
 
 String _number(dynamic value) {
-  if (value is num)
+  if (value is num) {
     return value % 1 == 0 ? value.toInt().toString() : value.toStringAsFixed(1);
+  }
   return value?.toString() ?? '0';
 }
 

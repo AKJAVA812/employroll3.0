@@ -13,7 +13,7 @@ class ShiftListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -35,10 +35,10 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['shiftName'] = this.shiftName;
-    data['shiftId'] = this.shiftId;
-    data['branchId'] = this.branchId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['shiftName'] = shiftName;
+    data['shiftId'] = shiftId;
+    data['branchId'] = branchId;
     return data;
   }
 }

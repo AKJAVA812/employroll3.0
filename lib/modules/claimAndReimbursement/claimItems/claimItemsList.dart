@@ -1,6 +1,5 @@
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../../commanScreen/homePage.dart';
@@ -14,7 +13,7 @@ import '../../../sharedPrefancePage/ShardPre.dart';
 
 
 class ClaimItemsList extends StatefulWidget {
-  const ClaimItemsList({Key? key}) : super(key: key);
+  const ClaimItemsList({super.key});
 
   @override
   State<ClaimItemsList> createState() => _ClaimItemsListState();
@@ -78,44 +77,31 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
     claimLevelThreeUIS = await shared.getClaimLevelThreeUIS();
 
     userPanelPermission= await shared.getUserPanel();
-    print("User Panel - $userPanelPermission");
-    print('empRole $empRole');
-    print('roRole $roRole');
-    print('adminRole $adminRole');
 
-    print('Claim L1 $claimLevelOneMO');
-    print('Claim L2 $claimLevelTwoMO');
-    print('Claim L3 $claimLevelThreeMO');
 
     if(empRole==1){
       showHide=true;
       showRo = false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if(empRole==0){
       showHide=false;
-      print('Show Emp $showHide');
       setState(() {
       });
     }
     if (adminRole == 0) {
       showAdmin = false;
-      print("Show Admin $showAdmin");
     }
     if (adminRole == 1) {
       showAdmin = true;
-      print("Show Admin $showAdmin");
     }
     if (roRole == 0) {
       showRo = false;
 
-      print("Show Ro $showRo");
     }
     if (roRole == 1) {
       showRo = true;
-      print("Show Ro $showRo");
     }
   }
   int pageIndex = 0;
@@ -510,31 +496,26 @@ class _ClaimItemsListState extends State<ClaimItemsList> with RouteAware{
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => HomePage(selectedIndex: 0,)));
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if(index==1){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => PunchInOUtActivity(selectedIndex: 1,)));
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if(index==2){
             Navigator.pushNamed(context, MyRoutings.claimItemsListRoute);
-            print('Claim Items');
           }
           if(index==3){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => EssAdminDashboardHead(EssDashboarrdModel()))
             );
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if(index==4){
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ProfilePageNew())
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";

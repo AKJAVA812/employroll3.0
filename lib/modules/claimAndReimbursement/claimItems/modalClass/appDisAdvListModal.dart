@@ -13,10 +13,10 @@ class AppDisAdvListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    if (this.claimAdvDatalist != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (claimAdvDatalist != null) {
       data['claimAdvDatalist'] =
-          this.claimAdvDatalist!.map((v) => v.toJson()).toList();
+          claimAdvDatalist!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -72,21 +72,21 @@ class ClaimAdvDatalist {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['empId'] = this.empId;
-    data['purpose'] = this.purpose;
-    data['remark'] = this.remark;
-    data['advanceAmt'] = this.advanceAmt;
-    data['claimId'] = this.claimId;
-    data['branch'] = this.branch;
-    data['placeTour'] = this.placeTour;
-    data['approvedStatus'] = this.approvedStatus;
-    data['approvedRemark'] = this.approvedRemark;
-    data['empName'] = this.empName;
-    data['design'] = this.design;
-    data['approvedAmount'] = this.approvedAmount;
-    data['Ndays'] = this.ndays;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['empId'] = empId;
+    data['purpose'] = purpose;
+    data['remark'] = remark;
+    data['advanceAmt'] = advanceAmt;
+    data['claimId'] = claimId;
+    data['branch'] = branch;
+    data['placeTour'] = placeTour;
+    data['approvedStatus'] = approvedStatus;
+    data['approvedRemark'] = approvedRemark;
+    data['empName'] = empName;
+    data['design'] = design;
+    data['approvedAmount'] = approvedAmount;
+    data['Ndays'] = ndays;
     return data;
   }
 }

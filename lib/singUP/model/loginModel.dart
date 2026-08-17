@@ -87,8 +87,9 @@ class LoginModel {
     json['profiles'] = profiles.map((v) => v.toJson()).toList();
     if (user != null) json['user'] = user!.toJson();
     if (session != null) json['session'] = session!.toJson();
-    if (essPermissions != null)
+    if (essPermissions != null) {
       json['essPermissions'] = essPermissions!.toJson();
+    }
     if (mss != null) json['mss'] = mss!.toJson();
     if (data != null) json['data'] = data!.toJson();
     return json;
@@ -798,11 +799,12 @@ class ProfileList {
 
 List<String> _stringList(dynamic value) {
   if (value == null) return <String>[];
-  if (value is List)
+  if (value is List) {
     return value
         .where((item) => item != null)
         .map((item) => item.toString())
         .toList();
+  }
   return <String>[value.toString()];
 }
 
@@ -832,10 +834,12 @@ bool? _boolValue(dynamic value) {
   if (value == null) return null;
   if (value is bool) return value;
   final normalized = value.toString().toLowerCase();
-  if (normalized == 'true' || normalized == '1' || normalized == 'yes')
+  if (normalized == 'true' || normalized == '1' || normalized == 'yes') {
     return true;
-  if (normalized == 'false' || normalized == '0' || normalized == 'no')
+  }
+  if (normalized == 'false' || normalized == '0' || normalized == 'no') {
     return false;
+  }
   return null;
 }
 

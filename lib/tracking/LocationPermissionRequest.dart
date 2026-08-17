@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LocationPermissionRequest extends StatefulWidget {
+  const LocationPermissionRequest({super.key});
+
   @override
   _LocationPermissionRequestState createState() =>
       _LocationPermissionRequestState();
@@ -16,7 +18,7 @@ class LocationPermissionRequest extends StatefulWidget {
           context: context,
           builder: (BuildContext context) {
             return Theme(
-              data: ThemeData(dialogBackgroundColor: Colors.white),
+              data: ThemeData(dialogTheme: DialogThemeData(backgroundColor: Colors.white)),
               child: CupertinoAlertDialog(
                 title: Text(
                   "Location Permission Required",
@@ -42,7 +44,6 @@ class LocationPermissionRequest extends StatefulWidget {
                     ),
                     onPressed: () async {
                       bool isOpened = await openAppSettings();
-                      print('App Settings opened: $isOpened');
                       Navigator.pop(context); // Close the current dialog
                     },
                   ),
@@ -52,7 +53,6 @@ class LocationPermissionRequest extends StatefulWidget {
           },
         );
       } catch (e) {
-        print('Exception: $e');
       }
     }
   }

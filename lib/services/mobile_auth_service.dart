@@ -32,7 +32,6 @@ class MobileAuthService {
     }
     MobilePermissionService.clearLastKnownState();
     await _runSync(() async {
-      print('[MOBILE-AUTH] syncAfterLogin -> start');
       final auth = MobileAuthData(
         accessToken: accessToken,
         sessionId: sessionId,
@@ -42,16 +41,13 @@ class MobileAuthService {
       await sendMobileDeviceInfo(auth: auth);
       await NotificationService.instance.registerCurrentToken(force: true);
       await NotificationService.instance.processPendingNotification();
-      print('[MOBILE-AUTH] syncAfterLogin -> end');
     });
   }
 
   Future<void> syncOnAppOpen({bool forceBootstrap = false}) {
     return _runSync(() async {
-      print('[MOBILE-AUTH] syncOnAppOpen -> start');
       final auth = await _readAuthFromPrefs();
       if (!auth.hasAuth) {
-        print('[MOBILE-AUTH] syncOnAppOpen -> skipped, token/session missing');
         return;
       }
 
@@ -59,9 +55,6 @@ class MobileAuthService {
       if (!sessionValid) {
         final refreshed = await refreshToken(auth: auth);
         if (!refreshed) {
-          print(
-            '[MOBILE-AUTH] syncOnAppOpen -> refresh failed, login required',
-          );
           await MobileHttpClient.instance.expireSession();
           return;
         }
@@ -75,19 +68,16 @@ class MobileAuthService {
       try {
         await MobileMssContextService.synchronizeCurrent();
       } catch (error) {
-        print('[MSS-CONTEXT] App-open synchronization failed: $error');
       }
       await sendMobileDeviceInfo(auth: latestAuth);
       await NotificationService.instance.registerCurrentToken();
       await NotificationService.instance.processPendingNotification();
-      print('[MOBILE-AUTH] syncOnAppOpen -> end');
     });
   }
 
   Future<void> _runSync(Future<void> Function() operation) {
     final running = _activeSync;
     if (running != null) {
-      print('[MOBILE-AUTH] sync -> waiting for active sync');
       return running;
     }
 
@@ -103,7 +93,6 @@ class MobileAuthService {
   Future<bool> validateSession({MobileAuthData? auth}) async {
     final authData = auth ?? await _readAuthFromPrefs();
     final uri = _uri(ApiDetails.sessionIdAuth);
-    print('[MOBILE-AUTH] SESSION -> GET $uri');
     final response = await MobileHttpClient.instance.get(
       uri,
       headers: _headers(authData),
@@ -115,7 +104,6 @@ class MobileAuthService {
   Future<bool> refreshToken({MobileAuthData? auth}) async {
     final authData = auth ?? await _readAuthFromPrefs();
     final uri = _uri(ApiDetails.refreshTokenId);
-    print('[MOBILE-AUTH] REFRESH -> POST $uri');
     final response = await MobileHttpClient.instance.post(
       uri,
       headers: _headers(authData),
@@ -136,11 +124,9 @@ class MobileAuthService {
     if (accessToken != null && accessToken.isNotEmpty) {
       await _sessionManager.setAccessToken(accessToken);
       await _sessionManager.setTokenType(tokenType);
-      print('[MOBILE-AUTH] REFRESH -> accessToken saved');
     }
     if (sessionId != null && sessionId.isNotEmpty) {
       await _sessionManager.setSessionId(sessionId);
-      print('[MOBILE-AUTH] REFRESH -> sessionId saved');
     }
     return true;
   }
@@ -150,7 +136,6 @@ class MobileAuthService {
     bool forceBootstrap = false,
   }) async {
     final uri = _uri(ApiDetails.bootStrapVersion);
-    print('[MOBILE-AUTH] BOOTSTRAP_VERSION -> GET $uri');
     final response = await MobileHttpClient.instance.get(
       uri,
       headers: _headers(auth),
@@ -177,24 +162,16 @@ class MobileAuthService {
             _normalizeVersion(remoteProfileVersion) !=
                 _normalizeVersion(localProfileVersion));
 
-    print(
-      '[MOBILE-AUTH] BOOTSTRAP_VERSION -> local permission=$localPermissionVersion profile=$localProfileVersion',
-    );
-    print(
-      '[MOBILE-AUTH] BOOTSTRAP_VERSION -> remote permission=$remotePermissionVersion profile=$remoteProfileVersion changed=$versionChanged',
-    );
 
     if (versionChanged) {
       await bootstrap(auth: auth);
     } else {
-      print('[MOBILE-AUTH] BOOTSTRAP -> skipped, local cache is current');
     }
   }
 
   Future<bool> bootstrap({MobileAuthData? auth}) async {
     final authData = auth ?? await _readAuthFromPrefs();
     final uri = _uri(ApiDetails.bootStrap);
-    print('[MOBILE-AUTH] BOOTSTRAP -> GET $uri');
     final response = await MobileHttpClient.instance.get(
       uri,
       headers: _headers(authData),
@@ -212,11 +189,12 @@ class MobileAuthService {
       'permissionVersion',
     ]);
     final profileVersion = _firstString(body, const ['profileVersion']);
-    if (permissionVersion != null)
+    if (permissionVersion != null) {
       await _sessionManager.setPermissionsVersion(permissionVersion);
-    if (profileVersion != null)
+    }
+    if (profileVersion != null) {
       await _sessionManager.setProfileVersion(profileVersion);
-    print('[MOBILE-AUTH] BOOTSTRAP -> cache saved');
+    }
     MobileProfileCache.notifyChanged();
     return true;
   }
@@ -289,14 +267,11 @@ class MobileAuthService {
     try {
       final authData = auth ?? await _readAuthFromPrefs();
       if (!authData.hasAuth) {
-        print('[MOBILE-AUTH] DEVICE_INFO -> skipped, token/session missing');
         return false;
       }
 
       final uri = _uri(ApiDetails.mobileInfo);
       final payload = await _deviceInfoPayload();
-      print('[MOBILE-AUTH] DEVICE_INFO -> POST $uri');
-      print('[MOBILE-AUTH] DEVICE_INFO payload -> $payload');
       final response = await MobileHttpClient.instance.post(
         uri,
         headers: <String, String>{
@@ -308,7 +283,6 @@ class MobileAuthService {
       _logResponse('DEVICE_INFO', response);
       return _isSuccess(response);
     } catch (error) {
-      print('[MOBILE-AUTH] DEVICE_INFO -> error=$error');
       return false;
     }
   }
@@ -403,8 +377,9 @@ class MobileAuthService {
     if (data is Map<String, dynamic>) {
       for (final key in keys) {
         final value = data[key];
-        if (value != null && value.toString().isNotEmpty)
+        if (value != null && value.toString().isNotEmpty) {
           return value.toString();
+        }
       }
     }
     return null;
@@ -418,13 +393,15 @@ class MobileAuthService {
 
   String? _sessionFromNested(Map<String, dynamic> json) {
     final session = json['session'];
-    if (session is Map<String, dynamic>)
+    if (session is Map<String, dynamic>) {
       return session['sessionId']?.toString();
+    }
     final data = json['data'];
     if (data is Map<String, dynamic>) {
       final nested = data['session'];
-      if (nested is Map<String, dynamic>)
+      if (nested is Map<String, dynamic>) {
         return nested['sessionId']?.toString();
+      }
       return data['sessionId']?.toString();
     }
     return null;
@@ -435,7 +412,6 @@ class MobileAuthService {
         response.body.length > 1200
             ? '${response.body.substring(0, 1200)}...'
             : response.body;
-    print('[MOBILE-AUTH] $tag <- status=${response.statusCode} body=$body');
   }
 }
 

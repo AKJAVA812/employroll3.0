@@ -38,18 +38,18 @@ class LiveTrackingModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['distance'] = this.distance;
+    data['distance'] = distance;
 
-    if (this.taskData != null) {
-      data['taskData'] = this.taskData!.map((v) => v.toJson()).toList();
+    if (taskData != null) {
+      data['taskData'] = taskData!.map((v) => v.toJson()).toList();
     }
-    data['dist'] = this.dist;
-    if (this.attData != null) {
-      data['attData'] = this.attData!.map((v) => v.toJson()).toList();
+    data['dist'] = dist;
+    if (attData != null) {
+      data['attData'] = attData!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -73,12 +73,12 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['tdate'] = this.tdate;
-    data['lng'] = this.lng;
-    data['tTime'] = this.tTime;
-    data['lat'] = this.lat;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['tdate'] = tdate;
+    data['lng'] = lng;
+    data['tTime'] = tTime;
+    data['lat'] = lat;
     return data;
   }
 }
@@ -115,15 +115,15 @@ class TaskData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['taskendTime'] = this.taskendTime;
-    data['taskPhoto'] = this.taskPhoto;
-    data['address'] = this.address;
-    data['tasklat'] = this.tasklat;
-    data['taskDate'] = this.taskDate;
-    data['taskstartTime'] = this.taskstartTime;
-    data['comment'] = this.comment;
-    data['tasklng'] = this.tasklng;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['taskendTime'] = taskendTime;
+    data['taskPhoto'] = taskPhoto;
+    data['address'] = address;
+    data['tasklat'] = tasklat;
+    data['taskDate'] = taskDate;
+    data['taskstartTime'] = taskstartTime;
+    data['comment'] = comment;
+    data['tasklng'] = tasklng;
     return data;
   }
 }
@@ -154,13 +154,13 @@ class AttData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['inTime'] = this.inTime;
-    data['inlat'] = this.inlat;
-    data['inPhoto'] = this.inPhoto;
-    data['inDate'] = this.inDate;
-    data['inlng'] = this.inlng;
-    data['inAddress'] = this.inAddress;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['inTime'] = inTime;
+    data['inlat'] = inlat;
+    data['inPhoto'] = inPhoto;
+    data['inDate'] = inDate;
+    data['inlng'] = inlng;
+    data['inAddress'] = inAddress;
     return data;
   }
 }

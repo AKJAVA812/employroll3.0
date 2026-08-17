@@ -41,19 +41,19 @@ class LoanLedgerModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['netDebitBal'] = this.netDebitBal;
-    data['period'] = this.period;
-    if (this.empList != null) {
-      data['empList'] = this.empList!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['netDebitBal'] = netDebitBal;
+    data['period'] = period;
+    if (empList != null) {
+      data['empList'] = empList!.map((v) => v.toJson()).toList();
     }
-    data['openingCreditBal'] = this.openingCreditBal;
-    data['empCode'] = this.empCode;
-    data['empName'] = this.empName;
-    data['netCreditBal'] = this.netCreditBal;
-    data['openingDebitBal'] = this.openingDebitBal;
-    data['currentCreditBal'] = this.currentCreditBal;
-    data['currentDebitBal'] = this.currentDebitBal;
+    data['openingCreditBal'] = openingCreditBal;
+    data['empCode'] = empCode;
+    data['empName'] = empName;
+    data['netCreditBal'] = netCreditBal;
+    data['openingDebitBal'] = openingDebitBal;
+    data['currentCreditBal'] = currentCreditBal;
+    data['currentDebitBal'] = currentDebitBal;
     return data;
   }
 }
@@ -102,19 +102,19 @@ class EmpList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['date'] = this.date;
-    data['eventDesc'] = this.eventDesc;
-    data['month'] = this.month;
-    data['leaveType'] = this.leaveType;
-    data['loanType'] = this.loanType;
-    data['debitValue'] = this.debitValue;
-    data['eventName'] = this.eventName;
-    data['time'] = this.time;
-    data['eventType'] = this.eventType;
-    data['countType'] = this.countType;
-    data['creationDate'] = this.creationDate;
-    data['creditValue'] = this.creditValue;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['date'] = date;
+    data['eventDesc'] = eventDesc;
+    data['month'] = month;
+    data['leaveType'] = leaveType;
+    data['loanType'] = loanType;
+    data['debitValue'] = debitValue;
+    data['eventName'] = eventName;
+    data['time'] = time;
+    data['eventType'] = eventType;
+    data['countType'] = countType;
+    data['creationDate'] = creationDate;
+    data['creditValue'] = creditValue;
     return data;
   }
 }

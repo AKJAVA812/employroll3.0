@@ -13,7 +13,7 @@ class AppDisReimbListModal {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -113,35 +113,35 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['empId'] = this.empId;
-    data['claimNo'] = this.claimNo;
-    data['distance'] = this.distance;
-    data['claimReqId'] = this.claimReqId;
-    data['fromPlace'] = this.fromPlace;
-    data['purpose'] = this.purpose;
-    data['branch'] = this.branch;
-    data['attachment'] = this.attachment;
-    data['empName'] = this.empName;
-    data['catName'] = this.catName;
-    data['toPlace'] = this.toPlace;
-    data['reimbName'] = this.reimbName;
-    data['expId'] = this.expId;
-    data['expName'] = this.expName;
-    data['subExpId'] = this.subExpId;
-    data['toDate'] = this.toDate;
-    data['dept'] = this.dept;
-    data['claimId'] = this.claimId;
-    data['billAvail'] = this.billAvail;
-    data['claimedAmt'] = this.claimedAmt;
-    data['fromDate'] = this.fromDate;
-    data['catId'] = this.catId;
-    data['policyId'] = this.policyId;
-    data['empGrade'] = this.empGrade;
-    data['subName'] = this.subName;
-    data['ReqDate'] = this.reqDate;
-    data['remarks'] = this.remarks;
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['empId'] = empId;
+    data['claimNo'] = claimNo;
+    data['distance'] = distance;
+    data['claimReqId'] = claimReqId;
+    data['fromPlace'] = fromPlace;
+    data['purpose'] = purpose;
+    data['branch'] = branch;
+    data['attachment'] = attachment;
+    data['empName'] = empName;
+    data['catName'] = catName;
+    data['toPlace'] = toPlace;
+    data['reimbName'] = reimbName;
+    data['expId'] = expId;
+    data['expName'] = expName;
+    data['subExpId'] = subExpId;
+    data['toDate'] = toDate;
+    data['dept'] = dept;
+    data['claimId'] = claimId;
+    data['billAvail'] = billAvail;
+    data['claimedAmt'] = claimedAmt;
+    data['fromDate'] = fromDate;
+    data['catId'] = catId;
+    data['policyId'] = policyId;
+    data['empGrade'] = empGrade;
+    data['subName'] = subName;
+    data['ReqDate'] = reqDate;
+    data['remarks'] = remarks;
+    data['status'] = status;
     return data;
   }
 }

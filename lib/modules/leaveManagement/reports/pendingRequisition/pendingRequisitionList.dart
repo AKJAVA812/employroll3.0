@@ -23,7 +23,7 @@ import '../leaveManageReport.dart';
 
 class PendingLeaveRequisitionList extends StatefulWidget {
   final PendingLeaveRequisitionModal pendingLeaveRequisitionModal;
-  const PendingLeaveRequisitionList(this.pendingLeaveRequisitionModal);
+  const PendingLeaveRequisitionList(this.pendingLeaveRequisitionModal, {super.key});
 
   @override
   State<PendingLeaveRequisitionList> createState() =>
@@ -75,9 +75,8 @@ class _PendingLeaveRequisitionListState
     super.initState();
     setState(() {
       getSharedPrfanceList();
-      var listLength;
+      int listLength;
       listLength = foundDataNew!.length;
-      print('listLength $listLength');
     });
   }
 
@@ -122,8 +121,6 @@ class _PendingLeaveRequisitionListState
     getProfileId = await shared.getDefaultProfileId();
     levelOne = await shared.getLevelOne();
     levelTwo = await shared.getLevelTwo();
-    print("Level 1 - $levelOne");
-    print("Level 2 - $levelTwo");
     // await Future.delayed(Duration(seconds: 5));
     Future<PendingLeaveRequisitionModal> getAppReq11 = getPendingLeaveReq(
       sessionId!,
@@ -143,7 +140,6 @@ class _PendingLeaveRequisitionListState
         pendingLeaveReqLabeled = pendingLeaveReqLabel;
         if (foundDataNew != null) {
           foundDataNew!.length;
-          print("Fetch data $foundDataNew");
         } else {
           Center(child: "There is no data available right now".text.make());
           foundDataNew = [];
@@ -173,12 +169,9 @@ class _PendingLeaveRequisitionListState
 
     mapResponse = json.decode(response.body);
     var getData = mapResponse['result']['data'];
-    print("My Data - $getData");
     if (getData == null) {
-      print("getData111 $getData");
       showNodata(context, "Oops", "There is no any requisition.");
     }
-    print('responseemployeeList $getData');
     pendingLeaveRequisitionModal = PendingLeaveRequisitionModal.fromJson(
       mapResponse,
     );
@@ -423,7 +416,6 @@ class _PendingLeaveRequisitionListState
                     onChanged: (i) {
                       setState(() {
                         value = i;
-                        print(i);
                       });
 
                       if (value == 0) {
@@ -474,7 +466,6 @@ class _PendingLeaveRequisitionListState
               MaterialPageRoute(builder: (context) => HomePage()),
             );
             //Navigator.of(context, rootNavigator: true).pop();
-            print('home tab');
           }
           if (index == 1) {
             Navigator.push(
@@ -482,16 +473,13 @@ class _PendingLeaveRequisitionListState
               MaterialPageRoute(builder: (context) => PunchInOUtActivity()),
             );
             //Navigator.pushNamed(context, MyRoutings.timeAttRoute);
-            print('Workflow');
           }
           if (index == 2) {
             Navigator.pushNamed(context, MyRoutings.leaveManageReportRoute);
-            print('Leave');
           }
           if (index == 3) {
             Navigator.pushNamed(context, MyRoutings.essDashboardNavigateRoute);
             //Navigator.pushNamed(context, MyRoutings.mssDashboardRoute);
-            print('Dashboard');
           }
           if (index == 4) {
             Navigator.push(
@@ -499,7 +487,6 @@ class _PendingLeaveRequisitionListState
               MaterialPageRoute(builder: (context) => ProfilePageNew()),
             );
             //Navigator.pushNamed(context, MyRoutings.profilePageHeadRoute);
-            print('Profile');
           }
           /*if(index==3){
                 title="Notifications";
@@ -552,7 +539,6 @@ class _PendingLeaveRequisitionListState
           final item = foundDataNew![index];
           return InkWell(
             onTap: () {
-              print(foundDataNew!.length);
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder:
@@ -692,7 +678,6 @@ class _PendingLeaveRequisitionListState
                             color: Colors.blueAccent,
                           ),
                           onPressed: () {
-                            print("Attachment tapped for ${item.employeeName}");
                             if (item.document != null &&
                                 item.document.toString().isNotEmpty) {
                               showAttachmentBottomSheet(

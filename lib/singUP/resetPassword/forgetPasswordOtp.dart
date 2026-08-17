@@ -10,7 +10,7 @@ import 'forgetPasswordNewCreation.dart';
 class ForgotPasswordOtpPage extends StatefulWidget {
   var emailController;
 
-  ForgotPasswordOtpPage(this.emailController);
+  ForgotPasswordOtpPage(this.emailController, {super.key});
 
   @override
   State<ForgotPasswordOtpPage> createState() =>
@@ -41,10 +41,9 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
     final url = Uri.parse(
       '$conn$apiUrl?'
       'email=${emailControllers.text}&'
-      'otp=${otp}',
+      'otp=$otp',
     );
 
-    print("Calling API: $url");
 
     // Show loader
     showDialog(
@@ -55,8 +54,6 @@ class _ForgotPasswordOtpPageState extends State<ForgotPasswordOtpPage> {
 
     try {
       final response = await MobileHttpClient.instance.post(url);
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
 
       // Dismiss loader
       Navigator.of(context, rootNavigator: true).pop();

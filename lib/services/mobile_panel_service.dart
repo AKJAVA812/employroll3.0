@@ -132,7 +132,6 @@ class MobilePanelService {
     try {
       await MobileMssContextService.synchronizeCurrent();
     } catch (error) {
-      print('[MSS-CONTEXT] Initial context sync failed: $error');
     }
   }
 }
