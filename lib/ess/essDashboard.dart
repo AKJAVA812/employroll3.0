@@ -557,8 +557,9 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                     : "0xffaf9f6";
             return {
               "mobColor": mobColor,
-              "status": legend["status"].toString(),
-              "statusName": legend["statusName"].toString(),
+              "status": legend["status"]?.toString() ?? "",
+              "statusName": legend["statusName"]?.toString() ?? "",
+              "statusCode": legend["statusCode"]?.toString() ?? "",
             };
           }).toList();
 
@@ -578,6 +579,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
             title: title,
             icon: AttendanceCalendarMarker(
               event: Map<String, dynamic>.from(event),
+              legends: _legends,
             ),
           ),
         );

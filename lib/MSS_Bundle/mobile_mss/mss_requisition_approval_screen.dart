@@ -355,7 +355,14 @@ class _MssRequisitionDetailScreenState
                   }
                   Navigator.pop(dialogContext, trimmedRemarks);
                 },
-                child: const Text('Confirm'),
+                style: FilledButton.styleFrom(
+                  backgroundColor:
+                      decision == 'APPROVE'
+                          ? Mythemes.successColor
+                          : Mythemes.dangerColor,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(_decisionLabel(decision)),
               ),
             ],
           ),
@@ -389,6 +396,13 @@ class _MssRequisitionDetailScreenState
   @override
   Widget build(BuildContext context) {
     final detail = _detail;
+    final visibleDecisions =
+        detail?.availableDecisions
+            .map((decision) => decision.toUpperCase())
+            .where((decision) => decision == 'APPROVE' || decision == 'REJECT')
+            .toSet()
+            .toList() ??
+        const <String>[];
     final config = _ModuleConfig.of(
       detail?.item.module ?? widget.requestId.split(':').first,
     );
@@ -472,7 +486,7 @@ class _MssRequisitionDetailScreenState
                 ],
               ),
       bottomNavigationBar:
-          detail == null || detail.availableDecisions.isEmpty
+          detail == null || visibleDecisions.isEmpty
               ? null
               : SafeArea(
                 child: Container(
@@ -486,7 +500,7 @@ class _MssRequisitionDetailScreenState
                             runSpacing: 8,
                             alignment: WrapAlignment.end,
                             children:
-                                detail.availableDecisions
+                                visibleDecisions
                                     .map(
                                       (decision) => _DecisionButton(
                                         decision: decision,
@@ -660,24 +674,17 @@ class _DecisionButton extends StatelessWidget {
   final VoidCallback onPressed;
   @override
   Widget build(BuildContext context) {
-    final primary = decision == 'APPROVE' || decision == 'FORWARD';
-    final icon = switch (decision) {
-      'APPROVE' => Icons.check_rounded,
-      'REJECT' => Icons.close_rounded,
-      'SEND_BACK' => Icons.undo_rounded,
-      _ => Icons.forward_rounded,
-    };
-    return primary
-        ? FilledButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon),
-          label: Text(_decisionLabel(decision)),
-        )
-        : OutlinedButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon),
-          label: Text(_decisionLabel(decision)),
-        );
+    final approve = decision == 'APPROVE';
+    final color = approve ? Mythemes.successColor : Mythemes.dangerColor;
+    return FilledButton.icon(
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+      ),
+      icon: Icon(approve ? Icons.check_rounded : Icons.close_rounded),
+      label: Text(_decisionLabel(decision)),
+    );
   }
 }
 

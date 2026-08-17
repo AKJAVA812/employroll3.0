@@ -325,6 +325,13 @@ class _MssLifecycleDetailScreenState extends State<MssLifecycleDetailScreen> {
                   if (decision == 'REJECT' && text.isEmpty) return;
                   Navigator.pop(dialogContext, text);
                 },
+                style: FilledButton.styleFrom(
+                  backgroundColor:
+                      decision == 'APPROVE'
+                          ? Mythemes.successColor
+                          : Mythemes.dangerColor,
+                  foregroundColor: Colors.white,
+                ),
                 child: Text(decision == 'APPROVE' ? 'Approve' : 'Reject'),
               ),
             ],
@@ -368,8 +375,12 @@ class _MssLifecycleDetailScreenState extends State<MssLifecycleDetailScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: OutlinedButton.icon(
+                          child: FilledButton.icon(
                             onPressed: _acting ? null : () => _decide('REJECT'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Mythemes.dangerColor,
+                              foregroundColor: Colors.white,
+                            ),
                             icon: const Icon(Icons.close_rounded),
                             label: const Text('Reject'),
                           ),
@@ -379,6 +390,10 @@ class _MssLifecycleDetailScreenState extends State<MssLifecycleDetailScreen> {
                           child: FilledButton.icon(
                             onPressed:
                                 _acting ? null : () => _decide('APPROVE'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Mythemes.successColor,
+                              foregroundColor: Colors.white,
+                            ),
                             icon: const Icon(Icons.check_rounded),
                             label: const Text('Approve'),
                           ),

@@ -355,7 +355,14 @@ class _MssAttendanceApprovalDetailScreenState
                   }
                   Navigator.pop(dialogContext, trimmedRemarks);
                 },
-                child: const Text('Confirm'),
+                style: FilledButton.styleFrom(
+                  backgroundColor:
+                      action == 'APPROVE'
+                          ? Mythemes.successColor
+                          : Mythemes.dangerColor,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(_actionLabel(action)),
               ),
             ],
           ),
@@ -405,6 +412,13 @@ class _MssAttendanceApprovalDetailScreenState
   @override
   Widget build(BuildContext context) {
     final detail = _detail;
+    final visibleActions =
+        detail?.availableActions
+            .map((action) => action.toUpperCase())
+            .where((action) => action == 'APPROVE' || action == 'REJECT')
+            .toSet()
+            .toList() ??
+        const <String>[];
     return Scaffold(
       backgroundColor: const Color(0xfff6f7fb),
       appBar: AppBar(
@@ -511,7 +525,7 @@ class _MssAttendanceApprovalDetailScreenState
                 ],
               ),
       bottomNavigationBar:
-          detail == null || detail.availableActions.isEmpty
+          detail == null || visibleActions.isEmpty
               ? null
               : SafeArea(
                 child: Container(
@@ -525,7 +539,7 @@ class _MssAttendanceApprovalDetailScreenState
                             runSpacing: 8,
                             alignment: WrapAlignment.end,
                             children:
-                                detail.availableActions
+                                visibleActions
                                     .map(
                                       (action) => _ActionButton(
                                         action: action,
@@ -832,32 +846,16 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final destructive = action == 'REJECT';
-    final primary = action == 'APPROVE' || action == 'FORWARD';
-    final icon = switch (action) {
-      'APPROVE' => Icons.check_rounded,
-      'REJECT' => Icons.close_rounded,
-      'SEND_BACK' => Icons.undo_rounded,
-      _ => Icons.forward_rounded,
-    };
-    if (primary) {
-      return FilledButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 18),
-        label: Text(_actionLabel(action)),
-      );
-    }
-    return OutlinedButton.icon(
+    final approve = action == 'APPROVE';
+    final color = approve ? Mythemes.successColor : Mythemes.dangerColor;
+    return FilledButton.icon(
       onPressed: onPressed,
-      icon: Icon(
-        icon,
-        size: 18,
-        color: destructive ? Mythemes.dangerColor : null,
+      style: FilledButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
       ),
-      label: Text(
-        _actionLabel(action),
-        style: TextStyle(color: destructive ? Mythemes.dangerColor : null),
-      ),
+      icon: Icon(approve ? Icons.check_rounded : Icons.close_rounded, size: 18),
+      label: Text(_actionLabel(action)),
     );
   }
 }

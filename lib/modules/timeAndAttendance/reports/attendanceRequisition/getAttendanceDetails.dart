@@ -13,6 +13,7 @@ import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
 import '../../../../ess/EssDashboarrddModel.dart';
 import '../../../../ess/Model/calendarModalClass.dart';
+import '../../../../ess/widgets/attendance_calendar_marker.dart';
 import '../../../../ess/essDashboardNavigate.dart';
 import '../../../../ess/myAllReports.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
@@ -201,8 +202,9 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
                     : "0xffaf9f6";
             return {
               "mobColor": mobColor,
-              "status": legend["status"].toString(),
-              "statusName": legend["statusName"].toString(),
+              "status": legend["status"]?.toString() ?? "",
+              "statusName": legend["statusName"]?.toString() ?? "",
+              "statusCode": legend["statusCode"]?.toString() ?? "",
             };
           }).toList();
 
@@ -223,12 +225,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
         String title =
             (event['status'] ?? event['attendanceStatus'] ?? "Event")
                 .toString();
-        String logDate = DateFormat('yyyy-MM-dd').format(eventDate);
-        String mobColor =
-            (event["mobColor"] != null &&
-                    event["mobColor"].toString().trim().isNotEmpty)
-                ? event["mobColor"].toString()
-                : "0xffaf9f6";
         //print("Calendar event data - $eventDate");
 
         _markedDateMap.add(
@@ -236,7 +232,10 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
           Event(
             date: eventDate,
             title: title,
-            icon: _buildEventIcon(mobColor, logDate),
+            icon: AttendanceCalendarMarker(
+              event: Map<String, dynamic>.from(event),
+              legends: _legends,
+            ),
           ),
         );
       }
@@ -289,31 +288,6 @@ class _GetAttendanceDetState extends State<GetAttendanceDet> {
       'firstInTime': '',
       'lastOutTime': '',
     };
-  }
-
-  // Helper function to build event icon
-  Widget _buildEventIcon(String colorHex, String logDate) {
-    //print('_buildEventIcon $colorHex');
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Color(int.parse(colorHex)), // Parse color from string
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        logDate
-            .split('-')
-            .last, // Extract the day from 'logDate' (e.g., "01" from "2024-12-01")
-        style: TextStyle(
-          color:
-              int.parse(colorHex) == 0xFFFFFF00 ? Colors.black : Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
   }
 
   void checkAndRunApi() async {
