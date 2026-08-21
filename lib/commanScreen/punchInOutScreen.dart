@@ -304,7 +304,9 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
 
   showLogoutPopup(BuildContext buildContext, result, alert) {
     String text = "Stop Service";
-    var alertDialog = AlertDialog(
+    showDialog<void>(
+      context: buildContext,
+      builder: (BuildContext dialogContext) => AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
@@ -321,6 +323,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
       actions: [
         TextButton(
           onPressed: () async {
+            Navigator.of(dialogContext).pop();
             await getLogout(context);
             shared.setSessionId("");
             shared.setAdminRole(0);
@@ -337,8 +340,8 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
             } else {
               text = 'Start Service';
             }
+            if (!mounted) return;
             setState(() {});
-            Navigator.of(buildContext, rootNavigator: true).pop();
             Navigator.pushAndRemoveUntil(
               buildContext,
               MaterialPageRoute(builder: (context) => LoginPage()),
@@ -353,12 +356,7 @@ class _PunchInOUtActivityState extends State<PunchInOUtActivity> {
         ),
       ],
       elevation: 24.0,
-    );
-    showDialog(
-      context: buildContext,
-      builder: (BuildContext context) {
-        return alertDialog;
-      },
+      ),
     );
   }
 

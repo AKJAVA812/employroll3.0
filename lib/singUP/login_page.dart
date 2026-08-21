@@ -114,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
         _username.text,
       );
       if (!mounted) return;
+      _password.clear();
       setState(() {
         _organisation = organisation;
         _resolvedLoginId = organisation.loginId.isNotEmpty
@@ -125,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
         _lookupError = '';
       });
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _passwordFocusNode.requestFocus();
+        if (mounted) FocusManager.instance.primaryFocus?.unfocus();
       });
     } on LoginOrganisationException catch (error) {
       if (!mounted) return;
@@ -479,9 +480,10 @@ class _LoginPageState extends State<LoginPage> {
     if (passwordChange.get("email") != null) {
       _username.text = passwordChange.get("email");
     }
-    if (passwordChange.get("pass") != null) {
-      _password.text = passwordChange.get("pass");
-    }
+    // Passwords must never be restored into the login field. Remove the old
+    // value as well so existing installations stop auto-filling it.
+    _password.clear();
+    await passwordChange.delete("pass");
   }
 
   String text = "Start Service";
@@ -639,7 +641,7 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      saveLoginCredentials();
+      await saveLoginCredentials();
       final value = await monthAttendance(
         _resolvedLoginId.isNotEmpty
             ? _resolvedLoginId
@@ -708,9 +710,9 @@ class _LoginPageState extends State<LoginPage> {
             if (hasLoginBackground)
               Image.network(
                 loginImageUrl,
-                fit: BoxFit.cover,
-                color: Colors.black.withOpacity(0.18),
-                colorBlendMode: BlendMode.darken,
+                // Stretch the complete organisation artwork to the available
+                // screen instead of cropping its edges with BoxFit.cover.
+                fit: BoxFit.fill,
                 errorBuilder: (context, error, stackTrace) =>
                     const ColoredBox(color: Colors.white),
               )
@@ -721,6 +723,7 @@ class _LoginPageState extends State<LoginPage> {
                 builder: (context, constraints) {
                   return SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
+                    physics: const ClampingScrollPhysics(),
                     keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     child: ConstrainedBox(
@@ -738,9 +741,14 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(
-                                hasLoginBackground ? 0.94 : 1,
+                                hasLoginBackground ? 0.68 : 1,
                               ),
                               borderRadius: BorderRadius.circular(24),
+                              border: hasLoginBackground
+                                  ? Border.all(
+                                      color: Colors.white.withOpacity(0.55),
+                                    )
+                                  : null,
                               boxShadow: hasLoginBackground
                                   ? const [
                                       BoxShadow(
@@ -818,9 +826,9 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     if (_isPasswordStep)
                                       TextFormField(
-                                        autofillHints: const [
-                                          AutofillHints.password,
-                                        ],
+                                        autofillHints: null,
+                                        enableSuggestions: false,
+                                        autocorrect: false,
                                         keyboardType: TextInputType.text,
                                         controller: _password,
                                         focusNode: _passwordFocusNode,
@@ -831,6 +839,38 @@ class _LoginPageState extends State<LoginPage> {
                                           }
                                         },
                                         decoration: InputDecoration(
+                                          filled: hasLoginBackground,
+                                          fillColor: hasLoginBackground
+                                              ? Colors.white.withOpacity(0.82)
+                                              : null,
+                                          border: hasLoginBackground
+                                              ? OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
+                                                  borderSide: BorderSide.none,
+                                                )
+                                              : null,
+                                          enabledBorder: hasLoginBackground
+                                              ? OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
+                                                  borderSide: BorderSide(
+                                                    color: Colors.white
+                                                        .withOpacity(0.65),
+                                                  ),
+                                                )
+                                              : null,
+                                          focusedBorder: hasLoginBackground
+                                              ? OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
+                                                  borderSide: BorderSide(
+                                                    color: Mythemes
+                                                        .lightBluishColor,
+                                                    width: 1.6,
+                                                  ),
+                                                )
+                                              : null,
                                           prefixIcon: Icon(
                                             Icons.security,
                                             size: 20,
@@ -3328,9 +3368,9 @@ class _LoginPageState extends State<LoginPage> {
     getSharedPrfanceList();
   }*/
 
-  void saveLoginCredentials() {
-    passwordChange.put("email", _username.text.trim());
-    passwordChange.put("pass", _password.text.trim());
+  Future<void> saveLoginCredentials() async {
+    await passwordChange.put("email", _username.text.trim());
+    await passwordChange.delete("pass");
   }
 
   /* void checkLoginOrNot() {

@@ -59,7 +59,7 @@ class CommonNotificationPage{
       elevation: 24.0,
     );
     showDialog(
-        context:buildContext,
+        context: buildContext,
         builder: (BuildContext context) {
           return alertDialog;
         });
@@ -364,29 +364,26 @@ class CommonNotificationPage{
         });
   }*/
 
-  static showLogoutPopup(BuildContext buildContext, result,alert) {
-    var alertDialog = AlertDialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0),
-          )
-      ),
-      title: Row(
-        children: [
-          //Icon(Icons.warning),
-          Expanded(child: Text( alert, style: TextStyle(
-              fontSize: 20
-          ),)),
-        ],
-      ),
-      content: Text(result , style: TextStyle(
-          fontSize: 14
-      )),
-      titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      actions: [
-        TextButton(
+  static showLogoutPopup(BuildContext buildContext, result, alert) {
+    showDialog<void>(
+      context: buildContext,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        title: Row(
+          children: [
+            Expanded(child: Text(alert, style: const TextStyle(fontSize: 20))),
+          ],
+        ),
+        content: Text(result, style: const TextStyle(fontSize: 14)),
+        titlePadding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        contentPadding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        buttonPadding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        actions: [
+          TextButton(
             onPressed: () {
+              Navigator.of(dialogContext).pop();
               shared.setSessionId("");
               shared.setAdminRole(0);
               shared.setEmpRoll(0);
@@ -396,23 +393,18 @@ class CommonNotificationPage{
               Navigator.pushAndRemoveUntil(
                 buildContext,
                 MaterialPageRoute(builder: (context) => LoginPage()),
-                    (route) => false,
+                (route) => false,
               );
-              //Navigator.of(buildContext, rootNavigator: true).pop();
             },
-            child: Container(
-              child: Text("Yes", style: TextStyle(color: Mythemes.warningColor),),
-            )
-        ),
-
-      ],
-      elevation: 24.0,
+            child: Text(
+              "Yes",
+              style: TextStyle(color: Mythemes.warningColor),
+            ),
+          ),
+        ],
+        elevation: 24.0,
+      ),
     );
-    showDialog(
-        context: buildContext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
   }
 /*static showLogoutPop(BuildContext buildContext, result, alert) {
     var alertDialog = AlertDialog(
