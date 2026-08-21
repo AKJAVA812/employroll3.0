@@ -70,7 +70,7 @@ class MobileAuthService {
       } catch (error) {
       }
       await sendMobileDeviceInfo(auth: latestAuth);
-      await NotificationService.instance.registerCurrentToken();
+      await NotificationService.instance.registerCurrentToken(force: true);
       await NotificationService.instance.processPendingNotification();
     });
   }

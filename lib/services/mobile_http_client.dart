@@ -205,6 +205,7 @@ class MobileHttpClient extends http.BaseClient {
     final server = Uri.tryParse(ApiDetails.server);
     if (server == null || url.host != server.host) return false;
     return url.path != ApiDetails.login &&
+        url.path != ApiDetails.loginOrganisationLookup &&
         url.path != ApiDetails.sessionIdAuth &&
         url.path != ApiDetails.refreshTokenId &&
         url.path != ApiDetails.logoutAPi;

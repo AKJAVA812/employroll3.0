@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../LocationPermissionRequest.dart';
+
 class Geolocatortracking extends StatefulWidget {
   const Geolocatortracking({super.key});
 
@@ -28,41 +30,20 @@ class _GeolocatortrackingState extends State<Geolocatortracking> {
 
   locationPermission({VoidCallback? inSuccess}) async
   {
-    bool serviceEnabled;
-    LocationPermission permission;
+    final permissionGranted =
+        await LocationPermissionRequest.requestLocationPermission(context);
+    if (!permissionGranted || !mounted) return;
 
     // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
-      await Geolocator.openAppSettings();
-      //return Future.error('Location services are disabled.');
+      return;
     }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        //return Future.error('Location permissions are denied');
-        await Geolocator.openAppSettings();
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    {
-      inSuccess?.call();
-    }
+    inSuccess?.call();
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.

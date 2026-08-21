@@ -6,10 +6,13 @@ import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/routes.dart';
 import '../../../../services/mobile_api_foundation.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
+import '../../leaveManagement/reports/leaveRequisition/leaveRequisitionPage.dart';
 import 'requisitionTypeTabs.dart';
 
 class WorkFromHomeRequisitionPage extends StatefulWidget {
-  const WorkFromHomeRequisitionPage({super.key});
+  const WorkFromHomeRequisitionPage({super.key, this.initialDate});
+
+  final DateTime? initialDate;
 
   @override
   State<WorkFromHomeRequisitionPage> createState() =>
@@ -33,6 +36,11 @@ class _WorkFromHomeRequisitionPageState
   @override
   void initState() {
     super.initState();
+    if (widget.initialDate != null) {
+      final date = DateFormat('yyyy-MM-dd').format(widget.initialDate!);
+      _fromDateController.text = date;
+      _toDateController.text = date;
+    }
     _loadEmployeeDetails();
   }
 
@@ -58,9 +66,10 @@ class _WorkFromHomeRequisitionPageState
 
   Future<void> _pickDate(TextEditingController controller) async {
     final now = DateTime.now();
+    final currentValue = DateTime.tryParse(controller.text);
     final selectedDate = await showDatePicker(
       context: context,
-      initialDate: now,
+      initialDate: currentValue ?? widget.initialDate ?? now,
       firstDate: DateTime(now.year - 1),
       lastDate: DateTime(now.year + 1),
     );
@@ -73,7 +82,14 @@ class _WorkFromHomeRequisitionPageState
     if (index == 0) {
       Navigator.pushNamed(context, MyRoutings.attendanceReqCalendar);
     } else if (index == 1) {
-      Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LeaveRequisitionPage(
+            initialDate: widget.initialDate,
+          ),
+        ),
+      );
     } else if (index == 2) {
       Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
     }

@@ -163,7 +163,7 @@ class NotificationService {
     if (!auth.hasAuth) return;
 
     await _clearPendingPayload();
-    _navigateFromPayload(prefsPayload);
+    await _navigateFromPayload(prefsPayload);
   }
 
   Future<void> _initializeLocalNotifications() async {
@@ -255,22 +255,26 @@ class NotificationService {
       return;
     }
 
-    _navigateFromPayload(payload);
+    await _navigateFromPayload(payload);
   }
 
-  void _navigateFromPayload(Map<String, dynamic> payload) {
+  Future<void> _navigateFromPayload(Map<String, dynamic> payload) async {
     final navigator = _navigatorKey?.currentState;
     if (navigator == null) {
-      _storePendingPayload(payload);
+      await _storePendingPayload(payload);
       return;
     }
 
-    final route = _routeForPayload(payload);
+    final activePanel = (await _sessionManager.getActivePanel() ?? '').toUpperCase();
+    final route = _routeForPayload(payload, activePanel: activePanel);
     debugPrint('[PUSH] navigate -> $route payload=$payload');
     navigator.pushNamed(route);
   }
 
-  String _routeForPayload(Map<String, dynamic> payload) {
+  String _routeForPayload(
+    Map<String, dynamic> payload, {
+    required String activePanel,
+  }) {
     final directRoute = payload['route']?.toString();
     if (directRoute != null && directRoute.trim().isNotEmpty) {
       return directRoute;
@@ -280,16 +284,38 @@ class NotificationService {
         (payload['module'] ?? payload['type'] ?? '').toString().toUpperCase();
     final action = (payload['action'] ?? '').toString().toUpperCase();
     final panel = (payload['panel'] ?? '').toString().toUpperCase();
+    final managerPayload = _isManagerPayload(panel, action);
+    final isMo = activePanel == 'MSS_MO';
 
-    if (module.contains('ATTENDANCE') && _isManagerPayload(panel, action)) {
-      return MyRoutings.mssAttPendingRequestRoRoute;
+    if (panel == 'ESS' &&
+        (action.contains('APPROVED') ||
+            action.contains('DISAPPROVED') ||
+            action.contains('REJECTED') ||
+            action.contains('DECISION'))) {
+      return MyRoutings.myAllRequestRoute;
     }
-    if (module.contains('LEAVE') && _isManagerPayload(panel, action)) {
-      return MyRoutings.mssPendingLeaveRequestRoute;
+
+    if (module.contains('ATTENDANCE') && managerPayload) {
+      return isMo
+          ? MyRoutings.mssMoAttPendingRequestRoRoute
+          : MyRoutings.mssAttPendingRequestRoRoute;
     }
-    if (module == 'OD') return MyRoutings.mssPendingOdRequisitionRoute;
-    if (module == 'WFH') return MyRoutings.mssWfhApprovalRoute;
-    if (module == 'COMP_OFF') return MyRoutings.mssCompOffApprovalRoute;
+    if (module.contains('LEAVE') && managerPayload) {
+      return isMo
+          ? MyRoutings.mssMoPendingLeaveRequestRoute
+          : MyRoutings.mssPendingLeaveRequestRoute;
+    }
+    if (module == 'OD' && managerPayload) {
+      return isMo
+          ? MyRoutings.mssMoPendingOdRequisitionRoute
+          : MyRoutings.mssPendingOdRequisitionRoute;
+    }
+    if (module == 'WFH' && managerPayload) {
+      return MyRoutings.mssWfhApprovalRoute;
+    }
+    if (module == 'COMP_OFF' && managerPayload) {
+      return MyRoutings.mssCompOffApprovalRoute;
+    }
     if (module.contains('CLAIM')) return MyRoutings.mssClaimItemRoute;
     if (module.contains('LOAN') && _isManagerPayload(panel, action)) {
       return MyRoutings.pendingLoanRequestListRoute;

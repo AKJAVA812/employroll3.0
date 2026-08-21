@@ -58,7 +58,10 @@ class Listdata {
     final punchTime = _text(json['punchTime']);
     final parsedPunchTime = DateTime.tryParse(punchTime)?.toLocal();
     date = _text(json['date'], parsedPunchTime?.toIso8601String() ?? punchTime);
-    image = _text(json['imageUrl'], _text(json['image']));
+    image = _text(
+      json['imageUrl'],
+      _text(json['image'], _text(json['imageReference'])),
+    );
     odtime = _text(
       json['odtime'],
       parsedPunchTime == null

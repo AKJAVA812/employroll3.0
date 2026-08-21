@@ -489,6 +489,52 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
     );
   }
 
+  Future<void> _showImagePreview(String imageUrl) async {
+    if (imageUrl.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No image is available for this OD request.')),
+      );
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        child: Stack(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.sizeOf(dialogContext).height * 0.72,
+              child: InteractiveViewer(
+                minScale: 0.8,
+                maxScale: 4,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, progress) => progress == null
+                      ? child
+                      : const Center(child: CircularProgressIndicator()),
+                  errorBuilder: (context, error, stackTrace) => const Center(
+                    child: Text('Unable to load this image.'),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              right: 4,
+              top: 4,
+              child: IconButton.filled(
+                tooltip: 'Close',
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                icon: const Icon(Icons.close),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   getSelfOdRequisitionList(SelfOdReqListModal selfOdReqListModal) {
     if (selfOdReqListModal.listdata == null ||
         selfOdReqListModal.listdata!.isEmpty) {
@@ -549,23 +595,28 @@ class _SelfODRequisitionListState extends State<SelfODRequisitionList>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Avatar
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.grey.shade200,
-                        child: ClipOval(
-                          child: Image.network(
-                            selfOdReqListModal.listdata![itemCount].image ?? "",
-                            fit: BoxFit.cover,
-                            width: 56,
-                            height: 56,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                'assets/images/avtar7.png',
-                                fit: BoxFit.cover,
-                                width: 56,
-                                height: 56,
-                              );
-                            },
+                      GestureDetector(
+                        onTap: () => _showImagePreview(
+                          selfOdReqListModal.listdata![itemCount].image ?? '',
+                        ),
+                        child: CircleAvatar(
+                          radius: 28,
+                          backgroundColor: Colors.grey.shade200,
+                          child: ClipOval(
+                            child: Image.network(
+                              selfOdReqListModal.listdata![itemCount].image ?? "",
+                              fit: BoxFit.cover,
+                              width: 56,
+                              height: 56,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/images/avtar7.png',
+                                  fit: BoxFit.cover,
+                                  width: 56,
+                                  height: 56,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),

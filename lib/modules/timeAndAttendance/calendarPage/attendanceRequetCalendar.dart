@@ -16,12 +16,15 @@ import '../../../../themes/empThemes.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/mobile_permission_service.dart';
+import 'package:er_flutter_project/services/short_leave_service.dart';
+import 'package:er_flutter_project/services/attendance_requisition_rules.dart';
 
 import '../../../ess/myAllReports.dart';
 import '../reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../reports/attendanceRequisition/model/onDateReportModel.dart';
 import 'requisitionTypeTabs.dart';
 import 'workFromHomeRequisitionPage.dart';
+import '../../leaveManagement/reports/leaveRequisition/leaveRequisitionPage.dart';
 
 class AttendanceRequisitionCalendar extends StatefulWidget {
   AttendanceReportModel? attendanceModelGlobel;
@@ -82,6 +85,15 @@ class _AttendanceRequisitionCalendarState
     this.singleDateString,
   );
 
+  DateTime _selectedRequisitionDate() {
+    final value = singleDateString?.toString().trim() ?? '';
+    try {
+      return DateFormat('dd-MM-yyyy').parseStrict(value);
+    } on FormatException {
+      return DateTime.now();
+    }
+  }
+
   @override
   void initState() {
     //var onDateNew = attendanceModelGlobel!.data![indexCont].attendanceDate,
@@ -90,6 +102,7 @@ class _AttendanceRequisitionCalendarState
     //print('responseemployeeList $empid');
     singleDateString;
     _loadOrgId();
+    _loadShortLeavePermission();
     getSharedPrfanceList();
     super.initState();
   }
@@ -249,6 +262,16 @@ class _AttendanceRequisitionCalendarState
     //print(employeeNameset);
   }
 
+  Future<void> _loadShortLeavePermission() async {
+    final permissionState = await MobilePermissionService.loadEssState();
+    if (!mounted) return;
+    setState(() {
+      _canAddShortLeaveRequisition =
+          permissionState.canAddShortLeaveRequisition;
+      _canAddCompOffRequisition = permissionState.canAddCompOffRequisition;
+    });
+  }
+
   String _firstText(dynamic primary, dynamic fallback) {
     final primaryText = primary?.toString().trim() ?? '';
     if (_isUsableText(primaryText)) {
@@ -305,6 +328,8 @@ class _AttendanceRequisitionCalendarState
   bool light0 = true;
   bool light1 = true;
   bool isShortLeave = false;
+  bool _canAddShortLeaveRequisition = false;
+  bool _canAddCompOffRequisition = false;
   bool isOutDuty = false;
   bool isCompOff = false;
   static const WidgetStateProperty<Icon> thumbIcon =
@@ -494,14 +519,23 @@ class _AttendanceRequisitionCalendarState
                     onChanged: (i) {
                       setState(() => value = i);
                       if (value == 1) {
-                        Navigator.pushNamed(context, MyRoutings.leaveRequisitionRoute);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LeaveRequisitionPage(
+                              initialDate: _selectedRequisitionDate(),
+                            ),
+                          ),
+                        );
                       } else if (value == 2) {
                         Navigator.pushNamed(context, MyRoutings.odLocationViewRoute);
                       } else if (value == 3) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const WorkFromHomeRequisitionPage(),
+                            builder: (context) => WorkFromHomeRequisitionPage(
+                              initialDate: _selectedRequisitionDate(),
+                            ),
                           ),
                         );
                       }
@@ -602,15 +636,30 @@ class _AttendanceRequisitionCalendarState
                           shortLeave = false;
                           outDuty = false;
                         }),
-                        buildVerticalToggle("Comp. Off", compOff, (val) {
-                          setState(() => compOff = val);
-                          nightShift = false;
-                          shortLeave = false;
-                          outDuty = false;
-                        }),
+                        Visibility(
+                          visible: _canAddCompOffRequisition,
+                          child: buildVerticalToggle("Comp. Off", compOff, (val) {
+                            if (val &&
+                                !hasCompleteAttendancePunches(
+                                  actualTimeset,
+                                  actualOutTimeset,
+                                )) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(compOffAttendanceRequiredMessage),
+                                ),
+                              );
+                              return;
+                            }
+                            setState(() => compOff = val);
+                            nightShift = false;
+                            shortLeave = false;
+                            outDuty = false;
+                          }),
+                        ),
 
                         Visibility(
-                          visible: isShortLeave,
+                          visible: _canAddShortLeaveRequisition,
                           child: buildVerticalToggle(
                             "Short Leave",
                             shortLeave,
@@ -744,11 +793,12 @@ class _AttendanceRequisitionCalendarState
                           ),
                         ),
                         Visibility(
-                          visible: compOff != true,
+                          visible: true,
                           child: Expanded(
                             child: Padding(
                               padding: EdgeInsets.all(10.0),
                               child: TextFormField(
+                                enabled: !compOff,
                                 onTap: () async {
                                   //_openInTimepicker(context);
                                   final TimeOfDay? n = await showTimePicker(
@@ -852,11 +902,12 @@ class _AttendanceRequisitionCalendarState
                           ),
                         ),
                         Visibility(
-                          visible: compOff != true,
+                          visible: true,
                           child: Expanded(
                             child: Padding(
                               padding: EdgeInsets.all(10.0),
                               child: TextFormField(
+                                enabled: !compOff,
                                 onTap: () async {
                                   //_openOutTimepicker(context);
                                   final TimeOfDay? o = await showTimePicker(
@@ -913,11 +964,13 @@ class _AttendanceRequisitionCalendarState
                         Expanded(
                           child: Padding(
                             padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
+                            child: compOff
+                                ? const SizedBox.shrink()
+                                : TextFormField(
                               maxLines: 3,
                               style: TextStyle(fontSize: 14),
                               controller: outRemarkController,
-                              enabled: true,
+                              enabled: !compOff,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
                                 /*enabledBorder: UnderlineInputBorder( //<-- SEE HERE
@@ -1004,13 +1057,21 @@ class _AttendanceRequisitionCalendarState
                                 fontWeight: FontWeight.bold,
                               ),
                               controller: TextEditingController(
-                                text: workingHrsSet,
+                                text: shortLeaveActualWorkingHours(
+                                  workingHrsSet,
+                                  inTime: actualTimeset,
+                                  outTime: actualOutTimeset,
+                                ),
                               ),
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: workingHrsSet,
+                                hintText: shortLeaveActualWorkingHours(
+                                  workingHrsSet,
+                                  inTime: actualTimeset,
+                                  outTime: actualOutTimeset,
+                                ),
                                 labelText: "Actual Work Hours",
                                 labelStyle: TextStyle(fontSize: 15),
                               ),
@@ -1026,13 +1087,13 @@ class _AttendanceRequisitionCalendarState
                                 fontWeight: FontWeight.bold,
                               ),
                               controller: TextEditingController(
-                                text: relaxationHourSet,
+                                text: shortLeaveRelaxationHours,
                               ),
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: relaxationHourSet,
+                                hintText: shortLeaveRelaxationHours,
                                 labelText: "Short Leave Relaxation Hour",
                                 labelStyle: TextStyle(fontSize: 15),
                               ),
@@ -1056,14 +1117,31 @@ class _AttendanceRequisitionCalendarState
                                 fontWeight: FontWeight.bold,
                               ),
                               controller: TextEditingController(
-                                text: updatedWorkHourSet,
+                                text:
+                                    shortLeave
+                                        ? shortLeaveTotalWorkingHours(
+                                          workingHrsSet,
+                                          inTime: actualTimeset,
+                                          outTime: actualOutTimeset,
+                                        )
+                                        : updatedWorkHourSet,
                               ),
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: updatedWorkHourSet,
-                                labelText: "Updated Work Hour",
+                                hintText:
+                                    shortLeave
+                                        ? shortLeaveTotalWorkingHours(
+                                          workingHrsSet,
+                                          inTime: actualTimeset,
+                                          outTime: actualOutTimeset,
+                                        )
+                                        : updatedWorkHourSet,
+                                labelText:
+                                    shortLeave
+                                        ? "Total Working Hours (+2h)"
+                                        : "Updated Work Hour",
                                 labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
@@ -1106,13 +1184,8 @@ class _AttendanceRequisitionCalendarState
                     ),
                   ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      OverflowBar(
-                        alignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
+                  Center(
+                    child: ElevatedButton(
                             onPressed: () {
                               DateTime now = DateTime.now();
                               String? inTimeReq;
@@ -1390,34 +1463,21 @@ class _AttendanceRequisitionCalendarState
                                       }
                                     }
                                   } else if (compOff == true) {
-                                    if (actualTimeset!.compareToIgnoringCase(
-                                              "N/A",
-                                            ) ==
-                                            0 ||
-                                        actualOutTimeset!.compareToIgnoringCase(
-                                              "N/A",
-                                            ) ==
-                                            0 ||
-                                        actualTimeset!.compareToIgnoringCase(
-                                              "--:--",
-                                            ) ==
-                                            0 ||
-                                        actualOutTimeset!.compareToIgnoringCase(
-                                              "--:--",
-                                            ) ==
-                                            0) {
+                                    if (!hasCompleteAttendancePunches(
+                                      actualTimeset,
+                                      actualOutTimeset,
+                                    )) {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
-                                        SnackBar(
+                                        const SnackBar(
                                           content: Text(
-                                            " Please Handle Attendance Requisition ",
+                                            compOffAttendanceRequiredMessage,
                                           ),
                                         ),
                                       );
                                     } else {
-                                      if (inRemarkController.text.isEmpty ||
-                                          outRemarkController.text.isEmpty) {
+                                      if (inRemarkController.text.trim().isEmpty) {
                                         ScaffoldMessenger.of(
                                           context,
                                         ).showSnackBar(
@@ -1428,6 +1488,9 @@ class _AttendanceRequisitionCalendarState
                                           ),
                                         );
                                       } else {
+                                        inTimeReq = actualTimeset;
+                                        outTimeReq = actualOutTimeset;
+                                        outRemarkString = "";
                                         sendRequsitionToServerCompOff(
                                           context,
                                           empId!,
@@ -1519,11 +1582,8 @@ class _AttendanceRequisitionCalendarState
                                 Mythemes.lightBluishColor,
                               ),
                             ),
-                            child: "Send".text.make(),
-                          ).wh(150, 40).py12(),
-                        ],
-                      ),
-                    ],
+                      child: "Send".text.make(),
+                    ).wh(150, 40).py12(),
                   ).py32(),
                 ],
               ),
@@ -1633,10 +1693,20 @@ class _AttendanceRequisitionCalendarState
     bool shortLeave = false,
   }) async {
     final permissionState = await MobilePermissionService.loadEssState();
-    if (!permissionState.canAddAttendanceRequisition) {
+    final allowed =
+        compOff
+            ? permissionState.canAddCompOffRequisition
+            : shortLeave
+            ? permissionState.canAddShortLeaveRequisition
+            : permissionState.canAddAttendanceRequisition;
+    if (!allowed) {
       showDialgSucess1(
         context,
-        "Attendance requisition permission is not assigned. Please contact your administrator.",
+        compOff
+            ? "Comp Off requisition permission is not assigned. Please contact your administrator."
+            : shortLeave
+            ? "Short leave requisition permission is not assigned. Please contact your administrator."
+            : "Attendance requisition permission is not assigned. Please contact your administrator.",
         "Permission Not Provided",
       );
       return;
@@ -1655,10 +1725,23 @@ class _AttendanceRequisitionCalendarState
       if (nextday) 'nextday': true,
       if (isOdReq) 'isOdReq': 1,
       if (compOff) 'compOff': true,
+      if (compOff) 'remarks': inRemarkString,
       if (shortLeave) 'shortLeave': 1,
+      if (shortLeave) 'remarks': inRemarkString,
+      if (shortLeave)
+        'actualWorkingMinutes': shortLeaveActualWorkingMinutes(
+          workingHrsSet,
+          inTime: actualTimeset,
+          outTime: actualOutTimeset,
+        ),
+      if (shortLeave) 'creditMinutes': shortLeaveCreditMinutes,
     };
     final response = await foundation.postJson(
-      ApiDetails.mobileAttendanceRequisition,
+      compOff
+          ? ApiDetails.mobileCompOffRequisition
+          : shortLeave
+          ? ApiDetails.mobileShortLeaveRequisition
+          : ApiDetails.mobileAttendanceRequisition,
       body: body,
       headers: await foundation.authHeaders(requestId: requestId, json: true),
       tag: 'ATT_REQ_MOBILE',

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -12,7 +11,6 @@ import '../../../../ess/myAllReports.dart';
 import '../../../../main.dart';
 import '../../../../sharedPrefancePage/ShardPre.dart';
 import '../../../../themes/empThemes.dart';
-import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import '../../../timeAndAttendance/reports/attendanceRequisition/getAttendanceDetails.dart';
 import '../leaveRequisition/leaveRequisitionPage.dart';
@@ -20,7 +18,12 @@ import '../modalClass/selfLeaveRequisitionModal.dart';
 
 class RequestedRequisitionList extends StatefulWidget {
   final SelfLeaveRequisitionListModal selfLeaveRequisitionListModal;
-  const RequestedRequisitionList(this.selfLeaveRequisitionListModal, {super.key});
+  final int initialTab;
+  const RequestedRequisitionList(
+    this.selfLeaveRequisitionListModal, {
+    super.key,
+    this.initialTab = 0,
+  });
 
   @override
   State<RequestedRequisitionList> createState() =>
@@ -33,8 +36,6 @@ SessionManager shared = SessionManager();
 
 String? sessionId;
 
-SelfLeaveRequisitionListModal? selfLeaveRequisitionLabel;
-
 class _RequestedRequisitionListState extends State<RequestedRequisitionList>
     with RouteAware {
   final SelfLeaveRequisitionListModal selfLeaveRequisitionListModal;
@@ -42,6 +43,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
 
   var status;
   var leaveId;
+  SelfLeaveRequisitionListModal? selfLeaveRequisitionLabel;
 
   @override
   void didChangeDependencies() {
@@ -64,34 +66,19 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    value = widget.initialTab == 1 ? 1 : 0;
     getSharedPrfanceList();
   }
 
-  Future getSharedPrfanceList() async {
+  Future<void> getSharedPrfanceList() async {
+    if (mounted) setState(() => _isLoading = true);
     sessionId = await shared.getSessionId();
-    // await Future.delayed(Duration(seconds: 5));
-
-    Future<SelfLeaveRequisitionListModal> getAppReq11 = getSelfLeaveReqList(
-      sessionId!,
-    );
-    setState(() {});
-    final loading = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        CircularProgressIndicator(),
-        Text(" Login ... Please wait"),
-      ],
-    );
-
-    getAppReq11.then((value) {
-      setState(() {
-        selfLeaveRequisitionLabel = value;
-      });
-      if (selfLeaveRequisitionLabel?.data != null) {
-      } else {
-      }
+    final result = await getSelfLeaveReqList(sessionId ?? '');
+    if (!mounted) return;
+    setState(() {
+      selfLeaveRequisitionLabel = result;
+      _isLoading = false;
     });
   }
 
@@ -131,12 +118,10 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
   }
 
   bool _isLoading = true;
+  int? _loadingReversalId;
   Future<SelfLeaveRequisitionListModal> getSelfLeaveReqList(
     String SessionId,
   ) async {
-    setState(() {
-      _isLoading = true;
-    });
     final foundation = MobileApiFoundation.instance;
     try {
       final response = await foundation.get(
@@ -155,11 +140,9 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
       }
       mapResponse = body;
       final model = SelfLeaveRequisitionListModal.fromJson(body);
-      if (mounted) setState(() => _isLoading = false);
       return model;
     } catch (error) {
       if (mounted) {
-        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -174,10 +157,269 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
     }
   }
 
+  Future<void> _openLeaveReversal(Data leave) async {
+    final requisitionId = leave.leavereqId;
+    if (requisitionId == null) {
+      _showMessage('Unable to identify this approved leave requisition.');
+      return;
+    }
+    if (_loadingReversalId != null) return;
+    setState(() => _loadingReversalId = requisitionId);
+    final api = MobileApiFoundation.instance;
+    try {
+      final response = await api.get(
+        ApiDetails.mobileLeaveReversalPreview(requisitionId),
+        headers: await api.authHeaders(requestId: api.newRequestId()),
+        tag: 'LEAVE_REVERSAL_PREVIEW',
+      );
+      final body = api.decodeMap(response.body);
+      if (!api.isSuccess(response)) {
+        throw MobileApiException(
+          'LEAVE_REVERSAL_PREVIEW_FAILED',
+          message: body['message']?.toString(),
+          statusCode: response.statusCode,
+        );
+      }
+      final payload =
+          body['data'] is Map
+              ? Map<String, dynamic>.from(body['data'] as Map)
+              : body;
+      final dates =
+          (payload['dates'] as List? ?? const <dynamic>[])
+              .whereType<Map>()
+              .map((item) => Map<String, dynamic>.from(item))
+              .toList();
+      if (!mounted) return;
+      if (dates.isEmpty) {
+        _showMessage('No leave dates are available for reversal.');
+        return;
+      }
+      setState(() => _loadingReversalId = null);
+      await _showLeaveReversalSheet(requisitionId, leave, dates);
+    } catch (error) {
+      if (!mounted) return;
+      _showMessage(
+        error is MobileApiException
+            ? (error.message ?? 'Unable to load leave reversal details.')
+            : 'Unable to load leave reversal details.',
+      );
+    } finally {
+      if (mounted && _loadingReversalId == requisitionId) {
+        setState(() => _loadingReversalId = null);
+      }
+    }
+  }
+
+  Future<void> _showLeaveReversalSheet(
+    int requisitionId,
+    Data leave,
+    List<Map<String, dynamic>> dates,
+  ) async {
+    final selectedDates = dates.map((item) => item['date'].toString()).toSet();
+    final remarksController = TextEditingController();
+    var submitting = false;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder:
+          (sheetContext) => StatefulBuilder(
+            builder:
+                (context, setSheetState) => SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      16,
+                      16,
+                      16 + MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Leave Reversal',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          leave.leavetype?.isNotEmpty == true
+                              ? leave.leavetype!
+                              : 'Approved Leave',
+                        ),
+                        const Divider(height: 24),
+                        Flexible(
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: dates.length,
+                            separatorBuilder:
+                                (_, __) => const Divider(height: 1),
+                            itemBuilder: (_, index) {
+                              final date = dates[index]['date'].toString();
+                              return CheckboxListTile(
+                                contentPadding: EdgeInsets.zero,
+                                value: selectedDates.contains(date),
+                                title: Text(_displayDate(date)),
+                                subtitle: Text(
+                                  '${dates[index]['days'] ?? 1} day',
+                                ),
+                                onChanged:
+                                    submitting
+                                        ? null
+                                        : (checked) => setSheetState(() {
+                                          if (checked == true) {
+                                            selectedDates.add(date);
+                                          } else {
+                                            selectedDates.remove(date);
+                                          }
+                                        }),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: remarksController,
+                          maxLines: 2,
+                          decoration: const InputDecoration(
+                            labelText: 'Remarks',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed:
+                                selectedDates.isEmpty || submitting
+                                    ? null
+                                    : () async {
+                                      setSheetState(() => submitting = true);
+                                      try {
+                                        final api =
+                                            MobileApiFoundation.instance;
+                                        final response = await api.postJson(
+                                          ApiDetails.mobileLeaveReversal,
+                                          body: <String, Object?>{
+                                            'sourceRequisitionId':
+                                                requisitionId,
+                                            'selectedDates':
+                                                selectedDates.toList()..sort(),
+                                            'reason':
+                                                remarksController.text.trim(),
+                                          },
+                                          headers: await api.authHeaders(
+                                            requestId: api.newRequestId(),
+                                            json: true,
+                                          ),
+                                          tag: 'LEAVE_REVERSAL_SUBMIT',
+                                        );
+                                        final body = api.decodeMap(
+                                          response.body,
+                                        );
+                                        if (!api.isSuccess(response)) {
+                                          throw MobileApiException(
+                                            'LEAVE_REVERSAL_SUBMIT_FAILED',
+                                            message:
+                                                body['message']?.toString(),
+                                            statusCode: response.statusCode,
+                                          );
+                                        }
+                                        if (!sheetContext.mounted) return;
+                                        Navigator.of(sheetContext).pop();
+                                        await getSharedPrfanceList();
+                                        if (!mounted) return;
+                                        _showMessage(
+                                          body['message']?.toString() ??
+                                              'Leave reversal submitted for approval.',
+                                        );
+                                      } catch (error) {
+                                        if (!sheetContext.mounted) return;
+                                        setSheetState(() => submitting = false);
+                                        ScaffoldMessenger.of(
+                                          sheetContext,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              error is MobileApiException
+                                                  ? (error.message ??
+                                                      'Unable to submit leave reversal.')
+                                                  : 'Unable to submit leave reversal.',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                            icon:
+                                submitting
+                                    ? const SizedBox.square(
+                                      dimension: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                    : const Icon(Icons.undo),
+                            label: const Text('Submit Reversal'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+          ),
+    );
+    remarksController.dispose();
+  }
+
+  String _displayDate(String? value) {
+    final rawValue = value?.trim() ?? '';
+    final parsed = DateTime.tryParse(rawValue);
+    if (parsed == null) return rawValue;
+    return '${parsed.day.toString().padLeft(2, '0')}-'
+        '${parsed.month.toString().padLeft(2, '0')}-${parsed.year}';
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   var titleName = "My Leave Requests";
   int pageIndex = 0;
   int currentIndex = 2;
   int value = 0;
+
+  List<Data> get _visibleRequests {
+    final rows = selfLeaveRequisitionLabel?.data ?? const <Data>[];
+    return rows.where((item) {
+      final requestType = (item.requestType ?? '')
+          .trim()
+          .toUpperCase()
+          .replaceAll('-', '_')
+          .replaceAll(' ', '_');
+      if (requestType == 'LEAVE_REVERSAL') return false;
+      final itemStatus = (item.status ?? '').trim().toUpperCase();
+      return value == 0
+          ? _isPendingStatus(itemStatus)
+          : _isApprovedStatus(itemStatus);
+    }).toList();
+  }
+
+  bool _isPendingStatus(String status) {
+    final normalized = status.trim().toUpperCase();
+    return normalized.contains('PENDING') ||
+        normalized == 'SUBMITTED' ||
+        normalized == 'IN_PROGRESS' ||
+        normalized == 'AWAITING_APPROVAL';
+  }
+
+  bool _isApprovedStatus(String status) {
+    final normalized = status.trim().toUpperCase();
+    return normalized.contains('APPROVED') &&
+        !normalized.contains('DISAPPROVED');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -228,6 +470,35 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
         color: context.canvasColor,
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<int>(
+                  showSelectedIcon: false,
+                  segments: const <ButtonSegment<int>>[
+                    ButtonSegment<int>(
+                      value: 0,
+                      icon: Icon(Icons.pending_actions, size: 18),
+                      label: Text('Pending'),
+                    ),
+                    ButtonSegment<int>(
+                      value: 1,
+                      icon: Icon(Icons.task_alt, size: 18),
+                      label: Text('Approved'),
+                    ),
+                  ],
+                  selected: <int>{value},
+                  onSelectionChanged: (selection) {
+                    if (selection.isNotEmpty) {
+                      setState(() => value = selection.first);
+                    }
+                  },
+                ),
+              ),
+            ),
+            if (_loadingReversalId != null)
+              const LinearProgressIndicator(minHeight: 3),
             /*  Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -297,11 +568,12 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
                   _isLoading
                       ? Center(child: CircularProgressIndicator())
                       : (selfLeaveRequisitionLabel == null ||
-                          selfLeaveRequisitionLabel!.data == null ||
-                          selfLeaveRequisitionLabel!.data!.isEmpty)
+                          _visibleRequests.isEmpty)
                       ? Center(
                         child: Text(
-                          'No leave requisitions available.',
+                          value == 0
+                              ? 'No pending leave requisitions available.'
+                              : 'No approved leave requisitions available.',
                         ),
                       )
                       : getSelfReqRequisitionList(selfLeaveRequisitionLabel!),
@@ -393,45 +665,39 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
   getSelfReqRequisitionList(
     SelfLeaveRequisitionListModal selfLeaveRequisitionListModal,
   ) {
+    final visibleRequests = _visibleRequests;
     return RefreshIndicator(
-      onRefresh: () {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder:
-                (a, b, c) =>
-                    RequestedRequisitionList(SelfLeaveRequisitionListModal()),
-            transitionDuration: Duration(seconds: 1),
-            maintainState: true,
-          ),
-        );
-        return Future.value(false);
-      },
+      onRefresh: getSharedPrfanceList,
       child: ListView.builder(
         padding: const EdgeInsets.all(8.0),
-        itemCount: selfLeaveRequisitionListModal.data!.length,
+        itemCount: visibleRequests.length,
         itemBuilder: (context, index) {
-          final leaveData = selfLeaveRequisitionListModal.data![index];
-          final statusCheck = leaveData.status.toString();
+          final leaveData = visibleRequests[index];
+          final statusCheck = (leaveData.status ?? '').trim().toUpperCase();
+          final isApproved = _isApprovedStatus(statusCheck);
+          final reversalStatus =
+              (leaveData.reversalStatus ?? '').trim().toUpperCase();
+          final reversalPending = reversalStatus == 'PENDING';
+          final fullyReversed = reversalStatus == 'REVERSED';
+          final partiallyReversed = reversalStatus == 'PARTIALLY_REVERSED';
+          final displayStatus =
+              fullyReversed
+                  ? 'REVERSED'
+                  : partiallyReversed
+                  ? 'PARTIALLY REVERSED'
+                  : statusCheck;
+          final canRequestReversal =
+              isApproved && !reversalPending && !fullyReversed;
+          final loadingReversal = _loadingReversalId == leaveData.leavereqId;
 
           return InkWell(
             onTap: () {
               leaveId = leaveData.leavereqId;
 
-              if (statusCheck == 'Level_One_Pending' ||
-                  statusCheck == 'Level_Two_Pending' ||
-                  statusCheck == 'PENDING') {
+              if (_isPendingStatus(statusCheck)) {
                 showDialgCancel(context, context, context);
-              } else if (statusCheck == 'APPROVED') {
-                Fluttertoast.showToast(
-                  msg: "Your Requisition has already Approved",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 3,
-                  backgroundColor: Colors.black,
-                  textColor: Colors.white,
-                  fontSize: 16.0,
-                );
+              } else if (canRequestReversal) {
+                _openLeaveReversal(leaveData);
               } else {
                 Fluttertoast.showToast(
                   msg: "Your Requisition has already Disapproved",
@@ -478,21 +744,25 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
                               ),
                               decoration: BoxDecoration(
                                 color:
-                                    statusCheck == 'APPROVED'
+                                    isApproved ||
+                                            fullyReversed ||
+                                            partiallyReversed
                                         ? Colors.green.withOpacity(0.15)
-                                        : statusCheck.contains('PENDING')
+                                        : _isPendingStatus(statusCheck)
                                         ? Colors.orange.withOpacity(0.15)
                                         : Colors.red.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                statusCheck,
+                                displayStatus,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color:
-                                      statusCheck == 'APPROVED'
+                                      isApproved ||
+                                              fullyReversed ||
+                                              partiallyReversed
                                           ? Colors.green
-                                          : statusCheck.contains('PENDING')
+                                          : _isPendingStatus(statusCheck)
                                           ? Colors.orange
                                           : Colors.red,
                                   fontSize: 13,
@@ -533,13 +803,13 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
                         Expanded(
                           child: _buildInfoColumn(
                             "Start Date",
-                            leaveData.startDate.toString(),
+                            _displayDate(leaveData.startDate),
                           ),
                         ),
                         Expanded(
                           child: _buildInfoColumn(
                             "End Date",
-                            leaveData.endDate.toString(),
+                            _displayDate(leaveData.endDate),
                           ),
                         ),
                         Expanded(
@@ -559,6 +829,94 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
                     ),
 
                     const SizedBox(height: 6),
+                    if (_isPendingStatus(statusCheck)) ...[
+                      const Divider(),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            leaveId = leaveData.leavereqId;
+                            showDialgCancel(context, context, context);
+                          },
+                          icon: const Icon(Icons.cancel_outlined, size: 18),
+                          label: const Text('Cancel requisition'),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Mythemes.dangerColor,
+                          ),
+                        ),
+                      ),
+                    ] else if (reversalPending) ...[
+                      const Divider(),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.hourglass_top,
+                              size: 18,
+                              color: Colors.orange,
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              'Reversal request already applied',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (fullyReversed) ...[
+                      const Divider(),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.task_alt, size: 18, color: Colors.green),
+                            SizedBox(width: 6),
+                            Text(
+                              'Leave reversed',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (canRequestReversal) ...[
+                      const Divider(),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed:
+                              _loadingReversalId != null
+                                  ? null
+                                  : () => _openLeaveReversal(leaveData),
+                          icon:
+                              loadingReversal
+                                  ? const SizedBox.square(
+                                    dimension: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                  : const Icon(Icons.undo, size: 18),
+                          label: Text(
+                            loadingReversal
+                                ? 'Loading leave dates...'
+                                : 'Request reversal',
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -604,7 +962,6 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
         TextButton(
           onPressed: () {
             Navigator.of(buildContext, rootNavigator: true).pop();
-            Navigator.of(buildContext).pop();
           },
           child: Container(
             // color: Mythemes.lightBluishColor,
@@ -612,7 +969,7 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
           ),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             Navigator.of(context, rootNavigator: true).pop();
             //getSelfLeaveReqList(sessionId!);
             /*Navigator.pushReplacement(
@@ -623,8 +980,8 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
                     transitionDuration: Duration(seconds: 1),
                     maintainState: true,
                   ));*/
-            cancelReqRequisitionList(leaveId.toString());
-            getSharedPrfanceList();
+            final id = int.tryParse(leaveId.toString());
+            if (id != null) await cancelReqRequisitionList(id);
           },
           child: Container(
             child: Text("Yes", style: TextStyle(color: Mythemes.warningColor)),
@@ -713,31 +1070,58 @@ class _RequestedRequisitionListState extends State<RequestedRequisitionList>
         });
   }*/
 
-  Future<void> cancelReqRequisitionList(String leaveId) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.cancelReqRequisition;
+  Future<void> cancelReqRequisitionList(int leaveId) async {
+    if (!mounted) return;
     CommonNotificationPage.showLoaderDialog(context);
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?"
-      "sessionId=$sessionId&"
-      "leaveId=$leaveId",
-    );
-    final response = await MobileHttpClient.instance.post(urlapi);
-    if (response.statusCode == 200) {
-      var responseResult = response.body;
+    var loaderOpen = true;
+    try {
+      final foundation = MobileApiFoundation.instance;
+      final response = await foundation.putJson(
+        ApiDetails.mobileLeaveRequisitionCancel(leaveId),
+        body: const <String, Object?>{'remarks': 'Cancelled by employee'},
+        headers: await foundation.authHeaders(),
+        tag: 'LEAVE_REQUISITION_CANCEL',
+      );
+      final responseBody = foundation.decodeMap(response.body);
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
+        loaderOpen = false;
       }
-      //Navigator.of(context, rootNavigator: true).pop();
-      mapResponse = json.decode(response.body);
-      String result = mapResponse['result'];
-      String reason = mapResponse['reason'];
-      if (result.compareToIgnoringCase("success") == 0) {
+      if (!foundation.isSuccess(response)) {
         if (mounted) {
-          showDialgSucess1(context, "${reason.upperCamelCase} ", "Success");
-        } else if (result.compareToIgnoringCase("error") == 0) {
-          showDialgSucess1(context, reason.upperCamelCase, " Error ");
+          showDialgSucess1(
+            context,
+            responseBody['message']?.toString() ??
+                'Unable to cancel requisition',
+            'Error',
+          );
         }
+        return;
+      }
+      if (mounted) {
+        Fluttertoast.showToast(msg: 'Leave requisition cancelled');
+        await getSharedPrfanceList();
+      }
+    } catch (error) {
+      if (mounted) {
+        if (!loaderOpen) {
+          showDialgSucess1(
+            context,
+            error is MobileApiException
+                ? (error.message ?? 'Unable to refresh requisitions')
+                : 'Unable to refresh requisitions',
+            'Error',
+          );
+          return;
+        }
+        Navigator.of(context, rootNavigator: true).pop();
+        showDialgSucess1(
+          context,
+          error is MobileApiException
+              ? (error.message ?? 'Unable to cancel requisition')
+              : 'Unable to cancel requisition',
+          'Error',
+        );
       }
     }
   }

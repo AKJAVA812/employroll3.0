@@ -14,7 +14,6 @@ import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordNewCreatio
 import 'package:er_flutter_project/singUP/resetPassword/forgetPasswordOtp.dart';
 import 'package:er_flutter_project/singUP/resetPassword/resetPasswordPage.dart';
 import 'package:er_flutter_project/tracking/geolocator/GeolocatorTracking.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:er_flutter_project/adminPage/modelClass/dashboardModel.dart';
 import 'package:er_flutter_project/commanScreen/ProjectListPage.dart';
@@ -43,6 +42,7 @@ import 'package:er_flutter_project/singUP/login_page.dart';
 import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:er_flutter_project/widgets/expendableList.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -167,8 +167,6 @@ import 'modules/helpDesk/helpdeskItem/hdResolvedTicket.dart';
 import 'modules/hris/hrisDetails.dart';
 import 'modules/inductionOnboarding/inductionOnboarding.dart';
 import 'modules/inductionOnboarding/onboardingList.dart';
-import 'modules/leaveManagement/reports/approvedReqList/approvedLeaveReqModal.dart';
-import 'modules/leaveManagement/reports/approvedReqList/roApprovedReqList.dart';
 import 'modules/leaveManagement/reports/leaveBalance/leaveBalancePage.dart';
 import 'modules/leaveManagement/reports/leaveRequisition/leaveRequisitionPage.dart';
 import 'modules/leaveManagement/reports/levelOneLeaveReq.dart';
@@ -512,42 +510,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     getSharedPrfanceList();
-    _determinePosition();
-    _getUserLocation();
     //requestPermission();
     //_startLocationTracking();
     //requestStoragePermission();
-    // TODO: implement initState
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-
-      // Show local notification
-      if (message.notification != null) {
-        _showNotification(message.notification!);
-      }
-    });
     super.initState();
-  }
-
-  Future<void> _showNotification(RemoteNotification notification) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-          'default_channel', // id
-          'General Notifications', // title
-          importance: Importance.max,
-          priority: Priority.high,
-          showWhen: true,
-        );
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-    );
-
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      notification.title,
-      notification.body,
-      platformChannelSpecifics,
-      payload: 'Default_Sound',
-    );
   }
 
   /*  Future<void> _startLocationTracking() async {
@@ -584,7 +550,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      openAppSettings();
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
@@ -600,14 +565,12 @@ class _MyHomePageState extends State<MyHomePage> {
         // Android's shouldShowRequestPermissionRationale
         // returned true. According to Android guidelines
         // your App should show an explanatory UI now.
-        openAppSettings();
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
-      openAppSettings();
       return Future.error(
         'Location permissions are permanently denied, we cannot request permissions.',
       );
@@ -763,7 +726,10 @@ class _MyHomePageState extends State<MyHomePage> {
               (context) => ApproveDisapproveLeaveReq(),
           MyRoutings.approvedLeaveReqListRoute:
               (context) =>
-                  ApprovedLeaveRequisitionList(ApprovedLeaveReqModal()),
+                  RequestedRequisitionList(
+                    SelfLeaveRequisitionListModal(),
+                    initialTab: 1,
+                  ),
           MyRoutings.loanAdvanceReqRoute: (context) => LoanAdvanceRequisition(),
           MyRoutings.pendingLoanRequestedRoute:
               (context) => PendingLoanRequestedList(LoanAdvanceReqModal()),

@@ -4,8 +4,16 @@ class ApprovedLeaveReqModal {
   ApprovedLeaveReqModal({this.result});
 
   ApprovedLeaveReqModal.fromJson(Map<String, dynamic> json) {
-    result =
-    json['result'] != null ? Result.fromJson(json['result']) : null;
+    if (json['content'] is List) {
+      result = Result(data: (json['content'] as List)
+          .whereType<Map>()
+          .map((item) => Data.fromJson(Map<String, dynamic>.from(item)))
+          .toList());
+    } else {
+      result = json['result'] is Map
+          ? Result.fromJson(Map<String, dynamic>.from(json['result']))
+          : Result(data: <Data>[]);
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -41,6 +49,8 @@ class Result {
 }
 
 class Data {
+  int? requisitionId;
+  String? requestType;
   String? employeeName;
   String? leaveType;
   String? endDate;
@@ -55,7 +65,9 @@ class Data {
   String? endTime;
 
   Data(
-      {this.employeeName,
+      {this.requisitionId,
+        this.requestType,
+        this.employeeName,
         this.leaveType,
         this.endDate,
         this.approvedBy,
@@ -69,22 +81,29 @@ class Data {
         this.endTime});
 
   Data.fromJson(Map<String, dynamic> json) {
-    employeeName = json['employeeName'];
-    leaveType = json['leaveType'];
-    endDate = json['endDate'];
+    requisitionId = int.tryParse((json['id'] ?? json['requisitionId'] ?? '').toString());
+    requestType = json['requestType']?.toString();
+    employeeName = json['employeeName']?.toString();
+    leaveType = (json['leaveTypeName'] ?? json['leaveType'])?.toString();
+    endDate = (json['toDate'] ?? json['endDate'])?.toString();
     approvedBy = json['approvedBy'];
-    count = json['count'];
+    final countValue = json['days'] ?? json['count'];
+    count = countValue is num
+        ? countValue.toDouble()
+        : double.tryParse(countValue?.toString() ?? '');
     nominee = json['nominee'];
     leaveLength = json['leaveLength'];
-    startDate = json['startDate'];
+    startDate = (json['fromDate'] ?? json['startDate'])?.toString();
     status = json['status'];
-    applicationDate = json['applicationDate'];
+    applicationDate = (json['appliedDate'] ?? json['applicationDate'])?.toString();
     startTime = json['startTime'];
     endTime = json['endTime'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = requisitionId;
+    data['requestType'] = requestType;
     data['employeeName'] = employeeName;
     data['leaveType'] = leaveType;
     data['endDate'] = endDate;

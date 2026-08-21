@@ -4,11 +4,23 @@ class SelfLeaveRequisitionListModal {
   SelfLeaveRequisitionListModal({this.data});
 
   SelfLeaveRequisitionListModal.fromJson(Map<String, dynamic> json) {
-    final source = json['content'] ?? json['data'];
+    Object? source = json['content'];
+    final nestedData = json['data'];
+    if (source is! List && nestedData is List) {
+      source = nestedData;
+    } else if (source is! List && nestedData is Map) {
+      source = nestedData['content'] ?? nestedData['data'];
+    }
+    final nestedResult = json['result'];
+    if (source is! List && nestedResult is Map) {
+      source = nestedResult['content'] ?? nestedResult['data'];
+    }
     if (source is List) {
       data = <Data>[];
       for (var v in source) {
-        if (v is Map) data!.add(Data.fromJson(Map<String, dynamic>.from(v)));
+        if (v is Map) {
+          data!.add(Data.fromJson(Map<String, dynamic>.from(v)));
+        }
       }
     } else {
       data = <Data>[];
@@ -45,6 +57,11 @@ class Data {
   String? approvarRemark;
   String? startDate;
   String? status;
+  String? requestType;
+  String? approvedBy;
+  String? reversalStatus;
+  int? reversalRequestId;
+  List<String> reversalRequestedDates = <String>[];
 
   Data(
       {this.deptName,
@@ -66,29 +83,58 @@ class Data {
         this.leavereqId,
         this.approvarRemark,
         this.startDate,
-        this.status});
+        this.status,
+        this.requestType,
+        this.approvedBy,
+        this.reversalStatus,
+        this.reversalRequestId,
+        this.reversalRequestedDates = const <String>[]});
 
   Data.fromJson(Map<String, dynamic> json) {
-    deptName = json['deptName'];
-    branchId = json['branchId'];
+    deptName = json['deptName']?.toString() ?? '';
+    branchId = _intValue(json['branchId']);
     leavetype = json['leaveTypeName']?.toString() ?? json['leavetype']?.toString() ?? '';
-    noOfDay = (json['days'] as num?)?.toDouble() ?? (json['noOfDay'] as num?)?.toDouble();
+    noOfDay = _doubleValue(json['days']) ?? _doubleValue(json['noOfDay']);
     endDate = json['toDate']?.toString() ?? json['endDate']?.toString() ?? '';
-    branchName = json['branchName'];
+    branchName = json['branchName']?.toString() ?? '';
     employeeId = json['employeeCode']?.toString() ?? json['employeeId']?.toString() ?? '';
     leaveLength = json['leaveLength']?.toString() ?? '';
     approvaldate = json['actionedAt']?.toString() ?? json['approvaldate']?.toString() ?? '';
     applicationdate = json['appliedDate']?.toString() ?? json['applicationdate']?.toString() ?? '';
     empName = json['employeeName']?.toString() ?? json['empName']?.toString() ?? '';
-    nominee = json['nominee'];
+    nominee = json['nominee']?.toString() ?? '';
     startTime = json['sessionName']?.toString() ?? json['startTime']?.toString() ?? '';
-    leaveId = json['leaveId'];
+    leaveId = _intValue(json['leaveId']);
     appliedby = json['appliedBy']?.toString() ?? json['appliedby']?.toString() ?? '';
     endTime = json['endTime']?.toString() ?? '';
     leavereqId = int.tryParse(json['id']?.toString() ?? json['leavereqId']?.toString() ?? '');
     approvarRemark = json['approvedRemarks']?.toString() ?? json['approvarRemark']?.toString() ?? '';
     startDate = json['fromDate']?.toString() ?? json['startDate']?.toString() ?? '';
-    status = (json['status']?.toString() ?? '').toUpperCase();
+    status = (json['status'] ??
+            json['requisitionStatus'] ??
+            json['approvalStatus'] ??
+            '')
+        .toString()
+        .trim()
+        .toUpperCase();
+    requestType = json['requestType']?.toString() ?? 'leave';
+    approvedBy = json['approvedBy']?.toString() ?? '';
+    reversalStatus = json['reversalStatus']?.toString().trim().toUpperCase() ?? '';
+    reversalRequestId = _intValue(json['reversalRequestId']);
+    reversalRequestedDates = (json['reversalRequestedDates'] as List? ?? const <dynamic>[])
+        .map((value) => value.toString())
+        .where((value) => value.isNotEmpty)
+        .toList();
+  }
+
+  static int? _intValue(Object? value) {
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString().trim() ?? '');
+  }
+
+  static double? _doubleValue(Object? value) {
+    if (value is num) return value.toDouble();
+    return double.tryParse(value?.toString().trim() ?? '');
   }
 
   Map<String, dynamic> toJson() {
@@ -113,6 +159,11 @@ class Data {
     data['approvarRemark'] = approvarRemark;
     data['startDate'] = startDate;
     data['status'] = status;
+    data['requestType'] = requestType;
+    data['approvedBy'] = approvedBy;
+    data['reversalStatus'] = reversalStatus;
+    data['reversalRequestId'] = reversalRequestId;
+    data['reversalRequestedDates'] = reversalRequestedDates;
     return data;
   }
 }

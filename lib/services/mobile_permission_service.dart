@@ -9,6 +9,8 @@ class MobileEssPermissionState {
   final bool canViewCalendar;
   final bool canViewDashboard;
   final bool canAddAttendanceRequisition;
+  final bool canAddShortLeaveRequisition;
+  final bool canAddCompOffRequisition;
   final bool canTrackOnly;
   final bool canTrackWithAttendance;
   final bool requiresSelfie;
@@ -22,6 +24,8 @@ class MobileEssPermissionState {
     required this.canViewCalendar,
     required this.canViewDashboard,
     required this.canAddAttendanceRequisition,
+    required this.canAddShortLeaveRequisition,
+    required this.canAddCompOffRequisition,
     required this.canTrackOnly,
     required this.canTrackWithAttendance,
     required this.requiresSelfie,
@@ -35,6 +39,8 @@ class MobileEssPermissionState {
       canViewCalendar ||
       canViewDashboard ||
       canAddAttendanceRequisition ||
+      canAddShortLeaveRequisition ||
+      canAddCompOffRequisition ||
       canTrackOnly ||
       canTrackWithAttendance;
 
@@ -48,6 +54,8 @@ class MobileEssPermissionState {
     'canViewCalendar': canViewCalendar,
     'canViewDashboard': canViewDashboard,
     'canAddAttendanceRequisition': canAddAttendanceRequisition,
+    'canAddShortLeaveRequisition': canAddShortLeaveRequisition,
+    'canAddCompOffRequisition': canAddCompOffRequisition,
     'canTrackOnly': canTrackOnly,
     'canTrackWithAttendance': canTrackWithAttendance,
     'requiresSelfie': requiresSelfie,
@@ -76,6 +84,9 @@ class MobilePermissionService {
   static const essMyDashboard = 'ESS_MY_DASHBOARD_VIEW';
   static const essMobileAttendanceRequisitionAdd =
       'ESS_MOBILE_ATT_REQUISITION_ADD';
+  static const essShortLeaveRequisitionAdd =
+      'ESS_SHORT_LEAVE_REQUISITION_ADD';
+  static const essCompOffRequisitionAdd = 'ESS_COMP_OFF_REQUEST_ADD';
   static const essMobileTracking = 'ESS_MOBILE_TRACKING_VIEW';
   static const essMobileAttSelfie = 'ESS_MOBILE_ATT_SELFIE_VIEW';
   static const essMobileAttWithoutSelfie = 'ESS_MOBILE_ATT_WITHOUT_SELFIE_VIEW';
@@ -93,6 +104,10 @@ class MobilePermissionService {
     final hasAttendanceRequisitionAdd = ids.contains(
       essMobileAttendanceRequisitionAdd,
     );
+    final hasShortLeaveRequisitionAdd = ids.contains(
+      essShortLeaveRequisitionAdd,
+    );
+    final hasCompOffRequisitionAdd = ids.contains(essCompOffRequisitionAdd);
     final hasTrackingOnly = ids.contains(essMobileTracking);
     final hasAttendanceTracking = ids.contains(essMobileAttTracking);
     final hasSelfie = ids.contains(essMobileAttSelfie);
@@ -110,6 +125,8 @@ class MobilePermissionService {
       canViewCalendar: hasCalendar,
       canViewDashboard: hasDashboard,
       canAddAttendanceRequisition: hasAttendanceRequisitionAdd,
+      canAddShortLeaveRequisition: hasShortLeaveRequisitionAdd,
+      canAddCompOffRequisition: hasCompOffRequisitionAdd,
       canTrackOnly: hasTrackingOnly && !hasAttendance && !hasWorkDone,
       canTrackWithAttendance: hasAttendanceTracking,
       requiresSelfie: hasSelfie || hasSelfieConflict,

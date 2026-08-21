@@ -57,6 +57,7 @@ import 'package:er_flutter_project/themes/empThemes.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../singUP/resetPassword/resetPasswordPage.dart';
+import '../tracking/LocationPermissionRequest.dart';
 import 'allAPIList.dart';
 import '../utils/profile_image_provider.dart';
 import 'commanNotificationPage.dart';
@@ -864,9 +865,7 @@ class _DefaultPageState extends State<DefaultPage> {
   void initState() {
     //print('initState');
     // TODO: implement initState
-    _determinePosition();
     //_getUserLocation();
-    _startLocationTracking();
     timeStringNew = _formatDateTime(DateTime.now());
     getSharedPrfanceList();
     _getTime();
@@ -1634,6 +1633,13 @@ class _DefaultPageState extends State<DefaultPage> {
                             margin: EdgeInsets.all(5),
                             child: InkWell(
                               onTap: () async {
+                                final locationAllowed =
+                                    await LocationPermissionRequest
+                                        .requestLocationPermission(context);
+                                if (!locationAllowed || !mounted) return;
+                                if (positionStream == null) {
+                                  _startLocationTracking();
+                                }
                                 bool internetCheck =
                                     await InternetConnectionChecker()
                                         .hasConnection;
@@ -1950,6 +1956,13 @@ class _DefaultPageState extends State<DefaultPage> {
                             margin: EdgeInsets.all(5),
                             child: InkWell(
                               onTap: () async {
+                                final locationAllowed =
+                                    await LocationPermissionRequest
+                                        .requestLocationPermission(context);
+                                if (!locationAllowed || !mounted) return;
+                                if (positionStream == null) {
+                                  _startLocationTracking();
+                                }
                                 bool internetCheck =
                                     await InternetConnectionChecker()
                                         .hasConnection;
@@ -2050,6 +2063,13 @@ class _DefaultPageState extends State<DefaultPage> {
                             margin: EdgeInsets.all(5),
                             child: InkWell(
                               onTap: () async {
+                                final locationAllowed =
+                                    await LocationPermissionRequest
+                                        .requestLocationPermission(context);
+                                if (!locationAllowed || !mounted) return;
+                                if (positionStream == null) {
+                                  _startLocationTracking();
+                                }
                                 bool internetCheck =
                                     await InternetConnectionChecker()
                                         .hasConnection;

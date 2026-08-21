@@ -25,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:er_flutter_project/services/attendance_calendar_api.dart';
 import 'package:er_flutter_project/ess/widgets/attendance_calendar_marker.dart';
+import 'package:er_flutter_project/ess/widgets/dashboard_today_events.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/mobile_permission_service.dart';
@@ -240,8 +241,23 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     //print("todayDate $date");
   }
 
+  Future<String> _dashboardCacheKey(String month) async {
+    final cachedOrgId = await shared.getOrgId();
+    final employeeDetailsId = await shared.getEmployeeDetailsId();
+    final employeeCode = await shared.getEmpCode();
+    final employeeKey = employeeDetailsId?.toString().trim().isNotEmpty == true
+        ? employeeDetailsId.toString().trim()
+        : employeeCode?.toString().trim() ?? 'unknown';
+    return 'essDashboardData:${cachedOrgId ?? 'unknown'}:$employeeKey:$month';
+  }
+
   Future<EssDashboarrdModel> getDashboardData(String sessionId) async {
     EssDashboarrdModel dashboardModel;
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
     final foundation = MobileApiFoundation.instance;
     final requestId = foundation.newRequestId();
     final response = await foundation.postForm(
@@ -254,17 +270,28 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       headers: await foundation.authHeaders(requestId: requestId),
       tag: 'ESS_DASHBOARD',
     );
-    setState(() {
-      isLoading = true; // Start loading
-    });
     _logLong('ESS_DASHBOARD_RAW_RESPONSE', response.body);
     developer.log("response:- ", name: response.body);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        'Dashboard API failed with status ${response.statusCode}: ${response.body}',
+      );
+    }
 
     mapResponse = json.decode(response.body);
     _logDashboardSummary(mapResponse);
+    await _attachEssProfileToDashboardRows(mapResponse);
     dashboardModel = EssDashboarrdModel.fromJson(mapResponse);
+    if (dashboardModel.countData == null) {
+      throw const FormatException('Dashboard response does not contain card data');
+    }
     // âœ… Save to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
+    final dashboardMonth = DateFormat('yyyy-MM').format(_targetDateTime);
+    await prefs.setString(
+      await _dashboardCacheKey(dashboardMonth),
+      jsonEncode(mapResponse),
+    );
     await prefs.setString('dashboardData', jsonEncode(mapResponse));
     return dashboardModel;
   }
@@ -293,6 +320,68 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
   }
 
   int _listLength(Object? value) => value is List ? value.length : 0;
+
+  Future<void> _attachEssProfileToDashboardRows(
+    Map<String, dynamic> body,
+  ) async {
+    final employee =
+        body['employee'] is Map
+            ? Map<String, dynamic>.from(body['employee'])
+            : <String, dynamic>{};
+    final empName =
+        _fallbackText(employee['employeeName'], await shared.getempName()) ??
+        'Self';
+    final department =
+        _fallbackText(employee['department'], await shared.getDept()) ?? '';
+    final designation =
+        _fallbackText(employee['designation'], await shared.getDesignation()) ??
+        '';
+    final branch =
+        _fallbackText(employee['branch'], await shared.getBranch()) ?? '';
+    final deptText =
+        [department, designation]
+            .where((value) => value.trim().isNotEmpty)
+            .join(' - ');
+    final countData = body['countData'];
+    if (countData is! Map) return;
+    const listKeys = <String>[
+      'presentList',
+      'absentList',
+      'lateList',
+      'mispunchList',
+      'earlyGoList',
+      'shortLeaveList',
+      'halfDayList',
+      'totalList',
+    ];
+    for (final key in listKeys) {
+      final rows = countData[key];
+      if (rows is! List) continue;
+      for (final row in rows) {
+        if (row is! Map) continue;
+        row['empName'] = _fallbackText(row['empName'], empName);
+        row['dept'] = _fallbackText(row['dept'], deptText);
+        row['branch'] = _fallbackText(row['branch'], branch);
+        row['inTime'] = _timeFallback(row['inTime']);
+        row['outTime'] = _timeFallback(row['outTime']);
+        row['workingHours'] = _timeFallback(row['workingHours']);
+      }
+    }
+  }
+
+  String? _fallbackText(Object? value, Object? fallback) {
+    final text = value?.toString().trim() ?? '';
+    if (text.isNotEmpty && text.toLowerCase() != 'null') return text;
+    final fallbackText = fallback?.toString().trim() ?? '';
+    return fallbackText.isEmpty || fallbackText.toLowerCase() == 'null'
+        ? null
+        : fallbackText;
+  }
+
+  String _timeFallback(Object? value) {
+    final text = value?.toString().trim() ?? '';
+    return text.isEmpty || text.toLowerCase() == 'null' ? '--:--' : text;
+  }
 
   void _logLong(String tag, String value) {
     const chunkSize = 700;
@@ -721,14 +810,15 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
       return;
     }
 
-    bool runApi = await shouldRunApi();
-    runApi = true;
-
-    if (!runApi) {
+    try {
       await loadSavedData();
-      return;
+    } catch (error, stackTrace) {
+      developer.log(
+        'Unable to restore cached ESS dashboard',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
-
 
     try {
       final dashboardData = await getDashboardData(sessionId!);
@@ -977,7 +1067,10 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     final holidayJson = prefs.getString('holidayData');
     final calendarJson = prefs.getString('calendarData');
     final calendarMonth = prefs.getString('calendarMonth');
-    final dashboardData = prefs.getString('dashboardData');
+    final dashboardMonth = DateFormat('yyyy-MM').format(_targetDateTime);
+    final dashboardData =
+        prefs.getString(await _dashboardCacheKey(dashboardMonth)) ??
+        prefs.getString('dashboardData');
 
     if (eventsJson != null) {
       final mapResponse = jsonDecode(eventsJson);
@@ -1030,6 +1123,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     }
     if (dashboardData != null) {
       final mapResponse = jsonDecode(dashboardData);
+      await _attachEssProfileToDashboardRows(mapResponse);
       essDashboardModelGlobal = EssDashboarrdModel.fromJson(mapResponse);
       //isLoadingEvent = false;
       //isLoadingEvent = false;
@@ -1215,7 +1309,7 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startAutoScroll();
     });
-    getSharedPrfanceList();
+    _initializeDashboard();
 
     setState(() {
       if (empRole == 1) {
@@ -1242,9 +1336,12 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
     });
     setState(() {});
 
-    getTodayDate();
-
     // TODO: implement initState
+  }
+
+  Future<void> _initializeDashboard() async {
+    await getTodayDate();
+    await getSharedPrfanceList();
   }
 
   int pageIndex = 0;
@@ -2648,13 +2745,14 @@ class _EssAdminDashboardState extends State<EssAdminDashboard> {
                                 imageBuilder: (item) => item.image,
                               ),*/
                               buildEventList(
-                                isLoading: isLoadingTodayEvent,
-                                items:
-                                    todayEventModalGlobal?.todayEventList ?? [],
+                                isLoading: isLoadingEvent,
+                                items: dashboardTodayEvents(
+                                  eventsListModalGlobal,
+                                ),
                                 emptyText: "No events today ðŸŽ‚",
                                 titleBuilder: (item) => item.fullName,
-                                subtitleBuilder: (item) => item.department,
-                                trailingBuilder: (item) => item.dob,
+                                subtitleBuilder: (item) => item.subtitle,
+                                trailingBuilder: (item) => item.date,
                                 imageBuilder: (item) => item.image,
                               ),
 

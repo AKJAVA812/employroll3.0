@@ -19,6 +19,8 @@ import '../../../../themes/empThemes.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/mobile_permission_service.dart';
+import 'package:er_flutter_project/services/short_leave_service.dart';
+import 'package:er_flutter_project/services/attendance_requisition_rules.dart';
 
 import '../../calendarPage/workFromHomeRequisitionPage.dart';
 import '../../calendarPage/requisitionTypeTabs.dart';
@@ -77,6 +79,16 @@ class _AttendanceRequestCurrentMonthState
   Future<void> _loadOrgId() async {
     orgId = await shared.getOrgId();
     setState(() {}); // rebuild UI after fetching
+  }
+
+  Future<void> _loadShortLeavePermission() async {
+    final permissionState = await MobilePermissionService.loadEssState();
+    if (!mounted) return;
+    setState(() {
+      _canAddShortLeaveRequisition =
+          permissionState.canAddShortLeaveRequisition;
+      _canAddCompOffRequisition = permissionState.canAddCompOffRequisition;
+    });
   }
 
   @override
@@ -140,6 +152,7 @@ class _AttendanceRequestCurrentMonthState
     }
 
     _loadOrgId();
+    _loadShortLeavePermission();
     getSharedPrfanceList();
     super.initState();
   }
@@ -170,6 +183,8 @@ class _AttendanceRequestCurrentMonthState
   bool light0 = true;
   bool light1 = true;
   bool isShortLeave = false;
+  bool _canAddShortLeaveRequisition = false;
+  bool _canAddCompOffRequisition = false;
   bool isOutDuty = false;
   static const WidgetStateProperty<Icon> thumbIcon =
       WidgetStateProperty<Icon>.fromMap(<WidgetStatesConstraint, Icon>{
@@ -383,15 +398,30 @@ class _AttendanceRequestCurrentMonthState
                           shortLeave = false;
                           outDuty = false;
                         }),
-                        buildVerticalToggle("Comp. Off", compOff, (val) {
-                          setState(() => compOff = val);
-                          nightShift = false;
-                          shortLeave = false;
-                          outDuty = false;
-                        }),
+                        Visibility(
+                          visible: _canAddCompOffRequisition,
+                          child: buildVerticalToggle("Comp. Off", compOff, (val) {
+                            if (val &&
+                                !hasCompleteAttendancePunches(
+                                  actualTimeset,
+                                  actualOutTimeset,
+                                )) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(compOffAttendanceRequiredMessage),
+                                ),
+                              );
+                              return;
+                            }
+                            setState(() => compOff = val);
+                            nightShift = false;
+                            shortLeave = false;
+                            outDuty = false;
+                          }),
+                        ),
 
                         Visibility(
-                          visible: isShortLeave,
+                          visible: _canAddShortLeaveRequisition,
                           child: buildVerticalToggle(
                             "Short Leave",
                             shortLeave,
@@ -608,11 +638,12 @@ class _AttendanceRequestCurrentMonthState
                           ),
                         ),
                         Visibility(
-                          visible: compOff != true,
+                          visible: true,
                           child: Expanded(
                             child: Padding(
                               padding: EdgeInsets.all(10.0),
                               child: TextFormField(
+                                enabled: !compOff,
                                 onTap: () async {
                                   //_openInTimepicker(context);
                                   final TimeOfDay? n = await showTimePicker(
@@ -719,11 +750,12 @@ class _AttendanceRequestCurrentMonthState
                           ),
                         ),
                         Visibility(
-                          visible: compOff != true,
+                          visible: true,
                           child: Expanded(
                             child: Padding(
                               padding: EdgeInsets.all(10.0),
                               child: TextFormField(
+                                enabled: !compOff,
                                 onTap: () async {
                                   //_openOutTimepicker(context);
                                   final TimeOfDay? o = await showTimePicker(
@@ -780,11 +812,13 @@ class _AttendanceRequestCurrentMonthState
                         Expanded(
                           child: Padding(
                             padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
+                            child: compOff
+                                ? const SizedBox.shrink()
+                                : TextFormField(
                               maxLines: 3,
                               style: TextStyle(fontSize: 14),
                               controller: outRemarkController,
-                              enabled: true,
+                              enabled: !compOff,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
                                 enabledBorder: UnderlineInputBorder(
@@ -874,14 +908,22 @@ class _AttendanceRequestCurrentMonthState
                                 fontWeight: FontWeight.bold,
                               ),
                               controller: TextEditingController(
-                                text: workingHrsSet,
+                                text: shortLeaveActualWorkingHours(
+                                  workingHrsSet,
+                                  inTime: actualTimeset,
+                                  outTime: actualOutTimeset,
+                                ),
                               ),
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: workingHrsSet,
-                                labelText: "Actual Work Hours",
+                                hintText: shortLeaveActualWorkingHours(
+                                  workingHrsSet,
+                                  inTime: actualTimeset,
+                                  outTime: actualOutTimeset,
+                                ),
+                                labelText: "Actual Working Hours",
                                 labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
@@ -896,14 +938,14 @@ class _AttendanceRequestCurrentMonthState
                                 fontWeight: FontWeight.bold,
                               ),
                               controller: TextEditingController(
-                                text: relaxationHourSet,
+                                text: shortLeaveRelaxationHours,
                               ),
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: relaxationHourSet,
-                                labelText: "Short Leave Relaxation Hour",
+                                hintText: shortLeaveRelaxationHours,
+                                labelText: "Short Leave Relaxation",
                                 labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
@@ -926,14 +968,31 @@ class _AttendanceRequestCurrentMonthState
                                 fontWeight: FontWeight.bold,
                               ),
                               controller: TextEditingController(
-                                text: updatedWorkHourSet,
+                                text:
+                                    shortLeave
+                                        ? shortLeaveTotalWorkingHours(
+                                          workingHrsSet,
+                                          inTime: actualTimeset,
+                                          outTime: actualOutTimeset,
+                                        )
+                                        : updatedWorkHourSet,
                               ),
                               readOnly: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 8.0),
-                                hintText: updatedWorkHourSet,
-                                labelText: "Updated Work Hour",
+                                hintText:
+                                    shortLeave
+                                        ? shortLeaveTotalWorkingHours(
+                                          workingHrsSet,
+                                          inTime: actualTimeset,
+                                          outTime: actualOutTimeset,
+                                        )
+                                        : updatedWorkHourSet,
+                                labelText:
+                                    shortLeave
+                                        ? "Total Working Hours"
+                                        : "Updated Work Hour",
                                 labelStyle: TextStyle(fontSize: 15),
                               ),
                             ),
@@ -953,7 +1012,7 @@ class _AttendanceRequestCurrentMonthState
                             child: TextFormField(
                               maxLines: 3,
                               style: TextStyle(fontSize: 14),
-                              controller: inRemarkController,
+                              controller: shortLeaveRemarkController,
                               enabled: true,
                               //initialValue: "${branchName}",
                               decoration: InputDecoration(
@@ -1000,7 +1059,7 @@ class _AttendanceRequestCurrentMonthState
                                 inRemarkString =
                                     shortLeaveRemarkController.text;
                                 outRemarkString = "";
-                                if (inRemarkString == "") {
+                                if (inRemarkString.trim().isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(" Please fill remarks !! "),
@@ -1210,32 +1269,19 @@ class _AttendanceRequestCurrentMonthState
                                     }
                                   }
                                 } else if (compOff == true) {
-                                  if (actualTimeset!.compareToIgnoringCase(
-                                            "N/A",
-                                          ) ==
-                                          0 ||
-                                      actualOutTimeset!.compareToIgnoringCase(
-                                            "N/A",
-                                          ) ==
-                                          0 ||
-                                      actualTimeset!.compareToIgnoringCase(
-                                            "--:--",
-                                          ) ==
-                                          0 ||
-                                      actualOutTimeset!.compareToIgnoringCase(
-                                            "--:--",
-                                          ) ==
-                                          0) {
+                                  if (!hasCompleteAttendancePunches(
+                                    actualTimeset,
+                                    actualOutTimeset,
+                                  )) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
+                                      const SnackBar(
                                         content: Text(
-                                          " Please Handle Attendance Requisition ",
+                                          compOffAttendanceRequiredMessage,
                                         ),
                                       ),
                                     );
                                   } else {
-                                    if (inRemarkController.text.isEmpty ||
-                                        outRemarkController.text.isEmpty) {
+                                    if (inRemarkController.text.trim().isEmpty) {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
@@ -1246,6 +1292,9 @@ class _AttendanceRequestCurrentMonthState
                                         ),
                                       );
                                     } else {
+                                      inTimeReq = actualTimeset;
+                                      outTimeReq = actualOutTimeset;
+                                      outRemarkString = "";
                                       sendRequsitionToServerCompOff(
                                         context,
                                         empId!,
@@ -1444,10 +1493,20 @@ class _AttendanceRequestCurrentMonthState
     bool shortLeave = false,
   }) async {
     final permissionState = await MobilePermissionService.loadEssState();
-    if (!permissionState.canAddAttendanceRequisition) {
+    final allowed =
+        compOff
+            ? permissionState.canAddCompOffRequisition
+            : shortLeave
+            ? permissionState.canAddShortLeaveRequisition
+            : permissionState.canAddAttendanceRequisition;
+    if (!allowed) {
       showDialgSucess1(
         context,
-        "Attendance requisition permission is not assigned. Please contact your administrator.",
+        compOff
+            ? "Comp Off requisition permission is not assigned. Please contact your administrator."
+            : shortLeave
+            ? "Short leave requisition permission is not assigned. Please contact your administrator."
+            : "Attendance requisition permission is not assigned. Please contact your administrator.",
         "Permission Not Provided",
       );
       return;
@@ -1466,10 +1525,23 @@ class _AttendanceRequestCurrentMonthState
       if (nextday) 'nextday': true,
       if (isOdReq) 'isOdReq': 1,
       if (compOff) 'compOff': true,
+      if (compOff) 'remarks': inRemarkString,
       if (shortLeave) 'shortLeave': 1,
+      if (shortLeave) 'remarks': inRemarkString,
+      if (shortLeave)
+        'actualWorkingMinutes': shortLeaveActualWorkingMinutes(
+          workingHrsSet,
+          inTime: actualTimeset,
+          outTime: actualOutTimeset,
+        ),
+      if (shortLeave) 'creditMinutes': shortLeaveCreditMinutes,
     };
     final response = await foundation.postJson(
-      ApiDetails.mobileAttendanceRequisition,
+      compOff
+          ? ApiDetails.mobileCompOffRequisition
+          : shortLeave
+          ? ApiDetails.mobileShortLeaveRequisition
+          : ApiDetails.mobileAttendanceRequisition,
       body: body,
       headers: await foundation.authHeaders(requestId: requestId, json: true),
       tag: 'ATT_REQ_MOBILE',

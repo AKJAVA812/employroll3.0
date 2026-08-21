@@ -20,11 +20,13 @@ import '../commanScreen/punchInOutScreen.dart';
 import '../sharedPrefancePage/ShardPre.dart';
 import '../services/mobile_auth_service.dart';
 import '../services/mobile_http_client.dart';
+import '../services/login_organisation_service.dart';
 import '../services/mobile_panel_service.dart';
 import '../sharedPrefancePage/sharedPreferenceCalendarMyRequest.dart';
 import '../sharedPrefancePage/shared_preference_helper.dart';
 import '../themes/empThemes.dart';
 import 'model/adminLoginModal.dart';
+import 'model/login_organisation.dart';
 import 'model/loginModel.dart';
 
 class LoginPage extends StatefulWidget {
@@ -71,11 +73,18 @@ class _LoginPageState extends State<LoginPage> {
   String name = "";
   bool changeButton = false;
   bool _showPassword = true;
+  bool _isPasswordStep = false;
+  bool _lookupLoading = false;
+  bool _logoLoadFailed = false;
+  String _lookupError = '';
+  String _resolvedLoginId = '';
+  LoginOrganisation? _organisation;
   LoginModel? loginModelglobal;
   AdminLoginModal? adminLoginModalGlobal;
   late BuildContext buildContext;
   final TextEditingController _username = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  final FocusNode _passwordFocusNode = FocusNode();
   late Box passwordChange;
   SessionManager shared = SessionManager();
   Map<String, dynamic> mapResponse = {};
@@ -83,6 +92,73 @@ class _LoginPageState extends State<LoginPage> {
   String? sessionId = "";
 
   final _formkey = GlobalKey<FormState>();
+
+  Future<void> _findWorkspace() async {
+    FocusScope.of(context).unfocus();
+    if (!(_formkey.currentState?.validate() ?? false)) return;
+
+    final internetAvailable =
+        await InternetConnectionChecker().hasConnection;
+    if (!internetAvailable) {
+      showDialgErro(context, 'Please check your internet connection.');
+      return;
+    }
+
+    setState(() {
+      _lookupLoading = true;
+      _lookupError = '';
+    });
+
+    try {
+      final organisation = await LoginOrganisationService.instance.lookup(
+        _username.text,
+      );
+      if (!mounted) return;
+      setState(() {
+        _organisation = organisation;
+        _resolvedLoginId = organisation.loginId.isNotEmpty
+            ? organisation.loginId
+            : _username.text.trim();
+        _isPasswordStep = true;
+        _lookupLoading = false;
+        _logoLoadFailed = false;
+        _lookupError = '';
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _passwordFocusNode.requestFocus();
+      });
+    } on LoginOrganisationException catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _lookupLoading = false;
+        _lookupError = '';
+      });
+      showDialgErro(context, error.message);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _lookupLoading = false;
+        _lookupError = '';
+      });
+      showDialgErro(
+        context,
+        'Unable to check your workspace. Please try again.',
+      );
+    }
+  }
+
+  void _changeIdentifier() {
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _isPasswordStep = false;
+      _organisation = null;
+      _resolvedLoginId = '';
+      _password.clear();
+      _lookupError = '';
+      changeButton = false;
+      _logoLoadFailed = false;
+    });
+  }
 
   moveToHome() async {
     if (_formkey.currentState!.validate()) {
@@ -151,20 +227,6 @@ class _LoginPageState extends State<LoginPage> {
     print('adminRole $adminRole');*/
     final response = await MobileHttpClient.instance.post(urlapi);
     //print('Response body: ${response.body}');
-    if (response.statusCode == 500) {
-      Fluttertoast.showToast(
-        msg: "Please check your internet connection.",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-      setState(() {
-        changeButton = false;
-      });
-    }
     mapResponse = json.decode(response.body);
     loginModel = LoginModel.fromJson(Map<String, dynamic>.from(mapResponse));
     final loginData = loginModel.data!;
@@ -203,14 +265,9 @@ class _LoginPageState extends State<LoginPage> {
           SharedPrefHelperMyRequest.clearApiCacheOnLogin();
         });
       } else {
-        Fluttertoast.showToast(
-          msg: loginModel.message ?? "Please check your internet connection.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0,
+        showDialgErro(
+          buildContext,
+          loginModel.message ?? 'Please check your internet connection.',
         );
       }
     } catch (e) {
@@ -410,6 +467,14 @@ class _LoginPageState extends State<LoginPage> {
     //checkLoginOrNot();
   }
 
+  @override
+  void dispose() {
+    _username.dispose();
+    _password.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
   void getCredentials() async {
     if (passwordChange.get("email") != null) {
       _username.text = passwordChange.get("email");
@@ -454,278 +519,513 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Widget _buildDefaultLoginHeader() {
+    if (!_isPasswordStep) {
+      return Image.asset(
+        'assets/images/employroll_logo_flutter_login_page.png',
+        height: 150,
+        width: 190,
+      );
+    }
+
+    return Container(
+      height: 230,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF18245C), Color(0xFF4F63D9)],
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Image.asset(
+        'assets/images/employroll_logo_flutter_login_page.png',
+        height: 120,
+        width: 160,
+      ),
+    );
+  }
+
+  Widget _buildOrganisationIdentity() {
+    final organisation = _organisation!;
+    final hasLogo = organisation.logoUrl.isNotEmpty && !_logoLoadFailed;
+
+    Widget fallbackLogo() => CircleAvatar(
+      radius: 48,
+      backgroundColor: Mythemes.lightBluishColor,
+      child: Text(
+        organisation.initial,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 38,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    return Column(
+      children: [
+        if (hasLogo)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.network(
+              organisation.logoUrl,
+              height: 96,
+              width: 120,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => fallbackLogo(),
+            ),
+          )
+        else
+          fallbackLogo(),
+        const SizedBox(height: 12),
+        Text(
+          'Sign in to',
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          organisation.orgName,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 14),
+        InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: _changeIdentifier,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.person_outline, size: 18),
+                const SizedBox(width: 7),
+                Flexible(
+                  child: Text(
+                    _username.text.trim(),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 7),
+                const Icon(Icons.edit_outlined, size: 16),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _submitPasswordLogin() async {
+    FocusScope.of(context).unfocus();
+    if (!(_formkey.currentState?.validate() ?? false)) return;
+
+    final internetAvailable =
+        await InternetConnectionChecker().hasConnection;
+    if (!internetAvailable) {
+      showDialgErro(context, 'Please check your internet connection.');
+      return;
+    }
+
+    setState(() {
+      changeButton = true;
+      _lookupError = '';
+    });
+
+    try {
+      saveLoginCredentials();
+      final value = await monthAttendance(
+        _resolvedLoginId.isNotEmpty
+            ? _resolvedLoginId
+            : _username.text.trim(),
+        _password.text,
+      );
+      if (!value.isSuccess) return;
+
+      loginModelglobal = value;
+      if (value.data?.expired == true) {
+        if (!mounted) return;
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AccountSuspendPage()),
+        );
+        if (mounted) setState(() => changeButton = false);
+        return;
+      }
+
+      if (!_hasAnyMobilePermission(value)) {
+        if (!mounted) return;
+        setState(() => changeButton = false);
+        showDialgErro(
+          context,
+          'No mobile permissions are assigned to your account. Please contact your administrator.',
+        );
+        return;
+      }
+
+      shared.setAdminRole(value.data!.adminrole!.length);
+      shared.setMobAction(value.data!.mobAction!.length);
+      shared.setEmpRoll(value.data!.empRole!.length);
+      shared.setRoRoll(value.data!.roRole!.length);
+      shared.setShowPayroll(value.data!.userLoginned!.showPayroll);
+
+      if (value.data!.adminrole!.isNotEmpty &&
+          value.data!.empRole!.isEmpty &&
+          value.data!.roRole!.isEmpty) {
+        await setAdminSharedPrefValue(value);
+      } else {
+        await setSharedPrefanceValue(value);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => changeButton = false);
+      showDialgErro(
+        context,
+        'Unable to sign in. Please check your details and try again.',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     buildContext = context;
-    //print(name);
+    final loginImageUrl = _organisation?.loginImageUrl.trim() ?? '';
+    final hasLoginBackground = _isPasswordStep && loginImageUrl.isNotEmpty;
+
     return MaterialApp(
       color: Colors.white,
       home: Scaffold(
-        body: Form(
-          key: _formkey,
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      SizedBox(width: 50, height: 120),
-                      Image.asset(
-                        "assets/images/employroll_logo_flutter_login_page.png",
-                        height: 150,
-                        width: 190,
+        backgroundColor: Colors.white,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (hasLoginBackground)
+              Image.network(
+                loginImageUrl,
+                fit: BoxFit.cover,
+                color: Colors.black.withOpacity(0.18),
+                colorBlendMode: BlendMode.darken,
+                errorBuilder: (context, error, stackTrace) =>
+                    const ColoredBox(color: Colors.white),
+              )
+            else
+              const ColoredBox(color: Colors.white),
+            SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight - 40,
                       ),
-                      SizedBox(height: 0.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16.0,
-                          horizontal: 32.0,
-                        ),
-                        child: AutofillGroup(
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                enableSuggestions: true,
-                                keyboardType: TextInputType.emailAddress,
-                                autofillHints: [AutofillHints.username],
-                                controller: _username,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    CupertinoIcons.profile_circled,
-                                    size: 20,
-                                    color: Mythemes.black,
-                                  ),
-                                  hintText: "Enter User Name ",
-                                  labelText: "UserName",
-                                ),
-                                onChanged: (value) {
-                                  name = value;
-                                  setState(() {});
-                                },
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "UserName can not be Null";
-                                  }
-                                  return null;
-                                },
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 440),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 32,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(
+                                hasLoginBackground ? 0.94 : 1,
                               ),
-                              TextFormField(
-                                autofillHints: [AutofillHints.password],
-                                keyboardType: TextInputType.text,
-                                controller: _password,
-                                decoration: InputDecoration(
-                                  prefixIcon: Icon(
-                                    Icons.security,
-                                    size: 20,
-                                    color: Mythemes.black,
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _showPassword
-                                          ? CupertinoIcons.eye_fill
-                                          : CupertinoIcons.eye_slash_fill,
-                                      size: 20,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _showPassword = !_showPassword;
-                                      });
-                                    },
-                                  ),
-                                  hintText: "Enter Password Name ",
-                                  labelText: "Password",
-                                ),
-                                obscureText: _showPassword,
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return "Password can not be Null";
-                                  } else if (value.length < 6) {
-                                    return "Password length shoud be 6 charcter";
-                                  }
-                                  return null;
-                                },
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  //Navigator.pushNamed(context, MyRoutings.forgetPasswordEmailRoute);
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              ForgotPasswordEmailPage(),
-                                    ),
-                                  );
-                                },
-                                child:
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        "Forget Password? ",
-                                        textAlign: TextAlign.right,
-                                        style: TextStyle(fontSize: 13),
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: hasLoginBackground
+                                  ? const [
+                                      BoxShadow(
+                                        color: Color(0x33000000),
+                                        blurRadius: 28,
+                                        offset: Offset(0, 12),
                                       ),
-                                    ).py4(),
-                              ),
-                              SizedBox(height: 80),
-                              SizedBox(
-                                height: 50,
-                                width: changeButton ? 50 : 180,
-                                child: Material(
-                                  elevation: 5,
-                                  color: Mythemes.lightBluishColor,
-                                  borderRadius: BorderRadius.circular(
-                                    changeButton ? 150 : 20,
-                                  ),
-                                  child: InkWell(
-                                    onTap: () async {
-                                      setState(() {
-                                        changeButton = true;
-                                      });
-                                      bool internetCheck =
-                                          await InternetConnectionChecker()
-                                              .hasConnection;
-                                      if (internetCheck == false) {
-                                        setState(() {
-                                          AlertDialog(
-                                            content:
-                                                "Please check your internet connection."
-                                                    .text
-                                                    .make(),
-                                          );
-                                          Fluttertoast.showToast(
-                                            msg:
-                                                "Please check your Internet connection.",
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            gravity: ToastGravity.BOTTOM_RIGHT,
-                                            timeInSecForIosWeb: 4,
-                                            backgroundColor: Mythemes.black,
-                                            textColor: Colors.white,
-                                            fontSize: 17.0,
-                                          );
-                                        });
-                                      } else {
-                                        //FlutterBackgroundService().invoke('setAsForeground');
-                                        //FlutterBackgroundService().startService();
-                                        setState(() {});
-                                        changeButton = true;
-                                        await moveToHome();
-                                        saveLoginCredentials();
-
-                                        final value = await monthAttendance(
-                                          _username.text.toString(),
-                                          _password.text.toString(),
-                                        );
-                                        if (!value.isSuccess) return;
-                                        loginModelglobal = value;
-                                        if (value.data?.expired == true) {
-                                          Navigator.push(
-                                            context,
+                                    ]
+                                  : null,
+                            ),
+                            child: Form(
+                              key: _formkey,
+                              child: AutofillGroup(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (!_isPasswordStep) ...[
+                                      _buildDefaultLoginHeader(),
+                                      const SizedBox(height: 12),
+                                      const Text(
+                                        'Welcome back',
+                                        style: TextStyle(
+                                          fontSize: 26,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        'Find your EmployRoll workspace',
+                                        style: TextStyle(
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 28),
+                                    ],
+                                    if (_isPasswordStep) ...[
+                                      _buildOrganisationIdentity(),
+                                      const SizedBox(height: 28),
+                                    ],
+                                    if (!_isPasswordStep)
+                                      TextFormField(
+                                        enableSuggestions: true,
+                                        keyboardType: TextInputType.text,
+                                        autofillHints: const [
+                                          AutofillHints.username,
+                                        ],
+                                        controller: _username,
+                                        textInputAction: TextInputAction.done,
+                                        onFieldSubmitted: (_) async {
+                                          if (!_lookupLoading) {
+                                            await _findWorkspace();
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(
+                                            CupertinoIcons.profile_circled,
+                                            size: 20,
+                                            color: Mythemes.black,
+                                          ),
+                                          hintText:
+                                              'Enter email, mobile or user ID',
+                                          labelText:
+                                              'Email, mobile number or user ID',
+                                        ),
+                                        onChanged: (value) {
+                                          name = value;
+                                          setState(() {});
+                                        },
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Email, mobile number, or user ID is required';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    if (_isPasswordStep)
+                                      TextFormField(
+                                        autofillHints: const [
+                                          AutofillHints.password,
+                                        ],
+                                        keyboardType: TextInputType.text,
+                                        controller: _password,
+                                        focusNode: _passwordFocusNode,
+                                        textInputAction: TextInputAction.done,
+                                        onFieldSubmitted: (_) async {
+                                          if (!changeButton) {
+                                            await _submitPasswordLogin();
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(
+                                            Icons.security,
+                                            size: 20,
+                                            color: Mythemes.black,
+                                          ),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(
+                                              _showPassword
+                                                  ? CupertinoIcons.eye_fill
+                                                  : CupertinoIcons
+                                                      .eye_slash_fill,
+                                              size: 20,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _showPassword = !_showPassword;
+                                              });
+                                            },
+                                          ),
+                                          hintText: 'Enter password',
+                                          labelText: 'Password',
+                                        ),
+                                        obscureText: _showPassword,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Password is required';
+                                          } else if (value.length < 6) {
+                                            return 'Password must be at least 6 characters';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    if (_isPasswordStep)
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
                                             MaterialPageRoute(
-                                              builder:
-                                                  (context) =>
-                                                      AccountSuspendPage(),
+                                              builder: (context) =>
+                                                  ForgotPasswordEmailPage(),
                                             ),
                                           );
-                                          return;
-                                        }
-                                        value.data!.sessionId;
-                                        shared.setAdminRole(
-                                          value.data!.adminrole!.length,
-                                        );
-                                        shared.setMobAction(
-                                          value.data!.mobAction!.length,
-                                        );
-                                        shared.setEmpRoll(
-                                          value.data!.empRole!.length,
-                                        );
-                                        shared.setRoRoll(
-                                          value.data!.roRole!.length,
-                                        );
-                                        shared.setShowPayroll(
-                                          value
-                                              .data!
-                                              .userLoginned!
-                                              .showPayroll,
-                                        );
-                                        //sendGeoFenceId(value.data!.sessionId!, fcmToken!);
-                                        if (value.data!.adminrole!.isNotEmpty &&
-                                            value.data!.empRole!.isEmpty &&
-                                            value.data!.roRole!.isEmpty) {
-                                          await setAdminSharedPrefValue(value);
-                                        } else {
-                                          await setSharedPrefanceValue(value);
-                                        }
-                                      }
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: Duration(seconds: 2),
-                                      width: changeButton ? 50 : 150,
-                                      height: 50,
-                                      alignment: Alignment.center,
-                                      child:
-                                          changeButton
-                                              ? Padding(
-                                                padding: const EdgeInsets.all(
-                                                  4.0,
-                                                ),
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      color: Mythemes.whitish,
-                                                    ),
-                                              )
-                                              : Text(
-                                                "Sign In",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
+                                        },
+                                        child: const Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            'Forgot Password?',
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(fontSize: 13),
+                                          ),
+                                        ).py4(),
+                                      ),
+                                    SizedBox(
+                                      height: _isPasswordStep ? 28 : 48,
                                     ),
-                                  ),
+                                    SizedBox(
+                                      height: 50,
+                                      width: (changeButton || _lookupLoading)
+                                          ? 50
+                                          : 180,
+                                      child: Material(
+                                        elevation: 5,
+                                        color: Mythemes.lightBluishColor,
+                                        borderRadius: BorderRadius.circular(
+                                          (changeButton || _lookupLoading)
+                                              ? 150
+                                              : 20,
+                                        ),
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(
+                                            (changeButton || _lookupLoading)
+                                                ? 150
+                                                : 20,
+                                          ),
+                                          onTap: () async {
+                                            if (_lookupLoading || changeButton) {
+                                              return;
+                                            }
+                                            if (!_isPasswordStep) {
+                                              await _findWorkspace();
+                                              return;
+                                            }
+                                            await _submitPasswordLogin();
+                                          },
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                              milliseconds: 300,
+                                            ),
+                                            alignment: Alignment.center,
+                                            child:
+                                                (changeButton || _lookupLoading)
+                                                    ? Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                          10,
+                                                        ),
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          color:
+                                                              Mythemes.whitish,
+                                                          strokeWidth: 3,
+                                                        ),
+                                                      )
+                                                    : Text(
+                                                        _isPasswordStep
+                                                            ? 'Sign In'
+                                                            : 'Continue',
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  void showDialgErro(BuildContext buildContext, result) {
-    var alertDialog = AlertDialog(
-      title: Row(children: [Icon(Icons.warning), Text("   Alert Dialog ")]),
-      content: Text(result),
-      titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop();
-            setState(() {
-              changeButton = false;
-            });
-          },
-          child: Text("Ok"),
-        ),
-      ],
-      elevation: 24.0,
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alertDialog;
+  void showDialgErro(BuildContext buildContext, Object? result) {
+    if (!mounted) return;
+
+    // Stop loaders only. Keep the entered identifier and password available so
+    // the user can correct/retry the login without typing everything again.
+    setState(() {
+      changeButton = false;
+      _lookupLoading = false;
+      _lookupError = '';
+    });
+
+    showDialog<void>(
+      context: buildContext,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded),
+              SizedBox(width: 10),
+              Expanded(child: Text('Unable to continue')),
+            ],
+          ),
+          content: Text(
+            result?.toString() ?? 'Something went wrong. Please try again.',
+          ),
+          titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+          contentPadding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+          buttonPadding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+          elevation: 24.0,
+        );
       },
     );
+  }
+
+  bool _hasAnyMobilePermission(LoginModel loginModel) {
+    final data = loginModel.data;
+    final profiles = <ProfileList>[
+      ...loginModel.profiles,
+      ...?data?.profileList,
+    ];
+    final hasProfilePermission = profiles.any(
+      (profile) => profile.profilePermission.isNotEmpty,
+    );
+    final hasEssPermission =
+        loginModel.essPermissions?.securityGroupIds.isNotEmpty == true;
+    final hasLegacyAccess =
+        data?.empRole?.isNotEmpty == true ||
+        data?.roRole?.isNotEmpty == true ||
+        data?.adminrole?.isNotEmpty == true;
+
+    return loginModel.permissions.isNotEmpty ||
+        hasEssPermission ||
+        hasProfilePermission ||
+        hasLegacyAccess;
   }
 
   Future<void> saveMobileAuth(LoginModel? loginModelglobal) async {

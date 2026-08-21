@@ -30,7 +30,12 @@ import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 
 class LeaveRequisitionPage extends StatefulWidget {
   final bool showShortcuts;
-  const LeaveRequisitionPage({super.key, this.showShortcuts = true});
+  final DateTime? initialDate;
+  const LeaveRequisitionPage({
+    super.key,
+    this.showShortcuts = true,
+    this.initialDate,
+  });
 
   @override
   State<LeaveRequisitionPage> createState() => _LeaveRequisitionPageState();
@@ -468,8 +473,11 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    if (widget.initialDate != null) {
+      _fromDateController.text = DateFormat('dd-MM-yyyy').format(widget.initialDate!);
+      _toDateController.text = _fromDateController.text;
+    }
     getUserName();
     getDept();
     getBranch();
@@ -912,7 +920,9 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const WorkFromHomeRequisitionPage(),
+                            builder: (context) => WorkFromHomeRequisitionPage(
+                              initialDate: widget.initialDate,
+                            ),
                           ),
                         );
                       }
@@ -1178,7 +1188,11 @@ class _LeaveRequisitionPageState extends State<LeaveRequisitionPage>
                         child:
                             TextFormField(
                               onTap: () async {
-                                DateTime? fromDate = DateTime.now();
+                                DateTime? fromDate = widget.initialDate ?? DateTime.now();
+                                if (_fromDateController.text.isNotEmpty) {
+                                  fromDate = DateFormat('dd-MM-yyyy')
+                                      .tryParseStrict(_fromDateController.text) ?? fromDate;
+                                }
                                 FocusScope.of(
                                   context,
                                 ).requestFocus(FocusNode());

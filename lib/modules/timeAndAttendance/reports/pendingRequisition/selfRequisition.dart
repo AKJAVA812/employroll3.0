@@ -7,6 +7,7 @@ import 'package:er_flutter_project/ess/myAllRequestsPage.dart';
 import 'package:er_flutter_project/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 //import 'package:flutter_app/modules/timeAndAttendance/reports/modelClass/selfRequisitionModel.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
@@ -626,6 +627,23 @@ class _PendingRequisitionState extends State<PendingRequisition>
             */
                       ],
                     ),
+                    if (_isPending(foundDataNew![i])) ...[
+                      const Divider(thickness: .8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            reqId = foundDataNew![i].reqId;
+                            showDialgCancel(context, context, context);
+                          },
+                          icon: const Icon(Icons.cancel_outlined, size: 18),
+                          label: const Text('Cancel requisition'),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Mythemes.dangerColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -667,19 +685,10 @@ class _PendingRequisitionState extends State<PendingRequisition>
           ),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             Navigator.of(buildContext, rootNavigator: true).pop();
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder:
-                    (a, b, c) => PendingRequisition(SelfRequisitionModel()),
-                transitionDuration: Duration(seconds: 1),
-                maintainState: true,
-              ),
-            );
-            cancelSelfAttRequisition(reqId.toString());
-            Navigator.of(buildContext, rootNavigator: true).pop();
+            final id = int.tryParse(reqId.toString());
+            if (id != null) await cancelSelfAttRequisition(id);
           },
           child: Container(
             child: Text("Yes", style: TextStyle(color: Mythemes.warningColor)),
@@ -696,67 +705,59 @@ class _PendingRequisitionState extends State<PendingRequisition>
     );
   }
 
-  Future<void> cancelSelfAttRequisition(String reqId) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.cancelSelfAttReqList;
-
+  Future<void> cancelSelfAttRequisition(int reqId) async {
     if (!mounted) return;
     CommonNotificationPage.showLoaderDialog(context);
+    var loaderOpen = true;
 
     try {
-      var urlapi = Uri.parse(
-        "$conn$apiUrl?"
-        "sessionId=$sessionId&"
-        "reqId=$reqId",
+      final foundation = MobileApiFoundation.instance;
+      final response = await foundation.putJson(
+        ApiDetails.mobileAttendanceRequisitionCancel(reqId),
+        body: const <String, Object?>{'remarks': 'Cancelled by employee'},
+        headers: await foundation.authHeaders(),
+        tag: 'ATTENDANCE_REQUISITION_CANCEL',
       );
-
-      final response = await MobileHttpClient.instance.post(urlapi);
-
-      String result = "unknown";
-
-      if (response.statusCode == 200) {
-        Map<String, dynamic> mapResponse = json.decode(response.body);
-        result = mapResponse['result']?.toString() ?? "unknown";
-      } else {
-      }
+      final responseBody = foundation.decodeMap(response.body);
+      final success = foundation.isSuccess(response);
 
       // âœ… Always close loader no matter success/failure
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
+        loaderOpen = false;
       }
 
       // âœ… Now show popup depending on result
+      if (!success) {
+        CommonNotificationPage.showDialgSucess(
+          context,
+          responseBody['message']?.toString() ?? 'Unable to cancel requisition',
+          'Error',
+        );
+        return;
+      }
       if (mounted) {
-        if (result.compareToIgnoringCase("success") == 0) {
-          CommonNotificationPage.showDialgSucess(
-            context,
-            "Requisition Deleted Successfully !",
-            "Success.",
-          );
-          // Close current screen after success
-          Future.delayed(const Duration(seconds: 1), () {
-            if (mounted) Navigator.pop(context);
-          });
-        } else if (result.compareToIgnoringCase("failed") == 0) {
-          CommonNotificationPage.showDialgSucess(
-            context,
-            "Please check the network connection!",
-            "Failed",
-          );
-        } else {
-          CommonNotificationPage.showDialgSucess(
-            context,
-            "Unexpected response: $result",
-            "Error",
-          );
-        }
+        Fluttertoast.showToast(msg: 'Attendance requisition cancelled');
+        await getSharedPrfanceList();
       }
     } catch (e) {
       if (mounted) {
+        if (!loaderOpen) {
+          CommonNotificationPage.showDialgSucess(
+            context,
+            e is MobileApiException
+                ? (e.message ?? 'Unable to refresh requisitions')
+                : 'Unable to refresh requisitions',
+            'Error',
+          );
+          return;
+        }
         Navigator.of(context, rootNavigator: true).pop(); // âœ… close loader
         CommonNotificationPage.showDialgSucess(
           context,
-          "Exception: $e",
+          e is MobileApiException
+              ? (e.message ?? 'Unable to cancel requisition')
+              : 'Unable to cancel requisition',
           "Error",
         );
       }

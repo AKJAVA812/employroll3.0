@@ -52,8 +52,9 @@ class MssAttendanceApprovalPage {
   factory MssAttendanceApprovalPage.fromJson(Map<String, dynamic> json) {
     final pagination = _map(json['pagination']);
     final summary = _map(json['summary']);
+    final rawItems = json['content'] ?? json['items'] ?? json['list'];
     return MssAttendanceApprovalPage(
-      items: (json['content'] as List? ?? const [])
+      items: (rawItems as List? ?? const [])
           .whereType<Map>()
           .map((item) => MssAttendanceApprovalItem.fromJson(_map(item)))
           .toList(),
@@ -112,23 +113,81 @@ class MobileMssAttendanceApprovalService {
     int? stage,
     String? branch,
   }) async {
-    final response = await _api.get(
-      ApiDetails.mobileMssAttendanceApprovals,
-      queryParameters: <String, Object?>{
-        'tab': tab,
-        'page': page,
-        'size': size,
-        'sortBy': sortBy,
-        'direction': direction,
-        'search': search,
-        'requestType': requestType,
-        'stage': stage,
-        'branch': branch,
-      },
-      headers: await _api.authHeaders(requestId: _api.newRequestId()),
-      tag: 'MSS_ATTENDANCE_APPROVAL_LIST',
+    final headers = await _api.authHeaders(requestId: _api.newRequestId());
+    final cacheKey = _listCacheKey(
+      headers,
+      tab: tab,
+      page: page,
+      size: size,
+      sortBy: sortBy,
+      direction: direction,
+      search: search,
+      requestType: requestType,
+      stage: stage,
+      branch: branch,
     );
-    return MssAttendanceApprovalPage.fromJson(_data(response));
+    final cached = await MobileApiCache.instance.readJson(cacheKey);
+    try {
+      final response = await _api.get(
+        ApiDetails.mobileMssAttendanceApprovals,
+        queryParameters: <String, Object?>{
+          'tab': tab,
+          'page': page,
+          'size': size,
+          'sortBy': sortBy,
+          'direction': direction,
+          'search': search,
+          'requestType': requestType,
+          'stage': stage,
+          'branch': branch,
+        },
+        headers: headers,
+        timeout: const Duration(seconds: 30),
+        tag: 'MSS_ATTENDANCE_APPROVAL_LIST',
+      );
+      final data = _data(response);
+      await MobileApiCache.instance.saveJson(cacheKey, data);
+      return MssAttendanceApprovalPage.fromJson(data);
+    } catch (_) {
+      if (cached != null) {
+        return MssAttendanceApprovalPage.fromJson(cached.data);
+      }
+      rethrow;
+    }
+  }
+
+  static String _listCacheKey(
+    Map<String, String> headers, {
+    required String tab,
+    required int page,
+    required int size,
+    required String sortBy,
+    required String direction,
+    String? search,
+    String? requestType,
+    int? stage,
+    String? branch,
+  }) {
+    final profile = headers['X-MSS-Profile-Id'] ?? '';
+    final organisation = headers['X-MSS-Organisation-Id'] ?? '';
+    final profileType = headers['X-MSS-Profile-Type'] ?? '';
+    final generation = MobileMssDashboardService.refreshSignal.value;
+    return <Object?>[
+      'mssAttendanceApprovals',
+      profileType,
+      profile,
+      organisation,
+      tab,
+      page,
+      size,
+      sortBy,
+      direction,
+      search ?? '',
+      requestType ?? '',
+      stage ?? '',
+      branch ?? '',
+      generation,
+    ].join(':');
   }
 
   static Future<MssAttendanceApprovalDetail> detail(int requisitionId) async {

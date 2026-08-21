@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../commanScreen/allAPIList.dart';
+import '../sharedPrefancePage/ShardPre.dart';
 import 'mobile_api_foundation.dart';
+import 'mobile_mo_organisation_service.dart';
 import 'mobile_mss_dashboard_service.dart';
+import 'mobile_panel_service.dart';
 
 class MssRequisitionItem {
   const MssRequisitionItem(this.data);
@@ -74,6 +77,31 @@ class MobileMssRequisitionService {
   MobileMssRequisitionService._();
 
   static final MobileApiFoundation _api = MobileApiFoundation.instance;
+  static final SessionManager _shared = SessionManager();
+  static final Map<String, MssRequisitionPage> _listCache =
+      <String, MssRequisitionPage>{};
+
+  static Future<void> _ensureActiveContext() async {
+    final activePanel = await _shared.getActivePanel();
+    final profileType = activePanel ?? await _shared.getDefaultProfileType();
+    final profileId = await _shared.getDefaultProfileId() ?? 0;
+    if (profileType == MobilePanel.mssMo) {
+      await MobileMoOrganisationService.loadForActivePanel();
+    }
+    var organisationId = await _shared.getActiveOrgId();
+    organisationId ??= await _shared.getOrgId();
+    if ((organisationId ?? 0) > 0 && await _shared.getActiveOrgId() == null) {
+      await _shared.setActiveOrgId(organisationId!);
+    }
+    if (profileId <= 0 || (organisationId ?? 0) <= 0 ||
+        (profileType != MobilePanel.mss && profileType != MobilePanel.mssMo)) {
+      throw const MobileApiException(
+        'MSS_CONTEXT_NOT_READY',
+        message: 'MSS profile and organisation context is not ready. Please retry.',
+        retryable: true,
+      );
+    }
+  }
 
   static Future<MssRequisitionPage> list({
     required String module,
@@ -87,27 +115,93 @@ class MobileMssRequisitionService {
     int? stage,
     String? branch,
   }) async {
-    final response = await _api.get(
-      ApiDetails.mobileMssRequisitions,
-      queryParameters: <String, Object?>{
-        'module': module,
-        'tab': tab,
-        'page': page,
-        'size': size,
-        'sortBy': sortBy,
-        'direction': direction,
-        'search': search,
-        'requestType': requestType,
-        'stage': stage,
-        'branch': branch,
-      },
-      headers: await _api.authHeaders(requestId: _api.newRequestId()),
-      tag: 'MSS_${module}_REQUISITION_LIST',
+    await _ensureActiveContext();
+    final query = <String, Object?>{
+      'module': module,
+      'tab': tab,
+      'page': page,
+      'size': size,
+      'sortBy': sortBy,
+      'direction': direction,
+      'search': search,
+      'requestType': requestType,
+      'stage': stage,
+      'branch': branch,
+    };
+    final headers = await _api.authHeaders(requestId: _api.newRequestId());
+    final cacheKey = _listCacheKey(
+      headers,
+      module: module,
+      tab: tab,
+      page: page,
+      size: size,
+      sortBy: sortBy,
+      direction: direction,
+      search: search,
+      requestType: requestType,
+      stage: stage,
+      branch: branch,
     );
-    return MssRequisitionPage.fromJson(_data(response));
+    try {
+      final response = await _api.get(
+          ApiDetails.mobileMssRequisitions,
+          queryParameters: query,
+          headers: headers,
+          timeout: const Duration(seconds: 30),
+          tag: 'MSS_${module}_REQUISITION_LIST',
+        );
+      final pageData = MssRequisitionPage.fromJson(_data(response));
+      _listCache[cacheKey] = pageData;
+      return pageData;
+    } on MobileApiException catch (error) {
+      final cached = _listCache[cacheKey];
+      if (cached != null &&
+          (error.retryable ||
+              error.statusCode == 502 ||
+              error.statusCode == 503 ||
+              error.statusCode == 504)) {
+        return cached;
+      }
+      rethrow;
+    }
+  }
+
+  static String _listCacheKey(
+    Map<String, String> headers, {
+    required String module,
+    required String tab,
+    required int page,
+    required int size,
+    required String sortBy,
+    required String direction,
+    String? search,
+    String? requestType,
+    int? stage,
+    String? branch,
+  }) {
+    final tokenScope = (headers['Authorization'] ?? '').hashCode;
+    return <Object?>[
+      'mssRequisitions',
+      tokenScope,
+      headers['X-MSS-Profile-Type'] ?? '',
+      headers['X-MSS-Profile-Id'] ?? '',
+      headers['X-MSS-Organisation-Id'] ?? '',
+      module,
+      tab,
+      page,
+      size,
+      sortBy,
+      direction,
+      search ?? '',
+      requestType ?? '',
+      stage ?? '',
+      branch ?? '',
+      MobileMssDashboardService.refreshSignal.value,
+    ].join(':');
   }
 
   static Future<MssRequisitionDetail> detail(String requestId) async {
+    await _ensureActiveContext();
     final headers = await _api.authHeaders(requestId: _api.newRequestId());
     final responses = await Future.wait([
       _api.get(
@@ -135,6 +229,7 @@ class MobileMssRequisitionService {
     required String decision,
     String remarks = '',
   }) async {
+    await _ensureActiveContext();
     final requestKey = _api.newRequestId();
     final response = await _api.postJson(
       '${ApiDetails.mobileMssRequisitions}/$requestId/decision',

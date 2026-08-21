@@ -1161,7 +1161,6 @@ class _DefaultPageState extends State<DefaultPage> {
   void initState() {
     //print('initState');
     // TODO: implement initState
-    _loadCurrentLocation();
     //_getUserLocation();
     timeString = _formatDateTime(DateTime.now());
     getSharedPrfanceList();
@@ -1221,7 +1220,10 @@ class _DefaultPageState extends State<DefaultPage> {
       setGeofenceActive = context?.geofenceRequired ?? setGeofenceActive;
       attAction = attendanceSelfieRequired ? '1' : '0';
     });
-    if (state.shouldRunBackgroundTracking) {
+    final permission = await Geolocator.checkPermission();
+    if (state.shouldRunBackgroundTracking &&
+        (permission == LocationPermission.whileInUse ||
+            permission == LocationPermission.always)) {
       _startLocationTracking();
     }
   }
@@ -2008,6 +2010,8 @@ class _DefaultPageState extends State<DefaultPage> {
         canViewCalendar: false,
         canViewDashboard: false,
         canAddAttendanceRequisition: false,
+        canAddShortLeaveRequisition: false,
+        canAddCompOffRequisition: false,
         canTrackOnly: false,
         canTrackWithAttendance: false,
         requiresSelfie: false,
@@ -2396,6 +2400,15 @@ class _DefaultPageState extends State<DefaultPage> {
                               margin: EdgeInsets.all(5),
                               child: InkWell(
                                 onTap: () async {
+                                  final locationAllowed =
+                                      await LocationPermissionRequest
+                                          .requestLocationPermission(context);
+                                  if (!locationAllowed || !mounted) return;
+                                  await _loadCurrentLocation();
+                                  if (!mounted) return;
+                                  if (positionStream == null) {
+                                    _startLocationTracking();
+                                  }
                                   bool internetCheck =
                                       await InternetConnectionChecker()
                                           .hasConnection;
@@ -2663,6 +2676,15 @@ class _DefaultPageState extends State<DefaultPage> {
                               margin: EdgeInsets.all(5),
                               child: InkWell(
                                 onTap: () async {
+                                  final locationAllowed =
+                                      await LocationPermissionRequest
+                                          .requestLocationPermission(context);
+                                  if (!locationAllowed || !mounted) return;
+                                  await _loadCurrentLocation();
+                                  if (!mounted) return;
+                                  if (positionStream == null) {
+                                    _startLocationTracking();
+                                  }
                                   bool internetCheck =
                                       await InternetConnectionChecker()
                                           .hasConnection;
@@ -2770,6 +2792,15 @@ class _DefaultPageState extends State<DefaultPage> {
                               margin: EdgeInsets.all(5),
                               child: InkWell(
                                 onTap: () async {
+                                  final locationAllowed =
+                                      await LocationPermissionRequest
+                                          .requestLocationPermission(context);
+                                  if (!locationAllowed || !mounted) return;
+                                  await _loadCurrentLocation();
+                                  if (!mounted) return;
+                                  if (positionStream == null) {
+                                    _startLocationTracking();
+                                  }
                                   bool internetCheck =
                                       await InternetConnectionChecker()
                                           .hasConnection;

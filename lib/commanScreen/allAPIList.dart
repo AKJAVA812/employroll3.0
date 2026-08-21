@@ -1,12 +1,13 @@
 class ApiDetails {
   //Base Server Address
-  static var server="https://ermobile.employroll.com";
-
-  //static var server = "https://fang-sizing-enrage.ngrok-free.dev";
+  //static var server = "https://ermobile.employroll.com";
+  static var server = "https://fang-sizing-enrage.ngrok-free.dev";
   //Attendance Punch in and Punch out
   //static String login="restful/service/login";
 
   static String login = "/ermobile/api/auth/login";
+  static String loginOrganisationLookup =
+      "/ermobile/api/auth/organisation/lookup";
   static String sessionIdAuth = "/ermobile/api/auth/session";
   static String refreshTokenId = "/ermobile/api/auth/refresh";
   static String bootStrap = "/ermobile/api/mobile/bootstrap";
@@ -35,12 +36,19 @@ class ApiDetails {
       "/ermobile/api/attendance/v1/requisition";
   static String mobileAttendanceRequisitionList =
       "/ermobile/api/attendance/v1/requisitions";
+  static String mobileAttendanceRequisitionCancel(int requisitionId) =>
+      "/ermobile/api/attendance/v1/requisitions/$requisitionId/cancel";
   static String mobileWorkFromHomeRequisition =
       "/ermobile/api/wfh/v1/requisition";
   static String mobileLeaveLedger = "/ermobile/api/leave/v1/ledger";
   static String mobileLeaveRequisition = "/ermobile/api/leave/v1/requisition";
   static String mobileLeaveRequisitionList =
       "/ermobile/api/leave/v1/requisitions";
+  static String mobileLeaveRequisitionCancel(int requisitionId) =>
+      "/ermobile/api/leave/v1/requisitions/$requisitionId/cancel";
+  static String mobileLeaveReversalPreview(int requisitionId) =>
+      "/ermobile/api/leave/v1/requisitions/$requisitionId/reversal-preview";
+  static String mobileLeaveReversal = "/ermobile/api/leave/v1/reversal";
   static String mobileEmployeeDocuments = "/ermobile/api/documents/v1/employee";
   static String mobileSalarySlips = "/ermobile/api/payroll/v1/salary-slips";
   static String mobileProfileDetails = "/ermobile/api/profile/v1/details";
@@ -56,6 +64,11 @@ class ApiDetails {
   static String mobileMssLifecycle = "/ermobile/api/mss/v1/lifecycle";
   static String mobileMssApprovalFilters =
       "/ermobile/api/mss/v1/approval-filters";
+
+      static String mobileShortLeaveRequisition =
+      "/ermobile/api/short-leave/v1/requisition";
+  static String mobileCompOffRequisition =
+      "/ermobile/api/comp-off/v1/requisition";
 
   //ESS Dashboard
   static var essDashboardAPi = "/ermobile/api/ess/v1/dashboard";

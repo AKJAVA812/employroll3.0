@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
-import 'package:er_flutter_project/services/mobile_http_client.dart';
+import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import '../../../../commanScreen/allAPIList.dart';
 import '../../../../commanScreen/homePage.dart';
 import '../../../../commanScreen/punchInOutScreen.dart';
@@ -93,23 +93,190 @@ class _ApprovedLeaveRequisitionListState
   Future<ApprovedLeaveReqModal> getApprovedLeaveReqList(
     String SessionId,
   ) async {
-    String conn = ApiDetails.server;
-    String apiUrl = ApiDetails.roApprovedReqList;
-    ApprovedLeaveReqModal approvedLeaveReqModal;
-    var urlapi = Uri.parse(
-      "$conn$apiUrl?sessionId=$SessionId&"
-      "profileId=$getProfileId&"
-      "userPermission=$userPanelPerm&"
-      "orgId=0",
+    final api = MobileApiFoundation.instance;
+    final response = await api.get(
+      ApiDetails.mobileLeaveRequisitionList,
+      queryParameters: const <String, Object?>{'page': 0, 'size': 100},
+      headers: await api.authHeaders(requestId: api.newRequestId()),
+      tag: 'LEAVE_APPROVED_LIST',
     );
-    final response = await MobileHttpClient.instance.post(urlapi);
+    mapResponse = Map<String, dynamic>.from(jsonDecode(response.body) as Map);
+    final modal = ApprovedLeaveReqModal.fromJson(mapResponse);
+    modal.result?.data?.removeWhere(
+      (item) => item.status?.toUpperCase() != 'APPROVED' ||
+          !_isLeaveRequestType(item.requestType),
+    );
+    return modal;
+  }
 
+  bool _isLeaveRequestType(String? value) {
+    final normalized = (value ?? 'leave')
+        .trim()
+        .toLowerCase()
+        .replaceAll('-', '_');
+    return normalized == 'leave' || normalized == 'leave_application';
+  }
 
-    mapResponse = json.decode(response.body);
-    var getData = mapResponse['data'];
-    approvedLeaveReqModal = ApprovedLeaveReqModal.fromJson(mapResponse);
+  Future<void> _openLeaveReversal(Data leave) async {
+    final id = leave.requisitionId;
+    if (id == null) return;
+    final api = MobileApiFoundation.instance;
+    try {
+      final response = await api.get(
+        ApiDetails.mobileLeaveReversalPreview(id),
+        headers: await api.authHeaders(requestId: api.newRequestId()),
+        tag: 'LEAVE_REVERSAL_PREVIEW',
+      );
+      final payload = Map<String, dynamic>.from(jsonDecode(response.body) as Map);
+      final dates = (payload['dates'] as List? ?? const <dynamic>[])
+          .whereType<Map>()
+          .map((item) => Map<String, dynamic>.from(item))
+          .toList();
+      if (!mounted) return;
+      if (dates.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No leave dates are available for reversal.')),
+        );
+        return;
+      }
+      await _showReversalSheet(id, leave, dates);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_errorMessage(error))),
+      );
+    }
+  }
 
-    return approvedLeaveReqModal;
+  Future<void> _showReversalSheet(
+    int sourceId,
+    Data leave,
+    List<Map<String, dynamic>> dates,
+  ) async {
+    final selected = dates.map((item) => item['date'].toString()).toSet();
+    final remarks = TextEditingController();
+    var submitting = false;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              16,
+              16,
+              16 + MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Leave Reversal', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 4),
+                Text(leave.leaveType ?? 'Approved Leave'),
+                const Divider(height: 24),
+                Flexible(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: dates.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (_, index) {
+                      final date = dates[index]['date'].toString();
+                      final days = dates[index]['days'];
+                      return CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: selected.contains(date),
+                        title: Text(_displayDate(date)),
+                        subtitle: Text('${days ?? 1} day'),
+                        onChanged: submitting
+                            ? null
+                            : (checked) => setSheetState(() {
+                                  checked == true ? selected.add(date) : selected.remove(date);
+                                }),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: remarks,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Remarks',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: selected.isEmpty || submitting
+                        ? null
+                        : () async {
+                            setSheetState(() => submitting = true);
+                            try {
+                              final api = MobileApiFoundation.instance;
+                              final response = await api.postJson(
+                                ApiDetails.mobileLeaveReversal,
+                                body: <String, Object?>{
+                                  'sourceRequisitionId': sourceId,
+                                  'selectedDates': selected.toList()..sort(),
+                                  'reason': remarks.text.trim(),
+                                },
+                                headers: await api.authHeaders(
+                                  requestId: api.newRequestId(),
+                                  json: true,
+                                ),
+                                tag: 'LEAVE_REVERSAL_SUBMIT',
+                              );
+                              if (response.statusCode < 200 || response.statusCode >= 300) {
+                                throw Exception('Unable to submit leave reversal.');
+                              }
+                              if (!sheetContext.mounted) return;
+                              Navigator.of(sheetContext).pop();
+                              await getSharedPrfanceList();
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Leave reversal submitted for approval.')),
+                              );
+                            } catch (error) {
+                              setSheetState(() => submitting = false);
+                              if (!sheetContext.mounted) return;
+                              ScaffoldMessenger.of(sheetContext).showSnackBar(
+                                SnackBar(content: Text(_errorMessage(error))),
+                              );
+                            }
+                          },
+                    icon: submitting
+                        ? const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.undo),
+                    label: const Text('Submit Reversal'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    remarks.dispose();
+  }
+
+  String _displayDate(String value) {
+    final date = DateTime.tryParse(value);
+    if (date == null) return value;
+    return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
+  }
+
+  String _errorMessage(Object error) {
+    if (error is MobileApiException && error.message?.trim().isNotEmpty == true) {
+      return error.message!.trim();
+    }
+    return 'Unable to process the leave reversal right now.';
   }
 
   int pageIndex = 0;
@@ -308,7 +475,7 @@ class _ApprovedLeaveRequisitionListState
         itemBuilder: (context, i) {
           return InkWell(
             onTap: () {
-              //Navigator.pushNamed(context, MyRoutings.approveDisapproveLeaveReqRoute);
+              _openLeaveReversal(approvedLeaveReqModal.result!.data![i]);
             },
             child: Card(
               elevation: 2,
@@ -324,18 +491,22 @@ class _ApprovedLeaveRequisitionListState
                             .px8()
                             .py4(),
                         Expanded(
-                          child: Column(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: ["Leave Length".text.make().px4()],
+                            children: [
+                              "Leave Length".text.make().px4(),
+                              const Tooltip(
+                                message: 'Request leave reversal',
+                                child: Icon(Icons.undo, size: 18, color: Colors.blue),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        approvedLeaveReqModal.result!.data![i].applicationDate
-                            .toString()
+                        _displayDate(approvedLeaveReqModal.result!.data![i].applicationDate.toString())
                             .text
                             .textStyle(context.captionStyle)
                             .make()
@@ -371,8 +542,7 @@ class _ApprovedLeaveRequisitionListState
                         Column(
                           children: [
                             "Start Date".text.sm.make(),
-                            approvedLeaveReqModal.result!.data![i].startDate
-                                .toString()
+                            _displayDate(approvedLeaveReqModal.result!.data![i].startDate.toString())
                                 .text
                                 .sm
                                 .make(),
@@ -388,8 +558,7 @@ class _ApprovedLeaveRequisitionListState
                           child: Column(
                             children: [
                               "End Date".text.sm.make(),
-                              approvedLeaveReqModal.result!.data![i].endDate
-                                  .toString()
+                              _displayDate(approvedLeaveReqModal.result!.data![i].endDate.toString())
                                   .text
                                   .sm
                                   .make(),

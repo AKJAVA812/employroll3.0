@@ -205,15 +205,16 @@ class _MssRequisitionApprovalScreenState
               onValueChanged: _changeTab,
             ),
             const SizedBox(height: 12),
-            MssApprovalFilterPanel(
-              total: _summary['total'] ?? 0,
-              pending: _summary['pending'] ?? 0,
-              approved: _summary['approved'] ?? 0,
-              rejected: _summary['rejected'] ?? 0,
-              requestFamilyCode: config.familyCode,
-              allowedRequestTypeCodes: config.requestTypes,
-              onChanged: _filters,
-            ),
+            if (!_loading)
+              MssApprovalFilterPanel(
+                total: _summary['total'] ?? 0,
+                pending: _summary['pending'] ?? 0,
+                approved: _summary['approved'] ?? 0,
+                rejected: _summary['rejected'] ?? 0,
+                requestFamilyCode: config.familyCode,
+                allowedRequestTypeCodes: config.requestTypes,
+                onChanged: _filters,
+              ),
             if (_loading)
               const Padding(
                 padding: EdgeInsets.only(top: 60),
