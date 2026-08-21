@@ -1,7 +1,7 @@
 class ApiDetails {
   //Base Server Address
-  //static var server = "https://ermobile.employroll.com";
-  static var server = "https://fang-sizing-enrage.ngrok-free.dev";
+  static var server = "https://ermobile.employroll.com";
+  //static var server = "https://fang-sizing-enrage.ngrok-free.dev";
   //Attendance Punch in and Punch out
   //static String login="restful/service/login";
 

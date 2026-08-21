@@ -730,7 +730,10 @@ class _LoginPageState extends State<LoginPage> {
                       constraints: BoxConstraints(
                         minHeight: constraints.maxHeight - 40,
                       ),
-                      child: Center(
+                      child: Align(
+                        alignment: _isPasswordStep
+                            ? Alignment.center
+                            : const Alignment(0, -0.45),
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 440),
                           child: Container(
@@ -809,9 +812,9 @@ class _LoginPageState extends State<LoginPage> {
                                             color: Mythemes.black,
                                           ),
                                           hintText:
-                                              'Enter email, mobile or user ID',
+                                              'Enter email or user ID',
                                           labelText:
-                                              'Email, mobile number or user ID',
+                                              'Email or user ID',
                                         ),
                                         onChanged: (value) {
                                           name = value;
@@ -819,7 +822,7 @@ class _LoginPageState extends State<LoginPage> {
                                         },
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
-                                            return 'Email, mobile number, or user ID is required';
+                                            return 'Email,  or user ID is required';
                                           }
                                           return null;
                                         },
