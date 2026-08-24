@@ -5,6 +5,7 @@ import 'package:er_flutter_project/commanScreen/allAPIList.dart';
 import 'package:er_flutter_project/services/mobile_api_foundation.dart';
 import 'package:er_flutter_project/services/mobile_http_client.dart';
 import 'package:er_flutter_project/sharedPrefancePage/ShardPre.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
@@ -163,24 +164,55 @@ class SalarySlipService {
 
     final foundation = MobileApiFoundation.instance;
     final requestId = foundation.newRequestId();
-    final response = await foundation.postJson(
-      ApiDetails.mobileSalarySlips,
-      body: <String, Object?>{
-        'organisationId': organisationId,
-        'employeeDetailsId': employeeDetailsId,
-      },
-      headers: await foundation.authHeaders(requestId: requestId, json: true),
-      tag: 'SALARY_SLIPS',
+    final stopwatch = Stopwatch()..start();
+    debugPrint(
+      '[SALARY-SLIPS][$requestId] POST ${ApiDetails.mobileSalarySlips} '
+      'organisationId=$organisationId employeeDetailsId=$employeeDetailsId',
     );
-    final body = foundation.decodeMap(response.body);
-    if (!foundation.isSuccess(response)) {
-      throw MobileApiException(
-        'SALARY_SLIPS_FAILED',
-        message: body['message']?.toString() ?? 'Unable to load salary slips.',
-        statusCode: response.statusCode,
+    try {
+      final response = await foundation.postJson(
+        ApiDetails.mobileSalarySlips,
+        body: <String, Object?>{
+          'organisationId': organisationId,
+          'employeeDetailsId': employeeDetailsId,
+        },
+        headers: await foundation.authHeaders(requestId: requestId, json: true),
+        tag: 'SALARY_SLIPS',
       );
+      final body = foundation.decodeMap(response.body);
+      final success = foundation.isSuccess(response);
+      debugPrint(
+        '[SALARY-SLIPS][$requestId] response status=${response.statusCode} '
+        'success=$success durationMs=${stopwatch.elapsedMilliseconds} '
+        '${success ? '' : 'body=${_logPreview(response.body)}'}',
+      );
+      if (!success) {
+        throw MobileApiException(
+          'SALARY_SLIPS_FAILED',
+          message:
+              body['message']?.toString() ?? 'Unable to load salary slips.',
+          statusCode: response.statusCode,
+        );
+      }
+      final result = SalarySlipResponse.fromJson(body);
+      debugPrint(
+        '[SALARY-SLIPS][$requestId] parsed slips=${result.slips.length}',
+      );
+      return result;
+    } catch (error) {
+      debugPrint(
+        '[SALARY-SLIPS][$requestId] failed '
+        'durationMs=${stopwatch.elapsedMilliseconds} error=$error',
+      );
+      rethrow;
     }
-    return SalarySlipResponse.fromJson(body);
+  }
+
+  String _logPreview(String body) {
+    final singleLine = body.replaceAll(RegExp(r'[\r\n]+'), ' ').trim();
+    return singleLine.length <= 1000
+        ? singleLine
+        : '${singleLine.substring(0, 1000)}...';
   }
 }
 

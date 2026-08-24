@@ -274,58 +274,62 @@ class _HomePageState extends State<HomePage> {
     String text = "Stop Service";
     showDialog<void>(
       context: buildContext,
-      builder: (BuildContext dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-      ),
-      title: Row(
-        children: [
-          //Icon(Icons.warning),
-          Expanded(child: Text(alert, style: TextStyle(fontSize: 20))),
-        ],
-      ),
-      content: Text(result, style: TextStyle(fontSize: 14)),
-      titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-      actions: [
-        TextButton(
-          onPressed: () async {
-            Navigator.of(dialogContext).pop();
-            await getLogout(context);
-            shared.setSessionId("");
-            shared.setAdminRole(0);
-            shared.setEmpRoll(0);
-            shared.setRoRoll(0);
-            shared.setMobAction(0);
-            final service = FlutterBackgroundService();
-            var isRunning = await service.isRunning();
+      builder:
+          (BuildContext dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            title: Row(
+              children: [
+                //Icon(Icons.warning),
+                Expanded(child: Text(alert, style: TextStyle(fontSize: 20))),
+              ],
+            ),
+            content: Text(result, style: TextStyle(fontSize: 14)),
+            titlePadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+            contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+            buttonPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+                  await getLogout(context);
+                  shared.setSessionId("");
+                  shared.setAdminRole(0);
+                  shared.setEmpRoll(0);
+                  shared.setRoRoll(0);
+                  shared.setMobAction(0);
+                  final service = FlutterBackgroundService();
+                  var isRunning = await service.isRunning();
 
-            if (isRunning) {
-              service.invoke("stopService");
-            }
-            if (!isRunning) {
-              text = 'Stop Service';
-            } else {
-              text = 'Start Service';
-            }
-            if (!mounted) return;
-            setState(() {});
-            Navigator.pushAndRemoveUntil(
-              buildContext,
-              MaterialPageRoute(builder: (context) => LoginPage()),
-              (route) => false,
-            );
+                  if (isRunning) {
+                    service.invoke("stopService");
+                  }
+                  if (!isRunning) {
+                    text = 'Stop Service';
+                  } else {
+                    text = 'Start Service';
+                  }
+                  if (!mounted) return;
+                  setState(() {});
+                  Navigator.pushAndRemoveUntil(
+                    buildContext,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    (route) => false,
+                  );
 
-            //Navigator.of(buildContext, rootNavigator: true).pop();
-          },
-          child: Container(
-            child: Text("Yes", style: TextStyle(color: Mythemes.warningColor)),
+                  //Navigator.of(buildContext, rootNavigator: true).pop();
+                },
+                child: Container(
+                  child: Text(
+                    "Yes",
+                    style: TextStyle(color: Mythemes.warningColor),
+                  ),
+                ),
+              ),
+            ],
+            elevation: 24.0,
           ),
-        ),
-      ],
-      elevation: 24.0,
-      ),
     );
   }
 
@@ -385,11 +389,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   logoutApp(context) {
-    showLogoutPopup(
-      context,
-      "Do You Want To Logout? ",
-      "Alert",
-    );
+    showLogoutPopup(context, "Do You Want To Logout? ", "Alert");
   }
 
   Future getUserNameImage() async {
@@ -428,7 +428,6 @@ class _HomePageState extends State<HomePage> {
     try {
       organisationListModal =
           await MobileMoOrganisationService.loadForActivePanel();
-
 
       return organisationListModal!;
     } catch (e) {
@@ -518,8 +517,14 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          elevation: 3,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          foregroundColor: const Color(0xFF17213A),
+          centerTitle: false,
           title: FittedBox(
             fit: BoxFit.scaleDown,
             child: RichText(
@@ -528,9 +533,9 @@ class _HomePageState extends State<HomePage> {
                   TextSpan(
                     text: '$title - ',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF17213A),
                     ),
                   ),
                   WidgetSpan(
@@ -538,8 +543,8 @@ class _HomePageState extends State<HomePage> {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Mythemes.successColor,
-                        borderRadius: BorderRadius.circular(12),
+                        color: const Color(0xFFE8F7EE),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: ValueListenableBuilder<String>(
                         valueListenable: selectedProfileNameNotifier,
@@ -550,9 +555,9 @@ class _HomePageState extends State<HomePage> {
                           return Text(
                             displayText,
                             style: TextStyle(
-                              color: Mythemes.whitish,
+                              color: const Color(0xFF179447),
                               fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w700,
                             ),
                           );
                         },
@@ -571,7 +576,12 @@ class _HomePageState extends State<HomePage> {
                 onPressed: MobileMssDashboardService.requestManualRefresh,
               ),
             IconButton(
-              icon: Icon(Icons.power_settings_new_outlined),
+              tooltip: 'Logout',
+              icon: const Icon(
+                Icons.power_settings_new_rounded,
+                size: 23,
+                color: Color(0xFF151A24),
+              ),
               onPressed: () {
                 logoutApp(context);
               },
@@ -584,98 +594,121 @@ class _HomePageState extends State<HomePage> {
                 : (_essPermissionState != null &&
                     !_essPermissionState!.hasAnyMobileAccess)
                 ? screens[0]
-                : screens[currentIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: activeIndex,
-          iconSize: 25,
-          selectedFontSize: 12,
-          unselectedFontSize: 10,
-          onTap: (index) async {
-            if (isManagerPanel) {
-              final titles = ['Home', 'Team', 'Requests', 'People'];
-              setState(() {
-                currentIndex = index;
-                title = titles[index];
-              });
-              return;
-            }
-            if (!await _canOpenEssTab(index)) return;
-            String newTitle = "";
+                : Container(
+                  color: Colors.white,
+                  child: screens[currentIndex],
+                ),
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Color(0x120D1B3E),
+                blurRadius: 18,
+                offset: Offset(0, -4),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            top: false,
+            child: BottomNavigationBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              type: BottomNavigationBarType.fixed,
+              currentIndex: activeIndex,
+              selectedItemColor: const Color(0xFF3666E8),
+              unselectedItemColor: const Color(0xFF9BA6BA),
+              iconSize: 24,
+              selectedFontSize: 11,
+              unselectedFontSize: 10,
+              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+              onTap: (index) async {
+                if (isManagerPanel) {
+                  final titles = ['Home', 'Team', 'Requests', 'People'];
+                  setState(() {
+                    currentIndex = index;
+                    title = titles[index];
+                  });
+                  return;
+                }
+                if (!await _canOpenEssTab(index)) return;
+                String newTitle = "";
 
-            // Adjust index mapping if Profile is hidden
-            int adjustedIndex = index;
-            if (userType == 'COMPANY_ADMIN' && index >= 4) {
-              adjustedIndex += 1;
-            }
+                // Adjust index mapping if Profile is hidden
+                int adjustedIndex = index;
+                if (userType == 'COMPANY_ADMIN' && index >= 4) {
+                  adjustedIndex += 1;
+                }
 
-            switch (adjustedIndex) {
-              case 0:
-                newTitle = "Home";
-                break;
-              case 1:
-                newTitle = "Workflow";
-                break;
-              case 2:
-                newTitle = "My Requests";
-                break;
-              case 3:
-                newTitle = "My Reports";
-                break;
-              case 4:
-                newTitle = "My Dashboard";
-                screens[4] = Dashboard(key: UniqueKey());
-                break;
-            }
+                switch (adjustedIndex) {
+                  case 0:
+                    newTitle = "Home";
+                    break;
+                  case 1:
+                    newTitle = "Workflow";
+                    break;
+                  case 2:
+                    newTitle = "My Requests";
+                    break;
+                  case 3:
+                    newTitle = "My Reports";
+                    break;
+                  case 4:
+                    newTitle = "My Dashboard";
+                    screens[4] = Dashboard(key: UniqueKey());
+                    break;
+                }
 
-            setState(() {
-              currentIndex = index;
-              title = newTitle;
-            });
-          },
-          items:
-              isManagerPanel
-                  ? const [
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
-                      label: 'Home',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.dashboard_customize),
-                      label: 'Team',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.pending_actions),
-                      label: 'Requests',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.people_alt),
-                      label: 'People',
-                    ),
-                  ]
-                  : [
-                    const BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
-                      label: 'Home',
-                    ),
-                    const BottomNavigationBarItem(
-                      icon: Icon(Icons.manage_accounts_outlined),
-                      label: 'Workflow',
-                    ),
-                    const BottomNavigationBarItem(
-                      icon: Icon(CupertinoIcons.app_badge_fill),
-                      label: 'My Requests',
-                    ),
-                    const BottomNavigationBarItem(
-                      icon: Icon(CupertinoIcons.doc_chart),
-                      label: 'My Reports',
-                    ),
-                    if (userType != 'COMPANY_ADMIN')
-                      const BottomNavigationBarItem(
-                        icon: Icon(Icons.dashboard),
-                        label: 'Dashboard',
-                      ),
-                  ],
+                setState(() {
+                  currentIndex = index;
+                  title = newTitle;
+                });
+              },
+              items:
+                  isManagerPanel
+                      ? const [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.home),
+                          label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.dashboard_customize),
+                          label: 'Team',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.pending_actions),
+                          label: 'Requests',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.people_alt),
+                          label: 'People',
+                        ),
+                      ]
+                      : [
+                        const BottomNavigationBarItem(
+                          icon: Icon(Icons.home),
+                          label: 'Home',
+                        ),
+                        const BottomNavigationBarItem(
+                          icon: Icon(Icons.manage_accounts_outlined),
+                          label: 'Workflow',
+                        ),
+                        const BottomNavigationBarItem(
+                          icon: Icon(CupertinoIcons.app_badge_fill),
+                          label: 'My Requests',
+                        ),
+                        const BottomNavigationBarItem(
+                          icon: Icon(CupertinoIcons.doc_chart),
+                          label: 'My Reports',
+                        ),
+                        if (userType != 'COMPANY_ADMIN')
+                          const BottomNavigationBarItem(
+                            icon: Icon(Icons.dashboard),
+                            label: 'Dashboard',
+                          ),
+                      ],
+            ),
+          ),
         ),
         drawer: DrawerFile(),
       ),
@@ -906,7 +939,6 @@ class _DefaultPageState extends State<DefaultPage> {
           CameraUpdate.newLatLng(LatLng(pos.latitude, pos.longitude)),
         );
       }
-
     });
   }
 
@@ -1322,7 +1354,11 @@ class _DefaultPageState extends State<DefaultPage> {
     var nameAdd = placemarkee.name;
     setState(() {
       currentAddressNew =
-          '$street ' '$nameAdd ' '$sublocality ' '$locality ' '$administrativeArea ' +
+          '$street '
+              '$nameAdd '
+              '$sublocality '
+              '$locality '
+              '$administrativeArea ' +
           '$contryName ' +
           '$postalCode ';
     });
@@ -1382,7 +1418,6 @@ class _DefaultPageState extends State<DefaultPage> {
       }
       if (roRole == 0) {
         showRo = false;
-
       }
       if (roRole == 1) {
         showRo = true;
@@ -1502,16 +1537,20 @@ class _DefaultPageState extends State<DefaultPage> {
                 ),
           ),
         );
-      } catch (e) {
-      }
+      } catch (e) {}
     }
 
     return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 24),
       child: Column(
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.4,
+            height: MediaQuery.of(context).size.height * 0.33,
             child: Card(
+              margin: EdgeInsets.zero,
+              elevation: 0,
+              clipBehavior: Clip.antiAlias,
+              shape: const RoundedRectangleBorder(),
               child:
                   currentPostion == null
                       ? Center(child: CircularProgressIndicator())
@@ -1533,91 +1572,127 @@ class _DefaultPageState extends State<DefaultPage> {
                       ),
             ),
           ),
-          //Container(height: 10),
+          const SizedBox(height: 12),
           // User info card
           Card(
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            elevation: 0,
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
             child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 4,
+              ),
               //title: Text({_loginModel.data?.userLoginned?.name}==null ?' ': " Name "),
-              title: ("$UserName($employeeCode)").text.make(),
-              subtitle: Text(currentAddressNew),
+              title: Text(
+                "$UserName ($employeeCode)",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color(0xFF17213A),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: Text(
+                  currentAddressNew,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF748097),
+                    fontSize: 12,
+                    height: 1.25,
+                  ),
+                ),
+              ),
               leading: SizedBox(
-                width: 45,
-                height: 45,
+                width: 46,
+                height: 46,
                 child:
                     imageStringNew == null
                         ? Center(child: CircularProgressIndicator())
                         : CircleAvatar(
-                          radius: 30,
+                          radius: 23,
                           backgroundImage: profileImageProvider(imageStringNew),
-                          backgroundColor: Colors.grey,
+                          backgroundColor: const Color(0xFFE9EDF5),
                           // child: Image.network(imageStringNew!),
                         ),
+              ),
+              trailing: Container(
+                width: 28,
+                height: 28,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEEF3FF),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.refresh_rounded,
+                  size: 16,
+                  color: Color(0xFF3666E8),
+                ),
               ),
             ),
           ),
 
           /* Container(
               height: 10),*/
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Card(
-                  elevation: 3,
-                  margin: EdgeInsets.all(8),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text("Today Date"),
-                      ),
-                      Container(height: 10),
-                      //Padding(padding: EdgeInsets.all(0)),
-                      Container(
-                        padding: EdgeInsets.all(15),
-                        child: Text(
-                          todayDateShowNew,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    ],
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: _HomeInfoCard(
+                    icon: Icons.calendar_today_rounded,
+                    label: "DATE",
+                    value: todayDateShowNew,
+                    color: Color(0xFF2463D4),
+                    backgroundColor: Color(0xFFEDF3FF),
+                    borderColor: Color(0xFFBFD1F7),
                   ),
                 ),
-              ),
-              Expanded(
-                child: Card(
-                  elevation: 3,
-                  margin: EdgeInsets.all(8),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Text("Today Time"),
-                      ),
-                      Container(height: 12, color: Mythemes.whiteShadeSeventy),
-                      //Padding(padding: EdgeInsets.all(0)),
-                      Container(
-                        padding: EdgeInsets.all(15),
-                        child: Text(
-                          timeStringNew,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    ],
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _HomeInfoCard(
+                    icon: Icons.schedule_rounded,
+                    label: "TIME",
+                    value: timeStringNew,
+                    color: Color(0xFFE58B1A),
+                    backgroundColor: Color(0xFFFFF8E8),
+                    borderColor: Color(0xFFF1DEB5),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           mobAction == 0
               ? SizedBox(height: 0)
               : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 7),
                 child: Column(
                   children: [
+                    const SizedBox(height: 18),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'ATTENDANCE',
+                        style: TextStyle(
+                          color: Color(0xFF8D929B),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1626,14 +1701,20 @@ class _DefaultPageState extends State<DefaultPage> {
                         //punch in
                         Expanded(
                           child: Card(
-                            color: Colors.transparent,
+                            color: const Color(0xFFF0FBF4),
                             elevation: 0,
-                            margin: EdgeInsets.all(5),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            clipBehavior: Clip.antiAlias,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              side: const BorderSide(color: Color(0xFFB9E4C8)),
+                            ),
                             child: InkWell(
                               onTap: () async {
                                 final locationAllowed =
-                                    await LocationPermissionRequest
-                                        .requestLocationPermission(context);
+                                    await LocationPermissionRequest.requestLocationPermission(
+                                      context,
+                                    );
                                 if (!locationAllowed || !mounted) return;
                                 if (positionStream == null) {
                                   _startLocationTracking();
@@ -1840,8 +1921,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                                   ),
                                             ),
                                           );
-                                        } on Exception catch (e) {
-                                        }
+                                        } on Exception catch (e) {}
                                       }
                                     }
                                   }
@@ -1896,8 +1976,7 @@ class _DefaultPageState extends State<DefaultPage> {
                                               ),
                                         ),
                                       );
-                                    } on Exception catch (e) {
-                                    }
+                                    } on Exception catch (e) {}
                                   }
 
                                   /*   if(_autoTimezone == "1") {
@@ -1918,30 +1997,11 @@ class _DefaultPageState extends State<DefaultPage> {
                                               .requestPermission();*/ /*
                               punchInnew(sessionId);*/
                               },
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 10),
-                                    child: CircleAvatar(
-                                      backgroundColor: Mythemes.successColor,
-                                      radius: 30,
-                                      child: Icon(
-                                        Icons.touch_app,
-                                        size: 30,
-                                        color: Mythemes.creamColor,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(height: 5),
-                                  Container(
-                                    padding: EdgeInsets.all(8),
-                                    //margin: EdgeInsets.all(5),
-                                    child: Text(
-                                      "Punch In",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                ],
+                              child: const _HomeActionContent(
+                                icon: Icons.login_rounded,
+                                label: "Punch In",
+                                color: Color(0xFF27A85A),
+                                caption: "Mark attendance",
                               ),
                             ),
                           ),
@@ -1949,14 +2009,20 @@ class _DefaultPageState extends State<DefaultPage> {
                         //work done
                         Expanded(
                           child: Card(
-                            color: Colors.transparent,
+                            color: const Color(0xFFEEF3FF),
                             elevation: 0,
-                            margin: EdgeInsets.all(5),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            clipBehavior: Clip.antiAlias,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              side: const BorderSide(color: Color(0xFFB9CDF8)),
+                            ),
                             child: InkWell(
                               onTap: () async {
                                 final locationAllowed =
-                                    await LocationPermissionRequest
-                                        .requestLocationPermission(context);
+                                    await LocationPermissionRequest.requestLocationPermission(
+                                      context,
+                                    );
                                 if (!locationAllowed || !mounted) return;
                                 if (positionStream == null) {
                                   _startLocationTracking();
@@ -2024,31 +2090,11 @@ class _DefaultPageState extends State<DefaultPage> {
                                   getImageForWorkdone();
                                 }
                               },
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: CircleAvatar(
-                                      backgroundColor:
-                                          Mythemes.lightBluishColor,
-                                      radius: 30,
-                                      child: Icon(
-                                        Icons.work_history,
-                                        size: 30,
-                                        color: Mythemes.creamColor,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(height: 5),
-                                  Padding(padding: EdgeInsets.all(0)),
-                                  Container(
-                                    padding: EdgeInsets.all(8),
-                                    child: Text(
-                                      "Work Done",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                ],
+                              child: const _HomeActionContent(
+                                icon: Icons.task_alt_rounded,
+                                label: "Work Done",
+                                color: Color(0xFF3666E8),
+                                caption: "Upload report",
                               ),
                             ),
                           ),
@@ -2056,14 +2102,20 @@ class _DefaultPageState extends State<DefaultPage> {
                         //punch out
                         Expanded(
                           child: Card(
-                            color: Colors.transparent,
+                            color: const Color(0xFFFFF1F2),
                             elevation: 0,
-                            margin: EdgeInsets.all(5),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            clipBehavior: Clip.antiAlias,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              side: const BorderSide(color: Color(0xFFF0C1C6)),
+                            ),
                             child: InkWell(
                               onTap: () async {
                                 final locationAllowed =
-                                    await LocationPermissionRequest
-                                        .requestLocationPermission(context);
+                                    await LocationPermissionRequest.requestLocationPermission(
+                                      context,
+                                    );
                                 if (!locationAllowed || !mounted) return;
                                 if (positionStream == null) {
                                   _startLocationTracking();
@@ -2159,30 +2211,11 @@ class _DefaultPageState extends State<DefaultPage> {
                                   }
                                 }
                               },
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 10),
-                                    child: CircleAvatar(
-                                      backgroundColor: Mythemes.dangerColorOne,
-                                      radius: 30,
-                                      child: Icon(
-                                        Icons.touch_app,
-                                        size: 30,
-                                        color: Mythemes.creamColor,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(height: 5),
-                                  Padding(padding: EdgeInsets.all(0)),
-                                  Container(
-                                    padding: EdgeInsets.all(8),
-                                    child: Text(
-                                      "Punch Out",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                ],
+                              child: const _HomeActionContent(
+                                icon: Icons.logout_rounded,
+                                label: "Punch Out",
+                                color: Color(0xFFE44C5C),
+                                caption: "End shift",
                               ),
                             ),
                           ),
@@ -2375,7 +2408,6 @@ class _DefaultPageState extends State<DefaultPage> {
     String resultSuccess = result['result'];
     String reasonSuccess = result['reason'];
 
-
     // âœ… Always pop loader safely
     if (rootContext.mounted) {
       Navigator.of(rootContext, rootNavigator: true).pop();
@@ -2562,6 +2594,139 @@ class _DefaultPageState extends State<DefaultPage> {
   }
 }
 
+class _HomeInfoCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  final Color backgroundColor;
+  final Color borderColor;
+
+  const _HomeInfoCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+    required this.backgroundColor,
+    required this.borderColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.10),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 17, color: color),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      color: Color(0xFF17213A),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeActionContent extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final String caption;
+
+  const _HomeActionContent({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.caption,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 5),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            child: Icon(icon, size: 27, color: Colors.white),
+          ),
+          const SizedBox(height: 10),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              maxLines: 1,
+              style: TextStyle(
+                color: color,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(height: 3),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              caption,
+              maxLines: 1,
+              style: const TextStyle(
+                color: Color(0xFF8992A3),
+                fontSize: 8,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class Workflow extends StatelessWidget {
   const Workflow({super.key});
 
@@ -2709,8 +2874,7 @@ class _DrawerFileState extends State<DrawerFile> {
       profileListGetter.clear();
       profileListGetter.addAll(profileListModal?.data ?? []);
 
-      for (int i = 0; i < profileListGetter.length; i++) {
-      }
+      for (int i = 0; i < profileListGetter.length; i++) {}
 
       if (profileListGetter.isNotEmpty) {
         if (activePanel == MobilePanel.ess) {
@@ -2754,7 +2918,6 @@ class _DrawerFileState extends State<DrawerFile> {
     odReqCount = prefs.getInt("odReqCount") ?? 0;
     tourReqCount = prefs.getInt("tourReqCount") ?? 0;
     attReqCount = prefs.getInt("attReqCount") ?? 0;
-
   }
 
   Future<void> getRequisitionCounts(String sessionId) async {
@@ -2772,7 +2935,6 @@ class _DrawerFileState extends State<DrawerFile> {
       );
 
       final response = await MobileHttpClient.instance.post(urlapi);
-
 
       Map<String, dynamic> mapResponse = json.decode(response.body);
 
@@ -2818,7 +2980,6 @@ class _DrawerFileState extends State<DrawerFile> {
       await prefs.setInt("odReqCount", odReqCount);
       await prefs.setInt("tourReqCount", tourReqCount);
       await prefs.setInt("attReqCount", attReqCount);
-
     } catch (e) {
     } finally {
       setState(() {
@@ -2850,7 +3011,6 @@ class _DrawerFileState extends State<DrawerFile> {
       }
       if (roRole == 0) {
         showRo = false;
-
       }
       if (roRole == 1) {
         showRo = true;
